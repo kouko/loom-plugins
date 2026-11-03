@@ -46,6 +46,11 @@ charter: 1.1
 - Test: A1 positive: faithful-scope; negative: new-guarantee. A2 positive: adaptable-outline; negative: copied-procedure-headings. A3 positive: brief-known-facts; boundary: missing-fact-interview. A4 positive: same-yes-consequences; negative: implementation-approval.
 - Risk: agent-decided — iteration1 fixes content fidelity but still serializes bookkeeping. Separate private preparation/post-reply records from the user-message instructions; unresolved required facts stay in the existing interview. Preserve all conditional disclosures, one stop, prior coverage and the five-iteration allowance.
 
+**W1-01 authorized iteration 3 — load examples at the producer and restore routing anchors** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-code/skills/write-plan/`, `loom-design/skills/capture-intent/SKILL.md`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: pre-draft-loaded-guidance; negative: stronger-outcome. A2 positive: local-direct-reference; negative: output-inventory. A3 positive: brief-known-facts; boundary: missing-fact-only. A4 positive: no-spec-consent-route; negative: lost-routing-anchor.
+- Risk: agent-decided — directly load code-only examples before intake drafting and existing-intent confirmation; preserve the missing-fact phase boundary. Separately restore both owners' original policy numbering consumed by consent tests. No new rules, weakened tests, output schema or publication changes.
+
 ## Simplicity check
 - none found
 
