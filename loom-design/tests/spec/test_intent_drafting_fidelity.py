@@ -14,6 +14,7 @@ RULES = (
     ("Preserve", "supplied facts", "outcome strength", "qualifiers"),
     ("Leave", "unknown facts unresolved", "user answers", "evidence"),
     ("Keep", "own-rule isolation separate from", "same-worker", "same-result guarantees"),
+    ("Keep", "missing required facts", "existing interview", "needed fact and why"),
 )
 EXAMPLE_RULES = (
     ("Use", "outline as content connections", "optional", "grouping", "length"),
@@ -52,9 +53,29 @@ def test_local_confirmation_examples_are_portable_and_identical() -> None:
     assert "loom-design/" not in text and "loom-code/" not in text
     for rule in EXAMPLE_RULES:
         assert affirms(" ".join(text.split()), *rule), rule
-    for case in ("Unknown date", "Multiple problems", "Repairing shorthand", "Interface boundary"):
+    for case in ("Unknown date", "Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
         example = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
         assert "Good:" in example and "Bad:" in example
+    pending = text.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
+    good_interview = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
+    assert "pull request" not in good_interview and "Saying yes" not in good_interview
+
+
+@pytest.mark.parametrize("path", [
+    "loom-design/skills/capture-intent/SKILL.md",
+    "loom-code/skills/write-plan/references/confirm-intent.md",
+])
+def test_user_composer_is_separate_from_private_work(path: str) -> None:
+    text = (REPO / path).read_text(encoding="utf-8")
+    preparation = text.index("### Private preparation")
+    composer = text.index("### User message")
+    records = text.index("### Private records and reply handling")
+    assert preparation < composer < records
+    message = text[composer:records]
+    assert "Compose **one message**" in message and "Restate Problem and Acceptance" in message
+    assert "uploading the change branch" in message and "separate merge decision" in message
+    assert "**Write down every question" not in message and "`decision_point" not in message
+    assert "**The complexity check" not in message and "`second-vendor:" not in message
 
 
 @pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, *EXAMPLE_RULES))

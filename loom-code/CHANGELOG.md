@@ -3,7 +3,7 @@
 ## [3.58.0] — 2026-11-03 — preserve context in intent confirmation
 
 - Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. Limit workflow detail throughout intake while preserving concrete publication and authorization consequences. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
-- Load the local adaptable outline and complete contrasting examples before intake drafting or replies, with parity coverage against the design entry's portable copy. Keep workflow procedures out of the message's section structure while preserving applicable consequences, existing authorization and confirmation boundaries.
+- Load the local adaptable outline and complete contrasting examples before intake drafting or replies, with parity coverage against the design entry's portable copy. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. Preserve applicable consequences, same-yes publication authorization and confirmation boundaries without dumping procedure or intent-schema inventories.
 
 ## [3.57.0] — 2026-11-03 — preserve fallback feedback and bounded continuation
 

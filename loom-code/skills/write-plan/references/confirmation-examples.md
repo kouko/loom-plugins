@@ -28,6 +28,13 @@ narration of skipped checks. Retain material consequences, required disclosures
 and unresolved user decisions, expressed through their effects. Never ask the
 user to approve implementation or review quality.
 
+Choose the existing phase before composing a reply. Missing required facts
+belong to the interview: ask for the needed fact and explain its relevance.
+Once ready, privately prepare applicable disclosures, then compose the connected
+outcome confirmation. Private records and after-answer actions stay outside that
+message. Show the user the outcome and applicable consequences, not the intent
+document's schema or a report of the station's work.
+
 Disclose in the same yes the automatic publication consequence, the opt-out
 before publication and the separate merge decision, in concrete language.
 That yes authorizes a later non-forced branch upload and a pull request ready
@@ -48,10 +55,7 @@ should change, and the correct release date is unknown.
 Good:
 > The old date makes the latest release look outdated. I need the actual release
 > date or a release record before correcting that date alone. What evidence or
-> date can you provide? When the scope is ready to confirm, that same yes also
-> authorizes uploading the branch without forcing it and opening a pull request
-> for review after checks pass; you may opt out before publication, and merging
-> remains a separate decision.
+> date can you provide?
 
 Bad:
 > I created an open engineering intent with needs-design: no. Confirm today's
@@ -60,7 +64,28 @@ Bad:
 
 The bad reply invents a date, serializes bookkeeping and adds a publication
 choice and implementation judgment. The good reply asks only for a missing fact;
-it does not claim the draft or date is confirmed.
+it is an interview, not a confirmation. The normal same-yes publication disclosure
+belongs in the eventual confirmation after the required fact is established.
+
+## Known correction
+
+Context: release notes show an old date and make the latest release look outdated.
+The user supplies the verified release date, 2 November; only that date may change.
+
+Good:
+> The release notes make the latest release look outdated. I will correct only
+> the displayed date to the verified 2 November, leaving the rest unchanged.
+> Saying yes confirms this scope and authorizes a non-forced branch upload and
+> pull request for review after checks pass; you may opt out before publication,
+> and merging remains separate. Is that the correction you want?
+
+Bad:
+> The intent is open and engineering with no design needed. Standing-document
+> checks passed. The current branch has no commits, and both handoff lists are
+> empty. Next I will commit the intent, plan and implement. Confirm these stages?
+
+The good reply is a complete confirmation because the required facts are known.
+The bad reply substitutes a private work inventory for the understandable result.
 
 ## Multiple problems
 

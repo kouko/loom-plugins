@@ -71,6 +71,9 @@ qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
 Lead with the user's problem or missing fact, minimizing workflow labels and
 bookkeeping throughout intake; retain consequence/authorization disclosures.
+Keep missing required facts in the existing interview, asking only for the
+needed fact and why it matters. Compose confirmation only when required facts
+are resolved.
 Draft directly when already sufficient. No intake question quota applies.
 Problems/outcomes are valid before choosing features or implementation.
 Existing decision points remain unchanged.
@@ -182,26 +185,12 @@ intent in step 4.
 
 ## Step 4 — Decision point ①: restate and confirm
 
-Compose **one message**. Everything below goes into it; you do not stop
-twice, and this is the only stop this station makes.
-Treat the items as procedures, not output sections: omit inapplicable items and
-internal bookkeeping; retain material consequences and required disclosures.
+### Private preparation
 
-1. Restate Problem and Acceptance: subject, problem,
-   impact, outcome and confirmation scope. Use the user's plain words, never paths,
-   identifiers or mechanism names. Supply necessary context for unfamiliar
-   terms and affected people at intent altitude. Choose wording, length and
-   presentation freely, keeping familiar requests short. Examples, scripts and
-   headings are optional. Check these connections and what yes confirms and
-   authorizes; outcomes only, never implementation approval.
+Prepare applicable consequences and questions privately; only their user-relevant
+content enters the message.
 
-   Explain yes authorizes uploading the change branch (non-forced push)
-   and opening a pull request ready for review after review/publication
-   checks pass, with a separate merge decision. Disclose automatic publication
-   and offer opt-out before answering. Record `publication: automatic — authorized <date> by <name>`
-   after informed yes only; otherwise omit.
-
-2. **The engineering one-way doors found so far**, in consequence form. A
+1. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
    decision point ② of the station writing its spec — `write-spec`, or
    `loom-code:write-plan` when it writes the spec — when a spec will be
@@ -235,7 +224,7 @@ internal bookkeeping; retain material consequences and required disclosures.
    state the irreversible consequence and safeguard (for example, what is
    rewritten, what stops reading it, and where the backup is kept).
 
-3. **The cross-model review question, only for `second-vendor: ask` without
+2. **The cross-model review question, only for `second-vendor: ask` without
    a qualifying direct user request.** Read `references/second-vendor.md` for
    mode routing. A missing line is `second-vendor: suggest` and adds no question.
    When defaults carry `second-vendor: ask`, use the reference's host-aware
@@ -244,10 +233,10 @@ internal bookkeeping; retain material consequences and required disclosures.
    authorization; disclose cost, egress and local execution before dispatch.
    A fixed CLI adds no question.
 
-4. **The principles confirmation**, if step 3 ran the interview — restated
+3. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
 
-5. **The carried details, `kind: engineering` only.**
+4. **The carried details, `kind: engineering` only.**
    Show them as a table, one row per detail in the user's language,
    confirmed by the same yes; no extra stop. With an empty list, no table appears. Every product change
    shows them at decision point ② of the station that writes its spec —
@@ -255,7 +244,7 @@ internal bookkeeping; retain material consequences and required disclosures.
    change that skips design. A product change's carried details never appear
    in this message.
 
-6. **The complexity check, when the scope adds cost.** When the user's
+5. **The complexity check, when the scope adds cost.** When the user's
    request or an option under discussion would add a mechanism, field, rule
    or step, run `loom-workflow:critique` in complexity mode before you
    compose this message. Carry only its verdict and its smaller alternative
@@ -274,14 +263,34 @@ at `ship`), or state one-way-door consequences. Decide implementation choices
 from repo evidence and record the reason; asking the user is a
 `user-judgment-leak` review failure.
 
-**Write down every question you asked**, as `{decision_point, text, type}`
-with `type` one of `what` / `behaviour` / `done` / `consequence`. The
-intent file has no section for this list, and inventing one would put a
-second schema next to the contract's. The canonical carrier is the plan's
-`## Questions asked` section. So **you pass the list forward in your hand-off
-message in step 5, verbatim**, and say that the receiving station must write
-it into that section. A question asked and not recorded makes the flow look
-quieter than it is.
+### User message
+
+Compose **one message**. Everything below goes into it; you do not stop
+twice, and this is the only stop this station makes.
+Include applicable consequences and questions prepared above; omit private
+records and intent-document inventory.
+
+Restate Problem and Acceptance: subject, problem, impact, outcome and
+confirmation scope. Use the user's plain words, never paths, identifiers or
+mechanism names. Supply necessary context for unfamiliar terms and affected
+people at intent altitude. Choose wording, length and presentation freely,
+keeping familiar requests short. Examples, scripts and headings are optional.
+Check these connections and what yes confirms and authorizes; outcomes only,
+never implementation approval.
+
+Explain yes authorizes uploading the change branch (non-forced push) and opening
+a pull request ready for review after review/publication checks pass, with a
+separate merge decision. Disclose automatic publication and offer opt-out before
+answering.
+
+### Private records and reply handling
+
+**Write down every question you asked** as `{decision_point, text, type}` with
+`type` one of `what` / `behaviour` / `done` / `consequence`. Pass the list verbatim
+in step 5's hand-off for the receiving station to write into the plan's
+`## Questions asked`; never invent an intent section for it.
+Record `publication: automatic — authorized <date> by <name>` after informed yes
+only; otherwise omit.
 
 **Keep a carried-details list** beside the question list: flow or reaction
 details the user stated or explicitly agreed to, before or during intake.

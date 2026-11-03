@@ -16,6 +16,9 @@ qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
 Lead with the user's problem or missing fact, minimizing workflow labels and
 bookkeeping throughout intake; retain consequence/authorization disclosures.
+Keep missing required facts in the existing interview, asking only for the
+needed fact and why it matters. Compose confirmation only when required facts
+are resolved.
 Problem holds present pain, who it affects, and the consequence, with no
 diagnosis or fix; Proposed outcome holds the wanted capability;
 Acceptance holds each observable delivery outcome, not value, complete
@@ -48,27 +51,12 @@ numbered list, diagrams stay at intent altitude (no UI reactions or state
 transitions), a product Problem holds no identifiers (Mermaid node ids
 included), and chat shows text tables or text diagrams, not Mermaid.
 
-Compose **one message**. Everything below goes in it; you do not stop
-twice.
-Treat the items as procedures, not output sections: omit inapplicable items and
-internal bookkeeping; retain material consequences and required disclosures.
+### Private preparation
 
-1. **The restatement.** Restate Problem and Acceptance: subject, problem,
-   impact, outcome and confirmation scope. Use the user's plain words, never paths,
-   identifiers or mechanism names. Supply necessary context for unfamiliar
-   terms and affected people at intent altitude. Choose wording, length and
-   presentation freely, keeping familiar requests short. Examples, scripts and
-   headings are optional. Check these connections and what yes confirms and
-   authorizes; ask about outcomes, never implementation approval.
+Prepare applicable consequences and questions privately; only their user-relevant
+content enters the message.
 
-   Explain that yes authorizes uploading the change branch (non-forced push)
-   and opening a pull request ready for review after review and publication
-   checks pass, with a separate merge decision. Publication defaults to
-   automatic; explicitly offer opt-out before publication. Disclose before
-   the answer. Record `publication: automatic — authorized <date> by <name>`
-   only after informed yes; opt-out leaves it absent.
-
-2. **The engineering one-way doors found so far**, in consequence form, per
+1. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is
    needed. Check existing decisions and evidence first: ask for the unresolved
    outcome preference only when alternatives materially change what the user
@@ -86,7 +74,7 @@ internal bookkeeping; retain material consequences and required disclosures.
    form inside this same message ("this will rewrite your ___, I am doing it
    the way you said: ___").
 
-3. **The cross-model review question, only for `second-vendor: ask` without
+2. **The cross-model review question, only for `second-vendor: ask` without
    a qualifying direct user request.** Load
    `second-vendor-ask-and-docs-lint.md` before composing this
    message. A missing line is initialized as `second-vendor: suggest`; it
@@ -104,9 +92,9 @@ internal bookkeeping; retain material consequences and required disclosures.
    on another yes/no answer; an ambiguous choice or expanded material scope
    still needs the missing choice.
 
-4. **The principles interview**, if step 2 demanded it.
+3. **The principles interview**, if step 2 demanded it.
 
-5. **The carried details, `kind: engineering` only.** Show them as a table,
+4. **The carried details, `kind: engineering` only.** Show them as a table,
    one row per detail in the user's language, confirmed by the same yes; no
    extra stop. With an empty list, no table appears. A product change shows
    them at decision point ② of the station writing its spec — `write-spec`,
@@ -130,6 +118,31 @@ reason as `agent-decided`.
 The closing-review station has a dimension for exactly this, `user-judgment-leak`,
 and it returns NEEDS_REVISION when it finds one. Ask nothing about spec
 quality, task splitting, or review verdicts.
+
+### User message
+
+Compose **one message**. Everything below goes in it; you do not stop
+twice.
+Include applicable consequences and questions prepared above; omit private
+records and intent-document inventory.
+
+Restate Problem and Acceptance: subject, problem, impact, outcome and
+confirmation scope. Use the user's plain words, never paths, identifiers or
+mechanism names. Supply necessary context for unfamiliar terms and affected
+people at intent altitude. Choose wording, length and presentation freely,
+keeping familiar requests short. Examples, scripts and headings are optional.
+Check these connections and what yes confirms and authorizes; ask about outcomes,
+never implementation approval.
+
+Explain that yes authorizes uploading the change branch (non-forced push) and
+opening a pull request ready for review after review and publication checks
+pass, with a separate merge decision. Publication defaults to automatic;
+explicitly offer opt-out before publication. Disclose before the answer.
+
+### Private records and reply handling
+
+Record `publication: automatic — authorized <date> by <name>` only after informed
+yes; opt-out leaves it absent.
 
 **Write down every question you asked.** Keep a running list from this
 point — every question put to the user at ①, and at ② if you run it here —
