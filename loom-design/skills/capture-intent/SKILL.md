@@ -184,18 +184,18 @@ twice, and this is the only stop this station makes.
    identifiers or mechanism names. Supply necessary context for unfamiliar
    terms and affected people at intent altitude. Choose wording, length and
    presentation freely, keeping familiar requests short. Examples, scripts and
-   headings are optional. Check these connections and what yes
-   confirms and authorizes; ask about outcomes, never
-   implementation approval.
+   headings are optional. Preserve supplied facts and outcome strength. Leave
+   unknown facts unresolved until user answers or evidence establish them. Lead with the user's
+   problem or missing fact, limiting workflow labels and bookkeeping to necessary
+   consequences. Check these connections and what yes confirms and
+   authorizes; ask about outcomes, never implementation approval.
 
-   For the current contract, automatic publication is the default. This same
-   restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after `closing-review` and publication checks pass, while merge
-   remains a separate decision. Say that the user may explicitly opt out before
-   publication. Do not hide that consequence in mechanism language or add it
-   after the user has answered. Write
-   `publication: automatic — authorized <date> by <name>` only after that
-   informed yes; an opt-out leaves the field absent.
+   Explain that yes authorizes uploading the change branch (non-forced push)
+   and opening a pull request ready for review after review and publication
+   checks pass, with a separate merge decision. Publication defaults to
+   automatic; explicitly offer opt-out before publication. Disclose before
+   the answer. Record `publication: automatic — authorized <date> by <name>`
+   only after informed yes; opt-out leaves it absent.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -299,8 +299,8 @@ detail. This self-check creates no fields, IDs, requirements, scenarios, or
 product behaviour.
 
 Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, or Out of scope. Keep publication authorisation in the
-intent's `publication:` frontmatter line. The sole Constraints exception is
+outcome, Acceptance, or Out of scope. Use `publication:` for publication consent.
+The sole Constraints exception is
 `- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
 skipped. It records the selected family; a direct request's verbatim quote,
 target and final `selected_executor` belong in JSON `authorization_source`
@@ -327,9 +327,8 @@ the intent and restate again; there is no limit on rounds here.
 **On "yes":**
 
 1. Write `status: confirmed <date>` into the intent. When the confirmed
-   restatement explicitly authorizes automatic publication, also write
-   `publication: automatic — authorized <date> by <name>`; never derive it
-   from status or prose. When step 3 ran, write
+   restatement explicitly authorizes automatic publication, record it as above;
+   never derive it from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
    After all confirmed intent frontmatter, including `publication:`, is written,
    replace the template's `intent_confirmed_sha: <sha7>` with

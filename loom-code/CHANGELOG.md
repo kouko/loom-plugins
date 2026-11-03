@@ -2,7 +2,7 @@
 
 ## [3.57.0] — 2026-11-02 — preserve context in intent confirmation
 
-- Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Wording, length and presentation remain flexible; the existing single stop, publication disclosure and outcome-only decision boundary remain unchanged.
+- Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts and outcome strength, leave unknown facts unresolved, and explain concrete publication effects with proportionate workflow detail. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
 
 ## [3.56.0] — 2026-11-02 — detect incomplete and stale verification evidence
 

@@ -50,17 +50,18 @@ twice.
    identifiers or mechanism names. Supply necessary context for unfamiliar
    terms and affected people at intent altitude. Choose wording, length and
    presentation freely, keeping familiar requests short. Examples, scripts and
-   headings are optional. Check these connections and what yes
-   confirms and authorizes; ask about outcomes, never
-   implementation approval.
+   headings are optional. Preserve supplied facts and outcome strength. Leave
+   unknown facts unresolved until user answers or evidence establish them. Lead with the user's
+   problem or missing fact, limiting workflow labels and bookkeeping to necessary
+   consequences. Check these connections and what yes confirms and
+   authorizes; ask about outcomes, never implementation approval.
 
-   For the current contract, automatic publication is the default. This same
-   restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after `closing-review` and publication checks pass, while merge
-   remains a separate decision. Say that the user may explicitly opt out before
-   publication. Write
-   `publication: automatic — authorized <date> by <name>` only after that
-   informed yes; an opt-out leaves the field absent.
+   Explain that yes authorizes uploading the change branch (non-forced push)
+   and opening a pull request ready for review after review and publication
+   checks pass, with a separate merge decision. Publication defaults to
+   automatic; explicitly offer opt-out before publication. Disclose before
+   the answer. Record `publication: automatic — authorized <date> by <name>`
+   only after informed yes; opt-out leaves it absent.
 
 2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is

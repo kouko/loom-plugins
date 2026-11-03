@@ -104,6 +104,10 @@ RESTATEMENT_CONTENT = (
     ("Supply", "necessary context", "unfamiliar terms", "affected people", "intent altitude"),
     ("Choose", "wording, length and presentation freely", "keeping familiar requests short"),
     ("Check", "these connections", "what yes confirms and authorizes"),
+    ("Preserve", "supplied facts", "outcome strength"),
+    ("Leave", "unknown facts unresolved", "user answers", "evidence"),
+    ("Lead", "user's problem or missing fact", "workflow labels", "bookkeeping"),
+    ("Explain", "uploading the change branch", "pull request ready for review", "non-forced push", "separate merge decision"),
 )
 
 

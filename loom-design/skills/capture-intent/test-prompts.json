@@ -2,7 +2,7 @@
   "skill_name": "capture-intent",
   "schema_version": 1,
   "created": "2026-09-13",
-  "last_reviewed": "2026-11-02",
+  "last_reviewed": "2026-11-03",
   "prompts": [
     {
       "id": 1,
@@ -54,6 +54,20 @@
       "prompt": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
       "expected_behavior": "Repair the missing context using the supplied meaning, affected jobs, inconsistent results and wanted correct selection. Explain more fully because the user requested detail; do not repeat the unexplained label, guess a diagnosis or ask for implementation approval. Keep any renewed confirmation within the existing correction round, without adding a new decision point.",
       "edge_case_dimensions": ["detailed follow-up", "unexplained label", "correction round"]
+    },
+    {
+      "id": 7,
+      "category": "edge-case",
+      "prompt": "Each background job owns a list of eligible workers and randomly chooses one worker from that list each time it runs. A bug makes some jobs use another job's list. Please make every job select from its own list while keeping random selection. Explain what you will fix before asking me to confirm.",
+      "expected_behavior": "Preserve own-list selection and randomness without adding repeatable worker choice or universally consistent outputs. Explain the cross-job mix-up and wanted isolation in ordinary language; include concrete publication consequences in the existing confirmation, without asking for implementation approval.",
+      "edge_case_dimensions": ["random own-list selection", "unsupported stronger guarantee", "supplied outcome strength"]
+    },
+    {
+      "id": 8,
+      "category": "edge-case",
+      "prompt": "The release notes show the wrong release date. I don't know the actual release date yet, and I have no release record to give you. Only correct that date once it is established.",
+      "expected_behavior": "Keep the factual date unresolved pending an answer or evidence, and keep the intent open. Do not recommend today or another convenient date as a fallback. Lead concisely with the missing fact and its consequence, without workflow labels, branch bookkeeping or a premature confirmation claim.",
+      "edge_case_dimensions": ["unknown factual date", "unsupported fallback", "proportionate context"]
     }
   ]
 }
