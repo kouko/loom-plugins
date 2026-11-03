@@ -3,8 +3,7 @@ originator: kouko
 kind: engineering
 needs-design: no — 僅調整既有需求確認的技能指引與參考說明，未新增介面或工作流程。
 status: confirmed 2026-11-04 — 使用者同意以五段式說明、開頭補背景與目前方向繼續實作與迭代
-intent_confirmed_sha: 93aaf16c69c7bb1346bd683889ed6ffb1db2d006
-publication: automatic — authorized 2026-11-02 by kouko
+intent_confirmed_sha: 5832acde5ac642ad19d21751caff237ed8092c26
 
 ## Problem
 Loom 請使用者確認工作範圍時，說明可能只剩抽象的修復項目，缺少理解所需的背景。使用者必須追問名詞指的是什麼，並自行補回誰在做什麼、發生什麼問題及其影響，才能判斷是否符合自己的需求。原對話已出現要求詳細說明後，仍須追問「設定是什麼」的情況。
