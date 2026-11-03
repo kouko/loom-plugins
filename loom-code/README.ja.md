@@ -1,6 +1,6 @@
 # loom-code
 
-[Loom](../README.md)
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
 
 skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
 

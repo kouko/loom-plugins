@@ -1,6 +1,6 @@
 # Handoff
 
-[Loom](../../../README.md) / [loom-workflow](../../README.ja.md) / handoff
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / handoff
 
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 

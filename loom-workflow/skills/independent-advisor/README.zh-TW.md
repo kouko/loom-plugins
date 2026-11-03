@@ -1,6 +1,6 @@
 # Independent Advisor
 
-[Loom](../../../README.md) / [loom-workflow](../../README.zh-TW.md) / independent-advisor
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.zh-TW.md) / independent-advisor
 
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
@@ -92,6 +92,6 @@ CLI 起始目錄及本機執行，並記錄原指令作為授權來源；不會�
 ## 相關技能
 
 - [loom-workflow:critique](../critique/README.zh-TW.md)
-- [loom-code:external-review](../../../loom-code/skills/external-review/README.md)
+- [loom-code:external-review](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/external-review/README.md)
 
 執行規則: [SKILL.md](SKILL.md).

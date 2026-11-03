@@ -1,6 +1,6 @@
 # project-retro
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / project-retro
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / project-retro
 
 Review one coding session for source-backed improvements to the project’s development environment.
 

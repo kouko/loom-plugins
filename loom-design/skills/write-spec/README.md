@@ -1,6 +1,6 @@
 # write-spec
 
-[Loom](../../../README.md) / [loom-design](../../README.md) / write-spec
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-design](../../README.md) / write-spec
 
 Describe what a confirmed change must do and what users will see before implementation is planned.
 
@@ -36,7 +36,7 @@ Use loom-design:write-spec for the confirmed export-history intent.
 ## Related skills
 
 - [loom-design:capture-intent](../capture-intent/README.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
 - [loom-design:design-system](../design-system/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

@@ -1,6 +1,6 @@
 # decision-map
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / decision-map
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / decision-map
 
 Keep a long-running outcome and its unresolved questions explicit across sessions and several delivered changes.
 
@@ -36,8 +36,8 @@ Use loom-workflow:decision-map to resume the onboarding map and identify the nex
 
 ## Related skills
 
-- [loom-design:capture-intent](../../../loom-design/skills/capture-intent/README.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+- [loom-design:capture-intent](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/capture-intent/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
 - [loom-workflow:handoff](../handoff/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

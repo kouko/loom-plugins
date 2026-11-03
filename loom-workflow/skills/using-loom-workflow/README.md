@@ -1,6 +1,6 @@
 # using-loom-workflow
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / using-loom-workflow
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / using-loom-workflow
 
 Select a workflow tool from what you want to do without requiring you to memorize the toolbox.
 

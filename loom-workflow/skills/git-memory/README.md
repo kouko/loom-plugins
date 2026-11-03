@@ -1,6 +1,6 @@
 # git-memory
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / git-memory
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / git-memory
 
 Record why a particular Git change was made and retrieve that rationale when it becomes relevant again.
 
@@ -38,6 +38,6 @@ Use loom-workflow:git-memory to find why we chose the current parser.
 ## Related skills
 
 - [loom-workflow:loom-memory](../loom-memory/README.md)
-- [loom-code:ship](../../../loom-code/skills/ship/README.md)
+- [loom-code:ship](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/ship/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

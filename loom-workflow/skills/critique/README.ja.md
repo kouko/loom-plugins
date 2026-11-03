@@ -1,6 +1,6 @@
 # Critique
 
-[Loom](../../../README.md) / [loom-workflow](../../README.ja.md) / critique
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / critique
 
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
@@ -90,6 +90,6 @@ mindset は `domain-teams:code-team/standards/` の canonical 版を追随する
 ## 関連スキル
 
 - [loom-workflow:independent-advisor](../independent-advisor/README.ja.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
 
 実行時の手順: [SKILL.md](SKILL.md).

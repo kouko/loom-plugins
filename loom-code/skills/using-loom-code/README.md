@@ -1,6 +1,6 @@
 # using-loom-code
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / using-loom-code
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / using-loom-code
 
 Select the appropriate implementation station from the request and the work already completed.
 

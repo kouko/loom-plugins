@@ -1,6 +1,6 @@
 # Critique
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / critique
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / critique
 
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
@@ -93,6 +93,6 @@ under `domain-teams:code-team/standards/`.
 ## Related skills
 
 - [loom-workflow:independent-advisor](../independent-advisor/README.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

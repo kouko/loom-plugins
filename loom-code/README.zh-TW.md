@@ -1,6 +1,6 @@
 # loom-code
 
-[Loom](../README.md)
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
 
 技能詳細頁有同語言翻譯時連至該版本，其餘連至英文版。
 

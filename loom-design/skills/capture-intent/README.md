@@ -1,6 +1,6 @@
 # capture-intent
 
-[Loom](../../../README.md) / [loom-design](../../README.md) / capture-intent
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-design](../../README.md) / capture-intent
 
 Confirm the problem to solve and the observable conditions that will prove the change worked.
 
@@ -38,6 +38,6 @@ Use loom-design:capture-intent for this bug: saved filters disappear after resta
 
 - [loom-design:write-spec](../write-spec/README.md)
 - [loom-design:product-principles](../product-principles/README.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

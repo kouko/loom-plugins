@@ -1,6 +1,6 @@
 # loom-interactive-diagram
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / loom-interactive-diagram
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / loom-interactive-diagram
 
 Create diagram files that you can edit in an external editor and that the agent can read back and validate.
 
@@ -38,7 +38,7 @@ Use loom-workflow:loom-interactive-diagram to read back and check this saved dia
 ## Related skills
 
 - [loom-workflow:loom-visualization](../loom-visualization/README.md)
-- [loom-design:architecture-design](../../../loom-design/skills/architecture-design/README.md)
-- [loom-design:write-spec](../../../loom-design/skills/write-spec/README.md)
+- [loom-design:architecture-design](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/architecture-design/README.md)
+- [loom-design:write-spec](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/write-spec/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

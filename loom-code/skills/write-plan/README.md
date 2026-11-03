@@ -1,6 +1,6 @@
 # write-plan
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / write-plan
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / write-plan
 
 Turn a confirmed change request into an implementation plan with bounded tasks, tests and risks.
 
@@ -34,8 +34,8 @@ Use loom-code:write-plan to plan this bug fix; loom-design is not installed.
 
 ## Related skills
 
-- [loom-design:capture-intent](../../../loom-design/skills/capture-intent/README.md)
-- [loom-design:write-spec](../../../loom-design/skills/write-spec/README.md)
+- [loom-design:capture-intent](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/capture-intent/README.md)
+- [loom-design:write-spec](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/write-spec/README.md)
 - [loom-code:build](../build/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

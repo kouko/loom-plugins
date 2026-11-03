@@ -1,6 +1,6 @@
 # loom-workflow
 
-[Loom](../README.md)
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
 
 Skill guides open in English unless a matching translation is available.
 

@@ -1,6 +1,6 @@
 # product-principles
 
-[Loom](../../../README.md) / [loom-design](../../README.md) / product-principles
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-design](../../README.md) / product-principles
 
 Write the priorities and limits that should govern a product’s future trade-offs.
 

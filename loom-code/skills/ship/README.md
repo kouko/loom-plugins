@@ -1,6 +1,6 @@
 # ship
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / ship
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / ship
 
 Publish a change branch, prepare its pull request and observe the required CI checks.
 
@@ -32,7 +32,7 @@ Use loom-code:ship to correct this PR body without changing committed content.
 ## Related skills
 
 - [loom-code:closing-review](../closing-review/README.md)
-- [loom-workflow:git-memory](../../../loom-workflow/skills/git-memory/README.md)
+- [loom-workflow:git-memory](https://github.com/kouko/loom-plugins/blob/main/loom-workflow/skills/git-memory/README.md)
 - [loom-code:maintain](../maintain/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

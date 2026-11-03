@@ -1,6 +1,6 @@
 # design-system
 
-[Loom](../../../README.md) / [loom-design](../../README.md) / design-system
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-design](../../README.md) / design-system
 
 Agree on a product’s visual rules so later interfaces use consistent colors, type and components.
 

@@ -1,6 +1,6 @@
 # loom-memory
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / loom-memory
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / loom-memory
 
 Keep reusable repository lessons in versioned files that other contributors can retrieve and verify.
 

@@ -1,6 +1,6 @@
 # skill-retro
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / skill-retro
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / skill-retro
 
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 

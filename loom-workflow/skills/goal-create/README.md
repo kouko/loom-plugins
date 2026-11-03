@@ -1,6 +1,6 @@
 # Goal Create
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / goal-create
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / goal-create
 
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
@@ -73,6 +73,6 @@ goal-create/
 ## Related skills
 
 - [loom-workflow:handoff](../handoff/README.md)
-- [loom-design:capture-intent](../../../loom-design/skills/capture-intent/README.md)
+- [loom-design:capture-intent](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/capture-intent/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

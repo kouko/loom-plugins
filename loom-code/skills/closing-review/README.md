@@ -1,6 +1,6 @@
 # closing-review
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / closing-review
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / closing-review
 
 Independently review completed work and generate evidence tied to the content that was checked.
 

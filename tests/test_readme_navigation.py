@@ -8,13 +8,22 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGINS = ("loom-code", "loom-design", "loom-workflow")
+REPOSITORY_FILES = "https://github.com/kouko/loom-plugins/blob/main/"
 
 
 def local_targets(page: Path) -> set[Path]:
+    """Resolve prose links into the checkout, including canonical GitHub links."""
     targets = set()
-    for link in re.findall(r"\[[^\]]*\]\(([^)]+)\)", page.read_text()):
+    prose = re.sub(r"<!--.*?-->", "", page.read_text(), flags=re.S)
+    prose = re.sub(
+        r"(?ms)^ {0,3}(`{3,}|~{3,})[^\n]*\n.*?^ {0,3}\1[ \t]*(?:\n|$)",
+        "", prose,
+    )
+    for link in re.findall(r"\[[^\]]*\]\(([^)]+)\)", prose):
         target = link.split("#", 1)[0]
-        if target and not re.match(r"[a-z]+:", target):
+        if target.startswith(REPOSITORY_FILES):
+            targets.add((ROOT / target.removeprefix(REPOSITORY_FILES)).resolve())
+        elif target and not re.match(r"[a-z]+:", target):
             targets.add((page.parent / target).resolve())
     return targets
 
@@ -46,12 +55,15 @@ def test_all_skills_have_readmes_reachable_from_each_catalog(plugin):
 @pytest.mark.parametrize("plugin", PLUGINS)
 def test_skill_pages_link_back_up_and_to_runtime_instructions(plugin):
     for skill in (ROOT / plugin / "skills").glob("*/SKILL.md"):
-        page = skill.parent / "README.md"
-        assert page.is_file(), page
-        targets = local_targets(page)
-        assert ROOT / "README.md" in targets, page
-        assert ROOT / plugin / "README.md" in targets, page
-        assert skill in targets, page
+        assert (skill.parent / "README.md").is_file(), skill.parent
+        for page in skill.parent.glob("README*.md"):
+            targets = local_targets(page)
+            assert ROOT / "README.md" in targets, page
+            assert any(
+                target.parent == ROOT / plugin and target.name.startswith("README")
+                for target in targets
+            ), page
+            assert skill in targets, page
 
 
 @pytest.mark.parametrize("plugin", PLUGINS)

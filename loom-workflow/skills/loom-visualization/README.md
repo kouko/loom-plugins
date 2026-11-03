@@ -1,6 +1,6 @@
 # loom-visualization
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / loom-visualization
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / loom-visualization
 
 Present comparisons and relationships in a form the reader’s coding client can actually display.
 

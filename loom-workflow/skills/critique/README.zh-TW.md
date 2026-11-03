@@ -1,6 +1,6 @@
 # Critique
 
-[Loom](../../../README.md) / [loom-workflow](../../README.zh-TW.md) / critique
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.zh-TW.md) / critique
 
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
@@ -82,6 +82,6 @@ verdict 恰好一個：`PROCEED`、`PROCEED-WITH-CAVEAT`、`RESHAPE`、`REJECT`�
 ## 相關技能
 
 - [loom-workflow:independent-advisor](../independent-advisor/README.zh-TW.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
 
 執行規則: [SKILL.md](SKILL.md).

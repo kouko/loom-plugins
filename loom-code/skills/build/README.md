@@ -1,6 +1,6 @@
 # build
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / build
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / build
 
 Implement an agreed change and test the resulting behavior before closing review.
 

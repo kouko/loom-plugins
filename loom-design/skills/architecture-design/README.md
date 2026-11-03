@@ -1,6 +1,6 @@
 # architecture-design
 
-[Loom](../../../README.md) / [loom-design](../../README.md) / architecture-design
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-design](../../README.md) / architecture-design
 
 Agree on repository structure and dependency rules, with executable checks for the rules that can be tested.
 
@@ -35,7 +35,7 @@ Use loom-design:architecture-design to revisit only the dependency rules affecte
 ## Related skills
 
 - [loom-design:product-principles](../product-principles/README.md)
-- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
-- [loom-workflow:loom-interactive-diagram](../../../loom-workflow/skills/loom-interactive-diagram/README.md)
+- [loom-code:write-plan](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/write-plan/README.md)
+- [loom-workflow:loom-interactive-diagram](https://github.com/kouko/loom-plugins/blob/main/loom-workflow/skills/loom-interactive-diagram/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

@@ -1,6 +1,6 @@
 # Independent Advisor
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / independent-advisor
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / independent-advisor
 
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
@@ -109,6 +109,6 @@ Read these before you rely on a result:
 ## Related skills
 
 - [loom-workflow:critique](../critique/README.md)
-- [loom-code:external-review](../../../loom-code/skills/external-review/README.md)
+- [loom-code:external-review](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/external-review/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

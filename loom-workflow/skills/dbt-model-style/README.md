@@ -1,6 +1,6 @@
 # dbt-model-style
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / dbt-model-style
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / dbt-model-style
 
 Keep dbt models for Redshift consistently structured and documented without changing their calculations.
 
@@ -34,7 +34,7 @@ Use loom-workflow:dbt-model-style to review the style of models/marts/revenue.sq
 
 ## Related skills
 
-- [loom-code:build](../../../loom-code/skills/build/README.md)
+- [loom-code:build](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/build/README.md)
 - [loom-workflow:critique](../critique/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

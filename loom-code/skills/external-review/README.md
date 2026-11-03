@@ -1,6 +1,6 @@
 # external-review
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / external-review
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / external-review
 
 Run one authorized review through an outside coding-agent CLI while keeping the caller’s review criteria.
 
@@ -30,7 +30,7 @@ Use loom-code:external-review for this authorized packet, executor and review ro
 
 ## Related skills
 
-- [loom-workflow:independent-advisor](../../../loom-workflow/skills/independent-advisor/README.md)
+- [loom-workflow:independent-advisor](https://github.com/kouko/loom-plugins/blob/main/loom-workflow/skills/independent-advisor/README.md)
 - [loom-code:closing-review](../closing-review/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).

@@ -1,6 +1,6 @@
 # maintain
 
-[Loom](../../../README.md) / [loom-code](../../README.md) / maintain
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-code](../../README.md) / maintain
 
 Turn an incident into a reproducible, scoped change request without duplicating existing work.
 
@@ -29,7 +29,7 @@ Use loom-code:maintain to investigate this regression alert and find its matchin
 
 ## Related skills
 
-- [loom-design:capture-intent](../../../loom-design/skills/capture-intent/README.md)
+- [loom-design:capture-intent](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/capture-intent/README.md)
 - [loom-code:write-plan](../write-plan/README.md)
 - [loom-code:ship](../ship/README.md)
 

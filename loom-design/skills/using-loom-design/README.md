@@ -1,6 +1,6 @@
 # using-loom-design
 
-[Loom](../../../README.md) / [loom-design](../../README.md) / using-loom-design
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-design](../../README.md) / using-loom-design
 
 Select the appropriate product-definition skill without requiring you to know its name.
 

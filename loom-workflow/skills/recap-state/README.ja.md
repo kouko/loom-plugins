@@ -1,6 +1,6 @@
 # Recap
 
-[Loom](../../../README.md) / [loom-workflow](../../README.ja.md) / recap-state
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / recap-state
 
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
