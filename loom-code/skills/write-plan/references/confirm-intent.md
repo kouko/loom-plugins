@@ -56,7 +56,7 @@ included), and chat shows text tables or text diagrams, not Mermaid.
 Prepare applicable consequences and questions privately; only their user-relevant
 content enters the message.
 
-1. **The engineering one-way doors found so far**, in consequence form, per
+2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is
    needed. Check existing decisions and evidence first: ask for the unresolved
    outcome preference only when alternatives materially change what the user
@@ -74,7 +74,7 @@ content enters the message.
    form inside this same message ("this will rewrite your ___, I am doing it
    the way you said: ___").
 
-2. **The cross-model review question, only for `second-vendor: ask` without
+3. **The cross-model review question, only for `second-vendor: ask` without
    a qualifying direct user request.** Load
    `second-vendor-ask-and-docs-lint.md` before composing this
    message. A missing line is initialized as `second-vendor: suggest`; it
@@ -92,9 +92,9 @@ content enters the message.
    on another yes/no answer; an ambiguous choice or expanded material scope
    still needs the missing choice.
 
-3. **The principles interview**, if step 2 demanded it.
+4. **The principles interview**, if step 2 demanded it.
 
-4. **The carried details, `kind: engineering` only.** Show them as a table,
+5. **The carried details, `kind: engineering` only.** Show them as a table,
    one row per detail in the user's language, confirmed by the same yes; no
    extra stop. With an empty list, no table appears. A product change shows
    them at decision point ② of the station writing its spec — `write-spec`,

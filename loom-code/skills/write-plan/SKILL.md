@@ -143,8 +143,9 @@ the user named a change, match the slug.
 
 - `loom-design` is installed → this is not your station. Tell the user the
   change starts at `capture-intent`, and stop.
-- `loom-design` is not installed → read `references/no-intent-interview.md`
-  and follow it.
+- `loom-design` is not installed → code-only intake.
+  Read `references/confirmation-examples.md` before drafting or replying.
+  Then read `references/no-intent-interview.md` and follow it.
 
 <!-- gate: write-plan.no-plan-without-confirmed-intent -->
 **No plan is written without a confirmed intent.** If `status:` is not
@@ -185,7 +186,9 @@ When `status:` is already `confirmed`, skip confirmation:
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
 
-Otherwise read `references/confirm-intent.md` and follow it fully before step 4,
+Otherwise perform code-only confirmation.
+Read `references/confirmation-examples.md` before drafting or replying.
+Then read `references/confirm-intent.md` and follow it fully before step 4,
 in the single message it describes, ending with the intent's confirmation
 commit. Step 5 writes the question list kept per that reference.
 

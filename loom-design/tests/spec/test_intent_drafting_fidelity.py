@@ -78,6 +78,24 @@ def test_user_composer_is_separate_from_private_work(path: str) -> None:
     assert "**The complexity check" not in message and "`second-vendor:" not in message
 
 
+def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
+    owner = REPO / "loom-code/skills/write-plan/SKILL.md"
+    text = owner.read_text(encoding="utf-8")
+    step1 = text.split("## Step 1 — Find the intent", 1)[1].split("\n## ", 1)[0]
+    no_intent = step1.split("- `loom-design` is not installed", 1)[1]
+    step3 = text.split("## Step 3 — Decision point ①: restate and confirm", 1)[1].split("\n## ", 1)[0]
+    confirmed, open_intent = step3.split("Otherwise", 1)
+    assert "confirmation-examples.md" not in confirmed
+    for route, child in ((no_intent, "references/no-intent-interview.md"),
+                         (open_intent, "references/confirm-intent.md")):
+        load = route.index("references/confirmation-examples.md")
+        assert load < route.index(child)
+        assert affirms(" ".join(route.split()), *LOAD_RULE)
+    reader = owner.parent / "references/no-intent-interview.md"
+    before_draft = reader.read_text(encoding="utf-8").split("When you write the intent", 1)[0]
+    assert affirms(" ".join(before_draft.split()), *LOAD_RULE)
+
+
 @pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, *EXAMPLE_RULES))
 def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
     verb, literal, *extras = rule

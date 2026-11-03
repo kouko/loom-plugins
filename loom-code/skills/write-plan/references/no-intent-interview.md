@@ -4,8 +4,8 @@ Loaded by step 1 of `../SKILL.md` when no intent exists and `loom-design`
 is not installed. Relative paths here are relative to this file's
 directory; step numbers are that SKILL.md's.
 
-When you write the intent, apply the intent-writing rules in
-`confirm-intent.md`.
+Read `confirmation-examples.md` and `confirm-intent.md` before drafting or replying.
+When you write the intent, apply their explanation and intent-writing rules.
 
 - `loom-design` is not installed → hand the user the template path,
   `contract/templates/intent.md` inside the `loom-code` plugin, and stop

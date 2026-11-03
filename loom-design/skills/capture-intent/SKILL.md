@@ -190,7 +190,7 @@ intent in step 4.
 Prepare applicable consequences and questions privately; only their user-relevant
 content enters the message.
 
-1. **The engineering one-way doors found so far**, in consequence form. A
+2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
    decision point ② of the station writing its spec — `write-spec`, or
    `loom-code:write-plan` when it writes the spec — when a spec will be
@@ -224,7 +224,7 @@ content enters the message.
    state the irreversible consequence and safeguard (for example, what is
    rewritten, what stops reading it, and where the backup is kept).
 
-2. **The cross-model review question, only for `second-vendor: ask` without
+3. **The cross-model review question, only for `second-vendor: ask` without
    a qualifying direct user request.** Read `references/second-vendor.md` for
    mode routing. A missing line is `second-vendor: suggest` and adds no question.
    When defaults carry `second-vendor: ask`, use the reference's host-aware
@@ -233,10 +233,10 @@ content enters the message.
    authorization; disclose cost, egress and local execution before dispatch.
    A fixed CLI adds no question.
 
-3. **The principles confirmation**, if step 3 ran the interview — restated
+4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
 
-4. **The carried details, `kind: engineering` only.**
+5. **The carried details, `kind: engineering` only.**
    Show them as a table, one row per detail in the user's language,
    confirmed by the same yes; no extra stop. With an empty list, no table appears. Every product change
    shows them at decision point ② of the station that writes its spec —
@@ -244,7 +244,7 @@ content enters the message.
    change that skips design. A product change's carried details never appear
    in this message.
 
-5. **The complexity check, when the scope adds cost.** When the user's
+6. **The complexity check, when the scope adds cost.** When the user's
    request or an option under discussion would add a mechanism, field, rule
    or step, run `loom-workflow:critique` in complexity mode before you
    compose this message. Carry only its verdict and its smaller alternative

@@ -4,6 +4,7 @@
 
 - Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. Limit workflow detail throughout intake while preserving concrete publication and authorization consequences. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
 - Load the local adaptable outline and complete contrasting examples before intake drafting or replies, with parity coverage against the design entry's portable copy. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. Preserve applicable consequences, same-yes publication authorization and confirmation boundaries without dumping procedure or intent-schema inventories.
+- Load examples directly from the main code-only entry before both new-intent drafting and open-intent confirmation, retaining the already-confirmed fast path. The no-intent reader loads its rules before writing; restore the original numbered consent-policy anchors without changing their routing or private/user-message separation.
 
 ## [3.57.0] — 2026-11-03 — preserve fallback feedback and bounded continuation
 
