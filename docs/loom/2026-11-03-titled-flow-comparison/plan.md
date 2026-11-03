@@ -17,8 +17,8 @@ charter: 1.1
 - Risk: agent-decided — retain the existing renderer and width helper; save a documentation recipe rather than introducing a generator. Verify both completed compositions, including the outer frames.
 
 **W0-02 Prepare the independent patch release** after: W0-01 acceptance: 4
-- Files: `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`, `loom-workflow/plugin.json`, `loom-workflow/package.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README*.md`, `README.md`
-- Test: A4 positive: synchronized-workflow-release; negative: unrelated-plugin-bump.
+- Files: `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`, `loom-workflow/plugin.json`, `loom-workflow/package.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README*.md`, `README.md`, `loom-workflow/tests/scripts/test_release_metadata.py`
+- Test: A4 positive: synchronized-workflow-release; negative: unrelated-plugin-bump. Existing `loom-workflow/tests/scripts/test_release_metadata.py` reproduced nine stale-version failures before updating its release expectation; all fourteen checks passed after the one-line correction.
 - Risk: agent-decided — release workflow 5.19.2 as a documentation patch; synchronize derived manifests from the Claude source and update version references. No station, field, rule or contract-manifest change is included.
 
 ## Simplicity check
