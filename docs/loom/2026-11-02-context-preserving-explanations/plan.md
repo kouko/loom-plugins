@@ -41,6 +41,11 @@ charter: 1.1
 - Test: A1 positive: faithful-outline; negative: stronger-guarantee. A2 positive: adaptable-examples; negative: mandatory-headings. A3 positive: short-date-correction; boundary: detailed-repair. A4 positive: outcome-confirmation; negative: no-helper-constraint.
 - Risk: agent-decided — replace accumulated reminders with an adaptable content outline and contrastive examples in portable sibling references. Preserve existing gates and authorization consequences, mirror the two copies with a parity check, and validate real outputs before claiming improvement.
 
+**W1-01 authorized iteration 2 — separate preparation from the user message** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/references/`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-design/CHANGELOG.md`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: faithful-scope; negative: new-guarantee. A2 positive: adaptable-outline; negative: copied-procedure-headings. A3 positive: brief-known-facts; boundary: missing-fact-interview. A4 positive: same-yes-consequences; negative: implementation-approval.
+- Risk: agent-decided — iteration1 fixes content fidelity but still serializes bookkeeping. Separate private preparation/post-reply records from the user-message instructions; unresolved required facts stay in the existing interview. Preserve all conditional disclosures, one stop, prior coverage and the five-iteration allowance.
+
 ## Simplicity check
 - none found
 
