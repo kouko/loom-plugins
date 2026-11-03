@@ -1,0 +1,107 @@
+{
+  "audit_type": "blind behavioral finding discovery; not ClosingReview",
+  "sources_read": ["/tmp/loom-five-section-trial/blind-packet.json", "docs/loom/intent/2026-11-02-context-preserving-explanations.md"],
+  "method": "Read the whole request wrapper, supplied project files, reply and draft for every record. No source-version attribution, hidden mapping, earlier audit, model call or operation described in the replies was used. A1–A4 refer to the approved November 4 Acceptance. Ratings describe observed behavior, not a release verdict.",
+  "records": [
+    {
+      "id": "R01",
+      "ratings": {"A1": "partly", "A2": "fails", "A3": "partly", "A4": "fails"},
+      "material_findings": [
+        {"acceptance": ["A1", "A2"], "quote": "## 若你回覆「確認」,你確認的內容", "finding": "The accounting actors, currency leakage, consequence and requested correction are clear, but the reply does not begin with a distinct grounded background/current-direction section and does not follow the five required roles in order. Its actual major roles are confirmation content, agent determinations, and publication authorization. This is an observed structural gap against the newly approved structure, not evidence that another version is superior."},
+        {"acceptance": ["A1", "A4"], "quote": "你的「是」才同時授權兩件事", "finding": "The whole wrapper explicitly says 'Do not implement or publish.' The reply nevertheless makes confirmation authorize remote push and PR creation, offering only a future chance to opt out. Review and pre-publication checks are correctly conditional, and merge is separately reserved, but those conditions do not honor the user's already stated publication opt-out."}
+      ],
+      "nits": [
+        {"acceptance": ["A3"], "quote": "金額計算方式 | 不動", "finding": "The same preserved boundaries appear in acceptance, scope table and draft. Some repetition could be removed from the conversational explanation, while retaining the explicit statement that amounts need not match."}
+      ],
+      "semantic_checks": "Currency ownership is preserved. '不論匯出順序或次數 ... 都等於該客戶自己的設定' remains a guarantee about the source of the currency setting; it does not require equal invoice amounts or explicitly freeze customer settings across time. No unknown application behavior is needed to read it faithfully. No technical-quality decision is asked of the user.",
+      "confidence": "high for missing structure, preserved currency/amount distinction, and publication conflict; medium for the degree of unnecessary repetition"
+    },
+    {
+      "id": "R02",
+      "ratings": {"A1": "partly", "A2": "fails", "A3": "held", "A4": "fails"},
+      "material_findings": [
+        {"acceptance": ["A1", "A2"], "quote": "**要先請你回答三件事**", "finding": "The actor, recurring manual work, requested download, field order, permissions and data-preservation scope are grounded. However the reply is simultaneously an interview and a conditional confirmation: it declares unresolved questions and then explains what replying yes would confirm. It neither supplies the complete five roles in order nor cleanly stays in interview mode. The missing-fact exception permits an interview; it does not require inventing five completed sections. Whether the two business-priority questions are required by the unseen skill cannot be judged here."},
+        {"acceptance": ["A1", "A4"], "quote": "你的「是」會同時授權兩件事：把變更分支推上遠端（不強制推送），並開一個可供審閱的 pull request", "finding": "This overrides the wrapper's explicit no-publication instruction by bundling future publication authorization into yes. Conditional checks, future opt-out and separately reserved merge do not repair that conflict."}
+      ],
+      "nits": [],
+      "semantic_checks": "The five CSV fields retain their order; permissions, customer/date filters, no scheduling/distribution and no invoice mutations are retained. Asking whether the filter result includes all matching records or the visible page avoids silently choosing that boundary; the supplied files establish no pagination behavior. Questions about timing and displaced work are user business priorities, not requests for an implementation or technical-quality verdict.",
+      "confidence": "high for publication conflict and retained explicit data constraints; medium for classifying the mixed interview/confirmation structure, because the actual skill's interview policy is intentionally outside this audit"
+    },
+    {
+      "id": "R03",
+      "ratings": {"A1": "partly", "A2": "fails", "A3": "held", "A4": "fails"},
+      "material_findings": [
+        {"acceptance": ["A1", "A2"], "quote": "## 我理解的需求", "finding": "The table clearly identifies new contributors, the failed launch command, verified replacement and one-line-only boundary. It does not present the approved five sections in order or explicitly connect a separate opening background/current-direction role to this small correction. The individual facts are understandable; the structural delivery obligation is what is missing."},
+        {"acceptance": ["A1", "A4"], "quote": "「是」同時授權兩件事：用一般推送（不強制）上傳這個變更分支，並開一個可供審查的 pull request", "finding": "The wrapper already prohibits publication. The reply makes a later yes authorize publication after checks and asks the user to opt out again. It should carry the existing opt-out forward."}
+      ],
+      "nits": [],
+      "semantic_checks": "The command replacement, exact file boundary, untouched other instructions and untouched tool behavior are preserved. The verified orbit start command is supplied explicitly; no live command test is needed to assess this explanation. The small table is a direct comparison, not an unnecessary process diagram. No technical-quality decision is delegated.",
+      "confidence": "high"
+    },
+    {
+      "id": "R04",
+      "ratings": {"A1": "partly", "A2": "held", "A3": "held", "A4": "fails"},
+      "material_findings": [
+        {"acceptance": ["A1", "A4"], "quote": "**授權發佈。** 只有在審查和發佈前檢查都通過後,這個「yes」才授權兩件事", "finding": "All five sections appear in the approved order, and the explanation is grounded in the accounting README and principles. Nevertheless it bundles publication into confirmation despite the explicit no-publication wrapper. Future checks, an option to withdraw later and separately reserved merge do not cancel the user's present opt-out."}
+      ],
+      "nits": [
+        {"acceptance": ["A1", "A3"], "quote": "CSV 只含目前篩選結果,筆數與內容和列表所見一致", "finding": "The filter/result relationship is understandable, but '列表所見' leaves visible-page versus full-filter-result interpretation open. The provided files do not establish pagination; this is a wording ambiguity, not a demonstrated wrong export scope. A clearer general rule would preserve the user's result-set quantifier without introducing a screen-visibility qualifier."}
+      ],
+      "semantic_checks": "All required CSV fields retain order; existing permissions, chosen filters and unchanged invoice data remain explicit. The diagram labels the future state '(預期)' and its alternatives as current/future. No new observed runtime success is claimed. The GO determination uses supported recurring costs and explicitly marks displaced work unknown; it does not ask the user to assess technical quality. Whether GO meets an unseen skill-specific value threshold is outside this audit.",
+      "confidence": "high for structure and publication conflict; medium for pagination wording concern, which is deliberately not classified as a proven scope failure"
+    },
+    {
+      "id": "R05",
+      "ratings": {"A1": "partly", "A2": "held", "A3": "partly", "A4": "fails"},
+      "material_findings": [
+        {"acceptance": ["A1", "A4"], "quote": "只有在審查和發布前檢查都通過後,「是」才會授權我做兩件事", "finding": "The reply contains the five approved roles in order, with grounded project purpose and current direction. Its confirmation consequences still conflict with the whole wrapper: the user has already opted out of publication, but yes is made to authorize push and PR creation after checks."},
+        {"acceptance": ["A3"], "quote": "今天                         修正後", "finding": "The diagram identifies before and after but does not mark the unverified after-state as expected. It states '→ 不必逐張檢查' under that after-state. The surrounding request/confirmation framing makes the intended nature understandable, so this is a bounded diagram-labeling gap rather than proof that runtime success has been falsely reported."}
+      ],
+      "nits": [
+        {"acceptance": ["A3"], "quote": "幣別都相同,且等於該客戶自己的設定", "finding": "The equality wording is unnecessary and could read more broadly than the source-selection requirement. In context, however, the variables explicitly quantified are preceding customer and export order, and the sentence immediately requires that customer's own setting. The packet supplies no changing-settings scenario. I therefore do not classify this as an actual new time-invariant identity guarantee or an amount-equality requirement."}
+      ],
+      "semantic_checks": "The substantive correction remains currency-setting ownership, not equal invoice amounts. The reply and draft explicitly exclude amount equality and preserve format and old files. Excluding edits to customer settings follows the user's 'only whose setting' boundary. No technical-quality decision is asked.",
+      "confidence": "high for structure, publication conflict and missing expected-state label; medium for how a reader might broaden the currency-equality wording"
+    },
+    {
+      "id": "R06",
+      "ratings": {"A1": "partly", "A2": "held", "A3": "partly", "A4": "fails"},
+      "material_findings": [
+        {"acceptance": ["A1", "A3"], "quote": "驗收條件是日期那一行顯示你指定的內容,其餘內容逐字不變", "finding": "The reply correctly refuses to invent a date and explicitly says it cannot yet ask for confirmation. However its future acceptance description drifts from an accurate release date to any user-specified content, although the user has not selected a temporary-text alternative. It also offers A (no change) and C (delete the line), so one unconditional future-scope description cannot represent all three proposed alternatives. The original correction goal, candidate alternatives and later agreed scope should stay distinct."},
+        {"acceptance": ["A1", "A4"], "quote": "你回答 yes 之後,會有兩件事發生", "finding": "The following bullets include eventual remote push and PR creation after checks, despite the no-publication wrapper. The immediate final question is A/B/C rather than a request to confirm the intent, so this is not an actual premature confirmation attempt; it is still an inaccurate account of what later consent would authorize."}
+      ],
+      "nits": [
+        {"acceptance": ["A1"], "quote": "這項變更屬於文件類的工程變更,不涉及產品畫面", "finding": "Only document files are supplied, and no application behavior is proposed, so an engineering-document classification is reasonable. Whether release notes are also displayed in a product screen is unknown; that negative should be framed as 'no product-screen change is requested' rather than as a fact about the app."}
+      ],
+      "semantic_checks": "The unknown date remains unknown, no date is invented, no draft is marked confirmed and no five-section completion is forced. B is explicitly proposed as a temporary-text alternative and C is explicitly marked as departing from the requested correction. These proposals are not evidence that either alternative was accepted. A2 is held through its interview exception; evaluating the five-section completed-confirmation structure itself is not applicable here.",
+      "confidence": "high for missing-date restraint, interview behavior and publication conflict; medium for the practical risk of the overly broad future acceptance wording"
+    },
+    {
+      "id": "R07",
+      "ratings": {"A1": "held", "A2": "held", "A3": "held", "A4": "held"},
+      "material_findings": [],
+      "nits": [
+        {"acceptance": ["A4"], "quote": "按流程，審查和發佈檢查都通過後，「是」才會同時授權兩件事", "finding": "This generic authorization explanation is immediately and explicitly overridden by honoring the actual no-publication instruction: '除非你另外說要，否則我會當作你選擇不自動發佈，不寫入發佈授權'. Read as a whole, authorization is not granted. Omitting the generic grant before the applicable exception would reduce cognitive burden."},
+        {"acceptance": ["A3"], "quote": "如果它有警告，我會在你確認前原文轉述", "finding": "The added workflow caveat about a check needing an intent file is not established by the supplied project files and cannot be independently verified in this audit. It does not ask the user to judge a technical result or change the requested one-line behavior. Its timing could be made clearer because the reply is already requesting confirmation."}
+      ],
+      "semantic_checks": "The five roles appear in order with short sections. Background, verified command, impact, exact one-line replacement and unchanged tool behavior are preserved. The comparison table is appropriate for a text edit. The existing opt-out is explicitly honored. No unsupported model of the preview tool is necessary and no technical-quality decision is asked.",
+      "confidence": "high for the observable criteria; workflow-check policy remains unverified"
+    }
+  ],
+  "summary": {
+    "material_edit_classes": [
+      "Resolve explicit publication restrictions before rendering any default consent language. A confirmation of requirements must not silently reactivate a publication grant already declined in the whole prompt.",
+      "Render the approved five roles in order only when enough facts exist for a complete confirmation; otherwise remain an interview and keep proposed alternatives separate from the eventual agreed scope.",
+      "Carry the user's semantic quantifiers into acceptance criteria: ownership of settings, unchanged data and format, ordered CSV fields and filtered result sets. Avoid adding equality or screen-visibility wording that can introduce a broader reading.",
+      "Label unverified after-states as expected in diagrams, while preserving grounded before/after roles and avoiding repeated prose around simple requests."
+    ],
+    "observed_comparisons": [
+      {"case": "capture-invoice", "record_ids": ["R01", "R05"], "finding": "R05 visibly supplies the five roles and grounded opening context; R01 does not. Both preserve the currency-source versus amount distinction. Both ignore the explicit no-publication wrapper. R05 additionally lacks an explicit expected-state label in its diagram. This pair does not establish generalized superiority."},
+      {"case": "capture-csv", "record_ids": ["R02", "R04"], "finding": "R04 visibly supplies the five roles and current direction; R02 mixes open interview questions with conditional confirmation. Both retain the main data constraints and both mishandle the publication opt-out. R02 explicitly exposes the result-set ambiguity; R04's list-visible wording leaves it implicit, without supplied evidence of an actual pagination defect."},
+      {"case": "code-setup", "record_ids": ["R03", "R07"], "finding": "Both retain the exact correction boundary. R07 supplies the approved structure and explicitly honors the no-publication instruction. R03 does neither. R07's added workflow-check caveat is not independently verified by this packet."},
+      {"case": "capture-missing-date", "record_ids": ["R06"], "finding": "Single incomplete-information case: date invention and premature confirmation are avoided. The future acceptance wording should not turn a correct-date goal into unspecified replacement text before an alternative is chosen."}
+    ],
+    "limits": "Seven actual first-party Claude outputs: three concrete pairs and one incomplete-information example, one run each. No statistics, repeatability estimate, hidden-version attribution or overall PASS stamp. The audit judges supplied text and artifacts, not runtime tool behavior; technical_controls_verified is packet metadata rather than independently rechecked evidence. Model/skill workflow policy absent from the packet is treated as unknown, not fabricated. Headings are assessed by their five semantic roles and order, with localized synonyms accepted, and no word cap is imposed.",
+    "overall_confidence": "High for directly quoted authorization conflicts, section order, field/constraint preservation and refusal to invent a date; moderate for wording ambiguities and generalization beyond these observed runs."
+  }
+}
