@@ -2,7 +2,7 @@
 
 ## [3.58.0] — 2026-11-03 — preserve context in intent confirmation
 
-- Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts and outcome strength, leave unknown facts unresolved, and explain concrete publication effects with proportionate workflow detail. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
+- Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. Limit workflow detail throughout intake while preserving concrete publication and authorization consequences. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
 
 ## [3.57.0] — 2026-11-03 — preserve fallback feedback and bounded continuation
 

@@ -10,6 +10,11 @@ above this file.
 When this station performs code-only intake, use the same capture boundary:
 ask only for missing required-field content, never a fixed intake question
 quota; existing decision points remain unchanged.
+Before drafting: Preserve supplied facts and outcome strength, including
+qualifiers. Leave unknown facts unresolved pending user answers/evidence.
+Keep own-rule isolation separate from same-worker or same-result guarantees.
+Lead with the user's problem or missing fact, minimizing workflow labels and
+bookkeeping throughout intake; retain consequence/authorization disclosures.
 Problem holds present pain, who it affects, and the consequence, with no
 diagnosis or fix; Proposed outcome holds the wanted capability;
 Acceptance holds each observable delivery outcome, not value, complete
@@ -50,10 +55,7 @@ twice.
    identifiers or mechanism names. Supply necessary context for unfamiliar
    terms and affected people at intent altitude. Choose wording, length and
    presentation freely, keeping familiar requests short. Examples, scripts and
-   headings are optional. Preserve supplied facts and outcome strength. Leave
-   unknown facts unresolved until user answers or evidence establish them. Lead with the user's
-   problem or missing fact, limiting workflow labels and bookkeeping to necessary
-   consequences. Check these connections and what yes confirms and
+   headings are optional. Check these connections and what yes confirms and
    authorizes; ask about outcomes, never implementation approval.
 
    Explain that yes authorizes uploading the change branch (non-forced push)

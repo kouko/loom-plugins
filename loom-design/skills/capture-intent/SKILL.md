@@ -65,6 +65,11 @@ or updated.
 ## Step 1 — Interview
 
 Read `references/interview.md`; ask only for missing required-field content.
+Before drafting: Preserve supplied facts and outcome strength, including
+qualifiers. Leave unknown facts unresolved pending user answers/evidence.
+Keep own-rule isolation separate from same-worker or same-result guarantees.
+Lead with the user's problem or missing fact, minimizing workflow labels and
+bookkeeping throughout intake; retain consequence/authorization disclosures.
 Draft directly when already sufficient. No intake question quota applies.
 Problems/outcomes are valid before choosing features or implementation.
 Existing decision points remain unchanged.
@@ -184,10 +189,7 @@ twice, and this is the only stop this station makes.
    identifiers or mechanism names. Supply necessary context for unfamiliar
    terms and affected people at intent altitude. Choose wording, length and
    presentation freely, keeping familiar requests short. Examples, scripts and
-   headings are optional. Preserve supplied facts and outcome strength. Leave
-   unknown facts unresolved pending user answers/evidence. Lead with the user's
-   problem or missing fact, minimizing workflow labels and bookkeeping.
-   Check these connections and what yes confirms and
+   headings are optional. Check these connections and what yes confirms and
    authorizes; outcomes only, never implementation approval.
 
    Explain yes authorizes uploading the change branch (non-forced push)
@@ -309,10 +311,8 @@ hand-off.
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
 
-Use only user-supplied product claims: add no product nouns, interfaces, states,
-scope dimensions, or guarantees. Put only unresolved outcome/scope choices or
-missing required content in Open questions; either keeps the intent `open`.
-Carry downstream spec/engineering questions in the hand-off.
+Add no product nouns, interfaces, states, scope dimensions, or guarantees.
+Unresolved outcome/scope or required content in Open questions keeps intent `open`.
 Complete Step 2's altitude pass before confirmation. A fork with materially
 different outcomes for the user or scope needs an explicit answer; an accepted
 restatement is insufficient; reopen it — move it to Open questions, stop confirmation,
