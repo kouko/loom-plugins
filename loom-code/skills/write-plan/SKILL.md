@@ -189,6 +189,8 @@ in its body.
 
 Otherwise perform code-only confirmation.
 Read `references/confirmation-template.md` before drafting or replying.
+The ready layout is `references/confirmation-format.md`, loaded by the composer
+only after required facts are settled.
 Then read `references/confirm-intent.md` and follow it fully before step 4,
 in the single message it describes, ending with the intent's confirmation
 commit. Step 5 writes the question list kept per that reference.

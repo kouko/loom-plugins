@@ -23,9 +23,10 @@ Problem holds present pain, who it affects, and the consequence, with no
 diagnosis or fix; Proposed outcome holds the wanted capability;
 Acceptance holds each observable delivery outcome, not value, complete
 scenarios, UI placement, state transitions, test steps, or implementation;
-Constraints are already fixed; product Value case gives beneficiary, urgency,
+Keep already-fixed user/standing-policy boundaries as Constraints; product Value case gives beneficiary, urgency,
 and GO/NO-GO, while an engineering intent omits obvious value;
-Out of scope names excluded capability; Open questions contains only unresolved
+Keep Out of scope to explicitly excluded capabilities or data at source abstraction.
+Open questions contains only unresolved
 outcome or scope choices. After drafting, make one author pass: **Keep,
 neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
 plan, and unsupported detail is deleted. This pass creates no field, ID,
@@ -120,6 +121,7 @@ quality, task splitting, or review verdicts.
 
 ### User message
 
+Read `confirmation-format.md` only when required facts are settled.
 Compose **one message** for the user's confirmation, then wait; this is the only
 confirmation stop this station makes.
 Use applicable consequences/questions; omit private records and inventory.
@@ -128,7 +130,7 @@ Restate Problem and Acceptance: subject, problem, impact, outcome and
 confirmation scope. Use the user's plain words, never paths, identifiers or
 mechanism names. Supply necessary context: unfamiliar terms, affected people,
 intent altitude. Use five ordered sections from
-`confirmation-template.md` as the whole public reply, with headings required.
+`confirmation-format.md` as the whole public reply, with headings required.
 Choose wording and length freely, keeping familiar requests short.
 Check these connections and what yes confirms and authorizes; never implementation approval.
 

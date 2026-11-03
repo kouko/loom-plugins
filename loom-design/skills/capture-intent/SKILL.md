@@ -75,8 +75,7 @@ labels and bookkeeping; retain consequence/authorization disclosures.
 Keep missing required facts in the existing interview, asking only for the
 needed fact and why it matters. Compose confirmation only when required facts
 are resolved.
-Draft directly when already sufficient. No intake question quota applies.
-Keep outcomes implementation-neutral and decision points unchanged.
+Draft directly when already sufficient. No question quota applies.
 
 Cover affected people, workaround, clean-environment observable outcomes,
 fixed constraints, and exclusions. For product also cover urgency, existing
@@ -100,14 +99,14 @@ Keep every field at intent altitude:
 - **Acceptance** — numbered observable delivery outcomes with external
   pass/fail evidence acceptance testing can produce; no value claim, scenario, test step, UI placement,
   architecture, or task split.
-- **Constraints** — already-fixed boundaries; no agent preference or
+- **Constraints** — Keep already-fixed user/standing-policy boundaries; no agent preference or
   speculative guardrail.
 - **Value case** — for a product intent: beneficiary, urgency, existing alternative,
   displaced work, and GO/NO-GO. Count each missing answer separately;
   confirmation of other fields is not evidence. Omit for an engineering intent
   with obvious value.
-- **Out of scope** — excluded capabilities, actors, systems, or data; no
-  deferred implementation list.
+- **Out of scope** — Keep explicitly excluded capabilities, actors, systems or data
+  at source abstraction; no inferred method bans or deferred implementation list.
 - **Open questions** — only unresolved outcome/scope choices or missing required
   content; both block confirmation. Carry downstream spec/engineering questions
   in the hand-off, not this section.
@@ -187,7 +186,7 @@ intent in step 4.
 
 ### Private preparation
 
-Privately prepare applicable consequences/questions.
+Prepare consequences/questions privately.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -264,15 +263,15 @@ from repo evidence and record the reason; asking the user is a
 
 ### User message
 
+Read `references/confirmation-format.md` only when required facts are settled.
 Compose **one message** for the user's confirmation, then wait; this is the only
 confirmation stop this station makes.
-Use applicable consequences/questions; omit private records and inventory.
 
 Restate Problem and Acceptance: subject, problem, impact, outcome and
 confirmation scope. Use the user's plain words, never paths, identifiers or
 mechanism names. Supply necessary context: unfamiliar terms, affected people,
 intent altitude. Use five ordered sections from
-`references/confirmation-template.md` as the whole public reply, with headings required.
+`references/confirmation-format.md` as the whole public reply, with headings required.
 Choose wording and length freely, keeping familiar requests short.
 Check these connections and what yes confirms and authorizes; never implementation approval.
 

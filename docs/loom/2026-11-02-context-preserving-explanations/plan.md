@@ -88,6 +88,11 @@ charter: 1.1
 - Test: A1 positive: read-grounded-overview. A2 positive: complete-five-section-reply; boundary: unavailable-required-fact. A3 positive: invoked-generated-aligned-comparison; negative: added-visibility-qualifier. A4 positive: held-versus-enabled-publication; negative: silently-reactivated-grant.
 - Risk: agent-decided — continuation count 1 retains W3-01 identity and all failed evidence. Repair consent explanation, public structure/diagram execution and imported result-set qualifiers together. No publication, runtime authorization-bypass or data-loss claim is inferred from the observed wording.
 
+**W3-01 behavioral continuation 2 — separate interview from ready format and retain source scope** after: W3-00 acceptance: 1,2,3,4
+- Files: both primary/ready-format references, composers and galleries; intent field/template guidance; focused fidelity checks and unreleased notes.
+- Test: A1 positive: source-target-qualifiers. A2 positive: ready-only-format-load; boundary: unavailable-fact-interview. A3 negative: inferred-method-ban-or-broadened-preservation. A4 positive: retained-explicit-hold/default-controls.
+- Risk: agent-decided — retain continuation count 2 and prior evidence. Separate ready layout from pre-draft guidance, and tie absence/preservation/exclusion claims to source subjects and qualifiers. Preserve working consent and diagram branches; ambiguous wrappers establish neither an ongoing-hold breach nor future authorization.
+
 ## Simplicity check
 - none found
 

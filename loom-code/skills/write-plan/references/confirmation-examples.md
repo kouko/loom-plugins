@@ -2,6 +2,8 @@
 
 Read the primary `confirmation-template.md` first. Use only the relevant section
 when an illustration is needed; these examples supply no facts for another case.
+Completed confirmations apply only after required facts are settled; the
+unavailable-date example stays a focused interview.
 
 
 ## Unknown date
@@ -222,8 +224,9 @@ Good:
 Bad:
 > Fix currency profile. All future invoice amounts will be identical; regenerate every existing export.
 > Your yes also permits publication despite your restriction.
+> Keep every existing datum untouched and prohibit changes to how customer settings are entered or stored.
 
-The bad reply hides the setting's role, invents amount and historical-data guarantees, and overrides existing publication restrictions. The good diagram illustrates the failing path, not every export.
+The bad reply hides the setting's role, broadens named export-file preservation to all data, invents method restrictions, and overrides existing publication restrictions. The good diagram illustrates the failing path, not every export; a result boundary does not ban an unrequested internal fix method.
 
 
 ## Filtered CSV export
@@ -251,5 +254,6 @@ Good:
 
 Bad:
 > We are modernizing the entire accounting platform. Approve a background export service and a new permission model.
+> There is no CSV download, so there are no download actions at all.
 
-The bad reply invents a project direction and implementation decision. The good reply ties the supplied direction to the requested capability and its boundaries.
+The bad reply invents a project direction and implementation decision, and expands the absence of one capability into the absence of all downloads. The good reply retains the supplied CSV qualifier and permission boundary.

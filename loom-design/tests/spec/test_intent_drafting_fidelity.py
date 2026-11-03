@@ -18,12 +18,10 @@ RULES = (
 )
 EXAMPLE_RULES = (
     ("Write", "user's conversation language"),
-    ("Use", "five sections in this order"),
     ("Connect", "sourced project or function purpose", "established direction", "this request"),
     ("Keep", "missing required facts", "existing interview"),
     ("Repair", "assistant shorthand", "already supplied role"),
     ("Preserve", "interface boundary", "private helpers"),
-    ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge", "publication is enabled"),
     ("Borrow", "information connections", "case-specific facts"),
     ("Require", "actual-request support or evidence", "date, role, impact and constraint"),
     ("Check", "each sentence", "grounded context", "scope", "outcome", "required decision or consent"),
@@ -43,6 +41,16 @@ HOLD_RULE = ("Honor", "prior publication hold or opt-out", "user explicitly lift
 PUBLIC_RULE = ("Keep", "whole public reply", "five sections", "private prefaces", "postscripts")
 CONTEXT_RULE = ("Read", "available README or equivalent project overview", "current direction", "before composing")
 DIAGRAM_RULE = ("Invoke", "loom-workflow:loom-visualization", "before composing a diagram", "when available")
+FORMAT_LOAD = ("Read", "confirmation-format.md", "only when required facts are settled")
+TARGET_RULE = ("Preserve", "source targets and qualifiers", "absence, preservation and exclusion claims", "unmentioned alternatives unknown")
+BOUNDARY_RULE = ("Trace", "each boundary privately", "actual user or current-document clause")
+CONSTRAINT_RULE = ("Keep", "already-fixed user/standing-policy boundaries")
+EXCLUSION_RULE = ("Keep", "explicitly excluded", "source abstraction")
+FORMAT_RULES = (
+    ("Use", "five sections in this order"),
+    ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge", "publication is enabled"),
+    PUBLIC_RULE, DIAGRAM_RULE, AUTH_RULE,
+)
 
 
 @pytest.mark.parametrize(("path", "draft_boundary"), [
@@ -63,7 +71,7 @@ def test_fidelity_precedes_first_drafting_instruction(path: str, draft_boundary:
     assert target.is_file() and target.resolve().parent == local_dir.resolve(), target
 
 
-@pytest.mark.parametrize("filename", ["confirmation-template.md", "confirmation-examples.md"])
+@pytest.mark.parametrize("filename", ["confirmation-template.md", "confirmation-examples.md", "confirmation-format.md"])
 def test_local_confirmation_examples_are_portable_and_identical(filename: str) -> None:
     paths = [REPO / root / filename for root in (
         "loom-design/skills/capture-intent/references",
@@ -73,7 +81,12 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
     assert text == paths[1].read_text(encoding="utf-8")
     assert "loom-design/" not in text and "loom-code/" not in text
     if filename == "confirmation-template.md":
-        for rule in (*EXAMPLE_RULES, AUTH_RULE, HOLD_RULE, PUBLIC_RULE, CONTEXT_RULE, DIAGRAM_RULE):
+        for rule in (*EXAMPLE_RULES, HOLD_RULE, CONTEXT_RULE, TARGET_RULE, BOUNDARY_RULE):
+            assert affirms(" ".join(text.split()), *rule), rule
+        assert "```markdown" not in text and "## Please confirm" not in text
+        return
+    if filename == "confirmation-format.md":
+        for rule in FORMAT_RULES:
             assert affirms(" ".join(text.split()), *rule), rule
         skeleton = text.split("```markdown\n", 1)[1].split("```", 1)[0]
         assert re.findall(r"^## (.+)$", skeleton, re.M) == [
@@ -135,8 +148,24 @@ def test_user_composer_is_separate_from_private_work(path: str) -> None:
     assert affirms(" ".join(message.split()), *FINAL_CHECK)
     assert affirms(" ".join(message.split()), *AUTH_RULE)
     assert affirms(" ".join(message.split()), *HOLD_RULE)
+    assert affirms(" ".join(message.split()), *FORMAT_LOAD)
+    ready_link = re.search(r"Read `([^`]*confirmation-format\.md)` only when required facts are settled", message)
+    assert ready_link and ((REPO / path).parent / ready_link.group(1)).is_file()
+    assert "confirmation-format.md" not in text[:composer]
     final_link = re.search(r"Apply .*?`([^`]*confirmation-template\.md)`", message)
     assert final_link and ((REPO / path).parent / final_link.group(1)).is_file()
+
+
+@pytest.mark.parametrize("path", [
+    "loom-design/skills/capture-intent/SKILL.md",
+    "loom-code/skills/write-plan/references/confirm-intent.md",
+    "loom-design/skills/capture-intent/templates/intent.md",
+    "loom-code/contract/templates/intent.md",
+])
+def test_intent_boundaries_retain_source_scope(path: str) -> None:
+    text = " ".join((REPO / path).read_text().split())
+    assert affirms(text, *CONSTRAINT_RULE)
+    assert affirms(text, *EXCLUSION_RULE)
 
 
 def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
@@ -147,6 +176,9 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
     step3 = text.split("## Step 3 — Decision point ①: restate and confirm", 1)[1].split("\n## ", 1)[0]
     confirmed, open_intent = step3.split("Otherwise", 1)
     assert "confirmation-template.md" not in confirmed and "confirmation-examples.md" not in confirmed
+    assert "confirmation-format.md" not in confirmed
+    assert "references/confirmation-format.md" in open_intent
+    assert "confirmation-format.md" not in no_intent
     for route, child in ((no_intent, "references/no-intent-interview.md"),
                          (open_intent, "references/confirm-intent.md")):
         load = route.index("references/confirmation-template.md")
@@ -162,8 +194,9 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
         assert not re.search(r"Read `[^`]*confirmation-examples\.md`.*before drafting or replying", child.read_text())
 
 
-@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, AUTH_RULE, HOLD_RULE,
-                                 PUBLIC_RULE, CONTEXT_RULE, DIAGRAM_RULE, *EXAMPLE_RULES))
+@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, HOLD_RULE, CONTEXT_RULE,
+                                 FORMAT_LOAD, TARGET_RULE, BOUNDARY_RULE, CONSTRAINT_RULE,
+                                 EXCLUSION_RULE, *FORMAT_RULES, *EXAMPLE_RULES))
 def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
     verb, literal, *extras = rule
     sentence = f"{verb} {literal}, {', '.join(extras)}."

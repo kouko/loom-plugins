@@ -18,13 +18,13 @@ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only af
 1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>
 
 ## Constraints
-- <already-fixed boundaries, not agent preferences>
+- <Keep already-fixed user/standing-policy boundaries at source abstraction; no agent preferences or inferred method bans>
 
 ## Value case
 <optional; product beneficiary, urgency, and GO/NO-GO; omit obvious engineering value>
 
 ## Out of scope
-- <excluded capabilities, actors, systems, or data; not deferred implementation tasks>
+- <Keep explicitly excluded capabilities, actors, systems or data at source abstraction; no inferred method bans or deferred implementation tasks>
 
 ## Open questions
 - <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none
