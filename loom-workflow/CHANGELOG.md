@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.19.2] — 2026-11-03 — titled before/after flow illustrations
+
+- Add a reusable comparison illustration to the existing linear-flow template, with a title inside each outer frame and corresponding steps aligned where applicable.
+- Distinguish reported behavior and expected changes; document width-aware side-by-side or stacked layouts using the existing renderer and alignment checks.
+
 ## [5.19.1] — 2026-11-03 — complete the linked skill documentation
 
 - Add the eight missing skill guides and connect all fourteen guides to their plugin, project and related skills; retain existing translated guides.

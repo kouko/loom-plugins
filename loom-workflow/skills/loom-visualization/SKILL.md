@@ -62,7 +62,7 @@ reader must act on, and state the other in a sentence.
 | Shape | Signals | Template | Generator |
 |---|---|---|---|
 | Option comparison | 2+ options, shared criteria | `templates/01-option-comparison.md` | `table` |
-| Linear steps | 3+ steps, fixed order, no branch | `templates/02-linear-steps.md` | `flow` |
+| Linear steps | 3+ steps, fixed order, no branch; before/after flows in titled panels | `templates/02-linear-steps.md` | `flow` |
 | Branching decision | a question sends work down different paths | `templates/03-branching-decision.md` | none |
 | Reasoning chain | causes or inferences leading to a conclusion | `templates/04-reasoning-chain.md` | none |
 | State lifecycle | named states changed by named events | `templates/05-state-lifecycle.md` | none |
