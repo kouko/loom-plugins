@@ -16,26 +16,23 @@
 
 ```mermaid
 flowchart TD
-    subgraph stations["loom-design 的站"]
-        intent["loom-design:capture-intent<br/>寫下 intent<br/>① 使用者確認 intent"]
-        spec["loom-design:write-spec<br/>只在 needs-design: yes 時<br/>② product 變更：使用者確認<br/>看得見的行為"]
-    end
+    intent["① 確認要解決的問題<br/>capture-intent"]
+    design{"需要設計？"}
+    spec["寫出設計<br/>write-spec<br/>② 僅確認產品可見行為"]
+    check{"需要事前審查？"}
+    review["審查設計<br/>closing-review"]
+    plan["規劃工作<br/>write-plan"]
 
-    specreview["loom-code:closing-review<br/>一次 fresh-context spec review<br/>只在 pre-build-review: required 時"]
-    plan(["交棒給<br/>loom-code:write-plan"])
-
-    subgraph tools["隨叫隨用的工具（不是流程步驟）"]
-        principles["loom-design:product-principles<br/>ratify PRINCIPLES.md"]
-        designsys["loom-design:design-system<br/>ratify DESIGN.md"]
-        arch["loom-design:architecture-design<br/>設計並 ratify ARCHITECTURE.md"]
-    end
-
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
-    spec -->|"pre-build-review: not-required"| plan
-    spec -.->|"pre-build-review: required"| specreview
-    specreview -.-> plan
+    intent --> design
+    design -->|"需要"| spec
+    design -->|"不需要"| plan
+    spec --> check
+    check -->|"需要"| review
+    check -->|"不需要"| plan
+    review -->|"檢查通過"| plan
 ```
+
+圖中的審查與規劃由 `loom-code` 負責，其餘由 `loom-design` 負責。
 
 - **① Intent** — `capture-intent` 只訪談到想要的結果清楚為止，寫下
   `docs/loom/intent/<change-id>.md`，用使用者的話覆述一次，然後等一個 yes。

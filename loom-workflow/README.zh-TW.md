@@ -37,80 +37,43 @@ plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。�
 
 ## 什麼時候用哪個工具
 
-這不是一條依序執行的流程。工具依使用時機分組；圖中的箭頭只有 `decision-map`
-自己的迴圈，以及它交棒給各站的那一步。
+依當下需要選工具；表格各列不是必須依序執行的步驟。
+
+| 需要協助的時機 | 工具 | 做什麼 |
+|---|---|---|
+| 還不清楚如何達成目標 | `decision-map` | 調查未知事項，將準備好的部分交付為 intent。 |
+| 想先檢查提案是否合理 | `critique` | 判斷工作是否必要，以及能否更簡單。 |
+| 對話中跟不上目前進度 | `recap-state` | 說明現在的位置，等待你確認。 |
+| 需要過去的教訓，或有新教訓值得保留 | `loom-memory` | 按需查詢；關閉分支前，依要求或 agent 判斷記錄持久教訓。沒有站點固定呼叫它。 |
+| 撰寫、編輯或審查 dbt model | `dbt-model-style` | 套用模型寫法與結構規則，不處理計算邏輯。 |
+| commit、建立 PR 或 merge | `git-memory` | 任何站的每次 commit 前、建立 PR 時與 merge 前分類記憶。 |
+| 結束 session，或在新 session 接續 | `handoff` | 保存狀態，或驗證保存的狀態後接續。 |
+| 想從 session 找出改善點 | `project-retro`、`skill-retro` | 回顧一次 session 的專案問題，或從所選快照找反覆出現的 skill 問題；只提案，不修改。 |
+| 想請另一個執行者審查 | `independent-advisor` | 取得第二意見；費用與外送資料需經授權。 |
+| 需要用圖表說明關係 | `loom-visualization`、`loom-interactive-diagram` | 在對話顯示表格或圖，或建立可編輯圖表。 |
+| 明確要求建立目標 | `goal-create` | 起草 session 目標或專案目的，只在指名時執行。 |
+| 不確定該用哪個工具 | `using-loom-workflow` | 分派請求；各工具也能直接呼叫。 |
+
+### decision-map 的探索流程
+
+以下迴圈只屬於 `decision-map`。地圖保存在 `docs/loom/maps/<map-id>/`，
+可跨 session 接續。開地圖與推進 ticket 不需要 `loom-code`，交付 intent 才需要。
 
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    subgraph before["變更之前"]
-        direction TB
-        subgraph dm["loom-workflow:decision-map"]
-            direction TB
-            dest["Destination<br/>地圖要抵達的終點"]
-            fog["Fog<br/>還不知道的事"]
-            ticket["Ticket<br/>用 grilling、research 或 prototype 解一個未知"]
-            log["Decisions so far<br/>目前為止的決策"]
-            slice["帶 map: 的 intent<br/>由 delivery 步驟寫出<br/>（需要 loom-code）"]
-        end
-        station["loom-design:capture-intent<br/>沒有 loom-design 時為<br/>loom-code:write-plan"]
-        critique["loom-workflow:critique<br/>動手做之前裁決提案"]
-    end
-
-    subgraph working["工作中"]
-        recap["loom-workflow:recap-state<br/>這個 session 目前做到哪"]
-        recall["loom-workflow:loom-memory<br/>被要求時，或任務需要<br/>過去的教訓時 Recall"]
-        dbt["loom-workflow:dbt-model-style<br/>每次撰寫、編輯或<br/>review dbt model 時"]
-    end
-
-    subgraph commit["commit / PR / merge 時"]
-        gitmem["loom-workflow:git-memory<br/>任何站的每次 commit 前、<br/>建立 PR 時、merge 前"]
-        record["loom-workflow:loom-memory<br/>branch 關閉前 Record，<br/>依要求或 agent 判斷；<br/>沒有任何站會呼叫它"]
-    end
-
-    subgraph sessions["Session 工作"]
-        handoff["loom-workflow:handoff<br/>session 結束時存下狀態，<br/>下一個 session 接續"]
-        distill["loom-workflow:skill-retro<br/>從 session 快照<br/>挖出 skill 改進點"]
-        retro["loom-workflow:project-retro<br/>回顧一次 session 的<br/>專案改善點"]
-    end
-
-    subgraph anytime["隨時"]
-        advisor["loom-workflow:independent-advisor<br/>向另一個 executor<br/>取得 second opinion"]
-        cot["loom-workflow:loom-visualization<br/>把比較、流程與推理畫成圖表"]
-        goal["loom-workflow:goal-create<br/>session goal 或 repository purpose，<br/>只在指名呼叫時"]
-        router["loom-workflow:using-loom-workflow<br/>不確定用哪個工具時<br/>幫你分派"]
-    end
-
-    dest --> fog
-    fog -->|"挑一個"| ticket
-    ticket -->|"記下答案"| log
-    ticket -.->|"新的未知"| fog
-    log -->|"一個 slice 準備好了"| slice
-    slice -->|"交棒"| station
-
-    before ~~~ working
-    working ~~~ commit
-    commit ~~~ sessions
-    sessions ~~~ anytime
+    dest["定義要達成的結果"] --> fog["找出未知事項"]
+    fog --> ticket["調查一個未知事項<br/>訪談、研究或原型驗證"]
+    ticket --> log["記錄答案與決策"]
+    log --> ready{"有準備好實作的部分？"}
+    ready -->|"沒有：繼續調查"| fog
+    ready -->|"有"| intent["寫出 intent<br/>需要 loom-code"]
+    intent --> entry["確認這次變更<br/>loom-design:capture-intent<br/>或 loom-code:write-plan"]
 ```
 
-- **變更之前** — `decision-map` 用於無法一開始就列出完整路線的工作。Outcome Map
-  位於 `docs/loom/maps/<map-id>/`，跨 session 保存。一個 slice 準備好時，delivery
-  步驟寫出帶 `map:` 的 intent，交給 `loom-design:capture-intent`（沒有
-  `loom-design` 時交給 `loom-code:write-plan`）；此後這個變更由該站負責。`critique`
-  在動手做任何東西之前裁決提案。
-- **工作中** — `recap-state` 在目前的對話裡幫你重新定向。`loom-memory`
-  在被要求時或任務需要時 Recall 過去的教訓。`dbt-model-style` 在每次撰寫、編輯或
-  review dbt model 時套用。
-- **commit / PR / merge 時** — `git-memory` 在任何站的每次 commit 前、建立 PR
-  時，以及 `ship` 之後才進行的 PR merge 之前執行。`loom-memory` 在 branch
-  關閉前，依要求或 agent 判斷 Record 持久的教訓；沒有任何站會呼叫它。
-- **Session 工作** — `handoff` 在 session 結束時存下狀態，並在下一個 session
-  接續。`skill-retro` 從所選過去或目前 session 快照分析反覆出現的 skill 改進點。`project-retro` 依要求
-  回顧目前或指定的一次 session，根據原始紀錄提出專案改善建議；skill 問題只列為候選。
-- **隨時** — `independent-advisor` 向另一個 executor 取得 second opinion，
-  `loom-visualization` 把比較、流程與推理呈現成表格或圖（也能做成推理頁），`goal-create` 只在指名呼叫時執行，
-  `using-loom-workflow` 在不確定該用哪個工具時分派請求。
+裝有 `loom-design` 時，grilling ticket 會把討論交給 `capture-intent`。
+交付步驟寫出帶 `map:` 的 intent，之後由入口站負責該變更，地圖只讀取狀態。
+交付一部分不代表整張地圖完成：仍須滿足所有 Destination 驗收條件、清空未知事項，
+並讓每張 ticket 都已關閉或撤回。
 
 ## Skills
 

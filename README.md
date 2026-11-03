@@ -22,51 +22,28 @@ covers usage in depth.
 
 ## The Loom flow
 
+This diagram shows one change only. Exploration and on-demand tools are listed
+separately below. Skill names are qualified by their plugin in the skill tables.
+Merging the PR is a separate action after `ship`, with your explicit authorization.
+
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    idea(["Idea or change request<br/>received by<br/>loom-design:capture-intent"])
+    intent["① Confirm the change<br/>capture-intent"]
+    design{"Design needed?"}
+    spec["Describe the design<br/>write-spec<br/>② confirm visible product behaviour"]
+    plan["Plan the work<br/>write-plan"]
+    build["Implement and test<br/>build"]
+    review["Review and verify<br/>closing-review"]
+    ship["③ Publish PR and accept result<br/>ship"]
 
-    subgraph dm["loom-workflow:decision-map"]
-        direction TB
-        dest["Destination<br/>where the map should end up"]
-        fog["Fog<br/>what is still unknown"]
-        ticket["Ticket<br/>grill, research or prototype one unknown"]
-        log["Decisions so far"]
-    end
-
-    subgraph design["loom-design"]
-        intent["loom-design:capture-intent<br/>① you confirm the intent"]
-        spec["loom-design:write-spec<br/>only when needs-design: yes<br/>② you confirm visible behaviour"]
-    end
-
-    subgraph code["loom-code"]
-        plan["loom-code:write-plan<br/>task DAG"]
-        build["loom-code:build<br/>test-first, one commit per task"]
-        review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
-        ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (acceptance test report when required)"]
-        maintain["loom-code:maintain<br/>alerts, CI or regression failures"]
-    end
-
-    merged(["Merged PR<br/>merged separately after<br/>loom-code:ship"])
-
-    idea --> intent
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
+    intent --> design
+    design -->|"Yes"| spec
+    design -->|"No"| plan
     spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -.->|"new or matching intent"| plan
-
-    dest --> fog
-    fog -->|"pick one"| ticket
-    ticket -->|"record the answer"| log
-    ticket -.->|"new unknowns"| fog
-    dm -->|"a slice is ready: intent with map:"| intent
+    review -->|"Needs changes"| build
+    review -->|"Checks pass"| ship
 ```
 
 - **① Intent** — `capture-intent` restates the change in your words, with
@@ -103,7 +80,7 @@ points or run on demand.
 | `project-retro`, `skill-retro` | On demand, not tied to a station | `project-retro` reviews one coding session for project development improvements; `skill-retro` mines multiple sessions for skill improvement proposals. |
 
 `decision-map` is for work whose whole route cannot be listed up front; its
-loop is the `loom-workflow:decision-map` group in the flow diagram above.
+loop is shown separately in the [loom-workflow README](loom-workflow/README.md#decision-map-loop).
 The map, called an Outcome Map, lives at `docs/loom/maps/<map-id>/` as
 `MAP.md` plus a `tickets/` directory and persists across sessions. An unknown
 becomes a ticket only once or is moved out of scope, and a grilling ticket hands

@@ -18,28 +18,28 @@
 
 ```mermaid
 flowchart TD
-    intent["① intent を確認する<br/>loom-design:capture-intent<br/>loom-design がなければ loom-code:write-plan"]
-    spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
-    plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
-    build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ<br/>最後に adversary と package テスト一式"]
-    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら independent acceptance testing"]
-    attest[["attestation を生成<br/>loom-code:closing-review による"]]
-    ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは acceptance test report で"]
-    merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
-    maintain["loom-code:maintain<br/>アラート・CI やリグレッションの失敗・障害"]
+    intent["① 解決する問題を確認<br/>capture-intent"]
+    design{"設計が必要？"}
+    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの振る舞いのみ確認"]
+    plan["作業を計画<br/>write-plan"]
+    build["実装とテスト<br/>build"]
+    review["レビューと検証<br/>closing-review"]
+    ship["③ PR を公開し結果を確認<br/>ship"]
 
-    intent --> plan
-    intent -.->|"needs-design: yes"| spec
-    spec -.-> plan
+    intent --> design
+    design -->|"必要"| spec
+    design -->|"不要"| plan
+    spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| attest
-    attest --> ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -->|"一致する intent か新しい intent"| plan
+    review -->|"修正が必要"| build
+    review -->|"検証に合格"| ship
 ```
+
+図の skill は `loom-code` が提供し、`capture-intent` と `write-spec` は
+`loom-design` が提供します。`loom-design` がなければ、`write-plan` が intent の
+確認と必要な最小 spec を担当します。マージと保守はこの変更の主フローから分け、
+下で説明します。
 
 - **Intent** — `loom-design` を入れている場合は `capture-intent` が intent を
   確認し（①）、入れていない場合は `write-plan` が変更を言い直して ① を自分で

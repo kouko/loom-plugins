@@ -18,28 +18,28 @@
 
 ```mermaid
 flowchart TD
-    intent["① You confirm the intent<br/>loom-design:capture-intent<br/>or loom-code:write-plan without loom-design"]
-    spec["Only when needs-design: yes<br/>loom-design:write-spec<br/>② product changes: you confirm the visible behaviour"]
-    plan["loom-code:write-plan<br/>Task DAG in plan.md"]
-    build["loom-code:build<br/>Test-first, one implementer per task<br/>ends with adversary and package suite"]
-    review["loom-code:closing-review<br/>Fresh-context reviewers<br/>independent acceptance testing when needed"]
-    attest[["Attestation generated<br/>by loom-code:closing-review"]]
-    ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the acceptance test report when required"]
-    merged(["Merged separately<br/>after loom-code:ship, on your own authorization"])
-    maintain["loom-code:maintain<br/>Alert, CI or regression failure, or incident"]
+    intent["① Confirm the change<br/>capture-intent"]
+    design{"Design needed?"}
+    spec["Describe the design<br/>write-spec<br/>② confirm visible product behaviour"]
+    plan["Plan the work<br/>write-plan"]
+    build["Implement and test<br/>build"]
+    review["Review and verify<br/>closing-review"]
+    ship["③ Publish PR and accept result<br/>ship"]
 
-    intent --> plan
-    intent -.->|"needs-design: yes"| spec
-    spec -.-> plan
+    intent --> design
+    design -->|"Yes"| spec
+    design -->|"No"| plan
+    spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| attest
-    attest --> ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -->|"matching or new intent"| plan
+    review -->|"Needs changes"| build
+    review -->|"Checks pass"| ship
 ```
+
+Skill names in this diagram use `loom-code`, except `capture-intent` and `write-spec`,
+which use `loom-design`. Without `loom-design`, `write-plan` handles intent
+confirmation and any needed minimal spec. Merging and maintenance are separate
+from this change flow; see their descriptions below.
 
 - **Intent** — with `loom-design` installed, `capture-intent` confirms the
   intent (①); without it, `write-plan` restates the change and asks ① itself.

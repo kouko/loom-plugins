@@ -42,83 +42,45 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 
 ## どのタイミングでどのツールを使うか
 
-これは 1 本の順序付きフローではありません。ツールは使うタイミングごとにまとめてあり、
-矢印は `decision-map` 自身のループと、station への引き渡しだけです。
+必要に応じてツールを選びます。表の各行は、順番に実行する手順ではありません。
+
+| 助けが必要な場面 | ツール | 行うこと |
+|---|---|---|
+| 目標までの進め方が不明 | `decision-map` | 未知の点を調べ、準備できた部分を intent として引き渡す。 |
+| 提案を実行する前に検討したい | `critique` | 必要な作業か、もっと単純にできるかを判断する。 |
+| 会話の途中で現在地を見失った | `recap-state` | 現状を説明し、ユーザーの確認を待つ。 |
+| 過去の教訓が必要、または新しい教訓を残したい | `loom-memory` | 必要時に参照し、branch を閉じる前に依頼または agent の判断で記録する。station からの固定呼び出しはない。 |
+| dbt model を書く・編集・レビューする | `dbt-model-style` | 書式と構造を整える。計算ロジックは対象外。 |
+| commit・PR 作成・merge を行う | `git-memory` | どの station でも毎回の commit 前、PR 作成時、merge 前に記憶を分類する。 |
+| session を終える、または別の session で再開する | `handoff` | 状態を保存し、再開前に保存された状態を検証する。 |
+| session から改善点を見つけたい | `project-retro`, `skill-retro` | 1 回の session のプロジェクト改善、または選択した記録の反復的な skill 問題を調べる。提案のみで変更しない。 |
+| 別の実行者にレビューを依頼したい | `independent-advisor` | 費用とマシン外への送信について承認を得て、別の意見を求める。 |
+| 関係を図表で説明したい | `loom-visualization`, `loom-interactive-diagram` | chat の表や図、または編集可能な図を作る。 |
+| 明示的に目標を作成したい | `goal-create` | session の目標または repository の目的を起草する。名前で呼んだ時のみ動く。 |
+| どのツールか分からない | `using-loom-workflow` | 適切なツールへ振り分ける。各ツールは直接呼び出すこともできる。 |
+
+### decision-map の探索フロー
+
+次のループは `decision-map` だけのものです。地図は
+`docs/loom/maps/<map-id>/` に保存され、session をまたいで残ります。
+地図の作成と ticket の推進には `loom-code` は不要で、intent の引き渡しには必要です。
 
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    subgraph before["変更の前"]
-        direction TB
-        subgraph dm["loom-workflow:decision-map"]
-            direction TB
-            dest["Destination<br/>地図が目指す到達点"]
-            fog["Fog<br/>まだ分からないこと"]
-            ticket["Ticket<br/>1 つの未知を grilling・research・prototype で解く"]
-            log["Decisions so far<br/>これまでの決定"]
-            slice["map: 付きの intent<br/>delivery ステップが書く<br/>（loom-code が必要）"]
-        end
-        station["loom-design:capture-intent<br/>loom-design がなければ<br/>loom-code:write-plan"]
-        critique["loom-workflow:critique<br/>作る前に提案を裁く"]
-    end
-
-    subgraph working["作業中"]
-        recap["loom-workflow:recap-state<br/>この session で今どこにいるか"]
-        recall["loom-workflow:loom-memory<br/>依頼時、またはタスクに<br/>過去の教訓が必要な時に Recall"]
-        dbt["loom-workflow:dbt-model-style<br/>dbt model を書く・編集する・<br/>review する時は常に"]
-    end
-
-    subgraph commit["commit / PR / merge の時"]
-        gitmem["loom-workflow:git-memory<br/>どの station でも毎回の commit 前、<br/>PR 作成時、merge 前"]
-        record["loom-workflow:loom-memory<br/>branch を閉じる前に Record<br/>依頼または agent の判断で；<br/>station からは呼ばれない"]
-    end
-
-    subgraph sessions["session に関する作業"]
-        handoff["loom-workflow:handoff<br/>session 終了時に状態を保存し、<br/>次の session で再開"]
-        distill["loom-workflow:skill-retro<br/>session のスナップショットから<br/>skill の改善点を掘り出す"]
-        retro["loom-workflow:project-retro<br/>1 回の session から<br/>プロジェクトの改善点を探す"]
-    end
-
-    subgraph anytime["いつでも"]
-        advisor["loom-workflow:independent-advisor<br/>別の executor から<br/>second opinion"]
-        cot["loom-workflow:loom-visualization<br/>比較・フロー・推論を<br/>図表で示す"]
-        goal["loom-workflow:goal-create<br/>session goal または repository purpose、<br/>名前で呼んだ時のみ"]
-        router["loom-workflow:using-loom-workflow<br/>どのツールか迷ったら<br/>振り分ける"]
-    end
-
-    dest --> fog
-    fog -->|"1 つ選ぶ"| ticket
-    ticket -->|"答えを記録"| log
-    ticket -.->|"新しい未知"| fog
-    log -->|"slice の準備ができた"| slice
-    slice -->|"引き渡す"| station
-
-    before ~~~ working
-    working ~~~ commit
-    commit ~~~ sessions
-    sessions ~~~ anytime
+    dest["達成する結果を定義"] --> fog["未知の点を特定"]
+    fog --> ticket["未知の点を 1 つ調査<br/>対話・研究・プロトタイプ"]
+    ticket --> log["答えと判断を記録"]
+    log --> ready{"実装できる部分がある？"}
+    ready -->|"ない：調査を続ける"| fog
+    ready -->|"ある"| intent["intent を書く<br/>loom-code が必要"]
+    intent --> entry["変更を確認<br/>loom-design:capture-intent<br/>または loom-code:write-plan"]
 ```
 
-- **変更の前** — `decision-map` は、全体の道筋を最初に列挙できない作業のためのものです。
-  Outcome Map は `docs/loom/maps/<map-id>/` にあり、session をまたいで残ります。
-  slice の準備ができると、delivery ステップが `map:` 付きの intent を書き、
-  `loom-design:capture-intent`（`loom-design` がなければ `loom-code:write-plan`）
-  に引き渡します。以後の変更はその station が受け持ちます。`critique`
-  は何かを作る前に提案を裁きます。
-- **作業中** — `recap-state` は現在の会話の中で状況を捉え直させます。`loom-memory`
-  は依頼された時、またはタスクに必要な時に過去の教訓を Recall します。
-  `dbt-model-style` は dbt model を書く・編集する・review する時に常に適用します。
-- **commit / PR / merge の時** — `git-memory` はどの station でも毎回の commit
-  前、PR 作成時、そして `ship` の後に行う PR の merge 前に動きます。`loom-memory`
-  は branch を閉じる前に、依頼または agent の判断で永続的な教訓を Record します。
-  station からは呼ばれません。
-- **session に関する作業** — `handoff` は session の終わりに状態を保存し、次の
-  session で再開します。`skill-retro` は選択した過去または現在の session のスナップショットから、反復する skill の改善点を調べます。
-  `project-retro` は依頼に応じて現在または指定された 1 回の session を振り返り、根拠のある
-  プロジェクト改善案を示します。skill の問題は候補として分けて示します。
-- **いつでも** — `independent-advisor` は別の executor に second opinion を求め、
-  `loom-visualization` は比較・フロー・推論を table や図で示し、推論ページも作ります。`goal-create` は名前で呼んだ時だけ動き、
-  `using-loom-workflow` は適切なツールが分からない依頼を振り分けます。
+`loom-design` があれば、grilling ticket は議論を `capture-intent` に渡します。
+引き渡しでは `map:` 付きの intent を書き、以後は入口の station が変更を担当し、
+地図は状態だけを参照します。一部の引き渡しは地図全体の完了ではありません。
+全 Destination の受け入れ条件を満たし、未知の点がなくなり、全 ticket が
+終了または撤回された時に完了します。
 
 ## Skills
 

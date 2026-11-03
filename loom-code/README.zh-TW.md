@@ -16,28 +16,27 @@
 
 ```mermaid
 flowchart TD
-    intent["① 你確認 intent<br/>loom-design:capture-intent<br/>沒裝 loom-design 時由 loom-code:write-plan"]
-    spec["只在 needs-design: yes 時<br/>loom-design:write-spec<br/>② product 變更：你確認可見的行為"]
-    plan["loom-code:write-plan<br/>plan.md 裡的任務 DAG"]
-    build["loom-code:build<br/>測試先行，每個任務一個 implementer<br/>最後跑 adversary 與完整 package 測試"]
-    review["loom-code:closing-review<br/>fresh-context 審查者<br/>需要時加 independent acceptance testing"]
-    attest[["產生 attestation<br/>由 loom-code:closing-review"]]
-    ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過 acceptance test report"]
-    merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
-    maintain["loom-code:maintain<br/>告警、CI 或回歸失敗、事故"]
+    intent["① 確認要解決的問題<br/>capture-intent"]
+    design{"需要設計？"}
+    spec["寫出設計<br/>write-spec<br/>② 僅確認產品可見行為"]
+    plan["規劃工作<br/>write-plan"]
+    build["實作與測試<br/>build"]
+    review["審查與驗證<br/>closing-review"]
+    ship["③ 發布 PR 並驗收結果<br/>ship"]
 
-    intent --> plan
-    intent -.->|"needs-design: yes"| spec
-    spec -.-> plan
+    intent --> design
+    design -->|"需要"| spec
+    design -->|"不需要"| plan
+    spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| attest
-    attest --> ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -->|"相符或新的 intent"| plan
+    review -->|"需要修改"| build
+    review -->|"檢查通過"| ship
 ```
+
+圖中的技能由 `loom-code` 提供；`capture-intent` 與 `write-spec` 則由
+`loom-design` 提供。沒裝 `loom-design` 時，由 `write-plan` 確認需求並在需要時
+寫出最小規格。合併與維護不放進這次變更的主流程，詳見下方說明。
 
 - **Intent** —— 裝了 `loom-design` 時由 `capture-intent` 確認 intent（①）；
   沒裝時，`write-plan` 自己覆述這次變更並問 ①。

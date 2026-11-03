@@ -17,26 +17,24 @@
 
 ```mermaid
 flowchart TD
-    subgraph stations["loom-design stations"]
-        intent["loom-design:capture-intent<br/>writes the intent<br/>① the user confirms the intent"]
-        spec["loom-design:write-spec<br/>only when needs-design: yes<br/>② product changes: the user confirms<br/>the visible behaviour"]
-    end
+    intent["① Confirm the change<br/>capture-intent"]
+    design{"Design needed?"}
+    spec["Describe the design<br/>write-spec<br/>② confirm visible product behaviour"]
+    check{"Review required?"}
+    review["Review the design<br/>closing-review"]
+    plan["Plan the work<br/>write-plan"]
 
-    specreview["loom-code:closing-review<br/>one fresh-context spec review<br/>only when pre-build-review: required"]
-    plan(["Hand-off to<br/>loom-code:write-plan"])
-
-    subgraph tools["On-demand tools, not flow steps"]
-        principles["loom-design:product-principles<br/>ratifies PRINCIPLES.md"]
-        designsys["loom-design:design-system<br/>ratifies DESIGN.md"]
-        arch["loom-design:architecture-design<br/>designs and ratifies ARCHITECTURE.md"]
-    end
-
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
-    spec -->|"pre-build-review: not-required"| plan
-    spec -.->|"pre-build-review: required"| specreview
-    specreview -.-> plan
+    intent --> design
+    design -->|"Yes"| spec
+    design -->|"No"| plan
+    spec --> check
+    check -->|"Yes"| review
+    check -->|"No"| plan
+    review -->|"Checks pass"| plan
 ```
+
+The review and planning steps use `loom-code`; the other skills in this
+diagram use `loom-design`.
 
 - **① Intent** — `capture-intent` interviews only until the wanted outcome
   is clear, writes `docs/loom/intent/<change-id>.md`, restates it in the

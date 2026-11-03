@@ -17,26 +17,23 @@
 
 ```mermaid
 flowchart TD
-    subgraph stations["loom-design のステーション"]
-        intent["loom-design:capture-intent<br/>intent を書く<br/>① ユーザーが intent を確認"]
-        spec["loom-design:write-spec<br/>needs-design: yes のときだけ<br/>② product の変更：目に見える振る舞いを<br/>ユーザーが確認"]
-    end
+    intent["① 解決する問題を確認<br/>capture-intent"]
+    design{"設計が必要？"}
+    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの振る舞いのみ確認"]
+    check{"事前レビューが必要？"}
+    review["設計をレビュー<br/>closing-review"]
+    plan["作業を計画<br/>write-plan"]
 
-    specreview["loom-code:closing-review<br/>fresh-context の spec review を 1 回<br/>pre-build-review: required のときだけ"]
-    plan(["引き渡し先<br/>loom-code:write-plan"])
-
-    subgraph tools["オンデマンドのツール（フローの段階ではない）"]
-        principles["loom-design:product-principles<br/>PRINCIPLES.md を ratify"]
-        designsys["loom-design:design-system<br/>DESIGN.md を ratify"]
-        arch["loom-design:architecture-design<br/>ARCHITECTURE.md を設計して ratify"]
-    end
-
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
-    spec -->|"pre-build-review: not-required"| plan
-    spec -.->|"pre-build-review: required"| specreview
-    specreview -.-> plan
+    intent --> design
+    design -->|"必要"| spec
+    design -->|"不要"| plan
+    spec --> check
+    check -->|"必要"| review
+    check -->|"不要"| plan
+    review -->|"検証に合格"| plan
 ```
+
+図のレビューと計画は `loom-code` が担当し、それ以外は `loom-design` が担当します。
 
 - **① Intent** — `capture-intent` は求める結果がはっきりするまでだけ
   ヒアリングし、`docs/loom/intent/<change-id>.md` を書き、ユーザーの言葉で
