@@ -139,6 +139,9 @@ opening a pull request ready for review after review and publication checks
 pass, with a separate merge decision. Publication defaults to automatic;
 explicitly offer opt-out before publication. Disclose before the answer.
 
+Apply `confirmation-examples.md` final-message check before sending;
+then ask and wait.
+
 ### Private records and reply handling
 
 Record `publication: automatic — authorized <date> by <name>` only after informed

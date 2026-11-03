@@ -21,8 +21,13 @@ EXAMPLE_RULES = (
     ("Repair", "assistant shorthand", "already supplied role"),
     ("Preserve", "interface boundary", "private helpers"),
     ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge"),
+    ("Borrow", "information connections", "case-specific facts"),
+    ("Require", "actual-request support or evidence", "date, role, impact and constraint"),
+    ("Check", "each sentence", "scope", "outcome", "required decision or consent"),
+    ("Retain", "required disclosures", "WARN", "cost/egress", "one-way-door", "carried details"),
 )
 LOAD_RULE = ("Read", "confirmation-examples.md", "before drafting or replying")
+FINAL_CHECK = ("Apply", "confirmation-examples.md", "final-message check", "before sending")
 
 
 @pytest.mark.parametrize(("path", "draft_boundary"), [
@@ -59,6 +64,12 @@ def test_local_confirmation_examples_are_portable_and_identical() -> None:
     pending = text.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
     good_interview = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
     assert "pull request" not in good_interview and "Saying yes" not in good_interview
+    assert "old" not in pending.lower() and "customer" not in pending.lower()
+    pair = text.split("## Known correction", 1)[1].split("\n## ", 1)[0]
+    good, bad = pair.split("Good:", 1)[1].split("Bad:", 1)
+    good = " ".join(line[2:] for line in good.splitlines() if line.startswith("> "))
+    bad = " ".join(line[2:] for line in bad.splitlines() if line.startswith("> "))
+    assert bad.startswith(good) and bad != good
 
 
 @pytest.mark.parametrize("path", [
@@ -76,6 +87,9 @@ def test_user_composer_is_separate_from_private_work(path: str) -> None:
     assert "uploading the change branch" in message and "separate merge decision" in message
     assert "**Write down every question" not in message and "`decision_point" not in message
     assert "**The complexity check" not in message and "`second-vendor:" not in message
+    assert affirms(" ".join(message.split()), *FINAL_CHECK)
+    final_link = re.search(r"Apply .*?`([^`]*confirmation-examples\.md)`", message)
+    assert final_link and ((REPO / path).parent / final_link.group(1)).is_file()
 
 
 def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
@@ -96,7 +110,7 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
     assert affirms(" ".join(before_draft.split()), *LOAD_RULE)
 
 
-@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, *EXAMPLE_RULES))
+@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, *EXAMPLE_RULES))
 def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
     verb, literal, *extras = rule
     sentence = f"{verb} {literal}, {', '.join(extras)}."

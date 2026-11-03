@@ -18,6 +18,7 @@ is the whole record. Their version numbers never continued here —
 - Add behavioral prompts for a short familiar request, unfamiliar concepts, a detailed follow-up, random own-list selection and an unknown factual date, for independent conversational exercises.
 - Load an adaptable content outline and complete contrasting examples before intake drafting or replies. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. Examples distinguish a brief missing-fact question from a complete known-fact confirmation, preserving faithful outcomes, interface boundaries and the same-yes publication consequence.
 - Preserve the original numbered consent-policy anchors after separating private preparation, retaining no-spec outcome/authorization routing and its existing regression coverage.
+- Bound example facts to their stated cases and use a neutral missing-date interview. The composer applies the reference's final-message relevance edit, removing irrelevant appended work inventory while preserving required notices and conditional disclosures.
 
 ## [2.20.0] — 2026-11-03 — preserve applicable work after changed requirements
 

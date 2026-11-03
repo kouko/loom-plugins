@@ -283,6 +283,9 @@ a pull request ready for review after review/publication checks pass, with a
 separate merge decision. Disclose automatic publication and offer opt-out before
 answering.
 
+Apply `references/confirmation-examples.md` final-message check before sending;
+then ask and wait.
+
 ### Private records and reply handling
 
 **Write down every question you asked** as `{decision_point, text, type}` with
