@@ -303,3 +303,80 @@ Read `blind-packet-i4.json`, all ten original `{case}-i4.jsonl` result records, 
 - Acceptance: 1 partly; 2 works; 3 partly; 4 works. All rows re-tested; no carried-over verdict.
 - Important findings remain: code-6's unverified list mechanism; repeated scope and internal bookkeeping especially capture-h1/code-h2. No finding is waived because tests or execution exits pass. Do not declare a global dogfood pass or unconditional readiness for finalization.
 - No new source/test edit, model run, external message, commit, remote write or publication. Only report/evidence changed. Prior failures remain above. Human understanding, ordinary installed-plugin loading/triggering, other hosts, future reliability and causal superiority over an unchanged baseline remain unproven.
+
+## Re-run on 2026-11-03, at 010d79e7afad64f2494b0201090a8dc1e272b089 — authorized iteration 5
+
+### Clean setup and provenance
+
+Independent witness, no source/test implementation. Fix range `aa9c8d1e..010d79e7` splits the primary adaptable template from the optional example gallery and clarifies that both publication actions require prior checks; both intake owners change. All four Acceptance lines were re-tested in full, none carried over. The confirmed intent and retained plan remain the requirements; `needs-design: no` means no missing spec flows. This is the fifth and final additional authorized iteration, not a reset of earlier failed history. No user-directed skip or dismissed important finding was supplied.
+
+```text
+git clone --no-hardlinks --quiet . /tmp/loom-context-acceptance-i5-clean
+git -C /tmp/loom-context-acceptance-i5-clean rev-parse HEAD
+010d79e7afad64f2494b0201090a8dc1e272b089
+```
+
+Inside the fresh clone, these checks exited zero:
+
+```text
+python3 scripts/sync_codex_manifests.py --check --all
+(no output)
+/Users/kouko/.conda/envs/dbt-redshift/bin/python3 loom-code/scripts/loom_checker.py contract --require 2.1
+contract 2.3.1 satisfies requires-contract >=2.1
+/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_intent_drafting_fidelity.py -q
+65 passed in 0.14s
+/Users/kouko/.local/bin/claude plugin validate /tmp/loom-context-acceptance-i5-clean/loom-code
+Validation passed
+/Users/kouko/.local/bin/claude plugin validate /tmp/loom-context-acceptance-i5-clean/loom-design
+Validation passed with warnings
+```
+
+Warnings are the existing missing listing icons and Claude's ignored design `requires-contract` field; the independent contract checker accepts compatibility. README marketplace setup would mutate installed state and fetch remote content rather than this candidate. Local validation and actual inline-plugin initialization establish the bounded candidate-loading setup; ordinary marketplace installation and automatic discovery/triggering remain unverified.
+
+Independently recomputed SHA256 for all **378/378** `export-manifest-i5.json` entries: clean source and current candidate bundle both match every manifest hash, whose source commit equals the tested HEAD. Read `blind-packet-i5.json`, all ten original `{case}-i5.jsonl` result/init/tool records and summaries, settings and changed owners/template. All ten packet replies equal original result text exactly; all exit 0, `is_error: false`, zero permission denials, model `claude-sonnet-5-5`. Init lists inline code 3.58.0 and workflow 5.19.0; capture cases also load design 2.21.0. Primary-template reads were requested ten times; optional gallery reads zero times. The gallery is optional, so zero is not a failure and does not support claiming gallery usage. Settings retain medium effort, disabled hooks/memory, restricted network and read-only candidate bundle. Code-8 contains one shell tool error during directory/absence inspection (its output also reports the contract accepted); the run recovered and completed. Zero permission denials is not a claim that every shell command succeeded. No fixture commits occurred. These are already executed first-party calls, not new witness model calls and not ten semantic passes.
+
+### 1. Subject, problem, intended scope and consequences — partly
+
+- Re-tested code-4/capture-4 simple unknown dates, code-5/capture-5 multiple issues, code-6/capture-6 detailed shorthand repair, capture-7 random eligible lists, code-8 explicitly unknown date, capture-h1 currency and code-h2 verified command correction, including any saved drafts.
+- Every case identifies its central subject, issue and intended outcome. Date interviews leave missing dates unknown. Multiple-issue cases retain selection ownership, configured retry limits, blocked-queue impact and successful-job preservation. Currency keeps legitimate amount variation, format and existing-file preservation; known command correction uses the supplied verified command. Both detailed repairs now distinguish the role of a selection rule from an unverified list/file/cache representation; the previous code-6 list-mechanism finding is not reproduced.
+- **Important current scope contradiction, capture-6:** its desired-outcome table says `每個工作都用它自己的選擇規則來決定由誰執行,不再借用別的工作的規則。` Later it says `範圍只含目前受影響的工作。我不會自行擴大到「所有工作」。` The latter is explicitly a future correction boundary, not merely a description of which jobs are presently observed to fail. The user describes worker selection as choosing who runs **each job** and reports borrowed selection; no restriction to a presently enumerated failing subset is supplied. The table preserves the universal target, so the output is contradictory rather than consistently narrowed. No draft was written; this evidence establishes an inconsistent explanation, not an implemented subset-only fix. Close by retaining the each-job target while leaving the unknown observed failing population as an unknown fact, then verifying actual replies.
+- Code-6 also says it will write only `受影響的工作`, but its stated outcome remains every job. That is less explicit than capture-6's scope exclusion and is not independently counted as a second definite narrowing. Likewise `同樣類型`/`同一類` in both corrections adds an unstated result comparison; it does not introduce a deterministic target and is not needed to establish the finding.
+- Code-5 translates profile as `派送設定檔`, although the request defines a selector role and does not establish file representation. This is avoidably specific terminology, but may be ordinary translation rather than a concrete file design promise; it is not independently elevated to an important mechanism finding. The explicit representation disclaimers in both detailed repairs are correctly credited.
+- All ready confirmations (capture-5, code-5, code-6, capture-7, capture-h1, code-h2, plus provisional code-8) now explicitly put **both** non-forced branch upload and review-ready PR after review and publication checks, with opt-out until publication and separate merge. Capture-4/code-4 are missing-date interviews, and capture-6 remains an interview asking missing facts; lack of a full grant there is not a failure. Capture-6's future `是否上傳` wording does not by itself establish a changed automatic default in an actual ready confirmation.
+- Verdict partly: earlier mechanism and authorization issues improve, but the scope contradiction remains material to understanding what is being requested.
+
+### 2. Flexible expression — works
+
+- Read both owners and the new primary template. The outline explicitly permits merging, reordering, expanding, optional headings and free length. Actual outputs vary between prose, bullet lists, numbered items and capture-6's table. No mandatory fill-in sentence or required set of displayed headings appears.
+- Clean-copy focused tests: 65 passed, including both owners' fidelity and flexible-composition checks. They supplement actual examples, not replace semantic assessment.
+- The full suite belongs to the automated test suite, which runs before the change is accepted and blocks it on failure: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. This witness did not run it. The station reports Build exit 0 at `/tmp/context-outline-i5-suite.log`; no claim of witness-run full tests is made. Finalization is not user-skipped, but is ineligible with the important findings below; the old attestation remains stale and no successful renewal is promised.
+
+### 3. Proportionate length and sufficient concept explanation — partly
+
+- Both detailed repairs now explain the assistant's `profile` shorthand using the supplied selection-rule role, without pretending to have verified an application object. Asking for a concrete observed example or missing impact does not itself fail acceptance; capture-6 is a pending interview, not an ignored confirmation. Dates remain unknown instead of being invented. The supplied retry and currency concepts are understandable in context.
+- **Important continuing brevity defect:** capture-5 repeats outcome information in Problem, desired result, four acceptance lines and out-of-scope. It additionally lists `engineering`, `needs-design: no`, next station, absence of irreversible choices, counts of acceptance/constraint fields and `none` open questions. These add internal schema/work inventory rather than decision context. Capture-7 likewise includes type/design routing and `這是單純的錯誤修正,沒有增加機制,所以沒有跑複雜度檢查。`
+- Capture-h1 repeats unchanged format and untouched old files under acceptance, fixed constraints and exclusions, then adds `這是修 bug，所以我沒有跑複雜度檢查。`, `跨模型審查：預設是 suggest，這裡不問你。`, and a list of frequencies/workarounds/customer counts it did not infer. The concrete consequence that old incorrect exports remain incorrect is useful and is **not** counted as excess; skipped-check/default-setting narration is not useful for choosing currency-setting ownership.
+- The simple known command correction code-h2 adds `未決問題：無`, a branch/commit announcement, `接著我會寫出實作計畫,再交給 build 階段。計畫只有一項任務,就是改那一行。`, then appends draft path and uncommitted/no-branch inventory **after the confirmation question**. Its facts and consent paragraph are correct, but these additions do not help decide the one-line correction. The new template expressly requires removing private progress/status/paths/check logs/commits/handoff inventory and ending at the question; the actual known-fact sample has not achieved that result.
+- Code-4 also narrates future draft fields and private no-file/no-commit state around a legitimate missing-date question. Not every long response or heading is a failure, and the detailed request is allowed more space. No arbitrary word limit is used; necessary authorization disclosure and relevant consequences are retained. The issue is unnecessary repetition and internal work inventory across both owners.
+- Verdict partly: concept repair and unknown-fact handling work in these samples, but simple-case brevity and whole-message relevance remain inconsistent. Close with observed concise known-fact confirmations and relevant detailed explanations, rather than further source assertions alone.
+
+### 4. Requirements and necessary authority only — works
+
+- All ten actual requested answers concern facts needed to understand the issue, whether the intended result/scope is right, or necessary publication authority. None asks the user to judge implementation design, specification quality or a review verdict.
+- Capture-6 asks examples/affected people/workarounds/preservation boundaries while staying unconfirmed; these may be more questions than useful, but are outcome/fact questions, not implementation approval. The scope contradiction is recorded under row 1, not converted into a false reviewer-quality demand.
+- No unqualified ban on private functions or request to choose a new default worker policy recurs. Code-h2's implementation-stage narration is a row-3 relevance defect, not an implementation decision placed on the user. Verdict works for this sampled criterion.
+
+### Final iteration disposition
+
+- Acceptance: **1 partly, 2 works, 3 partly, 4 works**. All re-tested; no carried-over row.
+- Important unresolved findings: capture-6's conflict between each-job coverage and currently-affected-only scope; repeated scope/internal workflow inventory across capture-5/capture-7/capture-h1/code-h2. No important finding is dismissed because tests pass, execution exits zero, or the iteration allowance is exhausted.
+- Five additional iterations are used. This witness performs no sixth repair, model call, commit or publication. The station must stop with honest incomplete acceptance; current old attestation is stale and will not be renewed as passing on this evidence.
+- No global dogfood pass, ordinary installation/automatic-trigger proof, live-hook proof, human comprehension result, causal superiority, or future-reliability claim. Only the report/evidence changed; prior failed history is preserved.
+
+### Metadata clarification — omitted shared prompt context, no new iteration
+
+Independently read `loom-workflow/hooks/hooks.json`, `loom-workflow/hooks/visualization-card`, `loom-workflow/skills/loom-visualization/assets/trigger-card.md`, and `/tmp/loom-context-claude-dogfood-retest/settings-run.json`. The manifest registers `UserPromptSubmit` to call `hooks/visualization-card`; that script normally reads a static card and injects it as additional prompt context. The full card supplies shared plain-language and visualization guidance: conclusion and user impact first, explain function before internal names, literal actors/actions, and context-sensitive tables/diagrams. The script can select a coexistence card when the ASCII toolkit is active; normal integrated behavior depends on the runtime installation and settings.
+
+The test settings explicitly have `disableAllHooks: true`, with global instruction exclusion via `claudeMdExcludes: ["/Users/kouko/**"]`; runners use `--setting-sources ''` and this settings file. All five additional-iteration batches, 50 samples, therefore lacked the normal UserPromptSubmit shared card. This specific omission was overlooked when interpreting verbosity. These are isolated candidate-skill tests without that shared prompt context, not a measurement of normal integrated hook behavior. This limits transfer of the observed prose/style findings to the complete installed environment; it does not erase actual isolated scope/style failures or show that enabling the card would repair them. No hook-enabled comparison was run, and the user limit precludes another probe or sixth source iteration. Verdicts remain 1 partly, 2 works, 3 partly, 4 works.
+
+Report row 2 now cites only this witness's 65 passing focused checks and observed formatting flexibility. Build's complete locked package-suite pass is station-provided evidence at `/tmp/context-outline-i5-suite.log`, not a witness full-suite run. Finalization is held and was not run for this candidate; no fresh attestation, future successful final review or future package result is claimed. This clarification changes report provenance only, without source/test edits, new model calls, commits or publication.
