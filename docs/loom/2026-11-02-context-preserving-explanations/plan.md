@@ -3,6 +3,7 @@ intent: 2026-11-02-context-preserving-explanations@2cfaae5e
 charter: 1.1
 
 ## Current State Evidence
+- Current continuation (2026-11-04): the user explicitly approved fixed five-section explanations with grounded project/function background and current direction first. This replaces optional headings, not sentence-level freedom or the missing-facts interview. W0/W1 below retain prior trial history; their superseded presentation obligations do not govern W3. W2 shipped independently in PR #130. Prior failures and counts remain retained.
 - Forward: `loom-design/skills/capture-intent/SKILL.md` Step 4 requires a plain-language Problem and Acceptance restatement before confirmation.
 - Reverse: `loom-code/skills/write-plan/references/confirm-intent.md` duplicates decision point 1 for code-only installations.
 - Error: `loom-design/skills/capture-intent/SKILL.md` Step 4's short fill-in example does not explicitly connect unfamiliar terms, present pain and consequences.
@@ -61,6 +62,26 @@ charter: 1.1
 - Test: A1 positive: live-case-abstraction; negative: imported-list-or-population. A2 positive: adaptable-content-grouping; negative: required-script. A3 positive: primary-brief-output; negative: repeated-artifact-inventory. A4 positive: both-actions-after-checks; negative: early-upload-or-optout-cutoff.
 - Risk: agent-decided — final authorized iteration: load a short primary content template, with examples optional and context-bound. Preserve evidence strength, scope and free expression; clarify both-action publication timing and opt-out. Keep prior failure history and all relevant test coverage.
 
+**W2-01 Save the approved titled before/after flow illustration** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-workflow/skills/loom-visualization/templates/02-linear-steps.md`, `loom-workflow/skills/loom-visualization/SKILL.md`, retained intent Constraints and this plan.
+- Verification: run existing template tests; reproduce the illustration with the existing flow generator and width helper, and run `align.py` on side-by-side and stacked layouts.
+- Risk: user-decided — save the specifically demonstrated outer-panel style as a shared documentation example. This newly requested reusable illustration is distinct from the exhausted confirmation-source iterations; it does not reset their counts or prove prior failures resolved. The proposed five-section confirmation redesign remains unimplemented. No production generator, confirmation-contract change, publication or release is included; earlier evidence does not verify this new example.
+
+**W3-00 Integrate the released visualization example and current main** after: W1-02 acceptance: 1,2,3,4
+- Files: current four uncommitted paths, upstream merge paths, release metadata and existing release pins.
+- Test: A1 positive: preserved-intent-history. A2 positive: current-confirmed-scope. A3 positive: released-diagram-preserved. A4 negative: unrelated-feature-loss.
+- Risk: agent-decided — preserve local approved work in a checkpoint before integration; merge main rather than replaying or deleting historical trials. The local visualization edits already equal the released files and must not appear as a new visualization release. Keep code/design unpublished minor releases, preserve main's patch history and workflow 5.19.2, and renew content-bound evidence after integration.
+
+**W3-01 Implement the newly approved five-section confirmation contract** after: W3-00 acceptance: 1,2,3,4
+- Files: both confirmation-template.md and confirmation-examples.md copies, capture-intent/SKILL.md, write-plan confirmation producers, affected existing contract tests and focused behavior fixtures.
+- Test: A1 positive: grounded-project-context-and-current-direction; negative: invented-roadmap. A2 positive: five-localized-sections-in-order; boundary: missing-required-facts-interview. A3 positive: concise-known-correction-and-framed-process-comparison; negative: cross-section-duplication-or-unverified-after-state. A4 positive: same-yes-publication-after-checks; negative: technical-quality-choice.
+- Risk: user-decided — fixed headings and source-grounded opening context are newly approved output obligations, distinct from the exhausted optional-outline task. Preserve prior evidence and counters, and do not claim they verify this contract. Remove competing optional-heading and overbroad public/private directions rather than stacking new reminders. Reuse the existing portable reference structure and optional visualization skill; do not require a cross-plugin filesystem path or new generator.
+
+**W3-02 Exercise realistic requests and finish independent verification** after: W3-01 acceptance: 1,2,3,4
+- Files: retained behavioral evidence and acceptance report; affected plugin release notes and version pins before finalization.
+- Test: A1 positive: invoice-export-context. A2 positive: ordinary-new-feature; boundary: incomplete-request. A3 positive: simple-correction-and-before-after-flow; negative: repeated-scope-and-private-inventory. A4 positive: understandable-consent; negative: extra-user-quality-checkpoint.
+- Risk: agent-decided — use identical, concrete requests and supplied project context for old/new samples under verified plugin hooks and explicit first-party model routing. Keep source selection and observed quality separate; run focused checks, adversarial checks, the complete locked suite and fresh independent review. No publication or merge is authorized for this continuation.
+
 ## Simplicity check
 - none found
 
@@ -68,8 +89,8 @@ charter: 1.1
 1 — what — 確認這次要做到：各確認點的說明都保留理解所需的背景、名詞與結果，簡單事情仍簡短，且不增加確認次數嗎？
 
 ## Risks
-1. user-decided — after industry research, scope is narrowed to decision point 1; fixed sentences are examples only. Product behavior confirmation and final acceptance remain unchanged.
-2. agent-decided — no new skill, checker rule, schema field or mandatory conversation section; reuse existing references and tests, adding focused examples only if necessary.
+1. user-decided — scope remains decision point 1. The earlier optional-heading design was superseded by the approved five-section structure on 2026-11-04; sentence wording stays free. Product behavior confirmation and final acceptance remain unchanged.
+2. agent-decided — reuse existing references and tests, with no new skill, checker rule or schema field. W3 adds the explicitly approved conversation sections; no additional workflow decision point is introduced.
 3. agent-decided — prose assertions cannot establish actual conversational behavior; fresh-context exercises must cover unfamiliar concepts, simple requests, and a user's detailed follow-up.
 4. agent-decided — sources motivate the design, not a claim of proven effectiveness: GOV.UK check-answers, Google conversation design, NHS SBAR, Google Cloud ADR and Atlassian DACI guidance were consulted.
 5. user-decided — repair dogfood findings D1–D3, fix the harness and rerun six original scenarios plus two counterexamples; publication remains held. This corrects observed failures under existing Acceptance, without changing requested outcomes or restarting review budgets.
