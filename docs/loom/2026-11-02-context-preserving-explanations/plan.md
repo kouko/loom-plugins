@@ -1,9 +1,10 @@
 # Context-preserving intent confirmation — plan
-intent: 2026-11-02-context-preserving-explanations@7df77107b43fb8d44e7c1caabd78fe1dd871551e
+intent: 2026-11-02-context-preserving-explanations@4fb8925051e7a9f96b1d251d586d54c4d06965d3
 charter: 1.1
 
 ## Current State Evidence
 - Current continuation (2026-11-04): approved five-section explanations replace optional headings; grounded background comes first. W0/W1 retain historical failures and counts. W2 shipped in PR #130; W3 carries the new obligations.
+- Five-section draft: both confirmation owners load identical portable templates; examples retain prior safety cases and add concrete invoice/CSV cases. Source iteration history remains unchanged.
 - Forward: `loom-design/skills/capture-intent/SKILL.md` Step 4 requires a plain-language Problem and Acceptance restatement before confirmation.
 - Reverse: `loom-code/skills/write-plan/references/confirm-intent.md` duplicates decision point 1 for code-only installations.
 - Error: `loom-design/skills/capture-intent/SKILL.md` Step 4's short fill-in example does not explicitly connect unfamiliar terms, present pain and consequences.

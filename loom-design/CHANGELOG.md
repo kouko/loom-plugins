@@ -12,13 +12,14 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.21.0] — 2026-11-03 — preserve context in intent confirmation
+## [2.21.0] — 2026-11-04 — grounded five-section intent confirmation
 
-- `capture-intent` connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. Limit workflow detail throughout intake while preserving concrete publication and authorization consequences. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
+- `capture-intent` uses five ordered, localized sections: background and current direction, current problem and impact, what changes, scope and acceptance, and confirmation. Connect sourced project or function context to the request, with natural wording and proportionate length. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. The existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
 - Add behavioral prompts for a short familiar request, unfamiliar concepts, a detailed follow-up, random own-list selection and an unknown factual date, for independent conversational exercises.
-- Load a short adaptable primary content template before intake drafting or replies; read relevant optional illustrations only when needed. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. Preserve each live-case fact's abstraction, present affected population and supplied boundaries without repeating artifact fields.
+- Load the five-section primary content template before intake drafting or replies; read relevant optional illustrations only when needed. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. Preserve each live-case fact's abstraction, present affected population and supplied boundaries without repeating artifact fields.
 - Preserve the original numbered consent-policy anchors after separating private preparation, retaining no-spec outcome/authorization routing and its existing regression coverage.
 - Bound example facts to their stated cases and use a neutral missing-date interview. The composer applies the primary template's relevance edit while preserving required disclosures. Both non-forced branch upload and ready-for-review pull request opening wait for completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
+- Illustrate the structure with concrete invoice and CSV requests. Use titled ASCII comparisons when helpful, marking expected results and reusing optional visualization tooling with a readable standalone fallback.
 
 ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
 

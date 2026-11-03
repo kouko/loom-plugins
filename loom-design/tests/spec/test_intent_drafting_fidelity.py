@@ -18,13 +18,15 @@ RULES = (
 )
 EXAMPLE_RULES = (
     ("Write", "user's conversation language"),
-    ("Use", "outline as content connections", "optional", "grouping", "length"),
+    ("Use", "five sections in this order", "Background and current direction", "Current problem and impact", "What changes", "Scope and acceptance", "Please confirm"),
+    ("Connect", "sourced project or function purpose", "established direction", "this request"),
+    ("Keep", "missing required facts", "existing interview"),
     ("Repair", "assistant shorthand", "already supplied role"),
     ("Preserve", "interface boundary", "private helpers"),
     ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge"),
     ("Borrow", "information connections", "case-specific facts"),
     ("Require", "actual-request support or evidence", "date, role, impact and constraint"),
-    ("Check", "each sentence", "scope", "outcome", "required decision or consent"),
+    ("Check", "each sentence", "grounded context", "scope", "outcome", "required decision or consent"),
     ("Retain", "required disclosures", "WARN", "cost/egress", "one-way-door", "carried details"),
     ("Ground", "every factual clause", "this request/current evidence"),
     ("Preserve", "abstraction", "present-versus-desired quantifiers"),
@@ -88,6 +90,15 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
         assert "Only after review and publication checks pass" in positive
         assert "both a non-forced branch upload and a pull request ready for review" in positive
         assert "anytime before publication" in positive
+        headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
+        assert headings == ["Background and current direction", "Current problem and impact",
+                            "What changes", "Scope and acceptance", "Please confirm"]
+    for case in ("Invoice currency correction", "Filtered CSV export"):
+        section = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
+        assert "Good:" in section and "Bad:" in section
+        headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
+        assert headings == ["Background and current direction", "Current problem and impact",
+                            "What changes", "Scope and acceptance", "Please confirm"]
 
 
 @pytest.mark.parametrize("path", [
@@ -102,6 +113,7 @@ def test_user_composer_is_separate_from_private_work(path: str) -> None:
     assert preparation < composer < records
     message = text[composer:records]
     assert "Compose **one message**" in message and "Restate Problem and Acceptance" in message
+    assert "Everything below goes" not in message
     assert "uploading the change branch" in message and "separate merge decision" in message
     assert "**Write down every question" not in message and "`decision_point" not in message
     assert "**The complexity check" not in message and "`second-vendor:" not in message

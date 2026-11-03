@@ -70,8 +70,8 @@ Optional illustrations: read relevant sections of `references/confirmation-examp
 Before drafting: Preserve supplied facts and outcome strength, including
 qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
-Lead with the user's problem or missing fact, minimizing workflow labels and
-bookkeeping throughout intake; retain consequence/authorization disclosures.
+Lead interviews with the user's problem or missing fact, minimizing workflow
+labels and bookkeeping; retain consequence/authorization disclosures.
 Keep missing required facts in the existing interview, asking only for the
 needed fact and why it matters. Compose confirmation only when required facts
 are resolved.
@@ -265,16 +265,17 @@ from repo evidence and record the reason; asking the user is a
 
 ### User message
 
-Compose **one message**. Everything below goes into it; you do not stop
-twice, and this is the only stop this station makes.
+Compose **one message** for the user's confirmation, then wait; this is the only
+confirmation stop this station makes.
 Include applicable consequences and questions prepared above; omit private
 records and intent-document inventory.
 
 Restate Problem and Acceptance: subject, problem, impact, outcome and
 confirmation scope. Use the user's plain words, never paths, identifiers or
 mechanism names. Supply necessary context for unfamiliar terms and affected
-people at intent altitude. Choose wording, length and presentation freely,
-keeping familiar requests short. Examples, scripts and headings are optional.
+people at intent altitude. Use five ordered sections from
+`references/confirmation-template.md`, with headings required.
+Choose wording and length freely, keeping familiar requests short.
 Check these connections and what yes confirms and authorizes; outcomes only,
 never implementation approval.
 

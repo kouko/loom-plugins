@@ -1,11 +1,12 @@
 # Changelog
 
-## [3.58.0] — 2026-11-03 — preserve context in intent confirmation
+## [3.58.0] — 2026-11-04 — grounded five-section intent confirmation
 
-- Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. Limit workflow detail throughout intake while preserving concrete publication and authorization consequences. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
+- Code-only intent confirmation uses five ordered, localized sections: background and current direction, current problem and impact, what changes, scope and acceptance, and confirmation. Connect sourced project or function context to the request, with natural wording and proportionate length. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. The existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
 - Load a short primary content template before intake drafting or replies, with optional relevant illustrations and parity coverage for both portable file pairs. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. State each live-case fact once, preserving its abstraction, present affected population and supplied boundaries.
 - Load the primary template directly from the main code-only entry before both new-intent drafting and open-intent confirmation, retaining the already-confirmed fast path. The no-intent reader loads its rules before writing; restore the original numbered consent-policy anchors without changing their routing or private/user-message separation.
 - Apply the primary template's final-message relevance check at the existing composer, retaining required disclosures and excluding borrowed example facts or private inventory. Explicitly condition both non-forced branch upload and ready-for-review pull request opening on completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
+- Illustrate the structure with concrete invoice and CSV requests, preserving missing-fact interviews. Use titled ASCII comparisons when helpful, marking expected results and reusing optional visualization tooling with a readable standalone fallback.
 
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 

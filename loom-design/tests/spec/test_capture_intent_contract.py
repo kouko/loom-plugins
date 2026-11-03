@@ -102,7 +102,8 @@ STEP_4 = "## Step 4 — Decision point ①: restate and confirm"
 RESTATEMENT_CONTENT = (
     ("Restate", "Problem and Acceptance", "subject, problem, impact", "outcome", "confirmation scope"),
     ("Supply", "necessary context", "unfamiliar terms", "affected people", "intent altitude"),
-    ("Choose", "wording, length and presentation freely", "keeping familiar requests short"),
+    ("Choose", "wording and length freely", "keeping familiar requests short"),
+    ("Use", "five ordered sections", "headings required"),
     ("Check", "these connections", "what yes confirms and authorizes"),
     ("Preserve", "supplied facts", "outcome strength"),
     ("Leave", "unknown facts unresolved", "user answers", "evidence"),
@@ -112,13 +113,13 @@ RESTATEMENT_CONTENT = (
 
 
 @pytest.mark.parametrize("owner", [SKILL, REPO / "loom-code/skills/write-plan/references/confirm-intent.md"])
-def test_first_confirmation_preserves_context_with_flexible_expression(owner: Path) -> None:
+def test_first_confirmation_preserves_context_in_five_sections(owner: Path) -> None:
     """A1-A4: both entry owners carry the connected content and self-check."""
     text = _flat(owner.read_text(encoding="utf-8"))
     for verb, literal, *extras in RESTATEMENT_CONTENT:
         assert affirms(text, verb, literal, *extras), (owner, literal)
     assert "你要的是 ___" not in text
-    assert "Examples, scripts and headings are optional." in text
+    assert "Examples, scripts and headings are optional." not in text
     assert "Use the user's plain words, never paths, identifiers or mechanism names." in text
 
 
@@ -132,8 +133,8 @@ def test_first_confirmation_content_rejects_reversed_obligations(rule: tuple[str
 
 # Whole sentences, not keyword subsets: a keyword pin lets reversed meaning pass.
 NO_SECOND_STOP = (
-    "Compose **one message**. Everything below goes into it; you do not stop "
-    "twice, and this is the only stop this station makes."
+    "Compose **one message** for the user's confirmation, then wait; "
+    "this is the only confirmation stop this station makes."
 )
 COMPLEXITY_CHECK = (
     "When the user's request or an option under discussion would add a "
