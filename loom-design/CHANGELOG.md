@@ -20,6 +20,11 @@ is the whole record. Their version numbers never continued here —
 - Preserve the original numbered consent-policy anchors after separating private preparation, retaining no-spec outcome/authorization routing and its existing regression coverage.
 - Bound example facts to their stated cases and use a neutral missing-date interview. The composer applies the primary template's relevance edit while preserving required disclosures. Both non-forced branch upload and ready-for-review pull request opening wait for completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
 
+## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
+
+- Add human-facing guides for all six skills, including examples, outputs, confirmation points and boundaries.
+- Link the three plugin README translations to skill guides and the project overview. Keep on-demand tools outside the main design flow diagram.
+
 ## [2.20.0] — 2026-11-03 — preserve applicable work after changed requirements
 
 - `capture-intent` requires renewed confirmation after substantive requirements changes during implementation and routes affected design, plan and evidence back through their owning stations while carrying applicable work forward.

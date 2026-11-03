@@ -13,60 +13,38 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.21.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.58.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.19.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`), editable diagrams for standalone or Loom discussions. |
+| [`loom-design`](loom-design/README.md) | 2.21.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-code`](loom-code/README.md) | 3.58.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/README.md) | 5.19.2 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
-Each plugin keeps its own manifest, version, tests and changelog; its README
-covers usage in depth.
+Each plugin keeps its own manifest, version, tests and changelog. Plugin
+links open its README; skill links below open the detailed usage guide.
+Each skill guide links back to its plugin and this project overview.
 
 ## The Loom flow
 
+This diagram shows one change only. Exploration and on-demand tools are listed
+separately below. Skill names are qualified by their plugin in the skill tables.
+Merging the PR is a separate action after `ship`, with your explicit authorization.
+
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    idea(["Idea or change request<br/>received by<br/>loom-design:capture-intent"])
+    intent["① Confirm the change<br/>capture-intent"]
+    design{"Design needed?"}
+    spec["Describe the design<br/>write-spec<br/>② confirm visible product behaviour"]
+    plan["Plan the work<br/>write-plan"]
+    build["Implement and test<br/>build"]
+    review["Review and verify<br/>closing-review"]
+    ship["③ Publish PR and accept result<br/>ship"]
 
-    subgraph dm["loom-workflow:decision-map"]
-        direction TB
-        dest["Destination<br/>where the map should end up"]
-        fog["Fog<br/>what is still unknown"]
-        ticket["Ticket<br/>grill, research or prototype one unknown"]
-        log["Decisions so far"]
-    end
-
-    subgraph design["loom-design"]
-        intent["loom-design:capture-intent<br/>① you confirm the intent"]
-        spec["loom-design:write-spec<br/>only when needs-design: yes<br/>② you confirm visible behaviour"]
-    end
-
-    subgraph code["loom-code"]
-        plan["loom-code:write-plan<br/>task DAG"]
-        build["loom-code:build<br/>test-first, one commit per task"]
-        review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
-        ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (acceptance test report when required)"]
-        maintain["loom-code:maintain<br/>alerts, CI or regression failures"]
-    end
-
-    merged(["Merged PR<br/>merged separately after<br/>loom-code:ship"])
-
-    idea --> intent
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
+    intent --> design
+    design -->|"Yes"| spec
+    design -->|"No"| plan
     spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -.->|"new or matching intent"| plan
-
-    dest --> fog
-    fog -->|"pick one"| ticket
-    ticket -->|"record the answer"| log
-    ticket -.->|"new unknowns"| fog
-    dm -->|"a slice is ready: intent with map:"| intent
+    review -->|"Needs changes"| build
+    review -->|"Checks pass"| ship
 ```
 
 - **① Intent** — `capture-intent` restates the change in your words, with
@@ -96,14 +74,14 @@ points or run on demand.
 
 | Tool | When it is used in the flow | What it does |
 | --- | --- | --- |
-| `decision-map` | Before the flow: writes the intent that starts a change | Keeps a long-running Outcome Map and turns a ready slice into an intent. |
-| `git-memory` | Before every commit at any station (intent, plan, build, attestation); at `ship` when the PR is created; and before the PR is merged, which happens after `ship` | Classifies decision, learning and gotcha memory for commits and the PR body. |
-| `loom-memory` | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
-| `independent-advisor`, `handoff`, `recap-state` | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
-| `project-retro`, `skill-retro` | On demand, not tied to a station | `project-retro` reviews one coding session for project development improvements; `skill-retro` mines multiple sessions for skill improvement proposals. |
+| [`decision-map`](loom-workflow/skills/decision-map/README.md) | Before the flow: writes the intent that starts a change | Keeps a long-running Outcome Map and turns a ready slice into an intent. |
+| [`git-memory`](loom-workflow/skills/git-memory/README.md) | Before every commit at any station (intent, plan, build, attestation); at [`ship`](loom-code/skills/ship/README.md) when the PR is created; and before the PR is merged, which happens after [`ship`](loom-code/skills/ship/README.md) | Classifies decision, learning and gotcha memory for commits and the PR body. |
+| [`loom-memory`](loom-workflow/skills/loom-memory/README.md) | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
+| [`independent-advisor`](loom-workflow/skills/independent-advisor/README.md), [`handoff`](loom-workflow/skills/handoff/README.md), [`recap-state`](loom-workflow/skills/recap-state/README.md) | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
+| [`project-retro`](loom-workflow/skills/project-retro/README.md), [`skill-retro`](loom-workflow/skills/skill-retro/README.md) | On demand, not tied to a station | [`project-retro`](loom-workflow/skills/project-retro/README.md) reviews one coding session for project development improvements; [`skill-retro`](loom-workflow/skills/skill-retro/README.md) mines multiple sessions for skill improvement proposals. |
 
 `decision-map` is for work whose whole route cannot be listed up front; its
-loop is the `loom-workflow:decision-map` group in the flow diagram above.
+loop is shown separately in the [loom-workflow README](loom-workflow/README.md#decision-map-loop).
 The map, called an Outcome Map, lives at `docs/loom/maps/<map-id>/` as
 `MAP.md` plus a `tickets/` directory and persists across sessions. An unknown
 becomes a ticket only once or is moved out of scope, and a grilling ticket hands
@@ -121,12 +99,12 @@ planning onward; intent and spec work alone.
 
 | Skill | Role |
 | --- | --- |
-| `capture-intent` | Interview, write and confirm a change intent (decision point ①). |
-| `write-spec` | Write a design spec from a confirmed `needs-design: yes` intent (decision point ②). |
-| `product-principles` | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
-| `design-system` | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
-| `architecture-design` | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
-| `using-loom-design` | Optional router to the right product-definition skill. |
+| [`capture-intent`](loom-design/skills/capture-intent/README.md) | Interview, write and confirm a change intent (decision point ①). |
+| [`write-spec`](loom-design/skills/write-spec/README.md) | Write a design spec from a confirmed `needs-design: yes` intent (decision point ②). |
+| [`product-principles`](loom-design/skills/product-principles/README.md) | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
+| [`design-system`](loom-design/skills/design-system/README.md) | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
+| [`architecture-design`](loom-design/skills/architecture-design/README.md) | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
+| [`using-loom-design`](loom-design/skills/using-loom-design/README.md) | Optional router to the right product-definition skill. |
 
 ## loom-code
 
@@ -135,19 +113,20 @@ content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
 | --- | --- |
-| `write-plan` | Turn a confirmed intent into a task DAG with tests and risks per task. |
-| `build` | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
-| `closing-review` | Run the closing review (read, acceptance testing) on Build-checked content and generate an attestation. |
-| `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
-| `maintain` | Attach alerts, CI or regression failures or incidents that arrive without a user's bug-fix request to a matching open intent, or create one, and hand it to write-plan. |
-| `using-loom-code` | Optional router to the right station. |
+| [`write-plan`](loom-code/skills/write-plan/README.md) | Turn a confirmed intent into a task DAG with tests and risks per task. |
+| [`build`](loom-code/skills/build/README.md) | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
+| [`closing-review`](loom-code/skills/closing-review/README.md) | Run the closing review (read, acceptance testing) on Build-checked content and generate an attestation. |
+| [`ship`](loom-code/skills/ship/README.md) | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
+| [`maintain`](loom-code/skills/maintain/README.md) | Attach alerts, CI or regression failures or incidents that arrive without a user's bug-fix request to a matching open intent, or create one, and hand it to write-plan. |
+| [`using-loom-code`](loom-code/skills/using-loom-code/README.md) | Optional router to the right station. |
+| [`external-review`](loom-code/skills/external-review/README.md) | Execute one authorized outside review with an explicit model and effort; the caller keeps its review criteria. |
 
 It also ships the `implementer`, `reviewer`, `acceptance-tester` and `adversary`
 agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.19.0. Workflow tools used around the stations; most work without
+Version 5.19.2. Workflow tools used around the stations; most work without
 `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -155,20 +134,20 @@ attach to the flow.
 
 | Skill | Role |
 | --- | --- |
-| `loom-memory` | Recall, record, reconcile or retire durable repository lessons. |
-| `git-memory` | Classify commit and PR memory before committing; recall why a past decision was made. |
-| `critique` | Judge a proposal or look for a simpler version of a change. |
-| `decision-map` | Chart or advance a persistent Outcome Map across sessions. |
-| `independent-advisor` | Get a second opinion from another model, effort level or vendor. |
-| `recap-state` | In-session recap of where the work stands. |
-| `handoff` | Save or resume state across sessions. |
-| `skill-retro` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
-| `project-retro` | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
-| `loom-visualization` | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
-| `loom-interactive-diagram` | Create and validate editable diagrams for standalone or Loom discussions; ask before editing an external diagram whether to copy it into the project. |
-| `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
-| `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
-| `using-loom-workflow` | Optional router to the right workflow tool. |
+| [`loom-memory`](loom-workflow/skills/loom-memory/README.md) | Recall, record, reconcile or retire durable repository lessons. |
+| [`git-memory`](loom-workflow/skills/git-memory/README.md) | Classify commit and PR memory before committing; recall why a past decision was made. |
+| [`critique`](loom-workflow/skills/critique/README.md) | Judge a proposal or look for a simpler version of a change. |
+| [`decision-map`](loom-workflow/skills/decision-map/README.md) | Chart or advance a persistent Outcome Map across sessions. |
+| [`independent-advisor`](loom-workflow/skills/independent-advisor/README.md) | Get a second opinion from another model, effort level or vendor. |
+| [`recap-state`](loom-workflow/skills/recap-state/README.md) | In-session recap of where the work stands. |
+| [`handoff`](loom-workflow/skills/handoff/README.md) | Save or resume state across sessions. |
+| [`skill-retro`](loom-workflow/skills/skill-retro/README.md) | Mine past Claude Code or Codex sessions for skill improvement proposals. |
+| [`project-retro`](loom-workflow/skills/project-retro/README.md) | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
+| [`loom-visualization`](loom-workflow/skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
+| [`loom-interactive-diagram`](loom-workflow/skills/loom-interactive-diagram/README.md) | Create and validate editable diagrams for standalone or Loom discussions; ask before editing an external diagram whether to copy it into the project. |
+| [`goal-create`](loom-workflow/skills/goal-create/README.md) | Create a session goal or draft a repository purpose (invoked by name only). |
+| [`dbt-model-style`](loom-workflow/skills/dbt-model-style/README.md) | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
+| [`using-loom-workflow`](loom-workflow/skills/using-loom-workflow/README.md) | Optional router to the right workflow tool. |
 
 Old names: `retro` → `project-retro`; `distill-sessions` → `skill-retro`. The old names are no longer callable after updating `loom-workflow` to 5.9.0. Both reviews propose changes for a separate implementation workflow.
 

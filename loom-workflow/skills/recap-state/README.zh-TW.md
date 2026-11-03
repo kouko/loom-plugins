@@ -1,5 +1,7 @@
 # Recap
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.zh-TW.md) / recap-state
+
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 > 對話中途迷失方向時，這個 skill 會停下來，把目前狀況
@@ -105,3 +107,10 @@ recap-state/
 └── references/
     └── seven-block-schema.md  <- 對齊模板 + 歷史脈絡 + 5 共通核心原則
 ```
+
+## 相關技能
+
+- [loom-workflow:handoff](../handoff/README.zh-TW.md)
+- [loom-workflow:project-retro](../project-retro/README.md)
+
+執行規則: [SKILL.md](SKILL.md).

@@ -1,5 +1,9 @@
 # loom-design
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
+
+技能詳細頁有同語言翻譯時連至該版本，其餘連至英文版。
+
 > **Loom 流程的入口：兩個站把粗略的想法變成確認過的 intent，變更需要設計時
 > 再變成一份 spec；三個工具決定產品的原則、視覺系統與架構。** loom-design 只寫
 > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
@@ -16,26 +20,23 @@
 
 ```mermaid
 flowchart TD
-    subgraph stations["loom-design 的站"]
-        intent["loom-design:capture-intent<br/>寫下 intent<br/>① 使用者確認 intent"]
-        spec["loom-design:write-spec<br/>只在 needs-design: yes 時<br/>② product 變更：使用者確認<br/>看得見的行為"]
-    end
+    intent["① 確認要解決的問題<br/>capture-intent"]
+    design{"需要設計？"}
+    spec["寫出設計<br/>write-spec<br/>② 僅確認產品可見行為"]
+    check{"需要事前審查？"}
+    review["審查設計<br/>closing-review"]
+    plan["規劃工作<br/>write-plan"]
 
-    specreview["loom-code:closing-review<br/>一次 fresh-context spec review<br/>只在 pre-build-review: required 時"]
-    plan(["交棒給<br/>loom-code:write-plan"])
-
-    subgraph tools["隨叫隨用的工具（不是流程步驟）"]
-        principles["loom-design:product-principles<br/>ratify PRINCIPLES.md"]
-        designsys["loom-design:design-system<br/>ratify DESIGN.md"]
-        arch["loom-design:architecture-design<br/>設計並 ratify ARCHITECTURE.md"]
-    end
-
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
-    spec -->|"pre-build-review: not-required"| plan
-    spec -.->|"pre-build-review: required"| specreview
-    specreview -.-> plan
+    intent --> design
+    design -->|"需要"| spec
+    design -->|"不需要"| plan
+    spec --> check
+    check -->|"需要"| review
+    check -->|"不需要"| plan
+    review -->|"檢查通過"| plan
 ```
+
+圖中的審查與規劃由 `loom-code` 負責，其餘由 `loom-design` 負責。
 
 - **① Intent** — `capture-intent` 只訪談到想要的結果清楚為止，寫下
   `docs/loom/intent/<change-id>.md`，用使用者的話覆述一次，然後等一個 yes。
@@ -54,12 +55,12 @@ flowchart TD
 
 | Skill | 類型 | 產物 | 角色 |
 |---|---|---|---|
-| [`capture-intent`](skills/capture-intent/SKILL.md) | 站 | `docs/loom/intent/<change-id>.md` | 訪談、寫下並確認一個變更的 intent（決策點 ①）。 |
-| [`write-spec`](skills/write-spec/SKILL.md) | 站 | `docs/loom/<change-id>/spec.md` | 從確認過的 intent 寫出需求、設計決策、現狀證據與 UI flows（決策點 ②，僅 product）。 |
-| [`product-principles`](skills/product-principles/SKILL.md) | 工具 | `PRINCIPLES.md` | Ratify 產品的常設原則：至少三條有順序的 Non-negotiables，以及一行 `ratified-by: <name> <date>`。 |
-| [`design-system`](skills/design-system/SKILL.md) | 工具 | `DESIGN.md` | Ratify 有 UI 的產品的視覺系統：顏色、字級、間距、形狀與元件 token。 |
-| [`architecture-design`](skills/architecture-design/SKILL.md) | 工具 | `ARCHITECTURE.md` | 和使用者一起設計專案架構：模組邊界、技術選型、資料夾結構、CI 階段，再用守護測試撐住每條規則。 |
-| [`using-loom-design`](skills/using-loom-design/SKILL.md) | 入口路由 | — | 可選：把較廣泛的產品定義請求分派給上面五個 skill 之一。不是前置條件；每個 skill 都能直接呼叫。 |
+| [`capture-intent`](skills/capture-intent/README.md) | 站 | `docs/loom/intent/<change-id>.md` | 訪談、寫下並確認一個變更的 intent（決策點 ①）。 |
+| [`write-spec`](skills/write-spec/README.md) | 站 | `docs/loom/<change-id>/spec.md` | 從確認過的 intent 寫出需求、設計決策、現狀證據與 UI flows（決策點 ②，僅 product）。 |
+| [`product-principles`](skills/product-principles/README.md) | 工具 | `PRINCIPLES.md` | Ratify 產品的常設原則：至少三條有順序的 Non-negotiables，以及一行 `ratified-by: <name> <date>`。 |
+| [`design-system`](skills/design-system/README.md) | 工具 | `DESIGN.md` | Ratify 有 UI 的產品的視覺系統：顏色、字級、間距、形狀與元件 token。 |
+| [`architecture-design`](skills/architecture-design/README.md) | 工具 | `ARCHITECTURE.md` | 和使用者一起設計專案架構：模組邊界、技術選型、資料夾結構、CI 階段，再用守護測試撐住每條規則。 |
+| [`using-loom-design`](skills/using-loom-design/README.md) | 入口路由 | — | 可選：把較廣泛的產品定義請求分派給上面五個 skill 之一。不是前置條件；每個 skill 都能直接呼叫。 |
 
 **常設文件。** 只要 repo 裡沒有 ratify 過的 `PRINCIPLES.md`，`kind: product`
 的變更就會被 loom-code 的 checker（`standing.product-principles-reject`）

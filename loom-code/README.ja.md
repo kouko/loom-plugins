@@ -1,5 +1,9 @@
 # loom-code
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
+
+skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
+
 > **5 つのステーションが一つの変更を確認済みの intent から公開済みの
 > pull request まで運び、何かがマシンの外に出る前に決定的な checker が
 > 証拠を再計算します。** loom-code が前提にするのは基本的なソフトウェア工学の
@@ -18,28 +22,28 @@
 
 ```mermaid
 flowchart TD
-    intent["① intent を確認する<br/>loom-design:capture-intent<br/>loom-design がなければ loom-code:write-plan"]
-    spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
-    plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
-    build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ<br/>最後に adversary と package テスト一式"]
-    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら independent acceptance testing"]
-    attest[["attestation を生成<br/>loom-code:closing-review による"]]
-    ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは acceptance test report で"]
-    merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
-    maintain["loom-code:maintain<br/>アラート・CI やリグレッションの失敗・障害"]
+    intent["① 解決する問題を確認<br/>capture-intent"]
+    design{"設計が必要？"}
+    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの振る舞いのみ確認"]
+    plan["作業を計画<br/>write-plan"]
+    build["実装とテスト<br/>build"]
+    review["レビューと検証<br/>closing-review"]
+    ship["③ PR を公開し結果を確認<br/>ship"]
 
-    intent --> plan
-    intent -.->|"needs-design: yes"| spec
-    spec -.-> plan
+    intent --> design
+    design -->|"必要"| spec
+    design -->|"不要"| plan
+    spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| attest
-    attest --> ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -->|"一致する intent か新しい intent"| plan
+    review -->|"修正が必要"| build
+    review -->|"検証に合格"| ship
 ```
+
+図の skill は `loom-code` が提供し、`capture-intent` と `write-spec` は
+`loom-design` が提供します。`loom-design` がなければ、`write-plan` が intent の
+確認と必要な最小 spec を担当します。マージと保守はこの変更の主フローから分け、
+下で説明します。
 
 - **Intent** — `loom-design` を入れている場合は `capture-intent` が intent を
   確認し（①）、入れていない場合は `write-plan` が変更を言い直して ① を自分で
@@ -64,13 +68,13 @@ flowchart TD
 
 | Skill | 役割 |
 |---|---|
-| [`write-plan`](skills/write-plan/SKILL.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
-| [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装し、最後に adversary と package テスト一式を走らせる。これらが通るまで引き渡さない。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて acceptance testing）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
-| [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
-| [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
-| [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
-| [`external-review`](skills/external-review/SKILL.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
+| [`write-plan`](skills/write-plan/README.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
+| [`build`](skills/build/README.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装し、最後に adversary と package テスト一式を走らせる。これらが通るまで引き渡さない。 |
+| [`closing-review`](skills/closing-review/README.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて acceptance testing）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
+| [`ship`](skills/ship/README.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
+| [`maintain`](skills/maintain/README.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
+| [`using-loom-code`](skills/using-loom-code/README.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
+| [`external-review`](skills/external-review/README.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
 
 ## Agents
 

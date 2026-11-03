@@ -297,7 +297,7 @@ def test_loom_design_version_2_17_0_consistent() -> None:
     assert "## [2.21.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.21.0 |",
+        "README.md": "| [`loom-design`](loom-design/README.md) | 2.21.0 |",
         "loom-design/README.md": "**Version**: 2.21.0",
         "loom-design/README.ja.md": "**Version**: 2.21.0",
         "loom-design/README.zh-TW.md": "**Version**: 2.21.0",

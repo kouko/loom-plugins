@@ -1,0 +1,93 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-03-titled-flow-comparison",
+  "content_digest": "38e14895b665791d3ede6dde129daa983b16d07e",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-visualization/test_templates.py",
+      "artifact": "loom-workflow/tests/loom-visualization/test_templates.py",
+      "result": "pass",
+      "command_digest": "7267164a0ebf9ef89be7caf2f2fed9ff35a770ffc6c5db64b201b3bade02822e"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "ae4f92e4629bf19b16784ee0f798047b99626499",
+      "review_target_sha": "8f9a4daab51f4f30d4da47fc15c2ec8406cf2bab",
+      "dimension_scores": {
+        "omission": "PASS — The saved comparison, titled outer frames, state labels, two-layout reproduction recipe and explicit scope satisfy the four approved acceptance lines.",
+        "ambiguity": "PASS — The text separates reported, observed and expected states and explains when to stack complete panels; the recipe is an example rather than a promised new generator.",
+        "inconsistency": "PASS — The new guidance preserves the existing table default and branching route. Acceptance carry-over identifies the exact unchanged content; the final evidence-only range does not invalidate it.",
+        "incorrect-fact": "PASS — Source paths and renderer/helper imports resolve; four manifests, affected README version references and changelog agree on 5.19.2. The changed release test independently passed all 14 checks.",
+        "missing-population": "PASS — Recipe results name the tested widths and dimensions, test totals name their modules, and both acceptance and adversarial evidence retain untested boundaries rather than claiming host-wide behavior or human comprehension.",
+        "deletion-first": "PASS — The user explicitly requested this saved illustration; extending the existing template and one routing cell avoids a new generator, dependency or duplicate template. No smaller shape delivers the requested reproducible framed example."
+      },
+      "findings": [],
+      "notes": [
+        "Independent changed-test execution: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/scripts/test_release_metadata.py -q; 14 passed in 0.01s.",
+        "Reviewed the handed reusable-probe output; did not rerun adversarial programs or the complete package suite. The probe ran on functional content at 8d6c1e471cb83dc4958261fd1ad5ccc9bbe39c1a; the inspected range to review_target_sha changes only acceptance/adversarial evidence.",
+        "No claim is made about automatic agent selection, typography in every host, installed-plugin behavior or improved human understanding."
+      ],
+      "reviewer": "/root/release_flow_review_docs",
+      "vendor": "openai",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "ae4f92e4629bf19b16784ee0f798047b99626499",
+      "review_target_sha": "8f9a4daab51f4f30d4da47fc15c2ec8406cf2bab",
+      "dimension_scores": {
+        "omission": "PASS — Existing routing reaches the extended template; the complete recipe identifies its inputs, renderer, width helper, output and final-composition verification without adding a production generator or checker gate.",
+        "ambiguity": "PASS — Reported and expected states, width selection, branching interiors and unequal topology are distinguished; the recipe claims only the saved comparison layout.",
+        "inconsistency": "PASS — The addition preserves the original linear example, table preference and branching guidance; no restrictive base sentence is deleted or reversed, and the release delta excludes confirmation contracts.",
+        "incorrect-fact": "PASS — Recipe imports match the existing render and display_width entry points; independent acceptance documents exact parallel reproduction and stacked alignment; four manifests and version references agree, and the changed release metadata module independently passed 14 tests.",
+        "missing-population": "PASS — Counts, widths and passing results identify their tested snapshot and scope; incomplete adversarial boundary checks are explicitly not presented as passes.",
+        "user-judgment-leak": "PASS — The delta introduces no technical question or renewed user choice; the explicitly selected documentation-only outcome remains isolated, with publication and merge distinguished.",
+        "deletion-first": "PASS — The concrete missing in-frame titles motivate the addition; extending one existing template and reusing its renderer, width helper and alignment checker avoids a duplicate template, API, dependency or production abstraction."
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran the changed release metadata test module with the locked dependencies: 14 passed in 0.01s.",
+        "Read the handed acceptance and adversarial evidence; did not rerun the complete package suite or the nominated adversarial test module.",
+        "Layout and reproduction evidence does not establish automatic host selection, installed-plugin behavior or improved human comprehension."
+      ],
+      "reviewer": "/root/release_flow_review_skill",
+      "vendor": "openai",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": null,
+  "tested_commit": "8d6c1e471cb83dc4958261fd1ad5ccc9bbe39c1a",
+  "reviewed_commit": "8f9a4daab51f4f30d4da47fc15c2ec8406cf2bab",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}

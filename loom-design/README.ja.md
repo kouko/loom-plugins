@@ -1,5 +1,9 @@
 # loom-design
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
+
+skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
+
 > **Loom フローの入口：2 つのステーションが漠然としたアイデアを確認済みの
 > intent に変え、設計が要る変更ならさらに spec に変える。3 つのツールが
 > プロダクトの原則とビジュアルシステムとアーキテクチャを決める。** loom-design は下書きを
@@ -17,26 +21,23 @@
 
 ```mermaid
 flowchart TD
-    subgraph stations["loom-design のステーション"]
-        intent["loom-design:capture-intent<br/>intent を書く<br/>① ユーザーが intent を確認"]
-        spec["loom-design:write-spec<br/>needs-design: yes のときだけ<br/>② product の変更：目に見える振る舞いを<br/>ユーザーが確認"]
-    end
+    intent["① 解決する問題を確認<br/>capture-intent"]
+    design{"設計が必要？"}
+    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの振る舞いのみ確認"]
+    check{"事前レビューが必要？"}
+    review["設計をレビュー<br/>closing-review"]
+    plan["作業を計画<br/>write-plan"]
 
-    specreview["loom-code:closing-review<br/>fresh-context の spec review を 1 回<br/>pre-build-review: required のときだけ"]
-    plan(["引き渡し先<br/>loom-code:write-plan"])
-
-    subgraph tools["オンデマンドのツール（フローの段階ではない）"]
-        principles["loom-design:product-principles<br/>PRINCIPLES.md を ratify"]
-        designsys["loom-design:design-system<br/>DESIGN.md を ratify"]
-        arch["loom-design:architecture-design<br/>ARCHITECTURE.md を設計して ratify"]
-    end
-
-    intent -->|"needs-design: yes"| spec
-    intent -->|"needs-design: no"| plan
-    spec -->|"pre-build-review: not-required"| plan
-    spec -.->|"pre-build-review: required"| specreview
-    specreview -.-> plan
+    intent --> design
+    design -->|"必要"| spec
+    design -->|"不要"| plan
+    spec --> check
+    check -->|"必要"| review
+    check -->|"不要"| plan
+    review -->|"検証に合格"| plan
 ```
+
+図のレビューと計画は `loom-code` が担当し、それ以外は `loom-design` が担当します。
 
 - **① Intent** — `capture-intent` は求める結果がはっきりするまでだけ
   ヒアリングし、`docs/loom/intent/<change-id>.md` を書き、ユーザーの言葉で
@@ -57,12 +58,12 @@ flowchart TD
 
 | Skill | 種類 | 生成物 | 役割 |
 |---|---|---|---|
-| [`capture-intent`](skills/capture-intent/SKILL.md) | ステーション | `docs/loom/intent/<change-id>.md` | 変更の intent をヒアリングし、書き、確認する（決定ポイント ①）。 |
-| [`write-spec`](skills/write-spec/SKILL.md) | ステーション | `docs/loom/<change-id>/spec.md` | 確認済みの intent から要件、設計上の決定、現状の証拠、UI flows を書く（決定ポイント ②、product のみ）。 |
-| [`product-principles`](skills/product-principles/SKILL.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
-| [`design-system`](skills/design-system/SKILL.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
-| [`architecture-design`](skills/architecture-design/SKILL.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
-| [`using-loom-design`](skills/using-loom-design/SKILL.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
+| [`capture-intent`](skills/capture-intent/README.md) | ステーション | `docs/loom/intent/<change-id>.md` | 変更の intent をヒアリングし、書き、確認する（決定ポイント ①）。 |
+| [`write-spec`](skills/write-spec/README.md) | ステーション | `docs/loom/<change-id>/spec.md` | 確認済みの intent から要件、設計上の決定、現状の証拠、UI flows を書く（決定ポイント ②、product のみ）。 |
+| [`product-principles`](skills/product-principles/README.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
+| [`design-system`](skills/design-system/README.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
+| [`architecture-design`](skills/architecture-design/README.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
+| [`using-loom-design`](skills/using-loom-design/README.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
 
 **常設ドキュメント。** リポジトリに ratify 済みの `PRINCIPLES.md` が無い
 間は、`kind: product` の変更を loom-code の checker

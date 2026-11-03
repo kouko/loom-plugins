@@ -1,9 +1,9 @@
 # Context-preserving intent confirmation — plan
-intent: 2026-11-02-context-preserving-explanations@2cfaae5e
+intent: 2026-11-02-context-preserving-explanations@7df77107b43fb8d44e7c1caabd78fe1dd871551e
 charter: 1.1
 
 ## Current State Evidence
-- Current continuation (2026-11-04): the user explicitly approved fixed five-section explanations with grounded project/function background and current direction first. This replaces optional headings, not sentence-level freedom or the missing-facts interview. W0/W1 below retain prior trial history; their superseded presentation obligations do not govern W3. W2 shipped independently in PR #130. Prior failures and counts remain retained.
+- Current continuation (2026-11-04): approved five-section explanations replace optional headings; grounded background comes first. W0/W1 retain historical failures and counts. W2 shipped in PR #130; W3 carries the new obligations.
 - Forward: `loom-design/skills/capture-intent/SKILL.md` Step 4 requires a plain-language Problem and Acceptance restatement before confirmation.
 - Reverse: `loom-code/skills/write-plan/references/confirm-intent.md` duplicates decision point 1 for code-only installations.
 - Error: `loom-design/skills/capture-intent/SKILL.md` Step 4's short fill-in example does not explicitly connect unfamiliar terms, present pain and consequences.
@@ -64,23 +64,23 @@ charter: 1.1
 
 **W2-01 Save the approved titled before/after flow illustration** after: W1-02 acceptance: 1,2,3,4
 - Files: `loom-workflow/skills/loom-visualization/templates/02-linear-steps.md`, `loom-workflow/skills/loom-visualization/SKILL.md`, retained intent Constraints and this plan.
-- Verification: run existing template tests; reproduce the illustration with the existing flow generator and width helper, and run `align.py` on side-by-side and stacked layouts.
-- Risk: user-decided — save the specifically demonstrated outer-panel style as a shared documentation example. This newly requested reusable illustration is distinct from the exhausted confirmation-source iterations; it does not reset their counts or prove prior failures resolved. The proposed five-section confirmation redesign remains unimplemented. No production generator, confirmation-contract change, publication or release is included; earlier evidence does not verify this new example.
+- Test: A1 positive: titled-panels. A2 positive: expected-state-label. A3 positive: reproducible-parallel; boundary: stacked-layout. A4 positive: template-only.
+- Risk: user-decided — save the approved outer-panel illustration independently from exhausted confirmation iterations; retain their counts and failures. No generator or confirmation-contract change is included. Shipped separately in PR #130; W3 owns the later five-section redesign.
 
 **W3-00 Integrate the released visualization example and current main** after: W1-02 acceptance: 1,2,3,4
 - Files: current four uncommitted paths, upstream merge paths, release metadata and existing release pins.
 - Test: A1 positive: preserved-intent-history. A2 positive: current-confirmed-scope. A3 positive: released-diagram-preserved. A4 negative: unrelated-feature-loss.
-- Risk: agent-decided — preserve local approved work in a checkpoint before integration; merge main rather than replaying or deleting historical trials. The local visualization edits already equal the released files and must not appear as a new visualization release. Keep code/design unpublished minor releases, preserve main's patch history and workflow 5.19.2, and renew content-bound evidence after integration.
+- Risk: agent-decided — checkpoint local work, then merge main without replaying trials. Preserve released visualization files, code/design unpublished minor versions, main's patch history and workflow 5.19.2. Integration invalidates earlier content-bound evidence.
 
 **W3-01 Implement the newly approved five-section confirmation contract** after: W3-00 acceptance: 1,2,3,4
 - Files: both confirmation-template.md and confirmation-examples.md copies, capture-intent/SKILL.md, write-plan confirmation producers, affected existing contract tests and focused behavior fixtures.
 - Test: A1 positive: grounded-project-context-and-current-direction; negative: invented-roadmap. A2 positive: five-localized-sections-in-order; boundary: missing-required-facts-interview. A3 positive: concise-known-correction-and-framed-process-comparison; negative: cross-section-duplication-or-unverified-after-state. A4 positive: same-yes-publication-after-checks; negative: technical-quality-choice.
-- Risk: user-decided — fixed headings and source-grounded opening context are newly approved output obligations, distinct from the exhausted optional-outline task. Preserve prior evidence and counters, and do not claim they verify this contract. Remove competing optional-heading and overbroad public/private directions rather than stacking new reminders. Reuse the existing portable reference structure and optional visualization skill; do not require a cross-plugin filesystem path or new generator.
+- Risk: user-decided — fixed sections and grounded context are new obligations, not a retry reset. Retain prior evidence and counts; replace conflicting optional-heading/private-record directions. Reuse portable references and optional visualization, without cross-plugin filesystem dependencies or new generators.
 
 **W3-02 Exercise realistic requests and finish independent verification** after: W3-01 acceptance: 1,2,3,4
 - Files: retained behavioral evidence and acceptance report; affected plugin release notes and version pins before finalization.
 - Test: A1 positive: invoice-export-context. A2 positive: ordinary-new-feature; boundary: incomplete-request. A3 positive: simple-correction-and-before-after-flow; negative: repeated-scope-and-private-inventory. A4 positive: understandable-consent; negative: extra-user-quality-checkpoint.
-- Risk: agent-decided — use identical, concrete requests and supplied project context for old/new samples under verified plugin hooks and explicit first-party model routing. Keep source selection and observed quality separate; run focused checks, adversarial checks, the complete locked suite and fresh independent review. No publication or merge is authorized for this continuation.
+- Risk: agent-decided — compare identical concrete requests with supplied context, verified hooks and explicit first-party routing. Separate selection from quality evidence; run focused, adversarial, complete-suite and independent checks. Publication and merge remain unauthorized.
 
 ## Simplicity check
 - none found
