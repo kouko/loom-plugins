@@ -1,0 +1,62 @@
+{
+  "S01": {
+    "root": "/tmp/loom-five-section-trial-i2",
+    "key": "capture-invoice-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-invoice",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false,
+    "comparison_role": "retained-request-candidate-rerun"
+  },
+  "S02": {
+    "root": "/tmp/loom-five-section-explicit-hold",
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-invoice-explicit-hold-graph",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false,
+    "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request"
+  },
+  "S03": {
+    "root": "/tmp/loom-five-section-trial-i2",
+    "key": "capture-invoice-default-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-invoice-default",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false,
+    "comparison_role": "conditional-consent-positive-control-no-matched-baseline"
+  },
+  "S04": {
+    "root": "/tmp/loom-five-section-trial-i2",
+    "key": "code-setup-candidate-r1",
+    "variant": "candidate",
+    "case": "code-setup",
+    "repeat": 1,
+    "skill": "loom-code:write-plan",
+    "code_only": true,
+    "comparison_role": "retained-request-candidate-rerun"
+  },
+  "S05": {
+    "root": "/tmp/loom-five-section-trial-i2",
+    "key": "capture-missing-date-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-missing-date",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false,
+    "comparison_role": "retained-request-candidate-rerun"
+  },
+  "S06": {
+    "root": "/tmp/loom-five-section-trial-i2",
+    "key": "capture-csv-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-csv",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false,
+    "comparison_role": "retained-request-candidate-rerun"
+  }
+}

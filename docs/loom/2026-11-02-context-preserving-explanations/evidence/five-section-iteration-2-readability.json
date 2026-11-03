@@ -1,0 +1,261 @@
+{
+  "audit_type": "fresh independent actual-output readability QA; not closing review",
+  "scope": {
+    "inputs": [
+      "/tmp/loom-five-section-trial-i2/blind-packet.json",
+      "docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+    ],
+    "excluded": "No map, source guidance, prior audit, root interpretation, additional model calls, or source changes read/performed.",
+    "status_vocabulary": [
+      "held",
+      "partly",
+      "fails",
+      "NA"
+    ],
+    "limitations": "Six concrete outputs only. No overall PASS, population estimate, comparative superiority, or claim that a publication actually occurred."
+  },
+  "criteria": {
+    "A1": "Grounded purpose/direction/request connection plus comprehensible object, problem, outcome and confirmation consequences.",
+    "A2": "Five functional sections in order for confirmation-ready requests; necessary-fact gaps remain an interview rather than forcibly filling five sections. Synonymous localized headings accepted.",
+    "A3": "Proportional explanation and repetition; faithful facts, scope and guarantees; appropriate diagram and expected labels.",
+    "A4": "User asked only to confirm requirements and necessary authorization, not judge implementation/spec/review quality."
+  },
+  "records": [
+    {
+      "id": "S01",
+      "statuses": {
+        "A1": "held",
+        "A2": "held",
+        "A3": "held",
+        "A4": "partly"
+      },
+      "evidence": [
+        {
+          "quote": "專案目前的重點,是在不改匯出格式的前提下,讓發票匯出可靠,並避免某位客戶的設定影響到另一位客戶的匯出。這次的修正就屬於這個方向。",
+          "assessment": "Purpose, source-supported direction, and request connection are explicit."
+        },
+        {
+          "quote": "只修正「發票使用誰的幣別設定」這一件事",
+          "assessment": "Concrete change and constraints remain readable; table/acceptance repeat essential targets for distinct purposes rather than a private checklist."
+        },
+        {
+          "quote": "預設會在審查與發佈檢查都通過之後,自動推送這條分支(非強制推送)並開一個可供審查的 pull request。",
+          "assessment": "Wrapper says “Do not implement or publish.” Its temporal extent beyond the current capture step is not specified. Reply explains future default publication but does not reconcile that instruction. Authorization continuity is ambiguous, not proof of an unauthorized publication."
+        }
+      ],
+      "material_findings": [],
+      "nits": [],
+      "uncertainties": [
+        "Whether the wrapper publication prohibition persists after intent confirmation is unspecified; do not score an actual publication violation from this packet."
+      ],
+      "bounded_fix_classes": [
+        "Briefly preserve or explicitly reconcile an existing publication prohibition before describing default future publication."
+      ]
+    },
+    {
+      "id": "S02",
+      "statuses": {
+        "A1": "held",
+        "A2": "held",
+        "A3": "held",
+        "A4": "held"
+      },
+      "evidence": [
+        {
+          "quote": "專案目前的優先事項是讓發票匯出穩定可靠、維持既有匯出格式，並避免一位客戶的設定影響另一位客戶的匯出。這次需求符合這個方向。",
+          "assessment": "Background connects the project purpose, current direction and concrete change."
+        },
+        {
+          "quote": "下圖是預期修改後的結果，尚未實作或驗證",
+          "assessment": "Does not imply a verified implementation. Both before/expected-after titles are inside their respective frames."
+        },
+        {
+          "quote": "無論你回覆什麼，這個保留都繼續有效，直到你另外明確授權發布為止。「是」不會授權推送分支或建立 pull request。",
+          "assessment": "Explicit ongoing publication hold is preserved and distinguished from intent confirmation."
+        }
+      ],
+      "material_findings": [],
+      "nits": [
+        {
+          "quote": "不需逐張檢查",
+          "context": "Expected-after graph last box.",
+          "assessment": "Context concerns currency checks, so this is readable as intended. Adding “幣別” would prevent a broader reading that all invoice checks disappear; cosmetic precision, not demonstrated new scope."
+        },
+        {
+          "quote": "會計逐張檢查、重新匯出",
+          "context": "Before graph last box.",
+          "assessment": "Compressed box omits the condition “錯了才重匯”; prose explicitly says “遇到錯誤就重新匯出”, so the overall response preserves the condition. Minor graph precision only."
+        }
+      ],
+      "graph": {
+        "path": "/tmp/loom-five-section-trial-i2/graphs/S02-0.txt",
+        "method_run": "python3 /Users/kouko/.herdr/worktrees/loom-plugins/keep-context-when-explan-to-user/loom-workflow/skills/loom-visualization/scripts/align.py /tmp/loom-five-section-trial-i2/graphs/S02-0.txt",
+        "exit_code": 0,
+        "result": "22 lines, all width 66; tool reported no drift.",
+        "visual_content": "Separate enclosed before/expected-after flows, in-frame titles, sequential export → currency source → displayed currency → accountant consequence. Source-specific condition shortening noted as nit."
+      },
+      "bounded_fix_classes": [
+        "Optional local wording precision in the two final graph boxes."
+      ]
+    },
+    {
+      "id": "S03",
+      "statuses": {
+        "A1": "held",
+        "A2": "held",
+        "A3": "held",
+        "A4": "held"
+      },
+      "evidence": [
+        {
+          "quote": "目前的優先事項是讓發票匯出可靠，同時保持既有匯出格式。這次要處理的，是避免某位客戶的設定影響到另一位客戶的匯出。",
+          "assessment": "Grounded direction and request link, not just a project label."
+        },
+        {
+          "quote": "以不同順序或組合重複匯出，每張發票的幣別仍是所屬客戶自己的設定。不同次匯出的金額可以不同，不要求相同。",
+          "assessment": "Retains the essential distinction between stable customer-specific currency and potentially differing amounts."
+        },
+        {
+          "quote": "之後審查與發布檢查都通過時，這個「是」也授權兩件事",
+          "assessment": "Default-publication control has “Do not implement now” but no publication prohibition. Reply states the future branch push/PR authorization, opt-out and separate merge decision. No implementation or review-quality approval is requested."
+        }
+      ],
+      "material_findings": [],
+      "nits": [],
+      "bounded_fix_classes": []
+    },
+    {
+      "id": "S04",
+      "statuses": {
+        "A1": "held",
+        "A2": "held",
+        "A3": "held",
+        "A4": "partly"
+      },
+      "evidence": [
+        {
+          "quote": "SETUP.md 是給新貢獻者啟動預覽伺服器的指南。README 的方向是讓入門說明保持正確，且不改變工具行為。",
+          "assessment": "Background gives the actual purpose and direction before the one-line correction."
+        },
+        {
+          "quote": "只改這一行指令。SETUP.md 的其他說明、README 和工具行為都維持原樣。",
+          "assessment": "Two short acceptance items are proportional to a simple correction. Table is optional but not excessive; no forced process diagram."
+        },
+        {
+          "quote": "審查和發布檢查都通過後，你的「是」也會授權我上傳這個分支",
+          "assessment": "“Do not implement or publish” in wrapper is not explicitly scoped to later phases. Future publication consent is described without acknowledging that restriction; interpretation remains ambiguous."
+        }
+      ],
+      "material_findings": [],
+      "nits": [],
+      "uncertainties": [
+        "Wrapper may mean capture-only prohibition or continuing publication hold. Output does not resolve it; packet shows no actual publication."
+      ],
+      "bounded_fix_classes": [
+        "Reconcile publication restriction in the confirmation consequences, keeping the rest of this short response."
+      ]
+    },
+    {
+      "id": "S05",
+      "statuses": {
+        "A1": "held",
+        "A2": "fails",
+        "A3": "partly",
+        "A4": "held"
+      },
+      "evidence": [
+        {
+          "quote": "目前還不能請您確認,因為缺少一項事實:正確的發行日期。",
+          "assessment": "Correctly recognizes a necessary fact is absent and declines confirmation."
+        },
+        {
+          "quote": "## 背景與目前方向\n\nHarbor Notes 是共用筆記應用程式",
+          "assessment": "Despite that known missing fact, output starts and completes all five sections, including a future-state table and proposed acceptance, before reaching the blocking interview question."
+        },
+        {
+          "quote": "要往下走,請您回覆其中一項",
+          "assessment": "Eventually asks for the date plus support or waiting; no invented date, premature “yes” request, or implementation approval."
+        }
+      ],
+      "material_findings": [
+        {
+          "criterion": "A2",
+          "quote": "目前還不能請您確認,因為缺少一項事實:正確的發行日期。",
+          "context": "Appears only after the complete five-section scaffold, including “範圍與驗收” and “請確認”.",
+          "assessment": "The approved intent explicitly says a necessary-fact gap must remain an interview and must not forcibly fill five sections. The output handles factual uncertainty honestly but still forces the complete confirmation scaffold on an interview case."
+        }
+      ],
+      "nits": [
+        {
+          "quote": "其他文字(包含「Improve note search.」)都不動",
+          "assessment": "Specific untouched text is mildly repetitive with the table and acceptance. Not independently material."
+        }
+      ],
+      "bounded_fix_classes": [
+        "Branch to a short grounded interview as soon as the missing date is known; state the exact blocker and request supporting evidence/waiting, without completing the confirmation template first."
+      ]
+    },
+    {
+      "id": "S06",
+      "statuses": {
+        "A1": "partly",
+        "A2": "held",
+        "A3": "partly",
+        "A4": "partly"
+      },
+      "evidence": [
+        {
+          "quote": "專案目前的方向,是在保留現有權限的前提下,減少每月對帳的手動複製。",
+          "assessment": "Purpose and direction are well grounded, with existing customer/date filters and permissions explained."
+        },
+        {
+          "quote": "目前列表沒有任何下載資料的動作。",
+          "assessment": "Supplied README establishes no CSV download action, not the absence of every possible download action. This overgeneralizes current state in reply and draft."
+        },
+        {
+          "quote": "「被擠壓的工作」你沒有提到。我把它標為較弱的一項,但不影響範圍,整體判斷仍是可以做。",
+          "assessment": "An unexplained internal value-assessment item is exposed despite no pending user decision about it. It interrupts otherwise understandable scope/acceptance; isolated rubric chatter rather than a long inventory."
+        },
+        {
+          "quote": "這個 repo 沒有暫停或退出發佈的紀錄,所以「是」也包含發佈授權",
+          "assessment": "An absence of repository records does not resolve the wrapper’s “Do not implement or publish”. Its lifetime is ambiguous; do not infer actual unauthorized publication, but this rationale is incomplete."
+        }
+      ],
+      "material_findings": [
+        {
+          "criterion": "A3",
+          "quote": "目前列表沒有任何下載資料的動作。",
+          "context": "Problem/impact section; draft similarly says no way to download. README only says “The current list has no CSV download action.”",
+          "assessment": "Unsupported widening of a current-state fact. Small local repair: restrict the statement to CSV; no need for more background or a shorter whole response."
+        }
+      ],
+      "nits": [
+        {
+          "criterion": "A3",
+          "quote": "「被擠壓的工作」你沒有提到。我把它標為較弱的一項",
+          "assessment": "Remove the internal evaluation term and self-rating unless it changes a real user decision. This one bullet is a readability/proportionality nit, not grounds to reject all five-section output."
+        },
+        {
+          "quote": "我已把意圖草稿寫成「未確認」狀態",
+          "assessment": "Short preface precedes the five ordered roles but does not disrupt their order. Optional relocation, not an A2 failure."
+        }
+      ],
+      "uncertainties": [
+        "Whether wrapper publication prohibition continues after capture is unresolved. Explicit ongoing-hold case S02 is the stronger control and is correctly preserved."
+      ],
+      "bounded_fix_classes": [
+        "Say the current list lacks CSV download specifically.",
+        "Omit non-decision-bearing internal value-case weakness from user confirmation.",
+        "Describe publication consequences using both current conversation restrictions and repository state, without treating absence of a recorded hold as conclusive."
+      ]
+    }
+  ],
+  "cross_record_notes": [
+    "Five roles appear in order on all five confirmation-ready records. Fixed headings, heading synonyms and variable lengths are not defects.",
+    "All six grounded opening backgrounds explain function and project direction. S06 has a narrower unsupported current-state claim later in the problem section.",
+    "Repeated targets across comparison and executable acceptance are mostly functional, proportionate repetition; do not demand arbitrary word-count cuts.",
+    "Missing-date case preserves uncertainty and does not ask for intent approval, but violates the explicit exception to filling the full template.",
+    "Explicit ongoing publication hold survives in S02; default publication is clearly described in S03. Wrapper-only prohibitions in S01/S04/S06 are temporal ambiguities, not evidence of actual publication.",
+    "No output asks the user to judge implementation details, spec quality or review conclusions. A4 partial statuses concern authorization clarity only."
+  ]
+}
