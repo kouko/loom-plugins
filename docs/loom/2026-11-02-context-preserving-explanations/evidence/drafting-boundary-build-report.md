@@ -1,0 +1,13 @@
+# Drafting-boundary Build handoff
+
+Branch base: 55587449a0473697dee852f0dff69b240ef5d36e. Functional target: 765c50d667d41f9f770f853154161244ddbf2b3c; runtime correction: 4d4d12cdf56073482d8091306b022ddc747d4f05. Requirements unchanged; W1-01 continues the same failed obligation after technical design re-look. Publication remains held.
+
+Sync-trunk: up to date with origin/main 2a4c5a3142edd10f8b68787cd69fa06d1760c96c. Current candidate code3.58.0/design2.21.0; focused RED2 failed/3passed, then GREEN87passed. Capture body3500words. Source/derived manifests and cumulative diff whitespace checks passed.
+
+Complete package suite: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`, exit0. Code2706passed/2skipped; remaining configured pytest groups and shell checks passed. Log `/tmp/context-drafting-full-suite.log`. Initial sandbox attempt could not acquire the uv cache lock; rerun with cache access succeeded.
+
+Existing graduated adversarial program: `python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py -q`, 37passed. No adversary redispatch: existing program remains runnable and passing; no scope widening. No unresolved adversary findings. Changed functional paths: two first-confirmation owners, their regression tests, release metadata and retained plan; cumulative changes include integrated main's dispatch fix. See `git diff --name-only 55587449a...765c50d6` for exact inventory.
+
+Actual Claude Code rerun: same8 logical synthetic cases, same374 approved resource paths, explicit first-party claude-sonnet-5-5 medium. All8 completed, model keys matched, zero permission denials, zero fixture commits. CLI estimated cost$0.8960377, not invoice/hard cap. Only four resource bytes changed from the previous manifest; original bundle/transcripts preserved. Candidate bundle hashes match current two owner files. Inline plugin initialization reports code3.58/design2.21, and code-only raw tool output includes the early fidelity rule; this is not evidence of normal installed-plugin behavior.
+
+The original two detailed-correction replies still appear to add same-worker/result guarantees. They remain open findings for independent adjudication, never dismissed. Eight successful CLI executions do not establish eight behavioral passes. Blind packet and raw transcripts: `/tmp/loom-context-claude-dogfood-retest/`; bounded comparison audits are pending. Earlier acceptance report/attestation remain historical and cannot attest this content. Closing Review needs an independently renewed report and current verdicts; do not finalize or publish while material behavior failures remain.
