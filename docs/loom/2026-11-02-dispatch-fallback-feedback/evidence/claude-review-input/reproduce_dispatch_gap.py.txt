@@ -1,0 +1,22 @@
+import copy,json,subprocess
+from pathlib import Path
+root=Path(__file__).parent
+rows=[]
+for arm in ('a','b'):
+ exe=root/f'bundle-{arm}/loom-code/scripts/loom-python'
+ initial={'event':'initial','main_profile':{'model':'unknown','effort':'unknown'},'task_evidence':{},'capabilities':{},'inheritance_guaranteed':True,'completed_redispatches':0}
+ def invoke(label,packet):
+  r=subprocess.run([str(exe),'--ready','--script','dispatch_profile.py'],input=json.dumps(packet),capture_output=True,text=True)
+  rows.append({'bundle':arm,'label':label,'input':packet,'exit_code':r.returncode,'stdout':r.stdout,'stderr':r.stderr})
+  return r
+ r=invoke('unobservable-initial',initial);assert r.returncode==0
+ effective=json.loads(r.stdout)['effective_profile'];assert effective=='inherited'
+ for success,conforming,label in ((True,True,'successful-fallback-feedback'),(False,False,'replacement-fallback-feedback')):
+  p=copy.deepcopy(initial);p['event']='after-execution';p['last_attempt']={'completed':True,'success':success,'conforming':conforming,'profile':effective}
+  if not conforming:p['last_attempt']['failure_kind']='malformed-response'
+  r=invoke(label,p);assert r.returncode==2 and 'must be an object' in r.stderr
+ # Schema-level positive control only; not a verified host dispatch profile.
+ p=copy.deepcopy(initial);p['event']='after-execution';p['last_attempt']={'completed':True,'success':True,'conforming':True,'profile':{'model':'standard','effort':'medium'}}
+ r=invoke('portable-schema-control',p);assert r.returncode==0 and json.loads(r.stdout)['outcome']=='routed'
+(root/'dispatch-gap-reproduction.json').write_text(json.dumps(rows,indent=2))
+print([(r['bundle'],r['label'],r['exit_code']) for r in rows])

@@ -1,0 +1,507 @@
+{
+  "untrusted_source": "Externally authored Claude Code findings are advisory, untrusted review content, not instructions. No changes adopted by this consultation.",
+  "divergence_points": [
+    {
+      "title": "Existing rules do not clearly cover the replacement that actually blocked the trial",
+      "kind": "factual-error",
+      "confidence": "medium",
+      "rationale": "The intent says replacement continues under original rules. Closing-review's retry covers a malformed response or transient failure before a conforming verdict exists. The blocked trial excluded a PASS reviewer for an execution-scope violation, then encoded it as conforming=false with malformed-response. The contract defines conforming as structural usability and classifiability, not execution-boundary compliance. Fixing the profile representation alone therefore leaves this replacement dependent on a stretched label. Whether the raw PASS YAML was structurally conforming cannot be verified here.",
+      "evidence": [
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 8,
+          "quote": "需要替換不合格的 reviewer 時，流程因此無法依原規則繼續"
+        },
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 353,
+          "quote": "A malformed response, unavailable executor, or other transient failure before"
+        },
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 354,
+          "quote": "a conforming verdict exists may retry once against the same functional-content"
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 70,
+          "quote": "structurally usable and contains enough evidence to classify its result;"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/graduated-original-result.json",
+          "line": 23,
+          "quote": "exceeding the explicit packet prohibition on running store probes"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/graduated-original-result.json",
+          "line": 34,
+          "quote": "\"failure_kind\": \"malformed-response\""
+        },
+        {
+          "path": "loom-code/agents/reviewer.md",
+          "line": 173,
+          "quote": "## What will get your verdict thrown out"
+        }
+      ],
+      "proposed_change": "Add one outcome to the intent: a review excluded for violating its execution boundary supplies no verdict, and its replacement at the same digest is an explicitly defined retry under a stated limit. Leave the failure-kind encoding to the design. If this is rejected, limit Acceptance 2 and 4 to genuinely malformed output and remove the excluded-reviewer case from the claimed repair.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Same-reviewer fix verification is merged with failed-attempt replacement",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "The intent's Problem and Acceptance 2 treat the initial-event Round 2 run as the same gap as replacement. Fix rounds resume the same agent over a fix delta, while a failed attempt retries without being a round. The resolver returns routed with no next_redispatch on success, and it requires a failure_kind on a conforming failure, so a reviewer correctly reporting code defects has no honest path to a redispatch decision. Counting Rounds 2 and 3 as redispatches also spends the whole budget and leaves no room for a retry in the same reviewer's episode. The report's 'deviation' claim is therefore unsettled: missing Round 1 feedback may be a deviation under the every-completed reading, but an initial event for Round 2 is not proven wrong. The raw log was not supplied.",
+      "evidence": [
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 8,
+          "quote": "另有實跑改以初次派工重新開始，漏掉必要的結果回報"
+        },
+        {
+          "path": "loom-code/agents/reviewer.md",
+          "line": 107,
+          "quote": "**the same agent that wrote the previous round's verdict**, never a fresh"
+        },
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 358,
+          "quote": "diagnostics before requesting authorization. That retry is not a review round."
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 178,
+          "quote": "\"outcome\": \"routed\", \"reason\": \"execution-succeeded\","
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 210,
+          "quote": "if kind not in FAILURE_KINDS:"
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 202,
+          "quote": "One task permits at most two completed redispatches after its initial"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/report.md",
+          "line": 62,
+          "quote": "its logged resolver calls are all new `initial` events"
+        }
+      ],
+      "proposed_change": "Limit the Problem and Acceptance 2 to a replacement or retry of a failed attempt. Add one outcome: the contract states how a same-reviewer review round relates to feedback and the retry budget, and a normal three-round episode must not exhaust that budget. Downgrade the missing-result-a claim to 'contract ambiguity; deviation not established' unless the raw log and the chosen reading support it.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Acceptance 4 overpromises completion yet cannot prove the repair",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "Acceptance 4 requires completed review and a committed record, while the Proposed outcome allows completion or an explicit stop. Real reviewers may return findings, or a retry may legitimately fail. Passing attestation validation also does not show the feedback path was used: dispatch records stay in active task context, and my search of loom_checker found no dispatch-feedback fields. The study itself reports an attestation that validated without established dispatch conformance.",
+      "evidence": [
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 11,
+          "quote": "讓獨立審查在既有規則下完成或明確停止"
+        },
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 17,
+          "quote": "可完成必要審查，產生已提交且通過獨立檢查的驗證紀錄"
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 15,
+          "quote": "evidence-grounded reason in active task context only."
+        },
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 363,
+          "quote": "Keep this episode in the active task context. Do not create a review-round"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/report.md",
+          "line": 62,
+          "quote": "Its committed attestation validates mechanically, while full shared-dispatch conformance is not established."
+        }
+      ],
+      "proposed_change": "Amend Acceptance 4 so the isolated rerun's own command log shows: accepted after-execution feedback before the replacement, the count carried forward, no relabeled initial event for that retry, and the excluded review absent from committed verdicts. The run then ends with either a committed, independently validated attestation or a named legal stop reported as not completed. Add no product ledger. If the claim is that the blocked scenario now completes, one completed rerun is still required.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "The gap is wider than an unobservable main profile",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "Every fallback emits a symbolic effective profile, including with a known main profile: unsupported profiles, host rejection, and a redispatch whose next profile is unsupported. The OpenCode and Antigravity adapters also instruct every dispatch to record host-default/unverified. The reproduction covers only unobservable initial with inheritance guaranteed. A repair keyed to that one path would leave the same stop elsewhere. A fallback's non-null requested_profile also must not be reported as what actually ran.",
+      "evidence": [
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 63,
+          "quote": "\"inherited\" if inheritance_guaranteed else \"host-default/unverified\""
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 110,
+          "quote": "\"unsupported-profile\", inheritance_guaranteed, count=count,"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 279,
+          "quote": "\"host-rejection-replacement\", inheritance_guaranteed, count=count,"
+        },
+        {
+          "path": "loom-code/references/opencode-tools.md",
+          "line": 47,
+          "quote": "overrides and record the effective profile as `host-default/unverified`. Never"
+        },
+        {
+          "path": "loom-code/references/antigravity-tools.md",
+          "line": 76,
+          "quote": "`host-default/unverified`, because effort inheritance is unverified on agy"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/reproduce_dispatch_gap.py.txt",
+          "line": 13,
+          "quote": "effective=json.loads(r.stdout)['effective_profile'];assert effective=='inherited'"
+        }
+      ],
+      "proposed_change": "Reword Acceptance 1 and 2 to apply whenever an attempt's settings are unverified, however the fallback arose and under either recorded label. Cover both labels and the known-to-fallback transitions with resolver-level checks. Extra OpenCode and Claude Code runtime validation can stay out of scope.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    }
+  ],
+  "findings": [
+    {
+      "title": "The representation mismatch is a real contract and resolver defect, not caller misuse",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "The contract asks for the effective profile, the resolver emits a string in fallback, and the same resolver rejects that string as feedback. The study's trial result also records an attempted null/null pair being rejected, consistent with the model check at line 171. Existing focused tests pass object profiles to after-execution and do not exercise a fallback round trip. Caller interpretation remains in dispute only for the failure label (see the first divergence).",
+      "evidence": [
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 192,
+          "quote": "dispatcher must omit both overrides. It records `inherited` only when the host"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 170,
+          "quote": "profile = _require_object(attempt[\"profile\"], \"last_attempt.profile\")"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 171,
+          "quote": "if set(profile) != {\"model\", \"effort\"} or profile[\"model\"] not in MODELS:"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/dispatch-gap-reproduction.json",
+          "line": 42,
+          "quote": "\"stderr\": \"dispatch-profile: last_attempt.profile must be an object\\n\""
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/graduated-original-result.json",
+          "line": 41,
+          "quote": "\"output\": \"dispatch-profile: last_attempt.profile is not a portable model-effort pair\\n\""
+        }
+      ],
+      "proposed_change": "Keep this defect as the intent's core, and require a test that feeds an actual fallback result through after-execution.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Feedback before replacement is mandatory; successful no-retry timing can be settled in the contract",
+      "kind": "judgement-call",
+      "confidence": "medium",
+      "rationale": "Feedback before redispatch is explicit. For a success with no retry, 'every completed result' and the requirement that every successful execution returns routed favor mandatory feedback, while 'before any redispatch' still allows the narrower reading. Once success feedback is representable, the dispute no longer blocks work, so Acceptance 1 can stand. The candidate trial's stop also followed an in-flight reminder, so it is not independent proof about ordinary runs.",
+      "evidence": [
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 64,
+          "quote": "The station must feed every completed result back as an `after-execution` event"
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 205,
+          "quote": "reset it. The dispatcher must ensure that every successful execution returns"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/report.md",
+          "line": 60,
+          "quote": "permits a narrower reading"
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/controller-notes.md",
+          "line": 22,
+          "quote": "Its executor interpreted the shared contract as requiring feedback for every completed review"
+        }
+      ],
+      "proposed_change": "Have the design state one reading in the contract, with the every-completed reading as the default recommendation. Treat this as a technical decision, not a user question, and keep mandatory feedback before any replacement.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Acceptance does not state what happens to routing failures with unknown settings",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "Acceptance 2 is conditional, but it does not say which unknown-state cases stop. Escalation requires a known model and effort, and existing policy already stops when no legal transition exists. Without an explicit outcome, a repair could add a blind retry or an invented escalation. Unknown state can only be retried without overrides where the existing rule is same-profile retry.",
+      "evidence": [
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 15,
+          "quote": "需要重新派工時，可依既有規則繼續並遵守原有次數上限"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 219,
+          "quote": "model, effort = actual[\"model\"], actual[\"effort\"]"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 237,
+          "quote": "\"outcome\": \"execution-failed\", \"reason\": \"no-legal-escalation\","
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "line": 207,
+          "quote": "remains or another completed execution would exceed the budget, return"
+        }
+      ],
+      "proposed_change": "Add this outcome: with unknown settings, a capability-quality or reasoning-depth failure stops explicitly with no invented escalation; incomplete attempts, non-routing failures and an exhausted budget also stop; only an allowed same-settings retry continues, without overrides.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Two retry ceilings apply, and the intent names neither precisely",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "The resolver can return dispatch for malformed output at counts 0 and 1, while closing-review ends the episode after a second failed attempt. The changelog shows this split is deliberate. A rerun that follows only the resolver could exceed the station limit. The resolver is also stateless and trusts the caller's count, so it cannot itself detect a reset.",
+      "evidence": [
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 359,
+          "quote": "A second failed attempt before a conforming verdict ends the episode as"
+        },
+        {
+          "path": "loom-code/CHANGELOG.md",
+          "line": 1118,
+          "quote": "- Keep YAML validation and Closing Review's stricter one-retry limit in the"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 184,
+          "quote": "if not attempt[\"completed\"] or count >= 2:"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 249,
+          "quote": "\"\"\"Resolve one observed dispatch state without I/O or persistent state.\"\"\""
+        }
+      ],
+      "proposed_change": "Reword the constraint to preserve the shared two-redispatch ceiling and closing-review's stricter one-retry limit, and verify count carry-forward from the caller's log. Do not require the stateless resolver to detect resets.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Station retry text and resolver stops already disagree on transient failures",
+      "kind": "factual-error",
+      "confidence": "medium",
+      "rationale": "Closing-review allows one retry after an unavailable executor or other transient failure, but the resolver returns execution-failed for incomplete attempts and non-routing kinds. With relabeling forbidden, such a retry has no legal resolver path. Acceptance 3 says failure stops stay consistent without acknowledging this existing conflict, so a repair could change it silently in either direction.",
+      "evidence": [
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 353,
+          "quote": "A malformed response, unavailable executor, or other transient failure before"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 37,
+          "quote": "NON_ROUTING_FAILURES = {"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 212,
+          "quote": "if kind in NON_ROUTING_FAILURES:"
+        },
+        {
+          "path": "loom-code/tests/test_dispatch_profile_resolver.py",
+          "line": 377,
+          "quote": "def test_incomplete_attempt_fails_closed() -> None:"
+        }
+      ],
+      "proposed_change": "Record this conflict explicitly. The smallest option is to keep the resolver's stops unchanged in this repair and list the station conflict as a separate follow-up; the design may reconcile it only by naming the change.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "The atomic-pair guarantee has a hole in the path being changed",
+      "kind": "factual-error",
+      "confidence": "high",
+      "rationale": "Acceptance 3 assumes pair handling already exists on this path. After-execution validates only the model tier, so a known model with a null or non-string effort appears able to reach the success branch and be returned in overrides and effective_profile. This comes from reading the code and was not executed. Adding unknown support here could widen the hole, for example through known-model/unknown-effort input.",
+      "evidence": [
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 16,
+          "quote": "設定已知時的既有派工結果、設定成對處理與失敗停止保障維持一致"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 171,
+          "quote": "if set(profile) != {\"model\", \"effort\"} or profile[\"model\"] not in MODELS:"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 173,
+          "quote": "actual = {\"model\": profile[\"model\"], \"effort\": profile[\"effort\"]}"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "line": 177,
+          "quote": "\"overrides\": actual.copy(), \"effective_profile\": actual,"
+        }
+      ],
+      "proposed_change": "Add this outcome: feedback is either a complete known pair or an explicit unknown state. Partial, null-component and unrecognized profile values still exit non-zero, and valid known inputs, including verified host-native effort, keep their current results.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Truthful unknown state may still be forced into a nonblank model at the attestation boundary",
+      "kind": "judgement-call",
+      "confidence": "medium",
+      "rationale": "The finalization input shows a model per verdict, and a delivery-state check rejects a verdict whose model is blank. The contract does not say what an incumbent reviewer with an unknown model should record there. A rerun could therefore pass the resolver and still fabricate at this later boundary. Committed trial attestations were not supplied, so what they recorded is unverified.",
+      "evidence": [
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 411,
+          "quote": "{\"reviewer\":\"<id>\",\"vendor\":\"<vendor>\",\"model\":\"<model>\",\"lens\":\"code\",\"verdict\":\"PASS\",\"findings\":[]}"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/intent_state.py",
+          "line": 169,
+          "quote": "for key in (\"reviewer\", \"vendor\", \"model\", \"lens\")):"
+        },
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 14,
+          "quote": "不要求編造設定"
+        }
+      ],
+      "proposed_change": "Extend Acceptance 4 so the committed record for an unknown-setting incumbent reviewer contains an explicitly non-invented model value, with no product or portable-tier claim. Prefer an existing permitted value or wording over a schema change; the design should change schema only if necessary.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "The fix must not relax the outside-reviewer requirement",
+      "kind": "judgement-call",
+      "confidence": "high",
+      "rationale": "Outside review has a stricter rule: overrides null does not select a profile, and its receipt requires explicit model and effort data. A general unknown-state repair could be misread as allowing unknown outside profiles. The intent's preserved guarantees mention independent review but not this boundary.",
+      "evidence": [
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "line": 189,
+          "quote": "resolver result of `overrides: null` does not select an outside profile;"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/reviewers.py",
+          "line": 217,
+          "quote": "\"status\", \"executor\", \"model\", \"effort\", \"family\", \"evidence_level\","
+        }
+      ],
+      "proposed_change": "Add a constraint that the unknown-state allowance applies only to host-native dispatches, and outside reviewers still need the explicit verified profile and receipt.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    },
+    {
+      "title": "Reproduction strength should not be overstated; narrow exclusions hold",
+      "kind": "judgement-call",
+      "confidence": "medium",
+      "rationale": "The eight calls are four cases repeated across byte-identical runtime bundles. The control is an unverified schema check on the success path only, so regression evidence for known failure paths comes from existing tests. The 37-test result is not a package-suite result. Nothing read shows collection optimization, caching, module splitting or wider history analysis is needed for this repair, so those exclusions hold.",
+      "evidence": [
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/controller-notes.md",
+          "line": 9,
+          "quote": "Both bundles have byte-identical runtime code."
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/reproduce_dispatch_gap.py.txt",
+          "line": 18,
+          "quote": "# Schema-level positive control only; not a verified host dispatch profile."
+        },
+        {
+          "path": "docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/claude-review-input/dispatch-existing-tests.txt",
+          "line": 2,
+          "quote": "37 passed in 0.35s"
+        },
+        {
+          "path": "docs/loom/intent/2026-11-02-dispatch-fallback-feedback.md",
+          "line": 25,
+          "quote": "測試收集順序或效能優化。"
+        }
+      ],
+      "proposed_change": "Describe the reproduction as four cases in two identical bundles. Keep the out-of-scope list, and require the complete package suite at Build rather than citing the focused 37-test result as full regression evidence.",
+      "corroborated_by": [
+        "claude-code"
+      ],
+      "resolution": "open"
+    }
+  ],
+  "verdict": "challenger-preferred",
+  "leg_count": 1,
+  "early_stopped": false,
+  "degraded_legs": [],
+  "executor_provenance": {
+    "executor": "claude",
+    "requested_model": "opus",
+    "requested_effort": "high",
+    "requested_family": "anthropic",
+    "observed_model": "claude-opus-5-5",
+    "observed_effort": null,
+    "evidence_level": "accepted-explicit-settings",
+    "candidate_source": "alias-or-explicit-id",
+    "filesystem_boundary": "Claude model file tools confined to review root; CLI startup writes outside root not excluded"
+  },
+  "actual_cost": {
+    "value": "unknown",
+    "reason": "The runner retains probe metadata and review body, not complete review billing/usage; the account billing basis is not independently known."
+  },
+  "known_weaknesses": [
+    "This is a single outside opinion; agreement cannot detect shared blind spots.",
+    "This was a full-context challenge after reading the incumbent's framing, not a blind review.",
+    "All source-behavior conclusions come from static reading; no code or tests were run.",
+    "The classification of the excluded reviewer rests on summary trial output, not its raw YAML or command logs.",
+    "The recommendation on the round-and-budget relationship is an interpretation of contract text that its authors may have intended differently."
+  ],
+  "coverage_disclaimer": "Read in full: the intent; dispatch_profile.py; dispatch-profile.md; both focused test files; the copied reproduction JSON, harness text, existing-test output, report, controller notes, both graduated result files and review request; closing-review SKILL.md; agents/reviewer.md. Read in part or by search: build SKILL.md, CHANGELOG.md, mechanisms.yaml, test_review_convergence_contract.py, test_loom_runtime_skill_commands.py, opencode-tools.md, antigravity-tools.md, closing-review/references/lenses.md, loom-python, loom_checker/intent_state.py, loom_checker/reviewers.py, plus a search of loom_checker and scripts. Not available or not verified: raw command logs, reviewer YAML, audit1/audit2, results.json, independent-state files, bundle-diff, committed trial attestations, and host runtime behavior on Codex, Claude Code, OpenCode or Antigravity. The missing-result-a account therefore cannot be independently reverified here. External /tmp locators were not opened. This reviewed the prepared packet and selected source, not the complete pinned commit or tree, and makes no completeness claim.",
+  "validation": {
+    "probe_returncode": 0,
+    "required_fields_present": true,
+    "citations_checked": 59,
+    "quotes_matched": 59,
+    "line_anchors_matched": 59,
+    "not_established": "Citation existence does not independently verify every semantic conclusion or raw-journal assertion."
+  },
+  "local_followup": "Three actual resolver calls independently confirmed null and integer effort values are accepted on completed success feedback; see local-followup-pair-validation.json. This is local verification, not Claude execution."
+}

@@ -1,0 +1,54 @@
+import copy,hashlib,json,subprocess
+from pathlib import Path
+ROOT=Path(__file__).parent
+REPO=Path('/Users/kouko/GitHub/loom-plugins')
+RUNNER=REPO/'loom-code/scripts/loom-python'
+rows=[]
+def call(label,packet):
+ r=subprocess.run([str(RUNNER),'--ready','--script','dispatch_profile.py'],input=json.dumps(packet),text=True,capture_output=True)
+ data=json.loads(r.stdout) if r.stdout.strip().startswith('{') else None
+ rows.append({'label':label,'packet':packet,'exit_code':r.returncode,'decision':data,'stderr':r.stderr})
+ return r.returncode,data
+def initial(model='standard',effort='medium',caps=None,inherit=True):
+ return {'event':'initial','main_profile':{'model':model,'effort':effort},'task_evidence':{},'capabilities':caps if caps is not None else {'standard':['medium']},'inheritance_guaranteed':inherit,'completed_redispatches':0}
+def feedback(profile,*,success=True,conforming=True,completed=True,count=0,kind=None,caps=None):
+ a={'completed':completed,'success':success,'conforming':conforming,'profile':profile}
+ if kind is not None:a['failure_kind']=kind
+ return {'event':'after-execution','last_attempt':a,'capabilities':caps if caps is not None else {'standard':['medium'],'frontier':['medium']},'inheritance_guaranteed':True,'completed_redispatches':count}
+
+producers=[]
+for inherit in (True,False):
+ producers.append((f'unknown-main-inherit-{inherit}',initial('unknown','unknown',{},inherit)))
+ producers.append((f'unsupported-known-inherit-{inherit}',initial(caps={'standard':['low']},inherit=inherit)))
+ p=initial(inherit=inherit);p['event']='host-rejection';p['rejection_retried']=False
+ producers.append((f'host-rejection-inherit-{inherit}',p))
+producers += [('retry-known-unsupported',feedback({'model':'standard','effort':'medium'},success=False,conforming=False,kind='malformed-response',caps={})),('escalation-unsupported',feedback({'model':'standard','effort':'medium'},success=False,kind='capability-quality',caps={'standard':['medium']}))]
+for label,packet in producers:
+ rc,out=call(label,packet);assert rc==0 and isinstance(out['effective_profile'],str)
+ for mode in ('success','malformed-retry'):
+  p=feedback(out['effective_profile'],success=mode=='success',conforming=mode=='success',kind='malformed-response' if mode!='success' else None,count=out.get('next_redispatch',0))
+  rc,_=call(label+' -> '+mode,p);assert rc==2
+
+# Successful feedback known-pair controls and malformed effort values.
+for effort in (None,17,True,{},[],'','unverified-effort','medium'):
+ rc,out=call('success-effort-'+repr(effort),feedback({'model':'standard','effort':effort}))
+ assert rc==0  # Diagnostic: code currently accepts even invalid types/empty values.
+for model in ('unknown',None):
+ rc,_=call('success-model-'+repr(model),feedback({'model':model,'effort':'medium'}));assert rc==2
+rc,out=call('verified-native-effort-control',feedback({'model':'frontier','effort':'ultra'},caps={'frontier':['ultra']}));assert rc==0 and out['outcome']=='routed'
+
+# Existing stop semantics vs same-settings malformed retry and budget boundary.
+for kind in ('malformed-response','host-unavailable','timeout','missing-input','transient-executor'):
+ for completed in (True,False):
+  rc,out=call(f'failure-{kind}-completed-{completed}',feedback({'model':'standard','effort':'medium'},success=False,conforming=False,completed=completed,kind=kind))
+  assert rc==0
+  assert out['outcome']==('dispatch' if kind=='malformed-response' and completed else 'execution-failed')
+for count in (0,1,2):
+ rc,out=call(f'malformed-count-{count}',feedback({'model':'standard','effort':'medium'},success=False,conforming=False,kind='malformed-response',count=count))
+ assert rc==0 and out['outcome']==('dispatch' if count<2 else 'execution-failed')
+for count in (0,2):
+ rc,out=call(f'success-count-{count}',feedback({'model':'standard','effort':'medium'},count=count));assert rc==0 and out['outcome']=='routed'
+
+payload={'source_head':subprocess.check_output(['git','-C',str(REPO),'rev-parse','HEAD'],text=True).strip(),'resolver_sha256':hashlib.sha256((REPO/'loom-code/scripts/dispatch_profile.py').read_bytes()).hexdigest(),'scope':'Actual stateless CLI calls on synthetic state packets; not live agent/host executions or independent incident samples. Direct symbolic feedback tests do not exclude truthful use of a separately observed known inherited pair.','rows':rows}
+(ROOT/'probe-results.json').write_text(json.dumps(payload,indent=2))
+print('Actual CLI calls:',len(rows));print('Fallback producers:',len(producers));print('Symbolic feedback rejections:',sum(' -> ' in x['label'] and x['exit_code']==2 for x in rows));print('All controls and expected present-behavior assertions passed.')

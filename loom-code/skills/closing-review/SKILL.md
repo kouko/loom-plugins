@@ -323,10 +323,21 @@ committed for earlier changes stay where they are.
 
 <!-- gate: review.bounded-episode -->
 A closing Review episode starts when fresh reviewers first evaluate completed
-functional content for one confirmed-intent commit. Only a newly confirmed
-intent starts another episode. The episode admits at most three distinct
+functional content for the confirmed requirements. Only a substantive requirements
+change with renewed intent confirmation starts another episode. The main agent
+must record the changed requirements and affected obligations in retained spec,
+plan and evidence (or intent Constraints when those artifacts are omitted),
+distinguishing evidence retained as applicable from evidence replaced for the
+new requirements. Confirmation's byte pin proves the confirmed content, not
+semantic change. The episode admits at most three distinct
 functional-content digests; changing the task, app, branch, reviewer, vendor,
 model, or technical design does not reset that limit.
+Wording-only reconfirmation must preserve existing review rounds.
+The main agent must retain the retry count for the same failed task, even after
+a substantive requirements change and renewed confirmation. Before treating work
+as a new task, the main agent must record a concrete changed obligation and the
+task-continuity rationale in those existing artifacts, with checkable evidence
+for that distinction; a new task name alone changes neither count nor limit.
 A digest is distinct whenever a functional-content file changed since the
 content the reviewers last read; publication-only edits do not change it.
 
@@ -357,8 +368,16 @@ authorized review with a fresh preflight; never retry silently. After
 `probe-rapid-refill-breaker` or `review-rapid-refill-breaker`, inspect private
 diagnostics before requesting authorization. That retry is not a review round.
 A second failed attempt before a conforming verdict ends the episode as
-`EXECUTION_FAILED`; a conforming `NEEDS_REVISION` always consumes the current
-round.
+`EXECUTION_FAILED`.
+Treat a conforming `NEEDS_REVISION` as a successful review assignment that
+consumes the current review round. Feed back that completed assignment as
+successful conforming work under the shared dispatch profile, then return the
+artifact defects to Build for the next permitted fix round; it consumes no
+failed-reviewer retry. An execution-boundary result remains excluded and does
+not automatically become `malformed-response`; classify it from its actual
+failure evidence under the shared dispatch contract and stop when that contract
+permits no retry. Report every completed host-native execution before any
+permitted retry, retaining its actual count and effective profile.
 
 Keep this episode in the active task context. Do not create a review-round
 ledger or committed state schema. Wording-only publication edits do not reopen

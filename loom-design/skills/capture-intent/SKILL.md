@@ -335,6 +335,9 @@ the intent and restate again; there is no limit on rounds here.
    `intent_confirmed_sha: <computed-sha>`, using the output of
    `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.
    This hashes the confirmed intent excluding its status and pin lines.
+   Changes require reconfirmation with matching pin; byte-based
+   confirmation does not establish a substantive requirements change;
+   `loom-code:closing-review`'s `review.bounded-episode` owns episode/task continuity.
 2. **Branch before the first commit.** Before the confirmation commit, make
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
