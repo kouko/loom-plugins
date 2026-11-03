@@ -1,5 +1,7 @@
 # Handoff
 
+[Loom](../../../README.md) / [loom-workflow](../../README.zh-TW.md) / handoff
+
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 > 結束 session 時把 10 格式的 HANDOFF 檔案寫入 `.claude/handoffs/`。
@@ -18,7 +20,7 @@ HANDOFF 檔案，儲存在 `.claude/handoffs/`。
 
 - **Prepare 模式（準備）** — session 結束時。Agent 透過 Bash 執行
   `git rev-parse HEAD`、`git status --short`、`git log --oneline -5`、
-  `claude --version`，然後用 Write 工具建立
+  目前分支及可用的 Claude Code 或 Codex CLI 版本，然後建立
   `.claude/handoffs/HANDOFF-YYYY-MM-DD-HHMMSS-<slug>.md`，包含
   `references/handoff-schema.md` 定義的全部 10 個區塊。輸出精度優先——
   完整路徑、完整錯誤訊息、使用者每輪發言逐字記錄、可執行驗證指令。
@@ -26,7 +28,8 @@ HANDOFF 檔案，儲存在 `.claude/handoffs/`。
 - **Resume 模式（繼續）** — session 開始時。Agent 用
   `ls -t .claude/handoffs/ | head -1` 找到最新檔案，完整 Read，然後逐一
   透過 Bash 執行 Block 9 的每條驗證指令，並把期望輸出和實際輸出並列顯示。
-  若有任何不符則拒絕繼續。所有驗證通過後，以 3〜5 條整理目前狀況、待完成
+  關鍵狀態 [T1] 不符時停止；提示性差異 [T2] 只有符合已記錄的無害原因才能繼續，
+  其餘先詢問你。接著以 3〜5 條整理目前狀況、待完成
   工作、下一步（Synthesis-check），詢問使用者確認後才開始工作。
 
 HANDOFF 檔案的讀者是冷啟動 AI——新 session、零前情脈絡。精度優先於可讀性：
@@ -47,7 +50,7 @@ HANDOFF 檔案的讀者是冷啟動 AI——新 session、零前情脈絡。精�
 | 把子任務委派給平行 agent | OpenAI Agents SDK 等（不同問題） |
 
 `loom-workflow:recap-state` 是 L3——不寫入任何檔案，給還在 session 內的人類讀者，
-輸出 7 格式對話摘要。
+只保留有助理解現在位置的段落。
 
 `loom-workflow:handoff` 是 L2——把檔案寫入 `.claude/handoffs/`，給未來
 session 的冷啟動 AI 讀者，在繼續工作前強制執行可驗證的狀態確認。
@@ -111,9 +114,8 @@ skill 不會新增或修改 `.gitignore`。
   長時間靜默、使用者說「掰掰」），不需要明確觸發詞。v0.1 需要明確呼叫。
 - **Interruption Snapshot 區塊** — 專門處理任務中斷（非 session 結束）
   的 Block 11。v0.1 所有情況都用現有 10 格式。
-- **各工具 init-prompt 變體** — Codex / Cursor / Gemini 的寫入路徑不同；
-  v0.1 只支援 Claude Code 的 Write 工具。HANDOFF 檔案的讀取（resume 模式）
-  已支援跨工具（任何能讀 markdown 的工具都可以）。
+- **各工具 init-prompt 變體** — 目前的 Resume Launcher 是不依賴宿主的檔案指引。
+  Prepare 會記錄可用的 Claude Code 或 Codex 版本，不限於 Claude 的 Write 工具。
 - **`test-prompts.json` + `trigger-eval.json` 骨架** — 觸發準確率和
   schema 完整性的結構化評估基盤。等真實 session 的 dogfood 建立出品質
   基準後再加入。
@@ -131,3 +133,10 @@ handoff/
 └── references/
     └── handoff-schema.md  <- 10 格式模板 + 5 共通核心原則
 ```
+
+## 相關技能
+
+- [loom-workflow:recap-state](../recap-state/README.zh-TW.md)
+- [loom-workflow:goal-create](../goal-create/README.zh-TW.md)
+
+執行規則: [SKILL.md](SKILL.md).

@@ -1,5 +1,7 @@
 # skill-retro
 
+[Loom](../../../README.md) / [loom-workflow](../../README.zh-TW.md) / skill-retro
+
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 分析所選過去或目前 Claude Code 與 Codex session 的已擷取快照，找出可讀取目標 skill 的反覆問題。排除擷取後的新增事件，不須安裝目標。提案可以針對其指示，或與該 skill 直接相關的 plugin 註冊、載入、hook、附帶腳本及相依 connector。回顧只產出審閱資料；選定的變更交由獨立實作流程處理。
@@ -70,3 +72,10 @@ python3 loom-workflow/skills/skill-retro/scripts/propose.py \
 ### 第三方歸屬
 
 `agents/` 中的失敗與成功分析 prompt 改作自 Apache 2.0 授權的 [Trace2Skill](https://github.com/Qwen-Applications/Trace2Skill)（[論文](https://arxiv.org/abs/2603.25158)）。轉載這些改作內容時應保留上游歸屬。
+
+## 相關技能
+
+- [loom-workflow:project-retro](../project-retro/README.md)
+- [loom-workflow:critique](../critique/README.zh-TW.md)
+
+執行規則: [SKILL.md](SKILL.md).

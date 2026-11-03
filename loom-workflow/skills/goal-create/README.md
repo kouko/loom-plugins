@@ -1,5 +1,7 @@
 # Goal Create
 
+[Loom](../../../README.md) / [loom-workflow](../../README.md) / goal-create
+
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > Create a goal condition. **SESSION** activates the four-field goal when
@@ -67,3 +69,10 @@ goal-create/
 └── scripts/
     └── goal_lint.py        <- SESSION's mechanical floor
 ```
+
+## Related skills
+
+- [loom-workflow:handoff](../handoff/README.md)
+- [loom-design:capture-intent](../../../loom-design/skills/capture-intent/README.md)
+
+Runtime instructions: [SKILL.md](SKILL.md).

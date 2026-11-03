@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.19.1] — 2026-11-03 — complete the linked skill documentation
+
+- Add the eight missing skill guides and connect all fourteen guides to their plugin, project and related skills; retain existing translated guides.
+- Present tool selection as a table and keep the decision-map exploration loop in its own diagram.
+- Update handoff documentation to the current verification tiers and host support, and replace the stale advisor file listing with source links.
+
 ## [5.19.0] — 2026-11-01 — standalone diagrams and explicit external edits
 
 - Create diagrams outside Loom at a user-selected directory. Before editing an existing external diagram, ask whether to copy it into the project; an accepted Loom copy stays in the change's diagram directory, while an explicit direct-edit choice updates the original's adjacent projection.

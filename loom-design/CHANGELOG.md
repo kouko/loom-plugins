@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
+
+- Add human-facing guides for all six skills, including examples, outputs, confirmation points and boundaries.
+- Link the three plugin README translations to skill guides and the project overview. Keep on-demand tools outside the main design flow diagram.
+
 ## [2.20.0] — 2026-11-03 — preserve applicable work after changed requirements
 
 - `capture-intent` requires renewed confirmation after substantive requirements changes during implementation and routes affected design, plan and evidence back through their owning stations while carrying applicable work forward.

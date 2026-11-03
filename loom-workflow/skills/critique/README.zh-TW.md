@@ -1,5 +1,7 @@
 # Critique
 
+[Loom](../../../README.md) / [loom-workflow](../../README.zh-TW.md) / critique
+
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 > 在動手做之前先裁決提案，一個 skill 兩個鏡頭：
@@ -76,3 +78,10 @@ verdict 恰好一個：`PROCEED`、`PROCEED-WITH-CAVEAT`、`RESHAPE`、`REJECT`�
 完整鏈路、各環節的貢獻與授權全文在 [`NOTICE`](NOTICE) 與
 [`LICENSE`](LICENSE)。內附的四份 mindset 追隨
 `domain-teams:code-team/standards/` 的 canonical 版本。
+
+## 相關技能
+
+- [loom-workflow:independent-advisor](../independent-advisor/README.zh-TW.md)
+- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+
+執行規則: [SKILL.md](SKILL.md).

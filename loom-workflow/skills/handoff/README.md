@@ -1,5 +1,7 @@
 # Handoff
 
+[Loom](../../../README.md) / [loom-workflow](../../README.md) / handoff
+
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > End a session by writing a 10-block HANDOFF file to `.claude/handoffs/`.
@@ -19,7 +21,8 @@ writes a structured 10-block HANDOFF file to `.claude/handoffs/`.
 Two modes:
 
 - **Prepare mode** — end of session. The agent runs `git rev-parse HEAD`,
-  `git status --short`, `git log --oneline -5`, and `claude --version` via
+  the branch name, `git status --short`, `git log --oneline -5`, and the
+  available Claude Code or Codex CLI version via
   Bash, then writes `.claude/handoffs/HANDOFF-YYYY-MM-DD-HHMMSS-<slug>.md`
   with all 10 blocks per `references/handoff-schema.md`. The output is
   precision-first: exact paths, full error messages, verbatim user turns,
@@ -28,8 +31,9 @@ Two modes:
 - **Resume mode** — start of session. The agent finds the latest file via
   `ls -t .claude/handoffs/ | head -1`, reads it fully, runs every
   Verification Command (Block 9) via Bash and reports verbatim output, and
-  refuses to continue if any output mismatches expected. After all
-  verifications pass, it produces a 3–5 bullet Synthesis-check and asks the
+  stops on a load-bearing [T1] mismatch. An advisory [T2] difference can
+  continue only when it matches a recorded benign cause; otherwise it asks
+  you. It then produces a 3–5 bullet Synthesis-check and asks the
   user to confirm before acting.
 
 The HANDOFF file targets a cold AI reader — a new session with zero prior
@@ -51,7 +55,8 @@ Both skills help you re-orient, but they target different situations:
 | Delegating a sub-task to a parallel agent | OpenAI Agents SDK or similar (different problem) |
 
 `loom-workflow:recap-state` is L3 — it writes nothing to disk, targets a warm human
-reader still inside the session, and produces a 7-block chat summary.
+reader still inside the session, and includes only the sections needed to
+explain the current position.
 
 `loom-workflow:handoff` is L2 — it writes a file to `.claude/handoffs/`,
 targets a cold AI reader in a future session, and enforces runnable
@@ -124,10 +129,9 @@ These are deliberate omissions from v0.1:
 - **Interruption Snapshot block** — a dedicated Block 11 for mid-task
   interruptions (not session-end). v0.1 uses the existing 10-block schema
   for all cases.
-- **Per-tool init-prompt variants** — Codex / Cursor / Gemini have
-  different write paths; v0.1 uses Claude Code's Write tool as the only
-  write path. Reading a HANDOFF file (resume mode) is already cross-tool
-  (any tool that can `read` markdown works).
+- **Per-tool init-prompt variants** — the current Resume Launcher is a
+  host-independent pointer to the saved file. Prepare records the available
+  Claude Code or Codex version; it is not limited to Claude's Write tool.
 - **`test-prompts.json` + `trigger-eval.json` scaffolding** — structured
   eval for trigger accuracy and schema completeness. Coming once real-session
   dogfood establishes a quality baseline.
@@ -145,3 +149,10 @@ handoff/
 └── references/
     └── handoff-schema.md  <- 10-block template + 5 core principles
 ```
+
+## Related skills
+
+- [loom-workflow:recap-state](../recap-state/README.md)
+- [loom-workflow:goal-create](../goal-create/README.md)
+
+Runtime instructions: [SKILL.md](SKILL.md).

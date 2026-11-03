@@ -1,12 +1,16 @@
 # loom-code
 
+[Loom](../README.md)
+
+技能詳細頁有同語言翻譯時連至該版本，其餘連至英文版。
+
 > **五個站把一次變更從確認過的 intent 送到已發布的 pull request；任何東西
 > 離開本機之前，決定性的 checker 會重算一次證據。** loom-code 假設你具備
 > 基本軟體工程知識，而不是熟悉這個 plugin：每次變更最多問你三個問題，其餘
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.57.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.57.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -56,13 +60,13 @@ flowchart TD
 
 | Skill | 角色 |
 |---|---|
-| [`write-plan`](skills/write-plan/SKILL.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
-| [`build`](skills/build/SKILL.md) | 每個任務派一個 implementer，以測試先行實作 plan，最後跑 adversary 與完整 package 測試，全數通過才交出。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | 對通過 Build 檢查的內容跑收尾審查——審查者，視需要加 acceptance testing——並產生 `docs/loom/<change-id>/attestation.json`。 |
-| [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
-| [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
-| [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
-| [`external-review`](skills/external-review/SKILL.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
+| [`write-plan`](skills/write-plan/README.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
+| [`build`](skills/build/README.md) | 每個任務派一個 implementer，以測試先行實作 plan，最後跑 adversary 與完整 package 測試，全數通過才交出。 |
+| [`closing-review`](skills/closing-review/README.md) | 對通過 Build 檢查的內容跑收尾審查——審查者，視需要加 acceptance testing——並產生 `docs/loom/<change-id>/attestation.json`。 |
+| [`ship`](skills/ship/README.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
+| [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
+| [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
+| [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
 
 ## Agents
 

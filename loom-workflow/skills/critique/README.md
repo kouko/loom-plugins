@@ -1,5 +1,7 @@
 # Critique
 
+[Loom](../../../README.md) / [loom-workflow](../../README.md) / critique
+
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > Judge a proposal before it is built, through one of two lenses:
@@ -87,3 +89,10 @@ projects (`reducing-entropy`). The full chain, what each link
 contributed, and the license text live in [`NOTICE`](NOTICE) and
 [`LICENSE`](LICENSE). The four bundled mindsets track canonical versions
 under `domain-teams:code-team/standards/`.
+
+## Related skills
+
+- [loom-workflow:independent-advisor](../independent-advisor/README.md)
+- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+
+Runtime instructions: [SKILL.md](SKILL.md).

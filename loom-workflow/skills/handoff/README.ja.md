@@ -1,5 +1,7 @@
 # Handoff
 
+[Loom](../../../README.md) / [loom-workflow](../../README.ja.md) / handoff
+
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 > セッション終了時に 10 ブロックの HANDOFF ファイルを `.claude/handoffs/` に書き出す。
@@ -18,8 +20,8 @@
 
 - **Prepare モード（準備）** — セッション終了時。エージェントが Bash で
   `git rev-parse HEAD`、`git status --short`、`git log --oneline -5`、
-  `claude --version` を実行し、その出力をすべて含む
-  `.claude/handoffs/HANDOFF-YYYY-MM-DD-HHMMSS-<slug>.md` を Write ツールで
+  現在の branch と利用可能な Claude Code または Codex CLI のバージョンを調べ、
+  その出力を含む `.claude/handoffs/HANDOFF-YYYY-MM-DD-HHMMSS-<slug>.md` を
   作成する。`references/handoff-schema.md` に定義された 10 ブロックすべてを
   記述する。出力は精度優先——正確なファイルパス、完全なエラーメッセージ、
   ユーザーターンの逐語記録、実行可能な検証コマンド。
@@ -27,7 +29,8 @@
 - **Resume モード（再開）** — セッション開始時。エージェントが
   `ls -t .claude/handoffs/ | head -1` で最新ファイルを特定し、全体を
   Read して、Block 9 の検証コマンドをすべて Bash で実行し、期待値と実際の
-  出力を逐語で報告する。不一致があれば継続を拒否する。全検証がパスした後、
+  出力を逐語で報告する。重要な状態 [T1] の不一致では停止する。参考情報 [T2] の差分は
+  記録済みの無害な原因に一致する場合だけ継続し、それ以外は確認する。その後、
   状況・未完タスク・次のステップを 3〜5 箇条でまとめ（Synthesis-check）、
   ユーザーの確認を得てから作業に入る。
 
@@ -49,7 +52,7 @@ HANDOFF ファイルの想定読者は、前回の文脈をゼロから出発す
 | 並行エージェントへのタスク委譲 | OpenAI Agents SDK 等（別の問題） |
 
 `loom-workflow:recap-state` は L3 — ファイルへの書き込みなし、セッション内の
-ウォームな人間読者向け、7 ブロックのチャット出力。
+同じ session の人間読者向けに、現在地の理解に必要なセクションだけを示す。
 
 `loom-workflow:handoff` は L2 — `.claude/handoffs/` にファイルを書き出し、
 将来セッションのコールド AI 読者向け、再開前に実行可能な検証を強制する。
@@ -114,10 +117,9 @@ v0.1 から意図的に外したもの：
   呼び出しが必要。
 - **割り込みスナップショットブロック** — タスク中断（セッション終了でない）
   専用の Block 11。v0.1 は全ケースに既存の 10 ブロックスキーマを使う。
-- **ツール別 init-prompt バリアント** — Codex / Cursor / Gemini は
-  書き込みパスが異なる。v0.1 は Claude Code の Write ツールのみ対応。
-  HANDOFF ファイルの読み込み（resume モード）は Markdown を読めるツールなら
-  クロスツール動作する。
+- **ツール別 init-prompt バリアント** — 現在の Resume Launcher は host に依存せず
+  保存ファイルを指す。Prepare は利用可能な Claude Code または Codex のバージョンを
+  記録し、Claude の Write ツールだけには限定されない。
 - **`test-prompts.json` + `trigger-eval.json` スキャフォールディング** —
   トリガー精度とスキーマ完全性の構造的評価基盤。実セッションでの
   ドッグフードでベースラインが出てから追加予定。
@@ -135,3 +137,10 @@ handoff/
 └── references/
     └── handoff-schema.md  <- 10 ブロックテンプレート + 5 共通核心原則
 ```
+
+## 関連スキル
+
+- [loom-workflow:recap-state](../recap-state/README.ja.md)
+- [loom-workflow:goal-create](../goal-create/README.ja.md)
+
+実行時の手順: [SKILL.md](SKILL.md).

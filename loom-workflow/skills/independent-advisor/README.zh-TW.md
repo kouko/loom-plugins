@@ -1,5 +1,7 @@
 # Independent Advisor
 
+[Loom](../../../README.md) / [loom-workflow](../../README.zh-TW.md) / independent-advisor
+
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 > 針對當前的計畫或決策，去找**另一個執行者**要第二意見——更強的模型、更高的
@@ -80,14 +82,16 @@ CLI 起始目錄及本機執行，並記錄原指令作為授權來源；不會�
 
 ---
 
-## Files
+## 詳細資料
 
-```
-independent-advisor/
-├── README.md            <- English
-├── README.ja.md         <- 日本語
-├── README.zh-TW.md      <- 繁體中文（本檔）
-├── SKILL.md             <- 實際運作檔（給 Claude 讀）
-└── scripts/
-    └── test_independent_advisor_readmes.py
-```
+- [執行者選擇](references/executor-detection.md)
+- [執行協定](references/dispatch-protocol.md)
+- [報告要求](references/report-contract.md)
+- [README 檢查](../../tests/independent-advisor/test_independent_advisor_readmes.py)
+
+## 相關技能
+
+- [loom-workflow:critique](../critique/README.zh-TW.md)
+- [loom-code:external-review](../../../loom-code/skills/external-review/README.md)
+
+執行規則: [SKILL.md](SKILL.md).

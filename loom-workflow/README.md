@@ -1,10 +1,14 @@
 # loom-workflow
 
+[Loom](../README.md)
+
+Skill guides open in English unless a matching translation is available.
+
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.19.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.19.1 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -87,20 +91,20 @@ Fourteen skills: thirteen tools and one optional router.
 
 | Skill | Role |
 |---|---|
-| [`using-loom-workflow`](skills/using-loom-workflow/) | Optional router: picks the matching tool for a broad or unclear request and loads its instructions. Every tool stays directly invocable. |
-| [`decision-map`](skills/decision-map/) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
-| [`critique`](skills/critique/) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
-| [`recap-state`](skills/recap-state/) | In-session recap of where the work stands, then a pause for confirmation. Not the built-in `/recap` away-summary. |
-| [`loom-memory`](skills/loom-memory/) | Recall, record, reconcile or retire durable repository lessons in the committed memory store. |
-| [`dbt-model-style`](skills/dbt-model-style/) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
-| [`git-memory`](skills/git-memory/) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
-| [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
-| [`skill-retro`](skills/skill-retro/) | Review selected past or current Claude Code and Codex session snapshots against readable target skill sources or related plugin integration; return source-linked proposals without applying changes. Current snapshots exclude events after capture; source paths need no local installation. Two distinct sessions promote a proposal; one remains pending. |
-| [`project-retro`](skills/project-retro/) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
-| [`independent-advisor`](skills/independent-advisor/) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
-| [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
-| [`loom-interactive-diagram`](skills/loom-interactive-diagram/) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
-| [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
+| [`using-loom-workflow`](skills/using-loom-workflow/README.md) | Optional router: picks the matching tool for a broad or unclear request and loads its instructions. Every tool stays directly invocable. |
+| [`decision-map`](skills/decision-map/README.md) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
+| [`critique`](skills/critique/README.md) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
+| [`recap-state`](skills/recap-state/README.md) | In-session recap of where the work stands, then a pause for confirmation. Not the built-in `/recap` away-summary. |
+| [`loom-memory`](skills/loom-memory/README.md) | Recall, record, reconcile or retire durable repository lessons in the committed memory store. |
+| [`dbt-model-style`](skills/dbt-model-style/README.md) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
+| [`git-memory`](skills/git-memory/README.md) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
+| [`handoff`](skills/handoff/README.md) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
+| [`skill-retro`](skills/skill-retro/README.md) | Review selected past or current Claude Code and Codex session snapshots against readable target skill sources or related plugin integration; return source-linked proposals without applying changes. Current snapshots exclude events after capture; source paths need no local installation. Two distinct sessions promote a proposal; one remains pending. |
+| [`project-retro`](skills/project-retro/README.md) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
+| [`independent-advisor`](skills/independent-advisor/README.md) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
+| [`loom-visualization`](skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
+| [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
+| [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts eight of these tools. `goal-create` and
 `dbt-model-style` and `project-retro` are standalone skills outside the Loom flow, and

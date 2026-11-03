@@ -1,5 +1,7 @@
 # Independent Advisor
 
+[Loom](../../../README.md) / [loom-workflow](../../README.md) / independent-advisor
+
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > Get a second opinion on the current plan or decision from a **different
@@ -97,14 +99,16 @@ Read these before you rely on a result:
 
 ---
 
-## Files
+## Further reading
 
-```
-independent-advisor/
-├── README.md            <- English (this file)
-├── README.ja.md         <- 日本語
-├── README.zh-TW.md      <- 繁體中文
-├── SKILL.md             <- operational file (for Claude)
-└── scripts/
-    └── test_independent_advisor_readmes.py
-```
+- [Executor selection](references/executor-detection.md)
+- [Dispatch protocol](references/dispatch-protocol.md)
+- [Report contract](references/report-contract.md)
+- [README checks](../../tests/independent-advisor/test_independent_advisor_readmes.py)
+
+## Related skills
+
+- [loom-workflow:critique](../critique/README.md)
+- [loom-code:external-review](../../../loom-code/skills/external-review/README.md)
+
+Runtime instructions: [SKILL.md](SKILL.md).

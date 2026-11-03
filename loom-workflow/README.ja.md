@@ -1,10 +1,14 @@
 # loom-workflow
 
+[Loom](../README.md)
+
+skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
+
 Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.19.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.19.1 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -84,23 +88,24 @@ flowchart TD
 
 ## Skills
 
-13 skills：12 個のツールと任意のルーター 1 個。
+14 skills：13 個のツールと任意のルーター 1 個。
 
 | Skill | 役割 |
 |---|---|
-| [`using-loom-workflow`](skills/using-loom-workflow/) | 任意のルーター：広い・曖昧な依頼に合うツールを選び、その手順を読み込む。各ツールは引き続き直接呼び出せる。 |
-| [`decision-map`](skills/decision-map/) | `docs/loom/maps/<map-id>/` にある永続的な Outcome Map を作成・推進する：Destination、fog、種類付きの ticket、Decisions-so-far ログ。delivery ステップは intent を書く。 |
-| [`critique`](skills/critique/) | 作る前に提案を裁く：`mode: proposal` は list や plan を KEEP / DEFER / DROP に振り分け、`mode: complexity` は 1 つの具体的変更を deletion-first で量る。 |
-| [`recap-state`](skills/recap-state/) | 作業が今どこにあるかを session 内で recap し、確認のために一度止まる。組み込みの `/recap`（away-summary）とは別物。 |
-| [`loom-memory`](skills/loom-memory/) | commit された memory store 内の、リポジトリの永続的な教訓を参照・記録・照合・廃止する。 |
-| [`dbt-model-style`](skills/dbt-model-style/) | dbt model を書く・編集する・review する時に、dbt + Redshift の style と structure（CTE の役割、zero-logic な final CTE、命名、comment）を適用する。計算ロジックは対象外。 |
-| [`git-memory`](skills/git-memory/) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
-| [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
-| [`skill-retro`](skills/skill-retro/) | 選択した過去または現在の Claude Code と Codex の session のスナップショットを、読み取り可能な対象 skill の原文や関連 plugin 統合と照合し、出典付きの提案を示す。取得後のイベントを除外し、原文のローカルインストールは不要。異なる 2 session で提案に昇格し、1 session は保留。変更は適用しない。 |
-| [`project-retro`](skills/project-retro/) | 依頼に応じて現在または指定された 1 回の開発 session を読み取り専用で振り返り、出典をたどれるプロジェクト改善案を示す。skill の問題は候補として分け、ファイルは変更しない。 |
-| [`independent-advisor`](skills/independent-advisor/) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
-| [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
-| [`goal-create`](skills/goal-create/) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
+| [`using-loom-workflow`](skills/using-loom-workflow/README.md) | 任意のルーター：広い・曖昧な依頼に合うツールを選び、その手順を読み込む。各ツールは引き続き直接呼び出せる。 |
+| [`decision-map`](skills/decision-map/README.md) | `docs/loom/maps/<map-id>/` にある永続的な Outcome Map を作成・推進する：Destination、fog、種類付きの ticket、Decisions-so-far ログ。delivery ステップは intent を書く。 |
+| [`critique`](skills/critique/README.ja.md) | 作る前に提案を裁く：`mode: proposal` は list や plan を KEEP / DEFER / DROP に振り分け、`mode: complexity` は 1 つの具体的変更を deletion-first で量る。 |
+| [`recap-state`](skills/recap-state/README.ja.md) | 作業が今どこにあるかを session 内で recap し、確認のために一度止まる。組み込みの `/recap`（away-summary）とは別物。 |
+| [`loom-memory`](skills/loom-memory/README.md) | commit された memory store 内の、リポジトリの永続的な教訓を参照・記録・照合・廃止する。 |
+| [`dbt-model-style`](skills/dbt-model-style/README.md) | dbt model を書く・編集する・review する時に、dbt + Redshift の style と structure（CTE の役割、zero-logic な final CTE、命名、comment）を適用する。計算ロジックは対象外。 |
+| [`git-memory`](skills/git-memory/README.md) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
+| [`handoff`](skills/handoff/README.ja.md) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
+| [`skill-retro`](skills/skill-retro/README.ja.md) | 選択した過去または現在の Claude Code と Codex の session のスナップショットを、読み取り可能な対象 skill の原文や関連 plugin 統合と照合し、出典付きの提案を示す。取得後のイベントを除外し、原文のローカルインストールは不要。異なる 2 session で提案に昇格し、1 session は保留。変更は適用しない。 |
+| [`project-retro`](skills/project-retro/README.md) | 依頼に応じて現在または指定された 1 回の開発 session を読み取り専用で振り返り、出典をたどれるプロジェクト改善案を示す。skill の問題は候補として分け、ファイルは変更しない。 |
+| [`independent-advisor`](skills/independent-advisor/README.ja.md) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
+| [`loom-visualization`](skills/loom-visualization/README.md) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
+| [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Loom の変更や単独の議論で、外部エディタで編集できる draw.io 図を作成・検証する。既存の外部図を編集する前に、プロジェクトへコピーするか確認する。 |
+| [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
 Loom の契約で数えるツールはこのうち 8 個です。`goal-create` と `dbt-model-style`
 と `project-retro` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。

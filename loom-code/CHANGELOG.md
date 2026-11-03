@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
+
+- Add human-facing guides for all seven skills, with usage examples, outputs, boundaries and links to their runtime instructions.
+- Link project, plugin and skill READMEs in both directions. Separate the main change flow from on-demand tools and show design branches explicitly.
+- Check documentation coverage and local destinations against the live skill inventory.
+
 ## [3.57.0] — 2026-11-03 — preserve fallback feedback and bounded continuation
 
 - Accept completed execution feedback for the existing `inherited` and `host-default/unverified` profiles without inventing model or effort overrides. Validate explicit profile pairs before every result branch; preserve legal malformed-response retries, completed-redispatch counts and stops when an unknown baseline cannot justify escalation.

@@ -1,5 +1,7 @@
 # Critique
 
+[Loom](../../../README.md) / [loom-workflow](../../README.ja.md) / critique
+
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 > 作り始める前に提案を裁く、2 つのレンズを持つ 1 つの skill：
@@ -84,3 +86,10 @@ verdict は `PROCEED` / `PROCEED-WITH-CAVEAT` / `RESHAPE` / `REJECT` の
 （`reducing-entropy`）に由来する。連鎖の全体、各リンクの寄与、ライセンス
 本文は [`NOTICE`](NOTICE) と [`LICENSE`](LICENSE) にある。同梱の 4 つの
 mindset は `domain-teams:code-team/standards/` の canonical 版を追随する。
+
+## 関連スキル
+
+- [loom-workflow:independent-advisor](../independent-advisor/README.ja.md)
+- [loom-code:write-plan](../../../loom-code/skills/write-plan/README.md)
+
+実行時の手順: [SKILL.md](SKILL.md).

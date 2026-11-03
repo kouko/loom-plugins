@@ -1,5 +1,9 @@
 # loom-code
 
+[Loom](../README.md)
+
+skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
+
 > **5 つのステーションが一つの変更を確認済みの intent から公開済みの
 > pull request まで運び、何かがマシンの外に出る前に決定的な checker が
 > 証拠を再計算します。** loom-code が前提にするのは基本的なソフトウェア工学の
@@ -8,7 +12,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.57.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.57.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -64,13 +68,13 @@ flowchart TD
 
 | Skill | 役割 |
 |---|---|
-| [`write-plan`](skills/write-plan/SKILL.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
-| [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装し、最後に adversary と package テスト一式を走らせる。これらが通るまで引き渡さない。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて acceptance testing）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
-| [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
-| [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
-| [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
-| [`external-review`](skills/external-review/SKILL.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
+| [`write-plan`](skills/write-plan/README.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
+| [`build`](skills/build/README.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装し、最後に adversary と package テスト一式を走らせる。これらが通るまで引き渡さない。 |
+| [`closing-review`](skills/closing-review/README.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて acceptance testing）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
+| [`ship`](skills/ship/README.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
+| [`maintain`](skills/maintain/README.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
+| [`using-loom-code`](skills/using-loom-code/README.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
+| [`external-review`](skills/external-review/README.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
 
 ## Agents
 

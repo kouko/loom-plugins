@@ -1,5 +1,9 @@
 # loom-code
 
+[Loom](../README.md)
+
+Skill guides open in English unless a matching translation is available.
+
 > **Five stations carry one change from a confirmed intent to a published
 > pull request, and a deterministic checker recomputes the evidence before
 > anything leaves the machine.** loom-code assumes you know basic software
@@ -8,7 +12,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.57.0 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.57.1 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -64,13 +68,13 @@ from this change flow; see their descriptions below.
 
 | Skill | Role |
 |---|---|
-| [`write-plan`](skills/write-plan/SKILL.md) | Turn a confirmed intent into `docs/loom/<change-id>/plan.md`: waved tasks with files, owned Acceptance lines, test cases and risk. Runs ① itself when `loom-design` is absent. |
-| [`build`](skills/build/SKILL.md) | Implement the plan test-first, dispatching one implementer per task, then run the adversary and the complete package suite, which must pass before hand-off. |
-| [`closing-review`](skills/closing-review/SKILL.md) | Run the closing review — reviewers and acceptance testing as needed — on content that passed Build's checks, and generate `docs/loom/<change-id>/attestation.json`. |
-| [`ship`](skills/ship/SKILL.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
-| [`maintain`](skills/maintain/SKILL.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
-| [`using-loom-code`](skills/using-loom-code/SKILL.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
-| [`external-review`](skills/external-review/SKILL.md) | Run a consented outside review with an explicit model and effort; the calling review skill keeps its criteria and verdict checks. |
+| [`write-plan`](skills/write-plan/README.md) | Turn a confirmed intent into `docs/loom/<change-id>/plan.md`: waved tasks with files, owned Acceptance lines, test cases and risk. Runs ① itself when `loom-design` is absent. |
+| [`build`](skills/build/README.md) | Implement the plan test-first, dispatching one implementer per task, then run the adversary and the complete package suite, which must pass before hand-off. |
+| [`closing-review`](skills/closing-review/README.md) | Run the closing review — reviewers and acceptance testing as needed — on content that passed Build's checks, and generate `docs/loom/<change-id>/attestation.json`. |
+| [`ship`](skills/ship/README.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
+| [`maintain`](skills/maintain/README.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
+| [`using-loom-code`](skills/using-loom-code/README.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
+| [`external-review`](skills/external-review/README.md) | Run a consented outside review with an explicit model and effort; the calling review skill keeps its criteria and verdict checks. |
 
 ## Agents
 

@@ -1,5 +1,7 @@
 # Recap
 
+[Loom](../../../README.md) / [loom-workflow](../../README.md) / recap-state
+
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > When you lose the thread mid-conversation, this skill stops and
@@ -117,3 +119,10 @@ recap-state/
 └── references/
     └── seven-block-schema.md  <- alignment template + lineage + 5 core principles
 ```
+
+## Related skills
+
+- [loom-workflow:handoff](../handoff/README.md)
+- [loom-workflow:project-retro](../project-retro/README.md)
+
+Runtime instructions: [SKILL.md](SKILL.md).

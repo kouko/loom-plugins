@@ -36,9 +36,9 @@ def _root_workflow_row() -> list[str]:
 def test_skill_is_listed_in_every_readme():
     for name in PLUGIN_READMES:
         text = (PLUGIN_DIR / name).read_text(encoding="utf-8")
-        # skill table row linking the skill directory
+        # Skill catalog entries open the human-facing guide directly.
         assert re.search(
-            rf"^\|\s*\[`{SKILL_NAME}`\]\(skills/{SKILL_NAME}/\)\s*\|", text, re.M
+            rf"^\|\s*\[`{SKILL_NAME}`\]\(skills/{SKILL_NAME}/README(?:\.ja|\.zh-TW)?\.md\)\s*\|", text, re.M
         ), f"{name} skill table is missing a `{SKILL_NAME}` row"
         # directory tree block entry
         assert re.search(rf"^│\s+├──\s+{SKILL_NAME}/\s*$", text, re.M), (

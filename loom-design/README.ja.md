@@ -1,12 +1,16 @@
 # loom-design
 
+[Loom](../README.md)
+
+skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
+
 > **Loom フローの入口：2 つのステーションが漠然としたアイデアを確認済みの
 > intent に変え、設計が要る変更ならさらに spec に変える。3 つのツールが
 > プロダクトの原則とビジュアルシステムとアーキテクチャを決める。** loom-design は下書きを
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.20.0 — 5 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.20.1 — 5 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -54,12 +58,12 @@ flowchart TD
 
 | Skill | 種類 | 生成物 | 役割 |
 |---|---|---|---|
-| [`capture-intent`](skills/capture-intent/SKILL.md) | ステーション | `docs/loom/intent/<change-id>.md` | 変更の intent をヒアリングし、書き、確認する（決定ポイント ①）。 |
-| [`write-spec`](skills/write-spec/SKILL.md) | ステーション | `docs/loom/<change-id>/spec.md` | 確認済みの intent から要件、設計上の決定、現状の証拠、UI flows を書く（決定ポイント ②、product のみ）。 |
-| [`product-principles`](skills/product-principles/SKILL.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
-| [`design-system`](skills/design-system/SKILL.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
-| [`architecture-design`](skills/architecture-design/SKILL.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
-| [`using-loom-design`](skills/using-loom-design/SKILL.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
+| [`capture-intent`](skills/capture-intent/README.md) | ステーション | `docs/loom/intent/<change-id>.md` | 変更の intent をヒアリングし、書き、確認する（決定ポイント ①）。 |
+| [`write-spec`](skills/write-spec/README.md) | ステーション | `docs/loom/<change-id>/spec.md` | 確認済みの intent から要件、設計上の決定、現状の証拠、UI flows を書く（決定ポイント ②、product のみ）。 |
+| [`product-principles`](skills/product-principles/README.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
+| [`design-system`](skills/design-system/README.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
+| [`architecture-design`](skills/architecture-design/README.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
+| [`using-loom-design`](skills/using-loom-design/README.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
 
 **常設ドキュメント。** リポジトリに ratify 済みの `PRINCIPLES.md` が無い
 間は、`kind: product` の変更を loom-code の checker
