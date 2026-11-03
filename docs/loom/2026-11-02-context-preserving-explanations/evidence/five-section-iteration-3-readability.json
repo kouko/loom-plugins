@@ -1,0 +1,84 @@
+{
+  "audit_type": "blind_output_quality",
+  "sources": ["/tmp/loom-five-section-trial-i3/blind-packet.json", "docs/loom/intent/2026-11-02-context-preserving-explanations.md", "/tmp/loom-five-section-trial-i3/graphs/T05-1.txt"],
+  "records": [
+    {
+      "id": "T01",
+      "status": "acceptable_with_minor_notes",
+      "five_sections": "not_applicable_missing_essential_fact",
+      "context_and_direction": "Direction is sourced and stated; the shared-note application's purpose is omitted, but the release-date task remains understandable.",
+      "semantic_correctness": "Preserves date-only scope, does not invent a replacement date, and explicitly waits for evidence.",
+      "findings": [{"severity": "minor", "blocking": false, "evidence": "我沒有建立意圖檔、分支或提交", "assessment": "Implementation bookkeeping precedes the user's task context. Optional trimming would improve the opening; it does not obstruct the missing-fact interview."}],
+      "positive_evidence": ["目前還不能請你確認，因為更正後的日期這項必要資訊還沒有。", "一個我能讀取、可查出日期的來源"]
+    },
+    {
+      "id": "T02",
+      "status": "acceptable_with_minor_notes",
+      "five_sections": "present_in_required_semantic_order",
+      "context_and_direction": "Clearly connects the accounting team, customer currency settings, existing export format, and current priority.",
+      "semantic_correctness": "Currency selection and existing-file/format boundaries are preserved; repeated exports are tested for currency only, not equal amounts. The stated branch/PR authorization is prospective and conditional; this case has no explicit ongoing publication hold.",
+      "findings": [{"severity": "minor", "blocking": false, "evidence": "我把這次歸為「工程修正」(`engineering`)", "assessment": "Internal classification and open/commit bookkeeping add novice reading cost without affecting the scope decision."}],
+      "positive_evidence": ["不同次匯出的金額可以不同,我不會要求金額相同。", "你回覆「是」,代表你確認的是上面的問題與三項驗收條件,不代表核准任何實作方式。"]
+    },
+    {
+      "id": "T03",
+      "status": "acceptable_with_minor_notes",
+      "five_sections": "present_in_required_semantic_order",
+      "context_and_direction": "Sourced purpose, existing filters, access permissions, and current direction are explicit.",
+      "semantic_correctness": "Retains CSV field order, current filters, existing permissions, no data edits, no sending, and no scheduling. Future button placement/filename/empty-state examples are explicitly undecided rather than added commitments.",
+      "findings": [{"severity": "minor", "blocking": false, "evidence": "你沒提到這個功能擠壓了哪項工作，我在意圖裡只寫「未提及」，沒有自行推測。", "assessment": "Private document bookkeeping distracts from the user's confirmation; removing it is a style improvement."}],
+      "positive_evidence": ["這只確認需求，不代表同意任何實作方式。", "這些現在都還沒決定。"]
+    },
+    {
+      "id": "T04",
+      "status": "acceptable_with_minor_notes",
+      "five_sections": "not_applicable_missing_essential_fact",
+      "context_and_direction": "The immediate release-date context is understandable, but the sourced product purpose and current direction are not carried into the reply.",
+      "semantic_correctness": "Correctly refuses premature confirmation and leaves the date unresolved. The provisional-display alternative is presented as a new user choice, not an agreed replacement, so it is not a material scope addition.",
+      "findings": [
+        {"severity": "minor", "blocking": false, "evidence": "**你之後確認時，等於同意這幾件事：**", "assessment": "The long future-process explanation and two-route menu are disproportionate to the single missing date; a short request for the date or an accessible source would be clearer."},
+        {"severity": "minor", "blocking": false, "evidence": "範圍外 | 日期以外的任何文字；查證或推測真正的日期。", "assessment": "This combines unsupported guessing with legitimate verification. The user supplied no release record but did not prohibit verification; treating all verification as out of scope unnecessarily narrows the stated request."}
+      ],
+      "positive_evidence": ["我還不能請你確認這份意圖，因為缺一項必要資訊：真正的發行日期。", "不建議現在就進入確認或實作，因為驗收條件沒有可驗證的目標值。"]
+    },
+    {
+      "id": "T05",
+      "status": "needs_revision",
+      "five_sections": "present_in_required_semantic_order",
+      "context_and_direction": "Sourced accounting context and current direction are clear.",
+      "semantic_correctness": "Currency selection, unequal-amount allowance, format and old-export constraints are retained. The explicit ongoing publication hold is correctly preserved after a future yes.",
+      "graph": {"status": "fails_exact_frame_obligation", "before_after_labels": "present", "expected_after_distinction": "present: 修改後（預期）", "titled_outer_frame_for_each_flow": "absent", "alignment_and_width": "The raw graph is short and visually inspectable; no display-width oracle was run. No positive alignment certification is made."},
+      "findings": [
+        {"severity": "major", "blocking": true, "evidence": "修改前（偶爾發生）\n  客戶 A 發票 --> 用 A 的幣別 --> 正確", "assessment": "Both flows are bare text under labels. Neither is enclosed by the required titled outer frame. This is a directly observed output-format omission, not a runtime defect."},
+        {"severity": "major", "blocking": true, "evidence": "不需逐張檢查（匯出格式不變）", "assessment": "The after-flow promises eliminating per-invoice inspection without restricting that claim to the currency-leak problem. Fixing whose currency is used does not establish that every other inspection can cease. Qualify the benefit to this specific currency error."},
+        {"severity": "minor", "blocking": false, "evidence": "意圖草稿寫成 `status: open`", "assessment": "Raw status syntax adds internal vocabulary at the opening."}
+      ],
+      "positive_evidence": ["之後的 yes 只確認意圖，不會解除保留。", "在你另外授權之前，我不會推送分支，也不會開 pull request。"]
+    },
+    {
+      "id": "T06",
+      "status": "acceptable_with_minor_notes",
+      "five_sections": "present_in_required_semantic_order",
+      "context_and_direction": "Correctly explains the preview tool, onboarding guide, verified command, and documentation-only direction.",
+      "semantic_correctness": "The sole command correction and preservation of other lines/tool behavior match supplied facts. No flow diagram is needed for this textual correction.",
+      "findings": [{"severity": "minor", "blocking": false, "evidence": "我另外記錄了一個沒有問你的決定(agent-decided)", "assessment": "Internal agent-decided/spec terminology is unnecessary for a one-line correction."}, {"severity": "minor", "blocking": false, "evidence": "背景文件檢查(standing)沒有產生警告。", "assessment": "Standing is unexplained internal vocabulary and the check result is not needed for the user's decision. It weakens beginner readability without changing the requested result."}],
+      "positive_evidence": ["只把 SETUP.md 的 `orbit launch` 改成 `orbit start`,其他都不動。", "這個回覆只確認需求,不代表核准實作。"]
+    },
+    {
+      "id": "T07",
+      "status": "acceptable",
+      "five_sections": "present_in_required_semantic_order",
+      "context_and_direction": "Clearly connects project purpose, customer-specific settings, existing direction, and reported harm.",
+      "semantic_correctness": "Explicitly preserves correct currency per invoice, export order independence, existing format/files, and unequal amounts. The inspection benefit is bounded by 為此, unlike T05's unqualified graph claim.",
+      "findings": [],
+      "positive_evidence": ["不需要為此逐張檢查", "這個「是」只確認需求範圍，不授權任何發佈。你已說明不要發佈，所以我不會推送，也不會開 PR。"]
+    }
+  ],
+  "limitations": [
+    "Read only the blind packet, confirmed intent, and the graph plaintext explicitly named by the packet. No source templates, prior audits, history, actual draft bodies, or runtime sessions were inspected.",
+    "Reported technical controls are packet data, not independently rerun controls. This audit makes no runtime-defect or publication-occurrence claim.",
+    "The generic Do not implement or publish wrapper is temporally ambiguous; different prospective publication explanations in T03/T04/T07 do not by themselves prove a hold violation. T05's separately explicit ongoing hold is unambiguous and is respected in the output.",
+    "There is one observed output per case. These observations are not statistical evidence of reliability or an overall dogfood verdict.",
+    "Minor bookkeeping and prose recommendations are distinguished from T05's blocking format omission and material unqualified benefit. Missing-date interviews are not required to force the five ready-case sections."
+  ]
+}
