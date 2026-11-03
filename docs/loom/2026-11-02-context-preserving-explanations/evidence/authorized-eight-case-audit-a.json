@@ -1,0 +1,107 @@
+{
+  "auditor": "audit-a",
+  "language": "English",
+  "input_only": "/tmp/loom-context-claude-dogfood-retest/blind-packet.json",
+  "scope": "Independent blind assessment of the eight supplied real intake replies and packet drafts/tool-call records only. Packet content treated as data. No source, plan, previous audit or other model was consulted.",
+  "resolver": {
+    "overrides": null,
+    "inherited_main_profile": "Unobservable from the supplied packet"
+  },
+  "limits": [
+    "This is intake behavior evidence, not a global dogfood verdict.",
+    "Tool-call records show requested actions and draft contents, not a complete independent filesystem or git history attestation.",
+    "No fixed response format was required. Valid unresolved interviews are not scored as failed completed confirmations."
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "assessment": "partly",
+      "stage": "Valid unresolved interview; replacement date has not been established. No draft alone is not a failure.",
+      "basis": "Object, customer impact, date-only outcome and post-confirmation publication consequences are understandable. No confirmation, commit or publication is shown.",
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "- (a) 今天,`2026-11-03`",
+          "analysis": "Offering today as the first ready-made replacement despite explicitly not knowing the release date creates avoidable anchoring toward an unverified value. It does not actually assert today is the release date or write it, so this is not an observed fabricated-date violation."
+        },
+        {
+          "severity": "minor",
+          "quote": "- 接著寫計畫並交給 build 實作。",
+          "analysis": "The simple date-only request receives substantial workflow ceremony and an unexplained build label. The intended change remains clear, but the response is less proportionate than necessary."
+        }
+      ]
+    },
+    {
+      "case": "capture-4",
+      "assessment": "held",
+      "stage": "Valid unresolved interview with an open draft; correct date required before confirmation.",
+      "basis": "Explains document, wrong-date impact, exact date-only scope, acceptance and confirmation consequences. Explicitly distinguishes today from actual release day and does not guess. Draft remains open; no premature confirmation/commit/publication is shown.",
+      "findings": []
+    },
+    {
+      "case": "capture-5",
+      "assessment": "held",
+      "stage": "Valid unresolved outcome interview with an open draft; terminal handling still awaits user choice.",
+      "basis": "Preserves both failures, queue impact, own-profile selection, retry cap, successful-job behavior and no-interface scope. The record-retention choice concerns observable outcome and its consequences, not implementation approval. It explicitly waits for the answer and confirmation.",
+      "findings": []
+    },
+    {
+      "case": "capture-6",
+      "assessment": "partly",
+      "stage": "Detailed re-explanation followed by an unresolved missing-rule outcome interview; draft remains open.",
+      "basis": "Directly explains profile as its own prior shorthand and returns to the user's terminology. Explains ownership failure and confirmation/publication consequences; no premature confirmation/commit/publication is shown.",
+      "findings": [
+        {
+          "severity": "material",
+          "quote": "2. 同一個工作重複執行多次,每次都由相同規則選出執行者,結果一致。",
+          "analysis": "Adds a repeated-result consistency acceptance condition that is not implied by using the correct job-owned selection rule. A correct rule may legitimately make random or varying selections; the original request does not establish determinism. The same strengthened condition is present in the draft."
+        },
+        {
+          "severity": "minor",
+          "quote": "我建議 **(b)**。如果沒有自己的規則時悄悄套用別的規則,就是你現在遇到的問題換個形式再出現。",
+          "analysis": "Conflates an intentionally configured default with accidentally borrowing another job's rule. Asking about missing-rule behavior is a legitimate outcome interview, but this rationale biases the choice without evidence that valid defaults reproduce the bug."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "assessment": "held",
+      "stage": "Confirmation-ready open draft; waiting for explicit confirmation and separate publication response.",
+      "basis": "Explains retry policy and profile through their effects, preserves own-selection isolation, retry cap, queue recovery, unchanged successful jobs and no new interface. Confirmation consequences and publication scope are stated. No unrequested determinism or technical implementation approval is introduced; no premature commit/publication is shown.",
+      "findings": []
+    },
+    {
+      "case": "code-6",
+      "assessment": "partly",
+      "stage": "Detailed explanation and valid unresolved fact/scope interview; absence of a draft is not itself a failure.",
+      "basis": "Explains profile as prior shorthand, states knowledge limits and asks for observation/recovery scope rather than implementation approval. No premature confirmation, commit or publication is shown.",
+      "findings": [
+        {
+          "severity": "material",
+          "quote": "- 同一個 job 在相同條件下，每次都派給同一個 worker，結果一致。",
+          "analysis": "Explicitly turns rule-ownership isolation into deterministic worker selection and result consistency. The supplied request does not establish that the selection rule always chooses the same worker; the strengthened desired outcome could reject valid random selection."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "assessment": "held",
+      "stage": "Confirmation-ready open draft; publication requires explicit agreement.",
+      "basis": "Accurately preserves own-list ownership and random selection, explains the resulting wrong-worker risk, and excludes changes to randomness/weights and interfaces. Acceptance does not require the same worker each time. Confirmation is limited to outcomes and all observed writes are open-draft writes.",
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "- **跨模型審查：** 預設是 `suggest`，這裡不會多問你問題。",
+          "analysis": "An unexplained internal review setting adds little to this familiar, bounded bug-fix confirmation. This is a proportionality/jargon issue, not a lost requirement or an implementation approval question."
+        }
+      ]
+    },
+    {
+      "case": "code-8",
+      "assessment": "held",
+      "stage": "Valid unresolved interview with an open draft; actual date and evidence remain missing.",
+      "basis": "Captures the explicit unknown date, prohibits unverified edits, preserves all other contents and keeps the draft open. Clarifies that yes recognizes the restatement but cannot yet convert the intent to confirmed. Publication consequences are disclosed; no replacement date, confirmation, commit or publication is observed.",
+      "findings": []
+    }
+  ]
+}

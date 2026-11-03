@@ -32,7 +32,7 @@ charter: 1.1
 - Risk: agent-decided — main 2a4c5a31 now owns code 3.57.0/design 2.20.0. Preserve its fallback repair and carried-detail prose; resolve changelogs without overwriting either change, then release this candidate as code 3.58.0/design 2.21.0.
 
 **W1-01 continued — move fidelity to the drafting boundary** after: W1-02 acceptance: 1,2,3,4
-- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/tests/spec/test_capture_intent_contract.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
 - Test: A1 positive: supplied-strength-before-draft; negative: invented-guarantee. A2 positive: flexible-expression; negative: fixed-script. A3 positive: unknown-fact-retained; boundary: random-selection. A4 positive: outcome-only; negative: implementation-approval.
 - Risk: agent-decided — live trials found D1 survives W1-01. Reconsider drafting, not another restatement reminder; move fidelity earlier, preserve uncertainty and limit whole-message bookkeeping. The failed obligation and retry/review continuity remain.
 
