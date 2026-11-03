@@ -1,6 +1,7 @@
 """W1-01 continued: fidelity applies before any outcome is drafted."""
 
 from pathlib import Path
+import re
 import sys
 
 import pytest
@@ -14,6 +15,13 @@ RULES = (
     ("Leave", "unknown facts unresolved", "user answers", "evidence"),
     ("Keep", "own-rule isolation separate from", "same-worker", "same-result guarantees"),
 )
+EXAMPLE_RULES = (
+    ("Use", "outline as content connections", "optional", "grouping", "length"),
+    ("Repair", "assistant shorthand", "already supplied role"),
+    ("Preserve", "interface boundary", "private helpers"),
+    ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge"),
+)
+LOAD_RULE = ("Read", "confirmation-examples.md", "before drafting or replying")
 
 
 @pytest.mark.parametrize(("path", "draft_boundary"), [
@@ -25,9 +33,31 @@ def test_fidelity_precedes_first_drafting_instruction(path: str, draft_boundary:
     before_draft = text[:text.index(draft_boundary)]
     for verb, literal, *extras in RULES:
         assert affirms(before_draft, verb, literal, *extras), (path, literal)
+    assert affirms(before_draft, *LOAD_RULE), path
+    link = re.search(r"Read `([^`]*confirmation-examples\.md)` before drafting or replying", before_draft)
+    assert link, path
+    owner = REPO / path
+    target = owner.parent / link.group(1)
+    local_dir = owner.parent / "references" if owner.name == "SKILL.md" else owner.parent
+    assert target.is_file() and target.resolve().parent == local_dir.resolve(), target
 
 
-@pytest.mark.parametrize("rule", RULES)
+def test_local_confirmation_examples_are_portable_and_identical() -> None:
+    paths = [REPO / root / "confirmation-examples.md" for root in (
+        "loom-design/skills/capture-intent/references",
+        "loom-code/skills/write-plan/references",
+    )]
+    text = paths[0].read_text(encoding="utf-8")
+    assert text == paths[1].read_text(encoding="utf-8")
+    assert "loom-design/" not in text and "loom-code/" not in text
+    for rule in EXAMPLE_RULES:
+        assert affirms(" ".join(text.split()), *rule), rule
+    for case in ("Unknown date", "Multiple problems", "Repairing shorthand", "Interface boundary"):
+        example = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
+        assert "Good:" in example and "Bad:" in example
+
+
+@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, *EXAMPLE_RULES))
 def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
     verb, literal, *extras = rule
     sentence = f"{verb} {literal}, {', '.join(extras)}."

@@ -10,6 +10,7 @@ above this file.
 When this station performs code-only intake, use the same capture boundary:
 ask only for missing required-field content, never a fixed intake question
 quota; existing decision points remain unchanged.
+Read `confirmation-examples.md` before drafting or replying.
 Before drafting: Preserve supplied facts and outcome strength, including
 qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
@@ -49,6 +50,8 @@ included), and chat shows text tables or text diagrams, not Mermaid.
 
 Compose **one message**. Everything below goes in it; you do not stop
 twice.
+Treat the items as procedures, not output sections: omit inapplicable items and
+internal bookkeeping; retain material consequences and required disclosures.
 
 1. **The restatement.** Restate Problem and Acceptance: subject, problem,
    impact, outcome and confirmation scope. Use the user's plain words, never paths,

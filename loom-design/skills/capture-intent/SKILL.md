@@ -65,6 +65,7 @@ or updated.
 ## Step 1 — Interview
 
 Read `references/interview.md`; ask only for missing required-field content.
+Read `references/confirmation-examples.md` before drafting or replying.
 Before drafting: Preserve supplied facts and outcome strength, including
 qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
@@ -183,6 +184,8 @@ intent in step 4.
 
 Compose **one message**. Everything below goes into it; you do not stop
 twice, and this is the only stop this station makes.
+Treat the items as procedures, not output sections: omit inapplicable items and
+internal bookkeeping; retain material consequences and required disclosures.
 
 1. Restate Problem and Acceptance: subject, problem,
    impact, outcome and confirmation scope. Use the user's plain words, never paths,
@@ -382,10 +385,6 @@ next station must record each item in the spec. When the list is non-empty and
 (`spec-minimal`) to hold them. An empty list forces no spec and adds nothing
 to the hand-off.
 
-Say two things so the next station is not re-run by accident: `write-plan`
-will **not** run decision point ① again, because `status:` is already
-`confirmed` — it reads the intent and starts planning. And decision point
-② — "you type ___ and you see ___" — happens where the product spec is
-written: at `write-spec`, or at `write-plan` when `needs-design: no` and
-carried details force a spec. Engineering changes go from here to a plan with
-no further stop until acceptance.
+Confirmed intents bypass ① at `write-plan`. Product ② occurs where its spec is
+written: `write-spec`, or `write-plan` when carried details force one.
+Engineering changes continue to planning with no further stop until acceptance.

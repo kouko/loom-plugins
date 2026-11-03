@@ -16,6 +16,7 @@ is the whole record. Their version numbers never continued here —
 
 - `capture-intent` connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. Limit workflow detail throughout intake while preserving concrete publication and authorization consequences. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
 - Add behavioral prompts for a short familiar request, unfamiliar concepts, a detailed follow-up, random own-list selection and an unknown factual date, for independent conversational exercises.
+- Load an adaptable content outline and complete contrasting examples before intake drafting or replies. Examples connect supplied roles, effects, outcomes and the existing publication consequence, showing faithful correction, unknown facts and interface boundaries without serializing workflow procedures as output sections.
 
 ## [2.20.0] — 2026-11-03 — preserve applicable work after changed requirements
 
