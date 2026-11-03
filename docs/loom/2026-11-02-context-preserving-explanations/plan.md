@@ -31,6 +31,11 @@ charter: 1.1
 - Test: A1 positive: integrated-guidance; negative: lost-obligation. A2 positive: flexible-expression; negative: fixed-script. A3 positive: word-cap; boundary: merged-content. A4 positive: synchronized-release; negative: stale-pin.
 - Risk: agent-decided — main 2a4c5a31 now owns code 3.57.0/design 2.20.0. Preserve its fallback repair and carried-detail prose; resolve changelogs without overwriting either change, then release this candidate as code 3.58.0/design 2.21.0.
 
+**W1-01 continued — move fidelity to the drafting boundary** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/tests/spec/test_capture_intent_contract.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: supplied-strength-before-draft; negative: invented-guarantee. A2 positive: flexible-expression; negative: fixed-script. A3 positive: unknown-fact-retained; boundary: random-selection. A4 positive: outcome-only; negative: implementation-approval.
+- Risk: agent-decided — live trials found D1 survives W1-01. Reconsider drafting, not another restatement reminder; move fidelity earlier, preserve uncertainty and limit whole-message bookkeeping. The failed obligation and retry/review continuity remain.
+
 ## Simplicity check
 - none found
 
@@ -45,3 +50,5 @@ charter: 1.1
 5. user-decided — repair dogfood findings D1–D3, fix the harness and rerun six original scenarios plus two counterexamples; publication remains held. This corrects observed failures under existing Acceptance, without changing requested outcomes or restarting review budgets.
 6. agent-decided — defect class: unsupported additions during explanation, observed as deterministic-selection guarantees and an invented date fallback. Both first-confirmation owners and all cumulative changed files were searched; internal publication jargon is repaired in the same affected paragraphs.
 7. agent-decided — sync-trunk detected conflicts in both plugin changelogs and left the tree untouched. Integration is a new bounded task, not a retry of completed W1-01; existing source edits remain applicable, while all pre-integration verification requires replacement.
+
+8. agent-decided — eight-case retest had no permission denials. Both blind audits found unsupported deterministic/result guarantees in capture-6 and code-6; date/random counterexamples held. W1-01 remains incomplete; this continuation changes rule placement, preserving requirements and retry identity.
