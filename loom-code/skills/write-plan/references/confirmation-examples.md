@@ -6,13 +6,13 @@ when an illustration is needed; these examples supply no facts for another case.
 
 ## Unknown date
 
-Context: release notes show an incorrect date; only that date should change,
-and the actual release date is unknown.
+Context: release notes show an incorrect date; only that date should change.
+The actual release date is unknown, and the user has no release record to supply.
 
 Good:
-> The displayed release date is incorrect. I need the actual release date or a
-> release record before correcting that date alone. What evidence or date can
-> you provide?
+> The actual release date is still unknown, and you cannot provide a release
+> record. I cannot replace it accurately from the available evidence, so the
+> correction is blocked until that evidence becomes available.
 
 Bad:
 > I created an open engineering intent with needs-design: no. Confirm today's
@@ -20,9 +20,10 @@ Bad:
 > planning, build and closing-review. Is this plan technically correct?
 
 The bad reply invents a date, serializes bookkeeping and adds a publication
-choice and implementation judgment. The good reply asks only for a missing fact;
-it is an interview, not a confirmation. The normal same-yes publication disclosure
-belongs in the eventual confirmation after the required fact is established.
+choice and implementation judgment. The good reply leaves the unavailable fact
+unresolved and states why correction is blocked, rather than proposing deletion,
+temporary text or a future confirmation. Publication details belong to a ready
+confirmation with enabled publication.
 
 ## Known correction
 
@@ -178,7 +179,7 @@ publication default.
 
 ## Invoice currency correction
 
-Context: accounting staff export invoices; the supplied priority is customer-setting isolation with the current format retained. Exports sometimes borrow the previous customer's currency. Amounts can differ, format stays unchanged, and existing files must remain untouched.
+Context: accounting staff export invoices; the supplied priority is customer-setting isolation with the current format retained. Exports sometimes borrow the previous customer's currency. Amounts can differ, format stays unchanged, and existing files must remain untouched. The user explicitly asked to capture requirements only and not publish.
 
 Good:
 > ### Background and current direction
@@ -214,33 +215,33 @@ Good:
 > Check exports for customers with different currencies. Keep the format unchanged and existing export files untouched. Amounts may legitimately differ between exports; identical amounts are not required.
 >
 > ### Please confirm
-> Only after review and publication checks pass does saying yes authorize
-> both a non-forced branch upload and a pull request ready for review. You may
-> opt out anytime before publication; merging remains separate.
+> Your confirmation covers these requirements only. You asked not to publish;
+> I will keep that restriction unless you explicitly lift it.
 > Is that the correction you want?
 
 Bad:
 > Fix currency profile. All future invoice amounts will be identical; regenerate every existing export.
+> Your yes also permits publication despite your restriction.
 
-The bad reply hides the setting's role and invents amount and historical-data guarantees. The good diagram illustrates the failing path, not every export.
+The bad reply hides the setting's role, invents amount and historical-data guarantees, and overrides existing publication restrictions. The good diagram illustrates the failing path, not every export.
 
 
 ## Filtered CSV export
 
-Context: accounting staff inspect filtered invoice rows; the supplied direction is offline use of that same view. They request CSV export containing only visible filtered rows, with invoice number, customer, currency and amount columns, retaining current permissions.
+Context: accounting staff inspect filtered invoices; the supplied direction is offline use of that same result. They request CSV export of the current filtered result, with invoice number, customer, currency and amount columns, retaining current permissions.
 
 Good:
 > ### Background and current direction
-> Accounting staff inspect filtered invoice rows. The stated direction is to make that same view available for offline accounting.
+> Accounting staff inspect filtered invoices. The stated direction is to make that same result available for offline accounting.
 >
 > ### Current problem and impact
-> They currently cannot download the filtered view as a CSV file.
+> They currently cannot download the filtered result as a CSV file.
 >
 > ### What changes
-> Add CSV export for the current filtered view.
+> Add CSV export for the current filtered result.
 >
 > ### Scope and acceptance
-> The download contains only the visible filtered rows, with invoice number, customer, currency and amount columns. Existing access permissions stay unchanged.
+> The download uses the current filtered result, with invoice number, customer, currency and amount columns. Existing access permissions stay unchanged.
 >
 > ### Please confirm
 > Only after review and publication checks pass does saying yes authorize

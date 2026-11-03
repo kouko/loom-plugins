@@ -20,6 +20,7 @@ is the whole record. Their version numbers never continued here —
 - Preserve the original numbered consent-policy anchors after separating private preparation, retaining no-spec outcome/authorization routing and its existing regression coverage.
 - Bound example facts to their stated cases and use a neutral missing-date interview. The composer applies the primary template's relevance edit while preserving required disclosures. Both non-forced branch upload and ready-for-review pull request opening wait for completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
 - Illustrate the structure with concrete invoice and CSV requests. Use titled ASCII comparisons when helpful, marking expected results and reusing optional visualization tooling with a readable standalone fallback.
+- Preserve existing publication holds until explicitly lifted; bind the full public reply to the five-section skeleton, ground its opening in available project context, and invoke the optional visualization procedure before generating and checking diagrams. Keep unavailable-fact interviews focused and preserve filtered-result qualifiers.
 
 ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
 

@@ -53,7 +53,7 @@ included), and chat shows text tables or text diagrams, not Mermaid.
 
 ### Private preparation
 
-Privately prepare applicable consequences/questions for the user message.
+Privately prepare applicable consequences/questions.
 
 2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is
@@ -122,29 +122,27 @@ quality, task splitting, or review verdicts.
 
 Compose **one message** for the user's confirmation, then wait; this is the only
 confirmation stop this station makes.
-Include applicable consequences and questions prepared above; omit private
-records and intent-document inventory.
+Use applicable consequences/questions; omit private records and inventory.
 
 Restate Problem and Acceptance: subject, problem, impact, outcome and
 confirmation scope. Use the user's plain words, never paths, identifiers or
-mechanism names. Supply necessary context for unfamiliar terms and affected
-people at intent altitude. Use five ordered sections from
-`confirmation-template.md`, with headings required.
+mechanism names. Supply necessary context: unfamiliar terms, affected people,
+intent altitude. Use five ordered sections from
+`confirmation-template.md` as the whole public reply, with headings required.
 Choose wording and length freely, keeping familiar requests short.
-Check these connections and what yes confirms and authorizes; ask about outcomes,
-never implementation approval.
+Check these connections and what yes confirms and authorizes; never implementation approval.
 
-Explain that only after review AND publication checks pass does yes authorize
+Honor a prior publication hold or opt-out until the user explicitly lifts it.
+Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
 BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
 with opt-out available anytime before publication and a separate merge decision.
 
-Apply `confirmation-template.md` final-message check before sending;
-then ask and wait.
+Apply `confirmation-template.md` final-message check before sending.
 
 ### Private records and reply handling
 
-Record `publication: automatic — authorized <date> by <name>` only after informed
-yes; opt-out leaves it absent.
+Record `publication: automatic — authorized <date> by <name>` after informed
+publication consent only; prior holds leave it absent.
 
 **Write down every question you asked.** Keep a running list from this
 point — every question put to the user at ①, and at ② if you run it here —

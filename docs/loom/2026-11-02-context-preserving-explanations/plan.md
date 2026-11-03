@@ -83,6 +83,11 @@ charter: 1.1
 - Test: A1 positive: invoice-export-context. A2 positive: ordinary-new-feature; boundary: incomplete-request. A3 positive: simple-correction-and-before-after-flow; negative: repeated-scope-and-private-inventory. A4 positive: understandable-consent; negative: extra-user-quality-checkpoint.
 - Risk: agent-decided — compare identical concrete requests with supplied context, verified hooks and explicit first-party routing. Separate selection from quality evidence; run focused, adversarial, complete-suite and independent checks. Publication and merge remain unauthorized.
 
+**W3-01 behavioral continuation 1 — preserve consent and complete the public skeleton** after: W3-00 acceptance: 1,2,3,4
+- Files: both primary templates, composers and galleries; capture interview/test-prompts; focused contract tests and unreleased notes.
+- Test: A1 positive: read-grounded-overview. A2 positive: complete-five-section-reply; boundary: unavailable-required-fact. A3 positive: invoked-generated-aligned-comparison; negative: added-visibility-qualifier. A4 positive: held-versus-enabled-publication; negative: silently-reactivated-grant.
+- Risk: agent-decided — continuation count 1 retains W3-01 identity and all failed evidence. Repair consent explanation, public structure/diagram execution and imported result-set qualifiers together. No publication, runtime authorization-bypass or data-loss claim is inferred from the observed wording.
+
 ## Simplicity check
 - none found
 

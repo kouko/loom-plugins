@@ -2,32 +2,46 @@
 
 Write in the user's conversation language.
 
-Use five sections in this order: Background and current direction, Current problem and impact, What changes, Scope and acceptance, Please confirm.
-Translate the headings into the conversation language; keep their order and
-write natural sentences rather than filling a fixed sentence script.
+Keep missing required facts in the existing interview, asking only what is needed and why.
+When the user already lacks the required fact and evidence, state what is blocked
+and wait; invent neither a replacement/deletion choice nor a future confirmation preview.
 
-1. **Background and current direction** — Connect sourced project or function purpose,
-   established direction and this request. Explain why this change belongs here.
-   A known function's purpose is enough when broader direction is unavailable;
-   qualify a material unknown instead of inventing a project story or roadmap.
-2. **Current problem and impact** — State who encounters what problem, in what
-   situation, and its supplied consequence. For a new capability, describe the
-   current limitation. Define unfamiliar terms by what they do.
-3. **What changes** — Describe the wanted behavior and its difference from today.
-   Use ASCII comparisons or logic flows when relationships help understanding,
-   with titles inside comparison frames and expected changes clearly labeled.
-   Preserve real steps and branches. Use `loom-workflow:loom-visualization` when
-   available, including its titled-panel example and width checks. Otherwise use
-   available width-aware tools or a readable table/text fallback; the optional
-   plugin is not a prerequisite. Simple wording corrections need no flowchart.
-4. **Scope and acceptance** — Give observable completion conditions and supplied
-   preservation/exclusion boundaries, using a table or list when useful.
-5. **Please confirm** — State what the user confirms and applicable consequences,
-   include the publication disclosure below, then ask the necessary question.
+Read the available README or equivalent project overview and relevant current direction
+before composing the opening; read narrowly, not across the whole repository.
+Use established goals, not procedural waivers. Unknown broader direction needs
+no new interview: use known function context and qualify material uncertainty.
 
-Keep missing required facts in the existing interview, asking only what is
-needed and why; compose these five sections only when confirmation is ready.
-Missing broader project background alone creates no new interview requirement.
+Use five sections in this order, translating headings and replacing bracketed
+guidance with natural paragraphs, lists or tables:
+
+```markdown
+## Background and current direction
+[Connect sourced project or function purpose, established direction and this request.]
+
+## Current problem and impact
+[Who encounters what problem or limitation, in which situation, with its supplied impact? Define unfamiliar terms by their role.]
+
+## What changes
+[Wanted behavior and its difference from today; include a useful diagram checked for alignment here.]
+
+## Scope and acceptance
+[Observable completion conditions and supplied preservation/exclusion boundaries.]
+
+## Please confirm
+[Requirement scope and the applicable consent branch below. Ask the necessary question and wait.]
+```
+
+Keep the whole public reply for a ready confirmation inside these five sections,
+excluding private prefaces and postscripts. Required WARN notices, cost/egress,
+one-way-door consequences, principles and carried details belong in the applicable section.
+
+Invoke `loom-workflow:loom-visualization` before composing a diagram when available.
+Follow its relevant diagram template: generate with width-aware tools and run
+final alignment on the complete composition, including titled frames.
+Use the titled-panel template for comparisons, with titles inside frames and
+unverified changes labeled expected. Preserve actual steps and branches.
+If the optional skill is unavailable, use verified host tools or readable
+table/text fallback. A wording correction needs no flowchart.
 
 Show each fact once, instead of copying Problem/Outcome/Acceptance/Scope fields.
 
@@ -45,12 +59,14 @@ Borrow only information connections, keeping example details as case-specific fa
 ## Final-message check
 
 Check each sentence for grounded context, scope, outcome or a required decision or consent.
-Remove private progress, status, paths, defaults, check logs, commits and handoff
-inventories unless requested; end at the necessary question and wait.
-Retain required disclosures: verbatim WARN notices, cost/egress, one-way-door
-consequences, principles and carried details when applicable.
+Remove private status, paths, classifications, GO/waiver labels, unrun checks,
+next-station and handoff inventories unless requested. Retain required disclosures:
+verbatim WARN notices, cost/egress, one-way-door consequences, principles and carried details.
 
-Disclose in the same yes automatic publication, opt-out and the separate merge decision.
-Explain that only after review AND publication checks pass does yes authorize
+Honor a prior publication hold or opt-out until the user explicitly lifts it.
+Under that restriction, confirmation covers requirements only; omit the default grant.
+Otherwise retain the normal automatic-publication default.
+Disclose automatic publication, opt-out and the separate merge decision in the same yes when publication is enabled.
+Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
 BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
 with opt-out available anytime before publication and a separate merge decision.

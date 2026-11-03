@@ -76,13 +76,12 @@ Keep missing required facts in the existing interview, asking only for the
 needed fact and why it matters. Compose confirmation only when required facts
 are resolved.
 Draft directly when already sufficient. No intake question quota applies.
-Problems/outcomes are valid before choosing features or implementation.
-Existing decision points remain unchanged.
+Keep outcomes implementation-neutral and decision points unchanged.
 
 Cover affected people, workaround, clean-environment observable outcomes,
 fixed constraints, and exclusions. For product also cover urgency, existing
-alternatives, and displaced work. End with GO or NO-GO plus one reason; write
-NO-GO as `status: withdrawn — <reason>` and stop.
+alternatives, and displaced work. Record GO or NO-GO with one reason privately; write
+NO-GO as `status: withdrawn — <reason>` and stop, explaining why.
 
 **Every question you ask must be of type `what`** — what do you want, what
 happens today, what would you be able to do. Nothing about how it should
@@ -188,7 +187,7 @@ intent in step 4.
 
 ### Private preparation
 
-Privately prepare applicable consequences/questions for the user message.
+Privately prepare applicable consequences/questions.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -267,24 +266,22 @@ from repo evidence and record the reason; asking the user is a
 
 Compose **one message** for the user's confirmation, then wait; this is the only
 confirmation stop this station makes.
-Include applicable consequences and questions prepared above; omit private
-records and intent-document inventory.
+Use applicable consequences/questions; omit private records and inventory.
 
 Restate Problem and Acceptance: subject, problem, impact, outcome and
 confirmation scope. Use the user's plain words, never paths, identifiers or
-mechanism names. Supply necessary context for unfamiliar terms and affected
-people at intent altitude. Use five ordered sections from
-`references/confirmation-template.md`, with headings required.
+mechanism names. Supply necessary context: unfamiliar terms, affected people,
+intent altitude. Use five ordered sections from
+`references/confirmation-template.md` as the whole public reply, with headings required.
 Choose wording and length freely, keeping familiar requests short.
-Check these connections and what yes confirms and authorizes; outcomes only,
-never implementation approval.
+Check these connections and what yes confirms and authorizes; never implementation approval.
 
-Explain that only after review AND publication checks pass does yes authorize
+Honor a prior publication hold or opt-out until the user explicitly lifts it.
+Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
 BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
 with opt-out available anytime before publication and a separate merge decision.
 
-Apply `references/confirmation-template.md` final-message check before sending;
-then ask and wait.
+Apply `references/confirmation-template.md` final-message check before sending.
 
 ### Private records and reply handling
 
@@ -292,8 +289,8 @@ then ask and wait.
 `type` one of `what` / `behaviour` / `done` / `consequence`. Pass the list verbatim
 in step 5's hand-off for the receiving station to write into the plan's
 `## Questions asked`; never invent an intent section for it.
-Record `publication: automatic — authorized <date> by <name>` after informed yes
-only; otherwise omit.
+Record `publication: automatic — authorized <date> by <name>` after informed
+publication consent only; prior holds leave it absent.
 
 **Keep a carried-details list** beside the question list: flow or reaction
 details the user stated or explicitly agreed to, before or during intake.

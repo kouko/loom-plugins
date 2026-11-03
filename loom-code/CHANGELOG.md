@@ -7,6 +7,7 @@
 - Load the primary template directly from the main code-only entry before both new-intent drafting and open-intent confirmation, retaining the already-confirmed fast path. The no-intent reader loads its rules before writing; restore the original numbered consent-policy anchors without changing their routing or private/user-message separation.
 - Apply the primary template's final-message relevance check at the existing composer, retaining required disclosures and excluding borrowed example facts or private inventory. Explicitly condition both non-forced branch upload and ready-for-review pull request opening on completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
 - Illustrate the structure with concrete invoice and CSV requests, preserving missing-fact interviews. Use titled ASCII comparisons when helpful, marking expected results and reusing optional visualization tooling with a readable standalone fallback.
+- Preserve existing publication holds until explicitly lifted; bind the full public reply to the five-section skeleton, ground its opening in available project context, and invoke the optional visualization procedure before generating and checking diagrams. Keep unavailable-fact interviews focused and preserve filtered-result qualifiers.
 
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 

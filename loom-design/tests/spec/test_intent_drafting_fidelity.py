@@ -18,12 +18,12 @@ RULES = (
 )
 EXAMPLE_RULES = (
     ("Write", "user's conversation language"),
-    ("Use", "five sections in this order", "Background and current direction", "Current problem and impact", "What changes", "Scope and acceptance", "Please confirm"),
+    ("Use", "five sections in this order"),
     ("Connect", "sourced project or function purpose", "established direction", "this request"),
     ("Keep", "missing required facts", "existing interview"),
     ("Repair", "assistant shorthand", "already supplied role"),
     ("Preserve", "interface boundary", "private helpers"),
-    ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge"),
+    ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge", "publication is enabled"),
     ("Borrow", "information connections", "case-specific facts"),
     ("Require", "actual-request support or evidence", "date, role, impact and constraint"),
     ("Check", "each sentence", "grounded context", "scope", "outcome", "required decision or consent"),
@@ -38,7 +38,11 @@ LOAD_RULE = ("Read", "confirmation-template.md", "before drafting or replying")
 FINAL_CHECK = ("Apply", "confirmation-template.md", "final-message check", "before sending")
 AUTH_RULE = ("Explain", "only after review AND publication checks pass",
              "BOTH uploading the change branch", "AND opening a pull request ready for review",
-             "anytime before publication", "separate merge decision")
+             "anytime before publication", "separate merge decision", "publication is enabled")
+HOLD_RULE = ("Honor", "prior publication hold or opt-out", "user explicitly lifts it")
+PUBLIC_RULE = ("Keep", "whole public reply", "five sections", "private prefaces", "postscripts")
+CONTEXT_RULE = ("Read", "available README or equivalent project overview", "current direction", "before composing")
+DIAGRAM_RULE = ("Invoke", "loom-workflow:loom-visualization", "before composing a diagram", "when available")
 
 
 @pytest.mark.parametrize(("path", "draft_boundary"), [
@@ -69,8 +73,12 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
     assert text == paths[1].read_text(encoding="utf-8")
     assert "loom-design/" not in text and "loom-code/" not in text
     if filename == "confirmation-template.md":
-        for rule in (*EXAMPLE_RULES, AUTH_RULE):
+        for rule in (*EXAMPLE_RULES, AUTH_RULE, HOLD_RULE, PUBLIC_RULE, CONTEXT_RULE, DIAGRAM_RULE):
             assert affirms(" ".join(text.split()), *rule), rule
+        skeleton = text.split("```markdown\n", 1)[1].split("```", 1)[0]
+        assert re.findall(r"^## (.+)$", skeleton, re.M) == [
+            "Background and current direction", "Current problem and impact",
+            "What changes", "Scope and acceptance", "Please confirm"]
         return
     for case in ("Unknown date", "Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
         example = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
@@ -78,6 +86,7 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
     pending = text.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
     good_interview = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
     assert "pull request" not in good_interview and "Saying yes" not in good_interview
+    assert "blocked" in good_interview
     assert "old" not in pending.lower() and "customer" not in pending.lower()
     pair = text.split("## Known correction", 1)[1].split("\n## ", 1)[0]
     good, bad = pair.split("Good:", 1)[1].split("Bad:", 1)
@@ -99,6 +108,12 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
         headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
         assert headings == ["Background and current direction", "Current problem and impact",
                             "What changes", "Scope and acceptance", "Please confirm"]
+        positive = section.split("Good:", 1)[1].split("Bad:", 1)[0]
+        if case == "Invoice currency correction":
+            assert "requirements only" in positive and "explicitly lift" in positive
+            assert "Only after review and publication checks pass" not in positive
+        else:
+            assert "current filtered result" in positive and "visible" not in positive
 
 
 @pytest.mark.parametrize("path", [
@@ -119,6 +134,7 @@ def test_user_composer_is_separate_from_private_work(path: str) -> None:
     assert "**The complexity check" not in message and "`second-vendor:" not in message
     assert affirms(" ".join(message.split()), *FINAL_CHECK)
     assert affirms(" ".join(message.split()), *AUTH_RULE)
+    assert affirms(" ".join(message.split()), *HOLD_RULE)
     final_link = re.search(r"Apply .*?`([^`]*confirmation-template\.md)`", message)
     assert final_link and ((REPO / path).parent / final_link.group(1)).is_file()
 
@@ -146,12 +162,15 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
         assert not re.search(r"Read `[^`]*confirmation-examples\.md`.*before drafting or replying", child.read_text())
 
 
-@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, AUTH_RULE, *EXAMPLE_RULES))
+@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, AUTH_RULE, HOLD_RULE,
+                                 PUBLIC_RULE, CONTEXT_RULE, DIAGRAM_RULE, *EXAMPLE_RULES))
 def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
     verb, literal, *extras = rule
     sentence = f"{verb} {literal}, {', '.join(extras)}."
     assert affirms(sentence, verb, literal, *extras)
     assert not affirms("Do not " + sentence, verb, literal, *extras)
+    if rule == AUTH_RULE:
+        assert not affirms(sentence.replace("publication is enabled", "publication is disabled"), *rule)
     if "separate from" in literal:
         assert not affirms(sentence.replace("separate from", "equivalent to"),
                            verb, literal, *extras)

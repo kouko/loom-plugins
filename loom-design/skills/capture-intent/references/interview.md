@@ -53,11 +53,13 @@ question count merely to make the interview look complete.
 3. **(what)** What concretely loses this time — what will you not do
    instead? If nothing is displaced, the appetite is hollow.
 
-End with GO or NO-GO and one reason. One weak answer alongside two
+Record GO or NO-GO and one reason privately. One weak answer alongside two
 concrete ones can still be a GO — name the weak one. Two or more weak
 answers are a NO-GO for now, never a hopeful GO. A NO-GO is written into
 the intent as `status: withdrawn — <reason>`; the reasoning is preserved so
 nobody re-argues it blind.
+Explain a blocking outcome and its user-relevant reason plainly; keep judgment
+labels and bookkeeping private.
 
 ## One bad / good pair per section
 

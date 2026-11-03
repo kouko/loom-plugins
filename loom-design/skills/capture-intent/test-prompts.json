@@ -38,7 +38,7 @@
       "id": 4,
       "category": "happy-path",
       "prompt": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
-      "expected_behavior": "Keep confirmation short while connecting the release notes, misleading date, customer confusion and wanted correction. Use natural wording rather than a fixed script or per-element headings. Include the existing publication consequence and single confirmation stop; ask for outcome confirmation, not implementation approval.",
+      "expected_behavior": "Keep the five ordered sections short, connecting available project context, the release notes, misleading date, customer confusion and wanted correction. Use natural sentences rather than a fixed script. Preserve any prior publication restriction; otherwise include the default publication consequence. Keep one confirmation stop and ask for outcome confirmation, not implementation approval; stay in a focused interview if the actual date remains unknown.",
       "edge_case_dimensions": ["simple familiar request", "concise connected context", "flexible expression"]
     },
     {
