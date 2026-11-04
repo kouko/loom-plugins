@@ -114,7 +114,13 @@ charter: 1.1
 - Test: A1 negative: placeholder-is-not-a-wrong-calendar-day; boundary: verified-wrong-value. A2 positive: unresolved-fact-remains-open. A3 negative: unsupported-announcement-or-reader-effect. A4 positive: retained-authorization-boundaries.
 - Risk: agent-decided — Two fresh auditors and independent acceptance confirm draft/message value-state mismatches and unsupported announcement/reader-effect claims. Repair the shared inference class in existing examples and drafting instructions; retain all failures and the second continuation count.
 
+**W3-04 Ground each section without filling unsupported content** after: W3-03 acceptance: 1,2,3,4
+- Files: both existing confirmation-format.md and confirmation-template.md copies, affected existing contract checks only when necessary, unreleased plugin notes and retained evidence.
+- Test: A1 positive: sparse-project-context-without-invented-direction. A2 positive: five-brief-sections; boundary: missing-required-fact-stays-interview. A3 positive: supported-impact-only; negative: inferred-exclusive-access-or-guaranteed-benefit. A4 positive: explicit-hold-and-normal-publication-controls.
+- Risk: user-decided — after the source-grounding pilot and explanation of content-expansion risk, the user said "試試看吧" to retaining five sections while requiring only necessary evidence-backed content. Keep previous failed obligations/counts; no new field, checker, model reviewer or research stage. Compare identical native cases against a frozen current-source baseline before claiming improvement; source-reading requirements remain intact.
+
 ## Simplicity check
+- W3-04 user-approved bounded trial: retain the five-section organization but remove implied completion of every background/direction/impact slot. Unknown broader context is not a new interview; missing required outcome facts still block confirmation. This is a changed presentation obligation, not a reset of W3-03's initial attempt/two continuations or an acceptance of its failed minimum. Preserve the separate-check pilot and earlier raw artifacts.
 - none found
 
 ## Questions asked
