@@ -104,6 +104,11 @@ charter: 1.1
 - Test: A1 positive: supported-context-and-source-boundaries. A2 positive: phase-appropriate-structure. A3 positive: literal-necessary-terms-and-framed-diagram; negative: private-inventory. A4 positive: unambiguous-confirmation-consent.
 - Risk: user-decided — "改吧" and "改完之後再做一輪測試" approve six private actual-reply checks replacing the generic paragraph. Preserve W3-01 history, disclosures and holds; add no file or approval.
 
+**W3-03 continuation 1 — remove factual and confirmation-phase contradictions** after: W3-03 acceptance: 1,2,3,4
+- Files: both confirmation owners and existing phase readers; paired grounding/examples where relevant; focused regression tests and existing unreleased notes.
+- Test: A1 negative: unknown-does-not-imply-false. A2 negative: confirmation-before-required-facts; boundary: established-fact-ready. A3 positive: source-supported-output. A4 positive: consistent-authorization.
+- Risk: user-decided — "對 請繼續迭代吧" authorizes this continuation after the factual/logical minimum was clarified. Retain the same failed obligations, W3-03's initial attempt and all W3-01 history; diagnose competing instructions before repairing them.
+
 ## Simplicity check
 - none found
 
@@ -124,3 +129,5 @@ charter: 1.1
 9. user-decided — explicitly override the previous local iteration ceiling: at most five additional iterations, stopping early on acceptance. Prior failures/counts remain retained; no requirement or publication authorization changes. Template-plus-examples reference structure approved.
 
 10. user-decided — W3-03 newly requires six actual-reply questions: background, fidelity, plain wording, consent, structure/diagrams and deletion. This additional deliverable preserves W3-01's attempts, failures and review continuity; no new file, station or public checklist.
+
+11. user-decided — Minimum release criteria are correct content and no internal logical conflict. Prioritize missing-fact confirmation and unsupported certainty over cosmetic wording. Existing five-section/visualization goals remain; publication and merge are still held.

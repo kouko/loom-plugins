@@ -247,3 +247,29 @@ def test_primary_reader_uses_literal_explanation_without_private_terms() -> None
     assert affirms(" ".join(text.split()), "State", "who does what", "user sees", "what changes")
     assert "metaphors or analogies" in text
     assert "new terminology" in text and "necessary" in text
+
+
+def test_incomplete_code_intake_cannot_enter_ready_reader() -> None:
+    root = REPO / "loom-code/skills/write-plan"
+    interview = (root / "references/no-intent-interview.md").read_text()
+    before_draft = interview.split("When you write the intent", 1)[0]
+    assert "confirm-intent.md" not in before_draft
+    step3 = (root / "SKILL.md").read_text().split(
+        "## Step 3 — Decision point ①: restate and confirm", 1)[1].split("\n## ", 1)[0]
+    open_route = step3.split("Otherwise", 1)[1]
+    stop = open_route.index("stop before loading")
+    assert stop < open_route.index("Read `references/confirm-intent.md`")
+    assert "required facts" in open_route[:stop]
+    assert "Only when required facts are settled" in open_route[:open_route.index("Read `references/confirm-intent.md`")]
+
+
+@pytest.mark.parametrize("path", [
+    "loom-code/skills/write-plan/references/confirm-intent.md",
+    "loom-design/skills/capture-intent/SKILL.md",
+    "loom-code/contract/templates/intent.md",
+    "loom-design/skills/capture-intent/templates/intent.md",
+])
+def test_open_questions_preserves_required_content_blocker(path: str) -> None:
+    text = " ".join((REPO / path).read_text().split())
+    assert re.search(r"[Oo]pen questions.{0,130}missing required content", text)
+    assert "both block confirmation" in text

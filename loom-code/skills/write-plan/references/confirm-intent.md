@@ -27,8 +27,8 @@ scenarios, UI placement, state transitions, test steps, or implementation;
 Keep already-fixed user/standing-policy boundaries as Constraints; product Value case gives beneficiary, urgency,
 and GO/NO-GO, while an engineering intent omits obvious value;
 Keep Out of scope to explicitly excluded capabilities or data at source abstraction.
-Open questions contains only unresolved
-outcome or scope choices. After drafting, make one author pass: **Keep,
+Open questions contains only unresolved outcome/scope choices or missing required
+content; both block confirmation. After drafting, make one author pass: **Keep,
 neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
 plan, and unsupported detail is deleted. This pass creates no field, ID,
 requirement, scenario, product behaviour, or review loop.

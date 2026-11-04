@@ -4,8 +4,12 @@ Loaded by step 1 of `../SKILL.md` when no intent exists and `loom-design`
 is not installed. Relative paths here are relative to this file's
 directory; step numbers are that SKILL.md's.
 
-Read `confirmation-template.md` and `confirm-intent.md` before drafting or replying.
-When you write the intent, apply their explanation and intent-writing rules.
+Read `confirmation-template.md` before drafting or replying.
+When you write the intent, use `../../../contract/templates/intent.md` for its
+field boundaries. Missing required content stays in Open questions and blocks
+confirmation; a yes cannot supply missing evidence. Stay in this interview until
+the facts are settled; do not load the ready confirmation reader or layout yet.
+Then return to step 2; step 3 loads `confirm-intent.md` only for ready confirmation.
 
 - `loom-design` is not installed → hand the user the template path,
   `contract/templates/intent.md` inside the `loom-code` plugin, and stop

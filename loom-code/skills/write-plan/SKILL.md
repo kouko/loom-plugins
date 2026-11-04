@@ -187,9 +187,13 @@ When `status:` is already `confirmed`, skip confirmation:
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
 
-Otherwise perform code-only confirmation.
+Otherwise assess the open intent for required facts first.
 Read `references/confirmation-template.md` before drafting or replying.
-Then read `references/confirm-intent.md` and follow it fully before step 4,
+If required facts are missing, follow its interview branch and stop before loading
+the ready confirmation reader; keep missing content in Open questions. A yes
+cannot replace missing evidence or make the intent ready.
+Only when required facts are settled:
+Read `references/confirm-intent.md` and follow it fully before step 4,
 in the single message it describes, ending with the intent's confirmation
 commit. Step 5 writes the question list kept per that reference.
 

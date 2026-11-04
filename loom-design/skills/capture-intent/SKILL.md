@@ -66,15 +66,15 @@ or updated.
 
 Read `references/interview.md`; ask only about missing required-field content.
 Read `references/confirmation-template.md` before drafting or replying.
-Missing required facts: follow its interview branch; stop before confirmation preparation.
+Keep missing required facts in the existing interview, asking for the
+needed fact and why it matters; stop before confirmation preparation or
+later readers. Resume Step 2 when settled.
 Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
 Before drafting: Preserve supplied facts, outcome strength and qualifiers.
 Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
 Lead interviews with the user's problem or missing fact, minimizing workflow
 labels and bookkeeping; retain consequence/authorization disclosures.
-Keep missing required facts in the existing interview, asking only for the
-needed fact and why it matters.
 Draft directly when already sufficient.
 
 Cover affected people, workaround, clean-environment observable outcomes,

@@ -31,6 +31,8 @@ temporary text or a future confirmation. Publication details belong to a ready
 confirmation with enabled publication. A lack of supplied records does not put
 verification out of scope; it leaves the date unknown until evidence is available.
 Do not turn "only change the date" into a ban on checking it.
+An unknown release date could coincide with today's date; no reliable evidence
+establishes either equality or difference. A confirmation cannot supply that evidence.
 
 ## Grounded drafting
 
@@ -61,7 +63,7 @@ Borrow only information connections, keeping example details as case-specific fa
 
 Check each sentence of the actual proposed reply for grounded context, scope,
 outcome or a required decision or consent using these six questions. Revise the
-offending sentences before sending. Keep this check private; do not append the
+offending sentences for the current phase before sending. Keep this check private; do not append the
 questions or a claim that all checks passed to the public reply.
 
 1. Can the user understand the project or function's purpose, current direction

@@ -27,4 +27,4 @@ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only af
 - <Keep explicitly excluded capabilities, actors, systems or data at source abstraction; no inferred method bans or deferred implementation tasks>
 
 ## Open questions
-- <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none
+- <unresolved outcome/scope choices or missing required content; both block confirmation; delegate spec and engineering questions> # write `- none` when there are none
