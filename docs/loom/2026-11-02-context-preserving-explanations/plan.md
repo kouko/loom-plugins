@@ -115,7 +115,7 @@ charter: 1.1
 - Risk: agent-decided — Two fresh auditors and independent acceptance confirm draft/message value-state mismatches and unsupported announcement/reader-effect claims. Repair the shared inference class in existing examples and drafting instructions; retain all failures and the second continuation count.
 
 **W3-04 Ground each section without filling unsupported content** after: W3-03 acceptance: 1,2,3,4
-- Files: both existing confirmation-format.md and confirmation-template.md copies, affected existing contract checks only when necessary, unreleased plugin notes and retained evidence.
+- Files: paired confirmation references; related visualization full/coexist cards and plain-language.md; derived host rule, workflow manifests/current version pins/README and changelog; existing relevant checks and retained evidence.
 - Test: A1 positive: sparse-project-context-without-invented-direction. A2 positive: five-brief-sections; boundary: missing-required-fact-stays-interview. A3 positive: supported-impact-only; negative: inferred-exclusive-access-or-guaranteed-benefit. A4 positive: explicit-hold-and-normal-publication-controls.
 - Risk: user-decided — "試試看吧" approves evidence-backed brief sections, retaining W3-03 failures/counts and all consent boundaries. Compare frozen native cases; add no research stage, checker or model reviewer.
 
@@ -147,3 +147,5 @@ charter: 1.1
 13. agent-decided — W3-04 trial complete; candidate unaccepted: both variants retain two material-failure cases, only two replies shorten. Preserve observations without tuning for a pass; minimum remains unmet, publication held and attestation stale.
 
 14. user-decided — Authorize at most five additional rounds, including option-guidance ablation and evidence-backed repairs. Retain W3-04/prior attempts. Behavioral actors remain first-party claude-sonnet-5-5, medium requested, regardless of main-model switch. Publication and merge remain held.
+
+15. agent-decided — Round1 only ablates the injected options directive; it does not establish a single cause. Round2 clarifies real-choice applicability in existing visualization guidance, preserving factual interviews and legitimate choices. Workflow guidance needs a minor version bump.
