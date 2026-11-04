@@ -1,3 +1,4 @@
+# concern: Relative or hard-coded conversation document paths and portable-reference rewrites.
 """Conversation-only guidance coverage; model compliance needs live acceptance testing."""
 import json
 import subprocess
