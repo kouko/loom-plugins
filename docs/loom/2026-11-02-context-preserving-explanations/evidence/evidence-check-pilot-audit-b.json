@@ -1,0 +1,563 @@
+{
+  "auditor": "B",
+  "criteria": "audit-b-criteria.json (frozen before blind packet), interpreted with authoritative format.md",
+  "limitations": [
+    "Initial evidence extraction accidentally emitted initial artifact fields before criteria creation; no variant map, checker/reviser feedback, historical reports or other auditor files read. This weakens blinding.",
+    "format.md authoritative contract was present in new-draft context but not passed verbatim to checker/reviser; differing contract exposure is a pilot limitation.",
+    "Offline replay: no real source writes or tool execution expected. Conditional later workflow descriptions are not executed actions."
+  ],
+  "scoring": "whether_minimum_met means no material fact/logic floor issue. Style and ambiguities do not enter floor counts. Open drafts are allowed before confirmation, but ready confirmation needs required facts. User-explicit new outcome is evaluated on its own terms.",
+  "records": [
+    {
+      "record_id": "X01",
+      "case_id": "N2",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "CSV 要包含哪些欄位？",
+          "source": "Request supplies no CSV field list.",
+          "finding": "Asks a grounded focused clarification; retains filtered scope, permissions and unchanged invoice data."
+        },
+        {
+          "quote": "目前發票列表沒有 CSV 下載功能",
+          "source": "README explicitly says list has no CSV download and an existing read-only API exists.",
+          "finding": "No claim API is absent; omitting an API mention does not contradict evidence."
+        }
+      ]
+    },
+    {
+      "record_id": "X02",
+      "case_id": "R4",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [
+        {
+          "quote": "現在停在決策點 ①",
+          "source": "format.md asks to omit private status and unnecessary procedural terminology.",
+          "reason": "Workflow bookkeeping is unnecessary for understanding the requested date correction."
+        }
+      ],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "從 2026-10-31 改成 2026-11-04",
+          "source": "Request and RELEASE_RECORD.md agree on actual date 2026-11-04.",
+          "finding": "Reply and open draft preserve exact supported replacement and other-text constraint."
+        },
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X03",
+      "case_id": "R5",
+      "material_issues": [
+        {
+          "kind": "unsupported_scope_of_benefit",
+          "location": "draft.Value case",
+          "quote": "不必再逐張檢查幣別、也不必因錯誤重新匯出",
+          "source_evidence": "Request: 只修正「使用誰的幣別設定」；README: stop one customer settings leaking into another export. format.md: preserve present-versus-desired quantifiers and source qualifiers.",
+          "reason": "The draft states exemption from checking/re-export without limiting it to this specific bug. Fixing one source of wrong currency does not establish all review/re-export becomes unnecessary. The pending-confirmation GO wording does not qualify this benefit."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "qualification_in_diagram",
+          "location": "reply.diagram",
+          "quote": "不需逐張檢查幣別",
+          "source_evidence": "Reply frames right-hand side as 預期結果 / 右邊尚未驗證.",
+          "reason": "This is explicitly an expected effect rather than a measured outcome; by itself it is weaker evidence of a material defect. The unqualified saved Value case independently supplies the floor issue."
+        },
+        {
+          "kind": "hold_not_carried_in_draft",
+          "location": "draft.Constraints",
+          "quote": "- 不同次匯出的金額可以合理不同；不要求金額相同。",
+          "source_evidence": "User additionally imposes explicit continuing publication hold.",
+          "reason": "Draft product constraints omit the workflow publication hold, but the reply retains it explicitly; no contrary grant or executed action. Flag durability uncertainty rather than invent a proven authorization violation."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        {
+          "quote": "這個限制繼續有效，直到你另外明確解除",
+          "source": "User explicitly retains publication hold after intent yes.",
+          "finding": "Reply preserves the persistent publication hold."
+        },
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X04",
+      "case_id": "N1",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "CSV 要包含哪些欄位，目前沒有資料可以判斷。",
+          "source": "Request supplies no CSV field list.",
+          "finding": "Asks a grounded focused clarification; retains filtered scope, permissions and unchanged invoice data."
+        }
+      ]
+    },
+    {
+      "record_id": "X05",
+      "case_id": "N3",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "over_specific_future_evidence",
+          "location": "reply and draft.open_questions",
+          "quote": "要等到有發行紀錄才能補上",
+          "source_evidence": "Current evidence has no date or release record; user requests placeholder only.",
+          "reason": "A reliable actual date might be established by other evidence. This over-specific future condition lies outside current placeholder task and is not counted as a material error in its present outcome."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "依你的決定，我會把這個欄位的內容從「to be corrected」改成「日期待確認」",
+          "source": "User: 這次不要填真正日期；我決定將日期欄位改成「日期待確認」.",
+          "finding": "Legitimate explicit new outcome; unknown real date does not block confirming this text replacement."
+        },
+        {
+          "quote": "待使用者確認。",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X06",
+      "case_id": "R6",
+      "material_issues": [
+        {
+          "kind": "unsupported_scope_of_benefit",
+          "location": "draft.Value case",
+          "quote": "可免去逐張檢查與重新匯出",
+          "source_evidence": "Request: 只修正「使用誰的幣別設定」；README: stop one customer settings leaking into another export. format.md: preserve present-versus-desired quantifiers and source qualifiers.",
+          "reason": "The draft states exemption from checking/re-export without limiting it to this specific bug. Fixing one source of wrong currency does not establish all review/re-export becomes unnecessary. The pending-confirmation GO wording does not qualify this benefit."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "publication_default_not_fully_supplied",
+          "location": "reply.confirmation",
+          "quote": "若之後要發布，需要你另外明確同意",
+          "source_evidence": "format.md refers to an applicable conditional publication default, without defining its full grant mechanics; R6 has no explicit publication hold.",
+          "reason": "Cannot independently determine whether extra later consent is required or the conditional default is correctly explained. Do not count absence of explicit user publication wording as a violation."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X07",
+      "case_id": "N2",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "CSV 要包含哪些欄位？",
+          "source": "Request supplies no CSV field list.",
+          "finding": "Asks a grounded focused clarification; retains filtered scope, permissions and unchanged invoice data."
+        },
+        {
+          "quote": "目前發票列表沒有 CSV 下載功能",
+          "source": "README explicitly says list has no CSV download and an existing read-only API exists.",
+          "finding": "No claim API is absent; omitting an API mention does not contradict evidence."
+        }
+      ]
+    },
+    {
+      "record_id": "X08",
+      "case_id": "R3",
+      "material_issues": [
+        {
+          "kind": "unsupported_exclusive_access_claim",
+          "location": "reply.opening",
+          "quote": "要用的資料目前只能在列表上看。",
+          "source_evidence": "README: The current list has no CSV download action. Request: manually copy invoice list to spreadsheet.",
+          "reason": "No CSV action and current manual workflow do not establish that no API or other access exists. This categorically narrows current access methods."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "unverified_design_inventory",
+          "location": "reply and draft.needs-design",
+          "quote": "目前沒有 DESIGN.md 或 ui-flows 涵蓋此介面",
+          "source_evidence": "Supplied files contain README and PRINCIPLES; no authoritative complete repository inventory provided.",
+          "reason": "Could be a valid fixture inventory observation or an unsupported exhaustive absence claim. Available evidence does not resolve it; no separate floor count."
+        },
+        {
+          "kind": "opportunity_cost_workflow_requirement",
+          "location": "reply.confirmation",
+          "quote": "這件事會擠掉哪些原本排定的工作?",
+          "source_evidence": "format.md permits necessary focused interview; supplied workflow does not establish whether this value-case field is mandatory.",
+          "reason": "Do not label this question invented scope solely because user did not request it. Necessity remains uncertain."
+        },
+        {
+          "kind": "value_decision_with_open_question",
+          "location": "draft.Value case",
+          "quote": "GO（理由：直接省去每月重複的手動作業）。",
+          "source_evidence": "Draft also says 被擠壓的工作：尚未說明; reply leaves intent open.",
+          "reason": "GO may be a provisional viability judgment rather than confirmation. No supplied authoritative rule makes opportunity cost essential to that judgment, so inconsistency is uncertain rather than floor."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X09",
+      "case_id": "R1",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "placeholder_classification",
+          "location": "reply",
+          "quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實",
+          "source_evidence": "Request asks for actual release-date correction.",
+          "reason": "TBD itself denotes uncertainty and is not necessarily a fabricated calendar fact, but it would not satisfy this request. Overbroad rationale has limited practical effect because action correctly stays blocked."
+        }
+      ],
+      "style_issues": [
+        {
+          "quote": "到時只會替換日期那一處文字。",
+          "source": "format.md says keep unknown-date situation in interview and avoid future confirmation preview.",
+          "reason": "Unnecessary future confirmation/process preview; not itself a new wrong date or a claim current correction is ready."
+        }
+      ],
+      "whether_minimum_met": true,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X10",
+      "case_id": "R6",
+      "material_issues": [
+        {
+          "kind": "unsupported_scope_of_benefit",
+          "location": "draft.Value case",
+          "quote": "可免去逐張檢查與重新匯出",
+          "source_evidence": "Request: 只修正「使用誰的幣別設定」；README: stop one customer settings leaking into another export. format.md: preserve present-versus-desired quantifiers and source qualifiers.",
+          "reason": "The draft states exemption from checking/re-export without limiting it to this specific bug. Fixing one source of wrong currency does not establish all review/re-export becomes unnecessary. The pending-confirmation GO wording does not qualify this benefit."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "publication_default_not_fully_supplied",
+          "location": "reply.confirmation",
+          "quote": "等你確認後，審查與發布檢查都通過，才會以非強制方式推送分支並開一個待審的 pull request",
+          "source_evidence": "format.md refers to an applicable conditional publication default, without defining its full grant mechanics; R6 has no explicit publication hold.",
+          "reason": "Cannot independently determine whether extra later consent is required or the conditional default is correctly explained. Do not count absence of explicit user publication wording as a violation."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X11",
+      "case_id": "N3",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "over_specific_future_evidence",
+          "location": "reply and draft.open_questions",
+          "quote": "要等到有發行紀錄才能補上",
+          "source_evidence": "Current evidence has no date or release record; user requests placeholder only.",
+          "reason": "A reliable actual date might be established by other evidence. This over-specific future condition lies outside current placeholder task and is not counted as a material error in its present outcome."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "依你的決定，我會把這個欄位的內容從「to be corrected」改成「日期待確認」",
+          "source": "User: 這次不要填真正日期；我決定將日期欄位改成「日期待確認」.",
+          "finding": "Legitimate explicit new outcome; unknown real date does not block confirming this text replacement."
+        },
+        {
+          "quote": "待使用者確認。",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X12",
+      "case_id": "R1",
+      "material_issues": [
+        {
+          "kind": "planning_before_confirmation",
+          "location": "reply.last_sentence",
+          "quote": "意圖和計畫會在那時一起建立，並請你確認「這就是我要的」。",
+          "source_evidence": "Request: I have not confirmed any change. format.md separates missing-fact interview from ready confirmation; frozen criteria require confirmed intent before implementation plan.",
+          "reason": "Describes creating the plan together with intent before obtaining confirmation, reversing the required order. A future sequence can be logically wrong even though no actual plan was executed."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "placeholder_classification",
+          "location": "reply",
+          "quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實",
+          "source_evidence": "Request asks for actual release-date correction.",
+          "reason": "TBD itself denotes uncertainty and is not necessarily a fabricated calendar fact, but it would not satisfy this request. Overbroad rationale has limited practical effect because action correctly stays blocked."
+        }
+      ],
+      "style_issues": [
+        {
+          "quote": "到時只會替換日期那一處文字。",
+          "source": "format.md says keep unknown-date situation in interview and avoid future confirmation preview.",
+          "reason": "Unnecessary future confirmation/process preview; not itself a new wrong date or a claim current correction is ready."
+        }
+      ],
+      "whether_minimum_met": false,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X13",
+      "case_id": "R2",
+      "material_issues": [
+        {
+          "kind": "ready_confirmation_without_required_fact",
+          "location": "reply.confirmation",
+          "quote": "以上意圖是否正確描述你的需求？確認後，這份意圖會以「日期未知」的狀態保留，待日期查明後才能進入實作。",
+          "source_evidence": "Request: true release date unknown, no release record; format.md: When user already lacks required fact and evidence, state what is blocked and wait; invent neither a replacement/deletion choice nor a future confirmation preview.",
+          "reason": "Moves the unchanged factual correction into intent confirmation while the essential target date remains unknown. This is distinct from the allowed creation of an explicitly unresolved open draft."
+        }
+      ],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X14",
+      "case_id": "N1",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "CSV 要包含哪些欄位，目前沒有資料可以判斷。",
+          "source": "Request supplies no CSV field list.",
+          "finding": "Asks a grounded focused clarification; retains filtered scope, permissions and unchanged invoice data."
+        }
+      ]
+    },
+    {
+      "record_id": "X15",
+      "case_id": "R5",
+      "material_issues": [
+        {
+          "kind": "unsupported_scope_of_benefit",
+          "location": "draft.Value case",
+          "quote": "不必再逐張檢查幣別、也不必因錯誤重新匯出",
+          "source_evidence": "Request: 只修正「使用誰的幣別設定」；README: stop one customer settings leaking into another export. format.md: preserve present-versus-desired quantifiers and source qualifiers.",
+          "reason": "The draft states exemption from checking/re-export without limiting it to this specific bug. Fixing one source of wrong currency does not establish all review/re-export becomes unnecessary. The pending-confirmation GO wording does not qualify this benefit."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "qualification_in_diagram",
+          "location": "reply.diagram",
+          "quote": "不需逐張檢查幣別",
+          "source_evidence": "Reply frames right-hand side as 預期結果 / 右邊尚未驗證.",
+          "reason": "This is explicitly an expected effect rather than a measured outcome; by itself it is weaker evidence of a material defect. The unqualified saved Value case independently supplies the floor issue."
+        },
+        {
+          "kind": "hold_not_carried_in_draft",
+          "location": "draft.Constraints",
+          "quote": "- 不同次匯出的金額可以合理不同；不要求金額相同。",
+          "source_evidence": "User additionally imposes explicit continuing publication hold.",
+          "reason": "Draft product constraints omit the workflow publication hold, but the reply retains it explicitly; no contrary grant or executed action. Flag durability uncertainty rather than invent a proven authorization violation."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        {
+          "quote": "這個限制繼續有效，直到你另外明確解除",
+          "source": "User explicitly retains publication hold after intent yes.",
+          "finding": "Reply preserves the persistent publication hold."
+        },
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X16",
+      "case_id": "R4",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "uncorroborated_check_report",
+          "location": "reply.opening",
+          "quote": "標準文件檢查沒有任何警告。",
+          "source_evidence": "Supplied synthetic evidence has no check log; offline replay expects no real tool execution.",
+          "reason": "Incidental check claim is uncorroborated and discouraged by format.md; it does not alter the supported date target or authorization, so not a floor issue."
+        }
+      ],
+      "style_issues": [
+        {
+          "quote": "現在停在決策點 ①",
+          "source": "format.md asks to omit private status and unnecessary procedural terminology.",
+          "reason": "Workflow bookkeeping is unnecessary for understanding the requested date correction."
+        }
+      ],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "從 2026-10-31 改成 2026-11-04",
+          "source": "Request and RELEASE_RECORD.md agree on actual date 2026-11-04.",
+          "finding": "Reply and open draft preserve exact supported replacement and other-text constraint."
+        },
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    },
+    {
+      "record_id": "X17",
+      "case_id": "N4",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "目前也沒有任何變更等待你確認。",
+          "source": "User requests real date, says maintain current state if insufficient evidence; no actual date available.",
+          "finding": "Correctly blocks original correction without introducing fallback or ready confirmation."
+        }
+      ]
+    },
+    {
+      "record_id": "X18",
+      "case_id": "R2",
+      "material_issues": [
+        {
+          "kind": "no_change_as_sufficient_alternative_to_fact",
+          "location": "reply.continuation_conditions",
+          "quote": "你確認這個欄位在日期查明之前就維持現狀。",
+          "source_evidence": "Request still asks to correct actual displayed release date; actual date unknown. format.md prohibits invented replacement/deletion choices or confirmation preview for missing facts.",
+          "reason": "Presents no-change confirmation as one of two sufficient inputs to continue restating the original correction. It cannot supply the missing date, and user has not changed the requested outcome."
+        }
+      ],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X19",
+      "case_id": "N4",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        {
+          "quote": "目前也沒有任何變更等待你確認。",
+          "source": "User requests real date, says maintain current state if insufficient evidence; no actual date available.",
+          "finding": "Correctly blocks original correction without introducing fallback or ready confirmation."
+        }
+      ]
+    },
+    {
+      "record_id": "X20",
+      "case_id": "R3",
+      "material_issues": [
+        {
+          "kind": "unsupported_exclusive_access_claim",
+          "location": "reply.opening",
+          "quote": "要用的資料目前只能在列表上看。",
+          "source_evidence": "README: The current list has no CSV download action. Request: manually copy invoice list to spreadsheet.",
+          "reason": "No CSV action and current manual workflow do not establish that no API or other access exists. This categorically narrows current access methods."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "unverified_design_inventory",
+          "location": "reply and draft.needs-design",
+          "quote": "目前沒有 DESIGN.md 或 ui-flows 涵蓋此介面",
+          "source_evidence": "Supplied files contain README and PRINCIPLES; no authoritative complete repository inventory provided.",
+          "reason": "Could be a valid fixture inventory observation or an unsupported exhaustive absence claim. Available evidence does not resolve it; no separate floor count."
+        },
+        {
+          "kind": "opportunity_cost_workflow_requirement",
+          "location": "reply.confirmation",
+          "quote": "這件事會擠掉哪些原本排定的工作?",
+          "source_evidence": "format.md permits necessary focused interview; supplied workflow does not establish whether this value-case field is mandatory.",
+          "reason": "Do not label this question invented scope solely because user did not request it. Necessity remains uncertain."
+        }
+      ],
+      "style_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        {
+          "quote": "status: open",
+          "source": "Offline replay draft outputs are allowed before confirmation.",
+          "finding": "Open intent draft is allowed; it is not implementation or a confirmed plan."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "records": 20,
+    "minimum_met": 11,
+    "minimum_failed": 9,
+    "failed_ids": [
+      "X03",
+      "X06",
+      "X08",
+      "X10",
+      "X12",
+      "X13",
+      "X15",
+      "X18",
+      "X20"
+    ]
+  }
+}

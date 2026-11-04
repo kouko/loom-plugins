@@ -1,0 +1,106 @@
+{
+  "auditor": "B",
+  "preserves": "audit-b.json unchanged",
+  "scope": "Focused post-blind adjudication; case/variant identities now disclosed in adjudication-context.json. This is not another blind score.",
+  "prior_limitations": [
+    "Initial artifact exposure before initial criteria; original audit already records this.",
+    "format.md contract exposure differed between draft and checker/reviser."
+  ],
+  "findings": [
+    {
+      "cases": [
+        "R5",
+        "R6"
+      ],
+      "affected_records": [
+        "X03",
+        "X15",
+        "X06",
+        "X10"
+      ],
+      "decision": "withdraw material floor finding; retain wording ambiguity only",
+      "original_finding": "unsupported_scope_of_benefit",
+      "exact_quotes": [
+        "R5 Problem: 偶爾會沿用上一位客戶的幣別設定 ... 會計同事目前必須逐張檢查發票，遇到錯誤再重新匯出。",
+        "R5 Value case: 不必再逐張檢查幣別、也不必因錯誤重新匯出。",
+        "R5 reply: 右邊是預期結果。右邊尚未驗證。",
+        "R6 Constraints: 只修正「使用誰的幣別設定」",
+        "R6 Value case: 可免去逐張檢查與重新匯出。"
+      ],
+      "reason": "The drafts establish one specific currency-leak bug, connect the current manual workaround causally to that bug, and frame the later statement as value of that proposed correction. Neither says all future causes, all review policies, or no checking ever. In ordinary contextual reading, the omitted qualifier can be recovered from the Problem and narrow Acceptance. My initial material finding required an unjustified all-cause reading of isolated text. R5 is particularly explicit about currency checks and expected/unverified results; R6 wording is broader but still attached to the same singular problem.",
+      "residual_ambiguity": "A reader extracting the value sentence alone may overread it. Clearer restriction to checks/re-exports caused by this bug would improve precision, but omission of a repeated qualifier is not enough to prove a material guarantee or changed acceptance.",
+      "rejected_alternative": "Do not classify an intended benefit as an observed result or a guaranteed removal of every invoice check merely because it is declaratively written.",
+      "authorization": "R5 reply explicitly preserves ongoing publication hold; saved draft omission remains durability ambiguity, not a demonstrated conflicting grant. R6 publication-default question remains unresolved from supplied abbreviated contract."
+    },
+    {
+      "case": "R1",
+      "affected_records": [
+        "X09",
+        "X12"
+      ],
+      "decision": "narrow rationale is logically unsound; do not promote it to material floor on this evidence",
+      "exact_quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實，也不是你要求的更正。",
+      "source": "Actual date unknown; existing field literally to be corrected. format.md: unknown date may coincide with today and evidence establishes neither equality nor difference.",
+      "reason": "Using today as if verified release date would assert an ungrounded fact, regardless of whether it happens to be correct. But TBD or 日期待確認 can truthfully communicate the known uncertainty; temporary wording is not inherently a fabricated actual date. The clause 也不是你要求的更正 independently and correctly rejects that substitution for R1. Thus the blanket rationale is false in part, while the blocked action and requested outcome are correctly preserved.",
+      "material_threshold": "No fabricated date is adopted, no supported target fact lost, and no user-explicit placeholder request exists in R1. Treat as a real but non-material explanatory inaccuracy. If rubric counts every invalid rationale as floor, report that alternative separately rather than silently changing threshold.",
+      "retained_material": "X12 still states 意圖和計畫會在那時一起建立，並請你確認, describing plan creation before intent confirmation; this is a separate ordering defect."
+    },
+    {
+      "case": "R3",
+      "affected_records": [
+        "X08",
+        "X20"
+      ],
+      "decision": "retain exclusive-access floor; do not add GO/open-state floor without authoritative prerequisite",
+      "retained_floor_quote": "要用的資料目前只能在列表上看。",
+      "retained_floor_source": "README establishes only absence of a CSV download action, not absence of all other access methods.",
+      "value_quotes": [
+        "Reply: 價值評估缺這個答案 ... 狀態維持 open。",
+        "Reply: 你回答並確認後 ... 把狀態改成 confirmed。",
+        "Original draft: 被擠壓的工作：尚未說明。GO（理由：直接省去每月重複的手動作業）。"
+      ],
+      "reason": "GO is a value judgment; status open is an unconfirmed workflow state. They are different assertions and can coexist. Missing opportunity-cost detail does not itself logically disprove GO if benefit is already evident. The reply makes future progression conditional on answering and confirming, so it does not currently mark intent confirmed. The supplied contract gives no specific rule making opportunity cost a prerequisite to any provisional value judgment.",
+      "ambiguity": "Whether value evaluation is complete is unclear; the reply says it lacks an answer and original draft says GO. That is a potential confidence/state mismatch, not proven material contradiction under available authority. X20 changing judgment to pending makes this clearer but does not repair its independent exclusive-access statement.",
+      "not_supported": "No finding that value GO proves confirmation, or that an open draft is forbidden planning."
+    },
+    {
+      "case": "R4",
+      "affected_record": "X16",
+      "decision": "resolve prior uncorroborated-check ambiguity in favor of narrow supported no-warning report",
+      "quote": "標準文件檢查沒有任何警告。",
+      "new_source": "adjudication-context.json R4_check_witness: actual loom-python --repair standing docs/loom/intent/2026-11-04-correct-release-notes-date.md; successful result (Bash completed with no output), is_error false.",
+      "reason": "Actual successful standing command with empty output supports this limited no-warning statement. Packet omission cannot establish fabrication. It does not prove all checks passed or broad correctness, but the reply does not make those broader claims.",
+      "retained_style": "Unrequested internal check narration remains unnecessary under format.md; no fact/logic floor issue."
+    }
+  ],
+  "score_effect": {
+    "original_failed_ids": [
+      "X03",
+      "X06",
+      "X08",
+      "X10",
+      "X12",
+      "X13",
+      "X15",
+      "X18",
+      "X20"
+    ],
+    "withdraw_failed_ids": [
+      "X03",
+      "X06",
+      "X10",
+      "X15"
+    ],
+    "remaining_failed_ids": [
+      "X08",
+      "X12",
+      "X13",
+      "X18",
+      "X20"
+    ],
+    "minimum_met_after_focused_adjudication": 15,
+    "minimum_failed_after_focused_adjudication": 5,
+    "records": 20,
+    "note": "Original audit preserved. Other unchallenged judgments retained rather than retested or optimized."
+  }
+}
