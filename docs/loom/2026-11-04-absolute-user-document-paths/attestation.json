@@ -1,0 +1,99 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-04-absolute-user-document-paths",
+  "content_digest": "626547dc0e27d79e91f3d5cea2160e1cb2a937ec",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_conversation_document_paths.py",
+      "artifact": "loom-code/tests/test_conversation_document_paths.py",
+      "result": "pass",
+      "command_digest": "989728830c2e7fac4c931b5908714acf07af64fdaf43abaed81eb80830cd34f3"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "41211a0b363cd970e0b13a1e451aafcfffaf6849",
+      "review_target_sha": "f7170e6b37b0815fa3d42532a5cc4774b5a15c64",
+      "reviewer": "/root/review_code",
+      "vendor": "codex",
+      "model": "inherited",
+      "dimension_scores": {
+        "security": "PASS — added guidance is literal prose; no new executable interpolation, credential, or network surface",
+        "architecture": "PASS — shared hook and conversation guidance cover installed-family entry points, with portable self-contained guidance for standalone design skills",
+        "correctness": "PASS — guidance covers actual repository/worktree and outside-root locations, absolute link targets, spaces, unsupported-link fallback, and preservation of stored relative references; all changed test files passed",
+        "naming": "PASS — names describe document-delivery guidance and regression coverage clearly",
+        "tests": "PASS — independently ran all five changed test files: 142 passed plus 7 conversation-path cases passed; affirmative prose pins include rejection self-checks, and acceptance evidence distinguishes instruction coverage from bounded observed responses",
+        "refactoring": "PASS — repeated standalone guidance has a portability reason; no production abstraction or unrelated cleanup was introduced",
+        "cross-task-coherence": "PASS — conversation-only scope is consistent across the hook, standalone skills, workflow cards, release metadata, plan, and acceptance report",
+        "external-surface-grounding": "N/A — no new API, SDK, MCP, CLI flag, or sibling-team contract call is introduced",
+        "principles-conformance": "PASS — respects portable plugin boundaries and preserves adopting-project data; acceptance report discloses bounded host/model and clickability evidence",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md exists in this repository",
+        "deliberate-simplification": "PASS — instruction-level implementation states its preservation boundary and acceptance evidence states observed-model and host limits",
+        "deletion-first": "PASS — explicit user request justifies the new conversation guidance; no new runtime option, mechanism, or general-purpose abstraction is added"
+      },
+      "findings": [],
+      "notes": [
+        "Independent focused verification used /Users/kouko/.conda/envs/dbt-redshift/bin/python3 without installing packages; 149 changed-file tests passed with no skips.",
+        "Did not replay the complete package suite or stored evidence probes, as required by the reviewer contract.",
+        "Acceptance evidence supports three cold Codex response samples; no universal host/model compliance or actual UI-link opening claim is made."
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "41211a0b363cd970e0b13a1e451aafcfffaf6849",
+      "review_target_sha": "f7170e6b37b0815fa3d42532a5cc4774b5a15c64",
+      "reviewer": "/root/review_skill",
+      "vendor": "codex",
+      "model": "inherited",
+      "dimension_scores": {
+        "omission": "PASS — Code session guidance, workflow direct entry and injected cards, and all five document-producing design entries cover the conversation path rule without requiring another plugin's hook.",
+        "ambiguity": "PASS — Instructions distinguish actual document location, active worktree, external documents, supported local Markdown links, spaces, and the unsupported-link fallback.",
+        "inconsistency": "PASS — Conversation-only scope preserves bundled references, stored relative paths and repository links; the capture entry retains skill-relative resource resolution, and rewritten card clauses retain their prior direction.",
+        "incorrect-fact": "PASS — Checked the changed guidance and acceptance evidence against the intent; independently ran the five changed test modules, obtaining 149 passed. Evidence identifies its tested commit and does not claim installed-cache or UI click verification.",
+        "missing-population": "PASS — Acceptance evidence identifies the three cold Codex response samples, guidance sources, fixture roots, focused command and 171-test population, with explicit host/model and clickability limitations.",
+        "user-judgment-leak": "PASS — The delta adds no technical approval question or reopened user choice; path resolution and link syntax remain agent responsibilities, and the report discloses agent-decided placement and release choices.",
+        "deletion-first": "PASS — The added guidance directly addresses the confirmed relative-path delivery failure. Shared code/workflow surfaces and explicit standalone design entry coverage avoid sweeping portable artifacts or introducing a new runtime mechanism."
+      },
+      "findings": [],
+      "notes": [
+        "Independent focused verification: /Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest -q loom-code/tests/test_conversation_document_paths.py loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py loom-workflow/tests/scripts/test_release_metadata.py loom-workflow/tests/scripts/test_visualization_card_hook.py; 149 passed in 0.62s.",
+        "Prose pins check affirmative source guidance and emitted hook/card routing, rather than proving model compliance. The acceptance witness separately records three bounded Codex response samples and explicitly excludes universal host/model compliance, fresh global installation and actual UI link opening.",
+        "The new path paragraphs provide conversation guidance, not an additional blocking quality gate. The complete package suite and evidence probes were not rerun, as required by the reviewer contract."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "96a898be40d0129814e931b9090c718d9c740d3e",
+  "tested_commit": "adad5c7cd2830bc783c9325fbf2feed53989e605",
+  "reviewed_commit": "f7170e6b37b0815fa3d42532a5cc4774b5a15c64",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
