@@ -143,7 +143,7 @@ solve the problem. No such engineering change is implemented by this experiment.
 - `evidence-check-pilot-data.json`: preregistration, all cases, exact prompts,
   raw CLI results/receipts, before/after artifacts, randomized packet/map,
   metrics, source guidance and the later witness context.
-- `evidence-check-pilot-runner.py`: tools-disabled CLI runner used for the
+- `probes/evidence-check-pilot-runner.py`: tools-disabled CLI runner used for the
   registered cells. To reproduce in a new temporary directory, restore
   `cases.json` and `protocol.json` from the archive and write
   `source_runtime_guidance` to `format.md`; never reuse output filenames.
@@ -158,3 +158,8 @@ and cost recomputation, runner syntax, lossless semantic normalization and sourc
 diff checks. The existing package suite was not rerun: no production skill,
 checker or plugin implementation changed. The canonical failed acceptance
 report and stale attestation remain untouched.
+
+Integration follow-up: the next complete package run caught the standalone
+runner outside `evidence/probes/`. Move its exact bytes into that required
+directory; preserve the earlier failure, all observations and the original
+commit. This changes evidence placement only, not the tested plugin runtime.
