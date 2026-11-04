@@ -9,6 +9,14 @@ version: 1.0.1
 
 Relative paths in this document are relative to this skill's own directory.
 
+For code-only intake of a new or unconfirmed intent:
+Read the available README or equivalent project overview and relevant current direction,
+plus request-relevant evidence, before composing any intake reply, including an
+interview or choice discussion. Read narrowly; documented facts are not interview
+gaps. If no overview exists, use known request/function context and qualify only
+material unknowns. Keep uncertainty scoped to its source: the user not knowing
+does not mean nobody knows, and undocumented does not mean absent.
+
 Turn one intent into `docs/loom/<change-id>/plan.md`: waved tasks with files,
 Acceptance ownership, positive and negative or boundary cases, and risk. Do **not**
 implement or ask the user to approve task splitting; decide and record why.

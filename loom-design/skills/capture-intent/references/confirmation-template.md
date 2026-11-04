@@ -42,8 +42,6 @@ establishes either equality or difference. A confirmation cannot supply that evi
 
 ## Grounded drafting
 
-Read the available README or equivalent project overview and relevant current direction
-before composing the opening; read narrowly, not across the whole repository.
 Connect sourced project or function purpose to this request, including
 established direction or impact only when evidenced and needed. Use established
 goals, not procedural waivers. Unknown broader direction needs no new interview

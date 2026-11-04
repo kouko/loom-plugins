@@ -7,11 +7,14 @@ version: 1.0.0
 
 ## What this station does
 
-Relative paths in this document are relative to this skill's own directory.
+Resolve relative paths from this skill's directory.
 
-Ask only until the wanted outcome is clear, write
-`docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
-confirmed intent onward. Do not design, plan, or ask the user to judge quality.
+Read the available README or equivalent project overview, current direction and
+request evidence narrowly before composing any intake reply. Documented facts are
+not gaps. Without an overview, use known context; qualify material unknowns.
+
+Clarify the outcome, write `docs/loom/intent/<change-id>.md`, and confirm it in
+the user's words before hand-off. Do not design, plan or request quality judgment.
 
 ## Artifact vocabulary
 
@@ -64,10 +67,10 @@ or updated.
 
 ## Step 1 — Interview
 
-Read `references/interview.md`; ask only about missing required-field content.
+Read `references/interview.md`.
 Read `references/confirmation-template.md` before drafting or replying.
 Keep missing required facts in the existing interview, asking for the
-needed fact and why it matters; stop before confirmation preparation or
+needed fact and why; stop before confirmation preparation or
 later readers. Resume Step 2 when settled.
 Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
 Before drafting: Preserve supplied facts, outcome strength and qualifiers.
@@ -77,9 +80,8 @@ Lead interviews with the user's problem or missing fact, minimizing workflow
 labels and bookkeeping; retain consequence/authorization disclosures.
 Draft directly when already sufficient.
 
-Cover affected people, workaround, clean-environment observable outcomes,
-fixed constraints, and exclusions. For product also cover urgency, existing
-alternatives, and displaced work. Record GO or NO-GO with one reason privately; write
+For product also cover urgency, existing alternatives, and displaced work.
+Record GO or NO-GO with one reason privately; write
 NO-GO as `status: withdrawn — <reason>` and stop, explaining why.
 
 **Every question you ask must be of type `what`** — what do you want, what

@@ -81,7 +81,7 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
     assert text == paths[1].read_text(encoding="utf-8")
     assert "loom-design/" not in text and "loom-code/" not in text
     if filename == "confirmation-template.md":
-        for rule in (*EXAMPLE_RULES, HOLD_RULE, CONTEXT_RULE, TARGET_RULE, BOUNDARY_RULE):
+        for rule in (*EXAMPLE_RULES, HOLD_RULE, TARGET_RULE, BOUNDARY_RULE):
             assert affirms(" ".join(text.split()), *rule), rule
         assert "```markdown" not in text and "## Please confirm" not in text
         return
@@ -189,6 +189,8 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
     before_draft = reader.read_text(encoding="utf-8").split("When you write the intent", 1)[0]
     assert affirms(" ".join(before_draft.split()), *LOAD_RULE)
     for entry in (text, (REPO / "loom-design/skills/capture-intent/SKILL.md").read_text()):
+        before_reader = entry.split("Read `references/confirmation-template.md`", 1)[0]
+        assert affirms(" ".join(before_reader.split()), *CONTEXT_RULE)
         assert re.search(r"Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed", " ".join(entry.split()))
         assert not re.search(r"Read `[^`]*confirmation-examples\.md` before drafting or replying", entry)
     for child in (reader, owner.parent / "references/confirm-intent.md"):
