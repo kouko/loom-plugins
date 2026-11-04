@@ -117,10 +117,9 @@ charter: 1.1
 **W3-04 Ground each section without filling unsupported content** after: W3-03 acceptance: 1,2,3,4
 - Files: both existing confirmation-format.md and confirmation-template.md copies, affected existing contract checks only when necessary, unreleased plugin notes and retained evidence.
 - Test: A1 positive: sparse-project-context-without-invented-direction. A2 positive: five-brief-sections; boundary: missing-required-fact-stays-interview. A3 positive: supported-impact-only; negative: inferred-exclusive-access-or-guaranteed-benefit. A4 positive: explicit-hold-and-normal-publication-controls.
-- Risk: user-decided — after the source-grounding pilot and explanation of content-expansion risk, the user said "試試看吧" to retaining five sections while requiring only necessary evidence-backed content. Keep previous failed obligations/counts; no new field, checker, model reviewer or research stage. Compare identical native cases against a frozen current-source baseline before claiming improvement; source-reading requirements remain intact.
+- Risk: user-decided — "試試看吧" approves evidence-backed brief sections, retaining W3-03 failures/counts and all consent boundaries. Compare frozen native cases; add no research stage, checker or model reviewer.
 
 ## Simplicity check
-- W3-04 user-approved bounded trial: retain the five-section organization but remove implied completion of every background/direction/impact slot. Unknown broader context is not a new interview; missing required outcome facts still block confirmation. This is a changed presentation obligation, not a reset of W3-03's initial attempt/two continuations or an acceptance of its failed minimum. Preserve the separate-check pilot and earlier raw artifacts.
 - none found
 
 ## Questions asked
@@ -142,3 +141,5 @@ charter: 1.1
 10. user-decided — W3-03 newly requires six actual-reply questions: background, fidelity, plain wording, consent, structure/diagrams and deletion. This additional deliverable preserves W3-01's attempts, failures and review continuity; no new file, station or public checklist.
 
 11. user-decided — Minimum release criteria are correct content and no internal logical conflict. Prioritize missing-fact confirmation and unsupported certainty over cosmetic wording. Existing five-section/visualization goals remain; publication and merge are still held.
+
+12. user-decided — W3-04 changes the presentation obligation, not the factual/logical minimum or W3-03 retry identity. Five headings remain, but unknown broader context need not be filled or newly interviewed. Preserve reading, required-fact interviews, disclosures, diagram conditions and all earlier evidence.
