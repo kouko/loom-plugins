@@ -76,7 +76,8 @@ _MOVED_INTAKE_RULES = {
         "When this station performs code-only intake, use the same capture boundary:",
         "**Keep, neutralize, defer, reopen, or delete**",
         "the intent must remain `open`. <!-- /gate -->",
-        "Any intent section may use a Markdown table or a Mermaid `flowchart`;",
+        "Any intent-file section may use a Markdown table or a Mermaid `flowchart`;",
+        "and chat shows text tables or text diagrams, not Mermaid.",
     ),
 }
 
