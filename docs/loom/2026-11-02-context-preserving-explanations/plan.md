@@ -102,7 +102,7 @@ charter: 1.1
 **W3-03 Replace the existing final-message check with six concrete editing questions** after: W3-01 acceptance: 1,2,3,4
 - Files: both confirmation-template.md copies and existing unreleased plugin notes; retained test evidence.
 - Test: A1 positive: supported-context-and-source-boundaries. A2 positive: phase-appropriate-structure. A3 positive: literal-necessary-terms-and-framed-diagram; negative: private-inventory. A4 positive: unambiguous-confirmation-consent.
-- Risk: user-decided — the user approved the proposed six checks with "改吧" and requested "改完之後再做一輪測試". Replace the existing generic final-message paragraph in place, not a new file, station, public checklist or approval. The concrete additional deliverable is a six-question inspection of the actual outgoing reply: background, fidelity, plain wording, consent, structure/diagrams and deletion. W3-01's earlier attempts and partial outcomes remain unchanged; this bounded checklist task does not reset them or the review episode. Preserve required disclosures and publication holds, and test actual output rather than claimed checklist compliance.
+- Risk: user-decided — "改吧" and "改完之後再做一輪測試" approve six private actual-reply checks replacing the generic paragraph. Preserve W3-01 history, disclosures and holds; add no file or approval.
 
 ## Simplicity check
 - none found
@@ -122,3 +122,5 @@ charter: 1.1
 8. agent-decided — eight-case retest had no permission denials. Both blind audits found unsupported deterministic/result guarantees in capture-6 and code-6; date/random counterexamples held. W1-01 remains incomplete; this continuation changes rule placement, preserving requirements and retry identity.
 
 9. user-decided — explicitly override the previous local iteration ceiling: at most five additional iterations, stopping early on acceptance. Prior failures/counts remain retained; no requirement or publication authorization changes. Template-plus-examples reference structure approved.
+
+10. user-decided — W3-03 newly requires six actual-reply questions: background, fidelity, plain wording, consent, structure/diagrams and deletion. This additional deliverable preserves W3-01's attempts, failures and review continuity; no new file, station or public checklist.
