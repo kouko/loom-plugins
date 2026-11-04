@@ -155,3 +155,5 @@ charter: 1.1
 17. user-decided — Consider template simplification within five rounds. Round4 moves unchanged ready examples into the existing optional gallery, retaining five headings and all obligations. Grounding/six checks stay; tests follow the new resource home without losing assertions.
 
 18. user-decided — Fifth/final round repairs entry-point evidence reading after actual README omission. The five-round authorization overrides the usual two-source-redispatch limit; retain prior attempts. No sixth source round, publication or merge.
+
+19. agent-decided — Five rounds completed with 38 ordinary-model actors. Final ten read overviews, but source 9b9c7d87 retains unsupported certainty and premature confirmation. Preserve disputed interpretations and failures; stop without sixth source, attestation, publication or merge.

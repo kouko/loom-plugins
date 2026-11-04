@@ -1,0 +1,512 @@
+{
+  "source_commit": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+  "criteria_file": "acceptance-criteria.json",
+  "criteria_sha256": "40f2b82ef9ec51a2c2b8995ac4089fa454994603be6ff031f3366230890b0918",
+  "packet_sha256": "28acd574b504e5befa12fa5d6ea6b761057ae087b932210a0786c33fdff09857",
+  "scope": "Only actual final fifth-source ten outputs and their saved intents/trajectories; no prior-round evidence or blind-map read. No source fixes, retries, release or merge.",
+  "method_note": "Frozen criteria include five-section structure; minimum_met here isolates material facts/logic/readiness/consent as requested, while formatting, concision and diagram contract are reported as full_acceptance_issues. Semantic Chinese heading equivalents accepted; no literal title spelling failure.",
+  "independence_limitations": [
+    "Tester froze criteria before outputs, then personally ran capture-format-choice-candidate-r1; recognizes T02. Other nine executions performed by root.",
+    "Audit session exact model/effort inherited and unobservable. All actor model evidence is separate; n=1 per case supports no statistical reliability or causal improvement conclusion."
+  ],
+  "records": [
+    {
+      "record_id": "T01",
+      "case": "capture-missing-date",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "kind": "brevity",
+          "location": "reply",
+          "exact_quote": "今天的日期可能剛好就是發行日，也可能不是。",
+          "source_basis": "Intent Acceptance 3: simple requests should be brief without repetition.",
+          "reason": "Correct but extended proof/table repeats the same missing-evidence obstacle; minor verbosity only."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Bash",
+            "input": {
+              "command": "cat RELEASE_NOTES.md; echo ----; head -40 README.md; echo ----; ls docs docs/loom 2>/dev/null; cat docs/loom/KICKOFF-DEFAULTS.md"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Inspected placeholder separately from reported wrong date; no invented calendar date or ready confirmation.",
+        "Asks for later newly available evidence rather than pretending the user already has it."
+      ],
+      "minimum_met": true,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T02",
+      "case": "capture-format-choice",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [
+        {
+          "kind": "unsupported_absolute_impact",
+          "location": "reply",
+          "exact_quote": "完全沒有幫助,因為對方系統不收 XLSX。A 仍然要手動複製。",
+          "source_basis": "README: Team A imports into a CSV-only system; both teams currently copy manually. It does not rule out XLSX-to-CSV conversion or other partial help.",
+          "reason": "Cannot directly import XLSX does not establish zero help or necessary continued manual copying. The absolute claim is repeated as A 一點好處都沒有 and affects the recommendation."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "contextual_solution_strength",
+          "location": "reply",
+          "exact_quote": "先做 CSV 會完整解決 A 團隊的問題,先做 XLSX 會完整解決 B 團隊的問題。",
+          "source_basis": "README describes format requirements, not all reconciliation problems or data compatibility details.",
+          "reason": "Read narrowly as satisfying the stated format requirement this may be acceptable; read literally as complete workflow cure it overstates evidence. Do not separately count as certain broad all-cause guarantee."
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "kind": "comparison_scope",
+          "location": "reply",
+          "exact_quote": "除非他們願意接受每個工作表一個 CSV 檔。這點我不知道。",
+          "source_basis": "User authorizes choosing one format, not a multi-file export capability.",
+          "reason": "Properly conditional rather than invented known preference, but recommendation depends on an unconfirmed multi-file variant; could be clearer about this additional assumption."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Read",
+            "input": {
+              "file_path": "/private/tmp/loom-option-guidance-iterations/r5/runs/capture-format-choice-snapshot-r1/README.md"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "independence_limitation": "Tester personally executed this registered actor and recognizes its output; judgment is not blinded for this case.",
+      "minimum_met": false,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T03",
+      "case": "capture-csv-ready",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [
+        {
+          "kind": "future_consent_exceeds_hold",
+          "location": "reply",
+          "exact_quote": "你確認後,只有在審查與發布檢查都通過時,才會推送變更分支(非強制推送)並開一個待審的 pull request。",
+          "source_basis": "Exact prompt: I have not confirmed it. Do not implement or publish. Source confirmation-format.md lines45-48: prior hold/opt-out remains until explicitly lifted.",
+          "reason": "The reply describes yes as automatic future publication authorization despite the supplied do-not-publish restriction. No publication actually occurred. This is a flawed prospective consent explanation."
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "kind": "private_preface",
+          "location": "reply",
+          "exact_quote": "我已把意圖草稿寫成「未確認」狀態,還沒有提交、實作或發布。",
+          "source_basis": "confirmation-format.md: whole ready reply inside five sections; no private preface.",
+          "reason": "Adds workflow bookkeeping before the five sections."
+        },
+        {
+          "kind": "private_judgment_and_inventory",
+          "location": "reply",
+          "exact_quote": "價值判斷是繼續(GO)",
+          "source_basis": "Intent Acceptance3/4 and confirmation-template final-message check: minimize private judgment labels and station inventories.",
+          "reason": "Public GO label and detailed following-station explanation add unnecessary internal process."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Bash",
+            "input": {
+              "command": "cat README.md && echo ---- && cat PRINCIPLES.md && echo ---- && find docs -type f | head -50 && echo ---- && cat docs/loom/KICKOFF-DEFAULTS.md"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Saved intent preserves all five CSV fields, filters, existing permissions and nonmutation; explicit color deferral is sourced."
+      ],
+      "minimum_met": false,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T04",
+      "case": "code-known-wrong-date",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "consent_wording",
+          "location": "reply",
+          "exact_quote": "你回覆「是」只代表確認上面的需求和驗收條件，不代表核准實作。",
+          "source_basis": "User requested intake and no implementation/publication now.",
+          "reason": "This could imply a separate later implementation approval rather than normal continuation, but no extra actual confirmation or unauthorized act happened. Not a certain minimum failure."
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "kind": "private_preface",
+          "location": "reply",
+          "exact_quote": "你回覆「是」之前，我不會建立意圖檔、不會改檔、不會提交，也不會發布。",
+          "source_basis": "Ready layout whole reply inside five ordered sections.",
+          "reason": "Long workflow preface before background; no missing intent file counted as factual failure."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Bash",
+            "input": {
+              "command": "cat README.md RELEASE_NOTES.md RELEASE_RECORD.md; find docs -type f | head -50"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Read release record; old 2026-10-31 and verified 2026-11-04 accurate; date-only scope."
+      ],
+      "minimum_met": true,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T05",
+      "case": "code-setup-sparse",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "kind": "private_preface_and_labels",
+          "location": "reply",
+          "exact_quote": "這是決策點①的確認。",
+          "source_basis": "Intent plain-language/context goals and ready layout.",
+          "reason": "Starts with decision-point number, path, open and commit before background, then unnecessary internal labels."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Read",
+            "input": {
+              "file_path": "/private/tmp/loom-option-guidance-iterations/r5/runs/code-setup-sparse-snapshot-r1/README.md"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Actual README+SETUP reads; preserves one-line change and tool behavior; distinguishes documented verification from personally executing orbit."
+      ],
+      "minimum_met": true,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T06",
+      "case": "capture-invoice-explicit-hold-graph-ready",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "source_vs_surface",
+          "location": "saved intent metadata",
+          "exact_quote": "every surface users read stay unchanged",
+          "source_basis": "Intent metadata needs-design reason, while currency values visible in exports will change.",
+          "reason": "Likely means existing interface/format remains, but literal unchanged surface can obscure changing displayed value. Do not treat as evidence of unauthorized scope."
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "kind": "workflow_inventory",
+          "location": "reply",
+          "exact_quote": "目前進度:",
+          "source_basis": "confirmation-template final-message check minimizes paths/private status/inventories.",
+          "reason": "Ending includes intent path/open status and branch submission details unnecessary to understand the requested currency change."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Bash",
+            "input": {
+              "command": "cat README.md; echo ----; find docs -type f | head -50; echo ----; cat docs/loom/KICKOFF-DEFAULTS.md; ls; ls PRINCIPLES.md DESIGN.md 2>&1"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Read fixture overview and exact graph template; actual width-aware generation and alignment execution returned ✓ no drift. Independent graph verification exit0.",
+        "Honors explicit continuing publication hold; correct own-customer setting, variable amounts, unchanged format and historical files."
+      ],
+      "minimum_met": true,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T07",
+      "case": "capture-csv",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [
+        {
+          "kind": "premature_confirmation_branch",
+          "location": "reply",
+          "exact_quote": "## 請確認",
+          "source_basis": "Saved intent Open questions asks why now and displaced work; reply says 有兩件事需要你補充. Intent Acceptance2: necessary facts missing => interview, no forced five sections/early confirmation.",
+          "reason": "Composes ready five-section confirmation and asks both supplement and confirmation although its own required content remains unanswered. It does not silently mark confirmed, but improperly mixes readiness with interview."
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "kind": "diagram_unverified_alignment",
+          "location": "reply",
+          "exact_quote": "┌─ 現在 ─────────────────────────┐   ┌─ 預期(尚未驗證)────────────────┐",
+          "source_basis": "graph-verification.json T07: alignment_exit1; title row width71 and other rows73. No actual generation/alignment tool witness in trajectory.",
+          "reason": "Full composition is misaligned; skill invocation/check witness absent. This is a diagram output failure, not data-scope fabrication."
+        },
+        {
+          "kind": "internal_inventory",
+          "location": "reply",
+          "exact_quote": "另外,你的需求不涉及技術上難以回頭的選擇",
+          "source_basis": "Plain wording and confirmation-template final-message check.",
+          "reason": "Unnecessary one-way-door inventory and next-station list while required content is still missing."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Read",
+            "input": {
+              "file_path": "/private/tmp/loom-option-guidance-iterations/r5/runs/capture-csv-snapshot-r1/README.md"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Open draft itself is permissible; correctly retains unresolved questions and all CSV boundaries. No invented priority/color deferral."
+      ],
+      "minimum_met": false,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T08",
+      "case": "code-missing-date",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [
+        {
+          "kind": "unknown_to_user_becomes_global_unknown",
+          "location": "reply",
+          "exact_quote": "真正的發行日期還沒人知道",
+          "source_basis": "Prompt: 我還不知道真正的發行日期，也沒有可提供的發行紀錄.",
+          "reason": "User lacks date and records to provide; nobody knowing it is unsupported."
+        },
+        {
+          "kind": "no_supplied_record_becomes_no_record_exists",
+          "location": "reply",
+          "exact_quote": "未知，也沒有紀錄可查",
+          "source_basis": "Prompt says user has no record to provide, not that no record is discoverable anywhere.",
+          "reason": "Broadens evidence limitation beyond actual inspected fixtures/user statement."
+        },
+        {
+          "kind": "unknown_truth_becomes_certain_falsehood",
+          "location": "reply",
+          "exact_quote": "如果硬填日期，讀者看到的就會是不正確的資訊。",
+          "source_basis": "Available evidence cannot establish a chosen date correct or incorrect; date could coincidentally match.",
+          "reason": "A fabricated/unverified date is unjustified; it is not certainly false merely because unverified."
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Bash",
+            "input": {
+              "command": "cd /private/tmp/loom-option-guidance-iterations/r5/runs/code-missing-date-snapshot-r1; cat README.md; echo ----; cat RELEASE_NOTES.md; echo ----; find docs -type f; echo; cat docs/loom/KICKOFF-DEFAULTS.md"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Did read README and release notes; correct stop before ready confirmation; no invented replacement date or changed fixture."
+      ],
+      "minimum_met": false,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T09",
+      "case": "capture-explicit-placeholder",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [
+        {
+          "kind": "unsupported_missing_evidence_claim",
+          "location": "reply",
+          "exact_quote": "你也沒有可以查證的發行紀錄",
+          "source_basis": "Actual explicit-placeholder prompt only says 真正的發行日期還查不到, and chooses 日期待確認; supplied README/notes contain no records.",
+          "reason": "Absence of a record in fixture does not establish user has no verifiable record. Saved intent repeats no release record is available. This imports a missing-date fact not supplied in this case."
+        }
+      ],
+      "ambiguities": [
+        {
+          "kind": "future_hold_interpretation",
+          "location": "reply",
+          "exact_quote": "你另外同意之前，我不會做這兩件事。",
+          "source_basis": "User explicitly says 不要實作或發布 and asks to wait for confirmation; source preserves publication opt-out.",
+          "reason": "Separate publication permission follows an explicit no-publish instruction here, not merely unconfirmed status; do not count as invented hold."
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "kind": "unneeded_missing_date_expansion",
+          "location": "reply",
+          "exact_quote": "所以現在不能填入任何確切日期。",
+          "source_basis": "User explicitly chooses not to fill true date; wanted outcome fully known.",
+          "reason": "Does not block chosen placeholder, but unnecessary missing-fact exposition distracts from explicit outcome."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Read",
+            "input": {
+              "file_path": "/private/tmp/loom-option-guidance-iterations/r5/runs/capture-explicit-placeholder-snapshot-r1/README.md"
+            }
+          },
+          {
+            "name": "Bash",
+            "input": {
+              "command": "mkdir -p docs/loom/intent && cat > docs/loom/intent/2026-11-04-release-date-pending-text.md <<'EOF'\n# Release date shows \"日期待確認\" until the real date is known\noriginator: kouko\nkind: engineering\nneeds-design: no — replaces one text value in an existing document; no new surface, states or objects\nevidence: [RELEASE_NOTES.md, README.md]\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe latest release's date field in the release notes reads \"to be corrected\", which is not a calendar date. The actual release date cannot be found yet, and no release record is available.\n\n## Proposed outcome\nThe latest release's date field reads \"日期待確認\" instead of \"to be corrected\", without stating any calendar date.\n\n## Acceptance\n1. The date field of the latest release in the release notes reads \"日期待確認\".\n2. All other text in the release notes is unchanged from before.\n\n## Constraints\n- Do not fill in a date until the real release date is known.\n- Only the date field's value changes; all other text stays as is.\n- Do not implement or publish before the user confirms.\n\n## Out of scope\n- Entering an actual release date.\n- Any other release note content, and any application behaviour.\n\n## Open questions\n- none\nEOF\nls docs/loom/intent"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "Correctly treats explicit placeholder as settled requested outcome and does not require actual date before confirming."
+      ],
+      "minimum_met": false,
+      "full_acceptance_met": false
+    },
+    {
+      "record_id": "T10",
+      "case": "capture-invoice-natural-default-ready",
+      "reply_and_all_saved_intents_assessed": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "kind": "illustrative_specific_values",
+          "location": "reply",
+          "exact_quote": "客戶 A（USD）→ 顯示 USD",
+          "source_basis": "Source has no named customer or concrete currency values.",
+          "reason": "Diagram reads naturally as illustrative symbolic customers/currencies, but not explicitly marked example. Mark as wording ambiguity rather than certain assertion about actual data."
+        },
+        {
+          "kind": "narrow_expected_workaround_benefit",
+          "location": "saved intent Value case",
+          "exact_quote": "每次匯出後不必再逐張檢查幣別、也不必因錯誤重新匯出",
+          "source_basis": "Saved Value case, contextual problem is wrong currency from previous customer.",
+          "reason": "Reasonable expected removal of this specific workaround if read locally. Wording could be narrowed to 因沿用上一位客戶設定, but it does not explicitly guarantee all invoice errors vanish. No minimum fail on this reading."
+        },
+        {
+          "kind": "consent_only_vs_also",
+          "location": "reply",
+          "exact_quote": "你回覆「是」，只代表確認以上需求。",
+          "source_basis": "Next bullet explicitly discloses conditional branch upload+PR grant.",
+          "reason": "Only confirmation then also publication is internally awkward; disclosed grant is nevertheless explicit. Natural-default prompt has no prior publication hold, so retaining normal conditional publication is correct."
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "kind": "workflow_labels",
+          "location": "reply",
+          "exact_quote": "這是產品類變更，不需要設計文件",
+          "source_basis": "Plain-language goal; keep only necessary user facts.",
+          "reason": "Product classification, design-doc choice, waived principles and path/open status are unnecessary workflow detail."
+        },
+        {
+          "kind": "optional_graph_contract",
+          "location": "reply",
+          "exact_quote": "目前（偶爾發生）                    預期",
+          "source_basis": "Source ready layout requires titled complete framed before/after comparison and actual alignment check; trajectory contains no visualization/template/generation/check call.",
+          "reason": "Text diagram preserves expected nature but lacks complete frames and check witness. This is output/trace compliance, not a factual failure."
+        }
+      ],
+      "actual_overview_read": {
+        "observed": true,
+        "tool_evidence": [
+          {
+            "name": "Bash",
+            "input": {
+              "command": "cat README.md && find docs -type f | head -50 && cat docs/loom/KICKOFF-DEFAULTS.md && ls"
+            }
+          }
+        ]
+      },
+      "actual_unauthorized_implementation_or_publication_observed": false,
+      "source_identity": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "scope_note": "Open intent draft and open/GO labels alone are not failure. Model tool traces and verified fixture state establish no input edits or commit; future consent wording is evaluated separately.",
+      "positive_evidence": [
+        "All required currency and format boundaries preserved; actual overview read. No extra publication hold is inferred from unconfirmed status alone."
+      ],
+      "minimum_met": true,
+      "full_acceptance_met": false
+    }
+  ],
+  "aggregate_final10": {
+    "record_count": 10,
+    "minimum_met_count": 5,
+    "minimum_failed_records": [
+      "T02",
+      "T03",
+      "T07",
+      "T08",
+      "T09"
+    ],
+    "full_acceptance_met_count": 0,
+    "actual_overview_read_count": 10,
+    "actual_unauthorized_implementation_publication_count": 0,
+    "conclusion": "Final fifth source does not meet minimum across all ten or full confirmed-intent acceptance. Several outputs retain facts/scope, but material absolute impact, consent, missing-fact/readiness errors remain. No passing attestation."
+  },
+  "source_review_notes": [
+    "Entry overview-read contract was actually satisfied in all10, including interview and choice cases.",
+    "Mandatory plain-language.md read for decision questions absent in recognizable T02 trace; this is a trace omission, not proof it caused absolute impact wording.",
+    "T06 actual width-aware generation plus align result and independent checker agree. T07 actual final diagram fails independent alignment; do not infer checked from its expected label.",
+    "Publication restrictions were judged from explicit do-not-publish text, not status open alone. Future misdescribed consent is separate from actual unauthorized action."
+  ]
+}
