@@ -116,9 +116,8 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
         headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
         assert headings == ["Background and current direction", "Current problem and impact",
                             "What changes", "Scope and acceptance", "Please confirm"]
-    ready = paths[0].with_name("confirmation-format.md").read_text()
     for case in ("Invoice currency correction", "Filtered CSV export"):
-        section = ready.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
+        section = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
         assert "Good:" in section and "Bad:" in section
         headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
         assert headings == ["Background and current direction", "Current problem and impact",
@@ -213,8 +212,8 @@ def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> Non
     assert not affirms(late.split("Draft directly", 1)[0], verb, literal, *extras)
 
 
-def test_required_readers_contain_their_phase_examples() -> None:
-    """Examples needed to recognize a phase cannot depend on optional reading."""
+def test_phase_examples_resolve_from_their_local_reader() -> None:
+    """Keep missing-fact guidance required and ready illustrations locally reachable."""
     root = REPO / "loom-design/skills/capture-intent/references"
     grounding = (root / "confirmation-template.md").read_text()
     ready = (root / "confirmation-format.md").read_text()
@@ -224,8 +223,13 @@ def test_required_readers_contain_their_phase_examples() -> None:
     assert "blocked" in positive and "### Please confirm" not in positive
     assert "verification" in pending and "out of scope" in pending
     assert "## Unknown date" not in ready + gallery
+    link = re.search(r"`([^`]*confirmation-examples\.md)`", ready)
+    assert link, "ready illustrations must resolve through a local gallery link"
+    target = root / link.group(1)
+    assert target.is_file() and target.resolve().parent == root.resolve()
+    assert target.read_text() == gallery
     for case in ("Invoice currency correction", "Filtered CSV export"):
-        assert f"## {case}" in ready and f"## {case}" not in gallery
+        assert f"## {case}" in gallery and f"## {case}" not in ready
     assert "templates/02-linear-steps.md" in ready
     assert "read" in ready.split("templates/02-linear-steps.md", 1)[0].splitlines()[-1].lower()
     assert "no diagrams" not in ready.lower()
