@@ -1,0 +1,24 @@
+{
+  "source_commit": "b536d274b1c7a6b067194562edc910a67145e565",
+  "plan_only_commit": "fad3ca007378f9f3b2d56a32e3136b5da4819e0d",
+  "focused_tests": 152,
+  "complete_locked_suite": {
+    "exit_code": 0,
+    "log_sha256": "d0edddf2a38e1d80dc1c3bd22aa352003c8a631be07e5cc8e12b0b12b6b77f16"
+  },
+  "reused_adversarial_module": {
+    "path": "loom-design/tests/spec/test_capture_intent_contract.py",
+    "passed": 38,
+    "log_sha256": "768d2df67510c1ede8acf6f7090d90421a7f861a76bfab017c358efcd07fd862"
+  },
+  "exact_observed_graph_alignment": {
+    "exit_code": 0,
+    "log": "  ln  width | content\n   1    62 | ┌────────────────────────────┐  ┌────────────────────────────┐\n   2    62 | │    修改前（使用者回報）    │  │         預期修改後         │\n   3    62 | ├────────────────────────────┤  ├────────────────────────────┤\n   4    62 | │  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n   5    62 | │  │   匯出某客戶的發票   │  │  │  │   匯出某客戶的發票   │  │\n   6    62 | │  └──────────────────────┘  │  │  └──────────────────────┘  │\n   7    62 | │              │             │  │              │             │\n   8    62 | │              ▼             │  │              ▼             │\n   9    62 | │  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n  10    62 | │  │ 偶爾用到前一位的幣別 │  │  │  │ 使用該客戶自己的幣別 │  │\n  11    62 | │  └──────────────────────┘  │  │  └──────────────────────┘  │\n  12    62 | │              │             │  │              │             │\n  13    62 | │              ▼             │  │              ▼             │\n  14    62 | │  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n  15    62 | │  │   發票顯示錯誤幣別   │  │  │  │ 發票顯示該客戶的幣別 │  │\n  16    62 | │  └──────────────────────┘  │  │  └──────────────────────┘  │\n  17    62 | └────────────────────────────┘  └────────────────────────────┘\n✓ no drift\n"
+  },
+  "limits": "Source integrity and script verification do not establish behavior of all replies. Plan field cap was corrected with no runtime change.",
+  "exact_observed_setup_graph_alignment": {
+    "exit_code": 0,
+    "log": "  ln  width | content\n   1    62 | ┌────────────────────────────┐  ┌────────────────────────────┐\n   2    62 | │     Before (SETUP.md)      │  │   Expected after (預期)    │\n   3    62 | ├────────────────────────────┤  ├────────────────────────────┤\n   4    62 | │  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n   5    62 | │  │     orbit launch     │  │  │  │     orbit start      │  │\n   6    62 | │  └──────────────────────┘  │  │  └──────────────────────┘  │\n   7    62 | │              │             │  │              │             │\n   8    62 | │              ▼             │  │              ▼             │\n   9    62 | │  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n  10    62 | │  │     指令執行失敗     │  │  │  │   預覽伺服器啟動     │  │\n  11    62 | │  └──────────────────────┘  │  │  └──────────────────────┘  │\n  12    62 | └────────────────────────────┘  └────────────────────────────┘\n✓ no drift\n",
+    "limit": "Alignment passes, but a large diagram for a one-line wording correction remains a proportionality finding."
+  }
+}

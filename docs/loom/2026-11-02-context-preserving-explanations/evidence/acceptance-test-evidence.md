@@ -1,82 +1,84 @@
 # Context-preserving intent confirmation — acceptance test evidence
 
-Tried on 2026-11-04, in a clean copy of the project at f66da1d9434b1367b88c9cccdc3ef6f27690454d.
-This independent witness did not implement source, repair tests/harnesses, run the full suite, commit, finalize an attestation, or publish.
-The canonical prior documents were copied before replacement to `acceptance-test-report-pre-five-section-i4-historical.md` and `acceptance-test-evidence-pre-five-section-i4-historical.md` in this evidence directory. They remain historical, including superseded criteria and failures.
+Tried on 2026-11-04, in a clean copy of the project at fad3ca007378f9f3b2d56a32e3136b5da4819e0d.
 
-## Setup, exact source identity and execution ownership
+This independent witness implemented no source, repaired no harness, ran no full suite, and produced no commit, attestation or publication. Prior canonical report/evidence were copied verbatim to acceptance-test-report-pre-six-checks-historical.md and acceptance-test-evidence-pre-six-checks-historical.md before replacement. Earlier history is unchanged. The durable six-checks-observed-replies.json retains every actual prompt, final reply, draft, invocation summary, transcript hash and experiment record.
 
-- Read the current confirmed intent and retained plan. Current intent has four five-section Acceptance lines and no retained spec (`needs-design: no`). No instructed skips or dismissed important findings were supplied.
-- Created a clean clone: `git clone --no-hardlinks --no-checkout . /tmp/loom-acceptance-f66da1d9-clean`, then `git checkout --detach f66da1d9434b1367b88c9cccdc3ef6f27690454d`. `git rev-parse HEAD` matched the full tested SHA and `git status --short` was empty.
-- Followed the README local clone/validation route: `agy plugin validate ./loom-code`, `./loom-design`, `./loom-workflow` each returned [ok], with 7/6/14 skills respectively; code included four agents. These validate package loading, not installation into a user's host or automatic runtime selection. README marketplace install targets released main and changes real installed state; it was not used to replace the user's installation.
-- `python3 scripts/sync_codex_manifests.py --check --all` exited 0 in the clean clone.
-- `git diff --stat 60fa5cdb169dc0ac73056e5bb66e1dc08775eeef HEAD` showed only `loom-code/tests/test_write_plan_shape_text.py` (2 insertions, 1 deletion). Independently hashed all 339 candidate-manifest source entries against clean HEAD: all match `source_sha256`. The live snapshot has 337 identical files; two `hooks/hooks.json` files have documented sandbox-command wrappers. An initial assertion that all runtime hashes were identical failed on these two files; it was corrected, not hidden. The wrappers preserve the original command inside sandbox-exec; no other runtime hash mismatch was observed. Public source identity is distinct from isolation adaptations and fresh-clone validation.
-- Independently ran only four focused modules in the clean clone:
-  `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_intent_drafting_fidelity.py loom-code/tests/test_write_plan_shape_text.py loom-code/tests/test_write_plan_station_text.py -q`
-  -> `152 passed in 0.25s`, exit 0. Initial restricted execution could not acquire the existing uv-cache lock; the authorized escalated run succeeded. No source was changed.
-- Full-suite command (station-owned, not rerun by witness): `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. The station reports exit 0 at `/tmp/loom-five-section-package-tests-i4-final.log`; this is handoff provenance, not my own execution. Finalization has not been skipped, but remains conditional on closing important findings. The full automated test suite runs before acceptance and blocks acceptance on failure; passing unit tests cannot resolve conversational wording defects.
-- Primary reused observations: three current-source sessions under `/tmp/loom-five-section-trial-i4`, independently inspected through original prompts, summaries, candidate-manifest, graph outputs, and fixture README/draft. Retained record: `five-section-iteration-4-observed-replies.json`; blinded audit/map files distinguish iteration 4 P01/P02/P03 from historical iteration 3 P04/P05/P06. The latter are comparisons, not current passes.
-- Supplemental diagnostic: `/tmp/loom-five-section-natural-interview-i4`; root ran capture-missing-date, this witness ran exactly the single preregistered `python3 /tmp/loom-five-section-natural-interview-i4/run.py code-missing-date-candidate-r1` (escalated execution for native authentication/nested strict sandbox). No retries. Prompts remove only the orchestration request to preview future confirmation; actual Chinese request/files remain identical. The pair is unmatched, not a new controlled A/B or hidden source iteration. Retained record: `five-section-iteration-4-neutral-wrapper-diagnostic.json`.
-- Both supplemental results returned exactly `claude-sonnet-5-5` in modelUsage; medium explicitly requested. Code cost USD0.1173902; capture USD0.1003863; total USD0.2177765. Code exit0/is_error=false/permission_denials=[]; skill call `loom-code:write-plan`; design skill call `loom-design:capture-intent`. Code has 8 successful hook responses, capture 4; both verify session context and shared card SHA256 `9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c`, unchanged plugin snapshot, no drafts and no fixture commit.
-- Preflight: 14 hook checks and 3 isolation guards passed (private-sentinel read denied, network bind denied, variant write denied). No routing environment override, proxy alias, private-source copy or personal host modification was used. Existing native auth was consumed by the CLI without exposing values. Settings, tools, hooks, prompts and artifact hashes are retained in the diagnostic record. Native CLI explicit skill loading in synthetic fixtures does not establish automatic selection in installed Codex/Claude/Antigravity/OpenCode.
+## Setup, source identity and execution ownership
 
-## 1. Grounded context, scope and confirmation consequences
+- Confirmed current four-line intent, no retained spec (needs-design: no), W3-03 approved six-question edit and one real round. No package-tests/finalize-review skip or dismissed important finding was supplied.
+- Independently created exact-HEAD clean clone using `git clone --no-hardlinks --no-checkout . /tmp/loom-six-checks-acceptance-clean` and `git checkout --detach fad3ca007378f9f3b2d56a32e3136b5da4819e0d`. HEAD matched, status empty.
+- Followed README's local pre-install validation route: `agy plugin validate ./loom-code`, `./loom-design`, `./loom-workflow`: all [ok], 7/6/14 skills; code four agents. `python3 scripts/sync_codex_manifests.py --check --all` exit0. No host installation replaced. This verifies clean package loading, not installed automatic selection.
+- Independently hashed all339 candidate-manifest source files against exact clean HEAD: zero mismatches. Runtime frozen source b536d274b1c7a6b067194562edc910a67145e565 differs from tested HEAD only in plan notes. All339 runtime hashes matched exported snapshot.337 source/runtime hashes identical; only loom-code/hooks/hooks.json and loom-workflow/hooks/hooks.json differ. Read both actual adaptations: original commands remain inside sandbox-exec/bash wrappers; no hook is removed. Manifest lists original commands and both adapted hashes.
+- Own focused command in clean clone: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_intent_drafting_fidelity.py loom-code/tests/test_write_plan_shape_text.py loom-code/tests/test_write_plan_station_text.py -q` ->152 passed in0.23s, exit0. Used escalation for existing locked uv cache; no source changes.
+- Station-owned full-suite command, not rerun by witness: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; handoff exit0 at /tmp/loom-six-checks-package-tests.log. Station-owned adversarial38 pass /tmp/loom-six-checks-adversarial.log. Automated full suite runs before acceptance and blocks acceptance on failure; finalize-review is not skipped, but no new attestation is claimed and conversational failures remain.
+- Five sessions were run by root; this witness personally ran exactly the sixth registered call: `python3 /tmp/loom-six-checks-trial/run.py capture-invoice-default-candidate-r1`, once with escalation for native authentication/nested strict sandbox. No retry or extra model call. Own call exit0/is_error=false/permission_denials=[]; exact returned model claude-sonnet-5-5; medium requested; costUSD0.1434542,10 successful hook responses.
+- Independently inspected all6 original prompts, final replies, generated drafts, verified summaries and snapshot hashes, then reran verify.py on all6. Each exact requested skill observed; all hooks successful with no stderr; session context and exact shared style card present (SHA2569f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c); snapshot unchanged; seed files unchanged; fixture has no commit. Successful hook counts: explicit invoice15, capture date6, code date12, setup8, CSV10, default invoice10.
+- All6 native first-party modelUsage match claude-sonnet-5-5, medium requested. CostsUSD0.1769912/0.0984345/0.1345450/0.1593217/0.1524643/0.1434542 respectively; totalUSD0.8652109. Prior25 calls/USD3.3986898 retained; cumulative31 calls/USD4.2639007.
+- Preflight retains14 hook checks and three true isolation controls: synthetic private read denied, network bind denied, variant write denied. Endpoint/model/provider overrides absent; existing native auth preserved without printing secrets. Public runtime and synthetic fixtures only. Explicit skill invocation is not automatic-trigger evidence.
+- Matched pre-fix observations exist for requested graph and two neutral missing-date wrappers. Other cases expand coverage; do not claim controlled A/B superiority or reliability from one sample per case. Two neutral date prompts omit any request to preview future confirmation.
 
-How I tried it: read complete current invoice wrapper, synthetic README and actual output/draft; compare every substantive claim with supplied facts; inspect both original and neutral unknown-date replies.
+## 1. Grounded context, source boundaries and consequences
 
-What came back: the invoice starts with Cedar Accounts as an internal accounting app and the accounting team's invoice work, then the README-backed direction to preserve export format and prevent cross-customer setting leakage. It retains each customer's own currency, allows different amounts, and preserves existing export files. Missing dates stay unknown; no date, roadmap or project purpose was fabricated. The invoice draft remains open and no implementation/commit occurred.
+All6 replies/drafts compared with original synthetic README, other fixture files and Chinese request. Ready invoice, setup and CSV backgrounds connect actual purpose/current direction/problem/outcome without invented roadmap. Date is never guessed or written. Consent is clearer (row4).
 
-Minor unsupported exclusivity in the new neutral code reply:
-> 只有你知道這個日期是錯的，我沒有任何證據能判斷正確日期是哪天。
+Nit, capture date unsupported certainty:
+> 今天的日期(2026-11-04)是我知道的日期,但它不等於發行日期。用它代替,只會把一個不正確的日期換成另一個。
 
-The second clause accurately preserves the unknown true date; the first claims only the user knows the displayed date is wrong, which the fixture never establishes. Absence of evidence available to the assistant does not show no other person knows. This is a nit grounded in actual wording, not an observed runtime failure or a new confirmation/authorization issue. “你指出目前日期有誤，但正確日期尚無依據” would avoid the unsupported exclusivity. No claim that the diagnostic is entirely fact-addition-free is made.
+Actual date is unknown, so today's date could coincide by chance. The supported claim is no evidence establishes it as the release date, not proof that it differs. This is claim-strength drift, not observed file corruption. Its opening “已確認” is locally about the missing-fact situation; no confirmed intent/file/action was observed.
 
-Boundary: no human comprehension study; current ready code-only branch and unrelated ready cases were not rerun. Confirmation consequences have the important ambiguity in row4. Result: partly.
+Default invoice:
+> 不必再為了幣別錯誤逐張檢查
 
-## 2. Ready five sections and missing-fact interview
+This is explicitly an expected-after table and narrower than historical unqualified “不需逐張檢查”. The fixture supplies the prior-customer currency error and resulting checks, so reduced checks for that bug are a plausible expected benefit. It does not establish all inspections unnecessary. Still, “幣別錯誤” is wider than this particular wrong-customer defect; do not promote the sentence to proof of a blanket runtime guarantee or automatic important failure.
 
-How I tried it: inspect ordered headings in invoice final output and all four unknown-date outputs (two original, two neutral); inspect code diagnostic tool/result controls.
+Separate default wording:
+> 這次沒有刪除或改寫你既有資料的動作，所以沒有需要額外同意的不可逆操作。
 
-What came back: current invoice headings are `背景與目前方向`, `目前的問題與影響`, `要改變什麼`, `範圍與驗收`, `請確認` in order. Natural equivalent headings retain the required five meanings. Unknown-date cases do not force the five-section ready layout, do not guess a date, do not write a draft, and do not request a current yes.
+The source protects existing export files, not every existing datum. The live session indeed made no existing-data changes, so the present-action reading is true. In a future-scope/irreversible-consent paragraph it can imply broader preservation than supplied. Record as a scope ambiguity/nit, without claiming actual deletion, implementation or unauthorized action. The draft itself keeps export-file boundaries. Result partly (date certainty demonstrated; broader implications qualified).
 
-The original wrapper explicitly says “Only capture the intent and explain what I would be confirming.” Therefore “你之後回覆「是」時，確認的是這幾點” is a requested future preview, not itself premature confirmation. The neutral code final reply says:
-> 目前無法更正，因為缺少真正的發行日期。我沒有建立計畫、沒有修改任何檔案，也沒有發布。
+## 2. Five ready sections and interview boundary
 
-It waits for a reliable date/source, states other text is unchanged, and ends:
-> 在那之前，這個變更維持未確認，也不排計畫。
+Ready explicit/default invoice and setup produce five localized sections in required order and meanings. Capture missing date remains an interview with no ready layout, draft or current yes. It correctly waits for evidence.
 
-The neutral capture reply similarly waits for a true date or evidence, with no draft or current confirmation. Both are shorter without the preview request. This supports a wrapper contribution, not a measured causal improvement/reliability claim. No paid retry was made.
+Important observed failure: code-only missing date uses all5 ready sections and offers:
+> B. 現在先確認需求，日期留待之後補
+> 你回覆日期，或選 B 並說「是，這就是我要的」後，我才會繼續。
 
-Boundary: full current ready confirmation only observed through capture-intent; code-only ready behavior, known-date simple request, CSV/new-feature/default-consent branches are not established on source4 by these samples. Old source3 outputs are not carried forward as passes. Result: partly.
+It admits actual release date unknown, writes an open draft with the same unresolved question, yet permits confirmation before that required fact arrives. This neutral wrapper does not request any future-confirmation preview. The confirmed Acceptance2 explicitly requires continued interview and no forced ready layout or early confirmation when necessary facts are missing. No actual confirmation/implementation occurs; the finding concerns the offered user path.
 
-## 3. Proportionate, literal explanation and appropriate diagram
+CSV similarly says:
+> 還差兩個價值面的事實,所以現在還不能請你確認。
 
-How I tried it: inspect actual invoice diagram and source facts, compare current and historical sampled replies without promoting historical results, inspect both alignment outputs and literal terminology.
+Yet prints the complete five ready headings including “請確認”. It ultimately asks the two questions and explicitly waits, so this is premature formatting, not proof of current confirmation/unauthorized progress. The wrapper asks what a later yes means; that conditional future preview alone is not counted as failure. The model itself treats the two facts as necessary; this assessment does not adjudicate whether the workflow should require them. Result partly.
 
-What came back: invoice includes each outer frame, in-diagram before and expected-after titles, and explicit not-yet-verified wording. It no longer says the old unqualified “不需逐張檢查” or that all existing data is preserved. The current graph changes whose currency is used, without promising equal amounts. Unknown-date document correction has no unnecessary diagram.
+## 3. Proportion, diagram appropriateness and literal plain language
 
-The original 22-line graph alignment command exits1: lines18–21 retain trailing padding after the shorter right panel ends. The rstrip-only diagnostic exits0 (“no drift”). Both original and diagnostic artifacts remain preserved in `five-section-iteration-4-graph-verification.json`; this witness inspected the actual graph text. This is a raw verifier/whitespace discrepancy, not evidence of visibly displaced boxes. No original output was edited to manufacture a pass; font/rendering in every user host remains untested.
+Requested explicit invoice graph has two enclosing panels, in-diagram before/expected-after headings and explicit unimplemented/unverified wording. Inspect /tmp/loom-six-checks-trial/invoice-graph.txt and invoice-graph-alignment.log:17 rows, each display width62, verifier “no drift”. No claim every font/host renders identically.
 
-Plain-language assessment of current samples: the business description is literal and identifies actor/action/problem/outcome. No sustained analogy/metaphor or unnecessary invented specialized name was found. This is a bounded observation, not proof of all future outputs. The everyday words “卡住”/“卡關” do not introduce an analogy model. Exact avoidable process terms remain:
-- “狀態是 `open`” and “你確認前,它不會變成 `confirmed`。” expose machine status names instead of simply saying the request awaits confirmation.
-- “也不會推送分支或建立 pull request。” preserves the important publication restriction but leaves the review/upload term unexplained.
-- Neutral code “例如 tag、發布公告或上線紀錄” uses an unexplained existing Git term; “可證明日期的發行紀錄” would suffice.
-- Original capture “我沒有請你確認任何東西，也沒有提到發布。” mentions publication while claiming not to mention it; confusing wording, not an actual publication action.
-These are existing technical/process terms, not proof that a new specialized name was coined. Current invoice repeats format/preservation boundaries across Acceptance and scope; some repetition clarifies tests versus boundaries, but the status inventory adds avoidable length.
+Setup one-line documentation correction includes a full before/expected-after diagram though no graph was requested. It explains command consequences, but the confirmed Acceptance explicitly says not to force charts on text corrections without a process; this is avoidable size, not an invented implementation. Invoice/default/CSV use suitable comparisons or ordinary prose.
 
-Boundary: known-date simple ready confirmation and CSV were not freshly exercised. Result: partly.
+Private inventory persists across cases:
+> 狀態是 `open`
+> status: open
+> 我沒有確認它,沒有建立分支或 commit,也沒有實作或發布。
 
-## 4. Requirement/authorization confirmation only
+Every ready reply exposes its draft path/status, often alongside repeated boundaries. Necessary consent/hold disclosures should remain; machine status/path/commit inventory is not needed to decide the requirement.
 
-How I tried it: compare full wrapper, actual invoice consent paragraph and subsequent held-publication paragraph; inspect available fixture draft/status and tool/result behavior.
+Literal wording check: business descriptions identify actors, action and result; no sustained metaphor or newly coined specialist label observed. Everyday “卡住” is not treated as a new analogy. Existing unexplained “open”, “commit”, “pull request”, “write-spec”, and date “標籤時間” remain avoidable jargon. Source filenames used to identify the actual correction target are necessary referents, unlike internal draft paths. Result partly.
 
-What came back: no request asks the user to judge architecture, technical implementation, specification quality or reviewer conclusions. Explicit publication hold remains: “即使你回覆「是」,也不會推送分支或建立 pull request。” No actual implementation/publication was observed.
+## 4. Requirements and necessary authorization only
 
-Important finding (wording ambiguity, not demonstrated unauthorized action):
-> 你回覆「是」,只代表確認上面的需求範圍和驗收條件,不代表授權實作以外的任何動作。
+No output asks the user to judge implementation architecture, specification quality or review verdicts.
 
-The opening “只代表確認” limits consent, but “實作以外” can imply implementation itself is authorized. The wrapper says later yes confirms intent only. Therefore users cannot confidently tell whether yes also permits implementation, even though the ongoing publication hold is unambiguous. The independent blind semantic audit calls the same sentence material; this witness narrows it to contradictory/ambiguous wording and does not claim the model performed unauthorized work. Close by clearly stating yes confirms requirements only and does not authorize implementation or publication, then verify the actual resulting reply. Result: partly.
+Explicit hold invoice now says:
+> 你的「是」只確認上面這些需求。
+> 你的「是」不會解除發佈暫停：我不會推送分支，也不會建立 pull request，也不會實作。要發佈，你之後必須另外明確授權。
 
-## Re-run on 2026-11-04, at f66da1d9434b1367b88c9cccdc3ef6f27690454d
+This removes the earlier contradictory “實作以外” sentence. Draft retains publication hold. No publication/implementation performed.
 
-All four current intent lines were reassessed; no old verdict was carried over. Current clean-load/focused checks were personally rerun. Three primary current-source calls and one neutral capture call were reused with explicit provenance; exactly one neutral code call was personally run. Runtime source identity was checked separately from test changes and sandbox wrappers. Two old canonical documents are historical snapshots, not current pass evidence. Report results remain partly because the material consent ambiguity is observed and coverage boundaries remain. No new attestation is claimed.
+Default invoice correctly discloses both future non-force branch upload and review-request creation only after review/publication checks, opt-out before publication, separate merge decision. Setup preserves these conditions too. CSV waits for facts and previews later visible-behavior confirmation without asking the user to assess design quality. The code-date early yes issue is row2, not technical-quality approval. Result works over sampled surfaces; not proof of later execution enforcement.
+
+## Re-run on 2026-11-04, at fad3ca007378f9f3b2d56a32e3136b5da4819e0d
+
+All4 current Acceptance rows independently reassessed in full over the6 supplied live surfaces. None carried over as a pass. Own exact-HEAD clean load/focused tests and sixth paid call distinguished from five reused root calls and station-owned suite. Source identity distinguishes339 source files,337 identical runtime files and2 sandbox wrapper files. Findings remain despite green152 tests. Prior report/evidence preserved verbatim as historical pre-six-checks copies, not current results.
