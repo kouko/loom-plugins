@@ -149,3 +149,5 @@ charter: 1.1
 14. user-decided — Authorize at most five additional rounds, including option-guidance ablation and evidence-backed repairs. Retain W3-04/prior attempts. Behavioral actors remain first-party claude-sonnet-5-5, medium requested, regardless of main-model switch. Publication and merge remain held.
 
 15. agent-decided — Round1 only ablates the injected options directive; it does not establish a single cause. Round2 clarifies real-choice applicability in existing visualization guidance, preserving factual interviews and legitimate choices. Workflow guidance needs a minor version bump.
+
+16. agent-decided — Round2 fails the existing 181-word card cap. Round3 compacts both cards within that cap, preserving real-choice scope and earlier obligations; no raised limit, README inflation or weakened tests. Each tested source remains separately recorded.
