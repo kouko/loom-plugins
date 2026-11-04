@@ -6,14 +6,17 @@ before confirmation preparation; the layout and ready examples do not apply.
 The grounding and interview rules remain in `confirmation-template.md`.
 
 Use five sections in this order, translating headings and replacing bracketed
-guidance with natural paragraphs, lists or tables:
+guidance with only necessary, evidence-backed content. A brief sentence can
+suffice for a section; no paragraph or filled purpose/direction/impact/benefit
+slot is required. Keep critical scope, authorization, constraints, consequences
+and required questions even in a short reply:
 
 ```markdown
 ## Background and current direction
-[Relevant project or function purpose and current direction connected to this request.]
+[Known project or function context connected to this request; broader direction only when evidenced and needed.]
 
 ## Current problem and impact
-[Who encounters what problem or limitation, in which situation, with its supplied impact? Define unfamiliar terms by their role.]
+[The supported problem or limitation; include affected people, situation and impact as needed and evidenced. Define necessary unfamiliar terms by their role.]
 
 ## What changes
 [Wanted behavior and its difference from today; include a useful diagram checked for alignment here.]
@@ -104,11 +107,11 @@ The bad reply hides the setting's role, broadens named export-file preservation 
 
 ## Filtered CSV export
 
-Context: accounting staff inspect filtered invoices; the supplied direction is offline use of that same result. They request CSV export of the current filtered result, with invoice number, customer, currency and amount columns, retaining current permissions.
+Context: accounting staff inspect filtered invoices. There is no CSV download of that result. They request CSV export of the current filtered result, with invoice number, customer, currency and amount columns, retaining current permissions. No broader project direction or intended use is supplied.
 
 Good:
 > ### Background and current direction
-> Accounting staff inspect filtered invoices. The stated direction is to make that same result available for offline accounting.
+> Accounting staff inspect filtered invoices; this request concerns exporting that result.
 >
 > ### Current problem and impact
 > They currently cannot download the filtered result as a CSV file.

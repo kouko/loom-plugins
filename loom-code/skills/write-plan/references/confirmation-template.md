@@ -44,9 +44,10 @@ establishes either equality or difference. A confirmation cannot supply that evi
 
 Read the available README or equivalent project overview and relevant current direction
 before composing the opening; read narrowly, not across the whole repository.
-Use established goals, not procedural waivers. Unknown broader direction needs
-no new interview: use known function context and qualify material uncertainty.
-Connect sourced project or function purpose, established direction and this request.
+Connect sourced project or function purpose to this request, including
+established direction or impact only when evidenced and needed. Use established
+goals, not procedural waivers. Unknown broader direction needs no new interview
+or filler disclaimer; state material uncertainty briefly.
 
 Show each fact once, instead of copying Problem/Outcome/Acceptance/Scope fields.
 
@@ -72,8 +73,9 @@ outcome or a required decision or consent using these six questions. Revise the
 offending sentences for the current phase before sending. Keep this check private; do not append the
 questions or a claim that all checks passed to the public reply.
 
-1. Can the user understand the project or function's purpose, current direction
-   and connection to this request, with each claim grounded in available evidence?
+1. Does the known project or function context explain its connection to this
+   request, including broader direction or impact only when evidenced and needed,
+   without filling unsupported purpose, direction, impact or benefit slots?
 2. Do the proposed reply and delivered intent (when written) agree on evidence-backed facts,
    scope boundaries, constraints and guarantees, retaining source targets,
    qualifiers and strength without invented additions?
