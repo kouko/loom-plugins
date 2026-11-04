@@ -151,3 +151,5 @@ charter: 1.1
 15. agent-decided — Round1 only ablates the injected options directive; it does not establish a single cause. Round2 clarifies real-choice applicability in existing visualization guidance, preserving factual interviews and legitimate choices. Workflow guidance needs a minor version bump.
 
 16. agent-decided — Round2 fails the existing 181-word card cap. Round3 compacts both cards within that cap, preserving real-choice scope and earlier obligations; no raised limit, README inflation or weakened tests. Each tested source remains separately recorded.
+
+17. user-decided — Consider template simplification within five rounds. Round4 moves unchanged ready examples into the existing optional gallery, retaining five headings and all obligations. Grounding/six checks stay; tests follow the new resource home without losing assertions.
