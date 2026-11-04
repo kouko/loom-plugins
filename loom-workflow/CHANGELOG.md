@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.20.0] — 2026-11-04 — standardize local document locations in conversation
+
+- Route document-path replies from both visualization cards to shared conversation guidance, retaining their 181-word budget.
+- Require absolute local document paths and supported Markdown targets, including spaces and active worktrees; preserve repository links, structured relative paths and the separate HTML artifact link contract.
+
 ## [5.19.2] — 2026-11-03 — titled before/after flow illustrations
 
 - Add a reusable comparison illustration to the existing linear-flow template, with a title inside each outer frame and corresponding steps aligned where applicable.

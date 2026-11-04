@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.58.0] — 2026-11-04 — resolve conversation document paths against the active worktree
+
+- Require absolute local document locations in user-facing conversation, with absolute Markdown link targets where supported and plain absolute paths otherwise.
+- Resolve the actual document location for the active repository or worktree, preserve spaces, and keep bundled references, stored relative paths and repository document links portable.
+
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 
 - Add human-facing guides for all seven skills, with usage examples, outputs, boundaries and links to their runtime instructions.

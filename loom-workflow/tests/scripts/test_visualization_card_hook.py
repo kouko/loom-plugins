@@ -418,6 +418,17 @@ def test_both_cards_point_at_the_plain_language_guide(card):
     assert GUIDE in card.read_text(encoding="utf-8")
 
 
+@pytest.mark.parametrize("toolkit", [False, True])
+def test_emitted_cards_route_document_paths_to_shared_guidance(env_dirs, toolkit):
+    home, config, project = env_dirs
+    _install(config, [{"scope": "user", "installPath": "/x", "version": "0.6.0"}])
+    _write(config / "settings.json", {"enabledPlugins": {KEY: toolkit}})
+    context = _context(_run(home, project))
+    assert any("document paths" in sentence and "read" in sentence
+               and GUIDE in sentence and not NEGATION.search(sentence)
+               for sentence in _sentences(context))
+
+
 def test_coexist_card_has_no_bare_skip_it():
     """'Skip it' was ambiguous next to the ascii-graph card, so the card must not say it."""
     body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))

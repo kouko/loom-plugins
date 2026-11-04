@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.21.0] — 2026-11-04 — deliver design documents with absolute conversation paths
+
+- Require absolute local document locations in conversation for all five document-producing skills, including standalone invocations.
+- Use supported absolute Markdown targets with short labels or absolute text paths, resolve the active document location, and preserve portable resource references and stored document paths.
+
 ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
 
 - Add human-facing guides for all six skills, including examples, outputs, confirmation points and boundaries.

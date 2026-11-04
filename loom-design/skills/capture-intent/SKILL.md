@@ -7,7 +7,9 @@ version: 1.0.0
 
 ## What this station does
 
-Relative paths in this document are relative to this skill's own directory.
+Relative paths use this skill's directory.
+
+Read `references/conversation-paths.md` before sharing document locations.
 
 Ask only until the wanted outcome is clear, write
 `docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
