@@ -1,0 +1,132 @@
+{
+  "auditor": "b",
+  "original_audit": "audit-b.json",
+  "original_audit_sha256": "a35e4ea5088293bd767c0d96bc1ba31d40e47be21c700eedfb6b565d3ed6a19b",
+  "original_preserved": true,
+  "method": "Focused independent reconsideration of original packet and supplied graph witnesses. No mapping or other audit read. Material error requires evidence excluding reasonable context-limited interpretation; ambiguous phrasing alone is not a demonstrated added prohibition.",
+  "adjudications": [
+    {
+      "record_id": "Z07",
+      "original_issue": "expanded-method-ban",
+      "decision": "downgrade material issue to ambiguity",
+      "quote": "重新產生或修改既有匯出檔",
+      "source": "blind-packet.json#Z07/reply; blind-packet.json#Z07/drafts/Out-of-scope",
+      "reason": "Object is existing export files, not every future output. Recreating/replacing those existing files is naturally encompassed by preserving them. A separate-output regeneration method ban is possible but not demonstrably intended. Original audit inferred too much from the word regeneration.",
+      "retained_ambiguity": "Could be read more broadly than do not rewrite existing files; use original boundary to avoid ambiguity.",
+      "factual_logical_minimum_met_after_adjudication": true,
+      "necessary_context_retained": true,
+      "clarity_status": "Graph composition fails independent verification; recorded separately below, not a factual scope defect."
+    },
+    {
+      "record_id": "Z08",
+      "original_issue": "no-other-files ambiguity",
+      "decision": "retain as ambiguity, no demonstrated material error",
+      "quote": "No other text in SETUP.md changes, and no other file changes.",
+      "source": "blind-packet.json#Z08/drafts/Acceptance/2",
+      "reason": "Read literally as an unrestricted repository invariant, it conflicts with the saved mandatory intent. In task context, it can reasonably mean only the requested implementation/documentation source line changes while workflow records are separate. Reply openly discloses the draft; there is no attempt to claim no file was written. Source request itself says only this one line, so a context-limited acceptance does not clearly enlarge scope.",
+      "retained_ambiguity": "Acceptance does not explicitly exclude required workflow records. This should not be counted as a proven failure without evidence of literal enforcement or broader intended ban.",
+      "factual_logical_minimum_met_after_adjudication": true,
+      "necessary_context_retained": true
+    },
+    {
+      "record_id": "Z01",
+      "original_issue": "absence-broadened ambiguity",
+      "decision": "retain as low-severity wording ambiguity, no material error",
+      "quote": "目前發票列表已能依客戶與日期篩選，但沒有下載資料的功能。",
+      "source": "blind-packet.json#Z01/drafts/Problem",
+      "reason": "The immediately surrounding context is monthly copying from the invoice list and the next Proposed outcome explicitly specifies downloading filtered CSV. Reading this as no CSV download is reasonable shorthand. Literal absence of any other download format is unsupported, but the whole artifact does not demonstrably assert or rely on that broader claim.",
+      "retained_ambiguity": "Could replace shorthand with absence of CSV action; do not count as proven unsupported broad product capability absence.",
+      "factual_logical_minimum_met_after_adjudication": true,
+      "necessary_context_retained": true
+    },
+    {
+      "record_id": "Z04",
+      "original_issue": "confirmation-with-unresolved-required-content",
+      "decision": "retain material issue, narrow anchor to author-declared unresolved required content",
+      "quotes": [
+        "有兩個價值面的資訊你還沒提供,我先列在草稿的未決問題裡,不自己猜:",
+        "你回答之後,我才會把草稿改成已確認。",
+        "以上這份需求是你要的嗎?"
+      ],
+      "source": "blind-packet.json#Z04/reply; blind-packet.json#Z04/drafts/Open-questions; loom-design/skills/capture-intent/SKILL.md#Step-1-Interview",
+      "reason": "Monthly recurrence can supply concrete urgency; absent exact deadline is not automatically a weak urgency answer. One weak displaced-work answer can coexist with GO. Therefore GO itself is not the error. The author nevertheless explicitly declares two missing items as unresolved Open questions that must be answered before confirmation, while presenting ready five-section confirmation and requesting confirmation now. The unchanged owner rule says missing required content keeps interview open and blocks confirmation preparation. If these questions are optional, they should not be represented as blocking required Open questions.",
+      "not_claimed": [
+        "No assumption that urgency necessarily lacks evidence.",
+        "No claim that open status alone conflicts with GO.",
+        "No claim that writing an open draft is already confirmation."
+      ],
+      "factual_logical_minimum_met_after_adjudication": false,
+      "necessary_context_retained": true
+    }
+  ],
+  "graph_clarity_obligations": [
+    {
+      "record_id": "Z04",
+      "source": "blind-graph-verification.json#Z04",
+      "alignment_exit": 1,
+      "alignment_passed": false,
+      "evidence": "line 2: col 62: '│' at display-col 62 connects to nothing vertically\nline 2: col 64: table line display width 63 differs from block width 64\nline 10: col 62: '│' at display-col 62 connects to nothing vertically\nline 10: col 62: seam kink: connector drifts from col 63 to col 62 with no junction glyph\nline 10: col 64: table line display width 63 differs from block width 64",
+      "interpretation": "Visible composition violates alignment obligation; keep as clarity/presentation issue without inferring fact error.",
+      "additional_clarity": "Both states are framed; after state is labeled expected. Z04 uses Now rather than explicit Before/After pair, which is weaker labeling under the confirmed intent."
+    },
+    {
+      "record_id": "Z09",
+      "source": "blind-graph-verification.json#Z09",
+      "alignment_exit": 0,
+      "alignment_passed": true,
+      "evidence": "✓ no drift",
+      "interpretation": "Full framed composition alignment witnessed, not implementation verification.",
+      "additional_clarity": "Requested graph supplied, full before/after titles and expected label."
+    },
+    {
+      "record_id": "Z11",
+      "source": "blind-graph-verification.json#Z11",
+      "alignment_exit": 0,
+      "alignment_passed": true,
+      "evidence": "✓ no drift",
+      "interpretation": "Full framed composition alignment witnessed, not implementation verification.",
+      "additional_clarity": "Requested graph supplied, full before/after titles and expected label."
+    },
+    {
+      "record_id": "Z06",
+      "source": "blind-graph-verification.json#Z06",
+      "alignment_exit": 1,
+      "alignment_passed": false,
+      "evidence": "line 2: col 33: '│' at display-col 33 connects to nothing vertically\nline 2: col 36: '│' at display-col 36 connects to nothing vertically\nline 2: col 66: table line display width 69 differs from block width 66\nline 2: col 68: '│' at display-col 68 connects to nothing vertically",
+      "interpretation": "Visible composition violates alignment obligation; keep as clarity/presentation issue without inferring fact error.",
+      "additional_clarity": "Optional comparison is framed and marked reported/expected but geometry fails."
+    },
+    {
+      "record_id": "Z07",
+      "source": "blind-graph-verification.json#Z07",
+      "alignment_exit": 1,
+      "alignment_passed": false,
+      "evidence": "line 2: col 33: '│' at display-col 33 connects to nothing vertically\nline 2: col 36: '│' at display-col 36 connects to nothing vertically\nline 2: col 66: table line display width 69 differs from block width 66\nline 2: col 68: '│' at display-col 68 connects to nothing vertically\nline 5: col 29: '│' at display-col 29 connects to nothing vertically\nline 5: col 32: '│' at display-col 32 connects to nothing vertically\nline 5: col 32: seam kink: connector drifts from col 31 to col 32 with no junction glyph\nline 5: col 35: '│' at display-col 35 connects to nothing vertically\nline 5: col 35: seam kink: connector drifts from col 34 to col 35 with no junction glyph\nline 5: col 38: '│' at display-col 38 connects to nothing vertically\nline 5: col 58: '│' at display-col 58 connects to nothing vertically\nline 5: col 66: table line display width 68 differs from block width 66\nline 5: col 67: '│' at display-col 67 connects to nothing vertically\nline 6: col 31: seam kink: connector drifts from col 32 to col 31 with no junction glyph\nline 6: col 34: seam kink: connector drifts from col 35 to col 34 with no junction glyph\nline 10: col 29: '│' at display-col 29 connects to nothing vertically\nline 10: col 32: '│' at display-col 32 connects to nothing vertically\nline 10: col 32: seam kink: connector drifts from col 31 to col 32 with no junction glyph\nline 10: col 35: '│' at display-col 35 connects to nothing vertically\nline 10: col 35: seam kink: connector drifts from col 34 to col 35 with no junction glyph\nline 10: col 38: '│' at display-col 38 connects to nothing vertically\nline 10: col 58: '│' at display-col 58 connects to nothing vertically\nline 10: col 66: table line display width 68 differs from block width 66\nline 10: col 67: '│' at display-col 67 connects to nothing vertically\nline 11: col 31: seam kink: connector drifts from col 32 to col 31 with no junction glyph\nline 11: col 34: seam kink: connector drifts from col 35 to col 34 with no junction glyph\nline 15: col 29: '│' at display-col 29 connects to nothing vertically\nline 15: col 32: '│' at display-col 32 connects to nothing vertically\nline 15: col 32: seam kink: connector drifts from col 31 to col 32 with no junction glyph\nline 15: col 35: '│' at display-col 35 connects to nothing vertically\nline 15: col 35: seam kink: connector drifts from col 34 to col 35 with no junction glyph\nline 15: col 38: '│' at display-col 38 connects to nothing vertically\nline 15: col 58: '│' at display-col 58 connects to nothing vertically\nline 15: col 66: table line display width 68 differs from block width 66\nline 15: col 67: '│' at display-col 67 connects to nothing vertically\nline 16: col 31: seam kink: connector drifts from col 32 to col 31 with no junction glyph\nline 16: col 34: seam kink: connector drifts from col 35 to col 34 with no junction glyph",
+      "interpretation": "Visible composition violates alignment obligation; keep as clarity/presentation issue without inferring fact error.",
+      "additional_clarity": "Optional comparison is framed and marked reported/expected but geometry fails."
+    },
+    {
+      "record_id": "Z02",
+      "source": "blind-graph-verification.json#Z02",
+      "alignment_exit": 1,
+      "alignment_passed": false,
+      "evidence": "line 4: col 28: '│' at display-col 28 connects to nothing vertically\nline 4: col 31: '│' at display-col 31 connects to nothing vertically\nline 4: col 58: '│' at display-col 58 connects to nothing vertically\nline 4: col 58: table line display width 59 differs from block width 58\nline 5: col 27: seam kink: connector drifts from col 28 to col 27 with no junction glyph\nline 5: col 30: seam kink: connector drifts from col 31 to col 30 with no junction glyph\nline 5: col 57: seam kink: connector drifts from col 58 to col 57 with no junction glyph\nline 7: col 29: '│' at display-col 29 connects to nothing vertically\nline 7: col 29: seam kink: connector drifts from col 30 to col 29 with no junction glyph\nline 7: col 32: '│' at display-col 32 connects to nothing vertically\nline 7: col 58: table line display width 61 differs from block width 58\nline 7: col 60: '│' at display-col 60 connects to nothing vertically",
+      "interpretation": "Visible composition violates alignment obligation; keep as clarity/presentation issue without inferring fact error.",
+      "additional_clarity": "Command wording fix has no process difference requiring a diagram; unnecessary graph also fails alignment."
+    }
+  ],
+  "revised_summary": {
+    "factual_logical_material_error_records": [
+      "Z03",
+      "Z04",
+      "Z06",
+      "Z09"
+    ],
+    "factual_logical_minimum_met_records": 8,
+    "factual_logical_minimum_total": 12,
+    "necessary_context_not_fully_retained_records": [
+      "Z09"
+    ],
+    "note": "Graph presentation and verbosity assessed separately from factual/logical minimum. No release conclusion."
+  }
+}

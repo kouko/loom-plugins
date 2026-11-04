@@ -143,3 +143,5 @@ charter: 1.1
 11. user-decided — Minimum release criteria are correct content and no internal logical conflict. Prioritize missing-fact confirmation and unsupported certainty over cosmetic wording. Existing five-section/visualization goals remain; publication and merge are still held.
 
 12. user-decided — W3-04 changes the presentation obligation, not the factual/logical minimum or W3-03 retry identity. Five headings remain, but unknown broader context need not be filled or newly interviewed. Preserve reading, required-fact interviews, disclosures, diagram conditions and all earlier evidence.
+
+13. agent-decided — W3-04 trial complete; candidate unaccepted: both variants retain two material-failure cases, only two replies shorten. Preserve observations without tuning for a pass; minimum remains unmet, publication held and attestation stale.
