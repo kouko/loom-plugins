@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "evaluator_role": "fresh blind content and consistency audit",
+  "inputs_read": [
+    "/tmp/loom-correct-consistent-trial/blind-packet.json",
+    "docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+  ],
+  "scope": "Only supplied exact prompts, file contents, replies, drafts, selected command text, controls, and intent. No source, prior judgments, variant mapping or execution of embedded commands.",
+  "minimum_floor_definition": "Minimum factually correct and internally consistent; full intent fulfillment evaluated separately. works does not mean full-contract pass. partly denotes material ambiguity affecting the floor without proof of a false statement.",
+  "records": [
+    {
+      "id": "V01",
+      "minimum_floor": "works",
+      "findings": [],
+      "full_contract_notes": {
+        "five_sections": "Interview exception applies: necessary date absent; no forced five sections or confirmation. It gives file context but not the README purpose/direction; not a completed full-contract confirmation.",
+        "phase_and_confirmation": "Correctly remains unconfirmed. A/C are proposed alternatives rather than assertions of current publication status; C is expressly identified as another placeholder and requires user wording.",
+        "visual": "Table reasonably compares alternatives; no needless date-change diagram.",
+        "plain_language": "Mostly clear; three options include a date-provision option despite the user already saying the date is unknown, so more verbose than necessary."
+      },
+      "verification_limits": "No commands/drafts supplied; no-file-change claim is not independently established by selected commands."
+    },
+    {
+      "id": "V02",
+      "minimum_floor": "works",
+      "findings": [
+        {
+          "quote": "你說過只要捕捉意圖，所以我會維持不實作、不發布，直到你明確解除。",
+          "rationale": "The request explicitly limits this turn to capture and stop. A persistent post-confirmation hold is a conservative interpretation, not an unambiguously supplied ongoing hold. This does not establish unauthorized publication or a factual contradiction.",
+          "possible_plain_rewrite": "這次先整理並確認需求，等你回覆後再說明下一步；若你要持續暫停實作或發布，我也會保留該限制。",
+          "severity": "low",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        },
+        {
+          "quote": "這個 repo 的預設也免除了原則文件。",
+          "rationale": "No defaults content or command output is included for this record. Cannot verify or refute this local-default claim.",
+          "possible_plain_rewrite": "若已讀取的專案預設免除原則文件，可據此說明；否則省略此句。",
+          "severity": "low",
+          "confidence": "high",
+          "evidence_status": "not_verified"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "All five stages in Chinese and correct order; useful project context.",
+        "phase_and_confirmation": "Open draft and no confirmation/implementation; future authorization consequences are somewhat underspecified.",
+        "visual": "Before/problem vs expected after are labeled; no spurious equal-amount condition. Box alignment appears uneven and was not rendered or width-checked here.",
+        "plain_language": "Main business description clear; open/product/needs-design/repo terms add unnecessary mechanics."
+      },
+      "verification_limits": "No selected commands establish defaults or state-change claims."
+    },
+    {
+      "id": "V03",
+      "minimum_floor": "fails",
+      "findings": [
+        {
+          "quote": "Readers are told the wrong date for when that version became available.",
+          "rationale": "The supplied file contains “to be corrected”, not a date. The draft asserts readers receive a wrong date although the established effect is that no actual date is shown. User wording says date is wrong, but inspected content supports the narrower effect.",
+          "possible_plain_rewrite": "The release-date field contains a placeholder, so readers cannot learn the actual release date.",
+          "severity": "medium",
+          "confidence": "high",
+          "evidence_status": "established"
+        },
+        {
+          "quote": "因為還沒確認，我沒有寫計畫，也沒有跑檢查。",
+          "rationale": "The selected command invokes contract --require 2.1, a version/contract validation. “檢查” might mean package/implementation tests rather than every validation; this is scope ambiguity, not proof of knowingly false reporting.",
+          "possible_plain_rewrite": "還沒確認，所以沒有寫計畫或跑實作測試；只確認了工具契約版本。",
+          "severity": "low",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "Missing date justifies interview/block rather than five-section completed confirmation; README purpose is not fully restated.",
+        "phase_and_confirmation": "Correctly blocks confirmation and plan until date/source is available; draft preserves date-only scope.",
+        "visual": "No unnecessary diagram.",
+        "plain_language": "Clear distinction that today might or might not be release day; some process vocabulary."
+      },
+      "verification_limits": "Tool outputs absent: version command proves invocation only, not successful validation or all repository state claims."
+    },
+    {
+      "id": "V04",
+      "minimum_floor": "works",
+      "findings": [],
+      "full_contract_notes": {
+        "five_sections": "Five Chinese stages in order; purpose/direction and business effect grounded.",
+        "phase_and_confirmation": "Explicit ongoing publication hold is correctly preserved in both reply and draft; yes confirms requirements, local branch/intent commit are distinguished from push/PR. Stop-for-response does not itself establish a permanent implementation hold after response.",
+        "visual": "Requested comparison supplied with before and expected-after labels and enclosing frames. No invented amount-equality condition. Alignment not rendered/checked.",
+        "plain_language": "Business explanation is clear; engineering vs product classification is not adjudicable from the allowed packet alone."
+      },
+      "verification_limits": "Selected command lists files/defaults but output absent; no-commit/no-code-change claims not fully independently verified."
+    },
+    {
+      "id": "V05",
+      "minimum_floor": "fails",
+      "findings": [
+        {
+          "quote": "讀者知道日期尚未公布,不會被誤導",
+          "rationale": "This proposed option is hypothetical, but its claimed informational effect is unsupported: an unknown-to-user past release date is not necessarily unpublished or undecided. A TBD label may imply a future undecided date; no basis guarantees readers will not be misled.",
+          "possible_plain_rewrite": "若改成「實際發行日期待查證」，只表示目前還沒有查證日期；不代表尚未發行或尚未公布。",
+          "severity": "medium",
+          "confidence": "high",
+          "evidence_status": "established"
+        },
+        {
+          "quote": "可能比現在的空白更糟",
+          "rationale": "The field is a placeholder rather than literally blank; likely colloquial shorthand, not a material false-fact blocker.",
+          "possible_plain_rewrite": "可能比目前的佔位文字更容易誤導。",
+          "severity": "low",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "Interview exception correctly used; not a completed five-section confirmation.",
+        "phase_and_confirmation": "Correctly avoids inventing date or implementing; proposed wording alternatives themselves are allowed if accurately qualified.",
+        "visual": "Comparison table is appropriate; recommended alternative needs factual correction.",
+        "plain_language": "Generally readable, but 日期未定/尚未公布 collapses distinct facts."
+      },
+      "verification_limits": "No commands/drafts; repository state claims not independently established."
+    },
+    {
+      "id": "V06",
+      "minimum_floor": "works",
+      "findings": [
+        {
+          "quote": "還差兩個價值面的事實",
+          "rationale": "User supplied recurring monthly cost and project direction, so the benefit and cadence are known. Why prioritize now over other work and what gets delayed are not established. Asking those questions is permissible; do not treat all urgency/value as wholly absent.",
+          "possible_plain_rewrite": "每月耗時與預期效益已知；還想了解是否需要優先處理，以及會延後哪項工作。",
+          "severity": "low",
+          "confidence": "high",
+          "evidence_status": "incomplete"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "All five headings appear, but it says confirmation cannot yet occur while using a 請確認 heading and full acceptance restatement. Interview could be shorter; presence of headings alone does not demonstrate all intent goals.",
+        "phase_and_confirmation": "Answer-questions-then-confirm is coherent; “yes only confirms requirements” does not assert yes alone will be accepted. No invented exclusion of existing behavior or amount condition.",
+        "visual": "No visual; CSV action has a short simple flow where a diagram might help, but omission alone is not a floor defect.",
+        "plain_language": "Clear business context; value/GO-NO-GO and process mechanics add jargon."
+      },
+      "verification_limits": "Claims of no DESIGN.md/ui-flows and state claims cannot be checked from command outputs because none supplied."
+    },
+    {
+      "id": "V07",
+      "minimum_floor": "fails",
+      "findings": [
+        {
+          "quote": "今天的日期(2026-11-04)是我知道的日期,但它不等於發行日期。用它代替,只會把一個不正確的日期換成另一個。",
+          "rationale": "No evidence excludes today as the release day. The date is unknown, not known different; the existing value is also a placeholder, not an incorrect calendar day.",
+          "possible_plain_rewrite": "今天是 2026-11-04，但目前不知道發行日是不是今天，因此不能用今天代替。",
+          "severity": "high",
+          "confidence": "high",
+          "evidence_status": "established"
+        },
+        {
+          "quote": "已確認,目前不能更正",
+          "rationale": "Could mean “I verified that it is blocked”, rather than intent confirmed; rest of reply stops. Still needlessly ambiguous given user explicitly has not confirmed change.",
+          "possible_plain_rewrite": "目前確定缺少實際日期，所以先停在需求確認之前。",
+          "severity": "low",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        },
+        {
+          "quote": "到時候我會只改日期欄位,並請你確認。",
+          "rationale": "Sequence sounds like change before confirmation, but no implementation occurred. It is a future-phase wording ambiguity, not demonstrated unauthorized edit.",
+          "possible_plain_rewrite": "取得可靠日期後，我會先整理需求請你確認，再只更正日期欄位。",
+          "severity": "medium",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "Missing-date interview exception applies; no full five-section confirmation expected.",
+        "phase_and_confirmation": "Stops now, but confirmation wording/future sequence need precision.",
+        "visual": "No needless diagram.",
+        "plain_language": "Mostly plain; definitive unknown-date exclusion changes factual meaning."
+      },
+      "verification_limits": "No commands/drafts."
+    },
+    {
+      "id": "V08",
+      "minimum_floor": "works",
+      "findings": [],
+      "full_contract_notes": {
+        "five_sections": "Appropriate interview/block exception; not proof that full five-section confirmation works.",
+        "phase_and_confirmation": "Correctly distinguishes unknown from false: neither today-is-release nor its negation is supported, and yes cannot replace evidence. No plan or business edit shown.",
+        "visual": "No unnecessary text-change diagram.",
+        "plain_language": "Clear and factually careful; a little repetitive."
+      },
+      "verification_limits": "No-file-change claim not contradicted by selected contract invocation; command behavior/output is unavailable, so cannot prove whether invocation creates infrastructure files. Do not infer mutation from command name."
+    },
+    {
+      "id": "V09",
+      "minimum_floor": "partly",
+      "findings": [
+        {
+          "quote": "既有匯出檔的改寫或重新產生。",
+          "rationale": "User prohibited rewriting existing exports. Adding an independent ban on regenerating them can narrow permissible workflows beyond non-overwrite (for example regenerating to a new file). Could also mean overwriting same file; ambiguity prevents categorical proof but preservation boundary changed in wording.",
+          "possible_plain_rewrite": "不改寫修正前已存在的匯出檔；新匯出仍使用所屬客戶設定。",
+          "severity": "medium",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        },
+        {
+          "quote": "## Background and current direction",
+          "rationale": "All five headings are English despite explicit Traditional-Chinese conversation and intent requirement for headings in conversation language. This is full-contract failure, not factual-floor failure.",
+          "possible_plain_rewrite": "## 背景與目前方向",
+          "severity": "low",
+          "confidence": "high",
+          "evidence_status": "established_style"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "Five sections ordered, but headings violate required language. Background gives function/use and current direction adequately.",
+        "phase_and_confirmation": "Natural default has no added capture-only/post-confirmation publication restriction. Reply stops before action but does not clearly say what yes enables afterward; incomplete consequence explanation, not proven permission contradiction.",
+        "visual": "Before/expected-after comparison supplied; boxes visibly uneven, not width-verified. No equal-amount guarantee.",
+        "plain_language": "English headings, intent/open/yes terminology reduce localization and plain-language quality."
+      },
+      "verification_limits": "Actual draft-writing command provided and matches draft. No command output supplied to fully verify commit/state claims."
+    },
+    {
+      "id": "V10",
+      "minimum_floor": "fails",
+      "findings": [
+        {
+          "quote": "readers are told the wrong day this version became available.",
+          "rationale": "Draft converts a placeholder into an asserted incorrect calendar day. Reply accurately says readers cannot see the real date; this creates a reply/draft mismatch.",
+          "possible_plain_rewrite": "The date field is still a placeholder, so readers cannot see the actual release date.",
+          "severity": "medium",
+          "confidence": "high",
+          "evidence_status": "established"
+        },
+        {
+          "quote": "你說「是」只代表確認上面這份需求，不代表同意實作或發布。 / Do not implement or publish before the user confirms.",
+          "rationale": "Reply retains an explicit post-yes hold until separately lifted. Draft records only the weaker pre-confirmation condition, though publication is separately out of scope. A necessary-before condition does not logically authorize after, so no strict contradiction; handoff could lose the implementation hold.",
+          "possible_plain_rewrite": "Do not implement or publish until separately authorized; confirmation of this intent alone does not lift that hold.",
+          "severity": "medium",
+          "confidence": "medium",
+          "evidence_status": "incomplete"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "All five Chinese sections with grounded purpose/direction; actual known date correctly sourced.",
+        "phase_and_confirmation": "Current response correctly stops; future plan after confirmation is compatible with no implementation. Persistent hold interpretation is conservative and not conclusively demanded by prompt; once reply promises it, preserve it consistently.",
+        "visual": "Unnecessary before/after box for a one-line date text correction conflicts with no-forced-diagram goal; extra display spaces could be layout padding, not proof of an intended text mutation.",
+        "plain_language": "Mostly plain; package-tests and open add process detail. Defaults content not provided, so defaults claim unverified."
+      },
+      "verification_limits": "Selected commands include contract and standing invocations; absent outputs do not establish either mutations or successful checks."
+    },
+    {
+      "id": "V11",
+      "minimum_floor": "fails",
+      "findings": [
+        {
+          "quote": "B. 現在先確認需求，日期留待之後補 / 你回覆日期，或選 B 並說「是，這就是我要的」後，我才會繼續。",
+          "rationale": "Necessary outcome is still missing, yet B explicitly permits confirming now with date unresolved. This directly conflicts with intent Acceptance 2: missing necessary facts must remain interview, not premature confirmation. “Acceptance cannot pass yet” does not repair an ungrounded confirmed outcome.",
+          "possible_plain_rewrite": "日期仍未知，現在先不確認需求；取得可靠日期後再請你確認並寫計畫。",
+          "severity": "high",
+          "confidence": "high",
+          "evidence_status": "established"
+        },
+        {
+          "quote": "readers are told the wrong day the version became available.",
+          "rationale": "Actual field is “to be corrected”; it does not tell readers a calendar day. Reply has the more accurate missing-date account.",
+          "possible_plain_rewrite": "The release-date field is a placeholder, so readers cannot learn the actual date.",
+          "severity": "medium",
+          "confidence": "high",
+          "evidence_status": "established"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "Five headings present but missing-date interview exception should prevent the confirmation fork. Structural completeness does not meet substance.",
+        "phase_and_confirmation": "Clear premature-confirmation branch; providing a date alone also does not explicitly confirm requirements, so wording should separate date evidence from human confirmation.",
+        "visual": "Table clarifies a fork that should not be offered under the intent.",
+        "plain_language": "Readable but incorrect phase choice remains a material defect."
+      },
+      "verification_limits": "Contract/version invocation does not prove implementation or publication."
+    },
+    {
+      "id": "V12",
+      "minimum_floor": "works",
+      "findings": [
+        {
+          "quote": "匯出的發票不會多於使用者在列表中本來就能查看的發票。",
+          "rationale": "Likely intended as authorized-record inclusion. Literal “not more than” could mean count, which would not ensure the same authorized records. Reply also says permission unchanged and draft out-of-scope disallows permission expansion, so do not assert demonstrated authorization logic failure.",
+          "possible_plain_rewrite": "CSV 只包含使用者在目前列表中原本就有權查看、且符合所選篩選的發票。",
+          "severity": "medium",
+          "confidence": "medium",
+          "evidence_status": "ambiguous"
+        },
+        {
+          "quote": "你一直沒說明",
+          "rationale": "The prompt gives no displaced-work answer, but “一直” suggests a repeated history of omission not evidenced in this one-turn packet. Small unsupported conversational presupposition; does not change business scope.",
+          "possible_plain_rewrite": "你尚未提供這項資訊。",
+          "severity": "low",
+          "confidence": "medium",
+          "evidence_status": "incomplete"
+        },
+        {
+          "quote": "GO — 能直接省下每月重複的手動作業,且範圍小、不涉及新權限。",
+          "rationale": "Expected reduction follows proposed direct export and the reported manual work, but “scope small” is an assessment without implementation evidence. GO and unresolved opportunity cost can coexist as provisional judgment; cannot infer a gate violation from unavailable source.",
+          "possible_plain_rewrite": "預期可減少每月手動複製；是否優先安排仍待確認會延後的工作。",
+          "severity": "low",
+          "confidence": "medium",
+          "evidence_status": "incomplete"
+        }
+      ],
+      "full_contract_notes": {
+        "five_sections": "All five Chinese sections; background connects team and rules but project purpose/direction is somewhat less explicit than V06. Conditional interview could be shorter.",
+        "phase_and_confirmation": "No internal contradiction: asks answer plus yes; yes-alone is not claimed sufficient. Third option supplies “none” and can be followed by confirmation. Publication hold preserved; continuing capture-only restriction is not assumed.",
+        "visual": "Short current/expected flow is appropriately labeled and does not promise implementation is complete.",
+        "plain_language": "Mostly plain; open/needs-design/DESIGN.md mechanisms and CSV undefined on first use are full-contract style concerns, not established false facts."
+      },
+      "verification_limits": "No selected commands establish absent DESIGN.md or all repository state claims."
+    }
+  ],
+  "summary": {
+    "established_material_floor_failures": [
+      "V03",
+      "V05",
+      "V07",
+      "V10",
+      "V11"
+    ],
+    "material_floor_ambiguity": [
+      "V09"
+    ],
+    "floor_works_with_separate_contract_limits": [
+      "V01",
+      "V02",
+      "V04",
+      "V06",
+      "V08",
+      "V12"
+    ],
+    "strongest_findings": [
+      "V07 incorrectly excludes today as release day.",
+      "V11 explicitly permits intent confirmation before necessary date is known.",
+      "V03/V10/V11 drafts say readers receive a wrong day although field contains a placeholder.",
+      "V05 unsupported unpublished-date interpretation and non-misleading guarantee."
+    ],
+    "limits": [
+      "No overall dogfood pass or reliability rate is assigned.",
+      "Twelve selected records, and any subgroup with n=1 or n=2, cannot establish general reliability or causal effect.",
+      "Commands show invocations, not outputs; no checks claim may use narrower scope than contract-version validation.",
+      "No paid calls, subagents, repository edits, embedded commands, drawing or width rendering performed.",
+      "Technical control metadata alone does not establish semantic correctness or real user comprehension."
+    ]
+  }
+}

@@ -1,0 +1,325 @@
+{
+  "auditor": "fresh blind logic and factual audit",
+  "language": "English for evaluator artifact",
+  "sources": [
+    "/tmp/loom-correct-consistent-trial/blind-packet.json",
+    "docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+  ],
+  "axes": {
+    "A": "Demonstrable factual error, unsupported certainty, or internal logical conflict; minimum-floor blockers distinct from ambiguity.",
+    "B": "Original structure, style, phase, scope and consent coverage; failure need not imply false content."
+  },
+  "result_vocabulary": {
+    "works": "No demonstrated content floor defect in visible evidence; not universal runtime verification.",
+    "partly": "Ambiguity prevents a confident unqualified floor pass.",
+    "fails": "At least one supported minimum-floor blocker.",
+    "notverified": "Insufficient evidence to assess the relevant content."
+  },
+  "records": [
+    {
+      "id": "V01",
+      "minimum_floor": "works",
+      "original_criteria": "partly",
+      "floor_rationale": "Correctly blocks confirmation and separates unknown date from false date; no demonstrable false assertion or internal contradiction in visible reply.",
+      "findings": [
+        {
+          "axis": "B",
+          "quote": "C. 先顯示明確的「尚未確定」字樣",
+          "support": "Request: 請只更正顯示的發行日期; actual date unknown.",
+          "rationale": "An additional interim-wording proposal exceeds the requested true-date correction, but it is explicitly a choice and explicitly called another placeholder; it does not pretend the original correction is ready.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "例如「發行日期：待確認」",
+          "support": "Existing line: Release date: to be corrected",
+          "rationale": "The sample also translates the label if applied literally; this would need a newly agreed scope. It has not been implemented.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V02",
+      "minimum_floor": "partly",
+      "original_criteria": "partly",
+      "floor_rationale": "Business facts, acceptance and expected diagram agree. The duration of the wrapper restriction prevents an unqualified floor pass; do not infer an actual unauthorized action.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "你說過只要捕捉意圖，所以我會維持不實作、不發布，直到你明確解除。",
+          "support": "Wrapper: Only capture the intent ... Stop for my response ... Do not implement now.",
+          "rationale": "The wrapper can reasonably mean a current-turn restriction or a continuing task restriction. The reply selects the continuing interpretation and attributes it to the user. This is ambiguous scope attribution rather than a confidently demonstrated factual error.",
+          "severity": "ambiguity"
+        },
+        {
+          "axis": "B",
+          "quote": "你的「是」只確認上面的需求範圍。",
+          "support": "Reply does not explain branch/commit or ordinary post-confirmation publication consequences.",
+          "rationale": "Coverage of what confirmation changes is incomplete under the current-phase reading; no actual unauthorized publication is shown.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V03",
+      "minimum_floor": "fails",
+      "original_criteria": "partly",
+      "floor_rationale": "Public missing-date reasoning is sound, including the explicit possibility that today equals the release date. The saved Problem contains a demonstrable inaccurate impact statement.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "Readers are told the wrong date for when that version became available.",
+          "support": "Draft Problem; provided RELEASE_NOTES.md: Release date: to be corrected",
+          "rationale": "The artifact supplies no calendar date. Readers lack the date; they are not told a different calendar day. The reply itself correctly says the real date is unknown, so the draft misstates the actual observable defect.",
+          "severity": "blocker"
+        },
+        {
+          "axis": "B",
+          "quote": "因為還沒確認，我沒有寫計畫，也沒有跑檢查。",
+          "support": "Selected command: loom-python --repair contract --require 2.1",
+          "rationale": "A contract-version invocation is visible, but “checks” can mean implementation checks. With no execution result or semantics supplied, this is not sufficient to call the self-report false. Wording could distinguish contract setup from implementation checks.",
+          "severity": "clarity"
+        }
+      ]
+    },
+    {
+      "id": "V04",
+      "minimum_floor": "works",
+      "original_criteria": "works",
+      "floor_rationale": "All material scenario facts and the explicit continuing publication boundary align; no shown action contradicts the self-report.",
+      "findings": [
+        {
+          "axis": "B",
+          "quote": "你回「是」只代表確認上述需求 ... 建立分支並提交這份意圖文件,再交給下一階段。",
+          "support": "Explicit publication hold persists after confirmation; reply says no push or PR until separately lifted.",
+          "rationale": "Reply distinguishes a local intent commit from publication, states expected graph results, and preserves the explicit hold. The current capture-only wrapper can limit this turn; the announced next phase is not proof of breaching an ongoing implementation hold.",
+          "severity": "satisfied"
+        }
+      ]
+    },
+    {
+      "id": "V05",
+      "minimum_floor": "fails",
+      "original_criteria": "partly",
+      "floor_rationale": "Appropriately refuses to invent a calendar date, but its recommended replacement comes with unsupported factual meaning and certainty about reader understanding.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "讀者知道日期尚未公布,不會被誤導",
+          "support": "Option A proposes Release date: TBD; user only knows that the real release date is unknown to them.",
+          "rationale": "Unknown historical release date does not establish that a date has not been announced. TBD may suggest an undecided future date; the categorical promise that readers will not be misled is unsupported. The defect is the asserted meaning/guarantee, not merely offering an alternative.",
+          "severity": "blocker"
+        },
+        {
+          "axis": "B",
+          "quote": "A. 明確標示日期未定 ... 建議",
+          "support": "Request asks to correct the actual date only.",
+          "rationale": "Recommends an interim placeholder outcome rather than waiting for the true date. It is explicitly a new choice, not a claim that the original date correction is ready.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V06",
+      "minimum_floor": "works",
+      "original_criteria": "partly",
+      "floor_rationale": "Visible project facts are grounded, missing urgency/displacement are explicitly unknown, proposed CSV benefit is a proposed outcome. No demonstrated floor error or contradiction.",
+      "findings": [
+        {
+          "axis": "B",
+          "quote": "還差兩個價值面的事實,所以現在還不能請你確認。",
+          "support": "Later: 回覆「是」之前,我需要你先回答兩個問題; 答完後我會請你確認需求是否正確。",
+          "rationale": "The conditional confirmation is consistent: missing information must arrive first. It is not an offer to confirm without required information. However the full five-section confirmation scaffold is premature while it says it remains in interview; Acceptance 2 calls for staying in interview.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "你回覆「是」,只代表你確認上面這份需求。",
+          "support": "Later explains write-spec and local branch/commit, but says nothing about continuing publication control.",
+          "rationale": "Missing future publication disclosure is a coverage issue only. The wrapper has current-phase and ongoing-scope readings; no actual publication is evidenced.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V07",
+      "minimum_floor": "fails",
+      "original_criteria": "partly",
+      "floor_rationale": "Decisive unsupported certainty: unknown date is treated as certainly different from today.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "今天的日期(2026-11-04)是我知道的日期,但它不等於發行日期。用它代替,只會把一個不正確的日期換成另一個。",
+          "support": "User says actual date is unknown; RELEASE_NOTES.md contains a placeholder.",
+          "rationale": "No evidence establishes inequality with today. Today may or may not be the actual date. It also incorrectly treats the placeholder as a wrong calendar date and guarantees replacing it with today would be wrong.",
+          "severity": "blocker"
+        },
+        {
+          "axis": "B",
+          "quote": "已確認,目前不能更正",
+          "support": "No intent has been confirmed; no draft exists.",
+          "rationale": "Opening could mean “I have verified the blockage,” so it is not conclusive false status; nevertheless the phrase is needlessly ambiguous at an intent confirmation point.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "到時候我會只改日期欄位,並請你確認。",
+          "support": "User: I have not confirmed any change. Do not implement or publish.",
+          "rationale": "Sequence wording suggests editing then confirming; it should explicitly keep confirmation before modification. No such modification is shown.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V08",
+      "minimum_floor": "works",
+      "original_criteria": "works",
+      "floor_rationale": "No forced five-part confirmation; stays blocked on the missing fact and announces confirmation before the future edit.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "沒有證據能證明發行日就是今天，也沒有證據能證明不是。你說「是」也不能代替證據。",
+          "support": "Actual release date unknown; no release record.",
+          "rationale": "Accurately distinguishes uncertainty, confirmation and evidence; stops before plan or date edits.",
+          "severity": "satisfied"
+        },
+        {
+          "axis": "B",
+          "quote": "沒有改任何檔案",
+          "support": "Selected command invokes contract --require 2.1 and read-only inspections; packet has no draft.",
+          "rationale": "The --repair wrapper alone does not establish file mutation or contradiction. No command output is supplied to verify broader filesystem self-report.",
+          "severity": "verification_limit"
+        }
+      ]
+    },
+    {
+      "id": "V09",
+      "minimum_floor": "works",
+      "original_criteria": "partly",
+      "floor_rationale": "Business facts and expected outcome align. English headings and incomplete consequence explanation violate original obligations without themselves making the content false.",
+      "findings": [
+        {
+          "axis": "B",
+          "quote": "## Background and current direction",
+          "support": "Confirmed intent Acceptance 2: headings use conversation language.",
+          "rationale": "Five sections are ordered, but all five headings are English in a Traditional Chinese response.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "既有匯出檔的改寫或重新產生。",
+          "support": "User prohibits rewriting existing files, not generating a new export from existing invoice data.",
+          "rationale": "Adding “重新產生” risks a broader exclusion than requested. It is a proposed scope exclusion rather than an assertion of current fact; clarify whether it only means overwriting.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "你的「yes」只確認以上需求範圍 ... 你回覆之前,我不會提交、推送或開 PR。",
+          "support": "Natural-default wrapper has no ongoing publication hold.",
+          "rationale": "Explains only the before-confirmation boundary; omits what a yes permits after confirmation. This is consent coverage, not evidence it published or claimed a user-imposed permanent hold.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V10",
+      "minimum_floor": "fails",
+      "original_criteria": "partly",
+      "floor_rationale": "The known date is validly sourced and is not inferred from the clock. Floor failure concerns the saved current-state impact claim, not the date.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "readers are told the wrong day this version became available.",
+          "support": "Draft Problem; actual displayed value is to be corrected.",
+          "rationale": "Placeholder omits the day rather than telling a wrong calendar day. Public reply correctly describes that readers cannot see the true day, so the stored factual problem statement is inaccurate.",
+          "severity": "blocker"
+        },
+        {
+          "axis": "B",
+          "quote": "你說「是」只代表確認上面這份需求，不代表同意實作或發布 ... 直到你明確解除。",
+          "support": "Draft constraint: Do not implement or publish before the user confirms; draft Out of scope: Publication of the change.",
+          "rationale": "Public reply selects a continuing implementation hold; the generic draft constraint is weaker but does not positively authorize post-confirmation implementation. Combined with publication out of scope this is not a proven direct logical contradiction, though durable consent wording should match.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "依這個 repo 的預設（package-tests: none），我停在確認之前。",
+          "support": "Selected commands read KICKOFF-DEFAULTS.md but outputs are not supplied.",
+          "rationale": "The actual default is not verifiable from this packet. Even if true, absence of package tests is not the reason user confirmation is pending; this causal explanation is misleading or at least unclear.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "┌─ 目前 ... 預期（尚未修改）",
+          "support": "Confirmed intent Acceptance 3: no forced diagrams for non-flow text corrections.",
+          "rationale": "Simple date replacement has an unnecessary diagram. The supplied release record directly supports 2026-11-04; its equality to today is not a blocker.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V11",
+      "minimum_floor": "fails",
+      "original_criteria": "fails",
+      "floor_rationale": "Public reply keeps the actual date unknown, but the draft has a false impact statement and the original confirmation rule is separately breached.",
+      "findings": [
+        {
+          "axis": "A",
+          "quote": "readers are told the wrong day the version became available.",
+          "support": "Draft Problem; provided displayed date is to be corrected.",
+          "rationale": "No calendar day is currently displayed. This misstates missing information as a wrong day communicated to readers.",
+          "severity": "blocker"
+        },
+        {
+          "axis": "B",
+          "quote": "B. 現在先確認需求，日期留待之後補",
+          "support": "Confirmed intent Acceptance 2: 必要事實不足時維持訪談 ... 不能 ... 提前要求確認。",
+          "rationale": "Offers explicit confirmation while the essential correction date remains missing. This violates the original phase contract; it does not fabricate a date or itself create a factual contradiction.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "你回覆日期，或選 B 並說「是，這就是我要的」後，我才會繼續。",
+          "support": "Actual date still unknown under option B.",
+          "rationale": "The two branches differ: date supplied can resolve the factual gap, but B expressly bypasses it. Do not conflate the safe conditional branch with B.",
+          "severity": "issue"
+        }
+      ]
+    },
+    {
+      "id": "V12",
+      "minimum_floor": "works",
+      "original_criteria": "partly",
+      "floor_rationale": "Facts, proposed CSV behavior and access constraints agree; no categorical claim that implementation already saves time. The provisional value assessment and conditional confirmation are workflow-quality concerns, not demonstrated content falsehood.",
+      "findings": [
+        {
+          "axis": "B",
+          "quote": "草稿因此還不能轉為已確認 ... 回答上面的問題,並說「是」。",
+          "support": "Displacement question must be answered first; proposed alternatives include correcting the summary.",
+          "rationale": "This is conditional confirmation after missing information is supplied, not confirmation despite its absence. Nevertheless the full confirmation scaffold is premature while the record remains in interview under Acceptance 2.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "急迫性:每月對帳都會遇到 ... GO — 能直接省下每月重複的手動作業,且範圍小、不涉及新權限。",
+          "support": "Draft Value case also says 取代的工作:使用者尚未說明.",
+          "rationale": "A monthly recurring problem supports frequency, not a proven now-versus-later priority. GO can be a provisional agent judgment while user confirmation remains blocked, so it is not logically impossible; it should explicitly be provisional and keep urgency unresolved.",
+          "severity": "issue"
+        },
+        {
+          "axis": "B",
+          "quote": "你說過不要發佈,所以我會維持這個限制 ... 不包含推送分支或開 PR。",
+          "support": "Wrapper: Only capture ... Stop for my response ... Do not implement or publish.",
+          "rationale": "Continuing publication hold is a reasonable conservative reading of this wrapper. It is not a proven false attribution. Consequence coverage omits branch/commit, though it explains write-spec.",
+          "severity": "issue"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Blind packet contains selected commands, not all execution results. Hidden KICKOFF-DEFAULTS, DESIGN absence, file mutations and broad self-reports cannot all be independently verified. This does not turn unknown claims into false claims.",
+    "Drafts are included in content correctness. Repeated “readers are told the wrong day” findings concern the saved draft; public replies often correctly explain an absent date. If the minimum is narrowed to public reply only, V03 and V11 would lose this A blocker, and V10 would require separate assessment of its unclear causal default explanation.",
+    "No map, source variants, old audits, embedded commands, paid services or repo edits used. No overall dogfood pass assigned.",
+    "Twelve randomized records and small repeated cases do not establish statistical or causal effects. Exact QA model identity cannot be observed from inherited agent identity."
+  ]
+}

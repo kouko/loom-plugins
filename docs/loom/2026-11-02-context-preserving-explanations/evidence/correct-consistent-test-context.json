@@ -1,0 +1,590 @@
+{
+  "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+  "main_cases": {
+    "capture-invoice": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "capture-csv": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。"
+    },
+    "code-setup": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Orbit Preview\n\nOrbit Preview is a local website preview tool. Its setup guide helps a new contributor start the existing preview server.\n\n## Current direction\nKeep the getting-started instructions accurate without changing the preview tool's behavior. The verified command for the existing installed version is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。"
+    },
+    "capture-invoice-default": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "conditional-consent-positive-control-no-matched-baseline",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "capture-missing-date": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n",
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+    },
+    "capture-invoice-explicit-hold-graph": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。",
+      "candidate_only": true,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n"
+    },
+    "code-missing-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "code-known-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n",
+        "RELEASE_RECORD.md": "# Release record\n\nLatest release date: 2026-11-04\nVerified release-publication metadata for this synthetic project.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    }
+  },
+  "main_experiment": {
+    "authorization_source": {
+      "quote": "最低標是內容不能有錯以及內容不能有邏輯衝突；對 請繼續迭代吧",
+      "scope": "Approved five-section iteration and realistic isolated validation; no publication or merge."
+    },
+    "source_versions": {
+      "baseline": "b536d274b1c7a6b067194562edc910a67145e565",
+      "candidate": "c4b639137b4d092b9d0e97400b1748f51d46dd17"
+    },
+    "schedule": [
+      {
+        "key": "code-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-csv-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-csv",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "retained-request-candidate-rerun"
+      },
+      {
+        "key": "code-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 2,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 2,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "code-known-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-known-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today"
+      },
+      {
+        "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-explicit-hold-graph",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request"
+      },
+      {
+        "key": "capture-invoice-default-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-default",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "conditional-consent-positive-control-no-matched-baseline"
+      }
+    ],
+    "sessions": 8,
+    "repeats": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "destination": "Anthropic through existing first-party native Claude Code authentication",
+    "estimated_total_usd": "about 5.16-5.66 including all prior phases",
+    "estimated_new_phase_usd": "0.9-1.4",
+    "prior_cli_cost_usd": 4.2639007,
+    "prior_completed_sessions": 31,
+    "estimated_cumulative_range_usd": [
+      5.1639007,
+      5.6639007
+    ],
+    "per_session_estimate_threshold_usd": 0.5,
+    "hard_cap": false,
+    "previous_artifacts": {
+      "root": "/private/tmp/loom-five-section-trial",
+      "experiment": "/private/tmp/loom-five-section-trial/experiment.json",
+      "baseline_results": [
+        "/private/tmp/loom-five-section-trial/capture-invoice-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/capture-csv-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/code-setup-baseline-r1.summary.json"
+      ],
+      "preparation_history": "/private/tmp/loom-five-section-trial/preparation-attempts",
+      "initial_failed_preflight": "/private/tmp/loom-five-section-trial/preflight-attempt-01.json",
+      "iteration_2": "/private/tmp/loom-five-section-trial-i2",
+      "explicit_hold_diagnostic": "/private/tmp/loom-five-section-explicit-hold",
+      "wrapper_audit": "/tmp/loom-five-section-wrapper-audit.json",
+      "iteration_3": "/private/tmp/loom-five-section-trial-i3",
+      "iteration_4": "/private/tmp/loom-five-section-trial-i4",
+      "six_check_baseline": "/private/tmp/loom-six-checks-trial",
+      "neutral_diagnostic_4": "/private/tmp/loom-five-section-natural-interview-i4",
+      "pre_fix_results": [
+        "/private/tmp/loom-five-section-trial-i3/capture-invoice-explicit-hold-graph-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/capture-missing-date-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/code-missing-date-candidate-r1.summary.json"
+      ]
+    },
+    "controls": "Eight preregistered calls: each unchanged neutral missing-date entry twice, unchanged CSV, explicit-hold graph and default-publication controls once; one added code-known-date control with supplied verified date equal to fixture today2026-11-04. Never infer unknown means unequal or incorrect. No target checklist/failure/structure hints in prompts. Scripts and isolation unchanged.",
+    "scope": "Public tracked plugin runtime snapshots and synthetic fixtures only. Original plugin hooks retained with identical isolation wrappers. No actor implementation, publication, private data or source edits.",
+    "limits": "Two runs per unknown-date entry and one per other case remain exploratory, not statistical reliability. Known-date is unmatched new positive control; other exact previous fixtures/outputs retained. All31 previous calls and USD4.2639007 retained. No paid baseline rerun or failure replacement.",
+    "routing_env_policy": "Refuse inherited endpoint/model/provider overrides; never read or print credential values. Preserve native authentication."
+  },
+  "supplement_cases": {
+    "capture-invoice-natural-default": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    }
+  },
+  "supplement_experiment": {
+    "authorization_source": {
+      "quote": "最低標是內容不能有錯以及內容不能有邏輯衝突；對 請繼續迭代吧",
+      "scope": "Approved five-section iteration and realistic isolated validation; no publication or merge."
+    },
+    "source_versions": {
+      "baseline": "b536d274b1c7a6b067194562edc910a67145e565",
+      "candidate": "c4b639137b4d092b9d0e97400b1748f51d46dd17"
+    },
+    "schedule": [
+      {
+        "key": "capture-invoice-natural-default-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-natural-default",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope"
+      }
+    ],
+    "sessions": 1,
+    "repeats": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "destination": "Anthropic through existing first-party native Claude Code authentication",
+    "estimated_total_usd": "about 5.36-5.46 including all prior phases",
+    "estimated_new_phase_usd": "0.1-0.2",
+    "prior_cli_cost_usd": 5.2559063,
+    "prior_completed_sessions": 39,
+    "estimated_cumulative_range_usd": [
+      5.3559063,
+      5.4559063
+    ],
+    "per_session_estimate_threshold_usd": 0.5,
+    "hard_cap": false,
+    "previous_artifacts": {
+      "root": "/private/tmp/loom-five-section-trial",
+      "experiment": "/private/tmp/loom-five-section-trial/experiment.json",
+      "baseline_results": [
+        "/private/tmp/loom-five-section-trial/capture-invoice-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/capture-csv-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/code-setup-baseline-r1.summary.json"
+      ],
+      "preparation_history": "/private/tmp/loom-five-section-trial/preparation-attempts",
+      "initial_failed_preflight": "/private/tmp/loom-five-section-trial/preflight-attempt-01.json",
+      "iteration_2": "/private/tmp/loom-five-section-trial-i2",
+      "explicit_hold_diagnostic": "/private/tmp/loom-five-section-explicit-hold",
+      "wrapper_audit": "/tmp/loom-five-section-wrapper-audit.json",
+      "iteration_3": "/private/tmp/loom-five-section-trial-i3",
+      "iteration_4": "/private/tmp/loom-five-section-trial-i4",
+      "six_check_baseline": "/private/tmp/loom-six-checks-trial",
+      "correct_consistent_round": "/private/tmp/loom-correct-consistent-trial",
+      "neutral_diagnostic_4": "/private/tmp/loom-five-section-natural-interview-i4",
+      "pre_fix_results": [
+        "/private/tmp/loom-five-section-trial-i3/capture-invoice-explicit-hold-graph-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/capture-missing-date-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/code-missing-date-candidate-r1.summary.json"
+      ]
+    },
+    "controls": "One separately registered natural-default diagnostic. Same invoice request and README as prior default control, same source/tools/hooks/model/effort. Wrapper retains explicit skill, language, synthetic context and not-yet-confirmed state, removing capture-only/future-preview/current-implementation wording; it adds no expected-consent or structure instruction. All previous8 observations remain unchanged.",
+    "scope": "Public tracked plugin runtime snapshots and synthetic fixtures only. Original plugin hooks retained with identical isolation wrappers. No actor implementation, publication, private data or source edits.",
+    "limits": "One unmatched fixture-validity diagnostic, not a source improvement comparison or replacement passing result.39 prior calls/costUSD5.2559063 retained. Does not establish general default-consent reliability or actual post-confirmation publication behavior.",
+    "routing_env_policy": "Refuse inherited endpoint/model/provider overrides; never read or print credential values. Preserve native authentication."
+  },
+  "preflight": [
+    {
+      "variant_results": {
+        "baseline": {
+          "passed": true,
+          "source_commit": "b536d274b1c7a6b067194562edc910a67145e565",
+          "hooks": [
+            {
+              "plugin": "loom-code",
+              "event": "SessionStart",
+              "matcher": "startup|clear|compact",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"You have loom-code. Software-development work runs through stations, one artifact each.\\n\\nStation order: capture-intent → write-spec → write-plan → build → closing-review → ship; maintain on alerts.\\n\\nAny software-development request that adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; maintain takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.\\n\\nYou ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:\\n① after the intent is written (capture-intent / write-plan) — restate the problem and the acceptance conditions in plain words and get \\\"yes, this is what I want\\\"; fold a missing-principles interview, any `second-vendor: ask` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.\\n② only for a product change, after the spec is written (write-spec) — read back the visible behaviour (\\\"you type X, you see Y\\\") and get \\\"yes\\\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.\\n③ at the end (ship) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.\\n\\nNever ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.\\n\\nWith `second-vendor: suggest`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.\\n\\nThe full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: capture-intent, or write-plan when loom-design is not installed. Load it there; it is not repeated here.\\n\\nThis repo's standing defaults (docs/loom/KICKOFF-DEFAULTS.md):\\n- second-vendor: suggest — synthetic fixture default (2026-11-04)\\n- standing-docs: waived — synthetic intake fixture (2026-11-04)\\n- package-tests: none — capture intent and stop before confirmation (2026-11-04)\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PreToolUse",
+              "matcher": "Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PostToolUse",
+              "matcher": "Skill|Agent",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PostToolUse\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}, \"additional_context\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}\n",
+              "context_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit|Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            }
+          ],
+          "fixture_key": "capture-missing-date-candidate-r1"
+        },
+        "candidate": {
+          "passed": true,
+          "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+          "hooks": [
+            {
+              "plugin": "loom-code",
+              "event": "SessionStart",
+              "matcher": "startup|clear|compact",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"You have loom-code. Software-development work runs through stations, one artifact each.\\n\\nStation order: capture-intent → write-spec → write-plan → build → closing-review → ship; maintain on alerts.\\n\\nAny software-development request that adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; maintain takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.\\n\\nYou ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:\\n① after the intent is written (capture-intent / write-plan) — restate the problem and the acceptance conditions in plain words and get \\\"yes, this is what I want\\\"; fold a missing-principles interview, any `second-vendor: ask` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.\\n② only for a product change, after the spec is written (write-spec) — read back the visible behaviour (\\\"you type X, you see Y\\\") and get \\\"yes\\\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.\\n③ at the end (ship) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.\\n\\nNever ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.\\n\\nWith `second-vendor: suggest`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.\\n\\nThe full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: capture-intent, or write-plan when loom-design is not installed. Load it there; it is not repeated here.\\n\\nThis repo's standing defaults (docs/loom/KICKOFF-DEFAULTS.md):\\n- second-vendor: suggest — synthetic fixture default (2026-11-04)\\n- standing-docs: waived — synthetic intake fixture (2026-11-04)\\n- package-tests: none — capture intent and stop before confirmation (2026-11-04)\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PreToolUse",
+              "matcher": "Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PostToolUse",
+              "matcher": "Skill|Agent",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PostToolUse\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}, \"additional_context\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}\n",
+              "context_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit|Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            }
+          ],
+          "fixture_key": "capture-missing-date-candidate-r1"
+        }
+      },
+      "isolation": {
+        "synthetic_private_read_denied": true,
+        "network_bind_denied": true,
+        "variant_write_denied": true,
+        "network_probe_exit": 77,
+        "network_probe_stderr": ""
+      },
+      "profile_sha256": "804d2302d5c374b9197d42d7af11177d58aaaf6d842f2f669d40da59c84caeb8"
+    },
+    {
+      "variant_results": {
+        "baseline": {
+          "passed": true,
+          "source_commit": "b536d274b1c7a6b067194562edc910a67145e565",
+          "hooks": [
+            {
+              "plugin": "loom-code",
+              "event": "SessionStart",
+              "matcher": "startup|clear|compact",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"You have loom-code. Software-development work runs through stations, one artifact each.\\n\\nStation order: capture-intent → write-spec → write-plan → build → closing-review → ship; maintain on alerts.\\n\\nAny software-development request that adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; maintain takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.\\n\\nYou ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:\\n① after the intent is written (capture-intent / write-plan) — restate the problem and the acceptance conditions in plain words and get \\\"yes, this is what I want\\\"; fold a missing-principles interview, any `second-vendor: ask` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.\\n② only for a product change, after the spec is written (write-spec) — read back the visible behaviour (\\\"you type X, you see Y\\\") and get \\\"yes\\\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.\\n③ at the end (ship) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.\\n\\nNever ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.\\n\\nWith `second-vendor: suggest`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.\\n\\nThe full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: capture-intent, or write-plan when loom-design is not installed. Load it there; it is not repeated here.\\n\\nThis repo's standing defaults (docs/loom/KICKOFF-DEFAULTS.md):\\n- second-vendor: suggest — synthetic fixture default (2026-11-04)\\n- standing-docs: waived — synthetic intake fixture (2026-11-04)\\n- package-tests: none — capture intent and stop before confirmation (2026-11-04)\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PreToolUse",
+              "matcher": "Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PostToolUse",
+              "matcher": "Skill|Agent",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PostToolUse\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}, \"additional_context\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}\n",
+              "context_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit|Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            }
+          ],
+          "fixture_key": "capture-invoice-natural-default-candidate-r1"
+        },
+        "candidate": {
+          "passed": true,
+          "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+          "hooks": [
+            {
+              "plugin": "loom-code",
+              "event": "SessionStart",
+              "matcher": "startup|clear|compact",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"You have loom-code. Software-development work runs through stations, one artifact each.\\n\\nStation order: capture-intent → write-spec → write-plan → build → closing-review → ship; maintain on alerts.\\n\\nAny software-development request that adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; maintain takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.\\n\\nYou ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:\\n① after the intent is written (capture-intent / write-plan) — restate the problem and the acceptance conditions in plain words and get \\\"yes, this is what I want\\\"; fold a missing-principles interview, any `second-vendor: ask` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.\\n② only for a product change, after the spec is written (write-spec) — read back the visible behaviour (\\\"you type X, you see Y\\\") and get \\\"yes\\\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.\\n③ at the end (ship) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.\\n\\nNever ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.\\n\\nWith `second-vendor: suggest`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.\\n\\nThe full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: capture-intent, or write-plan when loom-design is not installed. Load it there; it is not repeated here.\\n\\nThis repo's standing defaults (docs/loom/KICKOFF-DEFAULTS.md):\\n- second-vendor: suggest — synthetic fixture default (2026-11-04)\\n- standing-docs: waived — synthetic intake fixture (2026-11-04)\\n- package-tests: none — capture intent and stop before confirmation (2026-11-04)\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PreToolUse",
+              "matcher": "Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-code",
+              "event": "PostToolUse",
+              "matcher": "Skill|Agent",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PostToolUse\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-code",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "UserPromptSubmit",
+              "matcher": null,
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}, \"additional_context\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}\n",
+              "context_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            },
+            {
+              "plugin": "loom-workflow",
+              "event": "PostToolUse",
+              "matcher": "Write|Edit|Bash",
+              "exit_code": 0,
+              "stderr": "",
+              "stdout": ""
+            }
+          ],
+          "fixture_key": "capture-invoice-natural-default-candidate-r1"
+        }
+      },
+      "isolation": {
+        "synthetic_private_read_denied": true,
+        "network_bind_denied": true,
+        "variant_write_denied": true,
+        "network_probe_exit": 77,
+        "network_probe_stderr": ""
+      },
+      "profile_sha256": "cc7454e63ac98c0129b5c4198338f2b06b793781a4bd18b97a3025f6210eaefd"
+    }
+  ],
+  "new_cli_estimate_usd": 1.1168344,
+  "cumulative_cli_estimate_usd": 5.3807351,
+  "retained_calls": 40,
+  "checks": {
+    "focused": 157,
+    "complete_package_suite_exit_code": 0,
+    "package_log_sha256": "8b3091381ace7c2de6a17ad1a2023d2ef94d0f66f43fcb7cd50cdbc1bb97f5ff",
+    "reused_adversarial": 38,
+    "adversarial_log_sha256": "768d2df67510c1ede8acf6f7090d90421a7f861a76bfab017c358efcd07fd862"
+  },
+  "graph_checks": {
+    "invoice": {
+      "exit_code": 1,
+      "log": "  ln  width | content\n   1    66 | ┌──────────────────────────────┐  ┌──────────────────────────────┐\n   2    64 | │    修改前(回報的問題)       │  │        修改後(預期)         │\n   3    66 | ├──────────────────────────────┤  ├──────────────────────────────┤\n   4    66 | │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n   5    66 | │  │       匯出發票         │  │  │  │     匯出發票     │        │\n   6    66 | │  └────────────────────────┘  │  │  └──────────────────┘        │\n   7    66 | │               │              │  │            │                 │\n   8    66 | │               ▼              │  │            ▼                 │\n   9    66 | │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n  10    66 | │  │   可能沿用上一位幣別   │  │  │  │ 使用所屬客戶幣別 │        │\n  11    66 | │  └────────────────────────┘  │  │  └──────────────────┘        │\n  12    66 | │               │              │  │            │                 │\n  13    66 | │               ▼              │  │            ▼                 │\n  14    66 | │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n  15    66 | │  │       幣別錯誤         │  │  │  │     幣別正確     │        │\n  16    66 | │  └────────────────────────┘  │  │  └──────────────────┘        │\n  17    66 | └──────────────────────────────┘  └──────────────────────────────┘\nline 2: col 30: '│' at display-col 30 connects to nothing vertically\nline 2: col 33: '│' at display-col 33 connects to nothing vertically\nline 2: col 63: '│' at display-col 63 connects to nothing vertically\nline 2: col 66: table line display width 64 differs from block width 66\n"
+    },
+    "known_date": {
+      "exit_code": 1,
+      "log": "  ln  width | content\n   1    66 | ┌─ 目前 ──────────────────────┐   ┌─ 預期（尚未修改）────────────┐\n   2    68 | │ Release date: to be corrected│ → │ Release date: 2026-11-04      │\n   3    68 | │ - Improve note search.       │   │ - Improve note search.        │\n   4    68 | └──────────────────────────────┘   └───────────────────────────────┘\nline 2: col 66: table line display width 68 differs from block width 66\nline 3: col 66: table line display width 68 differs from block width 66\nline 4: col 66: table line display width 68 differs from block width 66\n"
+    }
+  },
+  "limits": "Source/parity/technical completion is distinct from semantic correctness. Eight preregistered calls plus separately registered unmatched natural-default diagnostic; two samples per missing-date entry do not establish general reliability. Native audit profiles inherited/unobservable; actors explicitly selected and modelUsage verified."
+}
