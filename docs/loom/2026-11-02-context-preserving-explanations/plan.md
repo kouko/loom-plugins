@@ -99,6 +99,11 @@ charter: 1.1
 - Risk: user-decided — after the prior stop and explanation of the dispatch ceiling, the user said "那就繼續迭代吧". This authorizes one additional source iteration beyond the default redispatch ceiling, retaining the same task identity, initial execution and two completed continuations. Diagnose actual reference consumption and competing composition guidance before a minimal repair, then rerun the invoice/unknown-date cases. No requirement, reviewer-episode reset or publication authorization is implied.
 - Risk: user-decided — also assess literal plain language, absence of metaphors and unnecessary invented terminology, following "也順便對於是否真的以白話方式說明 不用比喻 非絕對必要不自創專有名詞 這方面做一下評估". These are existing conversation clarity obligations, not an additional user decision or workflow phase.
 
+**W3-03 Replace the existing final-message check with six concrete editing questions** after: W3-01 acceptance: 1,2,3,4
+- Files: both confirmation-template.md copies and existing unreleased plugin notes; retained test evidence.
+- Test: A1 positive: supported-context-and-source-boundaries. A2 positive: phase-appropriate-structure. A3 positive: literal-necessary-terms-and-framed-diagram; negative: private-inventory. A4 positive: unambiguous-confirmation-consent.
+- Risk: user-decided — the user approved the proposed six checks with "改吧" and requested "改完之後再做一輪測試". Replace the existing generic final-message paragraph in place, not a new file, station, public checklist or approval. The concrete additional deliverable is a six-question inspection of the actual outgoing reply: background, fidelity, plain wording, consent, structure/diagrams and deletion. W3-01's earlier attempts and partial outcomes remain unchanged; this bounded checklist task does not reset them or the review episode. Preserve required disclosures and publication holds, and test actual output rather than claimed checklist compliance.
+
 ## Simplicity check
 - none found
 

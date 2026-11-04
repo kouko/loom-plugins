@@ -59,10 +59,28 @@ Borrow only information connections, keeping example details as case-specific fa
 
 ## Final-message check
 
-Check each sentence for grounded context, scope, outcome or a required decision or consent.
-Remove private status, paths, classifications, GO/waiver labels, unrun checks,
-next-station and handoff inventories unless requested. Retain required disclosures:
-verbatim WARN notices, cost/egress, one-way-door consequences, principles and carried details.
+Check each sentence of the actual proposed reply for grounded context, scope,
+outcome or a required decision or consent using these six questions. Revise the
+offending sentences before sending. Keep this check private; do not append the
+questions or a claim that all checks passed to the public reply.
+
+1. Can the user understand the project or function's purpose, current direction
+   and connection to this request, with each claim grounded in available evidence?
+2. Does every fact, scope boundary, constraint and guarantee retain its source's
+   target, qualifiers and strength, without invented additions?
+3. Does the reply state literally who does what and what the user sees, without
+   analogies or unnecessary new terminology, explaining necessary names by role?
+4. Does the confirmation say plainly exactly what yes authorizes, honoring prior
+   holds and the applicable conditional publication default? Replace double
+   negatives or exception phrasing that could imply extra consent.
+5. Are the five ordered sections used only when required facts are settled,
+   with missing facts kept in the interview? Where a diagram helps, are comparison
+   flows fully framed and titled, unverified changes labeled expected, and the
+   complete composition checked for alignment?
+6. Can repetition or detail unnecessary for understanding be removed: private
+   status, paths, classifications, GO/waiver labels, unrun checks, next-station
+   and handoff inventories unless requested? Retain required disclosures:
+   verbatim WARN notices, cost/egress, one-way-door consequences, principles and carried details.
 
 Honor a prior publication hold or opt-out until the user explicitly lifts it.
 Under that restriction, confirmation covers requirements only; omit the default grant.
