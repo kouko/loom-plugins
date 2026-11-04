@@ -1,0 +1,1532 @@
+{
+  "experiment": {
+    "authorization_source": {
+      "quote": "最低標是內容不能有錯以及內容不能有邏輯衝突；對 請繼續迭代吧",
+      "scope": "Approved five-section iteration and realistic isolated validation; no publication or merge."
+    },
+    "source_versions": {
+      "baseline": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+      "candidate": "8c6a3f2628efc4dafadfab00f048dac7364c253f"
+    },
+    "schedule": [
+      {
+        "key": "code-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-csv-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-csv",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "retained-request-candidate-rerun"
+      },
+      {
+        "key": "code-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 2,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 2,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "code-known-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-known-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today"
+      },
+      {
+        "key": "code-known-wrong-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-known-wrong-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-actual-wrong-calendar-value-positive-control"
+      },
+      {
+        "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-explicit-hold-graph",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request"
+      },
+      {
+        "key": "capture-invoice-natural-default-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-natural-default",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope"
+      }
+    ],
+    "sessions": 9,
+    "repeats": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "destination": "Anthropic through existing first-party native Claude Code authentication",
+    "estimated_total_usd": "about 6.18-6.58 including all prior phases",
+    "estimated_new_phase_usd": "0.8-1.2",
+    "prior_cli_cost_usd": 5.3807351,
+    "prior_completed_sessions": 40,
+    "estimated_cumulative_range_usd": [
+      6.1807351,
+      6.5807351
+    ],
+    "per_session_estimate_threshold_usd": 0.5,
+    "hard_cap": false,
+    "previous_artifacts": {
+      "root": "/private/tmp/loom-five-section-trial",
+      "experiment": "/private/tmp/loom-five-section-trial/experiment.json",
+      "baseline_results": [
+        "/private/tmp/loom-five-section-trial/capture-invoice-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/capture-csv-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/code-setup-baseline-r1.summary.json"
+      ],
+      "preparation_history": "/private/tmp/loom-five-section-trial/preparation-attempts",
+      "initial_failed_preflight": "/private/tmp/loom-five-section-trial/preflight-attempt-01.json",
+      "iteration_2": "/private/tmp/loom-five-section-trial-i2",
+      "explicit_hold_diagnostic": "/private/tmp/loom-five-section-explicit-hold",
+      "wrapper_audit": "/tmp/loom-five-section-wrapper-audit.json",
+      "iteration_3": "/private/tmp/loom-five-section-trial-i3",
+      "iteration_4": "/private/tmp/loom-five-section-trial-i4",
+      "six_check_baseline": "/private/tmp/loom-six-checks-trial",
+      "correct_consistent_round": "/private/tmp/loom-correct-consistent-trial",
+      "natural_default_diagnostic": "/private/tmp/loom-natural-default-control",
+      "neutral_diagnostic_4": "/private/tmp/loom-five-section-natural-interview-i4",
+      "pre_fix_results": [
+        "/private/tmp/loom-five-section-trial-i3/capture-invoice-explicit-hold-graph-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/capture-missing-date-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/code-missing-date-candidate-r1.summary.json"
+      ]
+    },
+    "controls": "Nine preregistered calls. Both unchanged neutral missing-date entries twice; same CSV, verified-placeholder-date and explicit-hold graph cases; same separately registered natural-default wrapper; one new actual-wrong-calendar-value control with2026-10-31 observed vs2026-11-04 verified. No correctness/checklist/target-output hints. Same source snapshot isolation, native model and effort.",
+    "scope": "Public tracked plugin runtime snapshots and synthetic fixtures only. Original plugin hooks retained with identical isolation wrappers. No actor implementation, publication, private data or source edits.",
+    "limits": "Exploratory bounded test, not statistics or causal reliability. All40 prior calls and USD5.3807351 retained. New actual-wrong-value control is unmatched; existing fixtures/prompts unchanged, no silent retries or replacement passes. Chat AND intent draft are evaluated for evidence-state agreement.",
+    "routing_env_policy": "Refuse inherited endpoint/model/provider overrides; never read or print credential values. Preserve native authentication."
+  },
+  "sessions": [
+    {
+      "key": "code-missing-date-candidate-r1",
+      "variant": "candidate",
+      "case": "code-missing-date",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.09360740000000001,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "目前無法更正：發行日期缺少可靠的來源，所以我沒有建立計畫，也沒有改任何檔案。\n\n**現況**\n- `RELEASE_NOTES.md` 的日期欄位現在寫的是「Release date: to be corrected」，不是一個錯誤的日曆日期。\n- 真正的發行日期還不知道，你也沒有發行紀錄可以提供。\n- 我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實，也不是你要求的更正。\n\n**目前的狀態**\n\n| 項目 | 狀態 |\n|---|---|\n| 意圖文件（intent） | 尚未建立。你沒有確認任何變更，缺少的日期資料也還補不上。 |\n| 計畫（plan.md） | 未撰寫。計畫必須以已確認的意圖為前提。 |\n| 實作與發布 | 都沒有做，符合你的要求。 |\n| 其他文字 | 完全沒動，包含「Improve note search.」那一行。 |\n\n**要繼續需要什麼**\n等你取得下列任一項，我就能繼續：\n- 真正的發行日期，或\n- 可以查證日期的紀錄，例如版本標籤、發布公告或提交時間。\n\n到時只會替換日期那一處文字。意圖和計畫會在那時一起建立，並請你確認「這就是我要的」。",
+      "drafts": [],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "draft_contents": [],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/code-missing-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/code-missing-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "7bd8834d1e21da70c781dd051f7c47d70fc7cde464be00bd2ac081fec0627ca8",
+        ".summary.json": "4895d2b8fcc0ee55a8058f67860e7f9e163494600fa907bbc472bf66bfa74d9c",
+        ".prompt.txt": "5927d7be2971d0c62787de9b502f9bcef14bd4df448969c47ac14c9b567367f3",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "2bc7808d6402fde5921b8c55bf3b4601cdea01d9f6a64f901173a9df7a10dae6"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "capture-missing-date-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-missing-date",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.15114670000000002,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "**目前沒辦法請你確認，因為缺一個必要資料：這個版本真正的發行日期。** 你說還不知道，也沒有發行紀錄。我不會猜日期，也不會填今天的日期。\n\n## 我看到的現況\n`RELEASE_NOTES.md` 的最新版本，發行日期欄現在寫的是「to be corrected」，不是日期。內容只有一行「Improve note search.」。\n\n## 我草擬的意圖\n- **要做的事：** 把顯示的發行日期換成真正的發行日期。\n- **驗收條件：**\n  1. 最新版本顯示的發行日期是真正的發行日期。\n  2. 除了發行日期，其餘文字與更正前逐字相同。\n- **範圍外：** 其他文字、其他版本、其他文件。\n- **狀態：** `open`（未確認）。草稿已寫在 `docs/loom/intent/2026-11-04-correct-latest-release-date.md`。我沒有改 `RELEASE_NOTES.md`，沒有 commit，也沒有發佈。\n\n## 需要你回答\n**這個版本真正的發行日期是哪一天？**\n\n| 你的情況 | 我會怎麼做 |\n|---|---|\n| 之後查到日期 | 你告訴我日期，我再請你確認一次，然後才動手。 |\n| 暫時查不到 | 這個變更維持未確認，因為「正確」還無法定義。你查到日期後再回來。 |\n| 想先把欄位改成「待定」之類的字樣 | 這是另一種結果（不是真正日期），你要明確告訴我，我才會改寫驗收條件。 |\n\n我建議第一種或第二種：先等到有真正的日期，再動手。",
+      "drafts": [
+        "docs/loom/intent/2026-11-04-correct-latest-release-date.md"
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 10,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "draft_contents": [
+        {
+          "path": "docs/loom/intent/2026-11-04-correct-latest-release-date.md",
+          "content": "# 更正最新版本發行說明的發行日期\noriginator: kouko\nkind: engineering\nneeds-design: no — 只更正既有發行說明文件中顯示的一個日期，沒有新的使用者介面或多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n最新版本的發行說明目前在「發行日期」欄位顯示的不是一個實際日期（現在寫著「to be corrected」），讀者看不到這個版本真正的發行日期。使用者表示顯示的發行日期有誤；真正的發行日期尚未知，也沒有可提供的發行紀錄。\n\n## Proposed outcome\n最新版本發行說明所顯示的發行日期被更正為該版本真正的發行日期；除此之外，發行說明的其他文字完全不變。\n\n## Acceptance\n1. 最新版本發行說明顯示的發行日期是該版本真正的發行日期。\n2. 發行說明中除發行日期以外的所有文字，與更正前逐字相同。\n\n## Constraints\n- 只更正顯示的發行日期，其他文字不要動。\n\n## Out of scope\n- 發行說明的其他文字（含更新內容描述）。\n- 其他版本的發行說明與其他文件。\n\n## Open questions\n- 該版本真正的發行日期是哪一天？目前使用者不知道，也沒有發行紀錄可佐證；在取得日期之前，無法定義「正確」，也不應猜測或填入今天的日期。\n"
+        }
+      ],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/capture-missing-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/capture-missing-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "fbbb3dfa27cae07694ce42b050c270b42f1cd03f4fcd7254eca0fe6e13311744",
+        ".summary.json": "16627f2af1aca7b00b6909ea08f210c9f9aad66cd914c0968abf29b93f00ce71",
+        ".prompt.txt": "319643cfe3d77ce4c4e6143605c0e68bf82d873eacb8543f08e6014c2575a8ff",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "f7b5ed28765106b15ea403f9ab2763118eb20351827e04d6774f38c4e59551ef"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "capture-csv-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-csv",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "retained-request-candidate-rerun",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1220019,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "## 背景與目前方向\n會計團隊每月在發票列表上對帳。要用的資料目前只能在列表上看。\n\n## 目前的問題與影響\n對帳時,會計人員得把發票列表的資料一筆一筆手動複製到試算表。這很花時間,而且每個月都要重做一次。\n\n## 要改變什麼\n在既有發票列表加一個「匯出 CSV」按鈕,下載目前篩選後的結果。\n\n```text\n┌─────────────── 現在 ───────────────┐  ┌────────── 預期改變後 ──────────┐\n│ 發票列表(已篩選客戶、日期)         │  │ 發票列表(已篩選客戶、日期)     │\n│          │                         │  │          │                     │\n│          ▼                         │  │          ▼                     │\n│ 手動複製到試算表                   │  │ 按「匯出 CSV」                 │\n│                                    │  │          │                     │\n│                                    │  │          ▼                     │\n│                                    │  │ 下載 CSV,可直接開啟對帳       │\n└────────────────────────────────────┘  └────────────────────────────────┘\n```\n\n## 範圍與驗收\n驗收條件(已寫入 `docs/loom/intent/2026-11-04-invoice-csv-export.md`,狀態為 `open`):\n\n1. 發票列表有「匯出 CSV」按鈕,可下載目前篩選後的發票資料。\n2. 下載內容只含你選定的客戶與日期篩選所得的發票。\n3. 欄位依序為:發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 下載內容不含該使用者在既有列表中無權查看的發票。\n5. 匯出前後,既有發票資料都沒有被改動。\n\n範圍外:自動寄送、排程、改動既有發票資料。\n\n這份意圖與 `PRINCIPLES.md` 沒有衝突。`PRINCIPLES.md` 已簽核,所以不用再做原則訪談。\n\n## 請確認\n你回覆「yes」,只代表確認上面的需求範圍,也就是問題、預期結果和五條驗收條件。你沒有要我發布,所以這次的 yes 不授權推送分支或開 PR,我會維持這個限制,直到你明確解除。\n\n我還需要你回答一個問題:這件事會擠掉哪些原本排定的工作?價值評估缺這個答案,所以意圖檔目前列在「未解問題」,狀態維持 `open`。\n\n你回答並確認後,我才會做這些事:\n- 把狀態改成 `confirmed`。\n- 建立變更分支並提交。\n- 交給 `write-spec`,因為這個變更碰到使用者會看到的畫面(按鈕和 CSV 檔),而且沒有現成的設計文件涵蓋它。\n\n你尚未確認,所以我先停在這裡。我沒有實作,也沒有發布。",
+      "drafts": [
+        "docs/loom/intent/2026-11-04-invoice-csv-export.md"
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "draft_contents": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-csv-export.md",
+          "content": "# 發票列表匯出 CSV\noriginator: kouko\nkind: product\nneeds-design: yes — 發票列表新增按鈕並產出使用者會開啟的 CSV 檔，目前沒有 DESIGN.md 或 ui-flows 涵蓋此介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊每月對帳時，必須從發票列表手動複製資料到試算表，耗費不少時間。\n\n## Proposed outcome\n會計人員能在既有發票列表下載目前篩選結果的 CSV，且保留已選定的客戶與日期篩選。\n\n## Acceptance\n1. 發票列表提供「匯出 CSV」按鈕，可下載目前篩選後的發票資料。\n2. 下載內容只包含使用者已選定的客戶與日期篩選所得的發票。\n3. CSV 欄位依序為：發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 下載內容不包含該使用者在既有發票列表中無權查看的發票。\n5. 匯出前後，既有發票資料皆未被改動。\n\n## Constraints\n- 沿用既有發票列表與帳號權限。\n- 匯出不得改動既有發票資料。\n- 保留使用者選定的客戶與日期篩選。\n\n## Value case\n受益者：每月對帳的會計團隊。急迫性：每月對帳都會遇到。現有替代做法：手動複製到試算表。被擠壓的工作：尚未說明。GO（理由：直接省去每月重複的手動作業）。\n\n## Out of scope\n- 自動寄送或排程匯出。\n- 改動既有發票資料。\n\n## Open questions\n- 若做這件事，會擠掉哪些原本排定的工作？（Value case 缺此答案）\n"
+        }
+      ],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/capture-csv-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/capture-csv-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "7c9f51cedc21c32a393b477afd26add6aa910b316b09610ab62c6461006ab368",
+        ".summary.json": "9a4800a9ffb05c95f336f69c4ef474a0472cbdd6f800280cb645ca9477e2948e",
+        ".prompt.txt": "f417c34dfdc4b299421ae6596dca1238fa58118433e32943adbd27d2cec2a256",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "8834783cf23a8b07deb6665e28db2cad6daedff160f955f29b2339768d65ed20"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "code-missing-date-candidate-r2",
+      "variant": "candidate",
+      "case": "code-missing-date",
+      "repeat": 2,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.0927817,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "目前無法更正：最新版本的發行日期欄位沒有實際日期，所以我沒有可以寫進去的正確值。我什麼都沒改，也沒有建立計畫、意圖檔，沒有提交或發布。\n\n`RELEASE_NOTES.md` 的現況：\n\n```\n# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n```\n\n「Release date」那一行寫的是 `to be corrected`，不是日曆日期。真正的發行日期未知，你也沒有發行紀錄可以提供。因此：\n\n- 我不會用今天的日期或其他推測值代替，那可能讓讀者看到錯的日期。\n- 我也不會自行改成「待定」、刪掉這一行，或加上臨時文字。你要求只更正日期，這些都超出範圍。\n- 這份文件裡沒有其他可以證明日期的資料。\n\n等你能提供真正的發行日期，或能查到可靠的發行紀錄時，再告訴我。屆時我只會替換 `Release date:` 這一行的內容，其他文字不動，並照 write-plan 流程先請你確認。確認之前不會實作，也不會發布。",
+      "drafts": [],
+      "verified_live_context": {
+        "successful_hook_responses": 6,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "draft_contents": [],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/code-missing-date-candidate-r2.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/code-missing-date-candidate-r2.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "9233fc5b448d1e3a57b36c6280c9f9e503aeb232187bb3c0a20e5f626483f428",
+        ".summary.json": "dca33815994a27c04008e561efa62805f34851e18bce4c7c866bcdc108a510da",
+        ".prompt.txt": "5927d7be2971d0c62787de9b502f9bcef14bd4df448969c47ac14c9b567367f3",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "7b37206a046121d3adf192e9f3d60e9ff1b0a372fd2c522822fad99685d98065"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "capture-missing-date-candidate-r2",
+      "variant": "candidate",
+      "case": "capture-missing-date",
+      "repeat": 2,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.10594119999999999,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "前置條件還缺一項事實，所以我先停在這裡。\n\n**目前被擋住的原因：** `RELEASE_NOTES.md` 的發行日期欄位現在寫的是「to be corrected」，不是一個實際日期。真正的發行日期你還不知道，也沒有發行紀錄可以提供。我手上沒有證據可以填入正確日期，所以這項更正暫時做不了。\n\n我不會用今天的日期或其他暫代文字去填。那樣可能把一個不正確的日期寫進發行說明。\n\n**我沒有做的事：**\n- 沒有修改任何檔案，也沒有建立意圖文件。\n- 沒有確認任何變更，也沒有實作或發布。\n\n**之後要繼續，需要其中一項：**\n- 實際的發行日期，或能查出該日期的紀錄；\n- 你確認這個欄位在日期查明之前就維持現狀。\n\n拿到其中一項後，我會用你的原話重述這項更正，包括只改顯示的發行日期、其他文字不動，再請你確認。",
+      "drafts": [],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "draft_contents": [],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/capture-missing-date-candidate-r2.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/capture-missing-date-candidate-r2.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "063e8f24ad1047749a4518e8d3dd85e8403a634f110e907c145cab7b5b107cf3",
+        ".summary.json": "b9cb6f67187d23f98f7ab3175ac5451a1750a42c840ab399ad76a7a8d2c45572",
+        ".prompt.txt": "319643cfe3d77ce4c4e6143605c0e68bf82d873eacb8543f08e6014c2575a8ff",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "4a26108b7574ec88da542c2e4dca4bf805da46d36a8853fa1c577e93d02a3aeb"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "code-known-date-candidate-r1",
+      "variant": "candidate",
+      "case": "code-known-date",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1460148,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "發行說明的日期可以改成 2026-11-04，但我還沒動手。我先寫了一份草稿意圖（狀態仍是 open，未提交），需要您確認。\n\n## 背景與目前方向\nHarbor Notes 是共用筆記應用程式。發行說明用來告訴使用者某個版本何時可用，專案目前的方向是讓已發布的資訊保持正確，且不改變應用程式行為。\n\n## 目前的問題與影響\n最新版本的發行說明，日期欄位寫的是「to be corrected」，不是實際日期。讀者看不出最新版本是哪一天開始提供。RELEASE_RECORD.md 記載最新發行日期為 2026-11-04，與您告知的相符。\n\n## 將會改變什麼\n| | 目前 | 預期 |\n|---|---|---|\n| 最新版發行說明的日期 | Release date: to be corrected | Release date: 2026-11-04 |\n\n## 範圍與驗收\n1. 最新發行說明顯示的發行日期是 2026-11-04。\n2. 發行說明的其他文字完全不變，例如「Improve note search.」。\n\n不在範圍內：發行紀錄、應用程式行為，以及其他發行說明的文字。\n\n## 請確認\n您的「是」只代表確認上述需求，不代表同意實作，也不代表同意發布。您說過不要發布，我會維持這個限制，直到您明確解除。\n\n確認後我才會寫實作計畫，之後的實作也要另外進行。這是您要的修正嗎？",
+      "drafts": [
+        "docs/loom/intent/2026-11-04-correct-release-date-display.md"
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 14,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n",
+        "RELEASE_RECORD.md": "# Release record\n\nLatest release date: 2026-11-04\nVerified release-publication metadata for this synthetic project.\n"
+      },
+      "draft_contents": [
+        {
+          "path": "docs/loom/intent/2026-11-04-correct-release-date-display.md",
+          "content": "# Correct the displayed release date of the latest version\noriginator: kouko\nkind: engineering\nneeds-design: no — only the value of an existing date line changes; no new surface, flow or state\nevidence: [RELEASE_RECORD.md, RELEASE_NOTES.md]\nstatus: open\n\n## Problem\nThe latest release notes show the release date as \"to be corrected\" instead of a calendar date, so readers cannot tell when the latest version became available. The release record states the latest release date is 2026-11-04.\n\n## Proposed outcome\nThe latest release notes show 2026-11-04 as their release date.\n\n## Acceptance\n1. The release date shown in the latest release notes is 2026-11-04.\n2. Every other line of the release notes is unchanged.\n\n## Constraints\n- Only the displayed release date changes; all other text stays as is.\n- Do not implement or publish until the user confirms.\n\n## Out of scope\n- Any change to the release record, the application's behavior, or other release notes wording.\n\n## Open questions\n- none\n"
+        }
+      ],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/code-known-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/code-known-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "3edd84872876d5a4e50c93f0c9771c0ca5359f28f5e27f259639563768206a73",
+        ".summary.json": "10ca9ffbd97934b36dd321e61adb0e539f53f968330200a53407dccd8a42fad0",
+        ".prompt.txt": "b6aa516bca6040ccaf38eda52c44216a81d3f7d4943dbe939a2005ca407c0bc1",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "d2e4bfa674cb6b67ddd8aa84a175926ca4cfbdd41d14e90fd08d38cbf9280a0d"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "code-known-wrong-date-candidate-r1",
+      "variant": "candidate",
+      "case": "code-known-wrong-date",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "unmatched-actual-wrong-calendar-value-positive-control",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.15782410000000002,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "我已把意圖草稿寫好（狀態仍是 open，尚未提交），現在停在決策點 ①，等你確認。標準文件檢查沒有任何警告。\n\n## 背景與目前方向\n這個專案的最新發行說明（`RELEASE_NOTES.md`）寫明發行日期。專案裡另有一份發行紀錄（`RELEASE_RECORD.md`），記載最新發行日期。\n\n## 目前的問題與影響\n發行說明寫的日期是 2026-10-31，和你已確認的真正發行日期 2026-11-04 不符。發行紀錄寫的也是 2026-11-04。讀者看到的是錯的日期。\n\n## 要改變什麼\n發行說明顯示的發行日期，從 2026-10-31 改成 2026-11-04。\n\n## 範圍與驗收\n1. 最新發行說明顯示的發行日期是 2026-11-04。\n2. 發行說明的其他文字完全不變。\n\n不在範圍內：發行說明的其他文字，以及發行紀錄本身。\n\n## 請確認\n你的「是」只確認上述需求。它不授權實作，也不授權推送或發佈。你已表示尚未確認任何變更，也不要實作或發佈，所以我會維持這項限制，直到你明確解除。\n\n這就是你要的更正嗎？",
+      "drafts": [
+        "docs/loom/intent/2026-11-04-correct-release-notes-date.md"
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 12,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明目前把日期寫成 2026-10-31，但已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。請只更正顯示的發行日期，其他文字不要動。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: 2026-10-31\n\n- Improve note search.\n",
+        "RELEASE_RECORD.md": "# Release record\n\nLatest release date: 2026-11-04\nVerified release-publication metadata for this synthetic project.\n"
+      },
+      "draft_contents": [
+        {
+          "path": "docs/loom/intent/2026-11-04-correct-release-notes-date.md",
+          "content": "# Correct the release date shown in the latest release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only a date value in an existing document changes; no new surface, no multi-state behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe latest release notes show the release date 2026-10-31. The user reports this is wrong and has confirmed the actual release date is 2026-11-04; the release record also lists 2026-11-04 as the latest release date.\n\n## Proposed outcome\nThe latest release notes show the release date 2026-11-04.\n\n## Acceptance\n1. The release date shown in the latest release notes reads 2026-11-04.\n2. Every other piece of text in the release notes is unchanged.\n\n## Constraints\n- Change only the displayed release date; leave all other text as it is.\n\n## Out of scope\n- Any other text in the release notes, and the release record.\n\n## Open questions\n- none\n"
+        }
+      ],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/code-known-wrong-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/code-known-wrong-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "107466d23cb73772ea345555192b5d3e833211e34b1f8f027a6530a931bc9cda",
+        ".summary.json": "0ac3e526d2cdc616a60bda440e3486bb0387559e6e189a8948e0202726a4ee48",
+        ".prompt.txt": "450e00df442d392cfcd7328b27feab370da30f63ae56cb264c2b5548c79f366e",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "7e8cfb0608f4e62678d69c335157d8cf20edb569a8d3c0258c67ecdda852a403"
+      },
+      "witness": "independent acceptance tester"
+    },
+    {
+      "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-invoice-explicit-hold-graph",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1804784,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        },
+        {
+          "skill": "loom-workflow:loom-visualization"
+        }
+      ],
+      "result": "我已把意圖草稿寫成 `docs/loom/intent/2026-11-04-invoice-own-customer-currency.md`，狀態是 `open`。我沒有建立分支、沒有 commit，也沒有實作。下面是請你確認的內容。\n\n## 背景與目前方向\nCedar Accounts 是內部會計系統，會計團隊用它準備並匯出客戶發票。每位客戶都有自己的幣別設定。目前的優先事項是讓發票匯出可靠，並且保持現有匯出格式，不讓一位客戶的設定影響另一位客戶的匯出。\n\n## 目前問題與影響\n匯出發票時，偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查發票，遇到錯誤再重新匯出。\n\n## 這次要改變什麼\n只修正「用誰的幣別設定」：每張發票都使用所屬客戶自己的幣別設定。下圖左邊是你回報的現象，右邊是預期結果。右邊尚未驗證。\n\n```text\n┌────────────────────────────────┐  ┌────────────────────────────────┐\n│      修改前（使用者回報）      │  │           預期修改後           │\n├────────────────────────────────┤  ├────────────────────────────────┤\n│  ┌──────────────────────────┐  │  │  ┌──────────────────────────┐  │\n│  │     匯出某客戶的發票     │  │  │  │     匯出某客戶的發票     │  │\n│  └──────────────────────────┘  │  │  └──────────────────────────┘  │\n│                │               │  │                │               │\n│                ▼               │  │                ▼               │\n│  ┌──────────────────────────┐  │  │  ┌──────────────────────────┐  │\n│  │ 偶爾沿用前一位客戶的幣別 │  │  │  │ 一律使用該客戶自己的幣別 │  │\n│  └──────────────────────────┘  │  │  └──────────────────────────┘  │\n│                │               │  │                │               │\n│                ▼               │  │                ▼               │\n│  ┌──────────────────────────┐  │  │  ┌──────────────────────────┐  │\n│  │     發票顯示錯誤幣別     │  │  │  │   發票顯示該客戶的幣別   │  │\n│  └──────────────────────────┘  │  │  └──────────────────────────┘  │\n│                │               │  │                │               │\n│                ▼               │  │                ▼               │\n│  ┌──────────────────────────┐  │  │  ┌──────────────────────────┐  │\n│  │  會計逐張檢查、重新匯出  │  │  │  │     不需逐張檢查幣別     │  │\n│  └──────────────────────────┘  │  │  └──────────────────────────┘  │\n└────────────────────────────────┘  └────────────────────────────────┘\n```\n\n## 範圍與驗收\n驗收條件：\n1. 連續匯出幣別設定不同的多位客戶的發票時，每張發票顯示的幣別都等於其所屬客戶自己的幣別設定。\n2. 匯出檔的格式與修改前相同。\n3. 修改前已經匯出的檔案內容沒有被改寫。\n\n不包含：\n- 變更匯出格式。\n- 改寫既有匯出檔。\n- 要求不同次匯出的金額相同。\n\n## 請確認\n你回「是」只代表確認上面這份需求範圍：問題、預期結果、三條驗收條件和排除項目。\n\n- **不會發生的事：** 你先前要求不要發布，這個限制繼續有效，直到你另外明確解除。所以「是」不授權推送分支，也不授權開 pull request。\n- **之後的步驟：** 確認後，我才會寫入已確認狀態、建立變更分支並 commit 這份意圖。實作和發布都不在這次確認內。\n\n這是不是你要的修正？",
+      "drafts": [
+        "docs/loom/intent/2026-11-04-invoice-own-customer-currency.md"
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 13,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "draft_contents": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-own-customer-currency.md",
+          "content": "# 發票匯出一律使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: product\nneeds-design: no — 匯出格式維持不變，只修正採用哪位客戶的幣別設定，沒有新的畫面或多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊用系統匯出客戶發票。每位客戶各有自己的幣別設定，但匯出時偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事目前必須逐張檢查發票，遇到錯誤再重新匯出。\n\n## Proposed outcome\n每張發票匯出時，都使用該發票所屬客戶自己的幣別設定。\n\n## Acceptance\n1. 連續匯出幣別設定不同的多位客戶的發票時，每張發票顯示的幣別都等於其所屬客戶自己的幣別設定。\n2. 匯出檔的格式與修改前相同。\n3. 修改前已經匯出的檔案內容沒有被改寫。\n\n## Constraints\n- 匯出格式維持不變。\n- 不改寫既有的匯出檔。\n- 不同次匯出的金額可以合理不同；不要求金額相同。\n\n## Value case\n受益者：會計團隊，不必再逐張檢查幣別、也不必因錯誤重新匯出。現行替代做法：人工逐張檢查後重新匯出。目前方向的優先事項是避免一位客戶的設定影響另一位客戶的匯出。GO：問題已有明確影響與工作量成本。\n\n## Out of scope\n- 變更匯出格式。\n- 改寫既有匯出檔。\n- 要求不同次匯出的金額相同。\n\n## Open questions\n- none\n"
+        }
+      ],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/capture-invoice-explicit-hold-graph-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/capture-invoice-explicit-hold-graph-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "c1e57d71dd954a066df6d72d8835433359f9bb0dbd50af38d894c2c492f1335b",
+        ".summary.json": "cee00f840707ca509249c96d96cd2a68d11e94bd654cd469f42c12d515eca26e",
+        ".prompt.txt": "4c3b688a0dd0dfb3126e968c7df7902ef2f146727db69e4f21a534b8a1460d11",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "093992c2b742a8342cd3766af859a88bcb873435b071f514970f7c819c7bab6a"
+      },
+      "witness": "orchestrator"
+    },
+    {
+      "key": "capture-invoice-natural-default-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-invoice-natural-default",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1375136,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "意圖已寫好，內容與下面的重述一致。我停在確認這一步，還沒有建分支、提交或實作。\n\n## 背景與目前方向\n會計團隊用 Cedar Accounts 匯出客戶發票，每位客戶各有自己的幣別設定。專案目前的重點是讓匯出穩定可靠、保留既有匯出格式，並避免某位客戶的設定影響另一位客戶的匯出。\n\n## 目前的問題與影響\n匯出發票時，偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事因此必須逐張檢查，遇到錯誤再重新匯出。\n\n## 這次要改什麼\n每張發票都使用所屬客戶自己的幣別設定。範圍只有「使用誰的幣別設定」。\n\n```text\n┌──────────────────────────────┐  ┌──────────────────────────────┐\n│    修正前（已回報的問題）    │  │         修正後（預期）       │\n├──────────────────────────────┤  ├──────────────────────────────┤\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │       匯出發票         │  │  │  │     匯出發票     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │   可能沿用上位客戶幣別 │  │  │  │ 用該客戶自己幣別 │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │       幣別錯誤         │  │  │  │     幣別正確     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n└──────────────────────────────┘  └──────────────────────────────┘\n```\n\n## 範圍與驗收\n1. 匯出不同幣別客戶的發票時，每張發票的幣別都等於該客戶自己的設定。\n2. 先匯出一位客戶、再匯出另一位幣別不同的客戶，後者的發票不出現前者的幣別。\n3. 匯出格式與修正前相同。\n4. 修正前已匯出的既有檔案內容沒有被改寫。\n\n不在範圍內：任何匯出格式變動、改寫既有匯出檔。不同次匯出的金額可以不同，不要求相同。\n\n## 請確認\n你的「是」只確認上面這份需求。你說過這項變更尚未確認，所以我不會在你確認前建立分支或提交。\n\n等你確認後，審查與發布檢查都通過，才會以非強制方式推送分支並開一個待審的 pull request。你可以在發布前隨時選擇不發布。合併是另一個獨立的決定。\n\n這是你要的修正嗎？",
+      "drafts": [
+        "docs/loom/intent/2026-11-04-invoice-own-customer-currency.md"
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 9,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "draft_contents": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-own-customer-currency.md",
+          "content": "# 發票匯出使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: product\nneeds-design: no — 匯出格式與既有介面維持不變，只修正套用哪位客戶的幣別設定，沒有新增使用者可讀或可輸入的介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊用這個系統匯出客戶發票，每位客戶各有自己的幣別設定。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤的幣別。會計同事現在必須逐張檢查發票，遇到錯誤再重新匯出。\n\n## Proposed outcome\n每張匯出的發票都使用該發票所屬客戶自己的幣別設定，不再沿用其他客戶的設定。\n\n## Acceptance\n1. 匯出不同幣別客戶的發票時，每張發票顯示的幣別都等於該發票所屬客戶自己的幣別設定。\n2. 先匯出某位客戶的發票、再匯出另一位幣別不同的客戶時，後者的發票不出現前者的幣別。\n3. 匯出格式與修正前相同。\n4. 修正前已匯出的既有檔案內容沒有被改寫。\n\n## Constraints\n- 匯出格式維持不變。\n- 不改寫既有匯出檔。\n- 只修正「使用誰的幣別設定」；不同次匯出的金額可以合理不同，不要求金額相同。\n\n## Value case\n受益者：會計團隊，可免去逐張檢查與重新匯出。優先順序：專案目前方向是避免某位客戶的設定影響另一位客戶的匯出。GO。\n\n## Out of scope\n- 匯出格式的任何變動。\n- 改寫既有匯出檔。\n- 要求不同次匯出的金額相同。\n\n## Open questions\n- none\n"
+        }
+      ],
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-value-state-trial/capture-invoice-natural-default-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-value-state-trial/capture-invoice-natural-default-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-value-state-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "8c6a3f2628efc4dafadfab00f048dac7364c253f",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "settings": {
+        "model": "claude-sonnet-5-5",
+        "effortLevel": "medium",
+        "autoMemoryEnabled": false,
+        "disableAllHooks": false,
+        "claudeMdExcludes": [
+          "/Users/kouko/**"
+        ],
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true,
+          "filesystem": {
+            "denyRead": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/private-sentinel",
+              "/private/tmp/loom-value-state-trial/variants/baseline"
+            ],
+            "allowRead": [
+              "/Users/kouko/.conda/envs/dbt-redshift/",
+              "/Users/kouko/.local/share/uv/",
+              "/Users/kouko/.cache/uv/",
+              "/Users/kouko/.cache/loom-code/"
+            ],
+            "denyWrite": [
+              "/Users/kouko/",
+              "/private/tmp/loom-value-state-trial/variants",
+              "/private/tmp/loom-value-state-trial/private-sentinel"
+            ]
+          },
+          "network": {
+            "allowedDomains": [],
+            "strictAllowlist": true
+          }
+        },
+        "env": {
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_SYSTEM": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "TMPDIR": "/private/tmp/loom-value-state-trial/tmp"
+        },
+        "permissions": {
+          "deny": [
+            "Edit(/private/tmp/loom-value-state-trial/variants/**)",
+            "Write(/private/tmp/loom-value-state-trial/variants/**)",
+            "Read(/Users/kouko/**)",
+            "Read(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Glob(/Users/kouko/**)",
+            "Glob(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Grep(/Users/kouko/**)",
+            "Grep(/private/tmp/loom-value-state-trial/variants/baseline/**)",
+            "Read(/private/tmp/loom-value-state-trial/private-sentinel)"
+          ]
+        }
+      },
+      "raw_sha256": {
+        ".jsonl": "a0950b376d0492b7fdae43837fa596a62be4b5460489693b65d5e81d858afc42",
+        ".summary.json": "fcb39bd609b68f63f0247230b10bc04310cf5924d85f9cd9bd1b45b7f9529bb8",
+        ".prompt.txt": "79ad19576d57528a8e0685aeeaf8f5d7b757402e490cb5178862c9abf8f8ebaf",
+        ".settings.json": "03af441e1953069b7834303adb91f762d0835d24b0713e80efa4c68cffebb789",
+        ".invocation.json": "eeb6e9106df04e32d4605f044605264171155ac62253e708a4cfedb806053906"
+      },
+      "witness": "orchestrator"
+    }
+  ],
+  "new_cli_estimate_usd": 1.1873098,
+  "cumulative_cli_estimate_usd": 6.5680449,
+  "retained_total_calls": 49,
+  "limits": "One new bounded nine-call round; two repeated observations per unknown-date entry are preregistered, not silent retries. No general reliability, actual post-confirmation action, personal installed-host or trigger-accuracy claim."
+}

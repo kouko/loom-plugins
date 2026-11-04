@@ -1,98 +1,87 @@
 # Context-preserving intent confirmation — acceptance test evidence
 
-Tried on 2026-11-04, in a clean copy of the project at c4b639137b4d092b9d0e97400b1748f51d46dd17.
+Tried on 2026-11-04, in a clean copy of the project at 8c6a3f2628efc4dafadfab00f048dac7364c253f.
 
 ## Setup and provenance
 
-- This independent witness implemented no source, repaired no fixtures, made no commit and ran no full package suite. Canonical prior report and evidence were copied byte-identically to acceptance-test-report-pre-correct-consistent-historical.md and acceptance-test-evidence-pre-correct-consistent-historical.md before replacement. Earlier failures and iteration counts remain unchanged.
-- Independently created `/tmp/loom-correct-consistent-acceptance-clean` with `git clone --no-hardlinks --no-checkout .` then `git checkout --detach c4b639137b4d092b9d0e97400b1748f51d46dd17`; exact HEAD matched and git status was empty. Followed README local pre-install validation with `agy plugin validate ./loom-code`, `./loom-design`, `./loom-workflow`: all passed; 7/6/14 skills, code four agents. This verifies clean package setup and the explicit local-load route, not automatic installed-host selection.
-- Independently hashed all339 source-manifest files against the clean clone: no mismatch. Candidate runtime has337 byte-identical files and two documented adapted hook JSON files (code/workflow). Original hook commands remain enclosed in strict sandbox wrappers; no hook removed. Preflight records14 hook checks and three successful isolation controls (synthetic private read denied, network bind denied, variant write denied). Profile SHA256: 804d2302d5c374b9197d42d7af11177d58aaaf6d842f2f669d40da59c84caeb8.
-- System `python3 -m pytest` lacked pytest; no package installed globally. Independent focused rerun used `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-design/tests/spec/test_intent_drafting_fidelity.py loom-design/tests/spec/test_capture_intent_contract.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_write_plan_shape_text.py`:157 passed in0.22s, exit0.
-- Station-owned full locked command: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`, exit0 in `/tmp/loom-correct-consistent-package-tests.log`. Station-owned adversarial module test_capture_intent_contract.py:38 passed, `/tmp/loom-correct-consistent-adversarial.log`. No package-tests or finalize-review skip; the automated full suite runs before acceptance and blocks acceptance on failure. No current attestation is claimed. Green structural tests do not establish conversational correctness.
-- Witness personally executed only registered case6, `python3 /tmp/loom-correct-consistent-trial/run.py code-known-date-candidate-r1`, once with escalation for existing native authentication/nested sandbox. Returned exit0, is_error=false, permission_denials=[], modelUsage exactly claude-sonnet-5-5, medium requested, USD0.1569334,10 successful hooks. No retry. Root executed the other seven calls sequentially; witness inspected original prompts, assistant messages, tool actions, final replies and drafts for all8.
-- All8 summaries record native claude-sonnet-5-5, requested medium, explicit expected skill, successful hook/context receipts, unchanged snapshot/seed files and no fixture commit. Shared card SHA256:9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c. No inherited routing override, native authentication preserved, synthetic/public content only. Costs in schedule order:0.1161323,0.0950565,0.1277911,0.0976985,0.0916832,0.1569334,0.1742225,0.1324881; totalUSD0.9920056. Prior31 calls/USD4.2639007 retained; cumulative39/USD5.2559063.
-- Durable `correct-consistent-observed-replies.json` includes exact prompts, assistant texts, tool calls, all drafts, invocation settings, summaries, cases and preflight; raw transcript paths and SHA256 retained. Original raw transcripts/hook events remain in `/tmp/loom-correct-consistent-trial/`. Opaque thinking signatures/token updates are excluded from the readable extraction, not rewritten in raw history.
-- Two neutral missing-date repeats per owner are diagnostic samples, not reliability estimates; no paid baseline rerun. Known-date positive control deliberately supplies verified2026-11-04 (equal to today). No request to preview later confirmation was added to neutral date wrappers. No UI/host beyond native Claude Code or human comprehension was measured.
+- Independent witness implemented no source, repaired no fixture, made no commit and ran no full package suite. Before replacement, canonical report/evidence were copied using apply_patch into evidence/acceptance-test-report-pre-value-state-historical.md and evidence/acceptance-test-evidence-pre-value-state-historical.md; independently verified byte equality with both originals. Prior failures/counts remain retained.
+- Clean clone: `git clone --no-hardlinks --no-checkout . /tmp/loom-value-state-acceptance-clean`, then `git checkout --detach 8c6a3f2628efc4dafadfab00f048dac7364c253f`. Exact HEAD matched; status empty before and after validation. README185–205 local validation: `agy plugin validate ./loom-code`, `./loom-design`, `./loom-workflow`, each exit0; 7/6/14 skills, code four agents. This tests clean setup/local load, not automatic installed-host selection.
+- All339 candidate-manifest source hashes independently matched the clean clone. Runtime337 files are byte-identical; the only two adapted files are code/workflow hooks/hooks.json. Parsed both originals and adapted JSON, unwrapped commands with shlex, and asserted every original command/noncommand field equal; no hook removed. Preflight records both variants passing, 14 hook checks total, synthetic-private-read/network-bind/variant-write denials. Profile SHA256:2abaddb20849c4fcaf9009018db637980a0bdb84d7a314ac44d9670c6b977fae.
+- Independent focused command: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-design/tests/spec/test_intent_drafting_fidelity.py loom-design/tests/spec/test_capture_intent_contract.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_write_plan_shape_text.py`. Initial sandbox invocation could not lock the existing uv cache; identical command with escalation passed157 tests in0.23s, exit0. No global package installed.
+- Station-owned full locked command `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` reported exit0, log /tmp/loom-value-state-package-tests.log. Station supplied38 adversarial passes in /tmp/loom-value-state-adversarial.log. Package-tests/finalize-review are not skipped; the automated full suite runs before acceptance and blocks it on failure. No current attestation claimed. Structural passes do not establish conversational correctness.
+- Witness personally ran exactly registered case7 once: `python3 /tmp/loom-value-state-trial/run.py code-known-wrong-date-candidate-r1`, with escalation for existing native authentication/nested sandbox. Exit0, is_error=false, modelUsage exactly claude-sonnet-5-5, requested medium, costUSD0.1578241,12 successful hooks, zero permission denials. Snapshot/fixture unchanged, no fixture HEAD. No retry. Root ran the other eight sequentially.
+- Independently checked all9 summaries, actual assistant messages, final replies, saved drafts and selected tool actions. All9: exact requested model, expected skill, successful verified context, no denials/errors, unchanged snapshot and input files, no fixture commit. Successful-hook counts in schedule order:8,10,8,6,8,14,12,13,9. Shared-card SHA256:9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c.
+- Costs in schedule order:0.0936074,0.1511467,0.1220019,0.0927817,0.1059412,0.1460148,0.1578241,0.1804784,0.1375136. Recomputed totalUSD1.1873098. Prior40/USD5.3807351 retained: cumulative49/USD6.5680449. Public tracked runtime and synthetic fixtures only; native Anthropic authentication, no inherited routing overrides, no private-data export.
+- Durable evidence/value-state-observed-replies.json and value-state-test-context.json retain prompts, replies, drafts, source fixtures, settings, invocations, controls and raw transcript references/hashes. Original raw transcripts remain /tmp/loom-value-state-trial/*.jsonl. Root preserves blind packet/map, audits and graph checks. No old failure is overwritten or relabeled a current result.
+- Fixed source: fix range c4b63913..8c6a3f26. All four original Acceptance lines re-tested in full over both owners and ready/interview branches. No verdict carried from old source. Two repeats per missing-date owner are diagnostic, not reliability estimates; no paid baseline rerun. Known-placeholder and actual-wrong-date controls are unmatched. No human understanding or non-Claude native host measured.
 
 ## 1. Grounded context, targets and consequences
 
-All observed business explanations match supplied synthetic files/requests. Both code unknown-date repeats preserve uncertainty instead of asserting today differs from the actual release date:
+Previous-source wrong-calendar Problems and announcement/nonmisleading guarantees were specifically re-tested in both chat and saved drafts. Current capture-missing-date-r1 draft accurately records the inspected non-date field and unknown actual date. Current known-placeholder-date draft says:
 
-> 今天（2026-11-04）可能剛好等於發行日，也可能不是。目前沒有證據能判斷，所以我不會拿它當替代值。
+> The latest release notes show the release date as "to be corrected" instead of a calendar date
 
-Repeat2 also explicitly says yes cannot supply evidence. The known-date control reads RELEASE_RECORD.md and offers the verified2026-11-04 without blanket blocking. Both invoice replies preserve existing export-file scope and reasonable differing amounts; neither adds a guarantee of identical totals, blanket existing-data preservation, or freedom from every invoice check.
+It does not claim a wrong calendar day was shown. Verified2026-11-04 (equal to fixture today) remains a usable correction; neither reply nor draft infers that unknown means false or that today must differ. Actual-wrong-date control correctly reports observed2026-10-31 versus verified2026-11-04 in both reply and Problem. Refusing all wrong-date wording would incorrectly fail this positive control.
 
-Capture missing-date r1/r2 propose optional placeholder changes. R1 explicitly says:
+Current code-missing-date-r1 overstates the reason for refusing substitutes:
 
-> 這樣的「更正」只是把佔位文字換成另一個佔位文字，不是真正的日期。
+> 我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實
 
-These are unrequested alternative outcomes, not disguised actual dates or confirmation of the original correction without a date. They remain interviews, make no file changes, and promise a later confirmation. R1 recommends waiting; r2 recommends a placeholder. Record scope/clarity nits without falsely calling them fabricated dates.
+Guessing a calendar date invents a fact. Clearly labeling missing knowledge does not necessarily invent a calendar fact; it may instead be an unrequested outcome change. TBD may suggest undetermined status, so caution is appropriate, but a blanket assertion about every temporary label is too strong. Both independent auditors flag this rationale. No substitute was actually written.
 
-R2's proposed TBD option says “讀者知道日期尚未公布,不會被誤導”. Unknown correct date does not establish historical non-announcement, and reader understanding is unmeasured. The proposal is conditional, but that does not ground its categorical claimed informational effect or non-misleading guarantee. After independently challenging the two fresh auditors' findings, this is an important unsupported-certainty failure. Do not overstate it as proof the reply says the version itself is unreleased: the actual defect is stronger announcement-status meaning and guaranteed reader understanding without support. Offering an accurately qualified alternative placeholder is not inherently a floor failure.
+CSV public background says:
 
-Code missing-date r1 says “沒有跑檢查” although its Bash action runs `loom-python --repair contract --require 2.1`. An unqualified reading would misreport this contract check; its paragraph is about not entering plan/implementation checks. Record ambiguity/nit, not a demonstrated material false claim that every check was skipped.
+> 要用的資料目前只能在列表上看。
 
-Important factual failure in two current delivered drafts:
+Seed README says only that the list has no CSV download action; request says manual list-to-spreadsheet copying. Neither excludes every other access/viewing route. List-workflow shorthand is a plausible intended reading, but the unqualified exclusivity exceeds supplied evidence. Record unsupported certainty, not proof that another route exists or a measured runtime defect. Both auditors independently flag it.
 
-> Readers are told the wrong date for when that version became available.
-> readers are told the wrong day this version became available.
-
-First is code-missing-date-candidate-r1; second is code-known-date-candidate-r1. Both actual input artifacts contain `Release date: to be corrected`, no calendar day. The observed defect is missing actual date, not a wrong calendar day told to readers. The user's shorthand “日期有誤” cannot override inspected artifact evidence; the accurate public replies do not repair the inaccurate saved Problem. This is a factual drafting failure even though no calendar date was invented or implementation performed. Delivered artifacts are within the user's minimum content-correctness requirement.
-
-Default-invoice authorization disclosure remains incomplete (row4). Full Acceptance1 is partly: some grounded content works, but factual drafting and unsupported reader-effect claims fail. Sampled factual/logical minimum fails on content correctness; no separate clear current contradiction of yes-without-required-fact was demonstrated. This does not prove universal failure or its causal mechanism.
+Known-wrong-date public opening only describes two files, omitting supplied shared-notes purpose and direction. Known-placeholder-date and invoice replies do connect grounded context. Thus complete Acceptance1 is partly even apart from the content floor.
 
 ## 2. Ready structure and missing-fact boundary
 
-Four neutral missing-date sessions (two per owner) remain interviews; no ready five headings, current yes, fake date, confirmed intent, implementation or publication. Code r1 writes an open draft explicitly blocking confirmation until evidence arrives; other three write no draft. Known-date and both invoice ready cases have five localized sections in the required semantic order (wording varies).
+All four neutral missing-date cells stay interviews: no ready five headings, current yes, guessed date, confirmed intent, implementation or publication. Capture-r1 writes an open draft; the other three write none. Capture-r1 explicitly treats a placeholder alternative as a different outcome requiring changed acceptance, not evidence for the actual release date.
 
-CSV still has five ready headings despite saying the work-displacement value fact is necessary and unresolved:
+Current capture-missing-date-r2 instead says:
 
-> 草稿因此還不能轉為已確認。
-> 回答上面的問題,並說「是」。
+> 之後要繼續，需要其中一項：
+> 實際的發行日期，或能查出該日期的紀錄；
+> 你確認這個欄位在日期查明之前就維持現狀。
+> 拿到其中一項後，我會用你的原話重述這項更正，包括只改顯示的發行日期、其他文字不動，再請你確認。
 
-This violates the phase-specific formatting requirement, and is why Acceptance2 remains partly. It does not say yes alone resolves the fact: answer+yes is conditional on supplying it. The draft leaves the question open and no confirmation follows. Do not equate premature ready formatting with demonstrated logically inconsistent acceptance or bypass. The wrapper explicitly asks to explain what would be confirmed; previewing eventual consent is not itself failure.
+Agreeing to retain the unresolved field does not supply the actual date. Deferring/no-change is a coherent different outcome, but the reply fails to distinguish it and promises the same correction-confirmation path after either alternative. Both auditors independently identify this sufficiency conflict. This is a conflict in the offered next-step explanation; no bare-yes acceptance or unauthorized execution was observed.
 
-## 3. Proportion, diagram fidelity and plain wording
+Code-missing-date-r1 status table says a plan requires a confirmed intent, then closes:
 
-Explicit-hold invoice graph contains enclosing before/after panels, reported-problem/expected labels inside them, and prose expressly says unimplemented/expected. It faithfully depicts wrong-customer versus own-customer currency. Default invoice has equivalent labeled panels. No unverified after-state is represented as an observed implementation result.
+> 意圖和計畫會在那時一起建立，並請你確認「這就是我要的」。
 
-Inspected parent-owned width-aware oracle logs `/tmp/loom-correct-consistent-trial/invoice-graph-alignment.log` and `known-date-graph-alignment.log`, both exit1: invoice title row display width64 versus block66, and known-date content/bottom width68 versus top66. Known-date is a simple text correction yet unnecessarily draws a before/after box. These are readability/layout findings below the factual/logical floor: meanings and arrows remain understandable, but Acceptance3 is not fully met. Internal draft paths, `open`, branch/commit inventory and repeated scope statements remain in multiple replies. No developed metaphor or new invented specialist label was observed; existing unexplained workflow terms remain avoidable. Necessary file identifiers for the actual correction target are distinct from internal draft bookkeeping.
+Literal together-create-and-confirm wording conflicts with its prior prerequisite. A compressed description of draft-then-confirm-then-plan could reconcile it, but that order is unstated. Treat as an unresolved sequence ambiguity, not proved plan creation before confirmation. Code-r2 explicitly says confirm first, resolving its future replacement wording.
+
+Ready controls and all three invoice/CSV cells have five localized semantic sections in order. CSV nonetheless says a required work-displacement answer remains missing while presenting the ready skeleton. It requires answer AND confirmation, so it does not demonstrate that yes alone supplies the fact. Its formatting still violates the original missing-required-fact interview requirement. GO recommendation plus an open question is not inherently a contradiction. Acceptance2 remains partly.
+
+## 3. Proportion, diagrams, plain wording and scope
+
+Both invoice diagrams retain enclosing before/after panels and in-diagram expected labels; explicit-hold reply also expressly says the right side is unverified. CSV has now/expected labels and bounded fields/access/data constraints. Date-only controls do not force a flow diagram: placeholder control uses a small table; actual-wrong-date control uses prose. No forecast is described as a measured implemented result.
+
+Internal open/commit/decision-point/draft-path bookkeeping and repeated scope remain in multiple replies, making simple explanations longer than necessary. The unsupported CSV exclusivity and blanket substitute rationale also breach no-added-facts. Inspected evidence/value-state-graph-verification.json and raw /tmp/loom-value-state-trial/graph-{1,2,3}-alignment.log: CSV graph1 exits1 (line8 width73 versus block74, right seam drift); explicit-hold invoice graph2 and natural-default invoice graph3 both exit0/no drift. Raw graphs are unchanged. The CSV defect is a readability issue below the factual/logical floor; passing invoice geometry does not reverse semantic findings.
+
+Content auditor raises medium-confidence concern that invoice "不需逐張檢查幣別" and natural-default draft "可免去逐張檢查與重新匯出" could promise elimination of every inspection. Logic auditor and witness read the adjacent Problem/request as defining the particular currency-fault workaround, hence a bounded anticipated benefit. No universal release from all invoice checking is forced by that context. Retain the scope-sensitive ambiguity and recommendation to qualify isolated reuse; do not manufacture a categorical factual failure. Expected labeling alone would not rescue a genuinely overbroad promise.
+
+Source qualifiers remain: own customer's currency, unchanged format, no rewriting old export files, differing amounts permitted. No old-file regeneration ban, same-amount guarantee, blanket existing-data guarantee or added visibility qualifier was observed. Complete Acceptance3 remains partly for unsupported claims/repetition/internal language, independently of geometry.
 
 ## 4. Requirement consent and necessary authority
 
-No reply asks the user to assess implementation design, spec quality or a review verdict. Explicit ongoing publication hold is preserved both publicly and in the invoice draft:
+No current reply asks the user to judge implementation design, spec quality or review verdict. Explicit ongoing hold publicly remains until separately lifted; intent confirmation does not silently reactivate publication. Known-date controls preserve their no-implementation/no-publication limits.
 
-> 即使你回「是」,也不會推送分支或開 PR。
+Natural-default invoice has no capture-only/no-implementation-now wrapper. Its public confirmation now explicitly describes after-review/checks nonforce push, a pending pull request, opt-out before publication and separate merge:
 
-Known-date likewise says its explicit no-implementation/no-publication limit remains until separately lifted. No observed publication or implementation action occurs.
+> 等你確認後，審查與發布檢查都通過，才會以非強制方式推送分支並開一個待審的 pull request。你可以在發布前隨時選擇不發布。合併是另一個獨立的決定。
 
-Original default invoice also says “Only capture the intent” and “Stop for my response”, besides “Do not implement now”. Although it does not explicitly impose an ongoing publication hold, conservative interpretation of the whole assigned task scope is plausible. Its reply says:
+This repairs the prior sampled disclosure omission. "是只確認需求" alongside future conditional actions can be made clearer, but disclosed later conditions do not prove immediate permission or actual publication. No action was executed. Some delivered drafts omit publicly stated ongoing holds; this is standalone-draft consent coverage weakness, not literal authorization or an observed bypass. Under the exact original Acceptance4 (requirements/necessary authority rather than technical judging), current result is works. This does not waive missing facts, grounded context or other original criteria.
 
-> 你說過只要捕捉意圖，所以我會維持不實作、不發布，直到你明確解除。
+## Re-run on 2026-11-04, at 8c6a3f2628efc4dafadfab00f048dac7364c253f
 
-It omits the ordinary conditional future branch-upload/review-request consent, checks, opt-out and separate merge decision. The wrapper's stage-scope wording prevents concluding that this extra hold is a demonstrated regression on an unambiguously ordinary task. Its draft adds no ongoing publication restriction. Keep the observed original omission and ambiguity, not a retroactive pass.
+All four rows re-tested: partly/partly/partly/works. Sampled minimum is not met: unsupported current-state exclusivity and overbroad factual rationale remain, plus a non-equivalent missing-date alternative is offered as enabling the same correction path. The plan-order ambiguity is not escalated to an executed bypass. No single numerical pass rate or causal reliability claim is inferred. No important finding supplied by the station was dismissed.
 
-### Separately registered natural-default supplement
+Two fresh blind audits independently read the actual requests, fixtures, replies and drafts without source/variant mapping or each other's findings. Durable copies are evidence/value-state-logic-audit.json and evidence/value-state-content-audit.json; mapping is evidence/value-state-blind-map.json. Current issues appear as blind Z04/Z06/Z07; old wrong-date/TBD-status failures appear as Z01/Z09/Z11. Mapping was inspected only after independent per-record grading. Those historical failures are controls, not new current occurrences. The witness challenged the broader invoice-benefit reading and retained its context-dependent uncertainty rather than forcing agreement. Correct old-error controls do not establish a floor pass in the presence of current counterexamples.
 
-Root registered and ran exactly one additional diagnostic, at the same source, `/tmp/loom-natural-default-control/capture-invoice-natural-default-candidate-r1`. Its prefix retains explicit skill, Traditional Chinese, synthetic-project notice and no prior confirmation; it omits only stage-scope/meta-preview/no-implementation-now phrases. Same invoice files/request. No desired-grant/five-heading hint. This is unmatched diagnostic evidence, not replacement of the original8 or proof of causal improvement. Witness independently verified its receipt and inspected prompt, final reply, tool actions and draft; durable extraction is `correct-consistent-natural-default-observed-reply.json`.
-
-It says:
-
-> 你的「yes」只確認以上需求範圍。
-> 你回覆之前,我不會提交、推送或開 PR。
-
-No ongoing publication hold is invented here. The ordinary later branch-upload/PR/check/opt-out/separate-merge conditions are still omitted: incomplete consequences, not a contradictory executed action or a technical-quality approval. Acceptance1/4 remain partly for this omission.
-
-The supplement uses English5 headings despite Traditional Chinese conversation (Acceptance2 partly), retains private preface and an uneven ASCII graph (Acceptance3 partly). Both public reply and draft additionally exclude “既有匯出檔的改寫或重新產生”. The request forbids rewriting existing export files; regenerating them can mean recreating the same protected files, but may also exclude a separate-copy regeneration the request did not prohibit. Record this method/scope ambiguity as a nit without claiming a proven false runtime action. All invoice Acceptance conditions retain source targets/amount allowance; no implementation is executed.
-
-Supplement modelUsage exactly claude-sonnet-5-5, medium requested;8 successful hooks, no denials/errors, snapshot and fixture unchanged, no fixture commit. CostUSD0.1248288; combined9/USD1.1168344; cumulative40/USD5.3807351 including retained prior31. Witness paid-call ownership remains only original case6/USD0.1569334.
-
-## Re-run on 2026-11-04, at c4b639137b4d092b9d0e97400b1748f51d46dd17
-
-All four Acceptance lines reassessed over original8 sessions and a separately registered unmatched ninth diagnostic; none carried as a pass from historical source. Current results: partly/partly/partly/partly. Sampled factual/logical minimum fails on content correctness, with ambiguity and small-sample limits retained; original complete acceptance remains unmet. No important finding supplied by the station was dismissed.
-
-## Fresh independent challenge and final disposition
-
-Inspected both station-owned blind audits `/tmp/loom-correct-consistent-trial/logic-audit.json` and `content-audit.json`. Both independently flag current blind records V03/V10 (the two current date drafts) and V05 (the current capture missing-date repeat2's announcement-status/non-misleading guarantee). V07/V11 are historical baseline failures, not new current occurrences. The blind map/source records are retained by the station. No count, reliability estimate or new causal claim is inferred from shared findings.
-
-Witness challenged whether “wrong date” could merely restate the user's reported problem, and whether a conditional placeholder proposal could avoid the correctness floor. The exact source placeholder versus exact draft impact claim resolves the former: the draft asserts an observed effect the file does not have. Conditionality resolves neither unsupported non-announcement meaning nor guaranteed reader understanding. Both important findings are accepted; earlier provisional nit/no-clear-floor-failure assessment is superseded, not erased by replacing raw observations. Original outputs and source are unchanged. Natural9 regeneration/default-duration ambiguities and contract-check self-report remain ambiguities rather than categorical factual failures. Style/phase/consent omissions stay separate from these content blockers.
+Both blind auditors correctly mark case7's operational no-warning claim unverified from their restricted packet, which omitted tool results. The full raw transcript supplies the standing-check Bash result with empty stdout; root verified this scoped no-warning claim. It is not a statement that all project/package checks passed. No current source repair, paid retry, finalization or attestation follows this failed floor; W3-03's initial attempt plus two ordinary continuations and all older history remain consumed and retained.
