@@ -91,9 +91,9 @@ Constraints and Out of scope can all be filled in without guessing.
 
 Keep every field at intent altitude:
 
-- **Problem** — present pain, affected people, and consequence; no diagnosis,
-  file list, or fix. Put missing current behaviour, workaround, or consequence
-  in Open questions; do not infer it.
+- **Problem** — evidenced pain, affected people, effects; no diagnosis, file list, fix.
+  Distinguish absent and incorrect values. Put unknown behaviour, workaround or
+  effects in Open questions without inference.
 - **Proposed outcome** — wanted capability or state; no complete scenarios,
   UI reactions, state transitions, or implementation design.
 - **Acceptance** — numbered observable delivery outcomes with external

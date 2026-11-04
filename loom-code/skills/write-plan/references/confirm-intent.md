@@ -20,8 +20,10 @@ Lead interviews with the user's problem or missing fact, minimizing workflow
 labels and bookkeeping; retain consequence/authorization disclosures.
 Keep missing required facts in the existing interview, asking only for the
 needed fact and why it matters.
-Problem holds present pain, who it affects, and the consequence, with no
-diagnosis or fix; Proposed outcome holds the wanted capability;
+Problem holds present pain, who it affects, and the evidence-backed consequence,
+with no diagnosis or fix; distinguish absent values from incorrect values,
+keeping reports and inspected observations distinct. Leave unsupported effects unknown.
+Proposed outcome holds the wanted capability;
 Acceptance holds each observable delivery outcome, not value, complete
 scenarios, UI placement, state transitions, test steps, or implementation;
 Keep already-fixed user/standing-policy boundaries as Constraints; product Value case gives beneficiary, urgency,

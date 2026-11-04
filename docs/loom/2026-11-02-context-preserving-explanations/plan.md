@@ -109,6 +109,11 @@ charter: 1.1
 - Test: A1 negative: unknown-does-not-imply-false. A2 negative: confirmation-before-required-facts; boundary: established-fact-ready. A3 positive: source-supported-output. A4 positive: consistent-authorization.
 - Risk: user-decided — "對 請繼續迭代吧" authorizes this continuation after the factual/logical minimum was clarified. Retain the same failed obligations, W3-03's initial attempt and all W3-01 history; diagnose competing instructions before repairing them.
 
+**W3-03 continuation 2 — reconcile observed values in messages and drafts** after: W3-03 acceptance: 1,2,3,4
+- Files: existing paired grounding/examples, intent field templates and corresponding drafting guidance; focused regression surfaces and unreleased notes.
+- Test: A1 negative: placeholder-is-not-a-wrong-calendar-day; boundary: verified-wrong-value. A2 positive: unresolved-fact-remains-open. A3 negative: unsupported-announcement-or-reader-effect. A4 positive: retained-authorization-boundaries.
+- Risk: agent-decided — Two fresh auditors and independent acceptance confirm draft/message value-state mismatches and unsupported announcement/reader-effect claims. Repair the shared inference class in existing examples and drafting instructions; retain all failures and the second continuation count.
+
 ## Simplicity check
 - none found
 

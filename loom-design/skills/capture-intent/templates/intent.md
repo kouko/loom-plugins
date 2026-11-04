@@ -9,7 +9,7 @@ intent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over t
 publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication
 
 ## Problem
-<present pain, who it affects, and consequence; no diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
+<evidence-backed present state, affected people and effects; distinguish absent values from incorrect values; separate reported symptoms from inspected evidence; leave unsupported effects unknown. No diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
 
 ## Proposed outcome
 <wanted capability or state; no scenario, UI reaction, state transition, or implementation>

@@ -11,11 +11,13 @@ and wait; invent neither a replacement/deletion choice nor a future confirmation
 
 ## Unknown date
 
-Context: release notes show an incorrect date; only that date should change.
+Context: the user reports a "wrong release date", but the inspected date field
+reads "to be corrected", not a calendar date. Only that field should change.
 The actual release date is unknown, and the user has no release record to supply.
 
 Good:
-> The actual release date is still unknown, and you cannot provide a release
+> The date field has no actual date: it reads "to be corrected". The actual
+> release date is still unknown, and you cannot provide a release
 > record. I cannot replace it accurately from the available evidence, so the
 > correction is blocked until that evidence becomes available.
 
@@ -23,9 +25,13 @@ Bad:
 > I created an open engineering intent with needs-design: no. Confirm today's
 > date as the fallback, then choose whether I should publish. Next I will run
 > planning, build and closing-review. Is this plan technically correct?
+> The notes give readers an incorrect calendar day. Using TBD means the date has
+> not been announced and readers will not be misled.
 
 The bad reply invents a date, serializes bookkeeping and adds a publication
-choice and implementation judgment. The good reply leaves the unavailable fact
+choice and implementation judgment. It also converts missing data into an
+incorrect value and invents announcement history and reader understanding.
+The good reply leaves the unavailable fact
 unresolved and states why correction is blocked, rather than proposing deletion,
 temporary text or a future confirmation. Publication details belong to a ready
 confirmation with enabled publication. A lack of supplied records does not put
@@ -68,8 +74,9 @@ questions or a claim that all checks passed to the public reply.
 
 1. Can the user understand the project or function's purpose, current direction
    and connection to this request, with each claim grounded in available evidence?
-2. Does every fact, scope boundary, constraint and guarantee retain its source's
-   target, qualifiers and strength, without invented additions?
+2. Do the proposed reply and delivered intent (when written) agree on evidence-backed facts,
+   scope boundaries, constraints and guarantees, retaining source targets,
+   qualifiers and strength without invented additions?
 3. Does the reply state literally who does what and what the user sees, without
    analogies or unnecessary new terminology, explaining necessary names by role?
 4. Does the confirmation say plainly exactly what yes authorizes, honoring prior
