@@ -115,7 +115,7 @@ charter: 1.1
 - Risk: agent-decided — Two fresh auditors and independent acceptance confirm draft/message value-state mismatches and unsupported announcement/reader-effect claims. Repair the shared inference class in existing examples and drafting instructions; retain all failures and the second continuation count.
 
 **W3-04 Ground each section without filling unsupported content** after: W3-03 acceptance: 1,2,3,4
-- Files: paired confirmation references; related visualization full/coexist cards and plain-language.md; derived host rule, workflow manifests/current version pins/README and changelog; existing relevant checks and retained evidence.
+- Files: both intake entry SKILLs and paired confirmation references; related visualization full/coexist cards and plain-language.md; derived host rule, workflow manifests/current version pins/README and changelog; existing relevant checks and retained evidence.
 - Test: A1 positive: sparse-project-context-without-invented-direction. A2 positive: five-brief-sections; boundary: missing-required-fact-stays-interview. A3 positive: supported-impact-only; negative: inferred-exclusive-access-or-guaranteed-benefit. A4 positive: explicit-hold-and-normal-publication-controls.
 - Risk: user-decided — "試試看吧" approves evidence-backed brief sections, retaining W3-03 failures/counts and all consent boundaries. Compare frozen native cases; add no research stage, checker or model reviewer.
 
@@ -153,3 +153,5 @@ charter: 1.1
 16. agent-decided — Round2 fails the existing 181-word card cap. Round3 compacts both cards within that cap, preserving real-choice scope and earlier obligations; no raised limit, README inflation or weakened tests. Each tested source remains separately recorded.
 
 17. user-decided — Consider template simplification within five rounds. Round4 moves unchanged ready examples into the existing optional gallery, retaining five headings and all obligations. Grounding/six checks stay; tests follow the new resource home without losing assertions.
+
+18. user-decided — Fifth/final round repairs entry-point evidence reading after actual README omission. The five-round authorization overrides the usual two-source-redispatch limit; retain prior attempts. No sixth source round, publication or merge.
