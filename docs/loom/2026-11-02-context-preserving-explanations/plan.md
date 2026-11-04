@@ -145,3 +145,5 @@ charter: 1.1
 12. user-decided — W3-04 changes the presentation obligation, not the factual/logical minimum or W3-03 retry identity. Five headings remain, but unknown broader context need not be filled or newly interviewed. Preserve reading, required-fact interviews, disclosures, diagram conditions and all earlier evidence.
 
 13. agent-decided — W3-04 trial complete; candidate unaccepted: both variants retain two material-failure cases, only two replies shorten. Preserve observations without tuning for a pass; minimum remains unmet, publication held and attestation stale.
+
+14. user-decided — Authorize at most five additional rounds, including option-guidance ablation and evidence-backed repairs. Retain W3-04/prior attempts. Behavioral actors remain first-party claude-sonnet-5-5, medium requested, regardless of main-model switch. Publication and merge remain held.
