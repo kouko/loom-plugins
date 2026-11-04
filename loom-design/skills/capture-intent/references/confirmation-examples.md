@@ -2,30 +2,10 @@
 
 Read the primary `confirmation-template.md` first. Use only the relevant section
 when an illustration is needed; these examples supply no facts for another case.
-Completed confirmations apply only after required facts are settled; the
-unavailable-date example stays a focused interview.
+Phase-specific examples are already in the required grounding and ready-layout readers.
+The examples below are supplementary; they define no additional reply structure.
 
 
-## Unknown date
-
-Context: release notes show an incorrect date; only that date should change.
-The actual release date is unknown, and the user has no release record to supply.
-
-Good:
-> The actual release date is still unknown, and you cannot provide a release
-> record. I cannot replace it accurately from the available evidence, so the
-> correction is blocked until that evidence becomes available.
-
-Bad:
-> I created an open engineering intent with needs-design: no. Confirm today's
-> date as the fallback, then choose whether I should publish. Next I will run
-> planning, build and closing-review. Is this plan technically correct?
-
-The bad reply invents a date, serializes bookkeeping and adds a publication
-choice and implementation judgment. The good reply leaves the unavailable fact
-unresolved and states why correction is blocked, rather than proposing deletion,
-temporary text or a future confirmation. Publication details belong to a ready
-confirmation with enabled publication.
 
 ## Known correction
 
@@ -178,82 +158,3 @@ Bad:
 The bad reply contradicts randomness, expands an interface constraint into an
 implementation prohibition, invents an additional scope choice and reverses the
 publication default.
-
-## Invoice currency correction
-
-Context: accounting staff export invoices; the supplied priority is customer-setting isolation with the current format retained. Exports sometimes borrow the previous customer's currency. Amounts can differ, format stays unchanged, and existing files must remain untouched. The user explicitly asked to capture requirements only and not publish.
-
-Good:
-> ### Background and current direction
-> The accounting team exports invoices. The stated priority is to isolate customer settings while preserving the export format.
->
-> ### Current problem and impact
-> An export sometimes uses the previous customer's currency setting, so the invoice shows the wrong currency.
->
-> ### What changes
-> Use the invoice customer's own currency setting. The comparison shows the reported failing case and the expected correction:
->
-> ```text
-> ┌──────────────────────────────┐  ┌──────────────────────────────┐
-> │    Before (reported bug)     │  │        Expected after        │
-> ├──────────────────────────────┤  ├──────────────────────────────┤
-> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
-> │  │     Export invoice     │  │  │  │  Export invoice  │        │
-> │  └────────────────────────┘  │  │  └──────────────────┘        │
-> │               │              │  │            │                 │
-> │               ▼              │  │            ▼                 │
-> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
-> │  │ May use prior currency │  │  │  │ Use own currency │        │
-> │  └────────────────────────┘  │  │  └──────────────────┘        │
-> │               │              │  │            │                 │
-> │               ▼              │  │            ▼                 │
-> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
-> │  │     Wrong currency     │  │  │  │ Correct currency │        │
-> │  └────────────────────────┘  │  │  └──────────────────┘        │
-> └──────────────────────────────┘  └──────────────────────────────┘
-> ```
->
-> ### Scope and acceptance
-> Check exports for customers with different currencies. Keep the format unchanged and existing export files untouched. Amounts may legitimately differ between exports; identical amounts are not required.
->
-> ### Please confirm
-> Your confirmation covers these requirements only. You asked not to publish;
-> I will keep that restriction unless you explicitly lift it.
-> Is that the correction you want?
-
-Bad:
-> Fix currency profile. All future invoice amounts will be identical; regenerate every existing export.
-> Your yes also permits publication despite your restriction.
-> Keep every existing datum untouched and prohibit changes to how customer settings are entered or stored.
-
-The bad reply hides the setting's role, broadens named export-file preservation to all data, invents method restrictions, and overrides existing publication restrictions. The good diagram illustrates the failing path, not every export; a result boundary does not ban an unrequested internal fix method.
-
-
-## Filtered CSV export
-
-Context: accounting staff inspect filtered invoices; the supplied direction is offline use of that same result. They request CSV export of the current filtered result, with invoice number, customer, currency and amount columns, retaining current permissions.
-
-Good:
-> ### Background and current direction
-> Accounting staff inspect filtered invoices. The stated direction is to make that same result available for offline accounting.
->
-> ### Current problem and impact
-> They currently cannot download the filtered result as a CSV file.
->
-> ### What changes
-> Add CSV export for the current filtered result.
->
-> ### Scope and acceptance
-> The download uses the current filtered result, with invoice number, customer, currency and amount columns. Existing access permissions stay unchanged.
->
-> ### Please confirm
-> Only after review and publication checks pass does saying yes authorize
-> both a non-forced branch upload and a pull request ready for review. You may
-> opt out anytime before publication; merging remains separate.
-> Is that the capability you want?
-
-Bad:
-> We are modernizing the entire accounting platform. Approve a background export service and a new permission model.
-> There is no CSV download, so there are no download actions at all.
-
-The bad reply invents a project direction and implementation decision, and expands the absence of one capability into the absence of all downloads. The good reply retains the supplied CSV qualifier and permission boundary.

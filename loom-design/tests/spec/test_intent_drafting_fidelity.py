@@ -93,10 +93,11 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
             "Background and current direction", "Current problem and impact",
             "What changes", "Scope and acceptance", "Please confirm"]
         return
-    for case in ("Unknown date", "Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
+    for case in ("Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
         example = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
         assert "Good:" in example and "Bad:" in example
-    pending = text.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
+    grounding = paths[0].with_name("confirmation-template.md").read_text()
+    pending = grounding.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
     good_interview = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
     assert "pull request" not in good_interview and "Saying yes" not in good_interview
     assert "blocked" in good_interview
@@ -115,8 +116,9 @@ def test_local_confirmation_examples_are_portable_and_identical(filename: str) -
         headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
         assert headings == ["Background and current direction", "Current problem and impact",
                             "What changes", "Scope and acceptance", "Please confirm"]
+    ready = paths[0].with_name("confirmation-format.md").read_text()
     for case in ("Invoice currency correction", "Filtered CSV export"):
-        section = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
+        section = ready.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
         assert "Good:" in section and "Bad:" in section
         headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
         assert headings == ["Background and current direction", "Current problem and impact",
@@ -177,7 +179,7 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
     confirmed, open_intent = step3.split("Otherwise", 1)
     assert "confirmation-template.md" not in confirmed and "confirmation-examples.md" not in confirmed
     assert "confirmation-format.md" not in confirmed
-    assert "references/confirmation-format.md" in open_intent
+    assert "confirmation-format.md" not in open_intent
     assert "confirmation-format.md" not in no_intent
     for route, child in ((no_intent, "references/no-intent-interview.md"),
                          (open_intent, "references/confirm-intent.md")):
@@ -209,3 +211,39 @@ def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> Non
                            verb, literal, *extras)
     late = "Draft directly when already sufficient. " + sentence
     assert not affirms(late.split("Draft directly", 1)[0], verb, literal, *extras)
+
+
+def test_required_readers_contain_their_phase_examples() -> None:
+    """Examples needed to recognize a phase cannot depend on optional reading."""
+    root = REPO / "loom-design/skills/capture-intent/references"
+    grounding = (root / "confirmation-template.md").read_text()
+    ready = (root / "confirmation-format.md").read_text()
+    gallery = (root / "confirmation-examples.md").read_text()
+    pending = grounding.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
+    positive = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
+    assert "blocked" in positive and "### Please confirm" not in positive
+    assert "verification" in pending and "out of scope" in pending
+    assert "## Unknown date" not in ready + gallery
+    for case in ("Invoice currency correction", "Filtered CSV export"):
+        assert f"## {case}" in ready and f"## {case}" not in gallery
+    assert "templates/02-linear-steps.md" in ready
+    assert "read" in ready.split("templates/02-linear-steps.md", 1)[0].splitlines()[-1].lower()
+    assert "no diagrams" not in ready.lower()
+
+
+def test_missing_fact_branch_stops_before_confirmation_preparation() -> None:
+    for relative in ("loom-design/skills/capture-intent/SKILL.md",
+                     "loom-code/skills/write-plan/references/confirm-intent.md"):
+        text = (REPO / relative).read_text()
+        branch = text.split("before drafting or replying.", 1)[1].split("Before drafting:", 1)[0]
+        assert "missing" in branch.lower() and "stop" in branch
+        assert "confirmation preparation" in branch
+    main = (REPO / "loom-code/skills/write-plan/SKILL.md").read_text()
+    assert "confirmation-format.md" not in main
+
+
+def test_primary_reader_uses_literal_explanation_without_private_terms() -> None:
+    text = (REPO / "loom-design/skills/capture-intent/references/confirmation-template.md").read_text()
+    assert affirms(" ".join(text.split()), "State", "who does what", "user sees", "what changes")
+    assert "metaphors or analogies" in text
+    assert "new terminology" in text and "necessary" in text

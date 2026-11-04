@@ -64,18 +64,18 @@ or updated.
 
 ## Step 1 — Interview
 
-Read `references/interview.md`; ask only for missing required-field content.
+Read `references/interview.md`; ask only about missing required-field content.
 Read `references/confirmation-template.md` before drafting or replying.
+Missing required facts: follow its interview branch; stop before confirmation preparation.
 Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
-Before drafting: Preserve supplied facts and outcome strength, including
-qualifiers. Leave unknown facts unresolved pending user answers/evidence.
+Before drafting: Preserve supplied facts, outcome strength and qualifiers.
+Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
 Lead interviews with the user's problem or missing fact, minimizing workflow
 labels and bookkeeping; retain consequence/authorization disclosures.
 Keep missing required facts in the existing interview, asking only for the
-needed fact and why it matters. Compose confirmation only when required facts
-are resolved.
-Draft directly when already sufficient. No question quota applies.
+needed fact and why it matters.
+Draft directly when already sufficient.
 
 Cover affected people, workaround, clean-environment observable outcomes,
 fixed constraints, and exclusions. For product also cover urgency, existing
@@ -111,7 +111,7 @@ Keep every field at intent altitude:
   content; both block confirmation. Carry downstream spec/engineering questions
   in the hand-off, not this section.
 
-Any section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
+Any intent-file section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
 for example current versus wanted, or who is affected. Acceptance stays a
 numbered list, a diagram stays at intent altitude (no UI reactions or state
 transitions), and a product Problem still holds no identifiers, Mermaid node
@@ -186,7 +186,7 @@ intent in step 4.
 
 ### Private preparation
 
-Prepare consequences/questions privately.
+Prepare inputs privately; the ready layout orders replies.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -273,7 +273,7 @@ mechanism names. Supply necessary context: unfamiliar terms, affected people,
 intent altitude. Use five ordered sections from
 `references/confirmation-format.md` as the whole public reply, with headings required.
 Choose wording and length freely, keeping familiar requests short.
-Check these connections and what yes confirms and authorizes; never implementation approval.
+Check these connections and what yes confirms and authorizes.
 
 Honor a prior publication hold or opt-out until the user explicitly lifts it.
 Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize

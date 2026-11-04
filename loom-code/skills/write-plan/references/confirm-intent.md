@@ -11,14 +11,15 @@ When this station performs code-only intake, use the same capture boundary:
 ask only for missing required-field content, never a fixed intake question
 quota; existing decision points remain unchanged.
 Read `confirmation-template.md` before drafting or replying.
+If required facts are missing, use its interview branch and stop before
+confirmation preparation.
 Before drafting: Preserve supplied facts and outcome strength, including
 qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
 Lead interviews with the user's problem or missing fact, minimizing workflow
 labels and bookkeeping; retain consequence/authorization disclosures.
 Keep missing required facts in the existing interview, asking only for the
-needed fact and why it matters. Compose confirmation only when required facts
-are resolved.
+needed fact and why it matters.
 Problem holds present pain, who it affects, and the consequence, with no
 diagnosis or fix; Proposed outcome holds the wanted capability;
 Acceptance holds each observable delivery outcome, not value, complete
@@ -47,14 +48,15 @@ insufficient; reopen means move it to Open questions, stop confirmation, and
 the intent must remain `open`.
 <!-- /gate -->
 
-Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
+Any intent-file section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
 numbered list, diagrams stay at intent altitude (no UI reactions or state
 transitions), a product Problem holds no identifiers (Mermaid node ids
 included), and chat shows text tables or text diagrams, not Mermaid.
 
 ### Private preparation
 
-Privately prepare applicable consequences/questions.
+Privately prepare applicable consequences/questions as inputs to the ready layout,
+not as another reply outline.
 
 2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is

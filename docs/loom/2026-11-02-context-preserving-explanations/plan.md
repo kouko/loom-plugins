@@ -93,6 +93,12 @@ charter: 1.1
 - Test: A1 positive: source-target-qualifiers. A2 positive: ready-only-format-load; boundary: unavailable-fact-interview. A3 negative: inferred-method-ban-or-broadened-preservation. A4 positive: retained-explicit-hold/default-controls.
 - Risk: agent-decided — retain continuation count 2 and prior evidence. Separate ready layout from pre-draft guidance, and tie absence/preservation/exclusion claims to source subjects and qualifiers. Preserve working consent and diagram branches; ambiguous wrappers establish neither an ongoing-hold breach nor future authorization.
 
+**W3-01 user-authorized continuation 3 — diagnose reference loading and competing guidance** after: W3-00 acceptance: 1,2,3,4
+- Files: existing confirmation owners, paired references, focused tests and retained evidence; no new skill or generator.
+- Test: A1 negative: broadened-preservation-or-method-ban. A2 positive: five-ready-sections; boundary: unavailable-date-interview. A3 positive: loaded-framed-comparison-example; negative: metaphor-or-unnecessary-coined-term. A4 positive: explicit-publication-hold-retained.
+- Risk: user-decided — after the prior stop and explanation of the dispatch ceiling, the user said "那就繼續迭代吧". This authorizes one additional source iteration beyond the default redispatch ceiling, retaining the same task identity, initial execution and two completed continuations. Diagnose actual reference consumption and competing composition guidance before a minimal repair, then rerun the invoice/unknown-date cases. No requirement, reviewer-episode reset or publication authorization is implied.
+- Risk: user-decided — also assess literal plain language, absence of metaphors and unnecessary invented terminology, following "也順便對於是否真的以白話方式說明 不用比喻 非絕對必要不自創專有名詞 這方面做一下評估". These are existing conversation clarity obligations, not an additional user decision or workflow phase.
+
 ## Simplicity check
 - none found
 

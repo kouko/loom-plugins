@@ -1,10 +1,38 @@
 # Intent grounding and focused interview
 
 Write in the user's conversation language.
+State literally who does what, what the user sees and what changes.
+Use no metaphors or analogies. Introduce no new terminology unless necessary;
+define a necessary unfamiliar name by its role, without creating another name.
 
 Keep missing required facts in the existing interview, asking only what is needed and why.
 When the user already lacks the required fact and evidence, state what is blocked
 and wait; invent neither a replacement/deletion choice nor a future confirmation preview.
+
+## Unknown date
+
+Context: release notes show an incorrect date; only that date should change.
+The actual release date is unknown, and the user has no release record to supply.
+
+Good:
+> The actual release date is still unknown, and you cannot provide a release
+> record. I cannot replace it accurately from the available evidence, so the
+> correction is blocked until that evidence becomes available.
+
+Bad:
+> I created an open engineering intent with needs-design: no. Confirm today's
+> date as the fallback, then choose whether I should publish. Next I will run
+> planning, build and closing-review. Is this plan technically correct?
+
+The bad reply invents a date, serializes bookkeeping and adds a publication
+choice and implementation judgment. The good reply leaves the unavailable fact
+unresolved and states why correction is blocked, rather than proposing deletion,
+temporary text or a future confirmation. Publication details belong to a ready
+confirmation with enabled publication. A lack of supplied records does not put
+verification out of scope; it leaves the date unknown until evidence is available.
+Do not turn "only change the date" into a ban on checking it.
+
+## Grounded drafting
 
 Read the available README or equivalent project overview and relevant current direction
 before composing the opening; read narrowly, not across the whole repository.
