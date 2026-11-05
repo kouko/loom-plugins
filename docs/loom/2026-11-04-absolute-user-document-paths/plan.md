@@ -34,7 +34,7 @@ When delivering a local document, provide its actual absolute location. Where lo
 ① — what — 以上就是你要的範圍嗎？ 若不希望自動建立 PR，也可一併說明。
 
 ## Risks
-1. user-decided — 2026-11-05: implement one concise document-delivery rule. Publish only after renewed verification and acceptance; merge and installed-plugin updates remain outside this change.
+1. user-decided — 2026-11-05: implement one concise document-delivery rule. Retain authorized PR publication after renewed verification; merge requires explicit acceptance and installed-plugin updates remain outside this change.
 2. agent-decided — realpath is an optional implementation tool. Judge correct delivered locations, not tool-call presence or byte-for-byte reuse.
 3. agent-decided — use known host support; unknown support falls back to full absolute text. Do not infer Markdown support from terminal branding or run environment detection.
 4. agent-decided — normal filename mentions and quoted examples are outside delivery scope; actual copyable delivery instructions must still identify the intended document.
