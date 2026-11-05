@@ -13,7 +13,7 @@ Scope revision confirmed for implementation on 2026-11-05. Continue the same cha
 
 ## Delivery rule
 
-When delivering a local document, provide its actual absolute location. Where local Markdown links are known to be supported, use a project-relative label (or a filename for an external document) and an absolute target; otherwise show the full absolute path. Preserve portable references inside files.
+When delivering a local document, provide its actual absolute location. Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) and an absolute target; otherwise show the full absolute path. Preserve portable references inside files.
 
 ## Task DAG
 ### Wave 0
