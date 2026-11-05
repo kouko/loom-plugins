@@ -1,5 +1,5 @@
 # Concise document-delivery guidance — revised plan
-intent: 2026-11-04-absolute-user-document-paths@22df8d03
+intent: 2026-11-04-absolute-user-document-paths@3a7ee21c
 charter: 1.1
 
 Scope revision confirmed for implementation on 2026-11-05. Continue the same change with narrower delivery obligations; existing implementation and review evidence describe the earlier scope, not completion of this revision.
