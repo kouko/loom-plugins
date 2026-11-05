@@ -12,10 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.21.0] — 2026-11-04 — deliver design documents with absolute conversation paths
+## [2.21.0] — 2026-11-05 — keep local design document delivery concise
 
-- Require absolute local document locations in conversation for all five document-producing skills, including standalone invocations.
-- Use supported absolute Markdown targets with short labels or absolute text paths, resolve the active document location, and preserve portable resource references and stored document paths.
+- Deliver local documents from all five document-producing skills, including standalone invocations, with their actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
+- Where local Markdown links are known to be supported, use a project-relative label or an external document's filename with an absolute target; otherwise show the full absolute path. Preserve portable resource references and stored document paths.
 
 ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
 

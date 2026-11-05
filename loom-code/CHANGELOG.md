@@ -1,9 +1,9 @@
 # Changelog
 
-## [3.58.0] — 2026-11-04 — resolve conversation document paths against the active worktree
+## [3.58.0] — 2026-11-05 — keep local document delivery concise
 
-- Require absolute local document locations in user-facing conversation, with absolute Markdown link targets where supported and plain absolute paths otherwise.
-- Resolve the actual document location for the active repository or worktree, preserve spaces, and keep bundled references, stored relative paths and repository document links portable.
+- When delivering a local document, provide its actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
+- Where local Markdown links are known to be supported, use a project-relative label or an external document's filename with an absolute target; otherwise show the full absolute path. Keep bundled references, stored relative paths and repository document links portable.
 
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 

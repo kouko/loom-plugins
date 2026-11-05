@@ -4,10 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
-## [5.20.0] — 2026-11-04 — standardize local document locations in conversation
+## [5.20.0] — 2026-11-05 — keep local document delivery concise
 
-- Route document-path replies from both visualization cards to shared conversation guidance, retaining their 181-word budget.
-- Require absolute local document paths and supported Markdown targets, including spaces and active worktrees; preserve repository links, structured relative paths and the separate HTML artifact link contract.
+- Route local document delivery from both visualization cards to shared guidance: provide the document's actual absolute location in the current project, worktree or external directory, without extending the rule to ordinary filename mentions or quoted examples.
+- Where local Markdown links are known to be supported, use a project-relative label or an external document's filename with an absolute target; otherwise show the full absolute path. Preserve repository links, structured relative paths and the separate HTML artifact link contract.
 
 ## [5.19.2] — 2026-11-03 — titled before/after flow illustrations
 
