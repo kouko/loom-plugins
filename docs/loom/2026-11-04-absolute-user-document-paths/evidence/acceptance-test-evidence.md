@@ -1,88 +1,70 @@
-# Absolute user document paths — acceptance test evidence
+# Concise document-delivery guidance — acceptance test evidence
 
-Tried on 2026-11-04, in a clean copy of the project at adad5c7cd2830bc783c9325fbf2feed53989e605.
+Tried on 2026-11-05, in a clean copy of the project at 165ad485ad97db0932d8d1dc0ba7f4994cb86d33.
 
 ## Setup and witness boundaries
 
-- Independent acceptance witness: native Codex subagent `/root/acceptance`; it implemented no part of the change.
-- Clean copy: `git clone --no-hardlinks /Users/kouko/GitHub/loom-plugins /tmp/loom-absolute-acceptance-adad5c7`, then `git checkout --detach adad5c7cd2830bc783c9325fbf2feed53989e605`. `git rev-parse HEAD` returned the exact tested SHA. `git status --porcelain` returned no entries, before and after focused tests.
-- Read README installation instructions for the three independently installable plugins. Existing `codex plugin list` completed with a remote catalogue warning under restricted network access; this inventory does not establish that the new version is installed. Installed plugin copies were not changed, as the intent excludes that work.
-- Clean source load: `bash loom-code/hooks/session-start </dev/null` returned valid JSON with `hookSpecificOutput.additionalContext`. Parsing it confirmed the absolute-path, active-worktree and preservation guidance. Each cold driver read the clean-copy guidance specified below. This verifies source instruction loading, not a new global host installation.
-- Fixture project `/tmp/Delivery Project 專案` was initialized with Git. `git worktree add --orphan -b fixture-branch '/tmp/Worktree 分支'` created a separate linked worktree. Its document `docs/設計 草稿.md` and the outside-project document `/tmp/Shared Notes/會議記錄.md` existed. `git worktree list --porcelain` reported both project and linked worktree (physical `/private/tmp` aliases point to the same files).
-- The parent coordinated three sequential fresh-context native Codex drivers, with only the source guidance path and neutral delivery request; expected answers were not supplied. Driver identities: `/root/cold_code`, `/root/cold_design`, `/root/cold_workflow`. Responses below are exact output relayed by the parent, not answers synthesized by this witness.
-- This is a bounded model-response sample. No claim is made about universal compliance across hosts/models, automatic skill routing, new installed cache behavior, or actual UI link opening.
+- Independent witness: `/root/delivery_acceptance`; no product implementation or repair by this witness. Profile oracle: overrides=null; effective inherited. The revised intent, retained plan, acceptance-tester contract and report template were read before execution. No skipped steps or dismissed important findings were supplied. OLD-scope passing evidence was replaced, not carried over.
+- Current root `R` means `/private/tmp/loom-delivery-165ad-xt_8s6hd`; `/tmp/loom-delivery-165ad-xt_8s6hd` is its valid macOS alias. Clean source came from `git archive 165ad485ad97db0932d8d1dc0ba7f4994cb86d33`, extracted into a newly created private temporary directory; `R/source.json` pins provenance. No stale candidate bytes were reused.
+- Followed README Install/Codex marketplace-add, plugin-add and plugin-list sequence, substituting the CLI's documented local marketplace source to test the pinned candidate: `CODEX_HOME=R/codex-home codex plugin marketplace add R/bundle --json`, followed by `codex plugin add <name>@loom --json` for all three plugins and `codex plugin list --json`. All returned 0; versions 3.58.0, 2.21.0, 5.20.0. `R/setup.json` retains exact output, including restricted-network remote-catalog warnings. Existing host installation/config was untouched; an isolated auth symlink used existing first-party credentials without printing them.
+- Tracked installed-cache parity, independently recomputed in `R/audit.json`: 314 code, 83 design and 336 workflow files, zero mismatches. Generated pytest caches are excluded by pinned Git inventory. Listing/cache parity alone is not evidence of startup hook delivery.
+- Each case created its own fresh Git fixture, a separate `main checkout`, a linked `worktree 工作`, and a sibling external document. Candidate plugin source stayed outside fixtures. No AGENTS.md, CLAUDE.md, rules or copied policy was installed into them. README and docs are real candidate README excerpts; package.json retains its original relative `main` sentinel.
+- Final bounded run: one Claude code-only call and three Codex calls, sequentially, exactly once per case. Runs were authorized only after the parent confirmed fixed-HEAD Build checks green. No broad benchmark or repeated sampling occurred. Raw outputs remain private in `R/runs/<code|design|workflow|unknown>/{prompt.txt,config.toml,metadata.json,stdout.jsonl,stderr.log,final.txt}`. Each metadata file records exact argv, source SHA, cwd/main/external paths, before/after hashes, diff, duration and exit. All exited 0: code 23.75s, design 44.24s, workflow 24.75s, unknown 18.41s.
+- Codex 0.166.0 calls explicitly selected `gpt-6.1-sol`, provider `openai`, effort `medium`, `--no-daemon`, `--ephemeral`, JSON output and workspace-write sandbox. Saved configs contain no custom provider/proxy. Executing turn telemetry in each Codex stderr confirms `model=gpt-6.1-sol codex.turn.reasoning_effort=medium`; provider is explicit configuration rather than separately returned server identity. No fallback was used. Codex refreshed account-connected remote plugin metadata; this baseline environment limits causal attribution.
+- Claude Code 2.1.317 used only pinned `--plugin-dir R/bundle/loom-code`, empty setting sources/enabled-plugin overrides, strict empty MCP config, explicit `claude-sonnet-5-5` and `--effort medium`. All inherited ANTHROPIC/provider switches were removed; `ANTHROPIC_BASE_URL=https://api.anthropic.com` was explicit. Debug log confirms `dispatching to firstParty model=claude-sonnet-5-5`; result `modelUsage` contains only `claude-sonnet-5-5`, canonicalModel same, provider `firstParty`, costUSD 0.0593201, subtype success, is_error false. Effort is explicit CLI selection; no separate returned effort field is claimed.
+- Relevant focused tests in the clean pinned export: `python3 -m pytest -q loom-code/tests/test_conversation_document_paths.py loom-code/tests/test_check_skill_crossrefs.py loom-design/tests/spec/test_capture_intent_contract.py` → `54 passed in 15.44s`, captured at `R/targeted-tests.txt`. Seven guidance tests cover code's emitted startup text, all five direct design entry points, visualization SKILL and its plain-language guide. The other 47 cover crossrefs and capture contracts. These establish coverage/portability, not runtime behavior at every entry point.
 
-## 1. Loom 對話中提供給使用者的本機文件位置皆為絕對路徑，涵蓋 loom-code、loom-design 與 loom-workflow 的文件交付。
+## 1. loom-code、loom-design 與 loom-workflow 交付本機文件時，提供該文件的實際絕對位置；一般敘述中的檔名、引用的原文與範例不必全部轉換。
 
-- How I tried it: ran focused tests in the clean clone and requested three cold document-delivery responses, one for each family guidance surface.
-- Focused command (no packages installed):
+- How I tried it: code asked to find/read two docs and a sibling external document and describe their locations; design requested a package-entry existence check but first draft requirements and wait for confirmation; workflow asked for a README/docs audience/use/location comparison table; unknown asked for only a README heading/package description edit and document locations. Prompts gave receiver support facts where needed, never the desired path policy. Exact full prompts are in each run's `prompt.txt`.
+- Code startup is independently observable: Claude stdout includes `hook_started` followed by `hook_response` for `SessionStart:startup`, `exit_code:0`, `outcome:"success"`. Its JSON `additionalContext` contains the current absolute-delivery rule, including `use the document's project-relative path as the link text`. This is native plugin delivery, not a user-prompt injection or direct guide-body read.
+- Code final deliveries were exactly `[docs/Review Notes.md](</private/tmp/loom-delivery-165ad-xt_8s6hd/fixtures/code/worktree 工作/docs/Review Notes.md>)`, `[docs/操作 指南.md](</private/tmp/loom-delivery-165ad-xt_8s6hd/fixtures/code/worktree 工作/docs/操作 指南.md>)`, and `[外部 Notes.md](</private/tmp/loom-delivery-165ad-xt_8s6hd/fixtures/code/外部 Notes.md>)`. All exist; no fixture writes.
+- Design naturally read installed capture-intent SKILL and `references/conversation-paths.md` before delivery. It created a pending draft, then delivered `[docs/loom/intent/2026-11-05-check-package-main.md](</private/tmp/loom-delivery-165ad-xt_8s6hd/fixtures/design/worktree 工作/docs/loom/intent/2026-11-05-check-package-main.md>)`. It waited for confirmation without implementation, commit or publication. Only intent/defaults were added; existing fixture bytes were unchanged.
+- Workflow naturally read installed visualization SKILL and `references/plain-language.md` before delivery. Its three table links used `README.md`, `docs/操作 指南.md` and `docs/Review Notes.md` as text, with full absolute targets under `R/fixtures/workflow/worktree 工作`. No fixture writes.
+- Source filenames, quoted examples, stored document links and ordinary explanatory references were not graded as copyable deliveries. The observed final responses retain ordinary filenames and quoted technical strings.
+- Result: works in these bounded family samples, with executed instruction-coverage tests across every changed family guidance surface. Other direct design stations were not each exercised through a full real workflow.
 
-```sh
-/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest -q loom-code/tests/test_conversation_document_paths.py loom-code/tests/test_check_skill_crossrefs.py loom-code/tests/test_sync_codex_manifest.py loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py loom-workflow/tests/scripts/test_release_metadata.py loom-workflow/tests/scripts/test_visualization_card_hook.py
+## 2. 已確認支援本機 Markdown 連結的環境使用相對路徑文字與絕對路徑目標，外部文件可用檔名；不支援或支援情況未知時顯示完整絕對路徑，不承諾可以點擊。
+
+- How I tried it: code, design and workflow prompts stated `本次輸出的接收介面已確認支援本機 Markdown 連結。`; unknown stated `本次輸出的接收介面是否支援本機 Markdown 連結，目前未知。`. These boundary contracts do not dictate link syntax or path policy, and do not establish actual UI clicking.
+- The three known-support family sessions used each document's actual project-relative path as link text, or the external document's filename, and absolute existing targets. Angle brackets preserve spaces/CJK names. Exact examples appear in section 1 and raw final files.
+- Unknown final gave plain full absolute text, without a clickable claim:
+
+```text
+已完成指定的兩處修改，其他內容未變更。檔案位置如下（純文字路徑）：
+
+- README.md：`/tmp/loom-delivery-165ad-xt_8s6hd/fixtures/unknown/worktree 工作/README.md`
+- package.json：`/tmp/loom-delivery-165ad-xt_8s6hd/fixtures/unknown/worktree 工作/package.json`
 ```
 
-- What came back: `171 passed in 0.80s`. This includes all direct design document-delivery entry guidance, emitted code guidance, workflow guidance, portable crossrefs, manifest synchronization, release pins and workflow card hooks. System Python initially lacked pytest; default uv cache writes were denied by the sandbox; the transient locked interpreter suggested by the parent no longer existed. The successful run used an existing non-base environment without installing anything.
-- Full package suite was deliberately left to finalization, per the acceptance agent contract. It was not skipped by user instruction and is not claimed as run by this witness. The blocking check is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`, recorded in `docs/loom/KICKOFF-DEFAULTS.md`; finalization must execute it and refuse acceptance on failure.
-- Guidance paths, each rooted at `/tmp/loom-absolute-acceptance-adad5c7/`:
-  - Code: execute and parse `loom-code/hooks/session-start`, use emitted `additionalContext`.
-  - Design: `loom-design/skills/capture-intent/references/conversation-paths.md`.
-  - Workflow: `loom-workflow/skills/loom-visualization/references/plain-language.md`.
-- Neutral request supplied to the parent (same delivery request for all three, only guidance source changes): “Active project /tmp/Delivery Project 專案, linked worktree /tmp/Worktree 分支; deliver existing worktree document docs/設計 草稿.md and outside document /tmp/Shared Notes/會議記錄.md with short labels; also say whether the stored project README link [設計](docs/設計%20草稿.md) and JSON {\"intent\":\"docs/loom/intent/change.md\"} should change. Environment supports local Markdown links.”
-- Exact captured Code response:
+- Unknown's tool events show no policy-skill read; correct output is observed behavior, not proof of natural policy routing or causal influence. A source coverage test verifies that the unknown/unsupported branch exists; an independently unsupported UI was not operated.
+- Result: works for the explicit known-support and unknown-support boundaries. No global file-URI ban, actual click guarantee or terminal-wrap claim was imposed.
 
-```markdown
-- [設計草稿](</tmp/Worktree 分支/docs/設計 草稿.md>)
-- [會議記錄](</tmp/Shared Notes/會議記錄.md>)
+## 3. 交付位置指向當次專案、worktree 或專案外的實際文件；不寫死開發者目錄，不指定必須使用 realpath 或逐字比對程序。
 
-README 的 `[設計](docs/設計%20草稿.md)` 和 JSON 的 `{"intent":"docs/loom/intent/change.md"}` 都不用改；它們是文件內的相對連結與儲存路徑。絕對路徑規則只適用於對話中提供的位置。
-```
-
-- Exact captured Design response:
-
-```markdown
-- [設計草稿](</tmp/Worktree 分支/docs/設計 草稿.md>)
-- [會議記錄](</tmp/Shared Notes/會議記錄.md>)
-
-README 的 `[設計](docs/設計%20草稿.md)` 和 JSON 的 `{"intent":"docs/loom/intent/change.md"}` 都不用改。絕對路徑規則只適用於對話中分享的位置；文件連結與儲存的相對路徑維持原樣。
-```
-
-- Exact captured Workflow response:
-
-```markdown
-可直接開啟這次 worktree 的草稿與外部會議記錄：
-
-- [設計草稿](</tmp/Worktree 分支/docs/設計 草稿.md>)
-- [會議記錄](</tmp/Shared Notes/會議記錄.md>)
-
-README 的 `[設計](docs/設計%20草稿.md)` 和 JSON `{"intent":"docs/loom/intent/change.md"}` 都不必改；它們保留相對路徑，方便專案搬移與共用。聊天中的開啟連結才使用絕對路徑。
-```
-
-- Result: works in all three observed response samples; broader host/model compliance remains untested.
-
-## 2. 支援本機文件連結的對話環境使用絕對路徑作為連結目標；顯示名稱可保留簡短檔名。
-
-- How I tried it: inspected the exact three responses above against the fixture locations, including spaces and CJK characters.
-- What came back: each response used `[設計草稿](</tmp/Worktree 分支/docs/設計 草稿.md>)` and `[會議記錄](</tmp/Shared Notes/會議記錄.md>)`. Both targets are absolute and angle-bracket wrapped; labels contain no directory prefix.
-- Evidence: the three captured response blocks in section 1 and the passing `test_emitted_code_guidance_and_direct_visualization_cover_document_paths`.
-- Result: works for emitted link syntax. Actual clicking in the host UI was not exercised.
-
-## 3. 在不同專案目錄與 worktree 中交付文件時，路徑均指向該次工作的實際文件位置，不固定使用開發者的電腦路徑。
-
-- How I tried it: delivered from a separate Git project and its linked worktree, both outside the plugin source clone, and requested another document outside both roots.
-- What came back: all three responses resolved the design document under `/tmp/Worktree 分支`, rather than `/tmp/Delivery Project 專案` or the plugin clone, and retained `/tmp/Shared Notes/會議記錄.md` for the external document. No `/Users/kouko` development prefix appeared in delivered targets.
-- Evidence: captured responses in section 1; `git -C '/tmp/Delivery Project 專案' worktree list --porcelain` reported both fixture roots; Python `Path(...).is_file()` returned `True` for both emitted targets.
-- Result: works for these separate-project, linked-worktree and external-document fixtures.
+- How I tried it: distinct fixture/main/worktree roots per case, each with spaces/CJK names; code also read and delivered the sibling external document. Independently checked all final absolute targets with filesystem existence, active-root resolution and external-path equality. `R/audit.json` stores exact values.
+- What came back: six project document links across code/design/workflow point to their active linked worktrees; the external code link points to its actual sibling, not to main checkout or plugin source. The two unknown paths use `/tmp` instead of physical `/private/tmp`; both exist and resolve inside the correct active worktree. They correctly pass without requiring realpath spelling or verbatim tool-output reuse. No target uses a fixed developer checkout prefix.
+- Result: works for distinct worktrees and the external document. Correctness was judged by the actual file, not presence of a particular tool call.
 
 ## 4. 插件內部資源引用、版本控制內的文件連結與結構化資料中的相對路徑契約保持可攜性。
 
-- How I tried it: ran the portable cross-reference and capture contract tests, inspected the runtime guidance diff, and checked fixture contents after collecting the responses.
-- What came back: focused tests passed; each response explicitly retained the stored README link and JSON reference. The fixture README still read `[設計](docs/設計%20草稿.md)` and parsed JSON remained `{'intent': 'docs/loom/intent/change.md'}`. No fixture was rewritten by the drivers.
-- Evidence: `test_check_skill_crossrefs.py`, `test_capture_intent_contract.py`, exact response blocks above, and `python3` reads of the two fixture files. Diff inspection showed new conversation guidance explicitly preserves bundled resource references, stored relative paths and repository document links; the capture skill still resolves relative paths from its own directory and loads `references/conversation-paths.md` relatively.
-- Result: works for the checked portable references and stored-data fixtures. Reading the diff is supporting scope evidence; the verdict also rests on executed tests and observed responses.
+- How I tried it: executed the 54 focused tests above; inspected the guidance diff from base `41211a0b` through tested HEAD as supporting scope evidence; independently compared before/after fixture files following actual unknown-session edits.
+- What came back: `R/audit.json` records `readme_only_heading:true`, `markdown_destinations_preserved:true`, `json_only_description:true`, `json_main:"index.js"`. The README change is only `# Loom` → `# Loom 文件樣本`; package change is only description → `本機文件樣本`. Existing README link destinations remain byte-identical and the structured relative `main` stays `index.js`. Metadata holds exact original/after hashes and diff. Other fixture files are unchanged.
+- Runtime bundled-reference resolution is also observed: design read the relative conversation-paths guide from its installed skill; workflow read its relative plain-language guide. Static tests cover all changed family guidance surfaces without converting bundled/stored relative references.
+- Result: works for executed tests and actual edit preservation. The full automated suite runs before acceptance and blocks acceptance on failure; this witness leaves it to station finalization rather than claiming a future result. Required command: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. Parent separately reported Build suite green at this HEAD in `/tmp/loom-delivery-build-fixed-suite.log`; the witness did not run the full suite.
 
-## Decisions, data and omissions
+## Earlier run on 2026-11-05, at 5c98f92f35c339492ffec1df267c94f5305c4d39
 
-- Agent-decided choices disclosed in the report come from the committed plan: shared guidance plus standalone design entry coverage; absolute link targets with short labels and a plain-path fallback; minor releases for runtime guidance changes.
-- No dismissed finding of severity important or worse was supplied by the station.
-- No `skipped-by-instruction` records appear in the intent constraints or plan risks.
-- This change modifies plugin instructions, tests and release metadata. It does not migrate or rewrite adopting projects' documents, links or structured relative-path data. Acceptance files are added to the original repository; no production code was edited by this witness.
+- Earlier root `P` is `/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/loom-delivery-5c98-3f08fc2x`. Its source/setup/runs/audit/test outputs remain intact; `P/current-observations.md` summarizes them. That clean archive used macOS's private temporary directory rather than literal `/tmp`.
+- Four initial Codex sessions each ran once, explicit openai/gpt-6.1-sol/medium. code/design/workflow/unknown durations were 22.96/63.26/26.65/22.22s, all exit0. The obsolete prior harness was used for neutral input/fixture reference only; realpath/file-URI/adoption-rate/20-run oracles were discarded.
+- Initial code-only output delivered three relative hrefs: `docs/操作 指南.md`, `docs/Review Notes.md`, `../外部 Notes.md`. It did not satisfy absolute delivery. However, the code startup payload was not observed. Read-only native app-server `hooks/list` with that exact saved config/cwd returned the enabled non-managed candidate SessionStart and PreToolUse hooks with `trustStatus:"untrusted"`, warnings/errors empty (`P/hooks-list.jsonl`). Native hooks feature was true; config had no hook trust records. The host requires explicit hook trust before non-managed hooks run ([official review/trust contract](https://learn.chatgpt.com/docs/hooks#review-and-trust-hooks)). Therefore this is an untrusted-installation setup limitation, not evidence of model disobedience after receiving the policy. It remains NOT VERIFIED for Codex code-family startup; the later Claude success does not change that classification. No trust write/bypass occurred.
+- Initial design delivered an existing correct absolute intent target but generic text `需求文件`; this did not demonstrate the intended relative-path label. Receiver support was unspecified in that initial design prompt. The parent revised ambiguous label wording after this observation; the fixed known-support design case explicitly re-tested it. Initial workflow known-support and explicit-unknown samples produced the desired forms; unknown had no policy-read event, so no routing claim is made.
+- One excluded setup attempt is retained at `P/runs/excluded-code-invalid-override`: quoted dotted CLI overrides created an invalid literal plugin ID, and sandbox DNS also failed. Only the temporary harness was corrected to update its own enabled booleans. No candidate repair or response resampling was done by the witness.
+- The final Claude code-only call was an explicitly authorized setup diagnostic on the fixed tree, not a concealed replacement for the earlier Codex limitation. Earlier raw model/usage/tool/final evidence was retained. Across both functional snapshots there were eight valid bounded sessions plus one excluded setup attempt, no broad benchmark.
+
+## Re-run on 2026-11-05, at 165ad485ad97db0932d8d1dc0ba7f4994cb86d33
+
+- 1–4: re-tested in full for the revised delivery scope; no OLD-scope passing row carried over. All changed family guidance surfaces were checked by focused tests; current behavior samples cover code/design/workflow and explicit unknown support, distinct linked worktrees, external delivery and stored-reference preservation.
+- Private harness/oracle sources used for this final run: `/tmp/loom-delivery-accept-setup.py`, `/tmp/loom-delivery-run.py`, `/tmp/loom-delivery-audit.py`. Earlier versions are retained under `P`. Raw evidence paths are temporary local artifacts, not a claim of permanent public reproducibility.
+- No skipped-by-instruction entry in retained intent/plan and no dismissed important finding supplied. Agent-decided sampling/setup choices are disclosed in the report. Product changes adjust guidance/tests/release descriptions and do not migrate adopting-project data. This witness edited only the report/evidence artifacts in the original repository.
+- Limits: no universal agent/host compliance claim, no causal improvement estimate, no every-design-station runtime pass, no actual UI click/wrap testing, and no Codex code-hook pass after trust. No installed-user-plugin update, merge, trust bypass, required realpath, byte-matching procedure or global file-URI prohibition.
