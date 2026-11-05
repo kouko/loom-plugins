@@ -91,15 +91,15 @@ You ask the user exactly three times. Everything else you decide yourself and re
 
 Never ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.
 
-Use absolute paths for every local document location shared in conversation.
-Resolve the actual document location from the active repository or worktree
-and the file's location, including documents outside that root. Use absolute
-Markdown link targets with short labels where local file links are supported.
-Wrap targets containing spaces in angle brackets: \`[name](<absolute-path>)\`.
-Use an absolute plain path when local links are unsupported. Never use
-\`file://\` or a fixed developer home directory in conversation. Preserve
-bundled resource references, stored relative paths and repository document
-links; this rule changes conversation output only.
+When delivering a local document, provide its actual absolute location in the
+active project or worktree, including files outside that root. Where local
+Markdown links are known to be supported, use a project-relative label (or a
+filename for an external document) and an absolute target; wrap targets
+containing spaces in angle brackets. When support is unknown or unsupported,
+show the full absolute path. Preserve portable references inside files,
+including bundled resource references, stored relative paths and repository
+document links. Leave incidental filename mentions and quoted source examples
+unchanged; apply this rule to copyable document deliveries.
 
 With \`second-vendor: suggest\`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.
 

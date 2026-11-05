@@ -1,5 +1,5 @@
-# concern: Relative or hard-coded conversation document paths and portable-reference rewrites.
-"""Conversation-only guidance coverage; model compliance needs live acceptance testing."""
+# concern: Incorrect document delivery locations and portable-reference rewrites.
+"""Delivery guidance coverage; model compliance needs live acceptance testing."""
 import json
 import subprocess
 from pathlib import Path
@@ -16,10 +16,16 @@ VISUAL = ROOT / "loom-workflow" / "skills" / "loom-visualization"
 def _path_rule(text):
     text = " ".join(text.split())
     return all((
-        affirms(text, "Use", "absolute paths", "local document", "conversation"),
-        affirms(text, "Resolve", "actual document location", "active repository or worktree"),
-        affirms(text, "Use", "absolute Markdown link targets", "short labels", "supported"),
-        affirms(text, "Preserve", "bundled resource references", "stored relative paths", "document links"),
+        affirms(text, "provide", "actual absolute location", "delivering a local document",
+                "active project or worktree", "outside that root"),
+        affirms(text, "use", "project-relative label", "known to be supported", "local Markdown links",
+                "filename for an external document", "absolute target"),
+        affirms(text, "show", "full absolute path", "unknown or unsupported"),
+        affirms(text, "wrap", "targets containing spaces", "angle brackets"),
+        affirms(text, "Preserve", "portable references inside files", "bundled resource references",
+                "stored relative paths", "document links"),
+        affirms(text, "Leave", "incidental filename mentions", "quoted source examples", "unchanged"),
+        affirms(text, "apply", "this rule", "copyable document deliveries"),
     ))
 
 
@@ -46,21 +52,25 @@ def test_emitted_code_guidance_and_direct_visualization_cover_document_paths(tmp
         (VISUAL / "references" / "plain-language.md").read_text(),
     ):
         assert _path_rule(text)
-        flat = " ".join(text.split())
-        assert affirms(flat, "Wrap", "targets containing spaces", "angle brackets")
-        assert affirms(flat, "Use", "absolute plain path", "unsupported")
-        assert "file://" in text and "Never" in text
         assert "/Users/kouko" not in text
 
 
 def test_path_rule_rejects_negated_or_incomplete_guidance():
     positive = (
-        "Use absolute paths for every local document location in conversation. "
-        "Resolve the actual document location in the active repository or worktree. "
-        "Use absolute Markdown link targets with short labels where supported. "
-        "Preserve bundled resource references, stored relative paths and document links."
+        "When delivering a local document, provide its actual absolute location in the "
+        "active project or worktree, including files outside that root. "
+        "Where local Markdown links are known to be supported, use a project-relative label "
+        "(or a filename for an external document) and an absolute target; "
+        "wrap targets containing spaces in angle brackets. "
+        "When support is unknown or unsupported, show the full absolute path. "
+        "Preserve portable references inside files, including bundled resource references, "
+        "stored relative paths and repository document links. "
+        "Leave incidental filename mentions and quoted source examples unchanged; "
+        "apply this rule to copyable document deliveries."
     )
     assert _path_rule(positive)
-    assert not _path_rule(positive.replace("Use absolute paths", "Never use absolute paths"))
-    assert not _path_rule(positive.replace("active repository or worktree", "developer checkout"))
-    assert not _path_rule(positive.replace("Preserve bundled", "Never preserve bundled"))
+    assert not _path_rule(positive.replace("provide its", "never provide its"))
+    assert not _path_rule(positive.replace("Leave incidental", "Never leave incidental"))
+    assert not _path_rule(positive.replace("active project or worktree", "developer checkout"))
+    assert not _path_rule(positive.replace("unknown or unsupported", "unsupported"))
+    assert not _path_rule(positive.replace("Preserve portable", "Rewrite portable"))

@@ -9,15 +9,15 @@ version: 1.0.0
 
 Relative paths in this document are relative to this skill's own directory.
 
-Use absolute paths for every local document location shared in conversation.
-Resolve the actual document location from the active repository or worktree
-and the file's location, including documents outside that root. Use absolute
-Markdown link targets with short labels where local file links are supported.
-Wrap targets containing spaces in angle brackets: `[name](<absolute-path>)`.
-Use an absolute plain path when local links are unsupported. Never use
-`file://` or a fixed developer home directory in conversation. Preserve
-bundled resource references, stored relative paths and repository document
-links; this rule changes conversation output only.
+When delivering a local document, provide its actual absolute location in the
+active project or worktree, including files outside that root. Where local
+Markdown links are known to be supported, use a project-relative label (or a
+filename for an external document) and an absolute target; wrap targets
+containing spaces in angle brackets. When support is unknown or unsupported,
+show the full absolute path. Preserve portable references inside files,
+including bundled resource references, stored relative paths and repository
+document links. Leave incidental filename mentions and quoted source examples
+unchanged; apply this rule to copyable document deliveries.
 
 The user names a product idea. You run one short interview, write
 `PRINCIPLES.md` at the consumer project's root, restate it, and — on
