@@ -3,7 +3,7 @@
 ## [3.58.0] — 2026-11-05 — keep local document delivery concise
 
 - When delivering a local document, provide its actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
-- Where local Markdown links are known to be supported, use a project-relative label or an external document's filename with an absolute target; otherwise show the full absolute path. Keep bundled references, stored relative paths and repository document links portable.
+- Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) with an absolute target; otherwise show the full absolute path. Keep bundled references, stored relative paths and repository document links portable.
 
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 

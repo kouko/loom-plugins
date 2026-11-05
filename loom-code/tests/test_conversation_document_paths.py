@@ -18,7 +18,7 @@ def _path_rule(text):
     return all((
         affirms(text, "provide", "actual absolute location", "delivering a local document",
                 "active project or worktree", "outside that root"),
-        affirms(text, "use", "project-relative label", "known to be supported", "local Markdown links",
+        affirms(text, "use", "project-relative path as the link text", "known to be supported", "local Markdown links",
                 "filename for an external document", "absolute target"),
         affirms(text, "show", "full absolute path", "unknown or unsupported"),
         affirms(text, "wrap", "targets containing spaces", "angle brackets"),
@@ -59,8 +59,9 @@ def test_path_rule_rejects_negated_or_incomplete_guidance():
     positive = (
         "When delivering a local document, provide its actual absolute location in the "
         "active project or worktree, including files outside that root. "
-        "Where local Markdown links are known to be supported, use a project-relative label "
-        "(or a filename for an external document) and an absolute target; "
+        "Where local Markdown links are known to be supported, use the document's "
+        "project-relative path as the link text (or its filename for an external document) "
+        "and an absolute target; "
         "wrap targets containing spaces in angle brackets. "
         "When support is unknown or unsupported, show the full absolute path. "
         "Preserve portable references inside files, including bundled resource references, "
@@ -69,6 +70,7 @@ def test_path_rule_rejects_negated_or_incomplete_guidance():
         "apply this rule to copyable document deliveries."
     )
     assert _path_rule(positive)
+    assert not _path_rule(positive.replace("project-relative path as the link text", "descriptive label"))
     assert not _path_rule(positive.replace("provide its", "never provide its"))
     assert not _path_rule(positive.replace("Leave incidental", "Never leave incidental"))
     assert not _path_rule(positive.replace("active project or worktree", "developer checkout"))

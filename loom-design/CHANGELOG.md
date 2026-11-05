@@ -15,7 +15,7 @@ is the whole record. Their version numbers never continued here —
 ## [2.21.0] — 2026-11-05 — keep local design document delivery concise
 
 - Deliver local documents from all five document-producing skills, including standalone invocations, with their actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
-- Where local Markdown links are known to be supported, use a project-relative label or an external document's filename with an absolute target; otherwise show the full absolute path. Preserve portable resource references and stored document paths.
+- Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) with an absolute target; otherwise show the full absolute path. Preserve portable resource references and stored document paths.
 
 ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
 
