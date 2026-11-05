@@ -3,7 +3,7 @@ originator: kouko
 kind: engineering
 needs-design: no — engineering guidance for conversation output in skills and hooks; no new interface surface or multi-state behaviour
 status: confirmed 2026-11-05
-intent_confirmed_sha: 96a898be40d0129814e931b9090c718d9c740d3e
+intent_confirmed_sha: 8ad07e13ae6c7bea932d83ccfc4fb4cc57afeb6e
 publication: automatic — authorized 2026-11-04 by kouko
 
 scope-revision: 2026-11-05 — 使用者以「那就改定位實作吧」確認實作縮小後的文件交付規則；延續同一變更，既有程序採用率與審查結果不代表修訂版已通過。
