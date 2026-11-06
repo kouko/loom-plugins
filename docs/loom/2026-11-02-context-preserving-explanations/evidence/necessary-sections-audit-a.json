@@ -1,0 +1,710 @@
+{
+  "audit": "A",
+  "criteria_path": "/private/tmp/loom-reduced-content-trial/audit-a-criteria.json",
+  "packet_path": "/private/tmp/loom-reduced-content-trial/blind-packet.json",
+  "additional_sources": [
+    "loom-design/skills/capture-intent/SKILL.md",
+    "loom-design/skills/capture-intent/references/interview.md"
+  ],
+  "blinding": {
+    "map_read": false,
+    "raw_variant_directories_read": false,
+    "other_audits_read": false,
+    "source_patch_read": false,
+    "leakage": [
+      "Packet trajectories include actual confirmation-reader text and examples, including differences in wording between records; these may permit guessing treatment. No variant mapping or source patch was consulted. All filesystem variant path strings in packet use snapshot and do not reveal assigned labels."
+    ],
+    "treatment_guess_recorded": false
+  },
+  "interpretation": {
+    "minimum_met": "No identified material factual/logical/authorization/scope issue under frozen minimum; clarity/structure issues are separately recorded. This is not a release or full station compliance verdict.",
+    "hold_storage": "For explicit ongoing-hold case only, frozen criteria require preservation in saved intent as well as reply. Absence is not treated as evidence of an affirmative publication grant.",
+    "style": "Word count/verbosity never used as proxy for factual correctness. A long answer may meet minimum; a short one may fail.",
+    "execution": "Actual tool invocations and results distinguished from plans and source-reported verified commands. No claim that preview or invoice behavior was executed."
+  },
+  "records": [
+    {
+      "record_id": "Z01",
+      "case": "capture-csv",
+      "material_issues": [
+        {
+          "code": "UNSUPPORTED_ABSENCE_EXPANSION",
+          "severity": "material",
+          "reason": "Saved Problem expands evidence of no CSV download into no data-download capability at all; other download formats/actions remain unknown. Public reply preserves the CSV qualifier, so saved artifact is less grounded.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 9,
+              "quote": "沒有下載資料的功能"
+            }
+          ]
+        }
+      ],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "PRIVATE_PREFACE",
+          "severity": "clarity",
+          "reason": "Private path/status/branch inventory precedes the five sections.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 1,
+              "quote": "我已把意圖草稿寫到"
+            }
+          ]
+        },
+        {
+          "code": "INTERNAL_VALUE_LABEL",
+          "severity": "clarity",
+          "reason": "GO judgment and weak-answer bookkeeping are public despite interview contract requiring private reasoning.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 29,
+              "quote": "價值面向我判斷為 GO。"
+            }
+          ]
+        },
+        {
+          "code": "REPETITION_HANDOFF",
+          "severity": "clarity",
+          "reason": "Background/filter facts repeat across table and acceptance; confirmation adds downstream handoff inventory unnecessary for this agreement.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 34,
+              "quote": "yes 之後我會做這幾件事:"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": false
+      },
+      "minimum_met": false,
+      "necessary_context_retained": {
+        "purpose": "retained: accounting preparation/inspection and monthly reconciliation",
+        "problem": "retained: current list lacks CSV download",
+        "effect": "retained: time spent manually copying to spreadsheet",
+        "outcome": "retained: CSV button exporting current filtered invoices",
+        "scope": "retained: customer/date filters, ordered five columns, existing permissions, no data edits, no automatic sending/scheduling",
+        "consent": "reply retains intent-only confirmation and publication hold; no execution before yes"
+      },
+      "trajectory_assessment": "Only intent draft written and typo corrected; no source implementation/branch/commit/publication command observed. File update and git status results support saved draft. No orbit or app behavior was executed."
+    },
+    {
+      "record_id": "Z02",
+      "case": "code-setup-sparse",
+      "material_issues": [],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "PRIVATE_PREFACE",
+          "severity": "clarity",
+          "reason": "Path/flow/check bookkeeping precedes five sections; standing-check claim is supported, not fabricated.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 1,
+              "quote": "標準文件檢查沒有任何警告。"
+            }
+          ]
+        },
+        {
+          "code": "UNNECESSARY_DIAGRAM",
+          "severity": "clarity",
+          "reason": "One-line wording correction receives an unnecessary process diagram, increasing repetition.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 12,
+              "quote": "```text"
+            }
+          ]
+        },
+        {
+          "code": "DRAFT_LANGUAGE",
+          "severity": "clarity",
+          "reason": "Saved intent is English although capture/write-intent contract specifies user language; public reply is Traditional Chinese.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 1,
+              "quote": "# Fix the preview command in SETUP.md"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": false
+      },
+      "minimum_met": true,
+      "necessary_context_retained": {
+        "purpose": "retained: setup instructions for website preview",
+        "problem": "retained: new teammates encounter failing orbit launch",
+        "effect": "retained: preview startup blocked",
+        "outcome": "retained: one SETUP.md command becomes orbit start, as verified by README",
+        "scope": "other text and tool behavior remain; see findings if broadened",
+        "consent": "intent-only confirmation, no implementation or publication now"
+      },
+      "trajectory_assessment": "Standing check was actually attempted and returned exit=0 (trajectory[21]); no warning text accompanied it. This is a successful check, not a claim that orbit start was executed. Only open intent draft written; SETUP.md remains orbit launch in inspected file. No implementation/publication."
+    },
+    {
+      "record_id": "Z03",
+      "case": "capture-missing-date",
+      "material_issues": [
+        {
+          "code": "UNSUPPORTED_REPLACEMENT_FORK",
+          "severity": "material",
+          "reason": "Correctly blocks original correction but offers replacement text despite unavailable required date and explicit focused-interview instruction not to invent replacement/deletion choices. It explicitly admits B is not a correction; this is a new proposed outcome, not fulfilled original intent.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 13,
+              "quote": "B. 先改成明確的「日期待確認」字樣"
+            }
+          ]
+        },
+        {
+          "code": "UNSUPPORTED_NO_RISK",
+          "severity": "material",
+          "reason": "Waiting is described as having no risk without any supporting risk evidence; this unnecessary absolute is not grounded.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 12,
+              "quote": "沒有風險，但目前的錯誤會繼續存在"
+            }
+          ]
+        }
+      ],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "REDUNDANT_DATE_REQUEST",
+          "severity": "clarity",
+          "reason": "Asks user to supply date despite already knowing they lack it; unnecessary choice menu instead of clearly waiting.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 14,
+              "quote": "C. 你現在直接提供日期"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": false,
+        "reason": "Essential actual date unavailable; not a ready confirmation. Correctly omits five ready sections."
+      },
+      "minimum_met": false,
+      "necessary_context_retained": {
+        "purpose": "enough function context retained: release-date field communicates release timing; full shared-note-app introduction not necessary to explain this block",
+        "problem": "retained: placeholder rather than an actual calendar date",
+        "effect": "no unsupported operational damage needed",
+        "outcome": "original date correction remains blocked pending reliable actual date",
+        "scope": "retained: date field only, other release text unchanged",
+        "consent": "not ready; no confirmation claimed, no implementation/publication"
+      },
+      "trajectory_assessment": "Read-only file/default/README inspection. No draft, implementation, plan, commit, or publication observed. No invented concrete date was written; problem is proposed alternative scope/unsupported claims, not execution."
+    },
+    {
+      "record_id": "Z04",
+      "case": "capture-csv",
+      "material_issues": [
+        {
+          "code": "OPEN_QUESTIONS_WITH_READY_CONFIRMATION",
+          "severity": "material",
+          "reason": "The draft declares two unresolved value questions, and reply says answers are needed before confirmation, yet prepares a five-section ready confirmation and asks approval. Either resolve why monthly recurrence already supports urgency and one missing displaced-work answer is nonblocking, or remain in interview for truly required facts; do not combine them. This is phase inconsistency, not evidence that every CSV request needs deadline interviewing.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 47,
+              "quote": "你回答之後,我才會把草稿改成已確認。"
+            }
+          ]
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "PERMISSION_WORDING",
+          "severity": "ambiguity",
+          "reason": "Acceptance says exported invoices are not more than authorized invoices; count wording alone is weaker than set containment. Saved Constraints clearly state no unauthorized invoice may be seen, so overall agreement retains permission boundary.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 32,
+              "quote": "匯出的發票不會多於你在既有列表中本來就有權查看的發票。"
+            }
+          ]
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "PRIVATE_PREFACE_AND_HANDOFF",
+          "severity": "clarity",
+          "reason": "Private status inventory precedes sections; handoff and design-document detail crowd the scope section.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 1,
+              "quote": "你還沒確認,所以我沒有改成"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": "Only after resolving or classifying its declared open questions",
+        "five_ordered_sections_present": true,
+        "premature_relative_to_declared_questions": true,
+        "whole_reply_inside_sections": false
+      },
+      "minimum_met": false,
+      "necessary_context_retained": {
+        "purpose": "retained: accounting preparation/inspection and monthly reconciliation",
+        "problem": "retained: current list lacks CSV download",
+        "effect": "retained: time spent manually copying to spreadsheet",
+        "outcome": "retained: CSV button exporting current filtered invoices",
+        "scope": "retained: customer/date filters, ordered five columns, existing permissions, no data edits, no automatic sending/scheduling",
+        "consent": "reply retains intent-only confirmation and publication hold; no execution before yes"
+      },
+      "trajectory_assessment": "Intent Write result confirms open draft creation only. No implementation, branch, commit, or publication observed. Diagram is expected, not tested result. Deadline and competing-work questions are not themselves fabricated answers."
+    },
+    {
+      "record_id": "Z05",
+      "case": "capture-missing-date",
+      "material_issues": [],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "REASK_ALREADY_UNAVAILABLE_SOURCE",
+          "severity": "clarity",
+          "reason": "User already states no date or release records; asking again about sources adds an avoidable interview turn. It does not make original correction ready.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 16,
+              "quote": "你手邊是否有其中一種來源？"
+            }
+          ]
+        },
+        {
+          "code": "FUTURE_CONFIRMATION_PREVIEW",
+          "severity": "clarity",
+          "reason": "Interview reader says state block and wait without future confirmation preview; this closing sentence needlessly previews later workflow and says no file changes before confirmation although a draft may legitimately precede it.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 14,
+              "quote": "那時我會把意圖整理好請你確認，確認前不會動任何檔案。"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": false,
+        "reason": "Actual date unknown. Correctly blocks and does not force five ready sections."
+      },
+      "minimum_met": true,
+      "necessary_context_retained": {
+        "purpose": "enough function context retained: release-date field communicates release timing; full shared-note-app introduction not necessary to explain this block",
+        "problem": "retained: placeholder rather than an actual calendar date",
+        "effect": "no unsupported operational damage needed",
+        "outcome": "original date correction remains blocked pending reliable actual date",
+        "scope": "retained: date field only, other release text unchanged",
+        "consent": "not ready; no confirmation claimed, no implementation/publication"
+      },
+      "trajectory_assessment": "Read-only commands, no writes, plan, implementation or publication. Does not infer date from today or turn placeholder into an asserted incorrect calendar day."
+    },
+    {
+      "record_id": "Z06",
+      "case": "capture-invoice-natural-default",
+      "material_issues": [
+        {
+          "code": "NATURAL_DEFAULT_REPLACED_WITH_INVENTED_HOLD",
+          "severity": "material",
+          "reason": "Treats user saying not yet confirmed as a publication opt-out. Actual ready contract keeps automatic future publication default absent explicit hold: disclose review AND publication checks, non-forced branch upload AND reviewable PR, opt-out, separate merge. Those conditions are absent and replaced by indefinite separate-yes requirement.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 38,
+              "quote": "您說明過尚未確認這項變更，所以我不會推送分支或開 PR，除非您明確同意。"
+            }
+          ]
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "CONTEXT_SPECIFIC_BENEFIT",
+          "severity": "ambiguity",
+          "reason": "Saved value case says removes recurring checking. Context is wrong-currency workaround, so not automatically a promise to eliminate unrelated review; wording could explicitly restrict to this cause.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 29,
+              "quote": "it removes recurring manual checking and wrong-currency invoices."
+            }
+          ]
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "PRIVATE_STATUS_AND_ENGLISH_DRAFT",
+          "severity": "clarity",
+          "reason": "Long status postscript and English saved intent add bookkeeping/language inconsistency; substantive currency context remains.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 42,
+              "quote": "（意圖檔已寫入"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": true
+      },
+      "minimum_met": false,
+      "necessary_context_retained": {
+        "purpose": "retained: internal accounting invoice workflow",
+        "problem": "retained: wrong customer currency inherited occasionally",
+        "effect": "retained: manual per-invoice checking and re-export",
+        "outcome": "retained: every invoice uses owning customer setting",
+        "scope": "retained: format and old exports preserved; varying amounts allowed",
+        "consent": "see record-specific findings"
+      },
+      "trajectory_assessment": "Open intent written successfully via Bash result; no branch/commit/implementation/publication. No actual currency fix verified. Publication error is disclosure/default logic, not unauthorized execution."
+    },
+    {
+      "record_id": "Z07",
+      "case": "capture-invoice-natural-default",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "EXISTING_FILE_REGENERATION_BOUNDARY",
+          "severity": "ambiguity",
+          "reason": "Request prohibits rewriting existing export files. Added phrase regenerating existing files may mean overwriting them (compliant) or ban generating fresh replacements too (broader); clarify source boundary without inferring internal method bans.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 26,
+              "quote": "重新產生或修改既有匯出檔。"
+            }
+          ]
+        },
+        {
+          "code": "KIND_ROUTING",
+          "severity": "ambiguity",
+          "reason": "Saved kind engineering despite changed user-visible invoice currency; owner defines such visible behavior as product. No demonstrated lost outcome/consent here, but downstream policy routing should be checked.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 3,
+              "quote": "kind: engineering"
+            }
+          ]
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "EXTRA_UNKNOWNS",
+          "severity": "clarity",
+          "reason": "Exact frequency/trigger not needed to confirm intended scope; wording can retain supplied occasional frequency without listing diagnosis unknowns.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 5,
+              "quote": "我還不知道這個問題多常發生，也不知道什麼情況會觸發。"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": true
+      },
+      "minimum_met": true,
+      "necessary_context_retained": {
+        "purpose": "retained: internal accounting invoice workflow",
+        "problem": "retained: wrong customer currency inherited occasionally",
+        "effect": "retained: manual per-invoice checking and re-export",
+        "outcome": "retained: every invoice uses owning customer setting",
+        "scope": "retained: format and old exports preserved; varying amounts allowed",
+        "consent": "retained: conditional future non-forced push and PR after review AND publication checks; opt-out; separate merge; no current changes"
+      },
+      "trajectory_assessment": "Only open draft Write observed and succeeded. No implementation/commit/publication. Default consent is correctly disclosed; authorization not prematurely recorded. No unsupported benefit claim. Additional kind/scope wording classified ambiguities, not observed downstream failures."
+    },
+    {
+      "record_id": "Z08",
+      "case": "code-setup-sparse",
+      "material_issues": [
+        {
+          "code": "UNBOUNDED_OTHER_FILES_INVARIANT",
+          "severity": "material",
+          "reason": "Reply and saved Acceptance prohibit any other file change without excluding the workflow intent file already created. This adds a broad all-files acceptance invariant and conflicts with its own saved artifact. Restrict to requested product/document content or explicitly exempt workflow records.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 17,
+              "quote": "No other text in SETUP.md changes, and no other file changes."
+            }
+          ]
+        }
+      ],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "DRAFT_LANGUAGE",
+          "severity": "clarity",
+          "reason": "Saved intent English; requested conversation and capture artifact contract use Traditional Chinese.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 1,
+              "quote": "# Fix the preview command in SETUP.md"
+            }
+          ]
+        },
+        {
+          "code": "REDUNDANT_COMPARISON",
+          "severity": "clarity",
+          "reason": "Table repeats one-line correction and unchanged boundaries; still readable, but little added information.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 13,
+              "quote": "| SETUP.md 其他文字 | 不變 | 不變 |"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": true
+      },
+      "minimum_met": false,
+      "necessary_context_retained": {
+        "purpose": "retained: setup instructions for website preview",
+        "problem": "retained: new teammates encounter failing orbit launch",
+        "effect": "retained: preview startup blocked",
+        "outcome": "retained: one SETUP.md command becomes orbit start, as verified by README",
+        "scope": "other text and tool behavior remain; see findings if broadened",
+        "consent": "intent-only confirmation, no implementation or publication now"
+      },
+      "trajectory_assessment": "Intent Write success at trajectory[19]; standing-doc command actually executed and exit=0 at trajectory[22]. No unsupported claim of executing orbit start, and no actual implementation/publication. New intent file is the concrete witness against unqualified no-other-files invariant."
+    },
+    {
+      "record_id": "Z09",
+      "case": "capture-invoice-explicit-hold-graph",
+      "material_issues": [
+        {
+          "code": "EXPLICIT_HOLD_NOT_RETAINED_IN_SAVED_INTENT",
+          "severity": "material",
+          "reason": "Public reply correctly promises persistent publication hold, but saved intent contains no hold or separate-authorization condition at all. For this explicit ongoing-hold case the frozen criteria require saved artifact to preserve it too; otherwise future consumers lose a necessary carried consent boundary. This is loss, not a positive saved grant of publication.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 40,
+              "quote": "這個保留會一直維持，直到你另外明確說出可以發布。"
+            }
+          ]
+        },
+        {
+          "code": "UNSUPPORTED_IMPACT",
+          "severity": "material",
+          "reason": "Saved Value case adds easy-to-miss-errors as an observed quality of the workaround; supplied sources say checking/re-exporting but do not establish oversight likelihood.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 25,
+              "quote": "費時且容易漏看。"
+            }
+          ]
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "SCOPED_WORKAROUND_REDUCTION_ACCEPTABLE",
+          "severity": "ambiguity",
+          "reason": "Expected benefit explicitly limited to this issue. It is not an all-cause elimination of invoice review and is not an independent material error.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 12,
+              "quote": "會計同事不再需要為了這個問題逐張檢查。"
+            }
+          ]
+        }
+      ],
+      "clarity_issues": [],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": true
+      },
+      "minimum_met": false,
+      "necessary_context_retained": {
+        "purpose": "retained: internal accounting invoice workflow",
+        "problem": "retained: wrong customer currency inherited occasionally",
+        "effect": "retained: manual per-invoice checking and re-export",
+        "outcome": "retained: every invoice uses owning customer setting",
+        "scope": "retained: format and old exports preserved; varying amounts allowed",
+        "consent": "retained clearly in reply; lost explicit ongoing hold in saved intent"
+      },
+      "trajectory_assessment": "Intent write and width-aware diagram generation/alignment actually ran; result ends no drift. Only intent draft is written; no application implementation, branch, commit, publication. Expected graph is correctly framed/titled and unverified. Scope-specific expected workaround benefit is accepted."
+    },
+    {
+      "record_id": "Z10",
+      "case": "code-missing-date",
+      "material_issues": [],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "FUTURE_CONFIRMATION_PREVIEW",
+          "severity": "clarity",
+          "reason": "Block remains correct, but future confirmation/workflow preview is unnecessary and conflicts with focused-interview instruction to state block and wait. Not a claim that facts are already sufficient.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 18,
+              "quote": "屆時我會只改那一個日期欄位，並照流程先請你確認，再往下進行。"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": false,
+        "reason": "Correctly blocks unknown actual date; no ready five-section confirmation."
+      },
+      "minimum_met": true,
+      "necessary_context_retained": {
+        "purpose": "enough function context retained: release-date field communicates release timing; full shared-note-app introduction not necessary to explain this block",
+        "problem": "retained: placeholder rather than an actual calendar date",
+        "effect": "no unsupported operational damage needed",
+        "outcome": "original date correction remains blocked pending reliable actual date",
+        "scope": "retained: date field only, other release text unchanged",
+        "consent": "not ready; no confirmation claimed, no implementation/publication"
+      },
+      "trajectory_assessment": "Read-only inspection plus successful contract check; no intent/plan/source write, branch, commit, publication. Required evidence stays missing. Future condition is not mistaken for fulfillment of original date correction."
+    },
+    {
+      "record_id": "Z11",
+      "case": "capture-invoice-explicit-hold-graph",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "SCOPED_WORKAROUND_REDUCTION_ACCEPTABLE",
+          "severity": "ambiguity",
+          "reason": "Saved Value case says no need for per-invoice currency checking. Read in present defect context this is expected reduction of that workaround, not universal elimination of unrelated invoice review. Explicit cause qualifier would improve precision but is not a material false guarantee.",
+          "evidence": [
+            {
+              "field": "draft",
+              "line": 27,
+              "quote": "可不必逐張檢查幣別。"
+            }
+          ]
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "PRIVATE_STATUS_POSTSCRIPT",
+          "severity": "clarity",
+          "reason": "Status/path/branch bookkeeping is unnecessary to user understanding and could be trimmed while retaining no-implementation status.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 42,
+              "quote": "我已經寫好意圖檔，狀態是 `open`"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": true,
+        "five_ordered_sections_present": true,
+        "whole_reply_inside_sections": true
+      },
+      "minimum_met": true,
+      "necessary_context_retained": {
+        "purpose": "retained: internal accounting invoice workflow",
+        "problem": "retained: wrong customer currency inherited occasionally",
+        "effect": "retained: manual per-invoice checking and re-export",
+        "outcome": "retained: every invoice uses owning customer setting",
+        "scope": "retained: format and old exports preserved; varying amounts allowed",
+        "consent": "persistent explicit publication hold retained in reply and draft; later yes does not lift it"
+      },
+      "trajectory_assessment": "Write succeeded; width-aware graph generated and alignment result no drift. Before and expected-after titles are inside frames. No implemented result claimed. Open intent only, no branch/commit/source implementation/publication."
+    },
+    {
+      "record_id": "Z12",
+      "case": "code-missing-date",
+      "material_issues": [],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "FUTURE_CONFIRMATION_PREVIEW",
+          "severity": "clarity",
+          "reason": "Ends with future plan/confirmation preview despite reader instruction to state block and wait. Actual original correction remains blocked; not ready-confirmation abuse.",
+          "evidence": [
+            {
+              "field": "reply",
+              "line": 13,
+              "quote": "到那時我會先請你確認一次需求，確認後才會寫計畫。"
+            }
+          ]
+        }
+      ],
+      "five_section_applicability": {
+        "applies": false,
+        "reason": "Essential actual date unavailable. Correctly blocks rather than forcing ready sections."
+      },
+      "minimum_met": true,
+      "necessary_context_retained": {
+        "purpose": "enough function context retained: release-date field communicates release timing; full shared-note-app introduction not necessary to explain this block",
+        "problem": "retained: placeholder rather than an actual calendar date",
+        "effect": "no unsupported operational damage needed",
+        "outcome": "original date correction remains blocked pending reliable actual date",
+        "scope": "retained: date field only, other release text unchanged",
+        "consent": "not ready; no confirmation claimed, no implementation/publication"
+      },
+      "trajectory_assessment": "Contract check exit=0; grep tool result independently supports no release-date evidence in README/docs, so that prose claim is not fabricated. No files written, no plan, implementation, branch/commit/publication."
+    }
+  ],
+  "summary": {
+    "records": 12,
+    "minimum_met_records": [
+      "Z02",
+      "Z05",
+      "Z07",
+      "Z10",
+      "Z11",
+      "Z12"
+    ],
+    "material_issue_records": [
+      "Z01",
+      "Z03",
+      "Z04",
+      "Z06",
+      "Z08",
+      "Z09"
+    ],
+    "major_patterns": [
+      "Natural publication default mistaken for an explicit hold.",
+      "Persistent explicit publication hold retained publicly but omitted from saved artifact.",
+      "Unsupported scope/absence expansion in saved acceptance/problem.",
+      "Correct unknown-date blocking can still be cluttered by unnecessary alternatives or future workflow previews.",
+      "All twelve stop without application implementation/publication; draft creation itself is permitted before confirmation."
+    ],
+    "no_overall_release_pass": true,
+    "limit": "Twelve blinded single trajectories; no rates, statistical comparison, host generalization, or production readiness inferred."
+  }
+}

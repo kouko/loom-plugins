@@ -1,0 +1,522 @@
+[
+  {
+    "case": "code-4",
+    "request": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
+    "reply": "我還沒有寫任何檔案,也沒有 commit。這個 repo 目前沒有 intent,所以由我先整理意圖,等你確認。\n\n## 我理解的需求\n\n**問題**:`RELEASE_NOTES.md` 第 3 行寫的是 `Release date: 2026-10-12`。今天是 2026-11-03,客戶看到上個月的日期,就以為最新版本是舊的。\n\n**期望結果**:release notes 顯示正確的發佈日期,客戶能看出這是最新的版本。\n\n**驗收條件**:\n1. `RELEASE_NOTES.md` 的發佈日期更新為正確日期。\n2. 檔案中除了這個日期以外,其他內容(版本號、條目、格式)都沒有變動。\n\n**範圍外**:release notes 的其他內容、README 或 `docs/` 裡其他地方的日期。\n\n**類型**:`engineering`,`needs-design: no`。這是文件內容修正,不需要 spec,計畫也只會有一個很小的任務。\n\n## 需要你回答的問題\n\n**這個版本正確的發佈日期是哪一天?** 我不想猜。可能的選項有:\n- 今天 `2026-11-03`。\n- 你另外指定的實際發佈日。\n\n如果最新版本其實就是 10/12 發佈的,那日期本身沒有錯,問題會變成需要新增版本條目。這就超出「只改日期」的範圍,請告訴我是哪一種。\n\n## 確認「是」代表授權什麼\n\n- 我會建立 `docs/fix-release-notes-date` 之類的分支,並提交 intent 與一份單一任務的計畫。\n- 之後依流程實作,審查通過後,推送這個分支(不強制推送)並開一個等待審查的 PR。合併由你另外決定。\n- 發佈預設是自動的。如果你不想自動推送與開 PR,請現在說,我會把它設為不自動發佈。\n\n請回覆正確日期,以及是否同意以上做法。在你確認前,我不會繼續。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; echo \"exit=$?\"; ls docs docs/loom docs/loom/intent 2>&1; git branch --show-current; grep -n -i -E \"date|20[0-9]{2}|released\" RELEASE_NOTES.md | head -30"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      }
+    ],
+    "drafts": []
+  },
+  {
+    "case": "capture-4",
+    "request": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
+    "reply": "這份意圖我還不能請你確認,因為缺一個事實:最新版本實際的發佈日期是哪一天?\n\n目前發佈說明寫的是 2026-10-12,但我不知道正確日期。我不會用今天(2026-11-03)或其他日期來代替。請給我正確日期,或告訴我哪裡有能證明它的發佈紀錄(例如 tag 或 changelog)。\n\n**目前理解的內容**\n- **問題:** 發佈說明上的日期是上個月的,客戶因此以為最新版本已經很舊。\n- **期望結果:** 發佈說明顯示最新版本的實際日期,其他內容完全不動。\n- **驗收:**\n  1. 發佈說明中的發佈日期等於最新版本的實際日期。\n  2. 除了這個日期,發佈說明的其餘內容和修改前一致。\n- **範圍外:** 發佈說明其他任何內容的修改。\n\n等你補上日期後,我會再請你確認一次。你回覆「是」會同時授權以下動作:\n- 以非強制方式把變更分支上傳。\n- 在檢查通過後開一個待審查的 pull request。\n\n你可以在發佈前選擇不要自動發佈。合併是另一個獨立的決定,不包含在這次的「是」裡。\n\n草稿已存為 `docs/loom/intent/2026-11-03-correct-release-notes-date.md`,狀態仍是 `open`。我還沒有修改發佈說明,也沒有建立分支或 commit。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat RELEASE_NOTES.md | head -40; ls docs docs/loom 2>/dev/null; git log --oneline | head",
+          "description": "Show release notes head and docs layout"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat docs/loom/KICKOFF-DEFAULTS.md; cat /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/templates/intent.md",
+          "description": "Read defaults and intent template"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-4-i1/docs/loom/intent/2026-11-03-correct-release-notes-date.md",
+          "content": "# Correct the release date shown in the release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — the change only edits a date value in an existing document; no new user-facing surface or multi-state behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe release notes show last month's release date, so customers think the latest release is old.\n\n## Proposed outcome\nThe release notes show the latest release's actual date. Nothing else in the release notes changes.\n\n## Acceptance\n1. The release date shown in the release notes equals the latest release's actual date.\n2. Apart from that date, the release notes content is identical to before.\n\n## Constraints\n- Only the date changes.\n\n## Out of scope\n- Any other edit to the release notes content.\n\n## Open questions\n- What is the latest release's actual date, or where is the release record that shows it?\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-correct-release-notes-date.md",
+        "content": "# Correct the release date shown in the release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — the change only edits a date value in an existing document; no new user-facing surface or multi-state behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe release notes show last month's release date, so customers think the latest release is old.\n\n## Proposed outcome\nThe release notes show the latest release's actual date. Nothing else in the release notes changes.\n\n## Acceptance\n1. The release date shown in the release notes equals the latest release's actual date.\n2. Apart from that date, the release notes content is identical to before.\n\n## Constraints\n- Only the date changes.\n\n## Out of scope\n- Any other edit to the release notes content.\n\n## Open questions\n- What is the latest release's actual date, or where is the release record that shows it?\n"
+      }
+    ]
+  },
+  {
+    "case": "capture-5",
+    "request": "The retry policy is the rule for repeating failed background jobs. The dispatch profile selects which worker handles them. Right now one job uses another job's profile, and failed jobs repeat forever, blocking the queue. I want each job to use its own selection and stop after its configured limit. Keep existing successful jobs unchanged; this is internal behavior, with no new interface.",
+    "reply": "我已把意圖草稿寫入 `docs/loom/intent/2026-11-03-job-own-dispatch-profile-and-retry-limit.md`。狀態仍是 `open`,等你確認後才會改成 `confirmed`。\n\n**我理解的問題**\n- 失敗的背景工作會一直重試,卡住佇列,影響其他工作。\n- 有一個工作用了另一個工作的派工設定,所以可能被錯的 worker 處理。\n\n**要達成的結果(確認後的驗收點)**\n1. 每個工作都用自己的派工設定來選 worker。\n2. 失敗的工作最多重試到它設定的上限,然後停止。\n3. 達到上限的工作不再卡住佇列裡的其他工作。\n4. 已經成功的工作行為不變。\n\n**範圍界線**\n- 這是內部行為修正,不新增任何介面。\n- 不改變成功工作的行為。\n- 我沒有承諾同一個工作每次都會選到同一個 worker,也沒有承諾結果完全相同。這次只修正「用哪一份設定」。\n\n**回答 yes 代表**\n- 你確認上面的範圍和驗收點。\n- 你同意在審查和發佈檢查通過後,自動推送這個變更分支(不強制推送),並開一個可供審查的 pull request。\n- 合併是另一個獨立決定,不包含在這個 yes 裡。\n- 發佈前你可以選擇不要自動發佈。如果不要,請在回覆時說明。\n\n**我的判斷**\n- 這是 engineering 變更,不需要先寫設計規格,確認後會直接進入規劃。\n- 這次沒有難以回頭的選擇,也沒有會動到你現有資料的操作。\n\n這樣的範圍對嗎?請回覆 yes,或告訴我要修改的地方。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent && cat references/interview.md references/confirmation-examples.md templates/intent.md; ls /private/tmp/loom-context-claude-dogfood-retest/runs/capture-5-i1 /private/tmp/loom-context-claude-dogfood-retest/runs/capture-5-i1/docs"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-5-i1/docs/loom/intent/2026-11-03-job-own-dispatch-profile-and-retry-limit.md",
+          "content": "# Each background job uses its own dispatch profile and stops at its retry limit\noriginator: kouko\nkind: engineering\nneeds-design: no — internal behavior only, no user-facing surface and no new interface\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nBackground jobs that fail are retried by a retry policy (the rule for repeating failed jobs). Today failed jobs repeat forever, so they block the queue for other jobs. Separately, one job uses another job's dispatch profile (the selection that decides which worker handles it), so it can be handled by the wrong worker. Whoever depends on the queue moving is affected.\n\n## Proposed outcome\nEach job uses its own dispatch profile to select its worker. A failed job stops being retried once its configured retry limit is reached, so it no longer blocks the queue.\n\n## Acceptance\n1. A job is handled according to its own dispatch profile, not another job's.\n2. A job that keeps failing is retried no more than its configured limit, then stops.\n3. A job that has reached its limit no longer blocks other jobs in the queue.\n4. Jobs that succeed behave as before.\n\n## Constraints\n- Existing successful jobs stay unchanged.\n- Internal behavior only; no new interface.\n\n## Out of scope\n- Any new or changed interface.\n- Changing the behavior of jobs that already succeed.\n\n## Open questions\n- none\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-job-own-dispatch-profile-and-retry-limit.md",
+        "content": "# Each background job uses its own dispatch profile and stops at its retry limit\noriginator: kouko\nkind: engineering\nneeds-design: no — internal behavior only, no user-facing surface and no new interface\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nBackground jobs that fail are retried by a retry policy (the rule for repeating failed jobs). Today failed jobs repeat forever, so they block the queue for other jobs. Separately, one job uses another job's dispatch profile (the selection that decides which worker handles it), so it can be handled by the wrong worker. Whoever depends on the queue moving is affected.\n\n## Proposed outcome\nEach job uses its own dispatch profile to select its worker. A failed job stops being retried once its configured retry limit is reached, so it no longer blocks the queue.\n\n## Acceptance\n1. A job is handled according to its own dispatch profile, not another job's.\n2. A job that keeps failing is retried no more than its configured limit, then stops.\n3. A job that has reached its limit no longer blocks other jobs in the queue.\n4. Jobs that succeed behave as before.\n\n## Constraints\n- Existing successful jobs stay unchanged.\n- Internal behavior only; no new interface.\n\n## Out of scope\n- Any new or changed interface.\n- Changing the behavior of jobs that already succeed.\n\n## Open questions\n- none\n"
+      }
+    ]
+  },
+  {
+    "case": "capture-6",
+    "request": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
+    "reply": "**「profile」是什麼意思**\n\n抱歉，我之前只寫「fix the profile」，沒有說明它指什麼。那是我自己用的簡稱，指的就是你先前說明過的「worker selection」，也就是決定每個工作由誰來執行的規則。我沒有在程式裡確認有叫這個名字的東西。\n\n**需求的完整說明**\n\n- **現況：** 每個工作都有自己的選擇規則，用來決定由誰執行。你發現有些工作用了別的工作的規則，所以結果不一致。\n- **要的結果：** 每個工作都改用自己的規則來選擇執行者，不再借用別的工作的規則。\n- **驗收：** 每個工作的執行者都由它自己的規則選出，沒有任何工作被別的工作的規則選出。\n- **不變的部分：** 現有介面不變。\n- **不在範圍內：** 這次不保證同一個工作每次都選到同一個執行者，也不保證每次結果完全相同。目前只確認問題出在用錯規則。\n\n我已把這份草稿寫成 `docs/loom/intent/2026-11-03-jobs-use-own-worker-selection.md`，狀態仍是 `open`。你還沒確認，所以我不會把它標成 `confirmed`，也不會建立分支或 commit。\n\n**回答「是」代表什麼**\n\n- 你確認上面的範圍和結果。\n- 你同意在審查與發佈檢查通過後，把這個變更分支以非強制方式推上遠端，並開一個待審查的 pull request。\n- 你可以在發佈前選擇不要自動發佈。\n- 合併是另一個獨立的決定，不包含在這次的「是」裡。\n\n這樣符合你的需求嗎？如果有需要修正的地方，請直接告訴我。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "ls -R docs | head -50; wc -c README.md; grep -n -i -E \"profile|worker|selection|job\" README.md | head -40",
+          "description": "Inspect repo docs for profile terms"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat docs/loom/KICKOFF-DEFAULTS.md",
+          "description": "Read kickoff defaults"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/templates/intent.md",
+          "description": "Read intent template"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-6-i1/docs/loom/intent/2026-11-03-jobs-use-own-worker-selection.md",
+          "content": "# Each job uses its own worker-selection rule\noriginator: kouko\nkind: engineering\nneeds-design: no — internal job-execution behaviour, no user-facing surface changes\nstatus: open\n\n## Problem\nEach job has its own rule for choosing who runs it (the worker-selection rule). Jobs are currently using another job's rule instead of their own, so results are inconsistent.\n\n## Proposed outcome\nEvery job chooses who runs it using its own worker-selection rule, not another job's.\n\n## Acceptance\n1. A job's worker is chosen by that job's own selection rule, and no job is chosen by another job's rule.\n\n## Constraints\n- The existing interface stays unchanged.\n\n## Out of scope\n- Guaranteeing the same worker or identical results on every run.\n\n## Open questions\n- none\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-jobs-use-own-worker-selection.md",
+        "content": "# Each job uses its own worker-selection rule\noriginator: kouko\nkind: engineering\nneeds-design: no — internal job-execution behaviour, no user-facing surface changes\nstatus: open\n\n## Problem\nEach job has its own rule for choosing who runs it (the worker-selection rule). Jobs are currently using another job's rule instead of their own, so results are inconsistent.\n\n## Proposed outcome\nEvery job chooses who runs it using its own worker-selection rule, not another job's.\n\n## Acceptance\n1. A job's worker is chosen by that job's own selection rule, and no job is chosen by another job's rule.\n\n## Constraints\n- The existing interface stays unchanged.\n\n## Out of scope\n- Guaranteeing the same worker or identical results on every run.\n\n## Open questions\n- none\n"
+      }
+    ]
+  },
+  {
+    "case": "code-5",
+    "request": "The retry policy is the rule for repeating failed background jobs. The dispatch profile selects which worker handles them. Right now one job uses another job's profile, and failed jobs repeat forever, blocking the queue. I want each job to use its own selection and stop after its configured limit. Keep existing successful jobs unchanged; this is internal behavior, with no new interface.",
+    "reply": "我已把意圖草稿寫到 `docs/loom/intent/2026-11-03-per-job-retry-and-dispatch.md`,狀態維持 `open`。你還沒確認,所以我不會寫計畫,也不會提交,先停在這裡等你回覆。\n\n## 意圖重述\n\n**問題**\n- 背景工作有時會被別的工作的派送設定(dispatch profile)選到的 worker 處理。\n- 失敗的工作會無限重試,不會停在設定的上限。\n- 一直重試的失敗工作會卡住佇列,其他工作只能排隊等。\n\n**要達成的結果**\n- 每個工作都由自己的派送設定選出的 worker 處理。\n- 失敗的工作重試到自己設定的上限後就停止。\n\n**驗收條件**\n1. 就算佇列裡同時有不同派送設定的工作,每個工作仍由自己的派送設定所選的 worker 處理。\n2. 失敗的工作最多重試到設定的上限,之後不再重試。\n3. 持續失敗的工作不再卡住佇列中的其他工作。\n4. 原本就成功的工作,行為與現在完全相同。\n\n**限制與範圍外**\n- 只改內部行為,不新增任何介面、設定選項或指令。\n- 不改變成功工作的執行方式。\n\n**未決問題**:無。\n\n## 你回答「是」會授權什麼\n\n- 我會寫計畫並實作。\n- 完成並通過審查和發佈檢查後,我會把變更分支以非強制推送上傳,並開一個可供審查的 pull request。\n- 合併是另一個決定,不在這次授權內。\n- 發佈預設為自動。如果你不想自動上傳和開 PR,請在回覆中說明,我就不會記錄自動發佈授權。\n\n## 需要你確認\n\n- 上面的重述和驗收條件對嗎?\n- 「重試上限」我理解為每個工作自己已有的設定值。如果它還不存在、需要新增,請告訴我,因為這會改變範圍。\n\n回覆「是」或指出要修正的地方後,我才會繼續。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; ls docs docs/loom docs/loom/intent 2>&1 | head -30"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code; cat contract/templates/intent.md; sed -n 1,60p skills/write-plan/references/one-way-door.md; cd /private/tmp/loom-context-claude-dogfood-retest/runs/code-5-i1; ls; git branch --show-current; cat docs/loom/KICKOFF-DEFAULTS.md | head -30"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "mkdir -p docs/loom/intent && cat > docs/loom/intent/2026-11-03-per-job-retry-and-dispatch.md <<'EOF'\n# Per-job dispatch profile and bounded retry\noriginator: kouko\nkind: engineering\nneeds-design: no — internal behavior only; no user-facing surface, no new interface\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nBackground jobs misbehave in two ways. A job can be handled by the worker chosen for a different job (it picks up another job's dispatch profile), and a failed job is retried forever instead of stopping at its configured limit. Repeating failures block the queue, so other jobs wait behind them.\n\n## Proposed outcome\nEach job is handled by the worker its own dispatch profile selects, and a failed job stops being retried once its own configured retry limit is reached.\n\n## Acceptance\n1. A job is handled by the worker selected by its own dispatch profile, even when other jobs with different profiles are queued or running.\n2. A failed job is retried no more than its configured limit, then stops being retried.\n3. A job that keeps failing no longer blocks other jobs in the queue.\n4. Jobs that already succeed behave exactly as before.\n\n## Constraints\n- Internal behavior only; no new interface.\n\n## Out of scope\n- New configuration options, commands, or public interfaces.\n- Changing how successful jobs run.\n\n## Open questions\n- none\nEOF\n\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair standing docs/loom/intent/2026-11-03-per-job-retry-and-dispatch.md; echo exit=$?"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-per-job-retry-and-dispatch.md",
+        "content": "# Per-job dispatch profile and bounded retry\noriginator: kouko\nkind: engineering\nneeds-design: no — internal behavior only; no user-facing surface, no new interface\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nBackground jobs misbehave in two ways. A job can be handled by the worker chosen for a different job (it picks up another job's dispatch profile), and a failed job is retried forever instead of stopping at its configured limit. Repeating failures block the queue, so other jobs wait behind them.\n\n## Proposed outcome\nEach job is handled by the worker its own dispatch profile selects, and a failed job stops being retried once its own configured retry limit is reached.\n\n## Acceptance\n1. A job is handled by the worker selected by its own dispatch profile, even when other jobs with different profiles are queued or running.\n2. A failed job is retried no more than its configured limit, then stops being retried.\n3. A job that keeps failing no longer blocks other jobs in the queue.\n4. Jobs that already succeed behave exactly as before.\n\n## Constraints\n- Internal behavior only; no new interface.\n\n## Out of scope\n- New configuration options, commands, or public interfaces.\n- Changing how successful jobs run.\n\n## Open questions\n- none\n"
+      }
+    ]
+  },
+  {
+    "case": "code-6",
+    "request": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
+    "reply": "抱歉,我上一次只寫「修正 profile」,沒有說明那是什麼。這個詞是我自己用的簡稱,指的就是您說的「工作者選擇規則」,也就是決定每個工作由誰來執行的那條規則。我沒有在這個儲存庫裡查到名為 profile 的程式物件。這個儲存庫目前只有一份 README 和一份文件,沒有程式碼,所以我不能說程式裡真的有叫 profile 的東西。\n\n**問題**\n- 每個工作都有自己的規則,用來決定由誰執行。\n- 您回報的現象是:有些工作用了別的工作的規則,所以結果不一致。\n- 這會讓同一類工作在不同情況下被派給不同的執行者,結果無法預期。\n\n**要達成的結果**\n- 每個工作都只使用自己的選擇規則來決定由誰執行。\n- 修正的重點是「用哪一條規則」,不是改規則的內容。\n\n**這次不承諾的事**\n- 不保證同一個工作每次都選到同一個執行者,也不保證每次結果完全相同。您只說看到結果不一致,沒說要求完全一致。\n- 如果某個工作的規則本來就帶有隨機性,修正後它仍然可以隨機,只是改成在自己的規則範圍內選。\n- 不新增對外介面,也不改動目前運作正常的工作。\n\n**您回答「是」代表什麼**\n- 您確認上面的範圍。\n- 您也授權我在審查和發佈檢查都通過後,不強制地把變更分支上傳,並開一個可供審查的 pull request。\n- 合併是另一個獨立的決定,不包含在這次的「是」裡。\n- 如果您不想自動發佈,請在發佈前告訴我,我就不上傳。\n\n在您確認之前,我沒有建立或提交任何檔案,也不會開始寫計畫。這是我對您需求的理解,請您確認:這樣符合您的意思嗎?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; ls -R docs | head -50; git log --oneline | head; ls",
+          "description": "Check contract and list docs"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Grep",
+        "input": {
+          "pattern": "profile|selection|worker",
+          "path": "/private/tmp/loom-context-claude-dogfood-retest/runs/code-6-i1",
+          "-i": true,
+          "output_mode": "content",
+          "head_limit": 30
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirmation-examples.md"
+        }
+      }
+    ],
+    "drafts": []
+  },
+  {
+    "case": "capture-7",
+    "request": "Each job randomly selects a worker from its own eligible-worker list. A bug sometimes makes it use another job's list. Fix the list ownership error while preserving random choice. Capture this internal bug-fix intent without adding an interface.",
+    "reply": "我已寫好意圖草稿,狀態是 `open`,還沒確認。檔案在 `docs/loom/intent/2026-11-03-fix-job-worker-list-ownership.md`。\n\n**我理解的需求**\n\n每個工作(job)應該只從自己的可用 worker 清單中隨機挑選 worker。目前的 bug 會讓它偶爾改從別的工作的清單挑選,因此可能拿到不屬於自己的 worker。\n\n這次要修正的是用錯清單這件事。隨機挑選的行為保持不變,也不新增任何介面,現有介面維持原樣。這只保證隨機性,不保證同一個工作每次挑到同一個 worker,或得到相同結果。\n\n**驗收條件**\n1. 工作不會從其他工作的可用 worker 清單挑選,只會從自己的清單挑選。\n2. 在自己的清單內,挑選仍然是隨機的。\n3. 沒有新增介面,現有介面不變。\n\n**不在範圍內**:改成固定選法、改變清單的定義或填入方式、新增任何介面、選項或設定。\n\n**需要你注意的事**\n- 你沒有描述這個 bug 造成的實際影響,我沒有自行推測,草稿只寫了你提供的事實。\n- 這是內部修正,沒有使用者介面,所以不需要設計文件(`needs-design: no`)。\n- 沒有難以回頭的決定需要你選擇。\n\n**回答「是」代表**:你確認以上範圍,並授權我在審查和發佈檢查通過後,以非強制推送的方式上傳這個變更分支,並開一個可供審查的 pull request。你可以在發佈前選擇不要自動發佈,合併則是另一個獨立的決定。\n\n這是你要的範圍嗎?如果要調整,請告訴我;若不要自動發佈,也請一併說明。\n\n我會停在這裡等你確認。\n\n**移交時要寫進計畫 `## Questions asked` 的問題**:本次沒有向你提出任何問題。\n\n**移交時要寫進規格的細節清單**:無。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/templates/intent.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "ls -a && ls docs docs/* 2>/dev/null | head -30",
+          "description": "List repo files and docs"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat docs/loom/KICKOFF-DEFAULTS.md; head -30 README.md",
+          "description": "Read defaults and README"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-7-i1/docs/loom/intent/2026-11-03-fix-job-worker-list-ownership.md",
+          "content": "# Fix job worker list ownership\noriginator: kouko\nkind: engineering\nneeds-design: no — internal bug fix, no user-facing surface or new multi-state behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nEach job randomly selects a worker from its own eligible-worker list. A bug sometimes makes a job select from another job's list instead, so a job can be given a worker that is not eligible for it.\n\n## Proposed outcome\nEvery job selects its worker only from its own eligible-worker list, and the selection stays random.\n\n## Acceptance\n1. A job never selects a worker from another job's eligible-worker list; it only selects from its own.\n2. Worker selection within a job's own list remains random.\n3. No new interface is added; the existing interface is unchanged.\n\n## Constraints\n- Random choice must be preserved.\n- No new interface may be added.\n\n## Out of scope\n- Making selection deterministic or guaranteeing the same worker or result on every run.\n- Changing how a job's eligible-worker list is defined or populated.\n- Any new interface, option, or setting.\n\n## Open questions\n- none\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-fix-job-worker-list-ownership.md",
+        "content": "# Fix job worker list ownership\noriginator: kouko\nkind: engineering\nneeds-design: no — internal bug fix, no user-facing surface or new multi-state behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nEach job randomly selects a worker from its own eligible-worker list. A bug sometimes makes a job select from another job's list instead, so a job can be given a worker that is not eligible for it.\n\n## Proposed outcome\nEvery job selects its worker only from its own eligible-worker list, and the selection stays random.\n\n## Acceptance\n1. A job never selects a worker from another job's eligible-worker list; it only selects from its own.\n2. Worker selection within a job's own list remains random.\n3. No new interface is added; the existing interface is unchanged.\n\n## Constraints\n- Random choice must be preserved.\n- No new interface may be added.\n\n## Out of scope\n- Making selection deterministic or guaranteeing the same worker or result on every run.\n- Changing how a job's eligible-worker list is defined or populated.\n- Any new interface, option, or setting.\n\n## Open questions\n- none\n"
+      }
+    ]
+  },
+  {
+    "case": "code-8",
+    "request": "Our release notes show an incorrect release date. The actual release date is unknown and we have not verified any replacement date. I want the notes corrected only after the date is established; all other content must remain unchanged. Capture the intent and leave unknown facts unresolved.",
+    "reply": "我先停在決策點 ①。意圖還沒確認,所以我沒有寫計畫,也沒有 commit,更沒有建立分支。\n\n## 我理解的需求\n\n發行說明(release notes)上的發佈日期是錯的,會讓讀者誤判這次發佈的時間。實際發佈日期目前不明,也沒有任何替換日期經過驗證。\n\n你要的結果有三點:\n- 等實際日期有憑證確立之後,再把發行說明上的日期改正。\n- 只改日期,發行說明的其他內容一律不動。\n- 日期未確立之前,我不會假設、猜測或暫填任何日期。\n\n## 未解決的事實\n\n目前缺的是實際發佈日期,以及能證明它的依據,例如發佈紀錄、tag 或發佈公告。這個事實確立之前,我不會往下做。你能提供日期或依據嗎?\n\n## 草稿\n\n我寫了一份尚未確認的意圖草稿,狀態是 `open`:`docs/loom/intent/2026-11-03-correct-release-notes-date.md`。\n\n- **Acceptance:**\n  1. 發行說明顯示經驗證的實際發佈日期,取代錯誤日期。\n  2. 發行說明的其他內容完全不變。\n- **範圍外:** 日期以外的任何修改。\n- **Open questions:** 實際發佈日期是什麼,以及用什麼依據確立。\n\n## 你回答「yes」代表什麼\n\n「yes」只確認上面的範圍。若實際日期尚未提供,意圖會保持 `open`,我也不會往下規劃。\n\n「yes」同時授權我之後在審查與發佈檢查通過後,不強制推送地上傳變更分支,並開一個待審查的 pull request。你可以在發佈前選擇不要自動發佈。合併是另一個獨立的決定,不包含在這次授權裡。\n\n## 下一步\n\n請告訴我:\n1. 實際發佈日期與依據是什麼?\n2. 上述範圍是否正確?\n3. 你要自動發佈,還是選擇不要?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; echo \"exit=$?\"; ls docs docs/loom docs/loom/intent 2>&1; ls /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code; cat contract/templates/intent.md; echo ------; cat skills/write-plan/references/confirmation-examples.md | head -80; echo -----; ls /private/tmp/loom-context-claude-dogfood-retest/runs/code-8-i1; cd /private/tmp/loom-context-claude-dogfood-retest/runs/code-8-i1; git branch --show-current; grep -rli \"release\" --include=*.md . 2>/dev/null | head"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "mkdir -p docs/loom/intent && cat > docs/loom/intent/2026-11-03-correct-release-notes-date.md <<'EOF'\n# Correct the release date in the release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only the text of an existing release-notes date changes; no user-facing surface or multi-state behaviour is added\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe release notes show an incorrect release date, which misleads readers of the notes about when the release happened. The actual release date is unknown and no replacement date has been verified.\n\n## Proposed outcome\nThe release notes show the actual release date, corrected only after that date has been established from evidence.\n\n## Acceptance\n1. The release notes show the verified actual release date in place of the incorrect one.\n2. All other content of the release notes is unchanged.\n\n## Constraints\n- The date is corrected only after the actual release date is established; no date is assumed or substituted in the meantime.\n\n## Out of scope\n- Any edit to the release notes other than the date.\n\n## Open questions\n- What is the actual release date, and what evidence or release record establishes it?\nEOF\n\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair standing docs/loom/intent/2026-11-03-correct-release-notes-date.md; echo exit=$?"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-correct-release-notes-date.md",
+        "content": "# Correct the release date in the release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only the text of an existing release-notes date changes; no user-facing surface or multi-state behaviour is added\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe release notes show an incorrect release date, which misleads readers of the notes about when the release happened. The actual release date is unknown and no replacement date has been verified.\n\n## Proposed outcome\nThe release notes show the actual release date, corrected only after that date has been established from evidence.\n\n## Acceptance\n1. The release notes show the verified actual release date in place of the incorrect one.\n2. All other content of the release notes is unchanged.\n\n## Constraints\n- The date is corrected only after the actual release date is established; no date is assumed or substituted in the meantime.\n\n## Out of scope\n- Any edit to the release notes other than the date.\n\n## Open questions\n- What is the actual release date, and what evidence or release record establishes it?\n"
+      }
+    ]
+  },
+  {
+    "case": "capture-h1",
+    "request": "The accounting team exports invoices. Each customer has its own currency setting, but an export sometimes uses the previous customer's setting, so the invoice shows the wrong currency. Fix only whose setting is used. Invoice amounts can legitimately differ between exports; I am not asking for identical amounts. Keep the export format unchanged and do not rewrite existing export files. Capture this internal bug-fix intent and explain what I would be confirming.",
+    "reply": "我已經把意圖草稿寫成 `docs/loom/intent/2026-11-03-invoice-export-use-own-customer-currency.md`。狀態是 `open`，還沒確認，也沒建立分支或 commit。\n\n## 你會確認的內容\n\n**問題:** 會計團隊匯出發票時,有時會沿用前一位客戶的幣別設定,所以發票上的幣別是錯的。\n\n**要修的事:** 每位客戶的發票,都使用該客戶自己的幣別設定。\n\n**驗收:** 匯出多位幣別設定不同的客戶之發票後,每張發票顯示的都是該客戶自己的幣別。\n\n**不動的部分:**\n- 匯出格式不變。\n- 不改寫既有的匯出檔案。\n- 發票金額不要求每次匯出都一樣。這個範圍只修正用誰的設定,不承諾「相同輸入一定得到相同結果」。\n\n**範圍外:**\n- 金額的計算和一致性。\n- 格式的變更。\n- 修正或重新產生已匯出的檔案。\n\n## 你回答「是」代表什麼\n\n1. 你確認上面的問題、結果和邊界。這只是確認結果,不是核准任何實作做法。\n2. 你授權自動發佈。通過審查和發佈檢查後,我會以非強制推送上傳變更分支,並開一個待審查的 pull request。發佈前你可以選擇不要自動發佈。合併是另一個獨立的決定,不包含在這次的「是」裡。\n3. 這是內部修正,不涉及不可逆的動作。因為不改寫既有匯出檔案,所以沒有刪除或覆寫使用者資料的後果要你同意。\n4. 回答「是」之後,我會把狀態寫成已確認,建立 `fix/2026-11-03-invoice-export-use-own-customer-currency` 分支並 commit。接著交給 `loom-code:write-plan`,因為這個變更不需要先寫設計規格。\n\n## 需要你注意的地方\n\n- 目前沒有未解的問題,所以我沒有向你提任何選擇題。\n- 這個 repo 目前沒有程式碼,所以我無法從程式確認匯出介面是否真的不受影響。「不需要設計」是依你說的「格式不變」判斷的。若檢查器之後不同意,我會回來告訴你。\n\n這是你要的範圍嗎?要自動發佈,還是改成不自動發佈?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/templates/intent.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "ls -R docs | head -30 && git branch --show-current",
+          "description": "List docs and current branch"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat docs/loom/KICKOFF-DEFAULTS.md; ls -R docs/loom/dogfood | head; git branch --show-current; git log --oneline | head -3",
+          "description": "Read kickoff defaults and git state"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-h1-i1/docs/loom/intent/2026-11-03-invoice-export-use-own-customer-currency.md",
+          "content": "# 發票匯出改用各客戶自己的幣別設定\noriginator: kouko\nkind: engineering\nneeds-design: no — 匯出格式不變，只修正讀取哪一位客戶的幣別設定，沒有新增或改變使用者讀寫的介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊會匯出發票。每位客戶都有自己的幣別設定，但匯出時偶爾會沿用前一位客戶的設定，導致發票上顯示錯誤的幣別。受影響的是會計團隊與收到錯誤幣別發票的客戶。\n\n## Proposed outcome\n匯出每位客戶的發票時，使用該客戶自己的幣別設定，而不是前一位客戶的。\n\n## Acceptance\n1. 匯出多位幣別設定不同的客戶之發票後，每張發票顯示的幣別都是該客戶自己的幣別設定。\n\n## Constraints\n- 匯出格式不變。\n- 不改寫既有的匯出檔案。\n- 只修正使用誰的設定；不同次匯出之間發票金額可以合理地不同，不要求一致。\n\n## Out of scope\n- 發票金額的計算或其跨次匯出的一致性。\n- 匯出格式的任何變更。\n- 修正或重新產生已匯出的檔案。\n\n## Open questions\n- none\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-invoice-export-use-own-customer-currency.md",
+        "content": "# 發票匯出改用各客戶自己的幣別設定\noriginator: kouko\nkind: engineering\nneeds-design: no — 匯出格式不變，只修正讀取哪一位客戶的幣別設定，沒有新增或改變使用者讀寫的介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊會匯出發票。每位客戶都有自己的幣別設定，但匯出時偶爾會沿用前一位客戶的設定，導致發票上顯示錯誤的幣別。受影響的是會計團隊與收到錯誤幣別發票的客戶。\n\n## Proposed outcome\n匯出每位客戶的發票時，使用該客戶自己的幣別設定，而不是前一位客戶的。\n\n## Acceptance\n1. 匯出多位幣別設定不同的客戶之發票後，每張發票顯示的幣別都是該客戶自己的幣別設定。\n\n## Constraints\n- 匯出格式不變。\n- 不改寫既有的匯出檔案。\n- 只修正使用誰的設定；不同次匯出之間發票金額可以合理地不同，不要求一致。\n\n## Out of scope\n- 發票金額的計算或其跨次匯出的一致性。\n- 匯出格式的任何變更。\n- 修正或重新產生已匯出的檔案。\n\n## Open questions\n- none\n"
+      }
+    ]
+  },
+  {
+    "case": "code-h2",
+    "request": "The setup guide tells customers to run orbit launch, which is the old command and now fails. I verified the correct command is orbit start. Change only that command line; every other part of the guide must stay the same. Capture this documentation-correction intent and stop for my confirmation.",
+    "reply": "我已經寫好意圖草稿,但還沒有確認,也沒有 commit。這一步到此為止,等你回覆。\n\n**我理解的問題**\n`SETUP.md` 叫客戶執行 `orbit launch` 來啟動應用程式。那是舊指令,現在會失敗,所以照著做的客戶無法啟動應用程式。\n\n**我會做的修正**\n只把那一行的指令改成你驗證過的 `orbit start`:\n\n- 之前:`Run \\`orbit launch\\` to start the application.`\n- 之後:`Run \\`orbit start\\` to start the application.`\n\n**驗收條件**\n1. 設定指南的啟動說明寫的是 `orbit start`,不再出現 `orbit launch`。\n2. 指南其他部分(包含「Keep this troubleshooting paragraph unchanged.」那一段)完全不變。\n\n**範圍外**\n指南中的其他文字、格式和內容,以及 README 等其他文件。\n\n**需要你確認的事**\n- 你回覆「是」,就代表同意以上範圍。\n- 你的「是」也會授權我之後在審查與發佈檢查通過後,以非強制推送的方式上傳分支,並開一個待審查的 pull request。\n- 你可以在發佈前選擇不要自動發佈。合併(merge)永遠是另一個獨立的決定。\n\n**目前狀態**\n- 意圖草稿放在 `docs/loom/intent/2026-11-03-fix-setup-launch-command.md`,狀態是 `open`。\n- 標準文件檢查已通過,沒有警告。\n- 目前所在分支 `dogfood` 還沒有任何 commit。你確認後,我會先建立 `docs/fix-setup-launch-command` 分支再 commit,然後撰寫計畫。\n\n這個範圍正確嗎?要自動發佈,還是只做到本地修改?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1",
+          "description": "Check loom-code contract version"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "git branch --show-current && ls -R docs | head -50 && grep -rn \"orbit\" README.md SETUP.md docs | head -30",
+          "description": "Inspect repo docs and orbit command usages"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/code-h2-i1/SETUP.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/contract/templates/intent.md; echo ------; cat /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirmation-examples.md | head -80; echo ------; cd /private/tmp/loom-context-claude-dogfood-retest/runs/code-h2-i1 && cat docs/loom/KICKOFF-DEFAULTS.md | head -30; git log --oneline | head -3",
+          "description": "Read intent template, examples, and kickoff defaults"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/code-h2-i1/docs/loom/intent/2026-11-03-fix-setup-launch-command.md",
+          "content": "# Fix the start command in the setup guide\noriginator: kouko\nkind: engineering\nneeds-design: no — one-line wording correction in an existing guide; no new surface, state or behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe setup guide tells customers to run `orbit launch` to start the application. That is the old command and it now fails, so customers who follow the guide cannot start the application.\n\n## Proposed outcome\nThe setup guide tells customers to run `orbit start`, the verified current command.\n\n## Acceptance\n1. The setup guide's start instruction names `orbit start` and no longer names `orbit launch`.\n2. Every other part of the setup guide, including the troubleshooting paragraph, is unchanged.\n\n## Constraints\n- The correct command is `orbit start` (verified by the user).\n\n## Out of scope\n- Any other wording, formatting or content in the setup guide.\n- Other documents, including the README.\n\n## Open questions\n- none\n"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair standing docs/loom/intent/2026-11-03-fix-setup-launch-command.md; echo \"exit=$?\"",
+          "description": "Run standing-documents check on draft intent"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-fix-setup-launch-command.md",
+        "content": "# Fix the start command in the setup guide\noriginator: kouko\nkind: engineering\nneeds-design: no — one-line wording correction in an existing guide; no new surface, state or behaviour\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe setup guide tells customers to run `orbit launch` to start the application. That is the old command and it now fails, so customers who follow the guide cannot start the application.\n\n## Proposed outcome\nThe setup guide tells customers to run `orbit start`, the verified current command.\n\n## Acceptance\n1. The setup guide's start instruction names `orbit start` and no longer names `orbit launch`.\n2. Every other part of the setup guide, including the troubleshooting paragraph, is unchanged.\n\n## Constraints\n- The correct command is `orbit start` (verified by the user).\n\n## Out of scope\n- Any other wording, formatting or content in the setup guide.\n- Other documents, including the README.\n\n## Open questions\n- none\n"
+      }
+    ]
+  }
+]

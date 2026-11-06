@@ -1,0 +1,191 @@
+{
+  "role": "independent blind auditor",
+  "input": "/tmp/loom-context-claude-dogfood/blind-packet.json",
+  "resolver": {
+    "overrides": null,
+    "profile": "inherited",
+    "main_profile": "unobservable"
+  },
+  "cases": [
+    {
+      "case": "capture-4-r2",
+      "assessment": "partly",
+      "phase": "missing-date interview with open draft; confirmation not completed",
+      "held": [
+        "Subject, customer impact, date-only scope and intended authorization are explicit.",
+        "Observed actions stop at writing an open draft; no confirmation, commit or publication on behalf of the user."
+      ],
+      "anchors": [
+        "客戶看到後,會以為最新版本很舊。",
+        "發佈說明的其他內容都沒有變動。",
+        "要顯示哪一天?",
+        "回答「是」也代表你授權我在審查和發佈檢查通過後,自動推送分支並建立可審閱的 PR。"
+      ],
+      "issues": [
+        "F2",
+        "F3"
+      ],
+      "workflow_evidence": "One open draft present; exact replacement date remains unanswered."
+    },
+    {
+      "case": "capture-5-r2",
+      "assessment": "partly",
+      "phase": "confirmation request with open draft",
+      "held": [
+        "Preserves own selection, retry bound, queue recovery and successful-job behavior.",
+        "User already explained retry policy and dispatch profile, so reusing those terms is proportionate.",
+        "Confirmation consequences and independent merge decision are stated; no unauthorized completion is observed."
+      ],
+      "anchors": [
+        "持續失敗的工作在達到它自己設定的重試上限後就停止，不再重複。",
+        "既有成功的工作，結果和修正前一樣。",
+        "這同時授權我在 closing-review 與發佈檢查通過後，做一般（非強制）push 並開 Ready PR。"
+      ],
+      "issues": [
+        "F3"
+      ],
+      "workflow_evidence": "One open draft present. No confirmation/commit/publish tools observed."
+    },
+    {
+      "case": "capture-6-r2",
+      "assessment": "partly",
+      "phase": "detailed explanation plus missing-information interview; open draft",
+      "held": [
+        "Acknowledges and removes the unsupported profile label; defines the requested selection rule.",
+        "Explains cross-job rule leakage and its consequence in sufficient detail.",
+        "Asks outcome questions rather than asking the user to validate implementation.",
+        "Clearly holds confirmation/branch/commit pending answers."
+      ],
+      "anchors": [
+        "「profile」是我上一次重述時自己用的詞,不是你的。",
+        "執行者選擇規則:決定每個工作(job)由誰來執行的規則。",
+        "同一個工作在相同條件下重複執行,執行者選擇的結果一致。",
+        "在你確認之前,我不會把狀態改成 `confirmed`,也不會建立分支或提交。"
+      ],
+      "issues": [
+        "F1",
+        "F3"
+      ],
+      "workflow_evidence": "Open draft and unresolved questions are present; not a completed confirmation."
+    },
+    {
+      "case": "code-4-r2",
+      "assessment": "partly",
+      "phase": "valid missing-date interview; no persistent draft yet",
+      "held": [
+        "Accurately explains date-only scope and customer impact.",
+        "Explicitly declines to infer the release date from today.",
+        "States confirmation will lead to branch, persisted intent and commit; these actions were not observed."
+      ],
+      "anchors": [
+        "今天是 2026-11-03,但這不一定是實際發佈日。",
+        "請回覆「確認」和實際日期,我才會繼續。",
+        "我已經確認了意圖,但還沒有建立任何檔案,也沒有改動日期。這需要你確認。"
+      ],
+      "issues": [
+        "F3"
+      ],
+      "workflow_evidence": "No draft intent observed. This limits persistent-workflow evidence, but a missing-information interview need not already be complete. Opening claim of confirmed intent conflicts with its later pending-confirmation status; improve wording to avoid ambiguity."
+    },
+    {
+      "case": "code-5-r2",
+      "assessment": "partly",
+      "phase": "confirmation request with open draft and disclosed tool block",
+      "held": [
+        "Restatement covers wrong selection, infinite retries, blocked queue and unchanged successful jobs.",
+        "Explicitly separates open draft from confirmation, commit and branch switching.",
+        "Discloses missing checks; permission failure is not a content-quality failure."
+      ],
+      "anchors": [
+        "每個工作都由自己的分派設定檔選定 worker。失敗的工作達到自己設定的重試上限後就停止重複。",
+        "原本就成功的工作行為完全不變。",
+        "我的 Bash 指令被自動拒絕",
+        "你回答「確認」,也就是授權我在 closing-review 和發佈檢查通過後,做一般(非強制)的 push 並建立 Ready PR。"
+      ],
+      "issues": [
+        "F3"
+      ],
+      "workflow_evidence": "One open draft present. One Bash denial prevents evidence for attempted checks; no unauthorized confirmation/commit/publication observed."
+    },
+    {
+      "case": "code-6-r2",
+      "assessment": "partly",
+      "phase": "detailed explanation and scope interview; no persistent draft yet",
+      "held": [
+        "Defines job and worker selection and explicitly retracts the unsupported profile term.",
+        "Discusses future behavior and asks separately about existing results without modifying them.",
+        "Authorization effects and independent merge decision are explicit."
+      ],
+      "anchors": [
+        "Worker selection:決定「這個 job 由誰來跑」的規則。每個 job 各自有一份。",
+        "同一個 job 重複執行,選人的結果一致,不再因為別的 job 而變動。",
+        "預設是**不動**。這次只修正之後的行為,不會改寫你現有的任何結果。",
+        "你確認後,我才會寫入意圖檔並繼續做計畫。"
+      ],
+      "issues": [
+        "F1",
+        "F3"
+      ],
+      "workflow_evidence": "No draft intent observed; interview is still pending. One reference-read Bash command was denied, then corresponding Read calls are observed. The packet does not contain tool outputs to verify read contents or successful checks."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "category": "unsupported stronger guarantee",
+      "severity": "material",
+      "cases": [
+        "capture-6-r2",
+        "code-6-r2"
+      ],
+      "evidence": [
+        "同一個工作在相同條件下重複執行,執行者選擇的結果一致。",
+        "同一個 job 重複執行,選人的結果一致,不再因為別的 job 而變動。"
+      ],
+      "explanation": "The request requires a job to use its own selection rule. It does not establish that this rule is deterministic; a legitimate rule could choose among workers by load or randomness. Own-rule isolation alone also does not prove all output consistency. These statements become additional acceptance obligations in the capture draft and proposed code acceptance.",
+      "action": "Require own-rule use and absence of cross-job rule leakage. Describe consistency specifically as eliminating inconsistency caused by the wrong rule; ask about deterministic selection only if it is a genuine requested outcome."
+    },
+    {
+      "id": "F2",
+      "category": "unsupported date fallback",
+      "severity": "material",
+      "cases": [
+        "capture-4-r2"
+      ],
+      "evidence": [
+        "我的建議是用實際發佈日。你若不確定,就用今天。"
+      ],
+      "explanation": "Offering today merely because the real release date is unknown can turn a requested factual correction into a knowingly unverified date. This is advice in an interview, not an observed incorrect edit; the open question and draft still seek the correct date.",
+      "action": "Keep the exact date unresolved until supplied or supported by release evidence; do not recommend today as a substitute for uncertainty."
+    },
+    {
+      "id": "F3",
+      "category": "reader-facing jargon, proportionality and state clarity",
+      "severity": "minor",
+      "cases": [
+        "capture-4-r2",
+        "capture-5-r2",
+        "capture-6-r2",
+        "code-4-r2",
+        "code-5-r2",
+        "code-6-r2"
+      ],
+      "evidence": [
+        "狀態是 `open`",
+        "needs-design: no",
+        "closing-review",
+        "Ready PR",
+        "我已經確認了意圖,但還沒有建立任何檔案,也沒有改動日期。這需要你確認。"
+      ],
+      "explanation": "The core requirements are understandable, but essential authorization consequences use unexplained workflow terms such as Ready PR, push and closing-review. Familiar date-only requests receive substantial workflow bookkeeping before resolving their one missing fact. code-4 also opens with a claim of confirmed intent while later saying confirmation is pending. No specific format is required; tables and prose both work.",
+      "action": "Lead with the requirement and missing fact, describe authorization in plain words (upload branch and open a pull request ready for review), and keep workflow labels secondary. Use one consistent pending-confirmation status. Remove redundant bookkeeping on simple requests."
+    }
+  ],
+  "limits": [
+    "This is a six-case, one-turn blind evaluation of supplied replies, tool-call inputs and draft strings only; no source skills, plans, prior verdicts or repository artifacts were read.",
+    "Tool-call presence is evidence of an attempted action, not successful execution. Tool outputs, hidden kickoff-default contents, complete git status and subsequent user responses are unavailable.",
+    "All observed trajectories stop before confirmation, commit and publication. This does not establish behavior after a future user confirmation.",
+    "The packet can establish missing-information interviews and draft presence/absence, but not full compliance with an unseen workflow contract.",
+    "No global pass is assigned. Not-observed dimensions include successful check execution where outputs are absent and any post-confirmation action."
+  ]
+}

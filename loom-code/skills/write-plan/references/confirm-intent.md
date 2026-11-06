@@ -45,13 +45,24 @@ included), and chat shows text tables or text diagrams, not Mermaid.
 Compose **one message**. Everything below goes in it; you do not stop
 twice.
 
-1. **The restatement.** Problem and Acceptance in the user's own plain
-   words — no file paths, no identifiers, no mechanism names:
-
-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
-   >
-   > (You want ___, and when it is done you will be able to ___, ___ and
-   > ___. Is that right?)
+1. **The restatement.** Only when required facts are settled, cover what is
+   needed in the user's plain language; five optional sections are:
+   background and current direction; current problem and impact; what changes;
+   scope and acceptance; and what the user is confirming. Connect known,
+   necessary project or function context to the request. Use only supplied or
+   evidenced facts, requirements, boundaries and guarantees; do not infer
+   unspecified restrictions from goals or examples. For example, "results may
+   differ" does not mean "the method cannot change"; do not copy example facts. For context, connect supplied facts:
+   <person> faces <problem>; this change enables <outcome>.
+   Preserve supplied ordering and conditions that affect acceptance.
+   Keep sections proportionate and avoid repetition. If required facts are
+   missing, continue the existing interview without asking for confirmation.
+   Use a table for a helpful comparison, or an ASCII flow for a useful or
+   requested flow comparison; label before and expected after inside each
+   frame and align the frame edges on every line. Follow the existing
+   visualization skill when available. Do not force
+   a diagram for a wording correction. Avoid paths, identifiers, and mechanism
+   names unless needed to understand the request.
 
    For the current contract, automatic publication is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced

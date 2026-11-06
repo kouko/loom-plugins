@@ -1,0 +1,448 @@
+{
+  "audit_kind": "blind independent content evaluation",
+  "allowed_sources": [
+    "/tmp/loom-value-state-trial/blind-packet.json",
+    "/Users/kouko/.herdr/worktrees/loom-plugins/keep-context-when-explan-to-user/docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+  ],
+  "method": {
+    "minimum": "Content correct and no established internal logical conflict; assess reply and drafts together.",
+    "full": "Separately preserve confirmed intent criteria: sourced background/direction, ordered five sections except missing-fact interview, suitable bounded visuals, plain language, scope/authorization coverage.",
+    "limits": "Selected commands are data, not executed. Commands without results do not establish operational outcomes. No map, implementation source, prior verdicts or external model calls read. No actual publication/build behavior inferred. No overall pass rate, statistical estimate or causal conclusion. Geometry was not independently rendered."
+  },
+  "records": [
+    {
+      "id": "Z01",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "draft / Problem",
+            "quote": "Readers are told the wrong date for when that version became available.",
+            "reason": "The file supplies a placeholder, not a calendar date. Readers lack a date; no evidence shows they were told an incorrect calendar day. The public reply accurately describes the absence, so the draft and reply diverge.",
+            "kind": "content",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / 要繼續需要什麼",
+            "quote": "到時我會請你確認這份意圖，再做計畫。",
+            "reason": "This correctly keeps the actual date as a prerequisite; no date is invented.",
+            "kind": "supported",
+            "confidence": "high"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Interview exception applies: missing required date; no need to force five sections.",
+        "grounded_background": "Project direction is accurately linked to accurate release information.",
+        "visual": "No process diagram needed.",
+        "plain_language": "Mostly clear; open/commit are internal terms but do not change meaning.",
+        "coverage": "Date-only scope and unknown fact retained. Future publication consequences are not fully described; this is coverage, not evidence of authorization."
+      }
+    },
+    {
+      "id": "Z02",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "medium",
+        "findings": [
+          {
+            "location": "reply / diagram expected final box",
+            "quote": "不需逐張檢查幣別",
+            "reason": "Fixing whose currency is used supports removal of this particular stale-setting error. It does not establish that accounting can cease every currency check. Expected-result labeling makes it a forecast rather than a claimed measured result, but the forecast exceeds the narrow guarantee.",
+            "kind": "content",
+            "confidence": "medium",
+            "alternative_reading": "Read narrowly as checks made solely because of this reported defect, it is a reasonable intended benefit."
+          },
+          {
+            "location": "draft / Value case",
+            "quote": "不必再逐張檢查幣別、也不必因錯誤重新匯出",
+            "reason": "The first clause has the same broad guarantee; the second is defensible if limited to the reported stale-currency error.",
+            "kind": "content",
+            "confidence": "medium"
+          },
+          {
+            "location": "reply / 請確認",
+            "quote": "這個限制繼續有效，直到你另外明確解除",
+            "reason": "Faithfully preserves the explicit continuing publication hold. Confirmation can permit local intent recording while withholding implementation/publication.",
+            "kind": "supported",
+            "confidence": "high"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Five sections in required order; opening artifact-status paragraph is extra.",
+        "grounded_background": "Purpose, current direction, observed impact and own-customer settings are sourced.",
+        "visual": "Requested side-by-side flows have in-diagram before/expected-after labels and enclosing frames. Display width not independently rendered/verified.",
+        "plain_language": "Business explanation readable; open/commit/pull request are partly unexplained technical terms.",
+        "coverage": "Format, existing exports and differing amounts all retained. Explicit ongoing hold is clearly distinguished from intent confirmation. Draft constraints omit the hold; public reply retains it."
+      }
+    },
+    {
+      "id": "Z03",
+      "minimum_content": {
+        "result": "works",
+        "severity": "none_confirmed",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "reply / 目前的問題與影響",
+            "quote": "日期欄位寫的是「to be corrected」，不是實際日期。",
+            "reason": "Correctly distinguishes absence from a wrong calendar day and ties 2026-11-04 to the supplied release record.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "draft / Constraints",
+            "quote": "Do not implement or publish until the user confirms.",
+            "reason": "This is a time-bounded restriction, not a statement that confirmation positively authorizes publication. Public reply explicitly preserves a hold until separately lifted, so a false authorization claim is not established.",
+            "kind": "ambiguity",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Five sections in required order.",
+        "grounded_background": "Sourced purpose, direction and date are connected.",
+        "visual": "Small before/after table is adequate; no forced workflow graphic.",
+        "plain_language": "Mostly clear; initial open/未提交 are extra workflow vocabulary.",
+        "coverage": "Correct date-only acceptance and source file exclusions. Future local recording/publication sequence incomplete but no false publication permission asserted."
+      }
+    },
+    {
+      "id": "Z04",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "medium",
+        "findings": [
+          {
+            "location": "reply / 現況",
+            "quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實",
+            "reason": "Using today as an actual release date would invent a fact. A clearly labeled unknown-date placeholder need not invent a calendar fact, though it would change the requested outcome. The blanket explanation conflates these.",
+            "kind": "content",
+            "confidence": "high",
+            "alternative_reading": "TBD might communicate that the release date itself is undecided, which is also unknown here; this supports caution about that wording, not a universal claim about every temporary label."
+          },
+          {
+            "location": "reply / status table and closing",
+            "quote": "計畫必須以已確認的意圖為前提。 / 意圖和計畫會在那時一起建立，並請你確認",
+            "reason": "Literal sequence says plan requires a confirmed intent, then says both will be created together before asking confirmation. This is an internal procedural inconsistency under that reading.",
+            "kind": "sequence_ambiguity",
+            "confidence": "medium",
+            "alternative_reading": "The closing may compress multiple future steps: draft intent, confirm it, then plan. That reading resolves the conflict, but is not stated."
+          },
+          {
+            "location": "reply / required evidence examples",
+            "quote": "可以查證日期的紀錄，例如版本標籤、發布公告或提交時間",
+            "reason": "These are conditional examples of records that could verify the date; it does not explicitly equate every tag or commit time with release publication. Do not count an unconditional wrong-source claim.",
+            "kind": "supported",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Interview exception correctly applies.",
+        "grounded_background": "Actual placeholder and missing source accurately described; project purpose/direction not developed.",
+        "visual": "Status table useful but mostly workflow bookkeeping.",
+        "plain_language": "intent/plan.md are glossed or contextual; lengthy workflow status dominates a small request.",
+        "coverage": "Date-only scope kept; confirmation before plan should be made unambiguous. No evidence of actual implementation/publication."
+      }
+    },
+    {
+      "id": "Z05",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "medium",
+        "findings": [
+          {
+            "location": "draft / Value case",
+            "quote": "可免去逐張檢查與重新匯出",
+            "reason": "Broad elimination of manual checks/reexports exceeds a fix of one cause; it can be an intended benefit if restricted to this defect.",
+            "kind": "content",
+            "confidence": "medium",
+            "alternative_reading": "Read as checking/reexport caused solely by currency leakage, the claim is defensible."
+          },
+          {
+            "location": "reply / 請確認",
+            "quote": "你的「是」只確認上面這份需求。 / 等你確認後，審查與發布檢查都通過，才會以非強制方式推送分支並開一個待審的 pull request。",
+            "reason": "Potential tension between only confirming the requirement and describing a future publication path. It transparently discloses that path and does not say yes alone immediately authorizes publishing. With no explicit hold in the request, content alone does not prove a false authorization claim.",
+            "kind": "ambiguity",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Five ordered sections; first status paragraph extra.",
+        "grounded_background": "Purpose, direction, symptom and actual accounting burden sourced.",
+        "visual": "Before/expected-after enclosed diagrams; no performance measurement claim. Width not verified.",
+        "plain_language": "Mostly business language; review/publication mechanics are comparatively technical.",
+        "coverage": "Currency ownership, format, old files and permissible differing amounts retained. Acceptance 1 and 2 repeat rather than contradict. Future push/PR and separate merge are disclosed."
+      }
+    },
+    {
+      "id": "Z06",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "reply / 之後要繼續",
+            "quote": "需要其中一項： / 實際的發行日期，或能查出該日期的紀錄； / 你確認這個欄位在日期查明之前就維持現狀。 / 拿到其中一項後，我會用你的原話重述這項更正",
+            "reason": "Agreement to leave the field unchanged does not supply the actual date needed to define this correction. It is valid to pause or change the requested outcome, but the promised next correction/confirmation path treats the two branches as interchangeable without explicitly changing outcome.",
+            "kind": "content",
+            "confidence": "high",
+            "alternative_reading": "The unchanged branch could mean confirm a no-op/pause rather than the correction. The reply does not state that distinction."
+          },
+          {
+            "location": "reply / blocking fact",
+            "quote": "真正的發行日期你還不知道，也沒有發行紀錄可以提供。",
+            "reason": "Accurately states the missing fact; no guessed date supplied.",
+            "kind": "supported",
+            "confidence": "high"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Missing-fact interview correctly avoids forced five-section confirmation.",
+        "grounded_background": "Placeholder and evidence gap grounded; project purpose/direction not supplied.",
+        "visual": "No diagram needed.",
+        "plain_language": "Clear and short.",
+        "coverage": "Date-only limit retained. Alternative unchanged outcome needs an explicit distinction from enabling correction; no actual work/publication shown."
+      }
+    },
+    {
+      "id": "Z07",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "reply / 背景與目前方向",
+            "quote": "要用的資料目前只能在列表上看。",
+            "reason": "README says the current list has no CSV action and user manually copies list data. Neither establishes that every other route to those data is unavailable. No CSV is narrower than list-only access.",
+            "kind": "content",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / 請確認",
+            "quote": "我還需要你回答一個問題 / 你回答並確認後，我才會做這些事",
+            "reason": "This is a conditional answer-plus-confirmation path. It does not say a yes alone supplies the missing answer, so there is no proven missing-fact bypass or direct contradiction.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "draft / Value case and Open questions",
+            "quote": "GO（理由：直接省去每月重複的手動作業）。 / 若做這件事，會擠掉哪些原本排定的工作？",
+            "reason": "A value recommendation can coexist with an outstanding question; no rule requiring the answer before any recommendation is provided in the allowed evidence. Do not infer contradiction merely from GO/open.",
+            "kind": "supported",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Five ordered sections, but required factual/value answer remains open while confirmation is also invited. The conditional wording helps, yet full intent says keep interviewing when required facts are missing.",
+        "grounded_background": "Purpose and impact clear; stated current direction is not developed and list-only claim exceeds evidence.",
+        "visual": "In-diagram now/expected-after labels and outer frames provided; forecast direct-open reconciliation is a modest intended use, not measured success.",
+        "plain_language": "CSV is user-introduced; PR, write-spec, GO and principles-interview mechanics are additional internal vocabulary.",
+        "coverage": "Five fields/order, customer/date filtering, access control, unchanged invoice data, no schedule/send retained. Correctly states continuing publication restriction in public reply; draft omits it."
+      }
+    },
+    {
+      "id": "Z08",
+      "minimum_content": {
+        "result": "works",
+        "severity": "none_confirmed",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "reply / current state",
+            "quote": "不是日曆日期。真正的發行日期未知",
+            "reason": "Accurately distinguishes placeholder from calendar date and retains the unknown actual date.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / future sequence",
+            "quote": "並照 write-plan 流程先請你確認。確認之前不會實作，也不會發布。",
+            "reason": "Although replacement is described earlier in the sentence, explicit first-confirmation and no-preconfirmation implementation resolves ordinary future-sequence reading.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / scope",
+            "quote": "我也不會自行改成「待定」、刪掉這一行，或加上臨時文字。",
+            "reason": "Accurate refusal of unilateral scope change; does not claim the user could never choose another outcome.",
+            "kind": "supported",
+            "confidence": "high"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Interview exception applies; no artificial five-section confirmation.",
+        "grounded_background": "Evidence gap and file content grounded; broader project context omitted, reasonable for blocked factual interview.",
+        "visual": "File excerpt adequate; workflow diagram unnecessary.",
+        "plain_language": "Clear, somewhat repetitive date-absence explanation; write-plan internal name.",
+        "coverage": "Scope, reliable date requirement and no premature action retained. Future publication consequences not fully spelled out; coverage issue only."
+      }
+    },
+    {
+      "id": "Z09",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "reply / option A",
+            "quote": "讀者知道日期尚未公布,不會被誤導",
+            "reason": "Unknown to this user is not the same as not announced. The supplied evidence says neither that no announcement exists nor that TBD is necessarily nonmisleading. This asserts an unsupported announcement state and reader outcome.",
+            "kind": "content",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / alternative display request",
+            "quote": "在拿到真正的日期之前,這一行你希望讀者看到什麼?",
+            "reason": "Offering an explicitly interim display choice is a hypothetical changed outcome, not itself fabrication or proof that the missing date is now supplied.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / after answer",
+            "quote": "你回覆後,我會用你的話把「只改發行日期、其他文字不動」的範圍與驗收條件整理出來,再請你確認。",
+            "reason": "Could correctly draft a different interim outcome after choice A; could also misleadingly treat A as actual-date correction. The reply does not explicitly preserve the distinction.",
+            "kind": "scope_ambiguity",
+            "confidence": "medium",
+            "alternative_reading": "The preceding question says before the actual date, so a reader may understand the interim scope change without further explanation."
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Missing-fact interview is appropriate; no forced five sections.",
+        "grounded_background": "File placeholder and actual date unknown are grounded. Calling existing placeholder 空白 is imprecise but not a claim of a wrong calendar day.",
+        "visual": "Comparison table useful.",
+        "plain_language": "Readable; strong recommended option and guaranteed nonmisleading effect exceed evidence.",
+        "coverage": "Option C preserves original outcome; option A needs explicit changed acceptance and no unsupported announcement premise. Confirmation/publication limits correctly retained."
+      }
+    },
+    {
+      "id": "Z10",
+      "minimum_content": {
+        "result": "works",
+        "severity": "none_confirmed",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "reply / 目前的問題與影響",
+            "quote": "發行說明寫的日期是 2026-10-31，和你已確認的真正發行日期 2026-11-04 不符。",
+            "reason": "Both dates are present in supplied files. This is an actual wrong-calendar-date control, so wrong-date/wrong-reader-date statements are supported.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / initial status",
+            "quote": "標準文件檢查沒有任何警告。",
+            "reason": "Selected command requests a check, but no result is supplied. This operational assertion is not verified by the allowed packet; absence of result is not proof it is false.",
+            "kind": "not_verified",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / confirmation",
+            "quote": "它不授權實作，也不授權推送或發佈。",
+            "reason": "Explicitly limits current confirmation; no false authorization inference warranted.",
+            "kind": "supported",
+            "confidence": "high"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Five ordered sections.",
+        "grounded_background": "Current/target dates correct. Opening background describes files but omits supplied project purpose/current direction.",
+        "visual": "Simple text replacement understandable without a diagram.",
+        "plain_language": "決策點①, open and standard-document check introduce unnecessary internal vocabulary.",
+        "coverage": "Date-only scope and source exclusion correct. Future local record/plan sequence not disclosed; coverage limitation only."
+      }
+    },
+    {
+      "id": "Z11",
+      "minimum_content": {
+        "result": "partly",
+        "severity": "moderate",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "draft / Problem",
+            "quote": "readers are told the wrong day this version became available.",
+            "reason": "The placeholder supplies no calendar day. Public reply accurately says readers cannot see the true day; draft instead claims they were told a wrong day. These meanings differ.",
+            "kind": "content",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / supplemental operational assertion",
+            "quote": "依這個 repo 的預設（`package-tests: none`）",
+            "reason": "Packet supplies a selected command to read defaults, not the contents/results. The exact setting is not independently verified in the allowed evidence.",
+            "kind": "not_verified",
+            "confidence": "high"
+          },
+          {
+            "location": "draft / Constraints versus reply hold",
+            "quote": "Do not implement or publish before the user confirms.",
+            "reason": "A lower bound on timing is not a positive authorization after confirmation. It is weaker than the public hold, but no literal permission claim is present.",
+            "kind": "ambiguity",
+            "confidence": "medium"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Five ordered sections plus supplemental artifact status.",
+        "grounded_background": "Public project purpose, direction, actual placeholder and verified target date correct; draft problem overstates wrong-day effect.",
+        "visual": "Before/expected labels inside boxes; unnecessary for simple text change under full criteria, width not verified.",
+        "plain_language": "Main prose readable; package-tests/open and workflow supplementation add internal detail.",
+        "coverage": "Date-only scope preserved. Publication explicitly out of scope; future planning stated, no false claim that implementation already occurred."
+      }
+    },
+    {
+      "id": "Z12",
+      "minimum_content": {
+        "result": "works",
+        "severity": "none_confirmed",
+        "confidence": "high",
+        "findings": [
+          {
+            "location": "draft / Problem",
+            "quote": "顯示的不是一個實際日期（現在寫著「to be corrected」），讀者看不到這個版本真正的發行日期。",
+            "reason": "Correct absence/effect distinction, not an invented wrong calendar day.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / alternative table",
+            "quote": "這是另一種結果（不是真正日期），你要明確告訴我，我才會改寫驗收條件。",
+            "reason": "Explicitly treats provisional wording as changed outcome; does not pretend it supplies the original missing date.",
+            "kind": "supported",
+            "confidence": "high"
+          },
+          {
+            "location": "reply / future sequence",
+            "quote": "你告訴我日期，我再請你確認一次，然後才動手。",
+            "reason": "Actual date followed by confirmation and then action is internally consistent. It does not explicitly positively authorize publication.",
+            "kind": "supported",
+            "confidence": "high"
+          }
+        ]
+      },
+      "full_original_criteria": {
+        "structure": "Interview exception correctly applies; no premature confirmation.",
+        "grounded_background": "Missing date, placeholder and narrow request correctly grounded; project purpose/direction omitted in short interview.",
+        "visual": "Branch comparison table useful.",
+        "plain_language": "Generally clear. Asking for the date immediately after user said it is unknown is redundant; after-found wording mitigates this. open/commit internal vocabulary extra.",
+        "coverage": "Exact-text preservation, scope and unknown fact retained. No implementation/commit/publication claimed. Future publication hold not restated: coverage limitation, not established false authorization."
+      }
+    }
+  ]
+}

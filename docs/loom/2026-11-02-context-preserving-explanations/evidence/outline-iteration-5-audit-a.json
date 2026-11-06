@@ -1,0 +1,200 @@
+{
+  "auditor": "audit-a",
+  "iteration": "authorized additional iteration 5 of 5",
+  "input_only": "/tmp/loom-context-claude-dogfood-retest/blind-packet-i5.json",
+  "resolver": {
+    "profile": "native ordinary inherited",
+    "overrides": null,
+    "exact_model_settings": "Not independently observable from packet"
+  },
+  "scope": "Final independent output-only blind assessment of ten distinct intake observations and supplied drafts/tool records. No source, plans, other audits or additional model calls consulted. Not a formal branch review or gate verdict.",
+  "limits": [
+    "No global pass or sixth source-modification request is asserted.",
+    "Gallery and primary-read flags are observations only, never standalone verdict criteria.",
+    "No fixed headings, rigid length limits or arbitrary word cap applied. Explicit brief-response outcome assessed separately from material fidelity.",
+    "Read complete qualifiers and distinguish present affected population, desired invariant, roles and unverified representation.",
+    "Pending factual interviews need not produce a draft or disclose publication before an actual yes request. Unknown facts are not required to be resolved to demonstrate valid intake behavior.",
+    "Recorded calls contain no confirmed-state write, git commit, push or PR creation; bounded packet evidence does not establish complete live external state."
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Pending actual-date interview; confirmation deferred.",
+      "basis": "Explains affected file, supplied customer impact, date-only scope and unknown date. Does not assert today as the replacement. The future confirmation/publication explanation is longer than necessary, but the unresolved fact remains clearly foregrounded and no implementation choice is requested. It conditions both publication actions on checks, permits opt-out until publication and separates merge.",
+      "evidence": [
+        "我只能確定要改的是這一行日期,檔案其他內容都不動。但我不知道**最新這次發佈的實際日期**。",
+        "這個日期不能由我猜。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-4",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Brief pending date interview; no actual yes request yet.",
+      "basis": "Explains missing actual date and risk of guessing and preserves date-only scope. No draft or publication statement is required before later confirmation. It does not claim an example or today is the actual release date.",
+      "evidence": [
+        "**最新一次發佈的實際日期是哪一天?**(例如 2026-11-0X。)",
+        "您回覆日期後,我會寫出意圖:只更正發佈日期,其餘內容不變。接著請您確認,您確認前我不會改任何檔案。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-5",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Preserves one observed ownership fault, desired per-job rule selection, retry cap, queue recovery, successful jobs and no new interface. No deterministic guarantee is added. Both publication actions are explicitly after review/publication checks with opt-out until publication and separate merge. However, an internal workflow/field inventory burdens an otherwise concrete request.",
+      "evidence": [
+        "- **現況:** 某個背景工作用到了另一個工作的派送設定,所以可能由錯的 worker 處理。失敗的工作也會無限重複執行,堵住佇列,讓其他工作做不了。",
+        "之後必須先通過審查與發佈檢查,才會執行下面兩件事:"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "- 草稿記錄了 4 條驗收條件、一條「不新增介面」的限制,以及上述範圍外項目;「待釐清問題」為 `none`。",
+          "consequence": "After already listing acceptance and scope, the reply inventories those same fields again, alongside engineering/needs-design labels and routing. This requires extra reading without improving the outcome or necessary publication decision. Required authorization disclosure itself is not treated as extraneous."
+        }
+      ]
+    },
+    {
+      "case": "capture-6",
+      "assessment": "partly",
+      "material_fidelity": "partly",
+      "proportionality_and_jargon": "partly",
+      "stage": "Detailed explanation plus unresolved fact/scope interview; no confirmation is requested yet.",
+      "basis": "Explains the shorthand and rule concept and correctly refuses to assume list/file representation or identical outcomes. Asking for observed examples and true scope constraints is valid pending intake, and no draft/publication statement is required yet. However, it prematurely narrows scope to currently affected jobs and makes several broad context questions prerequisites without establishing why they block the stated rule-ownership requirement.",
+      "evidence": [
+        "- **不假設規則存在哪裡。** 它是設定檔、清單還是別的形式,我沒有證據,也不屬於你要確認的部分。",
+        "**需要你補充的事實**(沒有這些,我無法定稿,意圖維持未確認):"
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "dimension": "present impact versus desired scope",
+          "quote": "- **範圍只含目前受影響的工作。** 我不會自行擴大到「所有工作」。",
+          "consequence": "The request describes jobs borrowing another job's selection rule and asks for an adequate explanation of that ownership requirement. No affected-job allowlist or limitation to presently identified cases was supplied. This sentence converts uncertainty about current incidence into a restriction on the correction, potentially excluding other jobs that should obey the same own-rule invariant. It is explicitly stated as scope before the user answers."
+        },
+        {
+          "severity": "minor",
+          "dimension": "proportionality / interview necessity",
+          "quote": "2. 誰會注意到這個問題,現在怎麼應付?例如手動指定執行者或事後重跑。這決定問題描述的影響範圍。",
+          "consequence": "Together with mandatory boundaries and out-of-scope questions, this creates a broad required interview after the user asked for an explanation of an already described ownership failure. Asking for examples is useful, but the reply does not explain why workaround/affected-person detail must block a faithful restatement. This is not a failure merely because the interview remains pending."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation request; no draft alone is not a failure.",
+      "basis": "Preserves actual one-job incidence and desired every-job own-selection behavior, retry cap, queue recovery, successful jobs and no new interface. Keeps terminal-state behavior out of the request. Both publication actions occur only after implementation/review/publication checks, with opt-out and separate merge. A repeated representation term is narrower than the supplied concept, but no actual storage architecture is finalized.",
+      "evidence": [
+        "- 目前有一個工作用到了另一個工作的派送設定檔。",
+        "- 回覆「yes」也表示授權:等實作完成、審查和發布前檢查都通過後,我會自動把這個變更分支推送到遠端(不強制推送),並開一個可供審查的 pull request。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "unsupported representation",
+          "quote": "- 每個工作都用自己的派送設定檔來選 worker。",
+          "consequence": "The user defines a dispatch profile by its selection role, not as a file. Repeatedly calling it a configuration file adds an unverified representation and may leave the user believing file ownership is established. The observable selection goal remains correct and no concrete file path or storage change is prescribed, so this is a minor fidelity issue rather than a demonstrated material implementation commitment."
+        }
+      ]
+    },
+    {
+      "case": "code-6",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Detailed re-explanation and confirmation request.",
+      "basis": "Responds to the explicit request for detail: defines rule, explains ownership failure, proposes causal-isolation acceptance and leaves implementation representation unknown. Its statement about different-job results does not itself promise identical same-job results; the full desired outcome remains rule ownership. The actual example is optional rather than an unnecessary blocker. Both publication actions follow checks with opt-out until publication and separate merge.",
+      "evidence": [
+        "- 我只依你的說法理解它是一條「規則」。它在程式裡是清單、設定檔、快取還是別的形式,我沒有看到證據,也不假設。",
+        "2. 改變某個工作的選擇規則,不會影響其他工作該由誰執行。",
+        "- 如果你有一個不一致的實際例子,請告訴我。它能幫助驗收,但不是必要的。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-7",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Preserves random own-eligible-list selection and does not turn randomness into fixed selection. Explicitly excludes changing selection method/distribution and adding interfaces. Both publication actions follow checks with opt-out and separate merge. The workflow inventory dilutes the required brief treatment of a familiar bounded bug fix.",
+      "evidence": [
+        "2. 同一個 job 多次挑選,仍可能選到清單內不同的工作者,不會變成固定單一結果。",
+        "**不在範圍內**:改變合格清單的決定方式、改變隨機挑選的方法或分佈、新增或改動任何對外介面。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "- 這是單純的錯誤修正,沒有增加機制,所以沒有跑複雜度檢查。",
+          "consequence": "Alongside internal engineering/needs-design routing, this reports process choices that do not help confirm the already stated list-ownership outcome or authority. The reply also repeats random-choice and no-interface constraints across several sections. The issue is cumulative unnecessary inventory, not headings or a word-count limit."
+        }
+      ]
+    },
+    {
+      "case": "code-8",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Scope confirmation request while actual date and location remain pending.",
+      "basis": "Preserves the unknown actual date, no verified substitute and unchanged other contents. Explicitly keeps intent open and implementation unable to start until the date is answered; a yes approves scope rather than resolving the unknown fact. Asks for location without guessing. Both publication actions are after checks, with opt-out until publication and separate merge. The opening plugin-state detail is unnecessary, but the main explanation remains connected to the specific missing facts and does not materially obstruct understanding.",
+      "evidence": [
+        "- **實際發布日期是什麼?** 目前不明,也沒有任何經過驗證的替代日期。這會列為 intent 的 Open questions。只要它沒有解答,intent 就維持 `open`,計畫的實作部分也無法開始。",
+        "- 若確認,我會把日期列為未決問題,而不是填入任何值。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-h1",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Confirmation-ready open draft with requested confirmation explanation.",
+      "basis": "Preserves accounting/customer currency ownership, unchanged format and existing files, and legitimate amount variation. Explains that old incorrect files remain unchanged, a meaningful consequence. Both publication actions explicitly follow checks, with opt-out until publication and separate merge. However, unrelated review settings and process commentary pad the explanation.",
+      "evidence": [
+        "- 發票金額在不同次匯出之間可以不同，我不會要求金額一致。",
+        "只有在審查和發布前檢查都通過之後，這個 yes 才同時授權兩件事："
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "- **跨模型審查：** 預設是 `suggest`，這裡不問你。",
+          "consequence": "This unexplained internal setting, the complexity-check note and a catalogue of absent background information do not clarify the requested invoice correction or confirmation authority. The user requested explanation, so necessary scope/consequence detail is warranted; this finding concerns the unrelated internal inventory, not the existence of a detailed explanation."
+        }
+      ]
+    },
+    {
+      "case": "code-h2",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Confirmation-ready open documentation draft.",
+      "basis": "Preserves verified orbit start, exact one-line correction and every other guide part. No unknown fact is invented and no extra implementation choice is delegated. Publication upload and PR both follow checks with opt-out until publication and separate merge. Internal station/task-count detail adds burden to the simple verified correction.",
+      "evidence": [
+        "**預期結果**:指南改為指示客戶執行 `orbit start`,這是你已驗證的正確指令。",
+        "2. 指南的其他部分完全不變,包括疑難排解段落。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "- 接著我會寫出實作計畫,再交給 build 階段。計畫只有一項任務,就是改那一行。",
+          "consequence": "The verified one-command correction does not need a build-station label or anticipated task count. Together with the empty-question field and repeated local workflow status, this makes the confirmation longer without improving the scope or necessary publication decision."
+        }
+      ]
+    }
+  ]
+}

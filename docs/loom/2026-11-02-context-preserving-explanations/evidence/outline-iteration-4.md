@@ -1,0 +1,13 @@
+# Authorized additional iteration 4 of 5
+
+Candidate aa9c8d1e58dba50a999f7e0e47f4e369002addb2 adds example-fact boundaries and a relevance check at the existing composer. RED 3 failed / 17 passed; focused GREEN 111 passed. Capture body 3487 words; releases remain code 3.58 / design 2.21. Publication held.
+
+Sync-trunk remained up to date with 2a4c5a31. The full locked package suite exited 0; log `/tmp/context-outline-i4-suite.log`. The existing graduated adversarial command `python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py -q` passed 37. Manifest and cumulative whitespace checks passed. No adversary redispatch or unresolved adversary finding.
+
+Ten same first-party claude-sonnet-5-5 medium cases completed, zero permission denials and zero fixture commits. All ten tool records request the examples file. CLI estimate USD 1.1575792, not invoice/hard cap. Source manifest remains 376 paths. Raw records and immutable prior candidates remain under `/tmp/loom-context-claude-dogfood-retest/`.
+
+Auditor A: 6 held / 4 partly. Auditor B: 7 held / 3 partly. Both identify code-6 importing an unestablished worker-list representation. Other findings include a present affected-population quantifier expanded from one job to every job, and branch-upload wording whose check condition clearly attaches only to PR creation. No premature confirmation, commit or publication observed.
+
+An independent acceptance tester clean-cloned aa9c8d1e, matched 376 source/bundle hashes and all ten raw results, validated local loading and ran 57 focused tests. Updated report: A1 partly, A2 works, A3 partly, A4 works. Important findings: unverified mechanism in code-6; duplicated scope and internal work inventory in capture-h1 and the simple code-h2 correction. It treats timing/opt-out wording as ambiguity rather than a separate important violation: it does not explicitly waive checks or forbid a later opt-out. No important finding was dismissed. Finalization was not run.
+
+The fifth and last authorized iteration keeps requirements and prior history. Separate a small primary content template from the optional example gallery; load the primary before drafting and at the message boundary. Its grouping is adaptable, without required headings or fixed sentences. Preserve live-case abstraction, quantifiers and scope, and keep example representations out of unsupported explanations. Bind both branch upload and PR opening explicitly to completed review/publication checks and preserve opt-out until publication. Retest the same ten scenarios, then update independent acceptance; do not claim convergence without it.

@@ -1,0 +1,331 @@
+{
+  "audit": "Fresh blind ProbeB/C literal plain-language and readability audit",
+  "inputs_read": [
+    "/tmp/loom-five-section-trial-i4/blind-packet.json",
+    "docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+  ],
+  "scope": "僅評讀所給回覆與確認 intent；未讀技能來源、先前審查、對照表，未判哪個條件屬於哪個版本。",
+  "method_limits": [
+    "六筆是所給樣本，不能推論整體成功率、穩定性或技能因果效果。",
+    "主要評讀 reply；drafts 與 trajectory 是背景資料，不能把其中未對使用者展示的術語計為使用者說明缺陷。",
+    "日期缺失的四筆適用訪談例外，五段要求僅對兩筆可供確認的發票需求適用。",
+    "完整 wrapper 要求 explain what I would be confirming，故適度未來確認預告受到提示，不自動歸咎技能；仍評估其中無關細節及授權是否清楚。",
+    "PR、commit、分支是慣用技術名稱，並非自創；需解釋角色或省去無關流程。資料中沒有 CSV 或使用者提供的精確命令可供評讀；不把字面必要名稱一概當作術語失敗。",
+    "以表意文字的常見字寬量度圖寬，不能證明特定宿主實際渲染。"
+  ],
+  "records": [
+    {
+      "id": "P01",
+      "coarse_clarity": "清楚；必要日期未定，讀者知道不能更正及下一步需要什麼。",
+      "literal_metaphor_verdict": "字面說明；「被擋住」是普通慣用語，沒有延伸類比、虛構角色或借用另一套機制。",
+      "grounding": {
+        "who": "發行說明讀者未明說，但文件、日期與其他文字的對象明確。",
+        "does_what": "只更正發行說明中的日期。",
+        "user_sees": "現有日期文字與一條更新項目逐字引用。",
+        "changes": "真正日期待提供，其他文字逐字不變；沒有捏造日期。"
+      },
+      "five_ready_sections": {
+        "applicable": false,
+        "assessment": "必要日期不足，適用繼續詢問的例外，不因缺五段判缺陷。"
+      },
+      "proportional_length": "略重複缺日期及其他文字不變，但確認範圍的預告由完整 wrapper 明確要求，不能僅因有預告就認定技能自行超出。",
+      "internal_process_inventory": "只有沒有寫檔／提交／發布的短句及授權界線，無流程清單。",
+      "terminology_findings": [],
+      "findings": [],
+      "diagram": {
+        "present": false,
+        "assessment": "文字修正不需圖。"
+      }
+    },
+    {
+      "id": "P02",
+      "coarse_clarity": "核心發票問題清楚；確認後是否授權實作的句子含混。",
+      "literal_metaphor_verdict": "以發票、客戶、幣別描述實際行為，沒有比喻。",
+      "grounding": {
+        "who": "會計團隊及每位客戶。",
+        "does_what": "會計匯出發票，系統選用客戶幣別設定。",
+        "user_sees": "現況錯誤幣別導致逐張檢查、重匯。",
+        "changes": "改用發票所屬客戶幣別，保留格式、既有檔案及金額可不同的界線。"
+      },
+      "five_ready_sections": {
+        "applicable": true,
+        "assessment": "依序有背景、問題、要改變什麼、範圍與驗收、請確認；標題語意對應完整。"
+      },
+      "proportional_length": "主文及圖有必要背景，範圍少量重複；末段狀態字串與流程動作偏多。",
+      "internal_process_inventory": "「建立分支、提交或實作」「open／confirmed」超過讀者判斷需求所需；發布限制需保留。",
+      "terminology_findings": [
+        {
+          "quote": "pull request",
+          "plain_alternative": "把修改送到共用儲存庫請人審閱的變更提案",
+          "reason": "既有慣用名稱，不是自創術語，但這裡未解釋它在發布限制中的角色。",
+          "severity": "style"
+        },
+        {
+          "quote": "open",
+          "plain_alternative": "尚未確認",
+          "reason": "避免要求讀者解碼內部狀態值。",
+          "severity": "style"
+        },
+        {
+          "quote": "confirmed",
+          "plain_alternative": "已確認",
+          "reason": "同上。",
+          "severity": "style"
+        },
+        {
+          "quote": "意圖草稿",
+          "plain_alternative": "需求草稿",
+          "reason": "此處指待確認的需求記錄；用日常詞即可。",
+          "severity": "style"
+        }
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "quote": "不代表授權實作以外的任何動作",
+          "assessment": "可讀成實作已獲授權，與 wrapper「a later yes confirms the intent only」不一致；改為「只確認需求，不代表同意開始實作或發布」。"
+        }
+      ],
+      "diagram": {
+        "present": true,
+        "frame": "左右流程各有完整外框。",
+        "titles": "圖內標示「修改前（回報的問題）」與「預期修改後」。",
+        "expected_state": "圖及導語均指出預期，並明說右側尚未驗證。",
+        "width_cells_max": 70,
+        "width_method": "依 Unicode East Asian Width 計算顯示寬度；未檢查宿主字型實際渲染。",
+        "grounding": "各節點都對應請求中的匯出、幣別錯誤及人工處理，沒有新增免檢查保證。"
+      }
+    },
+    {
+      "id": "P03",
+      "coarse_clarity": "清楚說明日期缺失與下一步；「沒有提到發布」的自述不自然。",
+      "literal_metaphor_verdict": "「卡住」只是一般表示尚不能繼續的慣用語，沒有展開另一套類比；其餘字面。",
+      "grounding": {
+        "who": "發行說明讀者未明示；目前討論文件與更正對象清楚。",
+        "does_what": "等待真實日期後，只更正該日期。",
+        "user_sees": "引用現有日期與更新項目。",
+        "changes": "未知日期保留未知，其他文字不動。"
+      },
+      "five_ready_sections": {
+        "applicable": false,
+        "assessment": "日期不足，無需硬填五段。"
+      },
+      "proportional_length": "適中，但沒有做的事有可縮短的重複。",
+      "internal_process_inventory": "無分支或完整站序清單；「意圖檔」仍可換成需求記錄。",
+      "terminology_findings": [
+        {
+          "quote": "意圖檔",
+          "plain_alternative": "需求記錄",
+          "reason": "對一般讀者交代文件用途即可。",
+          "severity": "style"
+        },
+        {
+          "quote": "意圖",
+          "plain_alternative": "待確認的需求內容",
+          "reason": "可避免把普通需求包成工作流程名稱。",
+          "severity": "style"
+        }
+      ],
+      "findings": [
+        {
+          "severity": "style",
+          "quote": "我沒有請你確認任何東西，也沒有提到發布。",
+          "assessment": "同一句已提及發布，容易讓讀者停頓；改為「日期確定後，我會再請你確認需求」。不把未來確認預告當成擅自添加，因 wrapper 已要求解釋會確認什麼。"
+        }
+      ],
+      "diagram": {
+        "present": false,
+        "assessment": "文字修正不需圖。"
+      }
+    },
+    {
+      "id": "P04",
+      "coarse_clarity": "清楚；列出必要事實、缺口與可提供的來源。",
+      "literal_metaphor_verdict": "「卡住」為普通慣用語，沒有延伸比喻。",
+      "grounding": {
+        "who": "發行說明使用者未明示，但用途及專案方向有文件依據。",
+        "does_what": "只更正文件日期。",
+        "user_sees": "精確指出現有日期欄文字。",
+        "changes": "標題與更新項目不變；不猜日期。"
+      },
+      "five_ready_sections": {
+        "applicable": false,
+        "assessment": "日期不足，不強求完整確認五段。"
+      },
+      "proportional_length": "缺日期說明略有重複，但下一步具體。",
+      "internal_process_inventory": "開頭「意圖檔、分支或提交」可縮成尚未修改；沒有大段工作站清單。",
+      "terminology_findings": [
+        {
+          "quote": "意圖檔",
+          "plain_alternative": "需求記錄",
+          "reason": "讀者無需先學工作流程名稱。",
+          "severity": "style"
+        },
+        {
+          "quote": "意圖",
+          "plain_alternative": "需求內容",
+          "reason": "此處可直接說整理成需求內容。",
+          "severity": "style"
+        }
+      ],
+      "findings": [
+        {
+          "severity": "style",
+          "quote": "我沒有建立意圖檔、分支或提交，也沒有改任何檔案。",
+          "assessment": "可簡化為「我尚未修改任何檔案」；這屬篇幅與過程資訊問題，沒有導致使用者誤解需求。"
+        }
+      ],
+      "diagram": {
+        "present": false,
+        "assessment": "文字修正不需圖。"
+      }
+    },
+    {
+      "id": "P05",
+      "coarse_clarity": "核心行為及確認只限需求都清楚；圖多承諾了全面免檢查。",
+      "literal_metaphor_verdict": "沒有延伸類比；「發布保留」是生硬命名，不是隱喻，應以禁止發布的原意直接說明。",
+      "grounding": {
+        "who": "會計團隊、客戶 A 與 B；A/B 是具體例子，非新功能。",
+        "does_what": "依發票客戶選幣別，會計目前檢查並重匯。",
+        "user_sees": "錯誤幣別與預期正確幣別對比。",
+        "changes": "選用自己的幣別有依據，全面不需逐張檢查則超出已知保證。"
+      },
+      "five_ready_sections": {
+        "applicable": true,
+        "assessment": "五段依序完整，修改內容標題與第三段同義。"
+      },
+      "proportional_length": "正文可讀；發布限制重複三次，內部狀態及提交分支說明偏多。",
+      "internal_process_inventory": "status: open、切出分支、提交意圖記錄對需求判斷幫助有限；確認後動作預告部分由 wrapper 引出，不可一概歸咎技能。",
+      "terminology_findings": [
+        {
+          "quote": "status: open",
+          "plain_alternative": "需求草稿還沒確認",
+          "reason": "內部欄位及值不必出現在開頭。",
+          "severity": "style"
+        },
+        {
+          "quote": "意圖",
+          "plain_alternative": "需求",
+          "reason": "用讀者當前要確認的內容命名。",
+          "severity": "style"
+        },
+        {
+          "quote": "變更分支",
+          "plain_alternative": "這次修改的獨立工作副本",
+          "reason": "常見 Git 術語，非自創；如確須交代提交後果，應解釋其作用，或刪除無關細節。",
+          "severity": "style"
+        },
+        {
+          "quote": "發布保留",
+          "plain_alternative": "你要求暫不發布",
+          "reason": "避免為禁止發布另造一個名詞。",
+          "severity": "style"
+        },
+        {
+          "quote": "解除保留",
+          "plain_alternative": "另外同意發布",
+          "reason": "直接說使用者需做的授權。",
+          "severity": "style"
+        },
+        {
+          "quote": "pull request",
+          "plain_alternative": "供他人審閱修改的變更提案",
+          "reason": "既有名稱，未解釋與發布禁令的關係。",
+          "severity": "style"
+        }
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "quote": "不需逐張檢查（匯出格式不變）",
+          "assessment": "圖中沒有把免檢查限於此幣別錯誤；修正幣別來源不證明所有檢查都可取消。改為「不再因沿用其他客戶的幣別而重新匯出」。"
+        },
+        {
+          "severity": "style",
+          "quote": "發布保留維持不變：",
+          "assessment": "下方三點反覆說同一禁令；保留一句「你另行明確同意發布之前，我不會上傳分支或建立供人審閱的變更提案」即可。"
+        }
+      ],
+      "diagram": {
+        "present": true,
+        "frame": "沒有外框，不符合確認 intent 保留的每側流程外框樣式。",
+        "titles": "圖內有「修改前（偶爾發生）」與「修改後（預期）」。",
+        "expected_state": "修改後標預期。",
+        "width_cells_max": 44,
+        "width_method": "依 Unicode East Asian Width 計算顯示寬度；未檢查宿主字型實際渲染。",
+        "grounding": "A/B 幣別流程有來源；「不需逐張檢查」新增過廣保證。箭頭指向人工步驟可讀，但沒有外框。"
+      }
+    },
+    {
+      "id": "P06",
+      "coarse_clarity": "核心缺日期清楚，但大量下一站及替代方案沖淡只問日期的重點。",
+      "literal_metaphor_verdict": "「兩條路」是普通選項慣用語，沒有持續拿道路機制說明工作；不應稱延伸類比。整體字面但有可避免術語。",
+      "grounding": {
+        "who": "發行說明讀者及可能錯誤的上線時間有交代。",
+        "does_what": "只更正日期，等待使用者提供。",
+        "user_sees": "引用目前 to be corrected；表格列出預期變更。",
+        "changes": "主要更正範圍清楚；新增暫定文字選項偏離已要求的真日期更正。"
+      },
+      "five_ready_sections": {
+        "applicable": false,
+        "assessment": "日期不足，仍在詢問，無需硬套五段。"
+      },
+      "proportional_length": "明顯過長；草稿表格、未來確認五點、二選一表重複解釋單一日期缺口。",
+      "internal_process_inventory": "「切出變更分支並 commit，接著進入規劃」「自動上傳分支並開 PR」「合併是另一個決定」構成過程清單；wrapper 確實要求確認後果，不能僅憑有預告推論過度，但此處列到尚未能確認的後續發布細節仍有比例問題。",
+      "terminology_findings": [
+        {
+          "quote": "open",
+          "plain_alternative": "尚未確認",
+          "reason": "不必暴露內部狀態值。",
+          "severity": "style"
+        },
+        {
+          "quote": "意圖",
+          "plain_alternative": "需求內容",
+          "reason": "可直接說讀者現在要確認什麼。",
+          "severity": "style"
+        },
+        {
+          "quote": "commit",
+          "plain_alternative": "儲存這份需求的版本記錄",
+          "reason": "既有 Git 名稱，非自創，也非使用者提供的精確指令；可用中文說作用。",
+          "severity": "style"
+        },
+        {
+          "quote": "變更分支",
+          "plain_alternative": "這次修改的獨立工作副本",
+          "reason": "若沒有必要解釋分支操作，刪除流程細節更簡潔。",
+          "severity": "style"
+        },
+        {
+          "quote": "PR",
+          "plain_alternative": "供他人審閱修改的變更提案",
+          "reason": "傳統縮寫，並非自創，但不能假定一般使用者懂它的發布角色。",
+          "severity": "style"
+        },
+        {
+          "quote": "驗收條件沒有可驗證的目標值",
+          "plain_alternative": "還不知道要改成哪一天，所以無法核對更正是否正確",
+          "reason": "抽象的檢驗術語可改成實際日期及核對動作。",
+          "severity": "style"
+        }
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "quote": "日期仍待定，要先留一個明確的暫定顯示方式",
+          "assessment": "提出使用者未要求的替代改動；雖未自動實作，但讓需補充的唯一真日期變成另一個範圍選擇。改為只索取真日期或可查證來源。"
+        },
+        {
+          "severity": "style",
+          "quote": "是否自動上傳分支並開 PR，會在確認訊息裡另外說明，你可以選擇不要。合併是另一個決定。",
+          "assessment": "此時日期未知且 wrapper 禁止發布，說明一般自動發布選項造成負擔；可直接說「現在只等日期，尚不修改或發布」。不憑此預告認定已經發布。"
+        }
+      ],
+      "diagram": {
+        "present": false,
+        "assessment": "沒有流程圖；二選一表不是文字修正需要的流程說明。"
+      }
+    }
+  ]
+}

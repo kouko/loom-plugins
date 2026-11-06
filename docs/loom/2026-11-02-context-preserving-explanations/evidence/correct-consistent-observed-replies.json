@@ -1,0 +1,1867 @@
+{
+  "experiment": {
+    "authorization_source": {
+      "quote": "最低標是內容不能有錯以及內容不能有邏輯衝突；對 請繼續迭代吧",
+      "scope": "Approved five-section iteration and realistic isolated validation; no publication or merge."
+    },
+    "source_versions": {
+      "baseline": "b536d274b1c7a6b067194562edc910a67145e565",
+      "candidate": "c4b639137b4d092b9d0e97400b1748f51d46dd17"
+    },
+    "schedule": [
+      {
+        "key": "code-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-csv-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-csv",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "retained-request-candidate-rerun"
+      },
+      {
+        "key": "code-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 2,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "capture-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 2,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+      },
+      {
+        "key": "code-known-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-known-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today"
+      },
+      {
+        "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-explicit-hold-graph",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request"
+      },
+      {
+        "key": "capture-invoice-default-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-default",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "conditional-consent-positive-control-no-matched-baseline"
+      }
+    ],
+    "sessions": 8,
+    "repeats": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "destination": "Anthropic through existing first-party native Claude Code authentication",
+    "estimated_total_usd": "about 5.16-5.66 including all prior phases",
+    "estimated_new_phase_usd": "0.9-1.4",
+    "prior_cli_cost_usd": 4.2639007,
+    "prior_completed_sessions": 31,
+    "estimated_cumulative_range_usd": [
+      5.1639007,
+      5.6639007
+    ],
+    "per_session_estimate_threshold_usd": 0.5,
+    "hard_cap": false,
+    "previous_artifacts": {
+      "root": "/private/tmp/loom-five-section-trial",
+      "experiment": "/private/tmp/loom-five-section-trial/experiment.json",
+      "baseline_results": [
+        "/private/tmp/loom-five-section-trial/capture-invoice-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/capture-csv-baseline-r1.summary.json",
+        "/private/tmp/loom-five-section-trial/code-setup-baseline-r1.summary.json"
+      ],
+      "preparation_history": "/private/tmp/loom-five-section-trial/preparation-attempts",
+      "initial_failed_preflight": "/private/tmp/loom-five-section-trial/preflight-attempt-01.json",
+      "iteration_2": "/private/tmp/loom-five-section-trial-i2",
+      "explicit_hold_diagnostic": "/private/tmp/loom-five-section-explicit-hold",
+      "wrapper_audit": "/tmp/loom-five-section-wrapper-audit.json",
+      "iteration_3": "/private/tmp/loom-five-section-trial-i3",
+      "iteration_4": "/private/tmp/loom-five-section-trial-i4",
+      "six_check_baseline": "/private/tmp/loom-six-checks-trial",
+      "neutral_diagnostic_4": "/private/tmp/loom-five-section-natural-interview-i4",
+      "pre_fix_results": [
+        "/private/tmp/loom-five-section-trial-i3/capture-invoice-explicit-hold-graph-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/capture-missing-date-candidate-r1.summary.json",
+        "/private/tmp/loom-five-section-trial-i3/code-missing-date-candidate-r1.summary.json"
+      ]
+    },
+    "controls": "Eight preregistered calls: each unchanged neutral missing-date entry twice, unchanged CSV, explicit-hold graph and default-publication controls once; one added code-known-date control with supplied verified date equal to fixture today2026-11-04. Never infer unknown means unequal or incorrect. No target checklist/failure/structure hints in prompts. Scripts and isolation unchanged.",
+    "scope": "Public tracked plugin runtime snapshots and synthetic fixtures only. Original plugin hooks retained with identical isolation wrappers. No actor implementation, publication, private data or source edits.",
+    "limits": "Two runs per unknown-date entry and one per other case remain exploratory, not statistical reliability. Known-date is unmatched new positive control; other exact previous fixtures/outputs retained. All31 previous calls and USD4.2639007 retained. No paid baseline rerun or failure replacement.",
+    "routing_env_policy": "Refuse inherited endpoint/model/provider overrides; never read or print credential values. Preserve native authentication."
+  },
+  "cases": {
+    "capture-invoice": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "capture-csv": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。"
+    },
+    "code-setup": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Orbit Preview\n\nOrbit Preview is a local website preview tool. Its setup guide helps a new contributor start the existing preview server.\n\n## Current direction\nKeep the getting-started instructions accurate without changing the preview tool's behavior. The verified command for the existing installed version is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。"
+    },
+    "capture-invoice-default": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "conditional-consent-positive-control-no-matched-baseline",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "capture-missing-date": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n",
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+    },
+    "capture-invoice-explicit-hold-graph": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。",
+      "candidate_only": true,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n"
+    },
+    "code-missing-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "code-known-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n",
+        "RELEASE_RECORD.md": "# Release record\n\nLatest release date: 2026-11-04\nVerified release-publication metadata for this synthetic project.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    }
+  },
+  "preflight": {
+    "variant_results": {
+      "baseline": {
+        "passed": true,
+        "source_commit": "b536d274b1c7a6b067194562edc910a67145e565",
+        "hooks": [
+          {
+            "plugin": "loom-code",
+            "event": "SessionStart",
+            "matcher": "startup|clear|compact",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"You have loom-code. Software-development work runs through stations, one artifact each.\\n\\nStation order: capture-intent → write-spec → write-plan → build → closing-review → ship; maintain on alerts.\\n\\nAny software-development request that adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; maintain takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.\\n\\nYou ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:\\n① after the intent is written (capture-intent / write-plan) — restate the problem and the acceptance conditions in plain words and get \\\"yes, this is what I want\\\"; fold a missing-principles interview, any `second-vendor: ask` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.\\n② only for a product change, after the spec is written (write-spec) — read back the visible behaviour (\\\"you type X, you see Y\\\") and get \\\"yes\\\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.\\n③ at the end (ship) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.\\n\\nNever ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.\\n\\nWith `second-vendor: suggest`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.\\n\\nThe full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: capture-intent, or write-plan when loom-design is not installed. Load it there; it is not repeated here.\\n\\nThis repo's standing defaults (docs/loom/KICKOFF-DEFAULTS.md):\\n- second-vendor: suggest — synthetic fixture default (2026-11-04)\\n- standing-docs: waived — synthetic intake fixture (2026-11-04)\\n- package-tests: none — capture intent and stop before confirmation (2026-11-04)\"}}\n"
+          },
+          {
+            "plugin": "loom-code",
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": ""
+          },
+          {
+            "plugin": "loom-code",
+            "event": "PostToolUse",
+            "matcher": "Skill|Agent",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PostToolUse\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+          },
+          {
+            "plugin": "loom-code",
+            "event": "UserPromptSubmit",
+            "matcher": null,
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+          },
+          {
+            "plugin": "loom-workflow",
+            "event": "UserPromptSubmit",
+            "matcher": null,
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}, \"additional_context\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}\n",
+            "context_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+          },
+          {
+            "plugin": "loom-workflow",
+            "event": "PostToolUse",
+            "matcher": "Write|Edit",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": ""
+          },
+          {
+            "plugin": "loom-workflow",
+            "event": "PostToolUse",
+            "matcher": "Write|Edit|Bash",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "fixture_key": "capture-missing-date-candidate-r1"
+      },
+      "candidate": {
+        "passed": true,
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "hooks": [
+          {
+            "plugin": "loom-code",
+            "event": "SessionStart",
+            "matcher": "startup|clear|compact",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"You have loom-code. Software-development work runs through stations, one artifact each.\\n\\nStation order: capture-intent → write-spec → write-plan → build → closing-review → ship; maintain on alerts.\\n\\nAny software-development request that adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; maintain takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.\\n\\nYou ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:\\n① after the intent is written (capture-intent / write-plan) — restate the problem and the acceptance conditions in plain words and get \\\"yes, this is what I want\\\"; fold a missing-principles interview, any `second-vendor: ask` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.\\n② only for a product change, after the spec is written (write-spec) — read back the visible behaviour (\\\"you type X, you see Y\\\") and get \\\"yes\\\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.\\n③ at the end (ship) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.\\n\\nNever ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.\\n\\nWith `second-vendor: suggest`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.\\n\\nThe full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: capture-intent, or write-plan when loom-design is not installed. Load it there; it is not repeated here.\\n\\nThis repo's standing defaults (docs/loom/KICKOFF-DEFAULTS.md):\\n- second-vendor: suggest — synthetic fixture default (2026-11-04)\\n- standing-docs: waived — synthetic intake fixture (2026-11-04)\\n- package-tests: none — capture intent and stop before confirmation (2026-11-04)\"}}\n"
+          },
+          {
+            "plugin": "loom-code",
+            "event": "PreToolUse",
+            "matcher": "Bash",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": ""
+          },
+          {
+            "plugin": "loom-code",
+            "event": "PostToolUse",
+            "matcher": "Skill|Agent",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PostToolUse\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+          },
+          {
+            "plugin": "loom-code",
+            "event": "UserPromptSubmit",
+            "matcher": null,
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"Write every message to the user in the language and script the user writes in during this conversation; machine-facing artifacts (brief/verdict/commit) keep their own language.\"}}\n"
+          },
+          {
+            "plugin": "loom-workflow",
+            "event": "UserPromptSubmit",
+            "matcher": null,
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}, \"additional_context\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\", \"additionalContext\": \"# Visualization card (loom-workflow)\\nReply to the user in their language. 1) First sentence: the conclusion and\\nwhat it means for the user; details after. 2) Say what a thing does in plain\\nwords; name an internal term, file path or rule id only when needed, in\\nbrackets after. 3) Be literal: who does what, what the user sees, what\\nchanges; no metaphors, analogies, \\\"like\\\" or \\\"imagine\\\". 4) Use tables or\\ndiagrams: before explaining comparisons of 2+ options, flows of 3+ steps,\\nbranching decisions, states or lifecycles, actor sequences, architectures,\\nreasoning chains, progress, a before and after, what each choice means,\\nreadiness, confirmed against unconfirmed, findings, risks or supported\\nenvironments, or typing any box-drawing diagram (\\u250c\\u2500\\u2510, +--+), invoke\\n`loom-visualization` FIRST and lead with its table or diagram. Skip\\nloom-visualization for one-paragraph answers; never decorate. When asking or\\nanswering how to do something, offer 2+ workable options in a table,\\nrecommending one; list or rule out doing nothing or later, a smaller version,\\nand combining two; for plainer explanations, read loom-visualization's\\n`references/plain-language.md` first.\\n\"}\n",
+            "context_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+          },
+          {
+            "plugin": "loom-workflow",
+            "event": "PostToolUse",
+            "matcher": "Write|Edit",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": ""
+          },
+          {
+            "plugin": "loom-workflow",
+            "event": "PostToolUse",
+            "matcher": "Write|Edit|Bash",
+            "exit_code": 0,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "fixture_key": "capture-missing-date-candidate-r1"
+      }
+    },
+    "isolation": {
+      "synthetic_private_read_denied": true,
+      "network_bind_denied": true,
+      "variant_write_denied": true,
+      "network_probe_exit": 77,
+      "network_probe_stderr": ""
+    },
+    "profile_sha256": "804d2302d5c374b9197d42d7af11177d58aaaf6d842f2f669d40da59c84caeb8"
+  },
+  "records": [
+    {
+      "key": "code-missing-date-candidate-r1",
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "summary": {
+        "key": "code-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.1161323,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-code:write-plan"
+          }
+        ],
+        "result": "現在還無法更正這個日期，我已停在確認之前。我沒有改動 `RELEASE_NOTES.md`，也沒有 commit 或發佈任何內容。\n\n**卡住的原因**\n- `RELEASE_NOTES.md` 目前顯示 `Release date: to be corrected`。\n- 真正的發行日期未知，你也沒有發行紀錄可提供，所以我無法確定正確日期。\n- 今天（2026-11-04）可能剛好等於發行日，也可能不是。目前沒有證據能判斷，所以我不會拿它當替代值。\n- 這項更正符合專案「讓已發佈的發行資訊保持正確」的方向，但少了日期就沒有依據可寫。\n\n**我做了什麼**\n- 在 `docs/loom/intent/2026-11-04-correct-release-date.md` 寫了一份草稿，狀態是 `open`，尚未 commit。\n- 草稿記下了你的限制：只更正顯示的發行日期，其他文字不動。\n- 草稿的「未解決問題」寫明：缺少實際發行日期，所以確認被擋住。\n- 因為還沒確認，我沒有寫計畫，也沒有跑檢查。\n\n**要繼續需要什麼**\n等你取得可靠的實際發行日期，或能指出可查證的來源時，請告訴我。到時我會請你確認這份意圖，再做計畫。",
+        "drafts": [
+          "docs/loom/intent/2026-11-04-correct-release-date.md"
+        ],
+        "verified_live_context": {
+          "successful_hook_responses": 12,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r1.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "60bf9169f41f53e8ced2d888012fde1bdc06ac892f6569214241e9bb96decff8",
+      "assistant_texts": [
+        "現在還無法更正這個日期，我已停在確認之前。我沒有改動 `RELEASE_NOTES.md`，也沒有 commit 或發佈任何內容。\n\n**卡住的原因**\n- `RELEASE_NOTES.md` 目前顯示 `Release date: to be corrected`。\n- 真正的發行日期未知，你也沒有發行紀錄可提供，所以我無法確定正確日期。\n- 今天（2026-11-04）可能剛好等於發行日，也可能不是。目前沒有證據能判斷，所以我不會拿它當替代值。\n- 這項更正符合專案「讓已發佈的發行資訊保持正確」的方向，但少了日期就沒有依據可寫。\n\n**我做了什麼**\n- 在 `docs/loom/intent/2026-11-04-correct-release-date.md` 寫了一份草稿，狀態是 `open`，尚未 commit。\n- 草稿記下了你的限制：只更正顯示的發行日期，其他文字不動。\n- 草稿的「未解決問題」寫明：缺少實際發行日期，所以確認被擋住。\n- 因為還沒確認，我沒有寫計畫，也沒有跑檢查。\n\n**要繼續需要什麼**\n等你取得可靠的實際發行日期，或能指出可查證的來源時，請告訴我。到時我會請你確認這份意圖，再做計畫。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01HnhqYJUSvywjRhSyPiz8pk",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-code:write-plan"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01683fJbxbQBxJHi7xVGZhTJ",
+          "name": "Bash",
+          "input": {
+            "command": "\"/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/scripts/loom-python\" --repair contract --require 2.1; echo \"exit $?\"; ls -R docs | head -50; cat RELEASE_NOTES.md; cat docs/loom/KICKOFF-DEFAULTS.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01WiJmMvaxMbiG2ivbUsn81h",
+          "name": "Bash",
+          "input": {
+            "command": "cd /private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references; cat confirmation-template.md no-intent-interview.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_018WKe9t9WDhzq62xt4C3JSK",
+          "name": "Bash",
+          "input": {
+            "command": "cd /private/tmp/loom-correct-consistent-trial/runs/code-missing-date-candidate-r1; cat README.md; cat /private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/contract/templates/intent.md; git status --short"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_017pjDGqCg7ehKHLZg7W2Ydw",
+          "name": "Write",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/runs/code-missing-date-candidate-r1/docs/loom/intent/2026-11-04-correct-release-date.md",
+            "content": "# Correct the release date shown in the latest release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only the text of one date in a release-notes file changes; no user-facing interface or multi-state behaviour is added\nevidence: [RELEASE_NOTES.md, README.md]\nstatus: open\n\n## Problem\nThe latest release in the release notes shows an incorrect release date. Readers are told the wrong date for when that version became available.\n\n## Proposed outcome\nThe release date displayed for the latest release is the correct one.\n\n## Acceptance\n1. The release date displayed for the latest release equals the actual release date.\n2. Apart from that displayed date, the text of the release notes is unchanged.\n\n## Constraints\n- Only the displayed release date changes; all other text stays as it is.\n- Do not implement or publish until the user confirms.\n\n## Out of scope\n- Any change to text other than the displayed release date.\n\n## Open questions\n- The actual release date is unknown, and the user has no release record to supply it. Without that evidence the correct date cannot be determined; confirmation is blocked until it is available.\n"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r1.jsonl",
+      "drafts": {
+        "docs/loom/intent/2026-11-04-correct-release-date.md": "# Correct the release date shown in the latest release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only the text of one date in a release-notes file changes; no user-facing interface or multi-state behaviour is added\nevidence: [RELEASE_NOTES.md, README.md]\nstatus: open\n\n## Problem\nThe latest release in the release notes shows an incorrect release date. Readers are told the wrong date for when that version became available.\n\n## Proposed outcome\nThe release date displayed for the latest release is the correct one.\n\n## Acceptance\n1. The release date displayed for the latest release equals the actual release date.\n2. Apart from that displayed date, the text of the release notes is unchanged.\n\n## Constraints\n- Only the displayed release date changes; all other text stays as it is.\n- Do not implement or publish until the user confirms.\n\n## Out of scope\n- Any change to text other than the displayed release date.\n\n## Open questions\n- The actual release date is unknown, and the user has no release record to supply it. Without that evidence the correct date cannot be determined; confirmation is blocked until it is available.\n"
+      }
+    },
+    {
+      "key": "capture-missing-date-candidate-r1",
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "summary": {
+        "key": "capture-missing-date-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.09505649999999999,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-design",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+            "source": "loom-design@inline",
+            "version": "2.21.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-design:capture-intent"
+          }
+        ],
+        "result": "目前還不能進入確認：更正後要顯示的發行日期，我手上沒有，也不能自己猜。\n\n**現況**：`RELEASE_NOTES.md` 的發行日期那行現在寫著「to be corrected」（待更正），不是真正的日期。其他文字（「Improve note search.」）你要求不動。\n\n**需要你告訴我的一件事**：這一行最後要顯示什麼？\n\n| 選項 | 這一行會顯示 | 適用情況 |\n|---|---|---|\n| A. 等你拿到日期再做（建議） | 先不改，意圖維持未決，日期確定後我再用正確日期更正 | 你很快就能查到真正日期 |\n| B. 你直接給我日期 | 你提供的那個日期 | 你已有日期，只是還沒說 |\n| C. 先顯示明確的「尚未確定」字樣 | 例如「發行日期：待確認」，之後再換成真日期 | 需要先擺脫目前這句，但日期還要等 |\n\n建議選 A。沒有發行紀錄可對照時，任何我填的日期都可能是錯的，而且會看起來像正式資訊。\n\n選 C 的話，請告訴我你想要的字樣。這樣的「更正」只是把佔位文字換成另一個佔位文字，不是真正的日期。\n\n我還沒有改任何檔案，也沒有建立或確認任何意圖文件；等你回覆後，我才會整理成一段話請你確認。",
+        "drafts": [],
+        "verified_live_context": {
+          "successful_hook_responses": 6,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r1.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "4f67b934160c0c5a6dfacd6d765938dcdd131a8b57c9e7e7a50b68b51926e934",
+      "assistant_texts": [
+        "目前還不能進入確認：更正後要顯示的發行日期，我手上沒有，也不能自己猜。\n\n**現況**：`RELEASE_NOTES.md` 的發行日期那行現在寫著「to be corrected」（待更正），不是真正的日期。其他文字（「Improve note search.」）你要求不動。\n\n**需要你告訴我的一件事**：這一行最後要顯示什麼？\n\n| 選項 | 這一行會顯示 | 適用情況 |\n|---|---|---|\n| A. 等你拿到日期再做（建議） | 先不改，意圖維持未決，日期確定後我再用正確日期更正 | 你很快就能查到真正日期 |\n| B. 你直接給我日期 | 你提供的那個日期 | 你已有日期，只是還沒說 |\n| C. 先顯示明確的「尚未確定」字樣 | 例如「發行日期：待確認」，之後再換成真日期 | 需要先擺脫目前這句，但日期還要等 |\n\n建議選 A。沒有發行紀錄可對照時，任何我填的日期都可能是錯的，而且會看起來像正式資訊。\n\n選 C 的話，請告訴我你想要的字樣。這樣的「更正」只是把佔位文字換成另一個佔位文字，不是真正的日期。\n\n我還沒有改任何檔案，也沒有建立或確認任何意圖文件；等你回覆後，我才會整理成一段話請你確認。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_016pBDcn7PZMJ1kpVXRGY4pE",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-design:capture-intent"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01D8z8uTgk6TNhh45nS3kSRe",
+          "name": "Bash",
+          "input": {
+            "command": "head -30 RELEASE_NOTES.md && ls docs docs/loom 2>/dev/null && cat docs/loom/KICKOFF-DEFAULTS.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01CnwWC2u4wkzptvYXEbjpZp",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/references/interview.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r1.jsonl",
+      "drafts": {}
+    },
+    {
+      "key": "capture-csv-candidate-r1",
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n",
+      "summary": {
+        "key": "capture-csv-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-csv",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "retained-request-candidate-rerun",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.1277911,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-design",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+            "source": "loom-design@inline",
+            "version": "2.21.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-design:capture-intent"
+          }
+        ],
+        "result": "我已寫好意圖草稿,狀態是 `open`,還沒有確認。我沒有實作、提交或發佈任何東西。\n\n草稿存放在 `docs/loom/intent/2026-11-04-invoice-list-csv-export.md`。\n\n## 背景與目前方向\n內部會計團隊用發票列表處理每月對帳。`PRINCIPLES.md` 已經由專案負責人核可,這個需求會沿用它的規則:\n- 權限不變。\n- 不改動發票資料。\n- 保留使用者選的篩選。\n- 不自動寄送給第三方。\n\n## 目前的問題與影響\n會計人員每月對帳時,得把發票列表的資料手動複製到試算表。這很花時間,而且每個月都要重複做。\n\n## 要改變什麼\n在既有發票列表加一個「匯出 CSV」按鈕,下載目前篩選後的發票資料。\n\n```text\n現在:  發票列表 → 手動複製 → 試算表\n預期:  發票列表(已篩選)→ 匯出 CSV → 試算表\n```\n\n## 範圍與驗收\n驗收條件有五項:\n1. 列表上有「匯出 CSV」按鈕,按下後會下載一個 CSV 檔。\n2. CSV 只含目前所選客戶與日期篩選後的發票。改變篩選再匯出,內容會跟著變。\n3. 欄位依序是發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 匯出的發票不會多於使用者在列表中本來就能查看的發票。\n5. 匯出前後,既有發票資料都沒有被改動。\n\n不在範圍內:\n- 自動寄送或排程。\n- 改動既有發票資料。\n- 改變誰能看哪些發票。\n\n這個需求會碰到使用者操作的按鈕和下載檔案,而且沒有 DESIGN.md 涵蓋,所以 `needs-design` 是 `yes`。確認後會先進入規格階段,在那裡才會讓你看「按下去會看到什麼」。\n\n## 請確認\n你回覆「是」,代表確認上面的問題、目標與五項驗收條件,也就是只確認需求範圍。你說過不要發佈,所以我會維持這個限制。你沒有明確解除前,這個「是」不包含推送分支或開 PR。\n\n我還需要你回答一個問題:這個功能若排進來,會取代或延後哪項既有工作?你一直沒說明,所以我先放在草稿的「未解問題」,草稿因此還不能轉為已確認。\n\n你的回覆可以是下面三種:\n- 回答上面的問題,並說「是」。\n- 指出哪裡不對,我改寫後再給你看。\n- 說這項工作沒有要取代或延後任何事,我就把它寫成「無」。",
+        "drafts": [
+          "docs/loom/intent/2026-11-04-invoice-list-csv-export.md"
+        ],
+        "verified_live_context": {
+          "successful_hook_responses": 8,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/capture-csv-candidate-r1.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/capture-csv-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/capture-csv-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "ad491524a9f4145ea783f8b9a18cb39baa48898707ff5b9557b7252ce4c8baa6",
+      "assistant_texts": [
+        "我先看一下 repo 現況和參考文件,再寫意圖草稿。",
+        "我已寫好意圖草稿,狀態是 `open`,還沒有確認。我沒有實作、提交或發佈任何東西。\n\n草稿存放在 `docs/loom/intent/2026-11-04-invoice-list-csv-export.md`。\n\n## 背景與目前方向\n內部會計團隊用發票列表處理每月對帳。`PRINCIPLES.md` 已經由專案負責人核可,這個需求會沿用它的規則:\n- 權限不變。\n- 不改動發票資料。\n- 保留使用者選的篩選。\n- 不自動寄送給第三方。\n\n## 目前的問題與影響\n會計人員每月對帳時,得把發票列表的資料手動複製到試算表。這很花時間,而且每個月都要重複做。\n\n## 要改變什麼\n在既有發票列表加一個「匯出 CSV」按鈕,下載目前篩選後的發票資料。\n\n```text\n現在:  發票列表 → 手動複製 → 試算表\n預期:  發票列表(已篩選)→ 匯出 CSV → 試算表\n```\n\n## 範圍與驗收\n驗收條件有五項:\n1. 列表上有「匯出 CSV」按鈕,按下後會下載一個 CSV 檔。\n2. CSV 只含目前所選客戶與日期篩選後的發票。改變篩選再匯出,內容會跟著變。\n3. 欄位依序是發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 匯出的發票不會多於使用者在列表中本來就能查看的發票。\n5. 匯出前後,既有發票資料都沒有被改動。\n\n不在範圍內:\n- 自動寄送或排程。\n- 改動既有發票資料。\n- 改變誰能看哪些發票。\n\n這個需求會碰到使用者操作的按鈕和下載檔案,而且沒有 DESIGN.md 涵蓋,所以 `needs-design` 是 `yes`。確認後會先進入規格階段,在那裡才會讓你看「按下去會看到什麼」。\n\n## 請確認\n你回覆「是」,代表確認上面的問題、目標與五項驗收條件,也就是只確認需求範圍。你說過不要發佈,所以我會維持這個限制。你沒有明確解除前,這個「是」不包含推送分支或開 PR。\n\n我還需要你回答一個問題:這個功能若排進來,會取代或延後哪項既有工作?你一直沒說明,所以我先放在草稿的「未解問題」,草稿因此還不能轉為已確認。\n\n你的回覆可以是下面三種:\n- 回答上面的問題,並說「是」。\n- 指出哪裡不對,我改寫後再給你看。\n- 說這項工作沒有要取代或延後任何事,我就把它寫成「無」。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01RFM7rkwJg6tJmnDy4AKkpd",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-design:capture-intent"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01W1xooA9DRmtTCqoBrTMNTz",
+          "name": "Bash",
+          "input": {
+            "command": "ls -R docs | head -30; echo ---; cat PRINCIPLES.md | head -60; echo ---; cat docs/loom/KICKOFF-DEFAULTS.md; echo ---; D=/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent; ls $D $D/references $D/templates; cat $D/templates/intent.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01HcVTDypeP9K1ZoLERQXeUU",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/references/confirmation-format.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01XNxQnrP4aXp1kJXJGVk133",
+          "name": "Write",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/runs/capture-csv-candidate-r1/docs/loom/intent/2026-11-04-invoice-list-csv-export.md",
+            "content": "# 發票列表匯出 CSV\noriginator: kouko\nkind: product\nneeds-design: yes — 新增使用者操作的按鈕與下載的 CSV 檔案,且沒有 DESIGN.md 或流程文件涵蓋此介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊每月對帳時,必須把發票列表上的資料手動複製到試算表,很花時間。受影響的是內部會計人員;每個月對帳都要重複這件事。\n\n## Proposed outcome\n會計人員能在既有發票列表上,把目前篩選後的發票資料下載成 CSV 檔,直接用於對帳。\n\n## Acceptance\n1. 發票列表上有「匯出 CSV」按鈕,按下後下載一個 CSV 檔。\n2. CSV 內容只包含使用者目前所選客戶與日期篩選後的發票;改變篩選後再匯出,內容隨之改變。\n3. CSV 欄位依序為:發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 使用者匯出的發票,不會多於其在發票列表中本來就有權查看的發票。\n5. 匯出前後,既有發票資料皆未被改動。\n\n## Constraints\n- 沿用目前的發票列表與資料存取權限(PRINCIPLES.md 固定選擇與不可妥協項)。\n- 匯出不得改動既有發票資料。\n\n## Value case\n受益者:內部會計團隊。急迫性:每月對帳都會遇到。現有替代方案:從列表手動複製到試算表(耗時)。取代的工作:使用者尚未說明。GO — 能直接省下每月重複的手動作業,且範圍小、不涉及新權限。\n\n## Out of scope\n- 自動寄送或排程匯出。\n- 改動既有發票資料。\n- 擴大或改變誰能查看哪些發票。\n\n## Open questions\n- 若此功能排進來,會取代或延後哪項既有工作?(尚未說明,價值評估所需)\n"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/capture-csv-candidate-r1.jsonl",
+      "drafts": {
+        "docs/loom/intent/2026-11-04-invoice-list-csv-export.md": "# 發票列表匯出 CSV\noriginator: kouko\nkind: product\nneeds-design: yes — 新增使用者操作的按鈕與下載的 CSV 檔案,且沒有 DESIGN.md 或流程文件涵蓋此介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊每月對帳時,必須把發票列表上的資料手動複製到試算表,很花時間。受影響的是內部會計人員;每個月對帳都要重複這件事。\n\n## Proposed outcome\n會計人員能在既有發票列表上,把目前篩選後的發票資料下載成 CSV 檔,直接用於對帳。\n\n## Acceptance\n1. 發票列表上有「匯出 CSV」按鈕,按下後下載一個 CSV 檔。\n2. CSV 內容只包含使用者目前所選客戶與日期篩選後的發票;改變篩選後再匯出,內容隨之改變。\n3. CSV 欄位依序為:發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 使用者匯出的發票,不會多於其在發票列表中本來就有權查看的發票。\n5. 匯出前後,既有發票資料皆未被改動。\n\n## Constraints\n- 沿用目前的發票列表與資料存取權限(PRINCIPLES.md 固定選擇與不可妥協項)。\n- 匯出不得改動既有發票資料。\n\n## Value case\n受益者:內部會計團隊。急迫性:每月對帳都會遇到。現有替代方案:從列表手動複製到試算表(耗時)。取代的工作:使用者尚未說明。GO — 能直接省下每月重複的手動作業,且範圍小、不涉及新權限。\n\n## Out of scope\n- 自動寄送或排程匯出。\n- 改動既有發票資料。\n- 擴大或改變誰能查看哪些發票。\n\n## Open questions\n- 若此功能排進來,會取代或延後哪項既有工作?(尚未說明,價值評估所需)\n"
+      }
+    },
+    {
+      "key": "code-missing-date-candidate-r2",
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "summary": {
+        "key": "code-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "code-missing-date",
+        "repeat": 2,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.0976985,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-code:write-plan"
+          }
+        ],
+        "result": "目前沒辦法更正這個日期，我先停在這裡，沒有改任何檔案，也沒有建立計畫、意圖檔或 commit。\n\n**目前狀況**\n- `RELEASE_NOTES.md` 第 3 行現在是 `Release date: to be corrected`。更正時只需要換掉這一行的日期，其他文字（標題和 `- Improve note search.`）都不動。\n- 真正的發行日期還不知道，你也沒有發行紀錄可以提供。我手上沒有任何證據能判斷正確日期。\n- 今天是 2026-11-04，但我不能拿它當發行日期。沒有證據能證明發行日就是今天，也沒有證據能證明不是。你說「是」也不能代替證據。\n- 所以這項更正目前被擋住，等到有可靠的發行日期來源才能做。\n\n**我沒有做的事**\n- 沒有填入猜測的日期，也沒有改成暫時文字，或把這一行刪掉。\n- 沒有安排發佈或推送。\n- 沒有進入規劃、建置或審查。\n\n**之後怎麼接**\n你之後拿到發行紀錄，例如 git tag、發佈頁面或 CI 紀錄，再把日期告訴我就行。到時我會把這個需求寫成一份意圖，等你確認後再做，而且仍然只換日期那一行。",
+        "drafts": [],
+        "verified_live_context": {
+          "successful_hook_responses": 8,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r2.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r2.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r2.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "03150c477de72e30dbdac731789e0f4611c6ad4824d15a4f8009d507782eb9a3",
+      "assistant_texts": [
+        "目前沒辦法更正這個日期，我先停在這裡，沒有改任何檔案，也沒有建立計畫、意圖檔或 commit。\n\n**目前狀況**\n- `RELEASE_NOTES.md` 第 3 行現在是 `Release date: to be corrected`。更正時只需要換掉這一行的日期，其他文字（標題和 `- Improve note search.`）都不動。\n- 真正的發行日期還不知道，你也沒有發行紀錄可以提供。我手上沒有任何證據能判斷正確日期。\n- 今天是 2026-11-04，但我不能拿它當發行日期。沒有證據能證明發行日就是今天，也沒有證據能證明不是。你說「是」也不能代替證據。\n- 所以這項更正目前被擋住，等到有可靠的發行日期來源才能做。\n\n**我沒有做的事**\n- 沒有填入猜測的日期，也沒有改成暫時文字，或把這一行刪掉。\n- 沒有安排發佈或推送。\n- 沒有進入規劃、建置或審查。\n\n**之後怎麼接**\n你之後拿到發行紀錄，例如 git tag、發佈頁面或 CI 紀錄，再把日期告訴我就行。到時我會把這個需求寫成一份意圖，等你確認後再做，而且仍然只換日期那一行。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_018pdWCBB7KzXTWLWAoCytRE",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-code:write-plan"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01Hnk8h4vKarSdKHrwPgR6j1",
+          "name": "Bash",
+          "input": {
+            "command": "\"/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/scripts/loom-python\" --repair contract --require 2.1; ls docs docs/loom docs/loom/intent 2>&1; cat docs/loom/KICKOFF-DEFAULTS.md; grep -n -i -E \"date|release|20[0-9]{2}\" RELEASE_NOTES.md | head -30; git log --oneline | head"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01Qv3gqMNNRw8tutV8NjMAc7",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references/no-intent-interview.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01P78Bspfk3iTjaJgU6BziY9",
+          "name": "Bash",
+          "input": {
+            "command": "cat /private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references/confirmation-template.md | head -80; echo ----; cat RELEASE_NOTES.md; echo ----; grep -rn -i \"release date\\|to be corrected\" README.md docs | head"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/code-missing-date-candidate-r2.jsonl",
+      "drafts": {}
+    },
+    {
+      "key": "capture-missing-date-candidate-r2",
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "summary": {
+        "key": "capture-missing-date-candidate-r2",
+        "variant": "candidate",
+        "case": "capture-missing-date",
+        "repeat": 2,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.0916832,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-design",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+            "source": "loom-design@inline",
+            "version": "2.21.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-design:capture-intent"
+          }
+        ],
+        "result": "目前還不能確認這個變更,因為缺少「更正後要顯示什麼」這個關鍵資訊。我沒有修改任何檔案,也沒有寫入意圖文件。\n\n最新版本的發行說明(`RELEASE_NOTES.md`)現在寫的是「Release date: to be corrected」,也就是沒有實際日期。你說還不知道真正的發行日期,也沒有紀錄可以查。所以我沒辦法替你填一個日期,否則就是憑空猜測,可能比現在的空白更糟。\n\n**請問:在拿到真正的日期之前,這一行你希望讀者看到什麼?**\n\n| 選項 | 讀者看到的結果 | 建議 |\n|---|---|---|\n| A. 明確標示日期未定,例如「Release date: TBD」(或你指定的措辭) | 讀者知道日期尚未公布,不會被誤導 | 建議 |\n| B. 改成你現在能確定的某個日期(請直接告訴我日期與來源) | 讀者看到一個確切的日期 | 只有在你能確定時才選 |\n| C. 暫時不改,等你拿到真正的日期再處理 | 發行說明維持現狀 | 若不急可選 |\n\n你回覆後,我會用你的話把「只改發行日期、其他文字不動」的範圍與驗收條件整理出來,再請你確認。確認之前我不會實作,也不會發佈。",
+        "drafts": [],
+        "verified_live_context": {
+          "successful_hook_responses": 6,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r2.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r2.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r2.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "4e92e3ee19420db34cfb27e5f817e42b1b36ae093b169aa22512948eed78b322",
+      "assistant_texts": [
+        "我先看一下發行說明和現有的 loom 文件,再決定要問什麼。",
+        "目前還不能確認這個變更,因為缺少「更正後要顯示什麼」這個關鍵資訊。我沒有修改任何檔案,也沒有寫入意圖文件。\n\n最新版本的發行說明(`RELEASE_NOTES.md`)現在寫的是「Release date: to be corrected」,也就是沒有實際日期。你說還不知道真正的發行日期,也沒有紀錄可以查。所以我沒辦法替你填一個日期,否則就是憑空猜測,可能比現在的空白更糟。\n\n**請問:在拿到真正的日期之前,這一行你希望讀者看到什麼?**\n\n| 選項 | 讀者看到的結果 | 建議 |\n|---|---|---|\n| A. 明確標示日期未定,例如「Release date: TBD」(或你指定的措辭) | 讀者知道日期尚未公布,不會被誤導 | 建議 |\n| B. 改成你現在能確定的某個日期(請直接告訴我日期與來源) | 讀者看到一個確切的日期 | 只有在你能確定時才選 |\n| C. 暫時不改,等你拿到真正的日期再處理 | 發行說明維持現狀 | 若不急可選 |\n\n你回覆後,我會用你的話把「只改發行日期、其他文字不動」的範圍與驗收條件整理出來,再請你確認。確認之前我不會實作,也不會發佈。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01Uvc8JM49dcsppTi7yhC9Qd",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-design:capture-intent"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01RiCn7QqYrh73rvV9ypksq3",
+          "name": "Bash",
+          "input": {
+            "command": "cat RELEASE_NOTES.md; ls -R docs | head -50; cat docs/loom/KICKOFF-DEFAULTS.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01B1tzVDJrGwaUqUrqSvqKha",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/references/interview.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/capture-missing-date-candidate-r2.jsonl",
+      "drafts": {}
+    },
+    {
+      "key": "code-known-date-candidate-r1",
+      "prompt": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。\n",
+      "summary": {
+        "key": "code-known-date-candidate-r1",
+        "variant": "candidate",
+        "case": "code-known-date",
+        "repeat": 1,
+        "skill": "loom-code:write-plan",
+        "code_only": true,
+        "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.15693340000000003,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-code:write-plan"
+          }
+        ],
+        "result": "## 背景與目前方向\nHarbor Notes 的發行說明用來告訴使用者某個版本何時開放、有哪些變更。專案目前的方向是讓已發布的發行資訊保持正確，而且不改動應用程式的行為。\n\n## 目前的問題與影響\n最新版本的發行說明（`RELEASE_NOTES.md`）顯示的發行日期目前是「to be corrected」，不是實際日期。讀者因此看不到這個版本真正開放的日子。\n\n## 要改變什麼\n把最新版本發行說明裡顯示的日期，改成發行紀錄（`RELEASE_RECORD.md`）所載的實際發行日期 2026-11-04。\n\n```text\n┌─ 目前 ──────────────────────┐   ┌─ 預期（尚未修改）────────────┐\n│ Release date: to be corrected│ → │ Release date: 2026-11-04      │\n│ - Improve note search.       │   │ - Improve note search.        │\n└──────────────────────────────┘   └───────────────────────────────┘\n```\n\n## 範圍與驗收\n1. 最新版本發行說明顯示的發行日期是 2026-11-04。\n2. 發行說明的其他文字完全不變。\n\n範圍外是除了顯示日期以外的任何發行說明修改，以及發布這項變更。\n\n## 請確認\n你說「是」只代表確認上面這份需求，不代表同意實作或發布。你已要求不要實作、不要發布，我會維持這個限制，直到你明確解除。\n\n這是你要的更正嗎？\n\n---\n補充：我已在工作目錄起草意圖檔 `docs/loom/intent/2026-11-04-correct-latest-release-date.md`，狀態仍是 `open`，沒有提交。我沒有建立分支，也沒有修改任何發行說明檔案。依這個 repo 的預設（`package-tests: none`），我停在確認之前。你確認後，才會進入計畫階段。",
+        "drafts": [
+          "docs/loom/intent/2026-11-04-correct-latest-release-date.md"
+        ],
+        "verified_live_context": {
+          "successful_hook_responses": 10,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/code-known-date-candidate-r1.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/code-known-date-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/code-known-date-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "1fe0ce10ba2892781f4834eac6fd577e70f827d87209cfac8c839178a776980f",
+      "assistant_texts": [
+        "我會先檢查現況和發行紀錄，再依流程起草意圖，並停在確認之前。",
+        "## 背景與目前方向\nHarbor Notes 的發行說明用來告訴使用者某個版本何時開放、有哪些變更。專案目前的方向是讓已發布的發行資訊保持正確，而且不改動應用程式的行為。\n\n## 目前的問題與影響\n最新版本的發行說明（`RELEASE_NOTES.md`）顯示的發行日期目前是「to be corrected」，不是實際日期。讀者因此看不到這個版本真正開放的日子。\n\n## 要改變什麼\n把最新版本發行說明裡顯示的日期，改成發行紀錄（`RELEASE_RECORD.md`）所載的實際發行日期 2026-11-04。\n\n```text\n┌─ 目前 ──────────────────────┐   ┌─ 預期（尚未修改）────────────┐\n│ Release date: to be corrected│ → │ Release date: 2026-11-04      │\n│ - Improve note search.       │   │ - Improve note search.        │\n└──────────────────────────────┘   └───────────────────────────────┘\n```\n\n## 範圍與驗收\n1. 最新版本發行說明顯示的發行日期是 2026-11-04。\n2. 發行說明的其他文字完全不變。\n\n範圍外是除了顯示日期以外的任何發行說明修改，以及發布這項變更。\n\n## 請確認\n你說「是」只代表確認上面這份需求，不代表同意實作或發布。你已要求不要實作、不要發布，我會維持這個限制，直到你明確解除。\n\n這是你要的更正嗎？\n\n---\n補充：我已在工作目錄起草意圖檔 `docs/loom/intent/2026-11-04-correct-latest-release-date.md`，狀態仍是 `open`，沒有提交。我沒有建立分支，也沒有修改任何發行說明檔案。依這個 repo 的預設（`package-tests: none`），我停在確認之前。你確認後，才會進入計畫階段。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_018eDH8p9q3ca4nVFcvdRk1g",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-code:write-plan"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01P2qcLZZK7BmTxWe2xsDKvb",
+          "name": "Bash",
+          "input": {
+            "command": "\"/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/scripts/loom-python\" --repair contract --require 2.1; ls docs docs/loom docs/loom/intent 2>&1; cat RELEASE_RECORD.md; echo ----; cat RELEASE_NOTES.md; echo ----; cat README.md | head -30"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01EBFzLVFiCDYKRPpw7joEnT",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references/no-intent-interview.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01Gyoea3zf6ZAeAnZpKXFYs5",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references/confirmation-template.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01EnEBBdVe5xG8zTjDBiTwdS",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references/confirm-intent.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_011qzkyMTK2mu3EF4fK78jVy",
+          "name": "Bash",
+          "input": {
+            "command": "cat docs/loom/KICKOFF-DEFAULTS.md; cat /private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/contract/templates/intent.md; \"/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/scripts/loom-python\" --repair standing docs/loom/intent/x.md 2>&1 | head"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01Q83T7tmRa9PeEZX7rHPgKL",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code/skills/write-plan/references/confirmation-format.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_016gENwijux3V83J6xecEvy4",
+          "name": "Write",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/runs/code-known-date-candidate-r1/docs/loom/intent/2026-11-04-correct-latest-release-date.md",
+            "content": "# Correct the displayed release date of the latest release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only the date text in an existing release-notes file changes; no user-facing surface is added or redesigned\nevidence: [RELEASE_RECORD.md, RELEASE_NOTES.md]\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe latest release notes show an incorrect release date, so readers are told the wrong day this version became available.\n\n## Proposed outcome\nThe latest release notes display the actual release date, 2026-11-04, as recorded in the release record.\n\n## Acceptance\n1. The release date shown in the latest release notes is 2026-11-04.\n2. All other text in the latest release notes is unchanged.\n\n## Constraints\n- Only the displayed release date changes; all other text stays as it is.\n- Do not implement or publish before the user confirms.\n\n## Out of scope\n- Any change to the release notes other than the displayed date.\n- Publication of the change.\n\n## Open questions\n- none\n"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/code-known-date-candidate-r1.jsonl",
+      "drafts": {
+        "docs/loom/intent/2026-11-04-correct-latest-release-date.md": "# Correct the displayed release date of the latest release notes\noriginator: kouko\nkind: engineering\nneeds-design: no — only the date text in an existing release-notes file changes; no user-facing surface is added or redesigned\nevidence: [RELEASE_RECORD.md, RELEASE_NOTES.md]\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nThe latest release notes show an incorrect release date, so readers are told the wrong day this version became available.\n\n## Proposed outcome\nThe latest release notes display the actual release date, 2026-11-04, as recorded in the release record.\n\n## Acceptance\n1. The release date shown in the latest release notes is 2026-11-04.\n2. All other text in the latest release notes is unchanged.\n\n## Constraints\n- Only the displayed release date changes; all other text stays as it is.\n- Do not implement or publish before the user confirms.\n\n## Out of scope\n- Any change to the release notes other than the displayed date.\n- Publication of the change.\n\n## Open questions\n- none\n"
+      }
+    },
+    {
+      "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n",
+      "summary": {
+        "key": "capture-invoice-explicit-hold-graph-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-explicit-hold-graph",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.17422249999999997,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-design",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+            "source": "loom-design@inline",
+            "version": "2.21.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-design:capture-intent"
+          },
+          {
+            "skill": "loom-workflow:loom-visualization"
+          }
+        ],
+        "result": "### 背景與目前方向\nCedar Accounts 是內部會計系統,會計團隊用它準備客戶發票並匯出交付,每位客戶有自己的幣別設定。目前的優先事項是讓發票匯出可靠、維持既有匯出格式,並避免某位客戶的設定影響到另一位客戶的匯出。\n\n### 目前的問題與影響\n匯出發票時,偶爾會沿用上一位客戶的幣別設定,讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查,發現錯誤再重新匯出。\n\n### 修改內容\n修改只涉及「每張發票使用誰的幣別設定」。下圖左邊是你回報的問題路徑,右邊是修改後的預期結果(尚未實作,屬預期):\n\n```text\n┌──────────────────────────────┐  ┌──────────────────────────────┐\n│    修改前(回報的問題)       │  │        修改後(預期)         │\n├──────────────────────────────┤  ├──────────────────────────────┤\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │       匯出發票         │  │  │  │     匯出發票     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │   可能沿用上一位幣別   │  │  │  │ 使用所屬客戶幣別 │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │       幣別錯誤         │  │  │  │     幣別正確     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n└──────────────────────────────┘  └──────────────────────────────┘\n```\n\n### 範圍與驗收\n驗收條件如下:\n1. 匯出不同幣別客戶的發票時,每張發票都顯示所屬客戶自己的幣別。\n2. 匯出格式與現在相同。\n3. 既有的匯出檔不被改寫。\n\n邊界如下:\n- 不同次匯出的金額可以合理不同,不要求金額相同。\n- 不改匯出格式。\n- 不改寫既有匯出檔。\n\n我已把這份草稿寫在 `docs/loom/intent/2026-11-04-invoice-own-currency-setting.md`,狀態仍是 `open`。目前沒有程式變更,也沒有建立分支或提交。\n\n### 請確認\n你回「是」只代表確認上述需求,也就是問題與驗收條件。回「是」之後,我才會把意圖標為已確認、建立分支並提交這份意圖文件,再交給下一階段。\n\n你已要求不發佈。這項限制會一直保留,直到你另外明確解除。即使你回「是」,也不會推送分支或開 PR。\n\n這是你要的修正嗎?我會等你回覆。",
+        "drafts": [
+          "docs/loom/intent/2026-11-04-invoice-own-currency-setting.md"
+        ],
+        "verified_live_context": {
+          "successful_hook_responses": 13,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/capture-invoice-explicit-hold-graph-candidate-r1.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/capture-invoice-explicit-hold-graph-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/capture-invoice-explicit-hold-graph-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "295bf218ed7ea16327de86b2e14ea83038b6481bb191c1a02ecae883dc7b5442",
+      "assistant_texts": [
+        "我已把意圖草稿寫進 repo,狀態是 `open`。現在要移除一行不符合規範的發佈欄位,然後把確認內容送給你。",
+        "### 背景與目前方向\nCedar Accounts 是內部會計系統,會計團隊用它準備客戶發票並匯出交付,每位客戶有自己的幣別設定。目前的優先事項是讓發票匯出可靠、維持既有匯出格式,並避免某位客戶的設定影響到另一位客戶的匯出。\n\n### 目前的問題與影響\n匯出發票時,偶爾會沿用上一位客戶的幣別設定,讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查,發現錯誤再重新匯出。\n\n### 修改內容\n修改只涉及「每張發票使用誰的幣別設定」。下圖左邊是你回報的問題路徑,右邊是修改後的預期結果(尚未實作,屬預期):\n\n```text\n┌──────────────────────────────┐  ┌──────────────────────────────┐\n│    修改前(回報的問題)       │  │        修改後(預期)         │\n├──────────────────────────────┤  ├──────────────────────────────┤\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │       匯出發票         │  │  │  │     匯出發票     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │   可能沿用上一位幣別   │  │  │  │ 使用所屬客戶幣別 │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │       幣別錯誤         │  │  │  │     幣別正確     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n└──────────────────────────────┘  └──────────────────────────────┘\n```\n\n### 範圍與驗收\n驗收條件如下:\n1. 匯出不同幣別客戶的發票時,每張發票都顯示所屬客戶自己的幣別。\n2. 匯出格式與現在相同。\n3. 既有的匯出檔不被改寫。\n\n邊界如下:\n- 不同次匯出的金額可以合理不同,不要求金額相同。\n- 不改匯出格式。\n- 不改寫既有匯出檔。\n\n我已把這份草稿寫在 `docs/loom/intent/2026-11-04-invoice-own-currency-setting.md`,狀態仍是 `open`。目前沒有程式變更,也沒有建立分支或提交。\n\n### 請確認\n你回「是」只代表確認上述需求,也就是問題與驗收條件。回「是」之後,我才會把意圖標為已確認、建立分支並提交這份意圖文件,再交給下一階段。\n\n你已要求不發佈。這項限制會一直保留,直到你另外明確解除。即使你回「是」,也不會推送分支或開 PR。\n\n這是你要的修正嗎?我會等你回覆。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01SEnd6jGJ6rDxLHUxfdnRLk",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-design:capture-intent"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01SyatTmPxTV3vv7qUb7Dvwz",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-workflow:loom-visualization"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01143j85EyWYAfT2PQzjRdSZ",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/references/confirmation-template.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01CreacKzqZYAakkDNC6jQR4",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/references/confirmation-format.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_0196KnCB4DeoRHtQPhWD4qLx",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/references/interview.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01CpKPNLKdmfcAF2xhjpZAU8",
+          "name": "Bash",
+          "input": {
+            "command": "find . -path ./.git -prune -o -type f -print | head -50 && cat docs/loom/KICKOFF-DEFAULTS.md",
+            "description": "List repo files and defaults"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01VxXWrJANM7L4dv3Hvpj8JE",
+          "name": "Read",
+          "input": {
+            "file_path": "/private/tmp/loom-correct-consistent-trial/runs/capture-invoice-explicit-hold-graph-candidate-r1/README.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_013FPPgt38egeKAEQeLrMkyd",
+          "name": "Bash",
+          "input": {
+            "command": "cat /private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent/templates/intent.md",
+            "description": "Read intent template"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01CcLHnZRPyysbrVvYYo5Nig",
+          "name": "Bash",
+          "input": {
+            "command": "mkdir -p docs/loom/intent && cat > docs/loom/intent/2026-11-04-invoice-own-currency-setting.md <<'EOF'\n# Invoice export uses the customer's own currency setting\noriginator: kouko\nkind: engineering\nneeds-design: no — export format is unchanged and no user-facing surface is added or altered\nstatus: open\npublication: none — user hold: do not publish until separately and explicitly authorized\n\n## Problem\nThe accounting team exports customer invoices. Occasionally an invoice shows the previous customer's currency instead of its own customer's. Accountants must check every exported invoice and re-export when a currency is wrong.\n\n## Proposed outcome\nEvery exported invoice uses the currency setting of the customer it belongs to.\n\n## Acceptance\n1. When invoices for customers with different currency settings are exported, each invoice shows its own customer's currency.\n2. The export format is unchanged from today.\n3. Existing export files are not rewritten.\n\n## Constraints\n- Export format stays unchanged.\n- Existing export files stay untouched.\n- Amounts may legitimately differ between exports; identical amounts are not required.\n- Publication is on hold until the user separately and explicitly authorizes it.\n\n## Out of scope\n- Changing the export format.\n- Rewriting existing export files.\n- Requiring identical amounts across exports.\n\n## Open questions\n- none\nEOF",
+            "description": "Write open intent draft file"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01GBPwJttN1YgR996FrHZaEr",
+          "name": "Bash",
+          "input": {
+            "command": "sed -i '' '/^publication:/d' docs/loom/intent/2026-11-04-invoice-own-currency-setting.md && head -6 docs/loom/intent/2026-11-04-invoice-own-currency-setting.md",
+            "description": "Remove publication line from draft intent"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/capture-invoice-explicit-hold-graph-candidate-r1.jsonl",
+      "drafts": {
+        "docs/loom/intent/2026-11-04-invoice-own-currency-setting.md": "# Invoice export uses the customer's own currency setting\noriginator: kouko\nkind: engineering\nneeds-design: no — export format is unchanged and no user-facing surface is added or altered\nstatus: open\n\n## Problem\nThe accounting team exports customer invoices. Occasionally an invoice shows the previous customer's currency instead of its own customer's. Accountants must check every exported invoice and re-export when a currency is wrong.\n\n## Proposed outcome\nEvery exported invoice uses the currency setting of the customer it belongs to.\n\n## Acceptance\n1. When invoices for customers with different currency settings are exported, each invoice shows its own customer's currency.\n2. The export format is unchanged from today.\n3. Existing export files are not rewritten.\n\n## Constraints\n- Export format stays unchanged.\n- Existing export files stay untouched.\n- Amounts may legitimately differ between exports; identical amounts are not required.\n- Publication is on hold until the user separately and explicitly authorizes it.\n\n## Out of scope\n- Changing the export format.\n- Rewriting existing export files.\n- Requiring identical amounts across exports.\n\n## Open questions\n- none\n"
+      }
+    },
+    {
+      "key": "capture-invoice-default-candidate-r1",
+      "prompt": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n",
+      "summary": {
+        "key": "capture-invoice-default-candidate-r1",
+        "variant": "candidate",
+        "case": "capture-invoice-default",
+        "repeat": 1,
+        "skill": "loom-design:capture-intent",
+        "code_only": false,
+        "comparison_role": "conditional-consent-positive-control-no-matched-baseline",
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "exit_code": 0,
+        "is_error": false,
+        "models": [
+          "claude-sonnet-5-5"
+        ],
+        "cost_usd": 0.1324881,
+        "plugins": [
+          {
+            "name": "loom-code",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+            "source": "loom-code@inline",
+            "version": "3.58.0"
+          },
+          {
+            "name": "loom-design",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+            "source": "loom-design@inline",
+            "version": "2.21.0"
+          },
+          {
+            "name": "loom-workflow",
+            "path": "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow",
+            "source": "loom-workflow@inline",
+            "version": "5.19.2"
+          },
+          {
+            "name": "cc-plugin-agents-md",
+            "path": "builtin",
+            "source": "cc-plugin-agents-md@builtin"
+          },
+          {
+            "name": "cc-plugin-telemetry",
+            "path": "builtin",
+            "source": "cc-plugin-telemetry@builtin"
+          },
+          {
+            "name": "cc-plugin-privacy",
+            "path": "builtin",
+            "source": "cc-plugin-privacy@builtin"
+          },
+          {
+            "name": "cc-plugin-plugin-authoring",
+            "path": "builtin",
+            "source": "cc-plugin-plugin-authoring@builtin"
+          }
+        ],
+        "permission_denials": [],
+        "skill_calls": [
+          {
+            "skill": "loom-design:capture-intent"
+          }
+        ],
+        "result": "我已把意圖寫成草稿，狀態是 `open`，還沒有確認。我還沒建分支、沒提交，也沒實作。草稿在 `docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md`。\n\n## 背景與目前方向\nCedar Accounts 是內部會計系統。會計團隊用它準備並下載客戶發票，每位客戶都有自己的幣別設定。目前的優先事項是維持匯出可靠、保留既有匯出格式，並避免某位客戶的設定影響另一位客戶的匯出。\n\n## 目前的問題與影響\n匯出發票時，偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在得逐張檢查，發現錯誤再重新匯出。\n\n## 這次要改變什麼\n每張發票都使用所屬客戶自己的幣別設定。\n\n```text\n┌──────────────────────────────┐  ┌──────────────────────────────┐\n│     修正前（已回報問題）     │  │          預期修正後          │\n├──────────────────────────────┤  ├──────────────────────────────┤\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │        匯出發票        │  │  │  │     匯出發票     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │   可能沿用上一位幣別   │  │  │  │ 使用所屬客戶幣別 │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │        幣別錯誤        │  │  │  │     幣別正確     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n└──────────────────────────────┘  └──────────────────────────────┘\n```\n\n## 範圍與驗收\n驗收條件有三項：\n1. 連續匯出幣別不同的多位客戶發票時，每張發票顯示的都是自己客戶的幣別。\n2. 匯出格式與修正前相同。\n3. 修正前已存在的匯出檔沒有被改寫。\n\n邊界如下：\n- 只修正「使用誰的幣別設定」。\n- 不同次匯出的金額可以不同，我不會要求金額相同。\n- 匯出格式不變。\n- 不改寫既有匯出檔。\n\n我把這項歸類為產品變更，因為它影響使用者看到的發票內容。它不需要先寫設計規格，因為介面和格式都不變。這個 repo 的預設也免除了原則文件。\n\n## 請確認\n你的「是」只確認上面的需求範圍。你說過只要捕捉意圖，所以我會維持不實作、不發布，直到你明確解除。\n\n**是不是你要的修正？** 若要調整，請告訴我。我先在這裡停下，等你回覆。",
+        "drafts": [
+          "docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md"
+        ],
+        "verified_live_context": {
+          "successful_hook_responses": 8,
+          "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+          "session_context_present": true,
+          "plugin_snapshot_unchanged": true,
+          "fixture_has_commit": false
+        },
+        "hook_events_raw_path": "/tmp/loom-correct-consistent-trial/capture-invoice-default-candidate-r1.summary.json"
+      },
+      "invocation": {
+        "argv": [
+          "/Users/kouko/.local/bin/claude",
+          "-p",
+          "--model",
+          "claude-sonnet-5-5",
+          "--effort",
+          "medium",
+          "--restricted",
+          "--strict-mcp-config",
+          "--setting-sources",
+          "",
+          "--settings",
+          "/private/tmp/loom-correct-consistent-trial/capture-invoice-default-candidate-r1.settings.json",
+          "--tools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--allowedTools",
+          "Skill,Read,Glob,Grep,Write,Edit,Bash",
+          "--permission-mode",
+          "acceptEdits",
+          "--permission-prompts",
+          "none",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--debug",
+          "hooks",
+          "--debug-file",
+          "/private/tmp/loom-correct-consistent-trial/capture-invoice-default-candidate-r1.hooks.log",
+          "--no-session-persistence",
+          "--max-budget-usd",
+          "0.50",
+          "--add-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-code",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design",
+          "--plugin-dir",
+          "/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-workflow"
+        ],
+        "requested_model": "claude-sonnet-5-5",
+        "requested_effort": "medium",
+        "source_commit": "c4b639137b4d092b9d0e97400b1748f51d46dd17",
+        "native_auth_preserved": true,
+        "routing_overrides_absent": true
+      },
+      "transcript_sha256": "e0d41a48e845a2b0873bb9c81f3e55273c6a2c1a79e62fe0d380a2b4b50e3f2f",
+      "assistant_texts": [
+        "我先看看 repo 現況和確認格式的參考文件。",
+        "我已把意圖寫成草稿，狀態是 `open`，還沒有確認。我還沒建分支、沒提交，也沒實作。草稿在 `docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md`。\n\n## 背景與目前方向\nCedar Accounts 是內部會計系統。會計團隊用它準備並下載客戶發票，每位客戶都有自己的幣別設定。目前的優先事項是維持匯出可靠、保留既有匯出格式，並避免某位客戶的設定影響另一位客戶的匯出。\n\n## 目前的問題與影響\n匯出發票時，偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在得逐張檢查，發現錯誤再重新匯出。\n\n## 這次要改變什麼\n每張發票都使用所屬客戶自己的幣別設定。\n\n```text\n┌──────────────────────────────┐  ┌──────────────────────────────┐\n│     修正前（已回報問題）     │  │          預期修正後          │\n├──────────────────────────────┤  ├──────────────────────────────┤\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │        匯出發票        │  │  │  │     匯出發票     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │   可能沿用上一位幣別   │  │  │  │ 使用所屬客戶幣別 │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n│               │              │  │            │                 │\n│               ▼              │  │            ▼                 │\n│  ┌────────────────────────┐  │  │  ┌──────────────────┐        │\n│  │        幣別錯誤        │  │  │  │     幣別正確     │        │\n│  └────────────────────────┘  │  │  └──────────────────┘        │\n└──────────────────────────────┘  └──────────────────────────────┘\n```\n\n## 範圍與驗收\n驗收條件有三項：\n1. 連續匯出幣別不同的多位客戶發票時，每張發票顯示的都是自己客戶的幣別。\n2. 匯出格式與修正前相同。\n3. 修正前已存在的匯出檔沒有被改寫。\n\n邊界如下：\n- 只修正「使用誰的幣別設定」。\n- 不同次匯出的金額可以不同，我不會要求金額相同。\n- 匯出格式不變。\n- 不改寫既有匯出檔。\n\n我把這項歸類為產品變更，因為它影響使用者看到的發票內容。它不需要先寫設計規格，因為介面和格式都不變。這個 repo 的預設也免除了原則文件。\n\n## 請確認\n你的「是」只確認上面的需求範圍。你說過只要捕捉意圖，所以我會維持不實作、不發布，直到你明確解除。\n\n**是不是你要的修正？** 若要調整，請告訴我。我先在這裡停下，等你回覆。"
+      ],
+      "tool_calls": [
+        {
+          "type": "tool_use",
+          "id": "toolu_019wZnmbb8kYMCEZb1PrK9tY",
+          "name": "Skill",
+          "input": {
+            "skill": "loom-design:capture-intent"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01P8vJ8WYCWk7ASr7Pg7u3gf",
+          "name": "Bash",
+          "input": {
+            "command": "cd /private/tmp/loom-correct-consistent-trial/runs/capture-invoice-default-candidate-r1; ls; cat README.md | head -40; find docs -type f | head -30; cat docs/loom/KICKOFF-DEFAULTS.md; S=/private/tmp/loom-correct-consistent-trial/variants/candidate/loom-design/skills/capture-intent; cat $S/references/confirmation-format.md; sed -n 1,80p $S/references/confirmation-template.md; cat $S/templates/intent.md"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        },
+        {
+          "type": "tool_use",
+          "id": "toolu_01ACCjJavR17ErNiUo8YYN1T",
+          "name": "Bash",
+          "input": {
+            "command": "cd /private/tmp/loom-correct-consistent-trial/runs/capture-invoice-default-candidate-r1; mkdir -p docs/loom/intent; cat > docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md <<'EOF'\n# 每張發票匯出都使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: product\nneeds-design: no — 匯出格式與既有畫面/檔案介面都維持不變，只改「發票使用哪位客戶的幣別設定」，沒有新增使用者讀取或輸入的介面，也不是多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊使用系統匯出客戶發票，每位客戶都有自己的幣別設定。目前偶爾會沿用上一位客戶的幣別設定，使這位客戶的發票顯示錯誤幣別。會計同事因此必須逐張檢查發票，遇到錯誤時再重新匯出。\n\n## Proposed outcome\n每張匯出的發票都使用所屬客戶自己的幣別設定，不受前一位客戶影響。\n\n## Acceptance\n1. 針對幣別不同的多位客戶連續匯出發票，每張發票顯示的幣別都是該發票所屬客戶自己的幣別設定。\n2. 匯出格式與修正前相同。\n3. 修正前已存在的匯出檔沒有被改寫。\n\n## Constraints\n- 只修正「使用誰的幣別設定」。\n- 匯出格式維持不變。\n- 不改寫既有匯出檔。\n- 不同次匯出的金額可以合理不同，不要求金額相同。\n\n## Value case\n受益者：會計團隊。現況替代做法：逐張檢查，遇到錯誤再重新匯出。判斷：GO，理由是這個問題持續造成人工逐張檢查與重複匯出。\n\n## Out of scope\n- 匯出格式的任何變更。\n- 改寫既有匯出檔。\n- 要求不同次匯出的金額相同。\n\n## Open questions\n- none\nEOF"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "raw_transcript_path": "/tmp/loom-correct-consistent-trial/capture-invoice-default-candidate-r1.jsonl",
+      "drafts": {
+        "docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md": "# 每張發票匯出都使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: product\nneeds-design: no — 匯出格式與既有畫面/檔案介面都維持不變，只改「發票使用哪位客戶的幣別設定」，沒有新增使用者讀取或輸入的介面，也不是多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊使用系統匯出客戶發票，每位客戶都有自己的幣別設定。目前偶爾會沿用上一位客戶的幣別設定，使這位客戶的發票顯示錯誤幣別。會計同事因此必須逐張檢查發票，遇到錯誤時再重新匯出。\n\n## Proposed outcome\n每張匯出的發票都使用所屬客戶自己的幣別設定，不受前一位客戶影響。\n\n## Acceptance\n1. 針對幣別不同的多位客戶連續匯出發票，每張發票顯示的幣別都是該發票所屬客戶自己的幣別設定。\n2. 匯出格式與修正前相同。\n3. 修正前已存在的匯出檔沒有被改寫。\n\n## Constraints\n- 只修正「使用誰的幣別設定」。\n- 匯出格式維持不變。\n- 不改寫既有匯出檔。\n- 不同次匯出的金額可以合理不同，不要求金額相同。\n\n## Value case\n受益者：會計團隊。現況替代做法：逐張檢查，遇到錯誤再重新匯出。判斷：GO，理由是這個問題持續造成人工逐張檢查與重複匯出。\n\n## Out of scope\n- 匯出格式的任何變更。\n- 改寫既有匯出檔。\n- 要求不同次匯出的金額相同。\n\n## Open questions\n- none\n"
+      }
+    }
+  ]
+}

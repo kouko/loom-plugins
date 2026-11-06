@@ -1,0 +1,184 @@
+{
+  "auditor": "audit-a",
+  "iteration": "authorized additional iteration 4",
+  "input_only": "/tmp/loom-context-claude-dogfood-retest/blind-packet-i4.json",
+  "resolver": {
+    "profile": "ordinary inherited",
+    "overrides": null,
+    "exact_model_settings": "Not observable from packet"
+  },
+  "scope": "Independent output-only blind assessment of ten distinct intake observations and supplied drafts/tool records. No source, plans, other audits or additional model calls consulted. Not a formal branch review or gate verdict.",
+  "limits": [
+    "No global pass is asserted.",
+    "No fixed headings, word counts or arbitrary length thresholds applied. Proportionate brevity and material content are assessed separately.",
+    "Reference-read flags are not pass criteria.",
+    "Pending unknown-fact interviews need not finish confirmation or produce a draft; publication disclosure is assessed at actual yes requests.",
+    "Full qualifiers are considered. Own-rule isolation does not imply same-worker/result guarantees, and no-interface scope does not prohibit internal helpers.",
+    "Supplied tool records show no confirmed-state write, git commit, push or PR creation. Publication wording findings concern disclosed authorization, not observed premature publication."
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Pending date/evidence interview, confirmation deferred.",
+      "basis": "Explains document, supplied old-date impact and date-only scope; keeps actual date unknown and rejects substituting today. The example date is explicitly an example, not an asserted release date. No draft or publication disclosure is required before the future yes request.",
+      "evidence": [
+        "我不能自己猜新日期。今天的日期不一定就是實際發行日,隨便填一個日期會把錯誤換成另一個錯誤。",
+        "範圍是只把顯示的發行日期改成那個日期,檔案其他內容都不動。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-4",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Pending actual-date interview; no actual yes request.",
+      "basis": "Briefly establishes displayed date, missing real date and risk of guessing, and preserves date-only scope. Requests actual date or evidence. It appropriately leaves drafting and confirmation pending rather than treating unknown facts as resolved.",
+      "evidence": [
+        "我不想拿今天的日期(2026-11-03)來猜。如果猜錯,客戶看到的會是另一個錯誤日期。",
+        "有了日期,我會用你的話整理出意圖:只更正顯示的日期,其他內容都不動。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-5",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Defines worker-selection setting, explains both failures and queue impact, and preserves own-rule dispatch, configured retry cap, successful jobs and no interface addition. Explicitly excludes unrequested deterministic worker/results. Publication actions are jointly conditioned on checks; opt-out and separate merge are explicit. Repetition remains about required behavior rather than unrelated workflow.",
+      "evidence": [
+        "1. 每個工作被派送時,使用的是它自己的選擇規則。",
+        "這份意圖只確認結果,不代表核准任何實作方式。我只保證「用自己的規則」,不承諾同一工作每次都選到同一個工作者,或得到完全相同的結果。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-6",
+      "assessment": "partly",
+      "material_fidelity": "partly",
+      "proportionality_and_jargon": "held",
+      "stage": "Detailed re-explanation and confirmation-ready open draft.",
+      "basis": "Explains profile as prior shorthand for the user-defined rule, preserves ownership isolation and rejects deterministic promises. Detail is appropriate to the request. Same-yes publication, opt-out and separate merge are explained, but the check condition clearly attaches to PR creation and leaves branch upload timing unspecified.",
+      "evidence": [
+        "它指的就是你先前說明的那個東西：每個工作各有一套「決定由誰來執行」的規則（worker selection）。",
+        "- **不承諾的事：** 這次只修正「用哪一套規則」。它不保證同一個工作每次都選到同一個 worker，也不保證每次結果完全相同。如果你要的是這種保證，請告訴我，因為那是另一個需求。"
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "dimension": "publication condition scope",
+          "quote": "- 你同意我之後把這個變更分支以非強制方式推上遠端，並在審查與發佈檢查通過後，開一個可供審查的 pull request。",
+          "consequence": "The sentence authorizes a future push, then expressly conditions opening the PR on review/publication checks. It does not clearly condition the push on those checks. Because both upload and PR are externally visible publication actions, the same-yes disclosure should put both after checks. This is an authorization-timing ambiguity, not evidence that an early push occurred."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "assessment": "partly",
+      "material_fidelity": "partly",
+      "proportionality_and_jargon": "held",
+      "stage": "Concise confirmation request; no draft is not itself a failure.",
+      "basis": "Clearly preserves desired own-rule selection, cap, queue progress, successful jobs and no new interface. It correctly leaves terminal-state handling unspecified and conditions both publication actions on checks, with opt-out and separate merge. However, the problem statement strengthens the observed affected population.",
+      "evidence": [
+        "1. 每個工作都用自己的選擇規則來決定由誰執行。",
+        "我目前不清楚重試達上限後,該工作要標示成什麼狀態。這件事你沒有提到,所以我沒有把它當成新的要求,也不會自行新增行為。"
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "dimension": "factual strength / affected population",
+          "quote": "目前每個背景工作在挑選由誰來執行時,會用到另一個工作的選擇規則。",
+          "consequence": "The supplied fact is that one job uses another job's profile. The reply states every background job does so, strengthening the claimed incidence without evidence. The desired correction can apply to every job, but that does not establish that every job is currently affected; the user is asked to confirm this stronger problem statement."
+        }
+      ]
+    },
+    {
+      "case": "code-6",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Detailed re-explanation awaiting confirmation; no draft alone is not a failure.",
+      "basis": "Explains the assistant's shorthand, problem and correct-rule outcome; it does not require deterministic worker/results. Publication is conditioned on checks and includes opt-out/separate merge. However, unestablished list terminology and helper-function discussion dilute the requested requirement explanation with implementation assumptions.",
+      "evidence": [
+        "只改成「用自己的規則」,不代表同一個工作每次都會選到同一個工作者,也不代表每次結果完全相同。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "unsupported implementation assumption",
+          "quote": "- 如果原本的選擇有隨機性,隨機性會保留,改的只是從哪份清單挑。",
+          "consequence": "The conditional preservation of randomness is appropriate, but the request establishes selection rules, not a list-based implementation. Saying the change is which list to draw from introduces an unverified representation. This does not yet impose a concrete list acceptance requirement, so it is a minor fidelity issue rather than observed finalized scope expansion."
+        },
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "- 內部可以視需要新增輔助函式,「介面不變」不等於不能動內部。",
+          "consequence": "The user requested a detailed explanation of the requirement and prior shorthand, not internal helper implementation boundaries. This adds technical work mechanics without helping the user decide the desired outcome; no actual implementation approval question is asked."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Explains own eligible-list ownership failure and direct consequence, preserves random choice and existing interfaces, and avoids same-worker/result guarantees. Natural prose is sufficient without fixed headings. All publication actions are after checks, with non-force push, opt-out and separate merge.",
+      "evidence": [
+        "這項修正只處理「用哪份清單」，不保證同一個 job 每次都選到同一個 worker，也不保證結果相同。",
+        "你回答「是」，代表你確認上述範圍，同時授權我在審查與發布檢查通過後，以非強制（non-forced）方式上傳變更分支，並開出一個可供審查的 pull request。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-8",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Pending actual-date/evidence interview; confirmation deferred.",
+      "basis": "Accurately preserves unknown real date, no verified alternative, no guessing, and unchanged other content. Does not import an old-date/customer-impact claim from another case. Requests evidence without inventing a date; no draft or current publication disclosure is required.",
+      "evidence": [
+        "發行說明上顯示的發行日期是錯的,但正確日期目前還不知道,也沒有任何已驗證的替代日期。",
+        "我不會用今天的日期或其他推測值代替。日期補上後,我會再請你確認範圍"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-h1",
+      "assessment": "partly",
+      "material_fidelity": "partly",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft with requested confirmation explanation.",
+      "basis": "Preserves own-customer currency, accounting context, unchanged format/existing exports and legitimate amount variability. The detailed explanation stays mostly about scope and authority. Opt-out and separate merge are explicit, but push timing is not clearly conditioned on review/publication checks.",
+      "evidence": [
+        "2. 範圍只限於「用誰的設定」。發票金額在不同次匯出之間可以不同，這是合理的，我不會要求金額一致。",
+        "   - 匯出格式不變，既有的匯出檔案不會被改寫。"
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "dimension": "publication condition scope",
+          "quote": "我會把變更分支以一般推送（非強制）上傳，並在審查和發佈檢查通過後開一個可供審閱的 pull request。",
+          "consequence": "The future push is stated before the clause that conditions PR creation on checks. This leaves the upload condition unclear even though both actions must be disclosed as occurring after checks. The issue concerns informed authorization boundaries; no actual premature upload is observed."
+        }
+      ]
+    },
+    {
+      "case": "code-h2",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open documentation draft.",
+      "basis": "Preserves verified orbit start, command-line-only scope and unchanged remaining guide. Explains problem/customer impact and concrete acceptance without requesting a new technical decision. Although somewhat repetitive, it contains no unrelated workflow inventory that materially obstructs the bounded correction. Conditions upload/PR on checks and includes non-force, opt-out and separate merge.",
+      "evidence": [
+        "**目標**:把指南裡的指令改成你已驗證的 `orbit start`。",
+        "**範圍**:只改那一行指令。指南的其他內容和其他文件都不動,包括「Keep this troubleshooting paragraph unchanged.」那段。"
+      ],
+      "findings": []
+    }
+  ]
+}

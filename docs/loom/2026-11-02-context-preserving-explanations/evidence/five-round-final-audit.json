@@ -1,0 +1,439 @@
+{
+  "auditor": "fresh-context-second-independent-auditor",
+  "criteria": "audit-criteria.json frozen before output",
+  "scope": "final candidate10 only; frozen source 9b9c7d87 as supplied by orchestrator",
+  "records": [
+    {
+      "record_id": "T01",
+      "case": "capture-missing-date",
+      "material_issues": [
+        {
+          "quote": "沒有可靠證據，我就不能用今天的日期、「TBD」或刪掉這一行來代替。這樣做會把「日期未知」改成一個沒有根據的說法。",
+          "reason": "停止填真實日期是正確的，但把 TBD 與硬填日期或刪除一併說成把未知變成無根據說法，理由過強；TBD 可如實表達日期未定。真正可成立的理由是使用者尚未改選占位／刪除結果。安全動作不能證明此理由正確。",
+          "source": "blind-packet.json T01 result; source-only.json capture-missing-date request",
+          "location": "reply"
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "quote": "你取得日期後告訴我，我再整理成需要你確認的內容。",
+          "reason": "仍在必要事實訪談，卻加未來確認預告；屬本地 grounding 指引偏離，不等於已要求立即確認。",
+          "source": "loom-design/skills/capture-intent/references/confirmation-template.md lines 8-10, 34-38",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": false,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_016N5Y1nxoEXafX9qc3nhZr1",
+            "tool": "Bash",
+            "input": "cat RELEASE_NOTES.md; echo ----; head -40 README.md; echo ----; ls docs docs/loom 2>/dev/null; cat docs/loom/KICKOFF-DEFAULTS.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": []
+    },
+    {
+      "record_id": "T02",
+      "case": "capture-format-choice",
+      "material_issues": [
+        {
+          "quote": "完全沒有幫助,因為對方系統不收 XLSX。A 仍然要手動複製。",
+          "reason": "CSV-only 只證明不能直接匯入 XLSX，不能證明 XLSX 對 A 完全沒有幫助或 A 必須維持手動複製；例如轉存可能有幫助，專案未證明轉換可用／不可用。絕對化理由又用來支撐 CSV 優先建議，會影響選擇。",
+          "source": "blind-packet.json T02 provided_files README.md; result recommendation",
+          "location": "reply"
+        },
+        {
+          "quote": "先做 CSV 會完整解決 A 團隊的問題,先做 XLSX 會完整解決 B 團隊的問題。",
+          "reason": "所需格式是已知，格式一項本身不足以證成整個匯入／整理問題完整解決；資料結構與匯出內容並未確定。應限於直接符合已知格式需求。",
+          "source": "blind-packet.json T02 provided_files README.md",
+          "location": "reply"
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "quote": "以下只依 README 的內容。",
+          "reason": "確實讀了 README，但 CSV 單表特性與轉成多 CSV 的可能性不是 README 文字；後者合理作為條件推論，須與文件事實區別。並且 trajectory 無 plain-language.md 讀取，雖已呼叫 visualization。",
+          "source": "loom-workflow/skills/loom-visualization/assets/trigger-card.md; blind-packet.json T02 trajectory",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": false,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_01SVk7ZiM7LiQ1q6KdBd7zCy",
+            "tool": "Read",
+            "input": "/private/tmp/loom-option-guidance-iterations/r5/runs/capture-format-choice-snapshot-r1/README.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": []
+    },
+    {
+      "record_id": "T03",
+      "case": "capture-csv-ready",
+      "material_issues": [
+        {
+          "quote": "你確認後,只有在審查與發布檢查都通過時,才會推送變更分支(非強制推送)並開一個待審的 pull request。",
+          "reason": "本案明示 Do not implement or publish，未撤除；回覆卻把確認接到自動發布，違反 hold 分支。條件式檢查與退出選項不會自行撤除先前禁止發布。",
+          "source": "blind-packet.json T03 prompt; loom-design/skills/capture-intent/references/confirmation-format.md lines 45-51",
+          "location": "reply"
+        },
+        {
+          "quote": "篩選 | 只作用在畫面上的列表 | 客戶與日期篩選會帶進 CSV",
+          "reason": "已知列表有篩選且無 CSV 動作，並不證成篩選目前只作用於畫面列表。這將一項 CSV 能力缺失擴成其他用途皆不存在。",
+          "source": "blind-packet.json T03 provided_files README.md; result comparison",
+          "location": "reply"
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "quote": "我已把意圖草稿寫成「未確認」狀態,還沒有提交、實作或發布。",
+          "reason": "完整確認前置私有進度句在五段以外；多處 GO、分支、提交及後站細節不利於簡短確認。",
+          "source": "loom-design/skills/capture-intent/references/confirmation-format.md lines 31-33; loom-design/skills/capture-intent/references/confirmation-template.md lines 89-92",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": false,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_0113bxdj7nvjJHQNxFcUaUjb",
+            "tool": "Bash",
+            "input": "cat README.md && echo ---- && cat PRINCIPLES.md && echo ---- && find docs -type f | head -50 && echo ---- && cat docs/loom/KICKOFF-DEFAULTS.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": [
+        "docs/loom/intent/2026-11-04-export-filtered-invoices-csv.md"
+      ]
+    },
+    {
+      "record_id": "T04",
+      "case": "code-known-wrong-date",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "quote": "範圍外：發行紀錄、應用程式行為，以及其他文字。",
+          "reason": "自然可讀成產品檔案修改範圍，不必解為禁止查證發行紀錄或禁止 Loom 工作產物；實際 trajectory 已讀發行紀錄。",
+          "source": "blind-packet.json T04 trajectory toolu_01GZ3qyCbghiZjECjj4EPZiT",
+          "location": "reply"
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "quote": "目前還沒有任何變更；下面是我對需求的理解，請你確認。",
+          "reason": "五段以外前言；主要事實、日期與授權限制正確。未寫草稿是本地流程差異，沒有虛稱已有草稿。",
+          "source": "loom-design/skills/capture-intent/references/confirmation-format.md lines 31-33; blind-packet.json T04 draft_contents and trajectory",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": true,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_01GZ3qyCbghiZjECjj4EPZiT",
+            "tool": "Bash",
+            "input": "cat README.md RELEASE_NOTES.md RELEASE_RECORD.md; find docs -type f | head -50",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": []
+    },
+    {
+      "record_id": "T05",
+      "case": "code-setup-sparse",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "quote": "needs-design: no — documentation wording only; no surface a user types into or reads output from changes",
+          "reason": "SETUP 是人讀取的文件，字面理由過廣；也可能是在區別文件更正與新增工具介面。依 SKILL 的 touches-surface 規則，不能僅從這句斷言已正確選擇 no；這是流程分類問題，未改變使用者授權的單行更正。",
+          "source": "loom-code/skills/write-plan/SKILL.md Step 4; blind-packet.json T05 draft",
+          "location": "draft"
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "quote": "這是決策點①的確認。我已把意圖草稿寫在",
+          "reason": "前言在五段以外，內部決策點／路徑／open／commit 等公開記帳過多。",
+          "source": "loom-design/skills/capture-intent/references/confirmation-format.md lines 31-33; loom-design/skills/capture-intent/references/confirmation-template.md lines 89-92",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": true,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_011LpZMwihcNysYzSnt8v2qJ",
+            "tool": "Read",
+            "input": "/private/tmp/loom-option-guidance-iterations/r5/runs/code-setup-sparse-snapshot-r1/README.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": [
+        "docs/loom/intent/2026-11-04-fix-setup-preview-command.md"
+      ]
+    },
+    {
+      "record_id": "T06",
+      "case": "capture-invoice-explicit-hold-graph-ready",
+      "material_issues": [],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "quote": "needs-design: no — corrects which customer's currency setting an invoice uses; the export format and every surface users read stay unchanged",
+          "reason": "使用者讀到的幣別正是要更正的可見輸出；保留格式不能單獨支持 every surface unchanged 或免設計判斷。來源規則也包含多物件行為。此處是保存稿分類與理由缺陷，與核心幣別需求完整保存分開看。",
+          "source": "loom-design/skills/capture-intent/SKILL.md Step 2 needs-design (a),(b); blind-packet.json T06 draft",
+          "location": "draft"
+        }
+      ],
+      "style_notes": [
+        "核心背景、暫緩配色、金額可不同、既有檔不改寫、明示持續發布 hold 均保留。圖有實際模板讀取、生成與 alignment 執行，獨立 graph-verification T06 exit 0。末段仍公開路徑與 open 等私有記帳。"
+      ],
+      "minimum_met": true,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_01SbTp98UuPqti1wtcUYh9sP",
+            "tool": "Bash",
+            "input": "cat README.md; echo ----; find docs -type f | head -50; echo ----; cat docs/loom/KICKOFF-DEFAULTS.md; ls; ls PRINCIPLES.md DESIGN.md 2>&1",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": [
+        "docs/loom/intent/2026-11-04-invoice-use-own-customer-currency.md"
+      ]
+    },
+    {
+      "record_id": "T07",
+      "case": "capture-csv",
+      "material_issues": [],
+      "ambiguities": [],
+      "full_acceptance_issues": [
+        {
+          "quote": "有兩件事需要你補充:",
+          "reason": "已承認急迫性及被擠掉工作未齊（saved Open questions 亦未解），仍載入 ready 格式並輸出五段與請確認，違反必要事實不足時維持訪談的要求。這不是 GO/open 自身矛盾。",
+          "source": "docs/loom/intent/2026-11-02-context-preserving-explanations.md Acceptance 2; loom-design/skills/capture-intent/references/confirmation-template.md lines 8-10; blind-packet.json T07 draft and trajectory",
+          "location": "reply"
+        },
+        {
+          "quote": "┌─ 現在 ─────────────────────────┐   ┌─ 預期(尚未驗證)────────────────┐",
+          "reason": "自繪對比圖缺規定修改前／修改後名稱，頂框總寬 71、後續行 73；獨立驗圖 exit 1。trajectory 沒有 visualization 呼叫、模板讀取或 align 執行，不能把圖已產生當成通過檢查。",
+          "source": "graph-verification.json T07; loom-design/skills/capture-intent/references/confirmation-format.md lines 35-41",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [
+        "CSV 的五個功能條件、權限與資料不變均保存；所問 displaced work 不是憑空加入已決定的優先序。急迫性已有每月耗時背景，仍可問為何現在，但不宜說完全沒有相關依據。"
+      ],
+      "minimum_met": false,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_016HBdvPYSpsLjVnaJor8yYC",
+            "tool": "Read",
+            "input": "/private/tmp/loom-option-guidance-iterations/r5/runs/capture-csv-snapshot-r1/README.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": [
+        "docs/loom/intent/2026-11-04-invoice-list-csv-export.md"
+      ]
+    },
+    {
+      "record_id": "T08",
+      "case": "code-missing-date",
+      "material_issues": [
+        {
+          "quote": "真正的發行日期還沒人知道",
+          "reason": "使用者不知道且沒有能提供的紀錄，不證成沒有人知道。",
+          "source": "blind-packet.json T08 prompt and provided_files",
+          "location": "reply"
+        },
+        {
+          "quote": "未知，也沒有紀錄可查",
+          "reason": "現有 fixture 未提供紀錄，不證成沒有任何紀錄可查；實際工具僅讀現有 README／notes／defaults，沒有外部搜尋。",
+          "source": "blind-packet.json T08 trajectory",
+          "location": "reply"
+        },
+        {
+          "quote": "如果硬填日期，讀者看到的就會是不正確的資訊。",
+          "reason": "無證據支持硬填，但未知日期仍可能恰好等於填入值；應說無法保證／確認正確，而非必定不正確。",
+          "source": "blind-packet.json T08 prompt; loom-design/skills/capture-intent/references/confirmation-template.md lines 40-41",
+          "location": "reply"
+        }
+      ],
+      "ambiguities": [],
+      "full_acceptance_issues": [],
+      "style_notes": [],
+      "minimum_met": false,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_011rxm9PUE8sMdCAiyMDAL68",
+            "tool": "Bash",
+            "input": "cd /private/tmp/loom-option-guidance-iterations/r5/runs/code-missing-date-snapshot-r1; cat README.md; echo ----; cat RELEASE_NOTES.md; echo ----; find docs -type f; echo; cat docs/loom/KICKOFF-DEFAULTS.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": []
+    },
+    {
+      "record_id": "T09",
+      "case": "capture-explicit-placeholder",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "quote": "你也沒有可以查證的發行紀錄",
+          "reason": "本案只說真實日期查不到，未直接說使用者沒有紀錄。可讀為當前未有可供查證依據，不能確定當作不存在紀錄的已證實事實。saved no release record is available 同樣限於當前語境。",
+          "source": "blind-packet.json T09 prompt and draft",
+          "location": "reply"
+        },
+        {
+          "quote": "Do not implement or publish before the user confirms.",
+          "reason": "saved draft 的時間界線不能單獨證成確認後已授權發布；reply 明確說須另外同意。沒有 automatic publication frontmatter，故保留為表述歧義，未據此判已執行或將必然發布。",
+          "source": "blind-packet.json T09 draft Constraints and result",
+          "location": "draft"
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "quote": "# Release date shows \"日期待確認\" until the real date is known",
+          "reason": "capture-intent 的 saved intent 主體用英文，來源要求 intent 與確認對話用使用者語言；回覆本身為繁體中文。",
+          "source": "loom-design/skills/capture-intent/SKILL.md Step 2",
+          "location": "draft"
+        },
+        {
+          "quote": "改前：`Release date: to be corrected`",
+          "reason": "真實日期未查明不阻擋明示改為 日期待確認 的新目標；這裡正確處理。但 trajectory 未讀 changed-outcome 決策要求的 plain-language.md，屬讀取程序缺口。",
+          "source": "loom-workflow/skills/loom-visualization/assets/trigger-card.md; blind-packet.json T09 trajectory",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": true,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_018UpiQ7TiTBfdqdoS2tsWD3",
+            "tool": "Read",
+            "input": "/private/tmp/loom-option-guidance-iterations/r5/runs/capture-explicit-placeholder-snapshot-r1/README.md",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": [
+        "docs/loom/intent/2026-11-04-release-date-pending-text.md"
+      ]
+    },
+    {
+      "record_id": "T10",
+      "case": "capture-invoice-natural-default-ready",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "quote": "每次匯出後不必再逐張檢查幣別、也不必因錯誤重新匯出。",
+          "reason": "saved Value case 可自然讀成所述幣別借用錯誤的 workaround 減少，不能無故擴成所有發票錯誤／所有原因均免檢查的普遍保證。",
+          "source": "blind-packet.json T10 draft Value case",
+          "location": "draft"
+        },
+        {
+          "quote": "你回覆「是」，只代表確認以上需求。",
+          "reason": "下一 bullet 清楚限定 review 與發佈檢查後的自動 push／PR，附 opt-out 與獨立 merge；合讀不是同時允許與禁止發布的確定矛盾。此案沒有先前發布 hold。",
+          "source": "blind-packet.json T10 result; source-only.json capture-invoice-natural-default-ready",
+          "location": "reply"
+        }
+      ],
+      "full_acceptance_issues": [
+        {
+          "quote": "目前（偶爾發生）                    預期",
+          "reason": "對比圖未用完整外框、內置修改前／修改後標題；trajectory 無 visualization 呼叫、線性模板讀取、寬度生成或對齊檢查。",
+          "source": "loom-design/skills/capture-intent/references/confirmation-format.md lines 35-41; blind-packet.json T10 trajectory",
+          "location": "reply"
+        },
+        {
+          "quote": "這是產品類變更，不需要設計文件：畫面和格式都不變。",
+          "reason": "來源 needs-design 規則含使用者讀取的檔案輸出與多物件行為，幣別輸出正在更正；單以畫面／格式不變推免設計，沒有足夠根據。saved draft 同樣理由。",
+          "source": "loom-design/skills/capture-intent/SKILL.md Step 2; blind-packet.json T10 draft",
+          "location": "reply"
+        },
+        {
+          "quote": "我也不會訂定新的產品原則，因為專案預設已豁免。",
+          "reason": "waiver 是本 fixture 真實設定，但公開私有流程豁免資訊沒有幫助使用者理解需求；不要把它升格為虛構產品事實。",
+          "source": "loom-design/skills/capture-intent/references/confirmation-template.md lines 89-92; blind-packet.json T10 provided fixture defaults",
+          "location": "reply"
+        }
+      ],
+      "style_notes": [],
+      "minimum_met": true,
+      "actual_overview_read": {
+        "observed": true,
+        "evidence": [
+          {
+            "tool_use_id": "toolu_01SaeJmFh45NFcoz8yu4vwVF",
+            "tool": "Bash",
+            "input": "cat README.md && find docs -type f | head -50 && cat docs/loom/KICKOFF-DEFAULTS.md && ls",
+            "successful_overview_content_present": true
+          }
+        ]
+      },
+      "draft_assessed": [
+        "docs/loom/intent/2026-11-04-invoice-export-customer-currency.md"
+      ]
+    }
+  ],
+  "aggregate": {
+    "n": 10,
+    "minimum_met": 5,
+    "minimum_not_met": [
+      "T01",
+      "T02",
+      "T03",
+      "T07",
+      "T08"
+    ],
+    "records_with_material_issues": [
+      "T01",
+      "T02",
+      "T03",
+      "T08"
+    ],
+    "all_observed_overview_read": true,
+    "full_acceptance_pass_records": []
+  },
+  "minimum_definition": "Evidence-grounded key facts/logic and faithful authorization, plus no ready confirmation while self-identified required content remains unresolved. Full acceptance adds complete five-section composition, diagram requirements, concise private-detail restraint and applicable source workflow obligations.",
+  "source_review_notes": [
+    "Local final-message checks and examples express intended behavior only; output and trajectories above determine conformance.",
+    "Single pass of 10 synthetic Claude Code actors is not a reliability estimate, human comprehension study, actual application implementation test or evidence for Codex/other host behavior.",
+    "I inspected no maps, prior-round outputs or other audits. No paid calls, source fixes, release actions or attestation.",
+    "No actor claims actual web research and none has web tool witness. Format general knowledge is distinguished from verified project details.",
+    "Heading variants are recorded as semantic five-section layout rather than inflated into separate material failures; strict literal heading-name conformance remains below full fixed-template target where wording differs."
+  ]
+}

@@ -1,0 +1,349 @@
+{
+  "audit_scope": "Blind qualitative audit of nine actual replies against the supplied intent; no source, condition mapping, prior judges, runtime execution, or process-compliance claims used.",
+  "limitations": [
+    "One sample per record is descriptive evidence only, not a statistical or causal comparison.",
+    "Diagram suitability was assessed visually from text; exact display-width alignment was not measured.",
+    "Draft contents were treated as supporting artifacts, not automatically as conversation wording.",
+    "Severity: high = premature or contradictory decision request; medium = materially avoidable ambiguity or disproportionate presentation; low = localized wording or repetition."
+  ],
+  "records": [
+    {
+      "id": "C01",
+      "coarse_result": "Clear fact-blocked response with small wording improvements",
+      "severity": "low",
+      "plain_literal_findings": "Clearly identifies the date line, the missing fact, why guessing is unsuitable, and what information is needed. Does not prematurely offer confirmation. Omitting five sections is appropriate while the date is unknown. The application introduction is unnecessary for this narrow blocked reply.",
+      "metaphor_findings": "No actual analogy. 卡關 is an ordinary idiom, not an explanatory comparison to a different domain.",
+      "terminology_findings": {
+        "required": [
+          "RELEASE_NOTES.md",
+          "發行日期"
+        ],
+        "avoidable": [
+          "tag",
+          "進入計畫"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "quote": "只有你知道這個日期是錯的",
+          "issue": "Unnecessary exclusive claim about who knows; the supplied file also visibly lacks an actual date.",
+          "literal_alternative": "你已說明日期有誤，但目前沒有資料能證明真正的日期。"
+        },
+        {
+          "severity": "low",
+          "quote": "例如 tag、發布公告或上線紀錄",
+          "issue": "tag is unexplained English and unnecessary here.",
+          "literal_alternative": "例如正式發行紀錄、發布公告或上線紀錄。"
+        }
+      ],
+      "internal_inventory": "No private classifications or long path inventory; one target filename and brief non-action status are relevant.",
+      "repetition": "The final unconfirmed/no-plan sentence repeats the opening but remains short.",
+      "graph_suitability": "No graph; appropriate for a missing date."
+    },
+    {
+      "id": "C02",
+      "coarse_result": "Core CSV behavior is clear; surrounding process language and repeated status reduce directness",
+      "severity": "medium",
+      "plain_literal_findings": "All five sections appear in order. Background, current direction, actors, button action, downloaded fields, permissions, and unchanged invoice data are grounded in the supplied material. It explicitly waits for two answers before confirmation, so this is not an early yes request. The need to delay this otherwise precise scope for two business-priority answers is not demonstrated in the reply itself; this audit does not infer a source-rule violation.",
+      "metaphor_findings": "No actual analogy. 價值面 is abstract process wording, not a metaphor.",
+      "terminology_findings": {
+        "required": [
+          "CSV",
+          "客戶與日期篩選",
+          "存取權限"
+        ],
+        "avoidable": [
+          "價值面的事實",
+          "open",
+          "commit",
+          "write-spec"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "medium",
+          "quote": "還差兩個價值面的事實",
+          "issue": "The opening names an internal category instead of the missing information and why it matters.",
+          "literal_alternative": "還需要知道為什麼現在要做，以及團隊會暫停哪些工作，才能判斷是否現在安排這項需求。"
+        },
+        {
+          "severity": "low",
+          "quote": "草稿存在 `docs/loom/intent/2026-11-04-invoice-csv-export.md`,狀態是 `open`。我沒有確認它,沒有建立分支或 commit",
+          "issue": "Long path, raw state, and Git inventory appear before the user's feature explanation.",
+          "literal_alternative": "我已保存需求草稿，尚未確認，也還沒有實作或發布。"
+        },
+        {
+          "severity": "low",
+          "quote": "下一步是撰寫設計規格(`write-spec`)",
+          "issue": "The command name adds no decision-relevant meaning after the Chinese description.",
+          "literal_alternative": "下一步會詳細說明按下按鈕後使用者會看到什麼，再請你確認。"
+        }
+      ],
+      "internal_inventory": "Opening and ending both list workflow state; approved principles and their four restrictions are repeated after already covering the restrictions.",
+      "repetition": "Purpose/current direction and the problem overlap slightly; permissions, filters, no-data-change, and no-distribution restrictions recur in acceptance and the principles paragraph. Main avoidable length is workflow status and principles explanation.",
+      "graph_suitability": "No diagram; the ordered field and acceptance lists are appropriate."
+    },
+    {
+      "id": "C03",
+      "coarse_result": "Grounded five-section explanation with a consequential confirmation wording ambiguity",
+      "severity": "high",
+      "plain_literal_findings": "Clearly explains who exports what, which customer's setting is wrong, and the intended correction. Five sections are ordered correctly. Explicit publication hold is preserved in the reply, and the graph is clearly requested and labeled as expected. The sentence defining yes is internally inconsistent about implementation authority.",
+      "metaphor_findings": "No actual analogy or invented replacement label.",
+      "terminology_findings": {
+        "required": [
+          "幣別設定",
+          "匯出格式"
+        ],
+        "avoidable": [
+          "open",
+          "confirmed",
+          "pull request"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "high",
+          "quote": "只代表確認上面的需求範圍和驗收條件,不代表授權實作以外的任何動作",
+          "issue": "The first clause says yes only confirms requirements; the second can mean implementation is authorized and only other actions are excluded. The explicit publication hold is clear elsewhere, but does not resolve this implementation ambiguity.",
+          "literal_alternative": "你回覆「是」只確認上面的需求範圍與驗收條件；目前不會實作，也不會發布。發布仍需要你另外明確授權。"
+        },
+        {
+          "severity": "low",
+          "quote": "狀態是 `open`。我還沒有建立分支、提交或實作。你確認前,它不會變成 `confirmed`",
+          "issue": "Raw internal states and a workflow inventory obscure the simpler unconfirmed status.",
+          "literal_alternative": "我已保存需求草稿，尚未確認，也沒有實作。"
+        }
+      ],
+      "internal_inventory": "A long draft path, two raw state labels, and several Git actions appear after an already complete decision explanation.",
+      "repetition": "Format and old-file restrictions are repeated in acceptance and scope. This is understandable but can be compressed. The before-side graph adds the already-described manual inspection step; it does not introduce a broader guarantee.",
+      "graph_suitability": "Requested before/expected-after graph supports the actual settings-selection flow. Outer frames and nested boxes make it tall, but it is not unsolicited decoration. No exact width claim made."
+    },
+    {
+      "id": "C04",
+      "coarse_result": "Appropriate blocked response with an avoidable confirmed-status ambiguity",
+      "severity": "medium",
+      "plain_literal_findings": "Names the actual placeholder and accurately waits for a reliable release date. It does not force five sections or solicit an early yes. Targeted scope is clear.",
+      "metaphor_findings": "No actual analogy. 卡住 is ordinary idiom.",
+      "terminology_findings": {
+        "required": [
+          "發行日期",
+          "日期欄位"
+        ],
+        "avoidable": [
+          "出貨通知 in a software-release example"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "medium",
+          "quote": "已確認,目前不能更正",
+          "issue": "In a request explicitly saying no change is confirmed, this opening can sound like confirmation has already occurred; it probably means the lack of information was verified.",
+          "literal_alternative": "目前不能更正，因為缺少真正的發行日期。"
+        },
+        {
+          "severity": "low",
+          "quote": "到時候我會只改日期欄位,並請你確認",
+          "issue": "The order can suggest editing before confirmation, despite the present non-action statement.",
+          "literal_alternative": "取得日期後，我會先請你確認要更正的日期，再只修改該欄位。"
+        },
+        {
+          "severity": "low",
+          "quote": "今天的日期(2026-11-04)是我知道的日期",
+          "issue": "The exact current date is irrelevant to what is missing.",
+          "literal_alternative": "不能用今天的日期代替真正的發行日期。"
+        }
+      ],
+      "internal_inventory": "No private classifications or Git inventory.",
+      "repetition": "The opening and blocker paragraph repeat why the date is unavailable, but the reply remains proportionate.",
+      "graph_suitability": "No graph; appropriate."
+    },
+    {
+      "id": "C05",
+      "coarse_result": "Premature confirmation route despite the known missing release date",
+      "severity": "high",
+      "plain_literal_findings": "Background and current direction are well grounded, and the intended one-line edit is clear. However, the necessary date is missing; constructing the full five-section confirmation and offering option B conflicts with the intent's explicit missing-fact exception.",
+      "metaphor_findings": "No actual analogy. 卡在一個事實 is an ordinary idiom.",
+      "terminology_findings": {
+        "required": [
+          "發行日期",
+          "RELEASE_NOTES.md or the date-line quotation"
+        ],
+        "avoidable": [
+          "open",
+          "未提交",
+          "意圖確認"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "high",
+          "quote": "B. 現在先確認需求，日期留待之後補",
+          "issue": "Explicitly offers confirmation before the required fact exists.",
+          "literal_alternative": "取得可靠的真正發行日期後，我才會請你確認這項更正。"
+        },
+        {
+          "severity": "high",
+          "quote": "你回覆日期，或選 B 並說「是，這就是我要的」後，我才會繼續",
+          "issue": "Invites a premature yes as an alternate route around the missing fact.",
+          "literal_alternative": "目前先等待真正的發行日期，不進入確認或計畫。"
+        },
+        {
+          "severity": "low",
+          "quote": "已寫入未提交的草稿 `docs/loom/intent/2026-11-04-fix-latest-release-date.md`，狀態為 open",
+          "issue": "Path and raw status add process detail to an already simple blocker.",
+          "literal_alternative": "我已保存草稿，尚未確認。"
+        }
+      ],
+      "internal_inventory": "A path, raw state, branch, submission, and publication status appear after a complete but premature confirmation structure.",
+      "repetition": "Same single-line restriction appears in change, acceptance, and exclusions. Five sections and the option table enlarge a factual blocker unnecessarily.",
+      "graph_suitability": "No flow graph, but the A/B table creates an inappropriate decision instead of clarifying the unavailable fact."
+    },
+    {
+      "id": "C06",
+      "coarse_result": "Clear one-line change; large graph and Git terminology are disproportionate",
+      "severity": "medium",
+      "plain_literal_findings": "Five sections are ordered correctly and grounded in the README. New colleague, failing command, correct replacement, and unchanged scope are clear. Future publication wording is not automatically treated as violating the wrapper's ambiguous Do not implement or publish timing; it explicitly describes a future consequence of yes rather than reporting present publication.",
+      "metaphor_findings": "No actual analogy. 跑起來 is ordinary computing idiom.",
+      "terminology_findings": {
+        "required": [
+          "SETUP.md",
+          "orbit launch",
+          "orbit start",
+          "預覽伺服器"
+        ],
+        "avoidable": [
+          "非強制方式推送變更分支",
+          "pull request",
+          "status: open"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "medium",
+          "quote": "以非強制方式推送變更分支，並開出可供審查的 pull request",
+          "issue": "Git mechanics and unexplained English add decoding work to a simple confirmation consequence.",
+          "literal_alternative": "審查與發布檢查通過後，上傳這次修改並建立審閱頁面；是否合併仍由你另外決定。"
+        },
+        {
+          "severity": "low",
+          "quote": "未確認狀態（status: open）",
+          "issue": "Chinese already communicates the status; the raw field is redundant.",
+          "literal_alternative": "需求草稿尚未確認。"
+        },
+        {
+          "severity": "medium",
+          "quote": "Expected after (預期)",
+          "issue": "Mixed-language titles and a large nested-box graph make a literal command replacement look more complex than it is.",
+          "literal_alternative": "把 `SETUP.md` 的 `orbit launch` 改成 `orbit start`，讓新同事照指南啟動預覽；其餘內容不變。"
+        }
+      ],
+      "internal_inventory": "No private classifications, but final status repeats branch/submission/implementation state and future publication mechanics.",
+      "repetition": "The command replacement appears in background, problem, change, graph, and acceptance. The graph repeats the sentence without adding a meaningful branch or process distinction.",
+      "graph_suitability": "A command-to-result flow can be drawn, but this one-line documentation correction does not need the 13-line nested comparison. Expected-after labeling avoids falsely claiming it has been implemented. Exact width was not checked."
+    },
+    {
+      "id": "C07",
+      "coarse_result": "Clear and proportionate response to the missing fact",
+      "severity": "low",
+      "plain_literal_findings": "Identifies the precise date line, unavailable evidence, reason not to guess, and what the user needs to supply. It waits rather than forcing five sections or an early yes. No unsupported application background is invented.",
+      "metaphor_findings": "No actual analogy. 卡住 is ordinary idiom.",
+      "terminology_findings": {
+        "required": [
+          "RELEASE_NOTES.md",
+          "發行日期"
+        ],
+        "avoidable": []
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "quote": "這項更正會先卡住",
+          "issue": "Already understandable, but literal wording is slightly more direct.",
+          "literal_alternative": "目前要先等待可靠的發行日期。"
+        }
+      ],
+      "internal_inventory": "Brief non-action statement is relevant; no raw statuses or internal classification inventory.",
+      "repetition": "Some overlap between the initial blocker and the explanation against guessing, but limited and useful.",
+      "graph_suitability": "No graph; appropriate."
+    },
+    {
+      "id": "C08",
+      "coarse_result": "Clear grounded confirmation with avoidable workflow phrasing and repeated exclusions",
+      "severity": "low",
+      "plain_literal_findings": "Five sections appear in order. Correctly identifies the accounting team, invoice export, customer currency settings, present error, and expected correction. The table's 不必再為了幣別錯誤逐張檢查 is qualified as an expected currency-specific benefit; it does not promise that all invoice inspection can stop. Future publication explanation is assessed as an explicit prospective consent consequence, not automatically as a breach of the request to stop now.",
+      "metaphor_findings": "No actual analogy or invented abstraction label.",
+      "terminology_findings": {
+        "required": [
+          "幣別設定",
+          "匯出格式"
+        ],
+        "avoidable": [
+          "非強制方式",
+          "pull request",
+          "open",
+          "不可逆操作"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "quote": "以非強制方式上傳這個變更分支，並開出可供審閱的 pull request",
+          "issue": "Unexplained Git-specific terms obscure the relevant consequence of confirmation.",
+          "literal_alternative": "上傳這次修改並建立審閱頁面；是否合併仍是另一個需要你決定的動作。"
+        },
+        {
+          "severity": "low",
+          "quote": "沒有需要額外同意的不可逆操作",
+          "issue": "Adds an abstract approval category after the concrete unchanged-data restrictions already explain the scope.",
+          "literal_alternative": "這次不會刪除或改寫既有資料。"
+        },
+        {
+          "severity": "low",
+          "quote": "狀態是 `open`。我沒有把它標成已確認，也沒有建立分支或做任何提交",
+          "issue": "Raw state and Git inventory repeat the already-stated stop for confirmation.",
+          "literal_alternative": "需求草稿尚未確認，我會等你回覆。"
+        }
+      ],
+      "internal_inventory": "Long draft path and raw state are avoidable; no private engineering/product classification is exposed.",
+      "repetition": "Format and old-file restrictions appear in acceptance, exclusions, and the no-irreversible-operation paragraph. Could omit the third occurrence.",
+      "graph_suitability": "Compact table compares the precise setting choice and expected staff effect; useful and less bulky than a flow graph."
+    },
+    {
+      "id": "C09",
+      "coarse_result": "Clear grounded confirmation that preserves the explicit publication hold",
+      "severity": "low",
+      "plain_literal_findings": "Five sections appear in order. Project purpose, current direction, customer-owned currency setting, reported error, and unchanged scope are grounded. Explicitly says yes only confirms requirements and does not lift the hold. Clearly labels the after-side as neither implemented nor verified.",
+      "metaphor_findings": "No actual analogy or invented label.",
+      "terminology_findings": {
+        "required": [
+          "幣別設定",
+          "匯出格式",
+          "發布授權"
+        ],
+        "avoidable": [
+          "open",
+          "變更分支",
+          "pull request"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "quote": "我已把這份意圖草稿寫成 `docs/loom/intent/2026-11-04-invoice-customer-currency-isolation.md`，狀態是 `open`",
+          "issue": "The long path and raw status are not necessary to understand what is being confirmed.",
+          "literal_alternative": "我已保存需求草稿，尚未確認。"
+        },
+        {
+          "severity": "low",
+          "quote": "我不會推送分支，也不會建立 pull request，也不會實作",
+          "issue": "Publication hold is clear, but the Git terms require additional understanding and the final implementation clause could be separated from the publication-specific sentence.",
+          "literal_alternative": "目前不會實作。即使你確認需求，我也不會上傳或發布這次修改；發布需要你另外明確授權。"
+        }
+      ],
+      "internal_inventory": "Path and raw state are extra; publication consequences are relevant because this prompt explicitly imposes an ongoing hold.",
+      "repetition": "Acceptance and scope repeat unchanged format and old files; modest redundancy. The graph restates prose but is explicitly requested.",
+      "graph_suitability": "Requested framed before/expected-after flow is directly about which setting the export uses. Outer headings and expected-status explanation distinguish report from future behavior. No exact width claim made."
+    }
+  ]
+}

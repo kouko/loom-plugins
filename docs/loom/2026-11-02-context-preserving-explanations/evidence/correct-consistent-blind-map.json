@@ -1,0 +1,50 @@
+{
+  "V01": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "capture-missing-date-candidate-r1"
+  },
+  "V02": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "capture-invoice-default-candidate-r1"
+  },
+  "V03": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "code-missing-date-candidate-r1"
+  },
+  "V04": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1"
+  },
+  "V05": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "capture-missing-date-candidate-r2"
+  },
+  "V06": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "capture-csv-candidate-r1"
+  },
+  "V07": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "capture-missing-date-candidate-r1"
+  },
+  "V08": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "code-missing-date-candidate-r2"
+  },
+  "V09": {
+    "root": "/tmp/loom-natural-default-control",
+    "key": "capture-invoice-natural-default-candidate-r1"
+  },
+  "V10": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "code-known-date-candidate-r1"
+  },
+  "V11": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "code-missing-date-candidate-r1"
+  },
+  "V12": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "capture-csv-candidate-r1"
+  }
+}

@@ -179,13 +179,8 @@ intent in step 4.
 Compose **one message**. Everything below goes into it; you do not stop
 twice, and this is the only stop this station makes.
 
-1. **The restatement.** Problem and Acceptance in the user's own plain
-   words — no file paths, no identifiers, no mechanism names:
-
-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
-   >
-   > (You want ___, and when it is done you will be able to ___, ___ and
-   > ___. Is that right?)
+1. **The restatement.** Once required facts are settled and this existing
+   confirmation step is ready, read `references/confirmation-ready-template.md`.
 
    For the current contract, automatic publication is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced

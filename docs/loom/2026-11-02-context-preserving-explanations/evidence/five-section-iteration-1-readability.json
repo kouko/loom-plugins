@@ -1,0 +1,352 @@
+{
+  "audit": "blind actual-output readability audit",
+  "basis": "Seven randomized records; full request, supplied files, replies, drafts, and Nov 4 approved intent Acceptance 1–4. No source variants, blind map, templates, or prior judges read.",
+  "limits": [
+    "One output per cell is exploratory and does not establish statistical superiority or runtime reliability.",
+    "technical_controls_verified is supplied packet metadata; this audit did not independently observe host actions.",
+    "held means held for this observed output, not an overall PASS."
+  ],
+  "records": [
+    {
+      "id": "R01",
+      "A1": {
+        "status": "partly",
+        "reason": "The concrete currency problem, impact, desired result, scope, and conditional publishing consequence are clear, but the opening never explains the supplied project/function purpose or connects its documented current direction to this request."
+      },
+      "A2": {
+        "status": "fails",
+        "reason": "Complete confirmation is offered in a different structure: problem/goal/acceptance are grouped under confirmation, followed by agent decisions and publishing. The five required roles do not appear in order."
+      },
+      "A3": {
+        "status": "partly",
+        "reason": "Tables clarify acceptance and exclusions, but overlap and private workflow inventory consume attention without helping confirm the requested change."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Asks to confirm outcomes and explicit conditional publishing authority, not implementation/review quality. Actual publication is not claimed."
+      },
+      "findings": [
+        {
+          "severity": "material",
+          "kind": "output-contract",
+          "quote": "## 我自行判定的部分(不需要你回答)",
+          "detail": "Expands into engineering/needs-design classification and exemptions rather than completing the required context-first structure."
+        },
+        {
+          "severity": "material",
+          "kind": "output-contract",
+          "quote": "本專案設定為免寫常駐文件、不需另做複雜度評估,也沒有需要你回答的跨模型審查問題。",
+          "detail": "Private workflow inventory unrelated to the user decision; not evidence of a runtime code defect."
+        },
+        {
+          "severity": "nit",
+          "kind": "repetition",
+          "quote": "匯出格式 | 不動",
+          "detail": "The same unchanged-format and existing-file boundaries already appear in the acceptance table."
+        }
+      ],
+      "diagram": {
+        "status": "NA",
+        "reason": "No diagram; tables are reasonable for the bounded conditions."
+      },
+      "bounded_edit_classes": [
+        "Add a short supplied-source project/function background and current-direction connection.",
+        "Reorganize into the approved five roles.",
+        "Remove exemptions inventory and merge repeated unchanged-scope statements."
+      ]
+    },
+    {
+      "id": "R02",
+      "A1": {
+        "status": "partly",
+        "reason": "Problem and results are concrete and supplied principles are accurately summarized, but the function/project purpose and direction are only implicit. This is an incomplete interview rather than a completed confirmation."
+      },
+      "A2": {
+        "status": "held",
+        "reason": "Explicitly retains three open questions and no GO decision; it is acceptable not to fill five sections while necessary facts are unresolved. Asking all filtered invoices versus current page is a real unresolved outcome."
+      },
+      "A3": {
+        "status": "partly",
+        "reason": "The five result bullets preserve fields, permissions, filtering and no mutation. Preliminary workflow descriptions and conditional publishing prose are lengthy relative to the active three-question interview."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Seeks factual/outcome answers and describes later confirmation consequences; does not seek implementation or review verdict approval."
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "kind": "workflow-inventory",
+          "quote": "所以不需要再做原則訪談。",
+          "detail": "The waiver explains internal process rather than the decision the user must make."
+        },
+        {
+          "severity": "nit",
+          "kind": "interview-focus",
+          "quote": "**你回覆「是」會代表什麼**",
+          "detail": "Publishing/next-station detail is given while the reply still requires answers before a GO judgment. Defer it to the completed confirmation for a cleaner interview; no actual premature confirmation or publication is evidenced."
+        }
+      ],
+      "diagram": {
+        "status": "NA",
+        "reason": "No diagram; a factual interview does not require one."
+      },
+      "bounded_edit_classes": [
+        "Keep the open-fact interview focused; defer completed-confirmation workflow detail.",
+        "Use supplied project background when a complete confirmation is ready."
+      ]
+    },
+    {
+      "id": "R03",
+      "A1": {
+        "status": "held",
+        "reason": "Explains the setup guide, affected new colleagues, verified command, failure, one-line outcome, boundaries, and conditional authority. Background is compact inside the table rather than isolated."
+      },
+      "A2": {
+        "status": "fails",
+        "reason": "Complete confirmation uses only understanding and consent sections; the required five roles are combined rather than presented in order."
+      },
+      "A3": {
+        "status": "held",
+        "reason": "A small comparison/condition table is appropriate to a textual one-line fix. No forced flowchart, invented command behavior, or excessive repetition."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Confirms problem/acceptance and conditional publishing authority, not implementation/review quality."
+      },
+      "findings": [
+        {
+          "severity": "material",
+          "kind": "output-contract",
+          "quote": "## 我理解的需求",
+          "detail": "All background/problem/result/scope roles are folded into one table instead of the approved five-section confirmation."
+        },
+        {
+          "severity": "nit",
+          "kind": "workflow-detail",
+          "quote": "我才會寫下並提交意圖檔，接著寫計畫，然後進入建置。",
+          "detail": "Station sequence could be reduced to what happens after confirmation."
+        }
+      ],
+      "diagram": {
+        "status": "NA",
+        "reason": "No diagram; the plain text change is well served by the table."
+      },
+      "bounded_edit_classes": [
+        "Retain compact content but divide it into five short roles.",
+        "Keep consent consequences readable without listing internal station sequence."
+      ]
+    },
+    {
+      "id": "R04",
+      "A1": {
+        "status": "held",
+        "reason": "Clearly connects the accounting system, monthly reconciliation, existing principles, manual-copy cost, CSV result, constraints and confirmation consequences to supplied sources."
+      },
+      "A2": {
+        "status": "held",
+        "reason": "Five localized headings appear in the approved order; introductory status lines do not defeat that structure."
+      },
+      "A3": {
+        "status": "partly",
+        "reason": "Before/after flow is appropriate and after-state is explicitly expected, but executed width validation fails. Some workflow inventory/repetition remains. The all-filtered versus visible-page interpretation is not resolved."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Requests outcome/acceptance and explicit publishing authority; distinguishes later visible-behavior confirmation and acceptance. Does not ask user to approve an implementation or reviewer verdict."
+      },
+      "findings": [
+        {
+          "severity": "material",
+          "kind": "diagram-rendering",
+          "quote": "┌─ 現在 ────────────────────┐   ┌─ 之後(預期)──────────────┐",
+          "detail": "Titles are inside frames and expected label is present, but frame/body widths drift according to actual checker execution."
+        },
+        {
+          "severity": "material",
+          "kind": "scope-ambiguity",
+          "quote": "筆數與內容和列表所見一致",
+          "detail": "Could mean only the currently visible page. Supplied files do not establish pagination semantics; flag as unresolved ambiguity, not a proven exclusion of hidden pages or runtime bug."
+        },
+        {
+          "severity": "nit",
+          "kind": "workflow-inventory",
+          "quote": "PRINCIPLES.md` 已經是核可狀態,所以不需要另外做原則訪談。",
+          "detail": "Repeats principles context and adds an internal waiver before the five sections."
+        }
+      ],
+      "diagram": {
+        "status": "fails",
+        "path": "/tmp/loom-five-section-trial/graphs/R04-0.txt",
+        "command": "python3 /Users/kouko/.herdr/worktrees/loom-plugins/keep-context-when-explan-to-user/loom-workflow/skills/loom-visualization/scripts/align.py /tmp/loom-five-section-trial/graphs/R04-0.txt",
+        "exit_code": 1,
+        "widths": [
+          60,
+          63,
+          63,
+          61
+        ],
+        "tool_result": "line 2: col 60: table line display width 63 differs from block width 60\nline 3: col 60: table line display width 63 differs from block width 60\nline 4: col 60: table line display width 61 differs from block width 60",
+        "title_placement": "inside frames",
+        "before_after_labels": "present: 現在 and 之後(預期)",
+        "expected_label": "present",
+        "fidelity": "Manual copying to filtered CSV is faithful at a high level; directly reconcile is an intended use, not evidence of an automatic reconciliation feature."
+      },
+      "bounded_edit_classes": [
+        "Regenerate/align the same diagram without altering its meaning.",
+        "Clarify all filtered invoices versus visible page before fixing acceptance wording.",
+        "Remove repeated principle waiver and shorten internal process inventory."
+      ]
+    },
+    {
+      "id": "R05",
+      "A1": {
+        "status": "held",
+        "reason": "Project purpose, current reliability/format direction, customer-specific setting, observed failure, manual effort, intended fix and boundaries are connected plainly and grounded in supplied content."
+      },
+      "A2": {
+        "status": "held",
+        "reason": "All five roles appear in order with bold localized headings. Bold rather than heading syntax is not a defect."
+      },
+      "A3": {
+        "status": "partly",
+        "reason": "Diagram is appropriate and width validation passes, but comparison titles are outside frames and the unverified after-state is not marked expected. The diagram and prose repeat some checking/format boundaries; no arbitrary length penalty applied."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Confirms outcomes and explicit conditional publishing authority, without requiring implementation or review judgment."
+      },
+      "findings": [
+        {
+          "severity": "material",
+          "kind": "diagram-contract",
+          "quote": "            今天                         修正後",
+          "detail": "Before/after labels exist but sit above the enclosing frames. The after-state lacks 預期 even though it is not validated."
+        },
+        {
+          "severity": "nit",
+          "kind": "repetition",
+          "quote": "修改匯出格式。",
+          "detail": "Unchanged format and existing-file constraints appear in both acceptance and exclusions; can be consolidated."
+        }
+      ],
+      "diagram": {
+        "status": "partly",
+        "path": "/tmp/loom-five-section-trial/graphs/R05-0.txt",
+        "command": "python3 /Users/kouko/.herdr/worktrees/loom-plugins/keep-context-when-explan-to-user/loom-workflow/skills/loom-visualization/scripts/align.py /tmp/loom-five-section-trial/graphs/R05-0.txt",
+        "exit_code": 0,
+        "widths": [
+          47,
+          55,
+          55,
+          55,
+          55,
+          55
+        ],
+        "tool_result": "✓ no drift",
+        "title_placement": "outside frames",
+        "before_after_labels": "present: 今天 and 修正後",
+        "expected_label": "absent",
+        "fidelity": "Customer A currency leaking into invoice B, versus each invoice using its own customer setting, preserves the requested distinction. It does not accidentally require equal monetary amounts."
+      },
+      "bounded_edit_classes": [
+        "Move comparison titles inside respective frames and label after-state as expected.",
+        "Consolidate repeated scope boundaries while retaining explicit allowance for differing amounts."
+      ]
+    },
+    {
+      "id": "R06",
+      "A1": {
+        "status": "held",
+        "reason": "Correctly identifies the actual placeholder date and absence of a trustworthy replacement; does not invent a date or project roadmap."
+      },
+      "A2": {
+        "status": "held",
+        "reason": "Incomplete necessary-fact interview is maintained and explicitly says confirmation is unavailable; five filled parts are not forced."
+      },
+      "A3": {
+        "status": "partly",
+        "reason": "Option table helps explain waiting versus changing date text. However promising the five-section inventory, publishing process, and engineering classification adds considerable non-decision material to one missing-fact interview."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Asks a scoped outcome question and flags deletion as outside a literal correction. Does not request implementation/review judgment; future yes consequence is conditional."
+      },
+      "findings": [
+        {
+          "severity": "material",
+          "kind": "output-contract",
+          "quote": "我會用你的語言寫一則確認訊息,包含背景、問題與影響、改變內容、範圍與驗收條件,以及最後的確認問題。",
+          "detail": "Exposes confirmation-format inventory instead of simply continuing the missing-fact interview. This is an output-quality issue, not a runtime code bug."
+        },
+        {
+          "severity": "nit",
+          "kind": "unnecessary-process",
+          "quote": "這項變更屬於文件類的工程變更,不涉及產品畫面,所以不需要另外撰寫規格。",
+          "detail": "Internal classification and waiver are not needed to choose whether to wait for a verified date."
+        }
+      ],
+      "diagram": {
+        "status": "NA",
+        "reason": "No diagram; table is useful for explicit outcome options."
+      },
+      "bounded_edit_classes": [
+        "Retain the fact gap and concise wait/request-evidence question.",
+        "Remove promised section inventory, classification and deferred publishing details until a concrete confirmation is possible."
+      ]
+    },
+    {
+      "id": "R07",
+      "A1": {
+        "status": "held",
+        "reason": "Explains guide purpose and current verified command, failure impact, intended replacement, one-line scope and confirmation consequences with source-grounded context."
+      },
+      "A2": {
+        "status": "held",
+        "reason": "Five localized sections appear in order and each has the right role."
+      },
+      "A3": {
+        "status": "partly",
+        "reason": "Compact before/after table is appropriate for this text-only correction. The last half exposes private metadata/plan inventory and an unrun-check promise, making a simple confirmation harder to follow."
+      },
+      "A4": {
+        "status": "held",
+        "reason": "Asks for problem and acceptance confirmation, honors explicit no-publication request, and does not ask for implementation/review quality approval."
+      },
+      "findings": [
+        {
+          "severity": "material",
+          "kind": "output-contract",
+          "quote": "流程中的「標準文件檢查」需要先有意圖檔才能執行，所以尚未跑。如果它有警告，我會在你確認前原文轉述。",
+          "detail": "Private unrun-check inventory is inserted into an otherwise complete confirmation. It also leaves the user unsure whether the already requested confirmation is ready, because an unspecified warning is promised before it."
+        },
+        {
+          "severity": "nit",
+          "kind": "workflow-inventory",
+          "quote": "計畫只會有一個任務，只改 SETUP.md。",
+          "detail": "Restates the already clear one-line scope as an internal plan claim."
+        },
+        {
+          "severity": "nit",
+          "kind": "metadata",
+          "quote": "不涉及新的介面或多狀態行為，所以不需要另外寫規格（`needs-design: no`）。",
+          "detail": "The user-facing reason is readable; raw metadata adds little to this simple confirmation."
+        }
+      ],
+      "diagram": {
+        "status": "NA",
+        "reason": "No diagram; comparison table is appropriate."
+      },
+      "bounded_edit_classes": [
+        "Remove unrun-check inventory and avoid promising future pre-confirmation warnings after already asking for confirmation.",
+        "Reduce metadata/plan repetition while preserving the no-publication boundary."
+      ]
+    }
+  ],
+  "cross_record_notes": [
+    "R04 and R05 show substantive context-first improvements in their observed outputs, but both have diagram contract defects of different kinds. This is not an inferred source-version ranking.",
+    "No observed reply asks the user to judge implementation quality, spec quality, or a reviewer verdict. Conditional future publishing consent is explicit in most records; the packet confirms no actual publication, and this audit does not infer a runtime consent breach from that prose alone.",
+    "R02 and R06 are incomplete interviews and are not penalized for lacking five completed sections.",
+    "A fixed five-section structure is approved; findings concern missing roles, unnecessary private inventory, ambiguity, and concrete rendering requirements, not the existence of that structure or an arbitrary word count."
+  ]
+}

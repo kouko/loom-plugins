@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.58.0] — 2026-11-05 — clarify intent confirmations
+
+- Explain the requested change with necessary context, scope and confirmation consequences; keep the structure proportionate to the request.
+
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 
 - Add human-facing guides for all seven skills, with usage examples, outputs, boundaries and links to their runtime instructions.

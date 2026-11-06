@@ -1,0 +1,177 @@
+{
+  "scope": "Independent assessment of the eight distinct observed outputs in blind-packet-r2.json only. This is not a whole-skill verdict.",
+  "resolver": {
+    "profile": "ordinary inherited/unobservable main profile",
+    "overrides": null,
+    "prior_assignment": "succeeded; this assessment uses distinct new observed outputs"
+  },
+  "rubric_notes": [
+    "Open drafts, missing drafts and pending interviews are not themselves failures.",
+    "Own-rule isolation permits random or otherwise variable selection. A causal qualifier about other jobs is not automatically an unconditional determinism promise.",
+    "Severity follows effect on scope, meaning, decisions or evidence, not verbosity or headings alone.",
+    "Future described actions do not establish completed confirmation, commit or publication."
+  ],
+  "defect_classes": [
+    {
+      "id": "D1",
+      "name": "Outcome or acceptance strength changes",
+      "description": "Claims must preserve rule ownership without guaranteeing a fixed worker; random choice must not be tested as guaranteed variation in a finite run."
+    },
+    {
+      "id": "D2",
+      "name": "Implementation restriction introduced into outcome confirmation",
+      "description": "A request for no new interface does not itself prohibit adding private helper functions."
+    },
+    {
+      "id": "D3",
+      "name": "Interview asks the user to resolve agent-introduced terminology or mechanism",
+      "description": "Questions about unexplained agent wording or technical root cause can impede correction when the user has already supplied the intended rule and failure."
+    }
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "status": "held",
+      "phase": "Open draft; valid missing-date interview.",
+      "evidence": [
+        "Question: 最新版本的實際發佈日期是哪一天? 你沒有說,我也不能猜。今天是 2026-11-03,但發佈日不一定是今天。",
+        "Preservation: 發佈說明的其他部分和修改前完全相同。"
+      ],
+      "assessment": "The object, customer impact, date-only outcome and missing fact are understandable. It describes confirmation/commit/publication consequences prospectively and asks whether automatic publication is accepted. Workflow terminology is unnecessary but does not materially obscure this request.",
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-4",
+      "status": "held",
+      "phase": "Open draft awaiting the actual release date.",
+      "evidence": [
+        "我只知道現在顯示的是 2026-10-12,不知道正確日期。我也不會從今天的日期(2026-11-03)去猜。",
+        "除了日期那一處,發行說明其他內容和修改前逐字相同。"
+      ],
+      "assessment": "Preserves the unknown date, explains the customer problem and correction boundary, and discloses branch/commit and opt-out publication consequences without performing them. No technical design choice is requested.",
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-5",
+      "status": "held",
+      "phase": "Open draft pending a factual impact/workaround interview.",
+      "evidence": [
+        "每個工作都用自己的派送設定選 worker。失敗後最多重試到自己設定的上限,到了就停,不再卡住佇列。",
+        "Draft constraint: 既有成功的工作行為不得改變。",
+        "目前遇到這個問題時,你們怎麼因應?哪些人或哪些工作類型受影響?"
+      ],
+      "assessment": "The core request, retry limit, queue impact and unchanged successful-job behavior are preserved across reply and draft. Worker selection by its own setting is not a fixed-worker guarantee. The follow-up asks about impact and workaround rather than demanding implementation approval. Although the supplied queue impact already gives useful context, the pending interview alone is not a defect.",
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-6",
+      "status": "held",
+      "phase": "Open explanatory draft and interview; confirmation incomplete.",
+      "evidence": [
+        "每個工作都使用屬於它自己的執行者選擇規則來決定由誰執行;一個工作的選擇不會影響另一個工作。",
+        "Acceptance: 重複執行同一組工作,每個工作的執行者與結果一致,不因其他工作而改變。",
+        "Boundary: 隔離的是規則本身 ... 範圍外:修改選擇規則本身的內容或挑選邏輯。"
+      ],
+      "assessment": "The supplied rule is explained and cross-job contamination is made understandable. Read as a whole, the repeated-run acceptance is qualified by 不因其他工作而改變 and preserving selection logic: it can mean causal isolation rather than unconditional determinism. I do not classify that sentence as a material fixed-worker promise. Its standalone consistency wording could be clearer; the disclaimer about different jobs does not by itself resolve same-job variability. No action is prematurely confirmed or published.",
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "D1",
+          "anchor": "每個工作的執行者與結果一致,不因其他工作而改變",
+          "effect": "Mixed wording leaves room for an evaluator to read same-job repeated consistency too strongly. Tie consistency explicitly to freedom from cross-job rule contamination while allowing the own rule's normal variation."
+        },
+        {
+          "class": "D3",
+          "anchor": "「profile」是指「執行者選擇」本身,還是另一個東西 ... 工作是怎麼用到別人的選擇的?",
+          "effect": "The user asked the assistant to explain its own unexplained word. Treating that word as a new unresolved object transfers clarification work back to the user and can widen scope. Ask about observable inconsistency when needed; do not require the user to diagnose root cause."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "status": "held",
+      "phase": "Open confirmation-ready draft.",
+      "evidence": [
+        "即使佇列裡有其他派工設定不同的工作,每個工作仍由自己的派工設定選出 worker。",
+        "失敗的工作最多重試到它設定的上限,之後就停止重試。",
+        "我沒有看到上限到達之後的處理方式,所以沒有多寫任何行為(例如標記為失敗)。"
+      ],
+      "assessment": "Clearly preserves ownership isolation, configured retries, queue progress and successful-job behavior. It avoids inventing terminal-state behavior or making root-cause diagnosis a condition. Outcome confirmation and publication consequences are understandable, with no completed action observed.",
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "code-6",
+      "status": "partly",
+      "phase": "Interview with no draft; no confirmation complete.",
+      "evidence": [
+        "Explains: 「工作者選擇」是一條規則,決定每個工作(job)由誰來執行。",
+        "Expected result: 同一個工作在相同條件下,會由同一個執行者執行,結果一致。",
+        "Question: 「另一個工作的選擇」是怎麼被用到的?例如工作之間共用同一份設定,或前一個工作留下的值被後一個沿用。"
+      ],
+      "assessment": "Explains the supplied concept and describes confirmation and publication boundaries, but changes the required behavior materially. Absence of a draft is not the failure.",
+      "material_findings": [
+        {
+          "class": "D1",
+          "anchor": "同一個工作在相同條件下,會由同一個執行者執行,結果一致。",
+          "effect": "This explicitly promises the same worker and result under the same conditions. An own-rule random selector can satisfy ownership isolation while choosing different workers under those conditions. No qualifier ties this promise only to other-job contamination. The reply also turns use of another selection rule into use of another selection result, narrowing an unverified mechanism."
+        }
+      ],
+      "minor_findings": [
+        {
+          "class": "D3",
+          "anchor": "「另一個工作的選擇」是怎麼被用到的?例如工作之間共用同一份設定 ...",
+          "effect": "Requests technical root-cause possibilities from the user. The optional 如果你已經知道 qualifier reduces the burden, so this is not an implementation-approval violation; observable examples would better serve the requested explanation."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "status": "partly",
+      "phase": "Open draft; publication separately opt-in.",
+      "evidence": [
+        "每個工作一定從自己的清單挑 worker,而且挑法仍然是隨機的。",
+        "Conversation constraint: 不新增任何介面(函式、選項、設定、指令都不加).",
+        "Draft constraint: No new interface (no new public function, option, setting, or command) is added.",
+        "Acceptance: 只有一個工作、清單裡有多位 worker,重複執行仍會挑到不同的 worker,不會變成固定的一位。"
+      ],
+      "assessment": "Preserves ownership and random choice in the main outcome and does not authorize publication without opt-in. However, the user-facing confirmation introduces a materially broader function restriction than the user requested and than the draft itself states.",
+      "material_findings": [
+        {
+          "class": "D2",
+          "anchor": "不新增任何介面(函式、選項、設定、指令都不加)",
+          "effect": "Saying no functions may be added asks the user to confirm an implementation constraint. No new interface permits private helper functions. The draft's public function qualifier is narrower; the conversation does not preserve it."
+        }
+      ],
+      "minor_findings": [
+        {
+          "class": "D1",
+          "anchor": "重複執行仍會挑到不同的 worker",
+          "effect": "Random selection can repeat the same worker in any finite sample. This is suitable as an informal diversity expectation, but acceptance should use controlled/statistical evidence rather than require guaranteed observed variation. The main outcome explicitly preserves randomness, so this is an evidence-formulation issue rather than a deterministic-selection promise."
+        }
+      ]
+    },
+    {
+      "case": "code-8",
+      "status": "held",
+      "phase": "Open draft explicitly retaining unknown facts.",
+      "evidence": [
+        "真正的發布日期目前未知,也沒有任何替代日期經過驗證。",
+        "日期確定並驗證之前,不寫入任何替代日期。",
+        "Draft Open questions retains both actual date/evidence and file location.",
+        "目前的草稿沒有 publication: 授權。確認前我會問你 ..."
+      ],
+      "assessment": "The conditional correction, preserved other content and unknown date are faithful. It does not invent a replacement or document location. It invites confirmation while retaining unresolved facts rather than claiming completed confirmation, and publication remains ungranted. Internal planning wording is awkward but does not alter the requested outcome.",
+      "material_findings": [],
+      "minor_findings": []
+    }
+  ],
+  "limits": [
+    "These are only observed intake replies and accompanying drafts. Subsequent answers, confirmation, implementation and publication behavior are unobserved.",
+    "Tool-input records cannot independently establish the asserted repository state.",
+    "No whole-skill or aggregate dogfood pass/fail verdict is inferred."
+  ]
+}

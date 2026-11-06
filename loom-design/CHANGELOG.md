@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.21.0] — 2026-11-05 — clarify intent confirmations
+
+- Use a concise confirmation template to connect known context, requested outcomes and applicable authorization in plain language.
+
 ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
 
 - Add human-facing guides for all six skills, including examples, outputs, confirmation points and boundaries.

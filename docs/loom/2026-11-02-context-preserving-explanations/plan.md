@@ -1,0 +1,232 @@
+# Context-preserving intent confirmation — plan
+intent: 2026-11-02-context-preserving-explanations@4fb8925051e7a9f96b1d251d586d54c4d06965d3
+charter: 1.1
+
+## Current State Evidence
+- Current continuation (2026-11-04): approved five-section explanations replace optional headings; grounded background comes first. W0/W1 retain historical failures and counts. W2 shipped in PR #130; W3 carries the new obligations.
+- Five-section draft: both confirmation owners load identical portable templates; examples retain prior safety cases and add concrete invoice/CSV cases. Source iteration history remains unchanged.
+- Forward: `loom-design/skills/capture-intent/SKILL.md` Step 4 requires a plain-language Problem and Acceptance restatement before confirmation.
+- Reverse: `loom-code/skills/write-plan/references/confirm-intent.md` duplicates decision point 1 for code-only installations.
+- Error: `loom-design/skills/capture-intent/SKILL.md` Step 4's short fill-in example does not explicitly connect unfamiliar terms, present pain and consequences.
+- Data: `loom-design/skills/capture-intent/test-prompts.json` contains behavioral prompts; `loom-workflow/skills/loom-visualization/references/plain-language.md` already requires preserving facts when simplifying wording.
+- Boundary: `loom-design/skills/write-spec/SKILL.md` Step 3 and `loom-code/skills/closing-review/references/acceptance-test-report.md` own other decision points, excluded here.
+
+## Task DAG
+
+**W0-01 Preserve context without prescribing sentences** after: none acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/tests/spec/`, `loom-code/tests/`
+- Test: A1 positive: connected-background; negative: label-only. A2 positive: varied-expression; negative: mandatory-script. A3 positive: brief-familiar; boundary: unfamiliar-concepts. A4 positive: outcome-confirmation; negative: technical-approval.
+- Risk: agent-decided — update both owners of decision point 1; use content checks and optional examples, preserving intent altitude, publication disclosure and the existing single confirmation stop.
+
+**W0-02 Synchronize release metadata** after: W0-01 acceptance: 1,2,3,4
+- Files: `loom-design/.claude-plugin/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-design/CHANGELOG.md`, `loom-code/CHANGELOG.md`, `loom-design/README.md`, `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Test: A1 positive: synchronized-release; negative: stale-version. A2 positive: synchronized-release; negative: stale-version. A3 positive: synchronized-release; negative: stale-version. A4 positive: synchronized-release; negative: stale-version.
+- Risk: agent-decided — minor bumps for changed station guidance: loom-design 2.20.0 and loom-code 3.57.0; preserve existing release checks and rewrite current-version pins where required.
+
+**W1-01 Repair unsupported additions and excessive workflow language** after: W0-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/tests/spec/test_capture_intent_contract.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-design/CHANGELOG.md`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: supplied-scope; negative: deterministic-addition. A2 positive: flexible-expression; negative: fixed-script. A3 positive: proportionate-context; negative: invented-date. A4 positive: concrete-authorization; negative: technical-approval.
+- Risk: agent-decided — repair unsupported additions across both owners, preserving existing coverage and word caps. Replace redundant affected prose instead of adding structure. The existing unpublished minor bumps remain; independent review and host evidence need renewal.
+
+**W1-02 Integrate current main and reconcile unpublished release numbers** after: W1-01 acceptance: 1,2,3,4
+- Files: `loom-code/`, `loom-design/`, `README.md`
+- Test: A1 positive: integrated-guidance; negative: lost-obligation. A2 positive: flexible-expression; negative: fixed-script. A3 positive: word-cap; boundary: merged-content. A4 positive: synchronized-release; negative: stale-pin.
+- Risk: agent-decided — main 2a4c5a31 now owns code 3.57.0/design 2.20.0. Preserve its fallback repair and carried-detail prose; resolve changelogs without overwriting either change, then release this candidate as code 3.58.0/design 2.21.0.
+
+**W1-01 continued — move fidelity to the drafting boundary** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: supplied-strength-before-draft; negative: invented-guarantee. A2 positive: flexible-expression; negative: fixed-script. A3 positive: unknown-fact-retained; boundary: random-selection. A4 positive: outcome-only; negative: implementation-approval.
+- Risk: agent-decided — live trials found D1 survives W1-01. Reconsider drafting, not another restatement reminder; move fidelity earlier, preserve uncertainty and limit whole-message bookkeeping. The failed obligation and retry/review continuity remain.
+
+**W1-01 authorized iteration 1 — adaptable outline with contrastive examples** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/references/`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-design/CHANGELOG.md`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: faithful-outline; negative: stronger-guarantee. A2 positive: adaptable-examples; negative: mandatory-headings. A3 positive: short-date-correction; boundary: detailed-repair. A4 positive: outcome-confirmation; negative: no-helper-constraint.
+- Risk: agent-decided — replace accumulated reminders with an adaptable content outline and contrastive examples in portable sibling references. Preserve existing gates and authorization consequences, mirror the two copies with a parity check, and validate real outputs before claiming improvement.
+
+**W1-01 authorized iteration 2 — separate preparation from the user message** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/references/`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-design/CHANGELOG.md`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: faithful-scope; negative: new-guarantee. A2 positive: adaptable-outline; negative: copied-procedure-headings. A3 positive: brief-known-facts; boundary: missing-fact-interview. A4 positive: same-yes-consequences; negative: implementation-approval.
+- Risk: agent-decided — iteration1 fixes content fidelity but still serializes bookkeeping. Separate private preparation/post-reply records from the user-message instructions; unresolved required facts stay in the existing interview. Preserve all conditional disclosures, one stop, prior coverage and the five-iteration allowance.
+
+**W1-01 authorized iteration 3 — load examples at the producer and restore routing anchors** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-code/skills/write-plan/`, `loom-design/skills/capture-intent/SKILL.md`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: pre-draft-loaded-guidance; negative: stronger-outcome. A2 positive: local-direct-reference; negative: output-inventory. A3 positive: brief-known-facts; boundary: missing-fact-only. A4 positive: no-spec-consent-route; negative: lost-routing-anchor.
+- Risk: agent-decided — directly load code-only examples before intake drafting and existing-intent confirmation; preserve the missing-fact phase boundary. Separately restore both owners' original policy numbering consumed by consent tests. No new rules, weakened tests, output schema or publication changes.
+
+**W1-01 authorized iteration 4 — bound example facts and check final-message relevance** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/references/`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: neutral-unknown-impact; negative: borrowed-example-fact. A2 positive: adaptable-wording; negative: mandatory-script. A3 positive: relevant-complete-confirmation; negative: appended-work-inventory. A4 positive: necessary-disclosure-retained; negative: extra-process-approval.
+- Risk: agent-decided — iteration3 improves loading and brevity but imports example facts and retains internal inventory. Refine examples with explicit fact boundaries and an otherwise-correct verbose counterexample; invoke relevance checking at the existing composer, preserving required disclosures and free presentation.
+
+**W1-01 authorized iteration 5 — separate primary template from optional examples** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: live-case-abstraction; negative: imported-list-or-population. A2 positive: adaptable-content-grouping; negative: required-script. A3 positive: primary-brief-output; negative: repeated-artifact-inventory. A4 positive: both-actions-after-checks; negative: early-upload-or-optout-cutoff.
+- Risk: agent-decided — final authorized iteration: load a short primary content template, with examples optional and context-bound. Preserve evidence strength, scope and free expression; clarify both-action publication timing and opt-out. Keep prior failure history and all relevant test coverage.
+
+**W2-01 Save the approved titled before/after flow illustration** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-workflow/skills/loom-visualization/templates/02-linear-steps.md`, `loom-workflow/skills/loom-visualization/SKILL.md`, retained intent Constraints and this plan.
+- Test: A1 positive: titled-panels. A2 positive: expected-state-label. A3 positive: reproducible-parallel; boundary: stacked-layout. A4 positive: template-only.
+- Risk: user-decided — save the approved outer-panel illustration independently from exhausted confirmation iterations; retain their counts and failures. No generator or confirmation-contract change is included. Shipped separately in PR #130; W3 owns the later five-section redesign.
+
+**W3-00 Integrate the released visualization example and current main** after: W1-02 acceptance: 1,2,3,4
+- Files: current four uncommitted paths, upstream merge paths, release metadata and existing release pins.
+- Test: A1 positive: preserved-intent-history. A2 positive: current-confirmed-scope. A3 positive: released-diagram-preserved. A4 negative: unrelated-feature-loss.
+- Risk: agent-decided — checkpoint local work, then merge main without replaying trials. Preserve released visualization files, code/design unpublished minor versions, main's patch history and workflow 5.19.2. Integration invalidates earlier content-bound evidence.
+
+**W3-01 Implement the newly approved five-section confirmation contract** after: W3-00 acceptance: 1,2,3,4
+- Files: both confirmation-template.md and confirmation-examples.md copies, capture-intent/SKILL.md, write-plan confirmation producers, affected existing contract tests and focused behavior fixtures.
+- Test: A1 positive: grounded-project-context-and-current-direction; negative: invented-roadmap. A2 positive: five-localized-sections-in-order; boundary: missing-required-facts-interview. A3 positive: concise-known-correction-and-framed-process-comparison; negative: cross-section-duplication-or-unverified-after-state. A4 positive: same-yes-publication-after-checks; negative: technical-quality-choice.
+- Risk: user-decided — fixed sections and grounded context are new obligations, not a retry reset. Retain prior evidence and counts; replace conflicting optional-heading/private-record directions. Reuse portable references and optional visualization, without cross-plugin filesystem dependencies or new generators.
+
+**W3-02 Exercise realistic requests and finish independent verification** after: W3-01 acceptance: 1,2,3,4
+- Files: retained behavioral evidence and acceptance report; affected plugin release notes and version pins before finalization.
+- Test: A1 positive: invoice-export-context. A2 positive: ordinary-new-feature; boundary: incomplete-request. A3 positive: simple-correction-and-before-after-flow; negative: repeated-scope-and-private-inventory. A4 positive: understandable-consent; negative: extra-user-quality-checkpoint.
+- Risk: agent-decided — compare identical concrete requests with supplied context, verified hooks and explicit first-party routing. Separate selection from quality evidence; run focused, adversarial, complete-suite and independent checks. Publication and merge remain unauthorized.
+
+**W3-01 behavioral continuation 1 — preserve consent and complete the public skeleton** after: W3-00 acceptance: 1,2,3,4
+- Files: both primary templates, composers and galleries; capture interview/test-prompts; focused contract tests and unreleased notes.
+- Test: A1 positive: read-grounded-overview. A2 positive: complete-five-section-reply; boundary: unavailable-required-fact. A3 positive: invoked-generated-aligned-comparison; negative: added-visibility-qualifier. A4 positive: held-versus-enabled-publication; negative: silently-reactivated-grant.
+- Risk: agent-decided — continuation count 1 retains W3-01 identity and all failed evidence. Repair consent explanation, public structure/diagram execution and imported result-set qualifiers together. No publication, runtime authorization-bypass or data-loss claim is inferred from the observed wording.
+
+**W3-01 behavioral continuation 2 — separate interview from ready format and retain source scope** after: W3-00 acceptance: 1,2,3,4
+- Files: both primary/ready-format references, composers and galleries; intent field/template guidance; focused fidelity checks and unreleased notes.
+- Test: A1 positive: source-target-qualifiers. A2 positive: ready-only-format-load; boundary: unavailable-fact-interview. A3 negative: inferred-method-ban-or-broadened-preservation. A4 positive: retained-explicit-hold/default-controls.
+- Risk: agent-decided — retain continuation count 2 and prior evidence. Separate ready layout from pre-draft guidance, and tie absence/preservation/exclusion claims to source subjects and qualifiers. Preserve working consent and diagram branches; ambiguous wrappers establish neither an ongoing-hold breach nor future authorization.
+
+**W3-01 user-authorized continuation 3 — diagnose reference loading and competing guidance** after: W3-00 acceptance: 1,2,3,4
+- Files: existing confirmation owners, paired references, focused tests and retained evidence; no new skill or generator.
+- Test: A1 negative: broadened-preservation-or-method-ban. A2 positive: five-ready-sections; boundary: unavailable-date-interview. A3 positive: loaded-framed-comparison-example; negative: metaphor-or-unnecessary-coined-term. A4 positive: explicit-publication-hold-retained.
+- Risk: user-decided — after the prior stop and explanation of the dispatch ceiling, the user said "那就繼續迭代吧". This authorizes one additional source iteration beyond the default redispatch ceiling, retaining the same task identity, initial execution and two completed continuations. Diagnose actual reference consumption and competing composition guidance before a minimal repair, then rerun the invoice/unknown-date cases. No requirement, reviewer-episode reset or publication authorization is implied.
+- Risk: user-decided — also assess literal plain language, absence of metaphors and unnecessary invented terminology, following "也順便對於是否真的以白話方式說明 不用比喻 非絕對必要不自創專有名詞 這方面做一下評估". These are existing conversation clarity obligations, not an additional user decision or workflow phase.
+
+**W3-03 Replace the existing final-message check with six concrete editing questions** after: W3-01 acceptance: 1,2,3,4
+- Files: both confirmation-template.md copies and existing unreleased plugin notes; retained test evidence.
+- Test: A1 positive: supported-context-and-source-boundaries. A2 positive: phase-appropriate-structure. A3 positive: literal-necessary-terms-and-framed-diagram; negative: private-inventory. A4 positive: unambiguous-confirmation-consent.
+- Risk: user-decided — "改吧" and "改完之後再做一輪測試" approve six private actual-reply checks replacing the generic paragraph. Preserve W3-01 history, disclosures and holds; add no file or approval.
+
+**W3-03 continuation 1 — remove factual and confirmation-phase contradictions** after: W3-03 acceptance: 1,2,3,4
+- Files: both confirmation owners and existing phase readers; paired grounding/examples where relevant; focused regression tests and existing unreleased notes.
+- Test: A1 negative: unknown-does-not-imply-false. A2 negative: confirmation-before-required-facts; boundary: established-fact-ready. A3 positive: source-supported-output. A4 positive: consistent-authorization.
+- Risk: user-decided — "對 請繼續迭代吧" authorizes this continuation after the factual/logical minimum was clarified. Retain the same failed obligations, W3-03's initial attempt and all W3-01 history; diagnose competing instructions before repairing them.
+
+**W3-03 continuation 2 — reconcile observed values in messages and drafts** after: W3-03 acceptance: 1,2,3,4
+- Files: existing paired grounding/examples, intent field templates and corresponding drafting guidance; focused regression surfaces and unreleased notes.
+- Test: A1 negative: placeholder-is-not-a-wrong-calendar-day; boundary: verified-wrong-value. A2 positive: unresolved-fact-remains-open. A3 negative: unsupported-announcement-or-reader-effect. A4 positive: retained-authorization-boundaries.
+- Risk: agent-decided — Two fresh auditors and independent acceptance confirm draft/message value-state mismatches and unsupported announcement/reader-effect claims. Repair the shared inference class in existing examples and drafting instructions; retain all failures and the second continuation count.
+
+**W3-04 Ground each section without filling unsupported content** after: W3-03 acceptance: 1,2,3,4
+- Files: both intake entry SKILLs and paired confirmation references; related visualization full/coexist cards and plain-language.md; derived host rule, workflow manifests/current version pins/README and changelog; existing relevant checks and retained evidence.
+- Test: A1 positive: sparse-project-context-without-invented-direction. A2 positive: five-brief-sections; boundary: missing-required-fact-stays-interview. A3 positive: supported-impact-only; negative: inferred-exclusive-access-or-guaranteed-benefit. A4 positive: explicit-hold-and-normal-publication-controls.
+- Risk: user-decided — "試試看吧" approves evidence-backed brief sections, retaining W3-03 failures/counts and all consent boundaries. Compare frozen native cases; add no research stage, checker or model reviewer.
+
+**W3-04 relative-evaluation continuation 1 — preserve ready-intake prerequisites** after: W3-04 acceptance: 1,2,3,4
+- Files: `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/write-plan/references/no-intent-interview.md`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/skills/capture-intent/SKILL.md`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, retained evidence.
+- Test: A2 positive: code-only ready intent is written before confirmation; negative: missing required facts still block ready confirmation. A4 positive: no hold uses informed automatic-publication default; boundary: explicit ongoing hold remains in effect.
+- Risk: user-decided — compare to released baseline rather than require 100% correctness, and allow up to ten more iterations; preserve all prior history and the same task identity. No publication or merge is authorized.
+- Risk: agent-decided — class: ready-confirmation prerequisites were omitted after the actor read guidance. Both composers, code-only entry/interview, paired template/format/examples, intent templates and visualization guidance were searched. Make the pre-existing default branch and write-before-confirm sequence explicit at actual owner routes; this is a behavioral hypothesis, not a claim that missing text was the sole cause.
+
+**W3-04 relative-evaluation continuation 2 — preserve language and evidence scope** after: W3-04 acceptance: 1,2,3,4
+- Files: both `confirmation-template.md` references and retained evidence; the two portable copies stay identical.
+- Test: A1 negative: unsupported activity or problem frequency in either reply or saved intent. A2 positive: the saved intent's prose follows the user's language while schema keys and headings remain stable. A3 control: invoke the visualization skill before a diagram when available; retain framed graph procedure. A4 controls: preserve publication default and explicit holds.
+- Risk: agent-decided — continuation 2 of the user's maximum ten rounds; the original task and prior failures remain. The first round's code-only draft and normal-publication controls passed once each, but the saved intent used the wrong language in one case and inferred an unsupported usage frequency in another. Both actors had read the template; clearer placement is a hypothesis, not a demonstrated sole cause. A diagram also appeared without an observed skill invocation despite the existing instruction, so do not claim this change repairs that behavior.
+
+**W3-04 relative-evaluation continuation 3 — keep sourced qualifiers and choose useful visuals** after: W3-04 acceptance: 1,2,3,4
+- Files: paired `confirmation-template.md` and `confirmation-format.md` references; retained evidence. Portable paired copies stay identical.
+- Test: A1 negative: a duration or frequency from one event is not assigned to another; retain the source qualifier in the user's language. A2 positive: an open intent is written before ready confirmation, and the reply distinguishes it from unchanged project files. A3 positive: an explicitly requested flow still uses the visualization skill and a framed, aligned comparison; a simple comparison can use a table without forcing a diagram. A4 controls: preserve the normal publication default and explicit holds.
+- Risk: agent-decided — continuation 3 of the user's maximum ten rounds; preserve prior failures, current task identity and the release/merge hold. Round 2's general timing reminder did not prevent an unsupported frequency, so test reusing the source qualifier with its event rather than adding an equivalent generic reminder. The ready layout's placeholder said to include a diagram even though surrounding guidance made diagrams conditional; clarify the choice while retaining visuals that convey the flow and user-requested diagrams. No evidence establishes that these changes alone will correct actor behavior.
+
+**W3-04 relative-evaluation continuation 5 — align product value guidance** after: W3-04 acceptance: 1,2,3,4
+- Files: both intent templates and the code-only confirmation reference; retained round 4 evidence.
+- Test: A2 negative: missing required product value answers remain open and prevent confirmation; positive: a complete product or an engineering intent with obvious value can proceed. A4 controls: preserve the normal publication default and explicit holds.
+- Risk: agent-decided — continuation 5 of the user's maximum ten rounds, without resetting prior attempts or authorizing publication or merge. The round 4 CSV actor explicitly identified missing urgency and displaced work, but marked open questions none and requested confirmation. The product owner already requires these answers; both templates called the section optional and omitted two required elements, while the code-only reference listed the same incomplete set. Align those surfaces without adding a field or stage. Loaded conflicting instructions and observed noncompliance do not establish a unique cause or prove this repair works; fresh behavioral evaluation is required.
+
+**W3-04 relative-evaluation continuation 6 — avoid invented comparison cells** after: W3-04 acceptance: 1,2,3,4
+- Files: paired `confirmation-format.md` references; retain prior evidence and attempts.
+- Test: A1/A3 negative: a comparison does not invent a current counterpart for a future detail; positive: evidence-backed differences remain clear, and an explicitly requested diagram follows the existing graph protocol.
+- Risk: agent-decided — continuation 6 of the user's maximum ten rounds; publication and merge remain held. The stock-report comparisons in rounds 3–5 added unsupported current-state selection or formatting details even though existing grounding guidance applied. The layout asks for a difference from today without explaining how to handle a missing counterpart; make omission or an unknown label available at that point. This is a hypothesis to test, not a finding of unique causation or proof of improvement.
+
+**W3-04 relative-evaluation continuation 8 — remove unproven comparison addition** after: W3-04 acceptance: 1,2,3,4
+- Files: paired `confirmation-format.md` references restored to their round 5 contents; retained round 6 and 7 evidence and all other changes.
+- Test: A1/A3 negative: comparisons do not invent present-state details; positive: explicitly requested diagrams continue to follow the graph protocol. A2 negative: missing required product value facts prevent confirmation.
+- Risk: agent-decided — continuation 8 of the user's maximum ten rounds; preserve all prior attempts, the baseline-relative quality criterion, and publication/merge hold. Round 6 avoided the previously observed stock details once, but round 7 repeated the identical overlay and invented present-state selection in stock and CSV; incomplete CSV also sought confirmation with required facts missing. The added comparison instruction has no reliable demonstrated benefit in these small samples, so remove it for simplicity. Neither result proves the instruction caused harm; behavior requires further evaluation.
+
+**W3-04 scope convergence — preserve the sixth Codex prototype** after: W3-04 acceptance: 1,2,3,4
+- Files: existing `capture-intent/SKILL.md` restatement, its new `references/confirmation-ready-template.md`, and existing `write-plan/references/confirm-intent.md` restatement. Other runtime content returns to released `41211a0b`; preserve earlier work and failures in evidence.
+- Test: released focused modules, including the word cap and forbidden-vocabulary guards; retained comparisons and independent acceptance remain separate from mechanical checks. The previous drafting-fidelity test and a per-test coverage audit are saved under evidence, not treated as equivalent coverage.
+- Risk: user-decided scope remains template-only with relative baseline comparison and no release or merge authorization. The capture template adds one read at ready confirmation; round 6 observed it in all five capture sessions, including an unready interview that then previewed five sections. That sample also had a misaligned diagram. Additional everyday cost and a reliable behavioral advantage are not established. Round 10 evaluated a different inline candidate, not this exact runtime. Preserve all prior failures and do not claim release readiness.
+
+**W3-04 relaxed Codex continuation — optional structure** after: W3-04 acceptance: 1,2,3,4
+- Files: the existing code-only restatement and capture ready template; retain `codex-relaxed-round-1.md` through `codex-relaxed-round-10.md`, their data and dispatch ledger.
+- Test: released four focused modules (96 passed); compare baseline against exact frozen sources and preserve missing-fact, consent, scope, background and requested-flow observations separately.
+- Risk: user-decided — ten further Codex-only rounds retain all prior history and release/merge holds. Five sections are optional, while supplied context and material boundaries remain important. A later explicit affected-person reminder was read but did not fix the repeated setup omission, and was removed for simplicity; final source exactly matches rounds 3–7. Round 3's flow misaligned, round 6 introduced an unrequested date-display option, and two simple cases omitted relevant user context. The extra ready-template read was observed before readiness. Mechanical checks do not replace independent review or acceptance.
+
+**W3-04 ten context-example iterations** after: W3-04 acceptance: 1,2,3,4
+- Files: the existing code-only confirmation restatement and capture ready template; retain ten round records, raw data and `codex-ten-context-ledger.json`.
+- Test: existing four focused modules (96 passed), manifest synchronization and diff checks; fresh behavioral cases retain positives and limitations for separate independent acceptance.
+- Risk: user-decided — retain ten-round evidence, prior failures and the tested example; no added stage or model call. See historical risk details below for results and authorization changes.
+
+## Historical risk details
+
+These records describe decisions and observations at the time; later user
+instructions supersede earlier publication or merge holds without erasing them.
+
+W3-04 context-example risk: user-decided — ten sequential Codex-only rounds, each at most eight starts, compare current with a short abstract example. Two starts per round completed; previous counts and failures remain. The example improved the connection in selected cases and had no consistently observed obvious new material harm, but did not reliably improve every case; earlier possible weakened `only`, diagram misalignment, unrequested date option and early template read remain disclosed. Apply the exact tested example without a new stage or model call; no publication or merge authorization is implied.
+
+Risk 20 at the time: user-decided — The user now considers a demonstrable improvement over the released baseline sufficient to consider release, rather than requiring 100% correctness, and authorizes up to ten additional iterations. Preserve prior failures, same-task continuity, existing acceptance/consent obligations, ordinary-model testing and the publication/merge hold.
+
+Risk 21 at the time: user-decided — Continue up to ten further iterations with Codex only, retaining prior attempts and the baseline-relative standard. Limit the change to the explanation template and necessary examples; add no workflow, mechanism or model call, and assess whether ongoing cost rises substantially. Audit the complete branch against the released baseline rather than treating the last uncommitted diff as the full change. Preserve publication and merge holds.
+
+Risk 22 at the time: user-decided — Up to ten further Codex-only iterations, at most eight started model sessions in any round including retries and controls. Relax the requirement for 100% correctness or five headings every time. Do not invent or change material requirements, authorization or facts, or claim missing information is confirmed. Compare with released baseline, report material regressions, use diagrams when useful, preserve earlier evidence and retain publication/merge holds. This supersedes earlier fixed-five wording without resetting its history.
+
+Risk 23 at the time: user-decided — Release is acceptable when there is no obvious negative effect. The original goal is a format that asks for more explanatory detail at confirmation, not a new fact-checking system. Judge the limited template change accordingly; retain observed problems and prior evidence rather than requiring zero errors or proof of an overall statistical improvement. This does not itself authorize a merge.
+
+Risk 24 at the time: agent-decided — Prepared the code 3.58.0 and design 2.21.0 release metadata for the tested template-only change. The focused 96 tests, manifest synchronization check and full locked offline Loom package suite passed after the metadata update. These mechanical results do not replace independent review or acceptance; publication and merge have not happened.
+
+Current authorization: the user subsequently said “合併吧”, explicitly
+authorizing publication and merge for this change and superseding the prior
+hold. The existing review, verification and merge checks still apply.
+
+## Simplicity check
+- none found
+
+## Questions asked
+1 — what — 確認這次要做到：各確認點的說明都保留理解所需的背景、名詞與結果，簡單事情仍簡短，且不增加確認次數嗎？
+
+## Risks
+1. user-decided — scope remains decision point 1. The earlier optional-heading design was superseded by the approved five-section structure on 2026-11-04; sentence wording stays free. Product behavior confirmation and final acceptance remain unchanged.
+2. agent-decided — reuse existing references and tests, with no new skill, checker rule or schema field. W3 adds the explicitly approved conversation sections; no additional workflow decision point is introduced.
+3. agent-decided — prose assertions cannot establish actual conversational behavior; fresh-context exercises must cover unfamiliar concepts, simple requests, and a user's detailed follow-up.
+4. agent-decided — sources motivate the design, not a claim of proven effectiveness: GOV.UK check-answers, Google conversation design, NHS SBAR, Google Cloud ADR and Atlassian DACI guidance were consulted.
+5. user-decided — repair dogfood findings D1–D3, fix the harness and rerun six original scenarios plus two counterexamples; publication remains held. This corrects observed failures under existing Acceptance, without changing requested outcomes or restarting review budgets.
+6. agent-decided — defect class: unsupported additions during explanation, observed as deterministic-selection guarantees and an invented date fallback. Both first-confirmation owners and all cumulative changed files were searched; internal publication jargon is repaired in the same affected paragraphs.
+7. agent-decided — sync-trunk detected conflicts in both plugin changelogs and left the tree untouched. Integration is a new bounded task, not a retry of completed W1-01; existing source edits remain applicable, while all pre-integration verification requires replacement.
+
+8. agent-decided — eight-case retest had no permission denials. Both blind audits found unsupported deterministic/result guarantees in capture-6 and code-6; date/random counterexamples held. W1-01 remains incomplete; this continuation changes rule placement, preserving requirements and retry identity.
+
+9. user-decided — explicitly override the previous local iteration ceiling: at most five additional iterations, stopping early on acceptance. Prior failures/counts remain retained; no requirement or publication authorization changes. Template-plus-examples reference structure approved.
+
+10. user-decided — W3-03 newly requires six actual-reply questions: background, fidelity, plain wording, consent, structure/diagrams and deletion. This additional deliverable preserves W3-01's attempts, failures and review continuity; no new file, station or public checklist.
+
+11. user-decided — Minimum release criteria are correct content and no internal logical conflict. Prioritize missing-fact confirmation and unsupported certainty over cosmetic wording. Existing five-section/visualization goals remain; publication and merge are still held.
+
+12. user-decided — W3-04 changes the presentation obligation, not the factual/logical minimum or W3-03 retry identity. Five headings remain, but unknown broader context need not be filled or newly interviewed. Preserve reading, required-fact interviews, disclosures, diagram conditions and all earlier evidence.
+
+13. agent-decided — W3-04 trial complete; candidate unaccepted: both variants retain two material-failure cases, only two replies shorten. Preserve observations without tuning for a pass; minimum remains unmet, publication held and attestation stale.
+
+14. user-decided — Authorize at most five additional rounds, including option-guidance ablation and evidence-backed repairs. Retain W3-04/prior attempts. Behavioral actors remain first-party claude-sonnet-5-5, medium requested, regardless of main-model switch. Publication and merge remain held.
+
+15. agent-decided — Round1 only ablates the injected options directive; it does not establish a single cause. Round2 clarifies real-choice applicability in existing visualization guidance, preserving factual interviews and legitimate choices. Workflow guidance needs a minor version bump.
+
+16. agent-decided — Round2 fails the existing 181-word card cap. Round3 compacts both cards within that cap, preserving real-choice scope and earlier obligations; no raised limit, README inflation or weakened tests. Each tested source remains separately recorded.
+
+17. user-decided — Consider template simplification within five rounds. Round4 moves unchanged ready examples into the existing optional gallery, retaining five headings and all obligations. Grounding/six checks stay; tests follow the new resource home without losing assertions.
+
+18. user-decided — Fifth/final round repairs entry-point evidence reading after actual README omission. The five-round authorization overrides the usual two-source-redispatch limit; retain prior attempts. No sixth source round, publication or merge.
+
+19. agent-decided — Five rounds completed with 38 ordinary-model actors. Final ten read overviews, but source 9b9c7d87 retains unsupported certainty and premature confirmation. Preserve disputed interpretations and failures; stop without sixth source, attestation, publication or merge.
+
+20. user-decided — compare with the released baseline, retain prior failures and consent; historical details above.
+21. user-decided — limit changes to explanation templates and examples; preserve history and assess cost. Historical details above.
+22. user-decided — relax perfection and fixed headings; preserve factual fidelity, per-round limits and history. Historical details above.
+23. user-decided — judge the explanation format by necessary detail and absence of obvious negative effects. Historical details above.
+24. agent-decided — release metadata and mechanical checks recorded; historical details above.

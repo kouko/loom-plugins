@@ -1,4 +1,5 @@
 # concern: capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
+# concern: a referenced intake template is missing from the distributed skill
 """capture-intent station contract (plan W2-01).
 
 The station is loom-design's entry point. These tests check its structure:
@@ -257,21 +258,21 @@ def test_loom_design_version_2_17_0_consistent() -> None:
         (REPO / "loom-design/package.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.20.1"
-    assert codex_manifest["version"] == "2.20.1"
-    assert agy_manifest["version"] == "2.20.1"
-    assert package_manifest["version"] == "2.20.1"
-    assert "## [2.20.1]" in changelog
+    assert claude_manifest["version"] == "2.21.0"
+    assert codex_manifest["version"] == "2.21.0"
+    assert agy_manifest["version"] == "2.21.0"
+    assert package_manifest["version"] == "2.21.0"
+    assert "## [2.21.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/README.md) | 2.20.1 |",
-        "loom-design/README.md": "**Version**: 2.20.1",
-        "loom-design/README.ja.md": "**Version**: 2.20.1",
-        "loom-design/README.zh-TW.md": "**Version**: 2.20.1",
+        "README.md": "| [`loom-design`](loom-design/README.md) | 2.21.0 |",
+        "loom-design/README.md": "**Version**: 2.21.0",
+        "loom-design/README.ja.md": "**Version**: 2.21.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.21.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
-    assert "## loom-design\n\nVersion 2.20.1." in (REPO / "README.md").read_text(encoding="utf-8")
+    assert "## loom-design\n\nVersion 2.21.0." in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def test_capture_intent_bare_branch_absent() -> None:

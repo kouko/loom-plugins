@@ -1,0 +1,94 @@
+{
+  "role": "unmatched supplemental fixture-validity diagnostic",
+  "source_commit": "60fa5cdb169dc0ac73056e5bb66e1dc08775eeef",
+  "integration_test_commit": "f66da1d9434b1367b88c9cccdc3ef6f27690454d",
+  "records": [
+    {
+      "key": "capture-missing-date-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-missing-date",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.10038630000000001,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "目前無法更正：真正的發行日期還不知道，你也沒有發行紀錄可以提供。我手上沒有任何依據能填入正確日期，所以這項更正會先卡住，直到有可靠的日期來源。\n\n目前 `RELEASE_NOTES.md` 的「Latest release」下，日期那一行寫的是「Release date: to be corrected」。你要改的只有這一行，其他文字都維持原樣。\n\n我沒有填入今天的日期或任何推測的日期，因為那會把另一個不正確的日期寫進發行說明。我也還沒有建立意圖文件，沒有修改任何檔案，也沒有發佈任何東西。\n\n等你取得真正的發行日期，或是找到能證明它的紀錄（例如發行標籤、發佈公告或部署紀錄），請再告訴我。到時我會用那個日期確認這項更正，確認前不會動任何檔案。",
+      "drafts": [],
+      "verified_live_context": {
+        "successful_hook_responses": 4,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "request": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "summary_sha256": "574e18c5776331820640ddb3c41a69e304e4dda72360c7f6b15fcf0e57d19a82",
+      "transcript_sha256": "fb1a3dd5b941774a8b4df2f7ca1407bcb857af838243df41227f0acbf5c7c66f"
+    },
+    {
+      "key": "code-missing-date-candidate-r1",
+      "variant": "candidate",
+      "case": "code-missing-date",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1173902,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "目前無法更正，因為缺少真正的發行日期。我沒有建立計畫、沒有修改任何檔案，也沒有發布。\n\n**目前狀況**\n- `RELEASE_NOTES.md` 的「Latest release」下，現在顯示的是 `Release date: to be corrected`。\n- 只有你知道這個日期是錯的，我沒有任何證據能判斷正確日期是哪天。\n- 你也沒有發行紀錄可以提供。我不會拿今天的日期或其他推測值填進去，因為那會讓使用者看到一個不實的日期。\n\n**要解除卡關需要什麼**\n- 一個可靠的真正發行日期，或能查到這個日期的發行紀錄，例如 tag、發布公告或上線紀錄。\n- 一旦有了，我會只更換那一行的日期，其他文字不動。到時我再向你確認要更正的內容，確認之後才會進入計畫。\n\n在那之前，這個變更維持未確認，也不排計畫。",
+      "drafts": [],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "request": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "summary_sha256": "884145cda11e278ab0a290cd70c28683460b67c1aa2b77a881eff021d1178305",
+      "transcript_sha256": "fde2d1c8c1f20739d89d6bb2536e89949ee26fc154a0a8e1d5131c3a47655f31"
+    }
+  ],
+  "new_cli_estimate_usd": 0.2177765,
+  "cumulative_cli_estimate_usd": 3.3986898,
+  "total_prior_and_current_calls": 25,
+  "limits": [
+    "Same actual user request and seed files; wrapper alone removes explicit request for a future-confirmation explanation.",
+    "Not a matched before-after source comparison or a replacement pass for earlier observed replies.",
+    "Native auth, requested and returned model, strict isolation, original hooks with sandbox wrappers and unchanged runtime manifests verified.",
+    "No triggering, statistical reliability, all-host or installed-personal-host claim."
+  ]
+}

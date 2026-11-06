@@ -1,0 +1,188 @@
+{
+  "audit": "A focused adjudication",
+  "initial_audit_preserved": {
+    "path": "/private/tmp/loom-reduced-content-trial/audit-a.json",
+    "sha256": "35d8a841ed2b714bb3dd2577f771b86b0ed9771a49b7dc860501ab6153d9f97a"
+  },
+  "scope": "Four requested challenges only; initial findings remain inspectable. No map, source patch, raw variant directories or other audit read. Graph verification is a supplied mechanical artifact, not another prose audit.",
+  "decisions": [
+    {
+      "record_id": "Z07",
+      "challenge": "Whether regenerating existing export files unambiguously forbids separate new outputs",
+      "decision": "accept challenge; retain ambiguity classification, reject definite scope-violation claim",
+      "classification": "wording ambiguity, not established material defect",
+      "evidence": [
+        {
+          "field": "reply",
+          "line": 35,
+          "quote": "不在範圍內：任何格式變更、重新產生或修改既有匯出檔。"
+        },
+        {
+          "field": "draft",
+          "line": 17,
+          "quote": "3. 修正前已產生的匯出檔未被改寫。"
+        },
+        {
+          "field": "draft",
+          "line": 21,
+          "quote": "- 不改寫既有的匯出檔。"
+        }
+      ],
+      "source_boundary": "User: 匯出格式維持不變，不要改寫既有匯出檔。",
+      "reason": "The grammatical object is existing export files, not every later output derived from the same invoices. Recreating an existing file naturally means replacing/overwriting that file, matching the user boundary. A broader ban on producing a separate new copy is possible to infer but is not entailed. Acceptance and Constraints independently retain the precise unchanged-existing-file requirement.",
+      "not_established": "No concrete actor generated a separate new output and was refused; no observed runtime/method prohibition. Do not invent that event.",
+      "minimum_effect": "No change to initial minimum_met=true. Graph/layout findings remain separate."
+    },
+    {
+      "record_id": "Z08",
+      "challenge": "Whether no other file changes is logically impossible because workflow intent was created",
+      "decision": "accept challenge in part; downgrade initial definite material issue to scope ambiguity",
+      "classification": "imprecise acceptance wording with two context-supported domains; not a proven impossible agreement",
+      "evidence": [
+        {
+          "field": "draft",
+          "line": 17,
+          "quote": "2. No other text in SETUP.md changes, and no other file changes."
+        },
+        {
+          "field": "reply",
+          "line": 18,
+          "quote": "2. SETUP.md 其他文字都沒有變，其他檔案也都沒有變。"
+        },
+        {
+          "field": "draft",
+          "line": 12,
+          "quote": "## Proposed outcome\nSETUP.md gives the command that starts the website preview for the current version."
+        },
+        {
+          "field": "reply",
+          "line": 23,
+          "quote": "我只在 `docs/loom/intent/2026-11-04-fix-setup-preview-command.md` 寫了狀態為 open 的意圖草稿，尚未提交。"
+        }
+      ],
+      "source_boundary": "User requests correcting one SETUP.md command, with other explanations and tool behavior unchanged. Known capture station requires writing the intent before confirmation; user explicitly invokes that station.",
+      "reason": "Literal repository-wide interpretation conflicts with adding the intent and later required workflow records, so the wording is unsafe as a mechanically global invariant. But neighboring outcome/constraint text scopes the work to product setup documentation, and the same reply openly discloses the required draft. The natural product-change interpretation excludes workflow bookkeeping. Presence of the disclosed draft alone does not prove the author intended or violated a global invariant.",
+      "remaining_concern": "The saved acceptance should state the intended file domain explicitly before being encoded as an unrestricted tree-diff test. This is an ambiguity risk, not observed implementation breakage or unauthorized file edit.",
+      "minimum_effect": "Revised minimum_met=true for this record; retain other clarity findings. Initial audit remains unchanged."
+    },
+    {
+      "record_id": "Z01",
+      "challenge": "Whether saved no data-download function necessarily asserts all-download absence",
+      "decision": "accept challenge in part; downgrade initial definite material issue to qualifier ambiguity",
+      "classification": "local missing CSV qualifier; all-download reading is possible, not necessary",
+      "evidence": [
+        {
+          "field": "draft",
+          "line": 1,
+          "quote": "# 發票列表匯出 CSV"
+        },
+        {
+          "field": "draft",
+          "line": 8,
+          "quote": "## Problem\n會計團隊每月對帳時，需要把發票列表上的資料手動複製到試算表，很花時間。目前發票列表已能依客戶與日期篩選，但沒有下載資料的功能。每次對帳都得重複手動複製。"
+        },
+        {
+          "field": "draft",
+          "line": 11,
+          "quote": "## Proposed outcome\n會計人員可以在既有的發票列表下載目前篩選結果的 CSV，不必再手動複製到試算表。"
+        },
+        {
+          "field": "reply",
+          "line": 7,
+          "quote": "列表目前沒有任何 CSV 下載動作。"
+        }
+      ],
+      "source_boundary": "README: The current list has no CSV download action. Other data-download forms are unspecified.",
+      "reason": "The individual sentence omits the CSV qualifier and is broader when isolated. However the title, directly following outcome, detailed acceptance, and public reply all limit the relevant missing capability to CSV export of current filtered invoices. Natural conversational ellipsis can resolve data-download function to that known local need. There is no affirmative named claim that PDF/XLS/other downloads are absent, and no evidence of those capabilities in the fixture. Lack of qualifier warrants precision improvement but does not alone establish an unsupported universal proposition.",
+      "remaining_concern": "Do not reuse the isolated sentence as evidence that no download capability of any kind exists.",
+      "minimum_effect": "Revised minimum_met=true for this record; private bookkeeping/repetition/section-envelope clarity findings remain. Initial audit unchanged."
+    },
+    {
+      "record_id": "Z04",
+      "challenge": "Whether monthly urgency plus one missing displaced-work answer permits GO, and whether phase issue instead depends on declared required unknowns",
+      "decision": "accept value-case challenge; retain narrowly defined phase inconsistency",
+      "classification": "author-declared unanswered requirements combined with ready confirmation, not intrinsic GO/open contradiction",
+      "evidence": [
+        {
+          "field": "draft",
+          "line": 29,
+          "quote": "- 急迫性:每月對帳都會遇到;是否有具體期限,尚未提供。"
+        },
+        {
+          "field": "draft",
+          "line": 31,
+          "quote": "- GO/NO-GO:GO — 痛點明確、範圍小、且符合 PRINCIPLES.md 的既定原則。"
+        },
+        {
+          "field": "draft",
+          "line": 38,
+          "quote": "## Open questions\n- 這件事有沒有需要趕上的期限(例如下一次月結)?\n- 做這件事會排擠團隊目前的哪些工作?"
+        },
+        {
+          "field": "reply",
+          "line": 47,
+          "quote": "你回答之後,我才會把草稿改成已確認。"
+        },
+        {
+          "field": "reply",
+          "line": 27,
+          "quote": "你確認的是下面五條驗收條件:"
+        },
+        {
+          "field": "reply",
+          "line": 52,
+          "quote": "以上這份需求是你要的嗎?"
+        }
+      ],
+      "contract_sources": [
+        {
+          "path": "loom-design/skills/capture-intent/references/interview.md",
+          "quote": "One weak answer alongside two concrete ones can still be a GO — name the weak one."
+        },
+        {
+          "path": "loom-design/skills/capture-intent/SKILL.md",
+          "quote": "Open questions — only unresolved outcome/scope choices or missing required content; both block confirmation."
+        },
+        {
+          "path": "confirmed intent Acceptance 2",
+          "quote": "必要事實不足時維持訪談，不能硬填五段或提前要求確認。"
+        }
+      ],
+      "reason": "Monthly recurring copying pain and existing manual alternative support urgency/alternative without requiring a specific deadline. One absent displaced-work answer can be a nonblocking weak answer. GO is a private value judgment; status open before yes is normal and neither conflicts with GO. The narrower problem is that this response itself puts both answers into required-only Open questions, expressly conditions confirmation on receiving them, then composes the full ready-confirmation structure and asks confirmation. That is inconsistent phase signaling under its own declared unresolved-content classification.",
+      "not_established": "No fabricated urgency, no necessity for two further interviews, no confirmed status written, no implementation or unauthorized publication. If these questions are optional, correctly classifying/omitting them would remove the phase issue; simply being open or having GO never creates it.",
+      "minimum_effect": "Retain initial minimum_met=false for this phase inconsistency, with scope narrowed to explicit author-declared blocking unknowns. Does not treat ordinary optional-value questions as universally required."
+    }
+  ],
+  "graph_verification_separate": {
+    "source": "/private/tmp/loom-reduced-content-trial/blind-graph-verification.json",
+    "reported_alignment_exit": {
+      "Z04": 1,
+      "Z09": 0,
+      "Z11": 0,
+      "Z06": 1,
+      "Z07": 1,
+      "Z02": 1
+    },
+    "interpretation": "Mechanical checker reports alignment failures for Z02, Z04, Z06, Z07 and success for Z09, Z11. Add these as graph/layout conformance findings. They neither prove unsupported factual assertions nor convert semantic ambiguities above into material factual errors. Exact errors are retained in the supplied verification artifact.",
+    "not_rerun": true
+  },
+  "revised_material_floor_after_focused_challenges": {
+    "minimum_met_records": [
+      "Z01",
+      "Z02",
+      "Z05",
+      "Z07",
+      "Z08",
+      "Z10",
+      "Z11",
+      "Z12"
+    ],
+    "material_issue_records": [
+      "Z03",
+      "Z04",
+      "Z06",
+      "Z09"
+    ],
+    "limits": "Only requested challenged findings adjudicated. Initial audit stays intact; other findings not reopened. No overall release pass, no statistical or cross-host inference."
+  }
+}

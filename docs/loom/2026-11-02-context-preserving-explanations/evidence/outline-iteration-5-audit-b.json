@@ -1,0 +1,232 @@
+{
+  "scope": "Independent output-only blind assessment of iteration 5. Not formal review, whole-skill pass/fail or branch-readiness judgment.",
+  "input": "/tmp/loom-context-claude-dogfood-retest/blind-packet-i5.json",
+  "iteration": 5,
+  "resolver": {
+    "profile": "ordinary inherited/unobservable main profile",
+    "overrides": null
+  },
+  "rubric_notes": [
+    "Judgment is based on observed content, not iteration budget, suite results, reference-read flags or optional gallery reading.",
+    "No arbitrary character limit or required output format. Familiar requests should remain proportionate; requested detail and necessary consent explanation justify length.",
+    "Both nonforced branch upload and PR must explicitly follow review and publication checks. Opt-out remains available until publication; merge is separate.",
+    "A valid missing-fact interview need not draft, seek confirmation or disclose publication yet.",
+    "Own-rule isolation is distinct from fixed-worker or identical-output requirements. Unknown affected counts do not authorize narrowing the requested invariant."
+  ],
+  "defect_classes": [
+    {
+      "id": "S",
+      "name": "Unsupported narrowing of requested outcome scope"
+    },
+    {
+      "id": "B",
+      "name": "Internal workflow inventory or redundant presentation"
+    },
+    {
+      "id": "Q",
+      "name": "Unnecessary required interview or shorthand clarification burden"
+    },
+    {
+      "id": "F",
+      "name": "Unverified representation implication"
+    }
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "status": "held",
+      "assessment": "Valid missing-date interview. Preserves the supplied stale-date/customer problem and date-only boundary, refuses to guess, and seeks the actual date. The example date is not presented as verified. Future publication explanation clearly places both actions after both checks, with opt-out and separate merge; no actual confirmation or draft is required yet.",
+      "exact_quotes": [
+        "這個日期不能由我猜。",
+        "檔案其他內容都不動",
+        "只有在審查和發佈檢查都通過時,才會推送變更分支(非強制推送)並開一個待審的 PR"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "確認稿 ... 內容包含問題、預期結果、驗收條件",
+          "why": "Previewing the later message's fields adds minor process detail to a missing-date interview. The actual fact and correction remain easy to find; this does not by itself defeat brevity."
+        }
+      ]
+    },
+    {
+      "case": "capture-4",
+      "status": "held",
+      "assessment": "Brief, legitimate missing-date interview. Names the current date, states the actual date is absent and avoids substituting today. It preserves date-only scope and defers confirmation. No current publication disclosure or draft is required.",
+      "exact_quotes": [
+        "最新一次發佈的實際日期是哪一天?",
+        "如果我自己猜 ... 可能會讓客戶看到一個不是真正發佈日的日期。",
+        "只更正發佈日期,其餘內容不變。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-5",
+      "status": "partly",
+      "assessment": "Core facts and outcomes are faithful: dispatch ownership, bounded retries, queue progress, unchanged successful jobs and no interface. Both publication actions clearly require checks, with opt-out and separate merge. The response nevertheless adds substantial internal workflow inventory and repeats the just-listed draft contents, weakening the required proportionate presentation.",
+      "exact_quotes": [
+        "某個背景工作用到了另一個工作的派送設定",
+        "既有成功的工作要維持原樣",
+        "之後必須先通過審查與發佈檢查,才會執行下面兩件事"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "這是 engineering 類型 ... needs-design: no ... loom-code:write-plan ... 草稿記錄了 4 條驗收條件、一條「不新增介面」的限制 ... 「待釐清問題」為 none",
+          "why": "After a complete restatement and acceptance list, station names and an inventory/count of the same draft fields add no correction or consent value. This is a required-brevity miss, not a factual or authority failure."
+        }
+      ]
+    },
+    {
+      "case": "capture-6",
+      "status": "partly",
+      "assessment": "Explains the term and rule role, avoids inventing a data representation, and treats inconsistent outputs as a symptom rather than an identical-output requirement. However, it asserts a narrower affected-jobs-only scope that the user did not supply, and makes several nonessential facts mandatory before finalization. This is a pending interview, so absent publication details or a draft are not defects.",
+      "exact_quotes": [
+        "每個工作都用它自己的選擇規則來決定由誰執行",
+        "範圍只含目前受影響的工作。我不會自行擴大到「所有工作」。",
+        "需要你補充的事實(沒有這些,我無法定稿,意圖維持未確認)"
+      ],
+      "material_findings": [
+        {
+          "class": "S",
+          "severity": "material",
+          "quote": "範圍只含目前受影響的工作。我不會自行擴大到「所有工作」。",
+          "why": "The supplied desired rule is that each job uses its own selection. The user did not restrict remediation to an identified current affected set. Preserving an unknown impact count does not justify narrowing the invariant or excluding currently unobserved cases. This creates a new outcome boundary under the guise of avoiding scope expansion."
+        }
+      ],
+      "minor_findings": [
+        {
+          "class": "Q",
+          "severity": "minor",
+          "quote": "沒有這些,我無法定稿 ... 誰會注意到這個問題,現在怎麼應付? ... 哪些明確不在這次範圍內?",
+          "why": "A concrete inconsistency example can legitimately improve acceptance evidence. Requiring impact/workaround and an explicit out-of-scope list for this already explained correction creates unnecessary interview friction; unknown nonessential facts can remain unknown."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "status": "held",
+      "assessment": "Defines retry and dispatch roles and preserves the observed one-job fault, all-jobs own-rule target, configured limit, queue progress, successful-job behavior and internal scope. It does not ask for a new post-limit outcome. Both publication actions follow checks and opt-out remains available until publication. No premature action is observed.",
+      "exact_quotes": [
+        "目前有一個工作用到了另一個工作的派送設定檔。",
+        "原本就成功的工作,行為和結果都跟現在一樣。",
+        "等實作完成、審查和發布前檢查都通過後 ... 推送 ... 並開一個可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "F",
+          "severity": "minor",
+          "quote": "「派送設定檔」決定由哪個 worker 處理",
+          "why": "The user defined a dispatch profile's selection role but not file-backed storage. 設定 would retain the abstraction better than 設定檔. No concrete file is requested or made an acceptance condition, so this remains a small representation implication."
+        }
+      ]
+    },
+    {
+      "case": "code-6",
+      "status": "held",
+      "assessment": "Provides requested detail, clearly defines the introduced shorthand using the supplied rule, and explicitly avoids assuming lists, files or caches. Main target is own-rule isolation. Repeated-rule-change acceptance is naturally causal isolation, not an unconditional fixed-worker promise. Optional example request does not block confirmation. Both publication actions are clearly after checks, with opt-out and separate merge.",
+      "exact_quotes": [
+        "它在程式裡是清單、設定檔、快取還是別的形式,我沒有看到證據,也不假設。",
+        "每個工作都只依自己的工作者選擇規則決定由誰執行",
+        "改變某個工作的選擇規則,不會影響其他工作該由誰執行。",
+        "如果你有一個不一致的實際例子,請告訴我。它能幫助驗收,但不是必要的。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "Q",
+          "severity": "minor",
+          "quote": "如果「profile」其實指別的東西 ... 請直接更正",
+          "why": "The user asked what the assistant's own shorthand meant. This fallback unnecessarily invites the user to resolve the assistant-introduced word, after the reply has already mapped it to the supplied rule. It is optional and does not undermine the main explanation."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "status": "held",
+      "assessment": "Preserves own eligible list, sometimes occurring fault, random choice and no interface. The acceptance uses 仍可能 rather than demanding guaranteed finite-sample variation. No private-function restriction or deterministic target is added. Publication conditions, nonforced upload, opt-out and separate merge are complete.",
+      "exact_quotes": [
+        "每個 job 一律只從自己的清單中隨機挑選",
+        "同一個 job 多次挑選,仍可能選到清單內不同的工作者",
+        "審查和發布檢查都通過之後 ... 以非強制 push 上傳 ... 開一個可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "這是 engineering 類型 ... needs-design: no ... 沒有跑複雜度檢查。",
+          "why": "Station classification and skipped-complexity-check reporting add unnecessary process detail. Most remaining content directly states the scope and consent, so I do not treat the whole reply as dominated by inventory."
+        }
+      ]
+    },
+    {
+      "case": "code-8",
+      "status": "held",
+      "assessment": "Preserves the unknown date and unverified replacement without borrowing old-version/customer impact. Conditions the correction on establishing the date and preserves all other content. It seeks confirmation of the conditional intent while explicitly retaining date as open, and both future publication actions require checks. No draft or completed confirmation is inferred.",
+      "exact_quotes": [
+        "目前不明,也沒有任何經過驗證的替代日期。",
+        "只要它沒有解答,intent 就維持 open",
+        "在審查與發布檢查都通過後,自動把這個變更分支以非強制方式推送,並開啟一個可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "這個 repo 沒有 docs/loom/intent/ 下的 intent,而且未安裝 loom-design。依流程",
+          "why": "Installed-plugin and store-path inventory is not needed to understand the date correction or consent. The unknown fact and preservation condition still dominate the useful explanation, so this is avoidable overhead rather than a material scope defect."
+        }
+      ]
+    },
+    {
+      "case": "capture-h1",
+      "status": "partly",
+      "assessment": "Faithfully preserves accounting currency ownership, legitimate variable amounts, unchanged format and untouched old exports. Explains the real consequence that old wrong-currency files remain unchanged. Both upload and PR explicitly wait for checks, opt-out lasts until publication, and merge is separate. Nevertheless, the detailed requested confirmation explanation is diluted by repeated boundaries and unrelated review-process metadata.",
+      "exact_quotes": [
+        "每張發票只使用它所屬客戶自己的幣別設定",
+        "發票金額在不同次匯出之間可以不同",
+        "只有在審查和發布前檢查都通過之後 ... 以非強制推送的方式上傳 ... 開啟一個可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "這是修 bug,所以我沒有跑複雜度檢查。 ... 跨模型審查: 預設是 suggest,這裡不問你。 ... 缺少的資訊 ... 我沒有推測,也沒有寫進文件。",
+          "why": "These items describe internal checks/defaults and skipped information rather than what the accounting user would confirm. Repeating the same format/file constraints in acceptance, fixed restrictions and exclusions adds further bulk. Requested detail justifies outcome and consequence explanations, but not this inventory; the required proportionality is only partly met."
+        }
+      ]
+    },
+    {
+      "case": "code-h2",
+      "status": "held",
+      "assessment": "Preserves the verified orbit start replacement, exact command-only scope and unchanged remainder. It stops with an open draft. Both publication actions explicitly follow both checks, opt-out remains possible until publication, and merge is separate. The structured format is acceptable and the core correction remains easy to review.",
+      "exact_quotes": [
+        "指南改為指示客戶執行 orbit start,這是你已驗證的正確指令。",
+        "指南的其他部分完全不變",
+        "只有在審查和發佈前檢查都通過後 ... 以非強制推送上傳變更分支,以及開啟可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "接著我會寫出實作計畫,再交給 build 階段。計畫只有一項任務,就是改那一行。",
+          "why": "Advance task decomposition and the build label add little to a fully specified one-line documentation correction. This short extra sentence is a minor proportionality issue, not a user approval of implementation or a complete brevity failure."
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Only the supplied packet was read; no source, plans, other audits or additional model calls.",
+    "Future confirmation, implementation, commits, publication and merge are unobserved.",
+    "Repository and installation-state assertions were not independently verified."
+  ]
+}
