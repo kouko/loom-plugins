@@ -5,11 +5,11 @@ charter: 1.1
 Scope revision confirmed for implementation on 2026-11-05. Continue the same change with narrower delivery obligations; existing implementation and review evidence describe the earlier scope, not completion of this revision.
 
 ## Current State Evidence
-- Forward: `loom-code/hooks/session-start` :: "Use absolute paths for every local document location shared in conversation." is broader than document delivery.
-- Reverse: `loom-design/skills/capture-intent/references/conversation-paths.md` :: "Never use" imposes a global file-URI prohibition without a universal renderer contract.
-- Error: `loom-code/tests/test_conversation_document_paths.py` :: `test_emitted_code_guidance_and_direct_visualization_cover_document_paths` pins the old wording and file-URI prohibition; static checks establish instruction coverage, not host behavior.
-- Data: `loom-design/skills/capture-intent/SKILL.md` :: `references/conversation-paths.md` remains a bundled relative resource; portable references are not delivery targets.
-- Boundary: `loom-workflow/skills/loom-visualization/references/plain-language.md` :: "where local file links are supported" already separates supported links from plain paths; terminal wrapping remains outside this contract.
+- Forward: `loom-code/hooks/session-start@13ecd257` :: "When delivering a local document" begins the 100-word rule; seven other runtime locations contain the same normalized text.
+- Reverse: `loom-design/skills/capture-intent/SKILL.md@13ecd257` :: "Read references/conversation-paths.md" is the reference's only runtime consumer; inlining removes that extra read.
+- Error: `loom-code/tests/test_conversation_document_paths.py@13ecd257` :: `test_direct_design_document_delivery_carries_path_guidance` special-cases capture's reference instead of checking its inline body.
+- Data: `loom-design/skills/capture-intent/references/conversation-paths.md@13ecd257` holds only the delivery paragraph; removing it requires no adopting-project migration.
+- Boundary: `loom-workflow/skills/loom-visualization/references/plain-language.md@13ecd257` preserves stored paths and unknown-support fallback; the shortened text must retain both without promising terminal clickability.
 
 ## Delivery rule
 
@@ -31,7 +31,7 @@ Deliver local documents with actual absolute paths from the active worktree or e
 **W1-01 Shorten the rule and inline its single-use capture entry** after: W0-02 acceptance: 1, 2, 3, 4
 - Files: loom-code/hooks/session-start; loom-design/skills/; loom-workflow/skills/loom-visualization/{SKILL.md,references/plain-language.md}; loom-code/tests/test_conversation_document_paths.py; loom-code/CHANGELOG.md; loom-design/CHANGELOG.md; loom-workflow/CHANGELOG.md
 - Test: A1 positive: inline-entry-delivery; boundary: incidental-filename. A2 positive: explicit-path-link-text; boundary: unknown-support-plain-path. A3 positive: worktree-external-location; negative: fixed-root. A4 positive: portable-reference-preserved; negative: stored-path-rewrite.
-- Risk: agent-decided — preserve all obligations while reducing each copy from 100 to 60 words. Inline capture guidance, delete its single-consumer reference, and adapt existing tests without weakening coverage; keep current unmerged versions and update release descriptions only.
+- Risk: agent-decided — preserve all obligations while reducing each copy from 100 to 60 words. Inline capture guidance and delete its reference; tighten capture wording to retain its existing 3500-word body cap. Keep unmerged versions and existing coverage.
 
 ## Simplicity check
 - Inline the single-use reference and shorten the existing policy without a new loader — taken
@@ -49,3 +49,4 @@ Deliver local documents with actual absolute paths from the active worktree or e
 7. agent-decided — revised intent is committed and pinned. Run plan/intake checks before Build and replace previous acceptance and review evidence for the revised functional tree; do not carry earlier passing verdicts into this review.
 8. user-decided — 2026-11-06: adopt the 60-word rule and inline capture guidance, preserving all four Acceptance lines. This is the same review episode's second functional digest; prior host outputs remain historical evidence, not current execution proof.
 9. agent-decided — do not start the pending twelve authenticated external-model sessions or bypass their approval rejection. Use local mechanical checks and native independent verification; disclose that the shortened text has no newly verified external-host behavior.
+10. agent-decided — the inline candidate exposed capture's existing 3500-word body cap: 3554 words failed its unchanged test. Remove at least 54 words of redundant capture prose without deleting obligations, changing gates, or raising the cap.
