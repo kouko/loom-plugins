@@ -13,7 +13,7 @@ Scope revision confirmed for implementation on 2026-11-05. Continue the same cha
 
 ## Delivery rule
 
-When delivering a local document, provide its actual absolute location. Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) and an absolute target; otherwise show the full absolute path. Preserve portable references inside files.
+Deliver local documents with actual absolute paths from the active worktree or external location, including in copyable instructions. For known local Markdown support, use the document's project-relative path as link text (external files: basename) and absolute targets; otherwise show full absolute paths. Enclose targets with spaces in angle brackets. Preserve bundled references, stored relative paths, quoted examples and incidental filenames.
 
 ## Task DAG
 ### Wave 0
@@ -27,8 +27,14 @@ When delivering a local document, provide its actual absolute location. Where lo
 - Test: A1 positive: neutral-document-delivery; boundary: incidental-filename. A2 positive: known-supported-link; boundary: unknown-support-fallback. A3 positive: distinct-worktree-and-external-file; negative: wrong-target. A4 positive: stored-reference-unchanged; negative: unintended-rewrite. Run targeted regressions, the required package suite and independent acceptance review.
 - Risk: agent-decided — retain current unmerged release versions, update their descriptions, and refresh evidence after functional edits. Reuse existing fixtures for bounded host acceptance; exclude terminal clicks and broad experiments.
 
+### Wave 1 — approved wording and indirection reduction
+**W1-01 Shorten the rule and inline its single-use capture entry** after: W0-02 acceptance: 1, 2, 3, 4
+- Files: loom-code/hooks/session-start; loom-design/skills/; loom-workflow/skills/loom-visualization/{SKILL.md,references/plain-language.md}; loom-code/tests/test_conversation_document_paths.py; loom-code/CHANGELOG.md; loom-design/CHANGELOG.md; loom-workflow/CHANGELOG.md
+- Test: A1 positive: inline-entry-delivery; boundary: incidental-filename. A2 positive: explicit-path-link-text; boundary: unknown-support-plain-path. A3 positive: worktree-external-location; negative: fixed-root. A4 positive: portable-reference-preserved; negative: stored-path-rewrite.
+- Risk: agent-decided — preserve all obligations while reducing each copy from 100 to 60 words. Inline capture guidance, delete its single-consumer reference, and adapt existing tests without weakening coverage; keep current unmerged versions and update release descriptions only.
+
 ## Simplicity check
-- none found
+- Inline the single-use reference and shorten the existing policy without a new loader — taken
 
 ## Questions asked
 ① — what — 以上就是你要的範圍嗎？ 若不希望自動建立 PR，也可一併說明。
@@ -41,3 +47,5 @@ When delivering a local document, provide its actual absolute location. Where lo
 5. agent-decided — retain existing standalone plugin entry points to avoid a new cross-plugin dependency. Inline duplication is bounded; do not create a new policy service or new guide files.
 6. agent-decided — prior dogfood provides counterexamples and reusable fixtures, not universal reliability or causal improvement estimates. Terminal wrap/click behavior remains unverified and out of scope.
 7. agent-decided — revised intent is committed and pinned. Run plan/intake checks before Build and replace previous acceptance and review evidence for the revised functional tree; do not carry earlier passing verdicts into this review.
+8. user-decided — 2026-11-06: adopt the 60-word rule and inline capture guidance, preserving all four Acceptance lines. This is the same review episode's second functional digest; prior host outputs remain historical evidence, not current execution proof.
+9. agent-decided — do not start the pending twelve authenticated external-model sessions or bypass their approval rejection. Use local mechanical checks and native independent verification; disclose that the shortened text has no newly verified external-host behavior.
