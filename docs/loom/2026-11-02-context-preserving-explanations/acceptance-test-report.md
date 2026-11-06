@@ -1,6 +1,8 @@
 # 保留必要背景的使用者說明 — 試用了什麼、結果如何
 
-於 2026-11-06 在乾淨副本檢查 45870a1ae3439a9792545e7588dbca7e694ca4c2；行為結果沿用先前 09a58419 的測試。逐項做法與回覆：`docs/loom/2026-11-02-context-preserving-explanations/evidence/acceptance-test-evidence.md`。
+Tried on 2026-11-06, in a clean copy of the project at 45870a1ae3439a9792545e7588dbca7e694ca4c2.
+
+行為結果沿用先前 09a58419 的測試。逐項做法與回覆：`docs/loom/2026-11-02-context-preserving-explanations/evidence/acceptance-test-evidence.md`。
 
 ## 你要求的事，逐項確認
 
