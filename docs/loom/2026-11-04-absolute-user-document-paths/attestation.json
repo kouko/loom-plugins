@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-04-absolute-user-document-paths",
-  "content_digest": "e37383d642c19f1377bd37ef3564ed5d262e9699",
+  "content_digest": "afa410883a6dde16fc188f167870d3734a2298c4",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,37 +22,39 @@
     {
       "verdict": "PASS",
       "lens": "code",
+      "reviewer": "/root/delivery_review_code",
+      "vendor": "codex",
+      "model": "inherited",
       "reviewed_sha": "968b329bedeee164eefdb7ef8a7f32a714e94ab0",
-      "review_target_sha": "e00859bab6e2178391d889d93575b0d5e75b79e5",
+      "review_target_sha": "8ce5cd295594d0c84945d354958a7f578f3c58ff",
       "dimension_scores": {
-        "security": "PASS — shortening literal instruction text and inlining a bundled paragraph introduces no interpolation, credential handling, network call or new mutation surface",
-        "architecture": "PASS — the single-consumer capture reference is deleted and its policy is inline; existing plugin boundaries and entry points remain intact, with no new service or loader",
-        "correctness": "PASS — the shortened instruction retains actual active-worktree/external absolute locations, copyable instructions, known-support link labels and targets, fallback, spaces and preserved references; both capture paragraph contractions retain their obligations; this judges instruction correctness rather than newly verified host compliance",
-        "naming": "PASS — existing document-delivery names remain accurate and the shortened text uses clear path and location terms",
-        "tests": "PASS — independently reran all five relevant changed test modules: 149 passed with no skips; emitted hook/card checks and affirmative prose pins still exercise the instruction entry surfaces, with synthetic missing-clause and negation checks; current acceptance evidence explicitly limits runtime claims",
-        "refactoring": "PASS — inlining removes one single-use reference and the test special case; existing shared prose-pin utility remains reused, without a new abstraction or unrelated code cleanup",
-        "cross-task-coherence": "PASS — all eight delivery paragraphs agree with the unchanged Acceptance lines; integrated trunk confirmation guidance is preserved, release pins use code3.59.0/design2.22.0/workflow5.20.0, and the renewed report does not reuse historical works verdicts",
-        "external-surface-grounding": "N/A — this delta adds no API, SDK, MCP, CLI-flag or sibling-team contract call",
-        "principles-conformance": "PASS — no new blocking prose gate or cross-plugin file dependency is introduced; stored data and portable references remain protected and report rows 1–3 visibly remain partly rather than overstating incomplete host evidence",
+        "security": "PASS — the final delta adds a literal Markdown example, correctly escaped in the Bash body; no executable interpolation, credential handling or external call is added",
+        "architecture": "PASS — the same eight existing instruction surfaces retain their responsibilities and plugin boundaries; no loader, service or runtime configuration is introduced",
+        "correctness": "PASS — the concrete example accurately demonstrates the already-required angle-bracket target syntax without changing location, label, fallback or preservation obligations; raw engineering output uses that syntax and raw unknown output retains full absolute text; broader current host coverage remains explicitly partial",
+        "naming": "PASS — existing path and delivery terms remain accurate; example label doc.md and absolute spaced target express the intended formatting clearly",
+        "tests": "PASS — independently reran all five relevant changed test modules: 149 passed with no skips; existing emitted-context/card and affirmative prose tests remain applicable, and bounded current host evidence supplements rather than replaces them",
+        "refactoring": "PASS — the final repair changes one example in each established copy, preserving the prior inline simplification and avoiding a new formatter or abstraction",
+        "cross-task-coherence": "PASS — all eight surfaces and current changelog entries agree on the 62-word rule; report distinguishes exact clean-source testing, same-runtime-source host executions and older failed/historical samples, with Acceptance1–3 partly and Acceptance4 works",
+        "external-surface-grounding": "N/A — no product API, SDK, MCP, CLI-flag or sibling-team contract call is added by this final delta",
+        "principles-conformance": "PASS — the repair adds no blocking prose gate or data transformation; independent evidence preserves prior failures and current host limitations instead of inferring universal quality from mechanical checks",
         "architecture-conformance": "N/A — no repository ARCHITECTURE.md exists",
-        "deliberate-simplification": "PASS — the approved 60-word rule and removed reference reduce instruction size without new mechanisms; the evidence states the bounded native/local verification ceiling and the need for future host execution evidence",
-        "deletion-first": "PASS — the refactor takes the concrete smaller shape requested by the user: shorten existing copies, inline the sole capture consumer and delete its reference, preserving existing entry points and unchanged word-cap checks"
+        "deliberate-simplification": "PASS — one concrete example addresses the observed abstract-formatting omission, while the evidence states the ceiling of two bounded host samples and unverified design/Codex-engineering combinations",
+        "deletion-first": "PASS — the final shape is the minimal demonstrated repair: an example in the existing rule, without a new resolver, interceptor, compatibility probe, flag or procedure"
       },
       "findings": [],
       "notes": [
-        "Same review episode, Round2; prior findings were empty. Reviewed changes from 13ecd257 through e00859ba and their integration against current main968b329b. Both capture contractions preserve question-record fields/types, canonical carrier, verbatim handoff/receiver obligation and all carried-detail consent, scope, quotation and exclusion clauses.",
-        "Independent focused command used /Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest -q with the five changed modules: 149 passed in 0.73s, no skips. Manifest synchronization --check --all and git diff --check passed. Only report/evidence differ between tested source08c92ede and targete00859ba; no full suite or stored evidence probe was rerun.",
-        "Read current report/evidence and retained native-smoke/audit artifacts. Acceptance1–3 remain partly and Acceptance4 works; this verdict does not convert the guided native smoke or local emission checks into host activation/compliance proof. No external-model calls, trust writes or repository edits were made; historical attestation awaits regeneration."
-      ],
-      "reviewer": "/root/delivery_review_code",
-      "vendor": "codex",
-      "model": "inherited"
+        "Same bounded episode, Round3 terminal verification; prior findings were empty. Reviewed final functional delta3464abdb..8ce5cd29 and its ground truth. Cached reviewer/lenses contracts match the repository copies previously read. No counters or reviewer identity were reset.",
+        "Independent focused command used /Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest -q with the five relevant modules: 149 passed in 0.68s, no skips. Manifest synchronization --check --all and git diff --check passed. No full package suite, stored evidence probe or new authenticated model call was executed; repository artifacts were not edited.",
+        "Read current acceptance report/evidence, both raw final responses, native SessionStart success/payload, unknown prompt/captured policy and retained audits. Independently confirmed all three engineering targets exist and the reported source boundaries: d0e933c7..5306d04b changes only plan, then target changes only acceptance report/evidence. This PASS judges the reviewed artifact; Acceptance1–3 remain partly, with no universal host, automatic-trigger, causal-improvement, click/wrap or Codex engineering after-trust claim. Historical attestation remains non-current until regeneration."
+      ]
     },
     {
       "verdict": "PASS",
       "lens": "skill",
+      "vendor": "openai",
+      "model": "inherited",
       "reviewed_sha": "968b329bedeee164eefdb7ef8a7f32a714e94ab0",
-      "review_target_sha": "e00859bab6e2178391d889d93575b0d5e75b79e5",
+      "review_target_sha": "8ce5cd295594d0c84945d354958a7f578f3c58ff",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -64,20 +66,18 @@
       },
       "findings": [],
       "notes": [
-        "Round 2 of the same bounded review episode; prior findings were empty. Reviewed the shortening/inlining delta against the previous tree and integrated base, preserving the inherited confirmation-ready-template guidance. The two capture paragraph contractions retain question-record shape/types, verbatim handoff/receiver obligation, explicit-agreement rules, exclusions, quotation rules and separation from the intent.",
-        "Independently confirmed eight identical normalized delivery paragraphs of 60 words each, capture body 3459 words under its unchanged 3500 cap, and no remaining conversation-paths.md reference under loom-design. All five changed focused test modules passed: 149 passed in 0.64s, including release synchronization pins. The deleted single-consumer guide is replaced inline without a new loader or mechanism.",
-        "Current report/evidence explicitly mark Acceptance 1-3 partly and 4 works, distinguish the guided native smoke and mechanical coverage from host activation, and retain the historical Codex hook trust limitation. This prose verdict does not upgrade partial runtime evidence to full host acceptance. No full suite, adversarial program or external model call was run by this reviewer."
+        "Round 3, terminal verification in the same bounded episode and same reviewer identity; prior findings were empty. The final functional delta adds one concrete space-safe Markdown example to the existing eight delivery paragraphs. It preserves location, receiver-support fallback, copyable-instruction and portability obligations without a new mechanism. The example directly addresses the retained engineering formatting failure.",
+        "Independently checked all eight emitted/runtime paragraphs are byte-identical and 62 words each; capture body is 3461 words under the unchanged 3500 cap. All eight runtime files equal the raw host source bytes. Verified the d0e933c7-to-5306d04b difference is plan.md only. Independently reran all five focused changed test modules: 149 passed in 0.73s; no repository artifacts were edited and no full suite, separate adversarial program or external model was run.",
+        "Read current report/evidence and raw engineering/unknown final outputs, metadata and policy-loading records, plus the retained W1 malformed-link counterexample. Current evidence distinguishes actual native SessionStart delivery from explicit visualization invocation, retains the earlier failures, and marks Acceptance 1-3 partly and 4 works without claiming all-host activation, universal compliance, causal improvement or UI clicks. The prose review does not upgrade these bounded results to full runtime acceptance. Model routing remains inherited with no override; no exact inherited model identifier is independently exposed to this reviewer."
       ],
-      "reviewer": "/root/delivery_review_skill",
-      "vendor": "codex",
-      "model": "inherited"
+      "reviewer": "/root/delivery_review_skill"
     }
   ],
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "8ad07e13ae6c7bea932d83ccfc4fb4cc57afeb6e",
-  "tested_commit": "08c92ede3adbdec971fc3397db5e7d196cb3fc7a",
-  "reviewed_commit": "e00859bab6e2178391d889d93575b0d5e75b79e5",
+  "tested_commit": "5306d04b4d36c22b87f0fba190338095b2515a65",
+  "reviewed_commit": "8ce5cd295594d0c84945d354958a7f578f3c58ff",
   "acceptance_status": [
     {
       "acceptance": 1,
