@@ -2,7 +2,7 @@
 originator: kouko
 kind: engineering
 needs-design: no — 僅調整既有需求確認的技能指引與參考說明，未新增介面或工作流程。
-status: confirmed 2026-11-06 — 使用者確認可選說明格式並授權本次合併
+status: confirmed 2026-11-06 — 使用者確認可選說明格式，並授權本次合併
 publication: automatic — authorized 2026-11-06 by kouko
 intent_confirmed_sha: 44276606332c340a1d5fed8c8c4ab2b2900dac2a
 
