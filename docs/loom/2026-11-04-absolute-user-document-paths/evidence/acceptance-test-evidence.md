@@ -1,6 +1,48 @@
 # Concise document-delivery guidance — acceptance test evidence
 
-Tried on 2026-11-06, in a clean copy of the project at 08c92ede3adbdec971fc3397db5e7d196cb3fc7a.
+Tried on 2026-11-06, in a clean copy of the project at 5306d04b4d36c22b87f0fba190338095b2515a65.
+
+## Re-run on 2026-11-06, at 5306d04b4d36c22b87f0fba190338095b2515a65
+
+- Independent witness: /root/w2_acceptance; ordinary inherited profile, overrides=null. No implementation repairs, additional authenticated model calls, installed-plugin/config/trust edits, publication or merge. No user skip markers or dismissed important findings were supplied.
+- Clean export R=/private/tmp/loom-w2-accept-t2jmd2hh; `git archive 5306d04b4d36c22b87f0fba190338095b2515a65` extracted into R/bundle, outside source and outside the exercising fixture. R/source.json pins the exact tested commit. All four rows are re-tested, with no carried-over verdict.
+- Read the README Install section. Its marketplace install changes user installation, which is excluded here. Locally applicable setup: `python3 scripts/sync_codex_manifests.py --check --all` exits 0; `bash loom-code/hooks/session-start` exits 0 and emits valid JSON containing the current policy. Emission alone is not host activation. No clean marketplace installation or Antigravity/OpenCode execution was attempted.
+- Clean focused command: `/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest -q loom-code/tests/test_conversation_document_paths.py loom-code/tests/test_check_skill_crossrefs.py loom-design/tests/spec/test_capture_intent_contract.py` → **54 passed in 0.24s**. R/focused-tests.txt records the output. It executes five design entry points, code hook emission and both visualization surfaces, plus portable cross-references and the capture contract. These are prose/contract checks, not a model-compliance result.
+- R/audit.py and R/audit.json independently verify all eight current runtime paragraphs are 62 words and their entire runtime files equal the corresponding raw host source bytes. `git diff --name-only d0e933c744e86b3df0cefbbcc998abb7eda5d790 5306d04b4d36c22b87f0fba190338095b2515a65` names only this change's plan.md. The two raw host executions below ran at **d0e933c744e86b3df0cefbbcc998abb7eda5d790**, not at the canonical Tried-on commit; only local tests/native exercise ran at the exact canonical tree.
+- No full suite was run by this witness. Required blocking command for finalization remains `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. Parent-supplied Build result: 4133 passed, 6 skipped plus shell checks, /private/tmp/loom-w2-suite.log; adversarial 7 passed is likewise parent evidence, not this witness's execution or a semantic pass.
+
+### 1. Actual absolute deliveries; all delivery surfaces re-tested
+
+- Focused current-tree tests execute all eight delivery entry surfaces. Native exercise R/native-smoke.md was produced by this fresh witness after reading the actual exported guidance; it is one explicitly guided in-session sample, not a newly launched model or proof of automatic routing. A distinct real Git worktree named `worktree 工作`, a separate main checkout, CJK/spaced documents and a sibling external document were created; plugin sources remain in R/bundle. R/native-audit.json verifies actual delivered targets and unchanged fixture bytes.
+- Separately audited H=/private/tmp/loom-w2-host-checks. Raw engineering run: H/runs/engineering/{prompt.txt,launch-command.txt,metadata.json,stdout.jsonl,stderr.log,final.txt,claude-debug.log,native-session-start.json}; first-party Anthropic Claude `claude-sonnet-5-5`, medium, exit 0, 16.027 seconds, reported cost USD 0.0640023. Debug log lines 177–178 contain the parsed native SessionStart payload with the 62-word rule; stdout also records native hook output. This is actual runtime loading, distinct from source-cache-parity.json's 336-file equality assertion.
+- Engineering final delivers three actual absolute targets, with project-relative labels and external basename. Incidental filename mentions remain relative. Unknown run: H/runs/unknown/{prompt.txt,config.toml,launch-command.txt,metadata.json,stdout.jsonl,stderr.log,final.txt}; first-party OpenAI Codex `gpt-6.1-sol`, medium, exit 0, 18.507 seconds. Captured command arguments explicitly select provider `openai`; telemetry records model and medium effort. The prompt deliberately invokes loom-visualization; stdout items 1 and 3 read its actual candidate SKILL.md and plain-language reference before delivery. This supports explicit invocation, not automatic triggering.
+- Result: **partly**. All current entry contracts and bounded native output pass; two same-runtime-source host cases pass. No current 62-word design host execution, full activation benchmark or Codex engineering after-trust execution exists. Earlier 60-word design/workflow sessions cannot fill that gap.
+
+### 2. Known support versus unknown fallback
+
+- Engineering raw final uses three `[project-relative-or-basename](<absolute target>)` links, including spaces and CJK. Independently parsed all three targets in R/audit.json: each exists and belongs to the active worktree or exact sibling external location. The earlier missing-angle-brackets failure is not erased.
+- Unknown raw final displays full absolute text for both delivered files and makes no clickability promise. Its actual policy reads precede the final output; the earlier unobserved-load case is not reused as proof. Native exercise additionally tries both branches and a copyable `open` instruction using the full absolute worktree path.
+- Result: **partly**, because design and other host/entry combinations remain unexercised on 62-word runtime text. No terminal click/wrap behavior was tested, and it is out of scope.
+
+### 3. Active worktree and external identity
+
+- R/audit.json independently checks engineering's three actual targets, avoiding the separate main checkout; unknown's two absolute outputs equal existing files in its own worktree. R/native-audit.json confirms the new native targets exist, with the external target outside the worktree and no fixed developer prefix. Focused tests reject a fixed developer root; no realpath invocation or byte-reuse procedure is mandated.
+- Result: **partly**. Exercised identities are correct, but unexercised current host/entry combinations remain unverified.
+
+### 4. Portable references and existing data
+
+- Executed the cross-reference and capture contract tests in the 54-test focused run. Native before/after hashes match; Git status is empty. R/native-audit.json records original Markdown `docs/Review%20Notes.md` and structured main value `docs/操作 指南.md` unchanged after actual delivery.
+- Independently compared host before/after worktree, main and external hash maps in metadata; both cases unchanged. Existing files still match those snapshots. Runtime-file parity and the focused cross-reference tests cover all eight current surfaces without rewriting bundled/stored paths.
+- Result: **works** for executed portability and preservation contracts; the automated full suite remains a blocking check before acceptance, not a claimed witness run.
+
+### Historical W1/W2 boundary, costs and counterexamples retained
+
+- W1 source 3464abdb used the **60-word** rule. Exact raw history: /private/tmp/loom-short-host-checks-3464/runs/{engineering,design,workflow,unknown}; engineering final omits angle brackets around all three spaced targets despite observed policy delivery, so that case failed formatting. The unknown final is a correct fallback but its trajectory did not demonstrate candidate-policy loading. Design/workflow output conformance remains historical 60-word execution only.
+- W2 adds one concrete Markdown example, reaching 62 words, without a new interceptor or compatibility procedure. Two follow-up calls were explicitly authorized by the user's current `同意` after the prior auto-review rejection; H/proposal.json preserves exact payload/providers and temporary-write consent. No further external calls were made here. Earlier twelve-call rejection and initial two-call rejection remain historical, not pending authorization for these completed two calls.
+- After forming the above independent assessment, read H/blind-audit-{a,b}.json: both separately classify the two outputs and actual policy loads as works, while preserving unexercised branches and no benchmark/click/causality claims. Their verdicts do not upgrade the four broader Acceptance rows here.
+- No universal compliance/rate or causal-improvement claim; no installation update, trust update or merge. Canonical clean HEAD testing, same-runtime-source delegated host evidence, and older 60-/100-word evidence are separate claims.
+
+## Historical clean re-run at 08c92ede3adbdec971fc3397db5e7d196cb3fc7a — retained verbatim below
 
 ## Current clean setup and limits
 

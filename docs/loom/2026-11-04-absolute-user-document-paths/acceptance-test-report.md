@@ -1,15 +1,15 @@
 # 簡短的文件交付規則 — what I tried and what happened
 
-Tried on 2026-11-06, in a clean copy of the project at 08c92ede3adbdec971fc3397db5e7d196cb3fc7a. How I tried each line and what came back: `docs/loom/2026-11-04-absolute-user-document-paths/evidence/acceptance-test-evidence.md`.
+Tried on 2026-11-06, in a clean copy of the project at 5306d04b4d36c22b87f0fba190338095b2515a65. How I tried each line and what came back: `docs/loom/2026-11-04-absolute-user-document-paths/evidence/acceptance-test-evidence.md`.
 
 ## What you asked for, one line at a time
 
 | # | What you asked for | Verdict | What happened | Re-run |
 |---|---|---|---|---|
-| 1 | loom-code、loom-design 與 loom-workflow 交付本機文件時，提供該文件的實際絕對位置；一般敘述中的檔名、引用的原文與範例不必全部轉換。 | partly | 八處指引的測試及單一原生對話示範通過；縮短版在各主程式實際載入後的交付尚未重測。 | re-tested |
-| 2 | 已確認支援本機 Markdown 連結的環境使用相對路徑文字與絕對路徑目標，外部文件可用檔名；不支援或支援情況未知時顯示完整絕對路徑，不承諾可以點擊。 | partly | 示範分別產出正確連結與完整文字位置；這次沒有操作實際主程式或測試點擊。 | re-tested |
-| 3 | 交付位置指向當次專案、worktree 或專案外的實際文件；不寫死開發者目錄，不指定必須使用 realpath 或逐字比對程序。 | partly | 示範的三個位置皆指向隔離工作副本或外部現存文件，含中文與空格；尚無縮短版的跨主程式實測。 | re-tested |
-| 4 | 插件內部資源引用、版本控制內的文件連結與結構化資料中的相對路徑契約保持可攜性。 | works | 相關測試通過，示範未改寫既有引用或資料；完整自動測試會在接受變更前執行，失敗時阻止接受。 | re-tested |
+| 1 | loom-code、loom-design 與 loom-workflow 交付本機文件時，提供該文件的實際絕對位置；一般敘述中的檔名、引用的原文與範例不必全部轉換。 | partly | 八處指引的測試通過；Claude 工程入口與明確指定的 Codex 工作流程入口已實際載入同文規則並正確交付，但新版設計入口尚未實測。 | re-tested |
+| 2 | 已確認支援本機 Markdown 連結的環境使用相對路徑文字與絕對路徑目標，外部文件可用檔名；不支援或支援情況未知時顯示完整絕對路徑，不承諾可以點擊。 | partly | 兩例分別正確產出含空白的連結與完整文字位置；尚未涵蓋新版所有入口，不保證點擊或終端換行。 | re-tested |
+| 3 | 交付位置指向當次專案、worktree 或專案外的實際文件；不寫死開發者目錄，不指定必須使用 realpath 或逐字比對程序。 | partly | 兩例及本輪原生示範皆指向正確工作副本或外部現存文件；新版設計入口與 Codex 工程入口仍有未驗範圍。 | re-tested |
+| 4 | 插件內部資源引用、版本控制內的文件連結與結構化資料中的相對路徑契約保持可攜性。 | works | 相關測試通過，兩例與原生示範保留原引用及資料；完整自動測試會在接受變更前執行，失敗時阻止接受。 | re-tested |
 
 ## 對你既有的資料做了什麼 (what this did to data you already had)
 
@@ -17,15 +17,15 @@ Tried on 2026-11-06, in a clean copy of the project at 08c92ede3adbdec971fc3397d
 
 ## I decided for you
 
-- **有限驗證** — 本輪採用本機測試與單一原生對話示範；沒有啟動遭拒的外部模型執行，也沒有將舊版樣本當成縮短版通過。日後要確認主程式實際行為，仍需另行取得執行證據。
+- **有限驗證** — 本輪獨立執行乾淨副本的測試與原生示範，另核對你明確同意的兩例外部執行紀錄；那兩例測的是與本輪交付指引完全相同的前一提交，兩次提交只差計畫紀錄。未再啟動其他模型，也未把舊版設計樣本當成新版通過。
 - **保留實作選擇** — 指引留在既有入口，不新增共用服務；縮寫的提問紀錄與使用者已同意細節規則逐句核對後，未發現義務遺失。
 
 沒有收到被主代理駁回的重大審查問題。
 
 ## Steps you told me to skip
 
-沒有，未依你的指示跳過任何驗證步驟；實際主程式載入未重測，已如實列為限制。
+沒有，未依你的指示跳過任何驗證步驟；未涵蓋的主程式與入口已如實列為限制。
 
 ## Things I am not sure you want
 
-沒有新增產品選擇待決定。縮短版尚未取得新的實際主程式行為證據；先前 Codex 啟動指引信任限制仍未重驗。單一示範不代表每個入口或主程式均通過，也不保證點擊、終端換行或遵循率。
+沒有新增產品選擇待決定。兩例不能證明自動觸發、每個入口均通過或整體遵循率；Codex 工程入口在允許載入啟動指引後的行為仍未重驗。先前缺少空白路徑括號與未知支援未觀察到規則載入的紀錄仍保留。
