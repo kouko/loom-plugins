@@ -33,6 +33,11 @@ Deliver local documents with actual absolute paths from the active worktree or e
 - Test: A1 positive: inline-entry-delivery; boundary: incidental-filename. A2 positive: explicit-path-link-text; boundary: unknown-support-plain-path. A3 positive: worktree-external-location; negative: fixed-root. A4 positive: portable-reference-preserved; negative: stored-path-rewrite.
 - Risk: agent-decided — preserve all obligations while reducing each copy from 100 to 60 words. Inline capture guidance and delete its reference; tighten capture wording to retain its existing 3500-word body cap. Keep unmerged versions and existing coverage.
 
+**W1-02 Integrate the newer trunk and avoid consumed release versions** after: W1-01 acceptance: 1, 2, 3, 4
+- Files: README.md; loom-code/; loom-design/; loom-workflow/; scripts/sync_codex_manifests.py
+- Test: A1 positive: merged-guidance-coverage; boundary: capture-budget. A2 positive: supported-target-format; boundary: unknown-fallback. A3 positive: active-worktree; negative: fixed-root. A4 positive: merged-portable-references; negative: manifest-drift.
+- Risk: agent-decided — origin/main 968b329b consumed code3.58.0/design2.21.0 in PR132. Preserve both changes, release code3.59.0/design2.22.0 and workflow5.20.0, derive manifests and update existing pins; resolve only integration conflicts and inherited word-budget failures.
+
 ## Simplicity check
 - Inline the single-use reference and shorten the existing policy without a new loader — taken
 
@@ -50,3 +55,4 @@ Deliver local documents with actual absolute paths from the active worktree or e
 8. user-decided — 2026-11-06: adopt the 60-word rule and inline capture guidance, preserving all four Acceptance lines. This is the same review episode's second functional digest; prior host outputs remain historical evidence, not current execution proof.
 9. agent-decided — do not start the pending twelve authenticated external-model sessions or bypass their approval rejection. Use local mechanical checks and native independent verification; disclose that the shortened text has no newly verified external-host behavior.
 10. agent-decided — the inline candidate exposed capture's existing 3500-word body cap: 3554 words failed its unchanged test. Remove at least 54 words of redundant capture prose without deleting obligations, changing gates, or raising the cap.
+11. agent-decided — sync-trunk found metadata conflicts with newly merged PR132 at 968b329b before second-digest review. Integrate trunk inside Build and rerun checks; this does not reset the review episode or replace its confirmed delivery requirements.
