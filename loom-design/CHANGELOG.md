@@ -16,7 +16,7 @@ is the whole record. Their version numbers never continued here —
 
 - Deliver local documents from all five document-producing skills, including standalone invocations, with their actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
 - Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) with an absolute target; otherwise show the full absolute path. Preserve portable resource references and stored document paths.
-- Compact each delivery rule to 60 words and inline capture-intent's single-use reference without changing its obligations.
+- Keep each delivery rule at 62 words, including a space-safe Markdown target example, and inline capture-intent's single-use reference without changing its obligations.
 
 ## [2.21.0] — 2026-11-05 — clarify intent confirmations
 

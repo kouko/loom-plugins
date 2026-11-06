@@ -13,7 +13,7 @@ Scope revision confirmed for implementation on 2026-11-05. Continue the same cha
 
 ## Delivery rule
 
-Deliver local documents with actual absolute paths from the active worktree or external location, including in copyable instructions. For known local Markdown support, use the document's project-relative path as link text (external files: basename) and absolute targets; otherwise show full absolute paths. Enclose targets with spaces in angle brackets. Preserve bundled references, stored relative paths, quoted examples and incidental filenames.
+Deliver local documents with actual absolute paths from the active worktree or external location, including in copyable instructions. For known local Markdown support, use the document's project-relative path as link text (external files: basename) and absolute targets; otherwise show full absolute paths. Enclose targets with spaces in angle brackets: `[doc.md](</worktree name/doc.md>)`. Preserve bundled references, stored relative paths, quoted examples and incidental filenames.
 
 ## Task DAG
 ### Wave 0
@@ -46,7 +46,7 @@ Deliver local documents with actual absolute paths from the active worktree or e
 
 **W2-02 Revalidate the repaired delivery rule** after: W2-01 acceptance: 1, 2, 3, 4
 - Files: this change's acceptance report and evidence; generated attestation only through finalization.
-- Test: recheck Claude engineering and Codex unknown fallback, explicitly invoking visualization for observable loading. Preserve valid failures without resampling. Obtain bounded authorization for further authenticated executions; the approved four sessions are consumed.
+- Test: recheck Claude engineering and Codex unknown fallback, explicitly invoking visualization. Preserve valid failures without resampling. Agent scopes necessary revalidation under the user's continuation to two calls using the previously disclosed providers/payload; preserve prior four-session evidence.
 - Risk: agent-decided — third/final digest; retain reviewers and counters. Supplement evidence: /private/tmp/loom-short-host-checks-3464/report.md; engineering format fails, design/workflow conform, unknown lacks loading attribution. A remaining blocker ends the episode. No click/wrap claim, installed changes or merge.
 
 ## Simplicity check
@@ -68,3 +68,4 @@ Deliver local documents with actual absolute paths from the active worktree or e
 10. agent-decided — the inline candidate exposed capture's existing 3500-word body cap: 3554 words failed its unchanged test. Remove at least 54 words of redundant capture prose without deleting obligations, changing gates, or raising the cap.
 11. agent-decided — sync-trunk found metadata conflicts with newly merged PR132 at 968b329b before second-digest review. Integrate trunk inside Build and rerun checks; this does not reset the review episode or replace its confirmed delivery requirements.
 12. user-decided — 2026-11-06: continue iterating after dogfood. Preserve Acceptance and simplicity; add a syntax example. Risk 9 describes the earlier rejected twelve sessions, not the subsequently authorized four-session supplement.
+13. agent-decided — scope necessary revalidation to two calls with previously disclosed providers and payload under the user's continuation request. Preserve the original four sessions; do not expand to twelve sessions, merge or update installed plugins.

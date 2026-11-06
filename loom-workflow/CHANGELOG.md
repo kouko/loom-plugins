@@ -8,7 +8,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 - Route local document delivery from both visualization cards to shared guidance: provide the document's actual absolute location in the current project, worktree or external directory, without extending the rule to ordinary filename mentions or quoted examples.
 - Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) with an absolute target; otherwise show the full absolute path. Preserve repository links, structured relative paths and the separate HTML artifact link contract.
-- Compact both delivery rules to 60 words while retaining their location, link, fallback and portability obligations, including copyable instructions.
+- Keep both delivery rules at 62 words, including a space-safe Markdown target example, while retaining their location, link, fallback and portability obligations, including copyable instructions.
 
 ## [5.19.2] — 2026-11-03 — titled before/after flow illustrations
 
