@@ -143,8 +143,10 @@ solve the problem. No such engineering change is implemented by this experiment.
 - `evidence-check-pilot-data.json`: preregistration, all cases, exact prompts,
   raw CLI results/receipts, before/after artifacts, randomized packet/map,
   metrics, source guidance and the later witness context.
-- `probes/evidence-check-pilot-runner.py`: tools-disabled CLI runner used for the
-  registered cells. To reproduce in a new temporary directory, restore
+- `historical-evidence-check-pilot-runner.py.txt`: byte-preserved source of the
+  tools-disabled CLI runner used for the registered cells, originally recorded
+  as `probes/evidence-check-pilot-runner.py`. This is a historical research
+  runner, not a reusable adversarial test. To reproduce in a new temporary directory, restore
   `cases.json` and `protocol.json` from the archive and write
   `source_runtime_guidance` to `format.md`; never reuse output filenames.
   Reproduction is a new paid run, not necessary for reading this report.

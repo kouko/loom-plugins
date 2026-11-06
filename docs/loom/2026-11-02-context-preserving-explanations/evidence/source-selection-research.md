@@ -53,8 +53,10 @@ that flag. The supplied evidence was synthetic request and fixture text; the
 actor was not running the Loom skill or its actual hooks. Returned modelUsage
 matched the requested model in all four calls; CLI-estimated total cost was
 USD 0.0550077. The actual prompt, sources, selections and rendered text are
-retained in `source-selection-pilot-data.json`; the exact pilot scripts are in
-`probes/source-selection-run.py` and `probes/source-selection-render.py`.
+retained in `source-selection-pilot-data.json`; the byte-preserved historical
+pilot sources are `historical-source-selection-run.py.txt` and
+`historical-source-selection-render.py.txt`. They were originally recorded
+under `probes/` but are not reusable adversarial tests.
 
 | Case | Direct observation | Limit |
 |---|---|---|
