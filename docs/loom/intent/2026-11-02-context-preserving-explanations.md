@@ -2,8 +2,9 @@
 originator: kouko
 kind: engineering
 needs-design: no — 僅調整既有需求確認的技能指引與參考說明，未新增介面或工作流程。
-status: confirmed 2026-11-04 — 使用者同意以五段式說明、開頭補背景與目前方向繼續實作與迭代
-intent_confirmed_sha: b17df46048b362692343459c263b72afa04202de
+status: confirmed 2026-11-06 — 使用者確認可選說明格式並授權本次合併
+publication: automatic — authorized 2026-11-06 by kouko
+intent_confirmed_sha: 44276606332c340a1d5fed8c8c4ab2b2900dac2a
 
 ## Problem
 Loom 請使用者確認工作範圍時，說明可能只剩抽象的修復項目，缺少理解所需的背景。使用者必須追問名詞指的是什麼，並自行補回誰在做什麼、發生什麼問題及其影響，才能判斷是否符合自己的需求。原對話已出現要求詳細說明後，仍須追問「設定是什麼」的情況。
@@ -18,6 +19,7 @@ Loom 在需求確認點使用適合需求的清楚說明，可用五段組織背
 4. 需求確認仍只要求使用者確認需求與必要授權，不要求使用者評斷實作方案、規格品質或審查結論。
 
 ## Constraints
+- user-decided — 2026-11-06：使用者確認可選說明格式並以「合併吧」授權本次發布與合併，取代先前發布及合併暫停；其他範圍及既有檢查不變。
 - user-decided — 2026-11-05: Continue up to ten further Codex-only iterations with relaxed criteria: neither 100% correctness nor five fixed sections in every response is required. Do not invent or change material requirements, authorization or facts, or present missing information as confirmed. Compare against the released baseline, disclose observed material regressions, and use diagrams when they improve understanding. Preserve previous failures, the template-only scope, per-round call limit, and publication/merge holds. This supersedes the earlier fixed-five-sections requirement, not its historical record.
 - user-decided — 2026-11-05: Continue up to ten further iterations using Codex only. The change is limited to the explanation template and necessary examples; do not add a workflow, mechanism, model call, or substantial ongoing cost to this stage. Compare behavior and costs with the released baseline, accept a demonstrated relative improvement rather than requiring perfect accuracy, and preserve earlier attempts, failures and publication/merge holds.
 - user-decided — 2026-11-05：「如果修改前的實作也會有相同的問題產生的話 只要比修改前要好 也許就可以 release，有可能做到 100% 正確的成本太高了」；以與已發布原版的實際比較評估是否值得釋出，不再要求 100% 正確作為最低門檻。保留已確認的說明內容與授權要求，揭露剩餘錯誤和退步；此決定不授權發布或合併。
