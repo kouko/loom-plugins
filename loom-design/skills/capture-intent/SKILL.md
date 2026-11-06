@@ -9,7 +9,12 @@ version: 1.0.0
 
 Relative paths use this skill's directory.
 
-Read `references/conversation-paths.md` before sharing document locations.
+Deliver local documents with actual absolute paths from the active worktree or
+external location, including in copyable instructions. For known local Markdown
+support, use the document's project-relative path as link text (external files:
+basename) and absolute targets; otherwise show full absolute paths. Enclose
+targets with spaces in angle brackets. Preserve bundled references, stored
+relative paths, quoted examples and incidental filenames.
 
 Ask only until the wanted outcome is clear, write
 `docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
@@ -272,25 +277,21 @@ from repo evidence and record the reason; asking the user is a
 `user-judgment-leak` review failure.
 
 **Write down every question you asked**, as `{decision_point, text, type}`
-with `type` one of `what` / `behaviour` / `done` / `consequence`. The
-intent file has no section for this list, and inventing one would put a
-second schema next to the contract's. The canonical carrier is the plan's
-`## Questions asked` section. So **you pass the list forward in your hand-off
-message in step 5, verbatim**, and say that the receiving station must write
-it into that section. A question asked and not recorded makes the flow look
-quieter than it is.
+with `type` one of `what` / `behaviour` / `done` / `consequence`.
+The intent has no section for this list; adding one duplicates the contract's
+schema. Use the plan's `## Questions asked` section: **pass the list verbatim
+in step 5's hand-off message** and require the receiving station to write it
+there. Unrecorded questions make the flow look quieter than it is.
 
-**Keep a carried-details list** beside the question list: flow or reaction
-details the user stated or explicitly agreed to, before or during intake.
-Only an explicit yes from the user counts as agreement: a proposal left
-unanswered, deferred ("later"), or answered about something else is dropped.
-Never carry an agent proposal the user did not agree to, or detail you
-inferred. Carry only details about what the command or screen does or how it
-reacts. A remark about background or usage context, such as when or where the
-user runs it, is not a carried detail. Quote the user's words for each carried detail —
-for an agreed proposal, quote the proposal the user said yes to. Add no explanation, implication, or inference of your own. The list
-never enters the intent file; its sections stay unchanged
-and detailed flows stay out.
+**Keep a carried-details list** beside the questions: command or screen behaviour
+and reactions the user stated or explicitly agreed to before or during intake.
+Agreement requires the user's explicit yes: drop unanswered or deferred ("later")
+proposals and answers about something else. Never carry unagreed agent proposals
+or inferred details. Background and usage context, including when or where the
+user runs it, are not carried details. Quote the user's words for each detail;
+for agreed proposals, quote the proposal the user accepted. Add no explanation,
+implication, or inference. Keep the list and detailed flows outside the intent;
+its sections stay unchanged.
 
 <!-- gate: capture-intent.no-confirmed-without-restatement -->
 **No intent becomes `confirmed` without the restatement being answered.**

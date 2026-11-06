@@ -6,15 +6,12 @@ description: |
 
 # Loom Visualization
 
-When delivering a local document, provide its actual absolute location in the
-active project or worktree, including files outside that root. Where local
-Markdown links are known to be supported, use the document's project-relative
-path as the link text (or its filename for an external document) and an
-absolute target; wrap targets containing spaces in angle brackets. When support
-is unknown or unsupported, show the full absolute path. Preserve portable references inside files,
-including bundled resource references, stored relative paths and repository
-document links. Leave incidental filename mentions and quoted source examples
-unchanged; apply this rule to copyable document deliveries.
+Deliver local documents with actual absolute paths from the active worktree or
+external location, including in copyable instructions. For known local Markdown
+support, use the document's project-relative path as link text (external files:
+basename) and absolute targets; otherwise show full absolute paths. Enclose
+targets with spaces in angle brackets. Preserve bundled references, stored
+relative paths, quoted examples and incidental filenames.
 
 Pick the right shape and form for information in a coding-harness
 conversation, so the reader gets a table or a diagram that actually displays
