@@ -38,6 +38,17 @@ Deliver local documents with actual absolute paths from the active worktree or e
 - Test: A1 positive: merged-guidance-coverage; boundary: capture-budget. A2 positive: supported-target-format; boundary: unknown-fallback. A3 positive: active-worktree; negative: fixed-root. A4 positive: merged-portable-references; negative: manifest-drift.
 - Risk: agent-decided — origin/main 968b329b consumed code3.58.0/design2.21.0 in PR132. Preserve both changes, release code3.59.0/design2.22.0 and workflow5.20.0, derive manifests and update existing pins; resolve only integration conflicts and inherited word-budget failures.
 
+### Wave 2 — bounded dogfood repair
+**W2-01 Demonstrate the existing space-safe Markdown target syntax** after: W1-02 acceptance: 1, 2, 3, 4
+- Files: the same eight runtime delivery paragraphs; existing plugin changelog entries; this change's evidence and acceptance report.
+- Test: retain engineering RED: three spaced targets omit brackets despite policy delivery. Add one concrete example, rerun focused/package checks; prose-presence alone is not behavioral GREEN.
+- Risk: agent-decided — abstract-formatting omission. Searched all cumulative changed files and eight Acceptance surfaces: eight runtime instances, plus plan and positive test fixture. Preserve historical evidence and adversarial test; no interceptor or new procedure.
+
+**W2-02 Revalidate the repaired delivery rule** after: W2-01 acceptance: 1, 2, 3, 4
+- Files: this change's acceptance report and evidence; generated attestation only through finalization.
+- Test: recheck Claude engineering and Codex unknown fallback, explicitly invoking visualization for observable loading. Preserve valid failures without resampling. Obtain bounded authorization for further authenticated executions; the approved four sessions are consumed.
+- Risk: agent-decided — third/final digest; retain reviewers and counters. Supplement evidence: /private/tmp/loom-short-host-checks-3464/report.md; engineering format fails, design/workflow conform, unknown lacks loading attribution. A remaining blocker ends the episode. No click/wrap claim, installed changes or merge.
+
 ## Simplicity check
 - Inline the single-use reference and shorten the existing policy without a new loader — taken
 
@@ -56,3 +67,4 @@ Deliver local documents with actual absolute paths from the active worktree or e
 9. agent-decided — do not start the pending twelve authenticated external-model sessions or bypass their approval rejection. Use local mechanical checks and native independent verification; disclose that the shortened text has no newly verified external-host behavior.
 10. agent-decided — the inline candidate exposed capture's existing 3500-word body cap: 3554 words failed its unchanged test. Remove at least 54 words of redundant capture prose without deleting obligations, changing gates, or raising the cap.
 11. agent-decided — sync-trunk found metadata conflicts with newly merged PR132 at 968b329b before second-digest review. Integrate trunk inside Build and rerun checks; this does not reset the review episode or replace its confirmed delivery requirements.
+12. user-decided — 2026-11-06: continue iterating after dogfood. Preserve Acceptance and simplicity; add a syntax example. Risk 9 describes the earlier rejected twelve sessions, not the subsequently authorized four-session supplement.
