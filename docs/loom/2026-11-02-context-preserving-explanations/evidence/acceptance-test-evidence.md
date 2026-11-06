@@ -42,3 +42,14 @@ Previous report and evidence were preserved in `acceptance-report-pre-09a58419-h
 - 4: carried over — no confirmation or publication authorization instruction changed; the earlier hold and candidate-only default authorization controls remain applicable.
 - The original-versus-candidate control remains unverified after automatic review rejected sending the private baseline to OpenAI. No additional model call was made and neither the previous 7 starts nor the rejected pre-start request was erased.
 - The immediately preceding acceptance report is preserved in `acceptance-report-pre-45870a1-historical.md`; no prior observations were overwritten.
+
+## Re-run on 2026-11-06, at f81993851f9007d146643657c435e6e924f61041
+
+- A fresh local clone was checked out at this commit. The README's `python3 scripts/sync_codex_manifests.py --check --all` completed successfully; the user's actual Codex marketplace was not changed, so installed-plugin discovery remains unverified.
+- The three focused modules listed above passed again: 94 passed in the locked offline environment. The finalization command remains responsible for the complete suite.
+- The full diff from 45870a1 includes acceptance report/evidence bookkeeping and a punctuation-only change to the intent status. It does not change Acceptance, the confirmed hash, publication authorization, or any runtime path. The same four runtime files were checked byte-for-byte against the clean 45870a1 clone.
+- 1: carried over — report formatting and status punctuation do not change the instruction to explain background; the observed omissions remain.
+- 2: carried over — neither change affects available sections or treatment of missing facts.
+- 3: carried over — neither change affects diagrams, explanation detail or factual boundaries; prior graph and omissions remain.
+- 4: carried over — neither change affects confirmation, publication authorization, or the hold control.
+- No new model session was started. The earlier seven starts, pre-start automatic approval rejection, unverified baseline comparison and earlier behavioral observations remain recorded above. The immediately preceding canonical report remains retrievable at git commit `c7c10e46`.
