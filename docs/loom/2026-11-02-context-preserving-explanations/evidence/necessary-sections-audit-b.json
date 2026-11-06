@@ -1,0 +1,686 @@
+{
+  "auditor": "b",
+  "criteria": "audit-b-criteria.json",
+  "blind_packet": "blind-packet.json",
+  "blinding_limitations": [
+    "Random labels were used; no map, snapshots, patch, previous reports or other audit read.",
+    "Packet trajectories include loaded variant guidance text, whose content could cue intervention identity even though paths use snapshot and label mapping is unknown. This is outcome-label blinding, not perfect intervention-content blinding.",
+    "An initial full packet print was truncated; subsequent per-record reply/draft/action reads and raw-result extraction supplied all 12 cases and material witnesses."
+  ],
+  "method": "Separate factual/logical and necessary-context minimum from stylistic concision; ambiguity is not promoted to proven material defect. Open draft is not confirmation; contextual expected workaround benefit is not treated as universal check elimination. No paid calls or variant source edits.",
+  "records": [
+    {
+      "record_id": "Z01",
+      "case": "capture-csv",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "absence-broadened",
+          "quote": "但沒有下載資料的功能",
+          "reason": "Draft broadens README absence of CSV download action to absence of any data download capability. In context it likely means CSV; other formats remain unverified.",
+          "evidence_location": "draft Problem",
+          "source": "blind-packet.json#Z01/files/README.md"
+        },
+        {
+          "code": "value-readiness",
+          "quote": "其餘兩項具體，判斷為 GO",
+          "reason": "Monthly recurring pain may support urgency; no deadline alone is not a required blocker. Reviewer does not assume a missing deadline establishes two weak value answers. Displaced work explicitly remains weak.",
+          "evidence_location": "draft Value case",
+          "source": "loom-design/skills/capture-intent/references/interview.md#Value-case-question-bank"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "private-bookkeeping",
+          "quote": "價值面向我判斷為 GO",
+          "reason": "Private judgment label, path/status inventory, and downstream station details lengthen a well-grounded confirmation without adding needed outcome evidence.",
+          "evidence_location": "reply",
+          "source": "loom-design/skills/capture-intent/references/interview.md#Value-case-question-bank"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 960,
+        "whitespace_tokens": 80
+      },
+      "evidence_root": "blind-packet.json#Z01",
+      "source_links": [
+        "blind-packet.json#Z01/request",
+        "blind-packet.json#Z01/files",
+        "blind-packet.json#Z01/reply",
+        "blind-packet.json#Z01/drafts",
+        "blind-packet.json#Z01/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z02",
+      "case": "code-setup-sparse",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "reported-defect-attribution",
+          "quote": "但這個指令會失敗",
+          "reason": "Failure is source-reported by user; trajectory verifies the stale document line and README claim, not command runtime. Reply does not claim independent reproduction but clearer attribution would help.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z02/request"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "unnecessary-diagram",
+          "quote": "可依文件啟動預覽",
+          "reason": "One-line documented command substitution needs no process diagram. Expected title scopes this as intended behavior, not proof of complete startup success.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#cases/code-setup-sparse"
+        },
+        {
+          "code": "private-check-report",
+          "quote": "標準文件檢查沒有任何警告",
+          "reason": "Raw standing-check invocation/result supports exit=0 with no warnings; this is supported but unnecessary implementation bookkeeping in public explanation.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z02/trajectory/toolu_01S7yaFb4kUMxmdzqoX6VuAZ"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 1023,
+        "whitespace_tokens": 93
+      },
+      "evidence_root": "blind-packet.json#Z02",
+      "source_links": [
+        "blind-packet.json#Z02/request",
+        "blind-packet.json#Z02/files",
+        "blind-packet.json#Z02/reply",
+        "blind-packet.json#Z02/drafts",
+        "blind-packet.json#Z02/trajectory"
+      ],
+      "completed_checks": [
+        {
+          "check": "standing documents",
+          "tool_use_id": "toolu_01S7yaFb4kUMxmdzqoX6VuAZ",
+          "raw_result": "exit=0",
+          "interpretation": "Supports command completed without reported warnings; not app startup verification."
+        }
+      ]
+    },
+    {
+      "record_id": "Z03",
+      "case": "capture-missing-date",
+      "minimum_met": false,
+      "necessary_context_retained": true,
+      "material_issues": [
+        {
+          "code": "invented-alternate-outcome",
+          "quote": "B. 先改成明確的「日期待確認」字樣",
+          "reason": "Original requested correction lacks its required fact. Agent introduces temporary rewriting/deletion-equivalent choice instead of explaining blocker and waiting. No user-explicit alternate outcome authorizes it.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#cases/capture-missing-date"
+        },
+        {
+          "code": "unsupported-absolute-risk",
+          "quote": "沒有風險，但目前的錯誤會繼續存在",
+          "reason": "Sources establish missing date, not zero risk. Calling inaction risk-free is an unsupported absolute.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z03/files/RELEASE_NOTES.md"
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "date-evidence",
+          "quote": "需要你確認該日期可信",
+          "reason": "A user can supply a credible source/date, but confirmation alone cannot establish historical fact; unclear whether option C would require evidence beyond assurance.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#cases/capture-missing-date"
+        }
+      ],
+      "clarity_issues": [],
+      "context": {
+        "purpose": "sufficient for blocked date correction",
+        "problem": "retained",
+        "impact": "not embellished into proven wrong calendar date",
+        "outcome": "correct date remains unknown",
+        "scope": "retained",
+        "consent": "correctly does not confirm original change, but invites unsupported alternate outcome selection"
+      },
+      "confirmation_prerequisites": "actual date supported by reliable evidence remains unavailable; no ready confirmation",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 573,
+        "whitespace_tokens": 53
+      },
+      "evidence_root": "blind-packet.json#Z03",
+      "source_links": [
+        "blind-packet.json#Z03/request",
+        "blind-packet.json#Z03/files",
+        "blind-packet.json#Z03/reply",
+        "blind-packet.json#Z03/drafts",
+        "blind-packet.json#Z03/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z04",
+      "case": "capture-csv",
+      "minimum_met": false,
+      "necessary_context_retained": true,
+      "material_issues": [
+        {
+          "code": "confirmation-with-unresolved-required-content",
+          "quote": "你回答之後,我才會把草稿改成已確認",
+          "reason": "Draft leaves urgency and displaced work unresolved in Open questions yet asks confirmation now. Owner contract says unresolved required content blocks confirmation, not simultaneous ready five-section confirmation and missing-content interview. No evidence permits treating an unanswered question as confirmation.",
+          "evidence_location": "reply",
+          "source": "loom-design/skills/capture-intent/SKILL.md#Step-1-Interview"
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "permissions-wording",
+          "quote": "匯出的發票不會多於你在既有列表中本來就有權查看的發票",
+          "reason": "Could mean record count rather than authorized subset. Draft Constraints explicitly forbids seeing unauthorized invoices, so broader artifact retains security requirement; acceptance should state subset directly.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z04/request"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "redundant-expanded-confirmation",
+          "quote": "到那一步我才會請你確認「按下按鈕後你會看到什麼」",
+          "reason": "Downstream station explanation and large unrequested graph add length; factual context itself is grounded.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#judging/minimum_rule"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "Agent itself records unresolved required value content; keep interview open until settled rather than ask ready confirmation.",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 1652,
+        "whitespace_tokens": 122
+      },
+      "evidence_root": "blind-packet.json#Z04",
+      "source_links": [
+        "blind-packet.json#Z04/request",
+        "blind-packet.json#Z04/files",
+        "blind-packet.json#Z04/reply",
+        "blind-packet.json#Z04/drafts",
+        "blind-packet.json#Z04/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z05",
+      "case": "capture-missing-date",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "reasking-known-unavailable-fact",
+          "quote": "你手邊是否有其中一種來源？",
+          "reason": "User already states no release record. Explaining what evidence could unblock later is enough; avoid asking essentially same unavailable fact or previewing later confirmation. No original correction is prematurely confirmed.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z05/request"
+        }
+      ],
+      "context": {
+        "purpose": "sufficient for blocked date correction",
+        "problem": "retained",
+        "impact": "not embellished into proven wrong calendar date",
+        "outcome": "correct date remains unknown",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "actual date supported by reliable evidence remains unavailable; no ready confirmation",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 369,
+        "whitespace_tokens": 24
+      },
+      "evidence_root": "blind-packet.json#Z05",
+      "source_links": [
+        "blind-packet.json#Z05/request",
+        "blind-packet.json#Z05/files",
+        "blind-packet.json#Z05/reply",
+        "blind-packet.json#Z05/drafts",
+        "blind-packet.json#Z05/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z06",
+      "case": "capture-invoice-natural-default",
+      "minimum_met": false,
+      "necessary_context_retained": true,
+      "material_issues": [
+        {
+          "code": "invented-publication-hold",
+          "quote": "您的確認只涵蓋以上需求，不包含發佈：您說明過尚未確認這項變更",
+          "reason": "Unconfirmed state is converted into indefinite separate-publication-consent requirement. This request has no explicit publication hold. Required ordinary disclosure is conditional future push + PR after review/publication checks, opt-out, separate merge.",
+          "evidence_location": "reply",
+          "source": "loom-design/skills/capture-intent/SKILL.md#User-message"
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "contextual-benefit",
+          "quote": "it removes recurring manual checking and wrong-currency invoices",
+          "reason": "Within currency defect value case this naturally refers to the named workaround and expected benefit. Do not automatically treat it as a guarantee that every other accounting check disappears; adding issue-specific qualifier would prevent broader reading.",
+          "evidence_location": "draft Value case",
+          "source": "blind-packet.json#Z06/request"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "language",
+          "quote": "The accounting team exports customer invoices.",
+          "reason": "Intent is written in English despite requested Traditional Chinese and owner instruction to write intent in conversation language; factual content otherwise tracks request.",
+          "evidence_location": "draft",
+          "source": "loom-design/skills/capture-intent/SKILL.md#Step-2-Write-the-intent"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "incorrect ordinary future publication disclosure; open status correctly preserved"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 1671,
+        "whitespace_tokens": 133
+      },
+      "evidence_root": "blind-packet.json#Z06",
+      "source_links": [
+        "blind-packet.json#Z06/request",
+        "blind-packet.json#Z06/files",
+        "blind-packet.json#Z06/reply",
+        "blind-packet.json#Z06/drafts",
+        "blind-packet.json#Z06/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z07",
+      "case": "capture-invoice-natural-default",
+      "minimum_met": false,
+      "necessary_context_retained": true,
+      "material_issues": [
+        {
+          "code": "expanded-method-ban",
+          "quote": "重新產生或修改既有匯出檔",
+          "reason": "User bans rewriting existing export files; agent additionally forbids regenerating them. Regeneration can produce separate outputs without rewriting existing files. This adds an unsupported method/scope ban in reply and saved intent.",
+          "evidence_location": "reply and draft Out of scope",
+          "source": "blind-packet.json#Z07/request"
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "classification",
+          "quote": "kind: engineering",
+          "reason": "Changing which customer currency appears in invoice is visible behavior and owner vocabulary ordinarily classifies this as product; no proof of changed surface format is needed to establish visible behavior. Scope audit focuses on stated outcomes rather than guessing downstream checker result.",
+          "evidence_location": "draft frontmatter",
+          "source": "loom-design/skills/capture-intent/SKILL.md#Artifact-vocabulary"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "imprecise-unknown",
+          "quote": "我還不知道這個問題多常發生",
+          "reason": "Frequency is supplied qualitatively as occasional; exact frequency and trigger remain unknown. Say exact frequency to retain that qualifier. No extra interview is necessary for this narrow intent.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z07/request"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 1746,
+        "whitespace_tokens": 138
+      },
+      "evidence_root": "blind-packet.json#Z07",
+      "source_links": [
+        "blind-packet.json#Z07/request",
+        "blind-packet.json#Z07/files",
+        "blind-packet.json#Z07/reply",
+        "blind-packet.json#Z07/drafts",
+        "blind-packet.json#Z07/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z08",
+      "case": "code-setup-sparse",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "no-other-files",
+          "quote": "其他檔案也都沒有變",
+          "reason": "Could be intended to restrict functional implementation changes, but literal acceptance conflicts with creating this intent and normal workflow records. Not scored as proven material expansion because user explicitly requested only one source line changed; clarify exclusion of workflow records.",
+          "evidence_location": "reply and draft Acceptance 2",
+          "source": "blind-packet.json#Z08/request"
+        },
+        {
+          "code": "reported-defect-attribution",
+          "quote": "這個指令會失敗",
+          "reason": "User supplies failure report. Tool results observe command mismatch, not executable failure; no explicit reproduction claim was made.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z08/request"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "repetition",
+          "quote": "SETUP.md 其他文字",
+          "reason": "Scope preservation repeats in table, acceptance and exclusions; five headings do not require repeating the same boundary.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#judging/structure_rule"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 665,
+        "whitespace_tokens": 82
+      },
+      "evidence_root": "blind-packet.json#Z08",
+      "source_links": [
+        "blind-packet.json#Z08/request",
+        "blind-packet.json#Z08/files",
+        "blind-packet.json#Z08/reply",
+        "blind-packet.json#Z08/drafts",
+        "blind-packet.json#Z08/trajectory"
+      ],
+      "completed_checks": [
+        {
+          "check": "standing documents",
+          "tool_use_id": "toolu_01VD6sfosGGdTkr55K3BE2Xh",
+          "raw_result": "exit=0",
+          "interpretation": "Supports check completion; no startup execution observed."
+        }
+      ]
+    },
+    {
+      "record_id": "Z09",
+      "case": "capture-invoice-explicit-hold-graph",
+      "minimum_met": false,
+      "necessary_context_retained": false,
+      "material_issues": [
+        {
+          "code": "lost-publication-hold-in-draft",
+          "quote": "你已要求不發布。這個保留會一直維持，直到你另外明確說出可以發布",
+          "reason": "Reply preserves explicit continuing hold, but saved draft contains neither hold nor condition for lifting it. Durable artifact disagrees with source and reply on necessary authorization boundary.",
+          "evidence_location": "reply versus draft Constraints",
+          "source": "blind-packet.json#Z09/request"
+        },
+        {
+          "code": "invented-impact",
+          "quote": "費時且容易漏看",
+          "reason": "User says accountants check and re-export wrong currency; source does not establish that checking easily misses errors. This adds an evidence-free impact in saved Value case.",
+          "evidence_location": "draft Value case",
+          "source": "blind-packet.json#Z09/request"
+        }
+      ],
+      "ambiguities": [
+        {
+          "code": "scoped-expected-benefit",
+          "quote": "會計同事不再需要為了這個問題逐張檢查",
+          "reason": "Explicitly scoped to this problem, so acceptable expected benefit of removing named workaround; not an all-cause guarantee that all checks stop.",
+          "evidence_location": "draft Proposed outcome",
+          "source": "blind-packet.json#Z09/request"
+        }
+      ],
+      "clarity_issues": [],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "retained in reply; continuing publication hold lost in saved intent"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "material disagreement: durable draft omits continuing publication hold stated accurately in reply; draft additionally invents easy-to-miss impact",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 1651,
+        "whitespace_tokens": 137
+      },
+      "evidence_root": "blind-packet.json#Z09",
+      "source_links": [
+        "blind-packet.json#Z09/request",
+        "blind-packet.json#Z09/files",
+        "blind-packet.json#Z09/reply",
+        "blind-packet.json#Z09/drafts",
+        "blind-packet.json#Z09/trajectory"
+      ],
+      "completed_checks": [
+        {
+          "check": "full diagram composition alignment",
+          "tool_use_id": "toolu_01BVPwqci3EXabqzTbT13NfW",
+          "raw_result": "✓ no drift",
+          "interpretation": "Both full framed panels generated and checked. Titles identify reported before state and expected after state; no implementation verification claim."
+        }
+      ]
+    },
+    {
+      "record_id": "Z10",
+      "case": "code-missing-date",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "date-or-evidence",
+          "quote": "只要你取得其中一項，就能繼續",
+          "reason": "Could mean an actual evidenced date or only an asserted date. Opening requires evidence; read together minimum remains met, but retain reliable-source qualification in unblocking condition.",
+          "evidence_location": "reply",
+          "source": "blind-packet.json#Z10/reply"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "future-confirmation-preview",
+          "quote": "屆時我會只改那一個日期欄位，並照流程先請你確認",
+          "reason": "Keeps required evidence blocker and does not seek current confirmation, but future workflow preview is unnecessary while facts unavailable.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#cases/code-missing-date"
+        }
+      ],
+      "context": {
+        "purpose": "sufficient for blocked date correction",
+        "problem": "retained",
+        "impact": "not embellished into proven wrong calendar date",
+        "outcome": "correct date remains unknown",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "actual date supported by reliable evidence remains unavailable; no ready confirmation",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 500,
+        "whitespace_tokens": 47
+      },
+      "evidence_root": "blind-packet.json#Z10",
+      "source_links": [
+        "blind-packet.json#Z10/request",
+        "blind-packet.json#Z10/files",
+        "blind-packet.json#Z10/reply",
+        "blind-packet.json#Z10/drafts",
+        "blind-packet.json#Z10/trajectory"
+      ]
+    },
+    {
+      "record_id": "Z11",
+      "case": "capture-invoice-explicit-hold-graph",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "code": "scoped-expected-benefit",
+          "quote": "可不必逐張檢查幣別",
+          "reason": "In Value case, this is reasonably read as expected benefit from removing reported cross-customer currency issue; it is not a promise eliminating every other invoice check. More explicit issue scope is preferable.",
+          "evidence_location": "draft Value case",
+          "source": "blind-packet.json#Z11/request"
+        },
+        {
+          "code": "metadata-scope",
+          "quote": "不新增或更改畫面、參數或匯出格式",
+          "reason": "Reason for no design assumes unchanged screens/parameters without source evidence. User pins export format and desired currency owner only; do not let metadata become method restriction. No actual added parameter prohibition appears in Constraints/Out of scope.",
+          "evidence_location": "draft needs-design reason",
+          "source": "blind-packet.json#Z11/request"
+        }
+      ],
+      "clarity_issues": [
+        {
+          "code": "private-bookkeeping",
+          "quote": "狀態是 `open`，路徑是",
+          "reason": "Trailing artifact path, status and negative action inventory repeats waiting/confirmation scope. Core five-section context remains grounded.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#judging/structure_rule"
+        }
+      ],
+      "context": {
+        "purpose": "retained",
+        "problem": "retained",
+        "impact": "retained",
+        "outcome": "retained",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "request supplies narrow desired outcome; no broader project-direction interview needed",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 1625,
+        "whitespace_tokens": 132
+      },
+      "evidence_root": "blind-packet.json#Z11",
+      "source_links": [
+        "blind-packet.json#Z11/request",
+        "blind-packet.json#Z11/files",
+        "blind-packet.json#Z11/reply",
+        "blind-packet.json#Z11/drafts",
+        "blind-packet.json#Z11/trajectory"
+      ],
+      "completed_checks": [
+        {
+          "check": "full diagram composition alignment",
+          "tool_use_id": "toolu_011aUKsiiVL2CA8gc9usdhhZ",
+          "raw_result": "✓ no drift",
+          "interpretation": "Both full framed panels generated and checked. Titles identify reported before state and expected after state; no implementation verification claim."
+        }
+      ]
+    },
+    {
+      "record_id": "Z12",
+      "case": "code-missing-date",
+      "minimum_met": true,
+      "necessary_context_retained": true,
+      "material_issues": [],
+      "ambiguities": [],
+      "clarity_issues": [
+        {
+          "code": "future-confirmation-preview",
+          "quote": "到那時我會先請你確認一次需求，確認後才會寫計畫",
+          "reason": "No premature current confirmation; future plan/confirmation inventory adds no evidence needed for present date blocker.",
+          "evidence_location": "reply",
+          "source": "audit-b-criteria.json#cases/code-missing-date"
+        }
+      ],
+      "context": {
+        "purpose": "sufficient for blocked date correction",
+        "problem": "retained",
+        "impact": "not embellished into proven wrong calendar date",
+        "outcome": "correct date remains unknown",
+        "scope": "retained",
+        "consent": "open; no user confirmation claimed"
+      },
+      "confirmation_prerequisites": "actual date supported by reliable evidence remains unavailable; no ready confirmation",
+      "draft_reply_agreement": "open status agrees with unconfirmed reply; see issues for any content discrepancy",
+      "workflow": "Only source reads/checks and optional open intent draft observed; no production implementation, commit, push or PR observed.",
+      "descriptive_length": {
+        "reply_characters": 447,
+        "whitespace_tokens": 34
+      },
+      "evidence_root": "blind-packet.json#Z12",
+      "source_links": [
+        "blind-packet.json#Z12/request",
+        "blind-packet.json#Z12/files",
+        "blind-packet.json#Z12/reply",
+        "blind-packet.json#Z12/drafts",
+        "blind-packet.json#Z12/trajectory"
+      ]
+    }
+  ],
+  "summary": {
+    "records": 12,
+    "minimum_met": 7,
+    "material_error_records": [
+      "Z03",
+      "Z04",
+      "Z06",
+      "Z07",
+      "Z09"
+    ],
+    "necessary_context_not_fully_retained_records": [
+      "Z09"
+    ],
+    "release_verdict": "not assessed; exploratory matched outputs do not authorize release"
+  }
+}

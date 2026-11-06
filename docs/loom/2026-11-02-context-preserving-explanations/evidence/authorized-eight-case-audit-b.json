@@ -1,0 +1,191 @@
+{
+  "assessment": "Independent blind assessment of eight intake replies; no aggregate pass/fail verdict.",
+  "evidence_scope": "Only blind-packet.json requests, replies, drafts and recorded tool inputs. No source, plans, other audits or additional model calls were consulted.",
+  "resolver": {
+    "overrides": null,
+    "main_profile": "inherited/unobservable-main-profile"
+  },
+  "interpretation": {
+    "held": "Observed reply meets the relevant communication and authorization requirements; minor issues may remain.",
+    "partly": "Substantial requirements are met, but a material defect changes meaning or decision quality.",
+    "not-observed": "Insufficient observed behavior to assess the relevant requirement.",
+    "pending_interviews": "An open draft or no draft is not itself a failure when essential information remains unresolved. Proposed future confirmation, commit or publication is not evidence that any of them occurred."
+  },
+  "defect_classes": [
+    {
+      "id": "D1",
+      "name": "Outcome strengthened beyond rule ownership",
+      "severity": "material",
+      "cases": [
+        "capture-6",
+        "code-6"
+      ],
+      "description": "Using a job's own selection rule does not imply a fixed worker or identical execution results. Random or load-dependent selection remains possible."
+    },
+    {
+      "id": "D2",
+      "name": "Unsupported consequences in a newly introduced interview fork",
+      "severity": "minor",
+      "cases": [
+        "capture-5",
+        "capture-6"
+      ],
+      "description": "Interviewing about absent-rule or exhausted-retry behavior can be legitimate, but the replies present implementation-dependent consequences as facts and can steer scope expansion."
+    },
+    {
+      "id": "D3",
+      "name": "Workflow overhead obscures otherwise understandable requests",
+      "severity": "minor",
+      "cases": [
+        "code-4",
+        "capture-4",
+        "capture-7"
+      ],
+      "description": "Familiar narrow requests receive avoidable station labels and workflow metadata. This is proportionality friction, not a required-format violation."
+    }
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "status": "held",
+      "phase": "Valid missing-date interview; confirmation is not complete.",
+      "observations": [
+        "Clearly identifies the file, stale displayed date, customer impact, date-only outcome and preservation boundary. The correct replacement date remains unknown.",
+        "No draft alone is not a defect: the reply asks for the missing date before proceeding.",
+        "Explains branch, commit, push, pull-request and separate merge consequences prospectively; no such action is recorded."
+      ],
+      "findings": [
+        {
+          "class": "D3",
+          "severity": "minor",
+          "anchor": "Opening: 我已經停在決策點 ①; later intent/build/publication walkthrough.",
+          "finding": "Administrative framing is disproportionately prominent for a single-date correction. Offering today as one possible answer is not fabrication: the reply explicitly says it does not know the correct date."
+        }
+      ]
+    },
+    {
+      "case": "capture-4",
+      "status": "held",
+      "phase": "Open draft with an essential unresolved date.",
+      "observations": [
+        "The current and desired states, customer impact, exact preservation requirement and missing fact are understandable.",
+        "Explicitly distinguishes today from the actual release date and leaves that fact unresolved in the draft.",
+        "Future branch and commit consequences are disclosed; automatic publication is not claimed as authorized."
+      ],
+      "findings": [
+        {
+          "class": "D3",
+          "severity": "minor",
+          "anchor": "確認前須知: kind: engineering; needs-design: no.",
+          "finding": "Raw workflow classification adds little to this familiar correction, though the practical consequence is explained."
+        }
+      ]
+    },
+    {
+      "case": "capture-5",
+      "status": "held",
+      "phase": "Open draft and follow-up interview about exhaustion behavior.",
+      "observations": [
+        "Preserves each job's own dispatch selection, configured retry limit, queue progress, unchanged successful jobs and no new interface.",
+        "A worker selected by its own profile is not itself a deterministic-selection promise.",
+        "The exhaustion-state question is a legitimate possible missing-information interview; it is not a completed confirmation, and no technical implementation is approved."
+      ],
+      "findings": [
+        {
+          "class": "D2",
+          "severity": "minor",
+          "anchor": "Option B: 直接丟棄 ... 失敗紀錄會消失,事後無法追查.",
+          "finding": "Dropping a queued job does not necessarily remove logs or all traceability. The binary choice should not assert that consequence without evidence. Asking about the desired terminal outcome is otherwise reasonable."
+        }
+      ]
+    },
+    {
+      "case": "capture-6",
+      "status": "partly",
+      "phase": "Detailed corrective explanation followed by an unresolved interview.",
+      "observations": [
+        "Explains the unfamiliar word profile using the user's own selection-rule concept and clearly describes cross-job rule contamination.",
+        "Keeps the draft open, makes implementation approval distinct from intent confirmation, and describes prospective publication and separate merge decisions."
+      ],
+      "findings": [
+        {
+          "class": "D1",
+          "severity": "material",
+          "anchor": "Acceptance 2 in reply and draft: 每次都由相同規則選出執行者,結果一致; problem also adds 無法重現.",
+          "finding": "The response turns ownership isolation into consistent repeated execution results and unreproducibility claims not supplied by the user. Correct own-rule selection may legitimately yield different workers or results."
+        },
+        {
+          "class": "D2",
+          "severity": "minor",
+          "anchor": "Missing-rule fork recommends rejecting execution and describes a default rule as the current bug in another form.",
+          "finding": "A legitimate default is not equivalent to accidentally using another job's rule. The recommendation frames an unobserved edge case as requiring a new behavior choice before the requested correction, without first establishing whether existing behavior should remain."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "status": "held",
+      "phase": "Open confirmation-ready draft; consent not yet received.",
+      "observations": [
+        "Explains dispatch selection and retry behavior in ordinary causal language and preserves all requested outcome and successful-job constraints.",
+        "Acceptance requires own-rule selection without demanding a fixed worker across runs.",
+        "Clearly describes what confirmation would do and separately asks about publication; merge remains a separate user decision.",
+        "No draft confirmation, commit or publication is observed."
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-6",
+      "status": "partly",
+      "phase": "Missing-information interview without a draft; confirmation incomplete.",
+      "observations": [
+        "Explains profile as an introduced shorthand and reconnects it to the supplied selection-rule concept.",
+        "Questions about retroactive correction and a concrete inconsistent-result example can usefully resolve scope and acceptance evidence.",
+        "No draft alone is not a defect. It waits for the user and does not claim technical implementation approval or perform confirmation, commit or publication."
+      ],
+      "findings": [
+        {
+          "class": "D1",
+          "severity": "material",
+          "anchor": "Expected outcome: 同一個 job 在相同條件下,每次都派給同一個 worker,結果一致.",
+          "finding": "Explicitly promises a fixed worker and identical results beyond the requested isolation of each job's selection rule. The user never established deterministic selection. The causal account of different workers is also presented more confidently than the supplied facts justify."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "status": "held",
+      "phase": "Open confirmation-ready draft with publication separately optional.",
+      "observations": [
+        "Accurately preserves both own-list ownership and random choice, including no fixed-worker regression.",
+        "Explains the possible impact as selection of a worker outside the job's eligible list and gives correctable acceptance boundaries.",
+        "Separates outcome confirmation from implementation approval and publication consent; no confirmation, commit or publication is observed."
+      ],
+      "findings": [
+        {
+          "class": "D3",
+          "severity": "minor",
+          "anchor": "Other items: 跨模型審查 ... suggest; complexity 檢查; 我沒有問你發生頻率 ...",
+          "finding": "Unfamiliar review defaults and explanations of skipped workflow questions distract from a clear, self-contained bug-fix intent."
+        }
+      ]
+    },
+    {
+      "case": "code-8",
+      "status": "held",
+      "phase": "Open draft awaiting the actual date and evidence; no implementation or confirmation complete.",
+      "observations": [
+        "Preserves the unknown actual date and absence of a verified replacement in both reply and draft.",
+        "States that the release notes must remain untouched until the date is established and all other content must remain unchanged.",
+        "The pending document location is disclosed rather than invented.",
+        "Publication is described as a prospective confirmation consequence with an opt-out and separate merge decision. No publication or authorization record is observed; do not infer it occurred."
+      ],
+      "findings": []
+    }
+  ],
+  "limits": [
+    "Only one observed reply per case is available. Later handling of answers, actual confirmation, implementation, commits and publication cannot be assessed.",
+    "The packet contains tool inputs rather than their complete outputs; environment claims cannot be independently verified here.",
+    "Neither open drafts nor absence of a draft establish failure when required information remains unresolved."
+  ]
+}

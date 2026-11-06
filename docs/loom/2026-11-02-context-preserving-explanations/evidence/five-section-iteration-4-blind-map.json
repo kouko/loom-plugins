@@ -1,0 +1,26 @@
+{
+  "P01": {
+    "iteration": 4,
+    "key": "code-missing-date-candidate-r1"
+  },
+  "P02": {
+    "iteration": 4,
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1"
+  },
+  "P03": {
+    "iteration": 4,
+    "key": "capture-missing-date-candidate-r1"
+  },
+  "P04": {
+    "iteration": 3,
+    "key": "code-missing-date-candidate-r1"
+  },
+  "P05": {
+    "iteration": 3,
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1"
+  },
+  "P06": {
+    "iteration": 3,
+    "key": "capture-missing-date-candidate-r1"
+  }
+}

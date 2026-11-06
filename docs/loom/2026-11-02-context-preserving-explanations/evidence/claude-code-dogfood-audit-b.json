@@ -1,0 +1,184 @@
+{
+  "audit": "Independent blind content audit of six replies",
+  "evidence_boundary": "Only blind-packet.json was read. Tool entries show call inputs, not source contents or successful execution. Drafts and permission denials are evaluated only as supplied. No global dogfood pass is assigned.",
+  "case_assessments": [
+    {
+      "case": "capture-4-r2",
+      "status": "partly",
+      "stage": "Open draft; missing actual release date; valid incomplete interview, not completed confirmation.",
+      "held": [
+        "Identifies release notes, stale date, customer impact, desired correction and date-only scope.",
+        "Asks for the missing date, retains open status, and describes subsequent branch/commit/publication consequences without performing them.",
+        "Uses a freely chosen table; no technical implementation approval question."
+      ],
+      "limitations": [
+        "Suggests substituting today when the real release date is unknown (F2).",
+        "A simple date correction receives substantial workflow detail and unexplained publication terminology (F3)."
+      ]
+    },
+    {
+      "case": "capture-5-r2",
+      "status": "partly",
+      "stage": "Open draft awaiting confirmation.",
+      "held": [
+        "Preserves each job’s own worker selection, configured retry limit, queue impact, successful-job behavior and no-new-interface scope.",
+        "Uses user-supplied concepts without requiring technical implementation approval.",
+        "Explicitly leaves confirmation, commit and publication for later."
+      ],
+      "limitations": [
+        "Workflow vocabulary and unnecessary negative-status inventory reduce clarity and concision (F3)."
+      ],
+      "not_observed": [
+        "Actual confirmed-state transition, commit or publication."
+      ]
+    },
+    {
+      "case": "capture-6-r2",
+      "status": "partly",
+      "stage": "Open draft and outstanding outcome questions; valid incomplete interview.",
+      "held": [
+        "Corrects the unexplained profile term, defines worker selection and explains the original problem in detail.",
+        "Asks about missing-selection behavior and a concrete example rather than implementation approval.",
+        "Leaves intent open and does not branch or commit."
+      ],
+      "limitations": [
+        "Adds deterministic and cross-job independence guarantees broader than merely applying each job’s own rule (F1).",
+        "Publication consequences contain unexplained workflow terms (F3)."
+      ]
+    },
+    {
+      "case": "code-4-r2",
+      "status": "partly",
+      "stage": "No persisted draft; actual date still missing; valid incomplete interview.",
+      "held": [
+        "Clearly names the target line, customer impact, correct-date outcome and unchanged-other-content scope.",
+        "Does not guess the actual date; requests it before continuing.",
+        "Explains that confirmation precedes branch, intent commit and planning; no technical implementation approval question."
+      ],
+      "limitations": [
+        "Opening says intent is already confirmed while the rest says it awaits the user; workflow diagnostics distract from a familiar small request (F3)."
+      ],
+      "not_observed": [
+        "Draft persistence is not required to judge this unfinished interview valid. Tool-call inputs alone do not independently verify the source facts quoted by the reply."
+      ]
+    },
+    {
+      "case": "code-5-r2",
+      "status": "partly",
+      "stage": "Open draft awaiting confirmation; one Bash permission denial.",
+      "held": [
+        "Preserves the supplied behavior and constraints, including successful-job behavior and no new interface.",
+        "Explains confirmation and future publication while keeping draft open and uncommitted.",
+        "No technical implementation approval question."
+      ],
+      "limitations": [
+        "Unexplained publication and check terminology weakens the explanation of what confirmation authorizes (F3)."
+      ],
+      "environment_note": "The Bash denial is an execution-environment block, not a content-quality failure. It does not justify penalizing absence of those check results."
+    },
+    {
+      "case": "code-6-r2",
+      "status": "partly",
+      "stage": "No persisted draft; explanation and outcome question precede confirmation; valid incomplete interview.",
+      "held": [
+        "Acknowledges misuse of profile, defines job and worker selection and explains the correction in detail.",
+        "Asks whether to repair past results, with a clear leave-existing-results-alone default; this is an outcome/scope decision, not implementation approval.",
+        "Does not confirm, commit, publish or merge on the user’s behalf."
+      ],
+      "limitations": [
+        "Promises consistent selected workers across repetitions beyond the supplied own-rule requirement (F1).",
+        "Confirmation consequences use unexplained publication terms (F3)."
+      ],
+      "environment_note": "The denied Bash reference-read was followed by Read calls in the packet. The denial is not itself a content defect or proof the explanation failed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "medium",
+      "actionable_category": "Preserve requested scope and avoid stronger guarantees",
+      "cases": [
+        "capture-6-r2",
+        "code-6-r2"
+      ],
+      "excerpts": [
+        {
+          "case": "capture-6-r2",
+          "anchor": "reply / acceptance 2; also draft Acceptance 2",
+          "verbatim": "同一個工作在相同條件下重複執行,執行者選擇的結果一致。"
+        },
+        {
+          "case": "capture-6-r2",
+          "anchor": "reply / acceptance 3",
+          "verbatim": "改動某個工作的選擇規則,不會改變其他工作的執行者選擇。"
+        },
+        {
+          "case": "code-6-r2",
+          "anchor": "reply / acceptance 3",
+          "verbatim": "同一個 job 重複執行,選人的結果一致,不再因為別的 job 而變動。"
+        }
+      ],
+      "reason": "Using each job’s own selection rule does not establish that the rule always selects the same worker. A valid rule may depend on load, availability or randomness. Similarly, changing one job can affect shared worker availability without incorrectly using its rule for another job. The replies turn the requested fix into additional guarantees.",
+      "action": "Require each execution to apply its own job’s rule and prevent rule mix-ups. Describe inconsistent results only as the reported symptom; ask separately before adding deterministic or shared-resource isolation guarantees."
+    },
+    {
+      "id": "F2",
+      "severity": "medium",
+      "actionable_category": "Do not substitute an unknown fact",
+      "cases": [
+        "capture-4-r2"
+      ],
+      "excerpts": [
+        {
+          "case": "capture-4-r2",
+          "anchor": "reply / date recommendation",
+          "verbatim": "我的建議是用實際發佈日。你若不確定,就用今天。"
+        },
+        {
+          "case": "capture-4-r2",
+          "anchor": "reply / date choices",
+          "verbatim": "如果版本就是今天發佈,或你希望顯示今天,就選這個。"
+        }
+      ],
+      "reason": "The request is to correct the release date, not choose an attractive display date. Advising today solely because the actual date is unknown can replace one inaccurate date with another. No incorrect date has yet been written, and the draft remains open.",
+      "action": "Keep the actual release date unresolved until supplied or verified. Do not offer today as a fallback unless today is independently established as the release date."
+    },
+    {
+      "id": "F3",
+      "severity": "low",
+      "actionable_category": "Explain authorization in plain language and scale detail to the request",
+      "cases": [
+        "capture-4-r2",
+        "capture-5-r2",
+        "capture-6-r2",
+        "code-4-r2",
+        "code-5-r2",
+        "code-6-r2"
+      ],
+      "excerpts": [
+        {
+          "case": "capture-5-r2",
+          "anchor": "reply / confirmation consequences",
+          "verbatim": "這同時授權我在 closing-review 與發佈檢查通過後，做一般（非強制）push 並開 Ready PR。"
+        },
+        {
+          "case": "capture-5-r2",
+          "anchor": "reply / unnecessary status inventory",
+          "verbatim": "沒有需要記錄的待處理細節。\n- 本次沒有向你提出任何問題。"
+        },
+        {
+          "case": "code-4-r2",
+          "anchor": "reply / opening",
+          "verbatim": "我已經確認了意圖,但還沒有建立任何檔案,也沒有改動日期。這需要你確認。"
+        },
+        {
+          "case": "code-4-r2",
+          "anchor": "reply / current status",
+          "verbatim": "契約版本檢查通過(2.3.1)。"
+        }
+      ],
+      "reason": "The object and intended outcome are generally explained well, but authorization still relies on unexplained closing-review, push and Ready PR terminology. Small date requests carry disproportionate internal workflow detail. Code-4 also uses confirmed for the agent’s own understanding immediately before requesting the user’s confirmation; later text clarifies the intent is pending, so this is ambiguity, not evidence of an unauthorized state transition.",
+      "action": "Describe publication as uploading the branch and opening a reviewable change request, explaining any necessary shorthand once. Remove irrelevant diagnostic/version/status inventories and say the agent has understood or drafted the intent while user confirmation remains pending. Keep the fuller explanation in the explicit correction cases."
+    }
+  ]
+}

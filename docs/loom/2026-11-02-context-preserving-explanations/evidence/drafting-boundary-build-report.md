@@ -1,0 +1,20 @@
+# Drafting-boundary Build handoff
+
+Branch base: 55587449a0473697dee852f0dff69b240ef5d36e. Functional target: 765c50d667d41f9f770f853154161244ddbf2b3c; runtime correction: 4d4d12cdf56073482d8091306b022ddc747d4f05. Requirements unchanged; W1-01 continues the same failed obligation after technical design re-look. Publication remains held.
+
+Sync-trunk: up to date with origin/main 2a4c5a3142edd10f8b68787cd69fa06d1760c96c. Current candidate code3.58.0/design2.21.0; focused RED2 failed/3passed, then GREEN87passed. Capture body3500words. Source/derived manifests and cumulative diff whitespace checks passed.
+
+Complete package suite: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`, exit0. Code2706passed/2skipped; remaining configured pytest groups and shell checks passed. Log `/tmp/context-drafting-full-suite.log`. Initial sandbox attempt could not acquire the uv cache lock; rerun with cache access succeeded.
+
+Existing graduated adversarial program: `python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py -q`, 37passed. No adversary redispatch: existing program remains runnable and passing; no scope widening. No unresolved adversary findings. Changed functional paths: two first-confirmation owners, their regression tests, release metadata and retained plan; cumulative changes include integrated main's dispatch fix. See `git diff --name-only 55587449a...765c50d6` for exact inventory.
+
+Actual Claude Code rerun: same8 logical synthetic cases, same374 approved resource paths, explicit first-party claude-sonnet-5-5 medium. All8 completed, model keys matched, zero permission denials, zero fixture commits. CLI estimated cost$0.8960377, not invoice/hard cap. Only four existing resource files changed from the previous manifest; original bundle/transcripts preserved. Candidate bundle hashes match current two owner files. Inline plugin initialization reports code3.58/design2.21, and code-only raw tool output includes the early fidelity rule; this is not evidence of normal installed-plugin behavior.
+
+The original two detailed-correction replies still appear to add same-worker/result guarantees. They remain open findings for independent adjudication, never dismissed. Eight successful CLI executions do not establish eight behavioral passes. Blind packet and raw transcripts: `/tmp/loom-context-claude-dogfood-retest/`; both independent comparison audits now confirm a material code-only deterministic-worker guarantee; one also identifies a no-new-functions implementation restriction in the random-choice case. Both classify capture-6 as causal-isolation wording with minor ambiguity. Earlier acceptance report/attestation remain historical and cannot attest this content. Closing Review needs an independently renewed report and current verdicts; do not finalize or publish while material behavior failures remain.
+
+
+## Current stop
+
+The same task used its initial implementation plus two substantive continued attempts, retaining the failed obligation. The last observable inherited profile has no legal additional dispatch: the packaged after-execution resolver returned `execution-failed` / `no-legal-redispatch` with completed_redispatches2 after a conforming but behaviorally unsuccessful attempt. This is an implementation execution boundary, not a formal fourth review round or a successful acceptance result. No further source patch, new task identity, unverified model override, finalize-review or publication is performed. Old attestation remains historical and stale for current functional content.
+
+Both blind audits agree code-6 adds deterministic-worker strength. Both treat capture-6 as causally qualified isolation with ambiguous wording, correcting the orchestrator's initial two-material-case impression. AuditB additionally flags capture-7's prohibition on adding any function, beyond the supplied no-new-interface boundary. Independent acceptance evaluation and report replace the prior all-works conclusion. No material finding has been dismissed; differences in interpretation remain traceable in the separate reports.

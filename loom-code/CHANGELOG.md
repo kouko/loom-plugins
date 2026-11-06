@@ -1,10 +1,14 @@
 # Changelog
 
-## [3.58.0] — 2026-11-06 — keep local document delivery concise
+## [3.59.0] — 2026-11-06 — keep local document delivery concise
 
 - When delivering a local document, provide its actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
 - Where local Markdown links are known to be supported, use the document's project-relative path as the link text (or its filename for an external document) with an absolute target; otherwise show the full absolute path. Keep bundled references, stored relative paths and repository document links portable.
 - Compact the delivery rule to 60 words while retaining its location, link, fallback and portability obligations, including copyable instructions.
+
+## [3.58.0] — 2026-11-05 — clarify intent confirmations
+
+- Explain the requested change with necessary context, scope and confirmation consequences; keep the structure proportionate to the request.
 
 ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
 

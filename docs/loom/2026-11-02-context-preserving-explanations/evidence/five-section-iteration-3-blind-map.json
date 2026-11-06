@@ -1,0 +1,9 @@
+{
+  "T01": "code-missing-date-candidate-r1",
+  "T02": "capture-invoice-default-candidate-r1",
+  "T03": "capture-csv-candidate-r1",
+  "T04": "capture-missing-date-candidate-r1",
+  "T05": "capture-invoice-explicit-hold-graph-candidate-r1",
+  "T06": "code-setup-candidate-r1",
+  "T07": "capture-invoice-candidate-r1"
+}

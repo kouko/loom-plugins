@@ -1,0 +1,127 @@
+{
+  "auditor": "audit-a",
+  "original_audit_preserved": true,
+  "basis": [
+    "Frozen audit-a criteria, blind packet and format.md retained; only newly supplied adjudication-context.json added.",
+    "New context exposes original labels for challenged cases; this is post-blind adjudication, not a second blind audit.",
+    "No production edits, artifact repairs, paid calls, or actual unexecuted-action violation inferred."
+  ],
+  "decisions": [
+    {
+      "topic": "R4 narrow no-warning statement",
+      "records": [
+        "X16"
+      ],
+      "prior": "material: unsupported_completed_verification",
+      "classification": "reject_material_with_added_evidence",
+      "artifact_quote": "標準文件檢查沒有任何警告。",
+      "source_quotes": [
+        "actual_command: ... loom-python --repair standing docs/loom/intent/2026-11-04-correct-release-notes-date.md",
+        "(Bash completed with no output)",
+        "is_error: false"
+      ],
+      "reason": "Successful execution without warning output supports the narrow no-warning claim. It does not certify all correctness or other checks, but the artifact does not make that broader claim. Original packet lacked this witness, so initial conclusion was packet-unsupported rather than proof of a false statement. Withdraw material issue when assessing actual source trajectory.",
+      "methodological_implication": "Critic/judge packet evidence omission can cause false-positive corrections; do not attribute removal of supported wording to error correction."
+    },
+    {
+      "topic": "R1 placeholder factual rationale",
+      "records": [
+        "X09",
+        "X12"
+      ],
+      "prior": "ambiguity, not counted material",
+      "classification": "reject_material_but_confirm_bounded_factual_overgeneralization",
+      "artifact_quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實，也不是你要求的更正。",
+      "source_quotes": [
+        "真正的發行日期還不知道，你也沒有發行紀錄可以提供。",
+        "Release date: to be corrected",
+        "請只更正顯示的發行日期，其他文字不要動。"
+      ],
+      "reason": "Using an unverified calendar date as actual release date would fabricate a fact. TBD normally asserts unknown date rather than inventing a calendar date; categorically equating all temporary text with fabricated fact overgeneralizes. Nevertheless refusing to substitute TBD is correct because original user requested actual-date correction and has not chosen a placeholder outcome. This bounded faulty rationale neither changes the concrete decision nor imposes a different accepted outcome in R1, so it remains below the material floor. Do not generalize it into blocking N3, where placeholder is explicitly chosen."
+    },
+    {
+      "topic": "R3 GO versus open intent and missing displaced-work answer",
+      "records": [
+        "X08"
+      ],
+      "prior": "material: reply_draft_decision_conflict",
+      "classification": "downgrade_to_ambiguity",
+      "artifact_quote": "被擠壓的工作：尚未說明。GO（理由：直接省去每月重複的手動作業）。",
+      "source_quotes": [
+        "價值評估缺這個答案,所以意圖檔目前列在「未解問題」,狀態維持 `open`。",
+        "你回答並確認後,我才會做這些事:",
+        "status: open"
+      ],
+      "reason": "GO is a value judgment, not status confirmed or user authorization. An open draft can contain an initial favorable value judgment while an interview answer remains missing; the available contract does not conclusively prohibit provisional GO. The reply does not explicitly say value verdict is pending (X20 does). My original separate conflict issue overstated this as a definite decision contradiction. Ambiguity remains about whether GO is provisional, but it must not be counted as actual confirmation or an executed action."
+    },
+    {
+      "topic": "R3 ready confirmation while required question remains",
+      "records": [
+        "X08",
+        "X20"
+      ],
+      "prior": "material: premature_ready_confirmation",
+      "classification": "retain_material",
+      "artifact_quote": "你回覆「yes」,只代表確認上面的需求範圍,也就是問題、預期結果和五條驗收條件。",
+      "source_quotes": [
+        "我還需要你回答一個問題:這件事會擠掉哪些原本排定的工作?價值評估缺這個答案",
+        "Are the five ordered sections used only when required facts are settled, with missing facts kept in the interview?"
+      ],
+      "reason": "This finding concerns presenting ready confirmation while explicitly required facts remain unsettled. It does not rely on GO equaling confirmed, nor infer any actual unauthorized branch, commit or implementation. Parenthetical promise to wait for answer prevents executed action but does not remove current-phase ready-confirmation conflict under supplied contract."
+    },
+    {
+      "topic": "R5 expected benefit and draft exemption wording",
+      "records": [
+        "X03",
+        "X15"
+      ],
+      "prior": "ambiguity, no material issue",
+      "classification": "reject_material",
+      "artifact_quote": "受益者：會計團隊，不必再逐張檢查幣別、也不必因錯誤重新匯出。",
+      "source_quotes": [
+        "目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。",
+        "只修正「用誰的幣別設定」",
+        "下圖左邊是你回報的現象，右邊是預期結果。右邊尚未驗證。"
+      ],
+      "reason": "The source names a specific wrong-currency workaround. Draft benefit and expected-after diagram refer to removing that described workaround, not abolishing every invoice review or all possible re-export causes. No amount-equality guarantee is introduced. Reading this as a universal exemption from accounting controls would detach it from supplied scope and surrounding cause."
+    },
+    {
+      "topic": "R6 broader shorthand for expected benefit",
+      "records": [
+        "X06",
+        "X10"
+      ],
+      "prior": "ambiguity, no material issue",
+      "classification": "reject_material_with_contextual_ambiguity",
+      "artifact_quote": "受益者：會計團隊，可免去逐張檢查與重新匯出。",
+      "source_quotes": [
+        "會計同事因此必須逐張檢查，遇到錯誤再重新匯出。",
+        "範圍只有「使用誰的幣別設定」。",
+        "每張匯出的發票都使用該發票所屬客戶自己的幣別設定，不再沿用其他客戶的設定。"
+      ],
+      "reason": "R6 benefit shorthand omits 幣別, making an isolated universal reading possible. Read with immediate defect description and explicit narrow scope, it reasonably promises removal of the specifically described currency workaround. No source establishes an unconditional guarantee of never checking or re-exporting for other reasons, and this text need not be read as making one. Retain ambiguity rather than material categorical-elimination finding."
+    }
+  ],
+  "effect_on_original_counts": {
+    "withdraw_material_issues": [
+      "X16 unsupported_completed_verification",
+      "X08 reply_draft_decision_conflict"
+    ],
+    "new_material_issues": [],
+    "remaining_material_issue_count": 7,
+    "remaining_records_with_material_issues": [
+      "X08",
+      "X12",
+      "X13",
+      "X18",
+      "X20"
+    ],
+    "minimum_met_after_adjudication": 15,
+    "qualification": "Counts apply these adjudication decisions to original audit-a.json only. Other original findings remain unchanged, not independently reaudited here."
+  },
+  "limits": [
+    "R4 witness is supplied source evidence, not independently reexecuted.",
+    "Whether the broad R1 rationale should count as material depends on floor definition; I retain a consequentiality floor distinguishing faulty explanatory generalization from changed outcome, gate, or consent. The overgeneralization itself is acknowledged, not silently accepted.",
+    "Full value-case rules are absent beyond supplied runtime contract; this limits a definitive GO-state judgment."
+  ]
+}

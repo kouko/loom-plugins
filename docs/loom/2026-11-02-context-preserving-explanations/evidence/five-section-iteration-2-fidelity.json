@@ -1,0 +1,252 @@
+{
+  "audit_kind": "fresh-context output QA; not closing review",
+  "sources_read": [
+    "/tmp/loom-five-section-trial-i2/blind-packet.json",
+    "/Users/kouko/.herdr/worktrees/loom-plugins/keep-context-when-explan-to-user/docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+  ],
+  "scope_limits": [
+    "未讀 map、來源變體、先前審查或其他審查意見；未呼叫模型；未執行受審回覆中的指令。",
+    "以回覆及草稿的實際語義評估；不將未來條件式發布說明當作已推送或已違反授權的證據。",
+    "S01/S04/S05/S06 的 Do not implement or publish 位於此次 capture-and-stop 包裝；是否延續至後續確認後仍有效，僅憑文字無法定論。S02 則明確規定跨確認持續，S03 沒有發布 hold。",
+    "五段的本地語言同義標題有效；不另設長度、逐字標題或風格硬門檻。"
+  ],
+  "records": [
+    {
+      "id": "S01",
+      "ratings": {
+        "A1": "partly",
+        "A2": "held",
+        "A3": "partly",
+        "A4": "held"
+      },
+      "evidence": {
+        "A1": "背景用途與目前方向直接對應 README；偶爾、逐張檢查、自己的幣別、格式與舊檔限制均保留。新增對所有既有資料不變的保證超出來源。",
+        "A2": "五個語義角色依序完整；不是評斷實作的請求。",
+        "A3": "表格的修正後欄是預期結果，未宣稱已完成；只是不應新增更廣資料不變保證。",
+        "A4": "請確認需求與驗收，明說不是實作核准，合併另決；發布僅是未來條件式說明。"
+      },
+      "material_findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "classification": "unsupported outcome guarantee; broader than requested file preservation, not an explicit internal-method prohibition",
+          "quote": "這次不會改動你既有的資料或已匯出的檔案",
+          "source": "S01.reply / 範圍與驗收 / 不可逆動作的說明",
+          "basis_quote": "匯出格式維持不變，不要改寫既有匯出檔。",
+          "basis_source": "S01.request",
+          "reason": "來源限制既有匯出檔；未證明所有既有資料都不會改動。將沒有額外不可逆決策說成所有資料均不變，增加了保證。"
+        }
+      ],
+      "nits_or_ambiguities": [
+        {
+          "quote": "預設會在審查與發佈檢查都通過之後,自動推送這條分支",
+          "source": "S01.reply / 請確認",
+          "classification": "temporal authorization ambiguity",
+          "reason": "包裝的 Do not implement or publish 是否只限制目前階段不明；不據此認定持續 hold 被違反，也不反向認定永久發布已獲授權。"
+        },
+        {
+          "quote": "你沒有提供發生頻率",
+          "source": "S01.reply / 目前的問題與影響",
+          "classification": "minor wording precision",
+          "reason": "使用者提供了質性的「偶爾」，缺的是量化頻率。"
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "ratings": {
+        "A1": "partly",
+        "A2": "held",
+        "A3": "partly",
+        "A4": "held"
+      },
+      "evidence": {
+        "A1": "背景與方向有 README 依據；幣別來源與金額差異、格式、舊檔邊界保留，但增列未要求的輸入與保存方式限制。",
+        "A2": "五段語義角色依序成立，「修改內容」是合法同義標題。",
+        "A3": "流程圖有修改前與預期修改後外框標題，且明說尚未實作或驗證。新增方法邊界違反不增範圍要求。",
+        "A4": "明確說後續是也不解除發布保留，直到另外明確授權；未要求判斷實作品質。"
+      },
+      "material_findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "classification": "unrequested internal-method constraint",
+          "quote": "不改客戶幣別設定的輸入與保存方式。",
+          "source": "S02.reply / 範圍外",
+          "draft_quote": "Changes to how currency settings are entered or stored per customer.",
+          "draft_source": "S02.drafts[0].content / Out of scope",
+          "basis_quote": "請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。",
+          "basis_source": "S02.request",
+          "reason": "使用者限制要修正的外部結果，未禁止為達結果調整內部保存方式。這是明列範圍外的方法限制，不只是每張發票採用自己設定的結果敘述。"
+        }
+      ],
+      "nits_or_ambiguities": [
+        {
+          "quote": "不需逐張檢查",
+          "source": "S02.reply / 圖內預期修改後末節點",
+          "classification": "contextual shortening",
+          "reason": "上下文是幣別錯誤檢查，可理解成不必再為此錯誤逐張檢查；未足以認定免除所有會計檢查的 material guarantee。"
+        },
+        {
+          "quote": "也有把錯誤幣別的發票交付出去的風險",
+          "source": "S02.reply / 目前問題與影響",
+          "classification": "reasonable prospective inference",
+          "reason": "README 說明匯出交付，錯誤幣別來自使用者；說風險而未宣稱真的發生，不當作捏造事故。"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "ratings": {
+        "A1": "partly",
+        "A2": "held",
+        "A3": "partly",
+        "A4": "held"
+      },
+      "evidence": {
+        "A1": "背景、目前方向及故障來源有據；不同次金額不要求相同已保留。既有資料一概不改寫或刪除的說明比舊匯出檔限制更廣。",
+        "A2": "五段依序，標題同義有效。",
+        "A3": "不同順序與組合是驗證每張發票自己幣別的合理操作化，不新增金額一致要求。表格清楚比較現在與修正後。",
+        "A4": "預設控制沒有發布 hold；回覆揭示後續非強制推送與開 PR 的必要授權，且合併另決。未要求使用者評斷實作或審查品質。"
+      },
+      "material_findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "classification": "unsupported broad data-preservation assertion; not an explicit method prohibition",
+          "quote": "這項修正沒有涉及改寫或刪除既有資料",
+          "source": "S03.reply / 請確認",
+          "basis_quote": "匯出格式維持不變，不要改寫既有匯出檔。",
+          "basis_source": "S03.request",
+          "reason": "來源沒有涵蓋所有既有資料；尚未查明實作便以更廣事實保證推導沒有不可逆選項。"
+        }
+      ],
+      "nits_or_ambiguities": [
+        {
+          "quote": "不在範圍內：金額計算、金額是否一致",
+          "source": "S03.reply / 範圍與驗收",
+          "classification": "grounded outcome scope boundary",
+          "reason": "使用者明確只修正幣別來源且不要求金額相同。這裡未禁止為了修正來源調整必要內部機制，不把它自動等同保存方式禁令。"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "ratings": {
+        "A1": "held",
+        "A2": "held",
+        "A3": "held",
+        "A4": "held"
+      },
+      "evidence": {
+        "A1": "工具用途、方向及正確命令來自 README 和使用者；只改 SETUP.md 一行，未增加功能結果。SETUP.md 中舊命令確實是第 6 行。",
+        "A2": "五段語義完整依序，簡單需求保持可讀。",
+        "A3": "小表格未強塞流程圖，明標修正後預期；不另以重述次數或長度做失敗閘。",
+        "A4": "只確認範圍與後續必要授權，不核准實作細節，合併獨立。未有實際推送證據。"
+      },
+      "material_findings": [],
+      "nits_or_ambiguities": [
+        {
+          "quote": "審查和發布檢查都通過後，你的「是」也會授權我上傳這個分支",
+          "source": "S04.reply / 請確認",
+          "classification": "temporal authorization ambiguity",
+          "reason": "與包裝 Do not implement or publish 的延續範圍存在不確定性；現有證據只支持目前等待、沒有 commit 或分支，不能判定實際授權違反。"
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "ratings": {
+        "A1": "held",
+        "A2": "partly",
+        "A3": "held",
+        "A4": "held"
+      },
+      "evidence": {
+        "A1": "Harbor Notes 用途與方向直接來自 README；目前 placeholder、真正日期未知及待補依據均清楚，未造日期。",
+        "A2": "語義上仍是訪談，沒有要求先確認，也沒有填入未知日期；但在已知缺必要事實時仍輸出完整五段與編號驗收，未完全遵守「不能硬填五段」。不能把它描述成提前要求確認的失敗。",
+        "A3": "預期實際日期只是目標不是捏造日期；對照表清楚，未增加應用程式行為改動。",
+        "A4": "明說目前不能請確認，請補日期與依據或維持等待；這是取得必要事實，不是評斷品質。"
+      },
+      "material_findings": [],
+      "nits_or_ambiguities": [
+        {
+          "quote": "目前還不能請您確認,因為缺少一項事實:正確的發行日期。",
+          "source": "S05.reply / 請確認",
+          "classification": "interview retained, template applicability only partly satisfied",
+          "reason": "此句及補日期/等待兩選項構成真正訪談。完整五段與兩條驗收是模板過度套用，不能只因標題「請確認」判成要求確認；也不能忽略 intent 明文對缺事實時的例外。"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "ratings": {
+        "A1": "partly",
+        "A2": "held",
+        "A3": "partly",
+        "A4": "partly"
+      },
+      "evidence": {
+        "A1": "用途、方向、權限、客戶日期篩選、欄位順序和只讀結果有來源；「沒有任何下載」比 README 的沒有 CSV 動作更廣。",
+        "A2": "五段語義順序成立；段前狀態說明不是未授權的新章節，無規則要求第一字必須是標題。",
+        "A3": "表格合理；指定五欄可合理轉述為不新增其他欄位。沒有任何下載的量詞擴大，以及否定存在發布暫停紀錄，均不應作無據事實。",
+        "A4": "未要求使用者核准實作或審查品質；但用「沒有暫停紀錄」作授權前提，忽略當前包裝確有不要發布的指令，使確認後果說明失準；持續效力仍未知。"
+      },
+      "material_findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "classification": "unsupported quantifier expansion",
+          "quote": "目前列表沒有任何下載資料的動作。",
+          "source": "S06.reply / 目前的問題與影響",
+          "draft_quote": "目前發票列表沒有任何下載資料的方式。",
+          "draft_source": "S06.drafts[0].content / Problem",
+          "basis_quote": "The current list has no CSV download action.",
+          "basis_source": "S06.provided_files.README.md / Current direction",
+          "reason": "沒有 CSV 下載不能推出沒有任何下載方式；未提供的其他下載功能應保持未知。"
+        },
+        {
+          "acceptance": [
+            "A3",
+            "A4"
+          ],
+          "classification": "unsupported authorization premise, not proven publication breach",
+          "quote": "這個 repo 沒有暫停或退出發佈的紀錄,所以「是」也包含發佈授權",
+          "source": "S06.reply / 請確認 / 發佈",
+          "basis_quote": "Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.",
+          "basis_source": "S06.request / wrapper",
+          "reason": "當前請求已有不要發布的文字，不能斷言完全沒有暫停紀錄。它是否在確認後仍是持續 hold 未知；可指出授權前提不實，而非據此推論已發生推送或永久禁令遭突破。"
+        }
+      ],
+      "nits_or_ambiguities": [
+        {
+          "quote": "「被擠壓的工作」你沒有提到。我把它標為較弱的一項",
+          "source": "S06.reply / 範圍與驗收 / 補充兩點",
+          "classification": "unnecessary internal evaluation jargon",
+          "reason": "明說未知，沒有要求使用者評斷，故只是可刪的理解負擔，不升為 A4 material failure。"
+        },
+        {
+          "quote": "這五個欄位以外的欄位",
+          "source": "S06.reply / 不做的事",
+          "classification": "grounded output boundary",
+          "reason": "使用者逐一指定 CSV 欄位與順序；固定這五欄是自然結果範圍，非未要求的內部實作禁令。"
+        }
+      ]
+    }
+  ],
+  "bounded_edit_classes": [
+    "保留有來源的專案用途與方向；不要把 no CSV、偶爾等來源量詞擴成任何、完全沒有。",
+    "刪除未要求的輸入/保存方式禁令；將既有資料一概不變的保證收窄至已要求的既有匯出檔不改寫。",
+    "缺必要事實時保留簡短訪談、未知與下一步，不生成完整待確認框架；不得填入猜測日期。",
+    "發布說明依實際指令表達；明確 ongoing hold 要持續保留；含糊 current-stage 前綴不可擅自推定永久 hold 或不存在 hold，更不可否認已見的不要發布文字。",
+    "保留已成立的五段同義標題與適切圖表，不新增逐字標題、長度或風格限制。"
+  ]
+}

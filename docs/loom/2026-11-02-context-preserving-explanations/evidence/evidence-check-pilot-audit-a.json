@@ -1,0 +1,454 @@
+{
+  "auditor": "audit-a",
+  "methods": [
+    "Frozen evidence-only per-case criteria from audit-a-criteria.json, supplemented only by clearly authoritative missing-fact/interview/ready-confirmation/open-draft and changed-outcome constraints in format.md.",
+    "All 20 randomized records judged blind to original/revised map, checker feedback, original nonpacket artifacts, and other audit.",
+    "Reply and complete supplied drafts judged together. Supplied draft representations treated losslessly; draft prepared claims need no real write.",
+    "Actual completed verification claims distinguished from conditional future workflow. No actual mutations, paid CLI calls, or host skill execution inferred.",
+    "Ambiguous legitimate workflow mechanics are not marked unsupported solely because absent from user request. Layout/style tracked separately."
+  ],
+  "limits": [
+    "Public format.md runtime contract was available to new initial replay drafts, but not supplied verbatim to checker/reviser. This is an asymmetric-input methodological limitation; changed output still judged against the contract.",
+    "Full publication-default and station-routing contract not supplied in this judging packet; uncertainty retained rather than adjudicated by invented rules.",
+    "Retained cases are purposively enriched; no statistical generalization, native trigger reliability, end-to-end host execution, or matched-compute efficacy claim.",
+    "Substantive check-result assertion in X16 unsupported by the judging evidence; this establishes absence of evidentiary support, not proof the source native run never checked anything."
+  ],
+  "records": [
+    {
+      "record_id": "X01",
+      "case_id": "N2",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "符合篩選條件的全部發票，而不只是畫面當前這一頁",
+          "reason": "Clearly labeled interpretation submitted for correction, not an invented established requirement. Asking column/page scope is legitimate interview work.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "目前發票列表沒有 CSV 下載功能",
+        "你確認後，這份需求才算定案；在那之前我不會做任何實作。"
+      ]
+    },
+    {
+      "record_id": "X02",
+      "case_id": "R4",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "intent_confirmed_sha: <sha7>",
+          "reason": "Template placeholder alongside status: open is not evidence of actual confirmation; no runtime schema sufficient to grade placeholder usage.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "發行說明顯示的發行日期，從 2026-10-31 改成 2026-11-04。",
+        "你的「是」只確認上述需求。它不授權實作，也不授權推送或發佈。"
+      ]
+    },
+    {
+      "record_id": "X03",
+      "case_id": "R5",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "不需逐張檢查幣別",
+          "reason": "Shown in expected-after diagram, not a guarantee all accounting verification is unnecessary. Reasonable expected removal of this specific defect-driven burden; not counted as broad unsupported guarantee.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "每張發票都使用所屬客戶自己的幣別設定。",
+        "你先前要求不要發布，這個限制繼續有效，直到你另外明確解除。",
+        "要求不同次匯出的金額相同。"
+      ]
+    },
+    {
+      "record_id": "X04",
+      "case_id": "N1",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "至於是否還有其他取得資料的方式，目前沒有調查過，我不做假設。",
+        "CSV 要包含哪些欄位，目前沒有資料可以判斷。"
+      ]
+    },
+    {
+      "record_id": "X05",
+      "case_id": "N3",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "之後只能把 RELEASE_NOTES.md 日期欄位的內容改成「日期待確認」",
+          "reason": "Describes bounded post-confirmation change, not a claim of actual execution. Requested placeholder is explicitly chosen, so unknown real date does not block intent readiness.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "依你的決定，我會把這個欄位的內容從「to be corrected」改成「日期待確認」",
+        "確認前不實作、不發布、不合併。"
+      ]
+    },
+    {
+      "record_id": "X06",
+      "case_id": "R6",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "可免去逐張檢查與重新匯出",
+          "reason": "Value-case shorthand is read in context of defect-specific currency checks, rather than all possible accounting checks; no material issue counted.",
+          "counted_material": false
+        },
+        {
+          "exact_quote": "若之後要發布，需要你另外明確同意",
+          "reason": "More restrictive publication explanation than X10 may conflict with full workflow default, but the supplied contract does not fully specify default conditions. No material factual or consent violation established.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "範圍只有「使用誰的幣別設定」。",
+        "不同次匯出的金額可以不同，不要求相同。"
+      ]
+    },
+    {
+      "record_id": "X07",
+      "case_id": "N2",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "符合篩選條件的全部發票，而不只是畫面當前這一頁",
+          "reason": "Clearly labeled interpretation submitted for correction, not an invented established requirement. Asking column/page scope is legitimate interview work.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "目前發票列表沒有 CSV 下載功能",
+        "你確認後，這份需求才算定案；在那之前我不會做任何實作。"
+      ]
+    },
+    {
+      "record_id": "X08",
+      "case_id": "R3",
+      "material_issues": [
+        {
+          "kind": "unsupported_exclusivity",
+          "exact_quote": "要用的資料目前只能在列表上看。",
+          "source_evidence": "README establishes no CSV download action on the current list. Request establishes monthly manual copying. Neither rules out API or other viewing/access methods. format.md requires preserving source targets/absence qualifiers.",
+          "reason": "Broadens no-list-CSV into list-only data access; materially misstates present capabilities."
+        },
+        {
+          "kind": "premature_ready_confirmation",
+          "exact_quote": "你回覆「yes」,只代表確認上面的需求範圍,也就是問題、預期結果和五條驗收條件。",
+          "source_evidence": "Same reply explicitly says value assessment lacks displaced-work answer. format.md: required missing facts stay in interview; five ordered sections only when required facts settled.",
+          "reason": "Uses ready confirmation while itself declaring a required decision fact missing. Open draft is allowed; readiness, not draft existence, is the issue. No actual branch/commit execution alleged."
+        },
+        {
+          "kind": "reply_draft_decision_conflict",
+          "exact_quote": "價值評估缺這個答案,所以意圖檔目前列在「未解問題」,狀態維持 `open`。",
+          "source_evidence": "Draft Value case: 被擠壓的工作：尚未說明。GO（理由：直接省去每月重複的手動作業）。",
+          "reason": "Reply presents a required value question unresolved while draft already records GO. GO is not merely open draft status; decision and prerequisite treatment are inconsistent."
+        }
+      ],
+      "ambiguities": [
+        {
+          "exact_quote": "目前沒有 DESIGN.md 或 ui-flows 涵蓋此介面",
+          "reason": "Could be supported by complete fixture inventory, but absence evidence is incomplete for wider repository. Not material to requested CSV scope; do not treat legitimate spec routing as unsupported merely absent from request.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [
+        {
+          "exact_quote": "你回答並確認後,我才會做這些事:",
+          "reason": "Next-station/branch bookkeeping is unnecessary detail per format.md; tracked separately from material prerequisites."
+        }
+      ],
+      "whether_minimum_met": false,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X09",
+      "case_id": "R1",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "例如版本標籤、發布公告或提交時間。",
+          "reason": "Presented as possible records to verify, not proof commit date equals release date. Their reliability would need checking later; no false date supplied.",
+          "counted_material": false
+        },
+        {
+          "exact_quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實",
+          "reason": "TBD does not itself assert an invented calendar day. Overbroad rationale, but correct concrete decision not to substitute an unrequested placeholder; no material change of requested outcome counted.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [
+        {
+          "exact_quote": "我會先提出意圖，請你確認「這就是我要的」，確認之後才會撰寫計畫。",
+          "reason": "Future workflow preview while facts unavailable, disfavored by format.md. However explicitly conditioned on obtaining true date/evidence; no material reversal of prerequisites."
+        }
+      ],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "真正的發行日期還不知道，你也沒有發行紀錄可以提供。",
+        "目前無法更正：發行日期缺少可靠的來源"
+      ]
+    },
+    {
+      "record_id": "X10",
+      "case_id": "R6",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "可免去逐張檢查與重新匯出",
+          "reason": "Value-case shorthand is read in context of defect-specific currency checks, rather than all possible accounting checks; no material issue counted.",
+          "counted_material": false
+        },
+        {
+          "exact_quote": "等你確認後，審查與發布檢查都通過，才會以非強制方式推送分支並開一個待審的 pull request。",
+          "reason": "Hypothetical conditional workflow, not actual publication. format.md expressly references an applicable conditional publication default, but does not specify its full conditions. R6 contains no explicit persistent hold. Cannot establish unauthorized future publication from this evidence alone.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "範圍只有「使用誰的幣別設定」。",
+        "不同次匯出的金額可以不同，不要求相同。"
+      ]
+    },
+    {
+      "record_id": "X11",
+      "case_id": "N3",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "之後只能把 RELEASE_NOTES.md 日期欄位的內容改成「日期待確認」",
+          "reason": "Describes bounded post-confirmation change, not a claim of actual execution. Requested placeholder is explicitly chosen, so unknown real date does not block intent readiness.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "依你的決定，我會把這個欄位的內容從「to be corrected」改成「日期待確認」",
+        "確認前不實作、不發布、不合併。"
+      ]
+    },
+    {
+      "record_id": "X12",
+      "case_id": "R1",
+      "material_issues": [
+        {
+          "kind": "plan_before_confirmed_intent",
+          "exact_quote": "意圖和計畫會在那時一起建立，並請你確認「這就是我要的」。",
+          "source_evidence": "Same reply says 計畫必須以已確認的意圖為前提. User intent unconfirmed.",
+          "reason": "Hypothetical workflow creates plan with intent before obtaining confirmation, contradicting its own stated prerequisite. Not graded as an actual executed plan."
+        }
+      ],
+      "ambiguities": [
+        {
+          "exact_quote": "例如版本標籤、發布公告或提交時間。",
+          "reason": "Presented as possible records to verify, not proof commit date equals release date. Their reliability would need checking later; no false date supplied.",
+          "counted_material": false
+        },
+        {
+          "exact_quote": "我不能用今天的日期、「TBD」或其他暫代文字來填，因為那等於編造一個沒有依據的事實",
+          "reason": "TBD does not itself assert an invented calendar day. Overbroad rationale, but correct concrete decision not to substitute an unrequested placeholder; no material change of requested outcome counted.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        "真正的發行日期還不知道，你也沒有發行紀錄可以提供。",
+        "目前無法更正：發行日期缺少可靠的來源"
+      ]
+    },
+    {
+      "record_id": "X13",
+      "case_id": "R2",
+      "material_issues": [
+        {
+          "kind": "premature_ready_confirmation",
+          "exact_quote": "**請你確認：** 以上意圖是否正確描述你的需求？確認後，這份意圖會以「日期未知」的狀態保留，待日期查明後才能進入實作。",
+          "source_evidence": "Actual date and records unavailable; format.md says keep missing required facts in interview, state blocked and wait rather than a future confirmation preview.",
+          "reason": "An unchanged true-date correction is presented for confirmation despite unresolved essential value. Blocking only implementation does not satisfy required interview/confirmation order. Keeping an open draft alone would be acceptable."
+        }
+      ],
+      "ambiguities": [],
+      "style_layout_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X14",
+      "case_id": "N1",
+      "material_issues": [],
+      "ambiguities": [],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "至於是否還有其他取得資料的方式，目前沒有調查過，我不做假設。",
+        "CSV 要包含哪些欄位，目前沒有資料可以判斷。"
+      ]
+    },
+    {
+      "record_id": "X15",
+      "case_id": "R5",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "不需逐張檢查幣別",
+          "reason": "Shown in expected-after diagram, not a guarantee all accounting verification is unnecessary. Reasonable expected removal of this specific defect-driven burden; not counted as broad unsupported guarantee.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "每張發票都使用所屬客戶自己的幣別設定。",
+        "你先前要求不要發布，這個限制繼續有效，直到你另外明確解除。",
+        "要求不同次匯出的金額相同。"
+      ]
+    },
+    {
+      "record_id": "X16",
+      "case_id": "R4",
+      "material_issues": [
+        {
+          "kind": "unsupported_completed_verification",
+          "exact_quote": "標準文件檢查沒有任何警告。",
+          "source_evidence": "Only release-note/current-date/release-record evidence and supplied intent draft are available; no check result is supplied.",
+          "reason": "An actual completed successful check is asserted without supporting evidence. Unlike a prepared draft claim, this cannot be validated from the draft object. No claim is made that this replay actually ran a check."
+        }
+      ],
+      "ambiguities": [
+        {
+          "exact_quote": "intent_confirmed_sha: <sha7>",
+          "reason": "Template placeholder alongside status: open is not evidence of actual confirmation; no runtime schema sufficient to grade placeholder usage.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        "發行說明顯示的發行日期，從 2026-10-31 改成 2026-11-04。",
+        "你的「是」只確認上述需求。它不授權實作，也不授權推送或發佈。"
+      ]
+    },
+    {
+      "record_id": "X17",
+      "case_id": "N4",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "我查看了該檔案",
+          "reason": "The supplied evidence directly states RELEASE_NOTES.md content, so treated as evidence review shorthand, not a claim to an actual filesystem operation. Tools disabled; no executed action inferred.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "修改在取得可靠的發行日期證據之前會被擋住。",
+        "目前也沒有任何變更等待你確認。"
+      ]
+    },
+    {
+      "record_id": "X18",
+      "case_id": "R2",
+      "material_issues": [
+        {
+          "kind": "missing_fact_replaced_by_noop_confirmation",
+          "exact_quote": "你確認這個欄位在日期查明之前就維持現狀。",
+          "source_evidence": "Offered as alternative to actual date/record under 之後要繼續，需要其中一項; then 拿到其中一項後 ... 重述這項更正 ... 再請你確認. No user-chosen new outcome in R2.",
+          "reason": "Confirmation of no change supplies no actual date and cannot unlock original date correction. Contradicts evidence prerequisite and invents a replacement choice. Correct opening blocked explanation does not cure later alternative."
+        }
+      ],
+      "ambiguities": [],
+      "style_layout_issues": [],
+      "whether_minimum_met": false,
+      "positive_evidence": []
+    },
+    {
+      "record_id": "X19",
+      "case_id": "N4",
+      "material_issues": [],
+      "ambiguities": [
+        {
+          "exact_quote": "我查看了該檔案",
+          "reason": "The supplied evidence directly states RELEASE_NOTES.md content, so treated as evidence review shorthand, not a claim to an actual filesystem operation. Tools disabled; no executed action inferred.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [],
+      "whether_minimum_met": true,
+      "positive_evidence": [
+        "修改在取得可靠的發行日期證據之前會被擋住。",
+        "目前也沒有任何變更等待你確認。"
+      ]
+    },
+    {
+      "record_id": "X20",
+      "case_id": "R3",
+      "material_issues": [
+        {
+          "kind": "unsupported_exclusivity",
+          "exact_quote": "要用的資料目前只能在列表上看。",
+          "source_evidence": "README establishes no CSV download action on the current list. Request establishes monthly manual copying. Neither rules out API or other viewing/access methods. format.md requires preserving source targets/absence qualifiers.",
+          "reason": "Broadens no-list-CSV into list-only data access; materially misstates present capabilities."
+        },
+        {
+          "kind": "premature_ready_confirmation",
+          "exact_quote": "你回覆「yes」,只代表確認上面的需求範圍,也就是問題、預期結果和五條驗收條件。",
+          "source_evidence": "Same reply explicitly says value assessment lacks displaced-work answer. format.md: required missing facts stay in interview; five ordered sections only when required facts settled.",
+          "reason": "Uses ready confirmation while itself declaring a required decision fact missing. Open draft is allowed; readiness, not draft existence, is the issue. No actual branch/commit execution alleged."
+        }
+      ],
+      "ambiguities": [
+        {
+          "exact_quote": "目前沒有 DESIGN.md 或 ui-flows 涵蓋此介面",
+          "reason": "Could be supported by complete fixture inventory, but absence evidence is incomplete for wider repository. Not material to requested CSV scope; do not treat legitimate spec routing as unsupported merely absent from request.",
+          "counted_material": false
+        }
+      ],
+      "style_layout_issues": [
+        {
+          "exact_quote": "你回答並確認後,我才會做這些事:",
+          "reason": "Next-station/branch bookkeeping is unnecessary detail per format.md; tracked separately from material prerequisites."
+        }
+      ],
+      "whether_minimum_met": false,
+      "positive_evidence": [
+        "判定：待定（待回答被擠壓的工作後再決定）。"
+      ]
+    }
+  ],
+  "summary": {
+    "records": 20,
+    "minimum_met": 14,
+    "records_with_material_issue": [
+      "X08",
+      "X12",
+      "X13",
+      "X16",
+      "X18",
+      "X20"
+    ],
+    "material_issue_count": 9
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "auditor": "audit-a",
+  "iteration": "authorized additional iteration 2",
+  "input_only": "/tmp/loom-context-claude-dogfood-retest/blind-packet-i2.json",
+  "resolver": {
+    "profile": "ordinary inherited",
+    "overrides": null,
+    "exact_model_settings": "Not independently observable from packet"
+  },
+  "scope": "Blind output assessment of ten fresh intake replies with supplied drafts and tool-call records; not a branch review or formal closing-review gate verdict. No source, plans, other audits or additional model calls consulted.",
+  "limits": [
+    "No global dogfood pass is asserted.",
+    "Reference-reading flags are observations only, not pass/fail prerequisites.",
+    "No mandatory headings, word counts or arbitrary length cap applied. Brevity/proportionality is assessed as an explicit user outcome, separately from material fidelity.",
+    "Known missing facts and pending interviews are valid; absence of a draft or completed confirmation is not alone a failure.",
+    "No disclosure requirement imposed before an actual yes question. When yes is asked, assess informed same-yes publication, opt-out and separate merge.",
+    "Recorded calls show inspection/repair and open-draft writing, with no recorded confirmed-state write, git commit, push or PR creation. This is bounded packet evidence, not complete live-state attestation."
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Pending date interview plus conditional yes request; no draft is not itself a failure.",
+      "basis": "Explains document, old-date impact, date-only correction and acceptance; keeps replacement unknown. Asking yes includes branch publication, opt-out and separate merge consequences. No premature confirmation, commit or publication is recorded.",
+      "evidence": [
+        "今天是 2026-11-03,但最新版本不一定是今天發布的,所以我不會自己猜。",
+        "2. 檔案中除了該日期以外,沒有任何其他內容被改動。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "這是暫時性的 repo,有需要的話你也可以選擇不發布。確認並給我日期後,我才會把意圖寫成檔案,接著寫出簡短的計畫。",
+          "consequence": "The simple missing-date question is surrounded by repeated problem/outcome/acceptance/scope information, decision-point vocabulary and a temporary-repo/process aside. This adds avoidable reading burden before the one unresolved fact; necessary publication disclosure itself is not treated as extraneous."
+        }
+      ]
+    },
+    {
+      "case": "capture-4",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Valid pending date interview; no yes request yet.",
+      "basis": "Briefly explains wrong-date impact, asks for actual date or evidence, rejects today as a substitute and preserves every other content item. It appropriately defers confirmation rather than forcing a completed intent. Publication disclosure is not required before it actually asks for a yes.",
+      "evidence": [
+        "我還缺一項事實，無法確認要改成哪一天：**最新版本實際的發佈日期是哪天？**",
+        "拿到日期後，我會把範圍整理給你確認：只更正顯示的日期，其他內容都不動。目前還沒有建立意圖檔，也沒有修改任何檔案。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-5",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Preserves own-rule selection, configured retry cap, queue recovery, unchanged successful jobs and no-interface scope. Does not promise deterministic worker/results. Provides understandable confirmation scope, automatic publication, opt-out and separate merge, without asking implementation questions.",
+      "evidence": [
+        "1. 每個工作選工作者時，用的是自己的派送設定。",
+        "我沒有承諾同一個工作每次都選到同一個工作者，也沒有承諾每次結果完全相同。我只要求它用對自己的規則。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-6",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Detailed explanation with confirmation-ready open draft.",
+      "basis": "Directly answers the term question, maps its shorthand to the user-defined rule without claiming a verified code object, and explains ownership failure/outcome. The requested detailed explanation is proportionate. Explicitly avoids turning symptom inconsistency into deterministic execution. Publication consequences are clear and the draft is open.",
+      "evidence": [
+        "它指的就是你說的**執行者選擇規則**，也就是決定每個工作由誰來執行的那條規則。",
+        "| 不承諾的事 | 光是改成使用自己的規則，並不保證同一個工作每次都選到同一個執行者，也不保證每次結果完全相同。你回報的不一致只是現象。我沒有把「結果必定相同」當成目標。 |"
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-5",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Defines worker-selection rule by its purpose and preserves both faults, cap, queue effect, successful jobs and no-interface scope. Distinguishes correct-rule use from guaranteed worker/results, and explains same-yes publication, opt-out and separate merge. No premature state change is shown.",
+      "evidence": [
+        "- **問題:** 背景工作有時會借用別的工作的「worker 選擇規則」,也就是決定由誰來執行的規則。失敗的工作還會無限重試,擋住佇列,後面的工作都跑不了。",
+        "- **不承諾的部分:** 我沒有承諾同一個工作每次都選到同一個 worker,或得到相同結果。你要的只是「用自己的規則」。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-6",
+      "assessment": "partly",
+      "material_fidelity": "partly",
+      "proportionality_and_jargon": "held",
+      "stage": "Detailed re-explanation and pending interview; no draft or completed confirmation is required yet.",
+      "basis": "Explains profile and the user-defined rule, ownership problem and intended isolation, and discloses publication/opt-out/separate merge. However, the interview introduces a new same-worker quality target rather than limiting clarification to the reported ownership failure. It is expressly provisional and questioned, so this is not evidence that an unapproved deterministic requirement was finalized.",
+      "evidence": [
+        "3. 同一個工作在相同條件下重複執行,選出的工作者一致。",
+        "2. **第 3 條「結果一致」是你要的嗎?** 如果你說的不一致只是「用錯規則」造成的,我會刪掉這條。"
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "dimension": "new obligation / unnecessary quality decision",
+          "quote": "3. 同一個工作在相同條件下重複執行,選出的工作者一致。",
+          "consequence": "Job-owned rule isolation does not imply the rule always selects the same worker. Asking the user whether to retain this extra proposed acceptance criterion creates an unnecessary quality decision and risks expanding scope to determinism. The later invitation to delete it mitigates finalization risk but does not make the extra decision necessary. A legitimate pending interview about observed examples or unknown cause remains valid."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft.",
+      "basis": "Preserves random own-list selection, list-membership acceptance and no public interface addition. Correctly distinguishes interfaces/public functions from internal helper implementation. The compact classification aside does not materially interfere with the bounded request. Same-yes publication, opt-out and separate merge are stated.",
+      "evidence": [
+        "- **目標:** 每個工作一律只從自己的清單中隨機挑選。隨機行為不變,也不新增任何介面。",
+        "  3. 沒有新增對外介面(選項、設定、指令或公開函式)。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-8",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Scope confirmation request with missing date/evidence/file facts; no draft itself is not a failure.",
+      "basis": "Explicitly preserves unknown date and no unverified replacement; all other content stays unchanged. It distinguishes approving intent from permitting a date edit before verification and asks no implementation decision. Publication, opt-out and separate merge are disclosed. More structured than necessary, but explanations remain about the concrete constraints and unknown facts rather than an internal workflow inventory.",
+      "evidence": [
+        "3. 日期若還沒查證,發行說明就維持原樣。我不會猜日期,也不會填入暫代值。",
+        "- 日期還沒確定之前,任何改動都會停在計畫階段,不會動到發行說明。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-h1",
+      "assessment": "held",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "held",
+      "stage": "Confirmation-ready open draft; explanation of confirmation scope requested.",
+      "basis": "Preserves customer currency ownership, accounting context, unchanged format and no rewrite of existing exports. The phrase about results being the same is qualified by correct own-customer currency, not a promise of identical invoice amounts. Explicitly allows amounts to differ. The requested confirmation explanation is detailed but relevant; same-yes publication, opt-out, separate merge and no implementation approval are understandable.",
+      "evidence": [
+        "**驗收:** 匯出的發票顯示該客戶自己設定的幣別。即使同一次匯出裡,前一位客戶的幣別不同,結果也一樣。",
+        "- 只修正「用誰的設定」。發票金額在不同次匯出之間可以不同,我不會要求金額一致。",
+        "這個「是」只確認要達成的結果,不代表你同意任何實作方式。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-h2",
+      "assessment": "partly",
+      "material_fidelity": "held",
+      "proportionality_and_jargon": "partly",
+      "stage": "Confirmation-ready open documentation draft.",
+      "basis": "Preserves verified orbit start and command-line-only scope, including byte-for-byte preservation elsewhere. Does not reopen the verified fact, and stops for confirmation. Informs automatic branch publication, opt-out and separate merge. Unnecessary internal checking inventory weakens the explicit brief-response acceptance.",
+      "evidence": [
+        "**期望結果**:指南改成叫客戶執行 `orbit start`。這個指令是你已經驗證過的。",
+        "- 只改那一行指令。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "dimension": "proportionality/jargon",
+          "quote": "- **已確認的檢查**:contract 版本檢查通過,standing documents 檢查通過,沒有警告。",
+          "consequence": "For a verified one-command correction, the reply adds unexplained contract/standing-document diagnostics, classification and next-station mechanics after already giving the scope and authorization. These details require extra reading without helping the user decide the requested correction. Necessary publication disclosure is not the source of this finding."
+        }
+      ]
+    }
+  ]
+}

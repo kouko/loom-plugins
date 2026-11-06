@@ -1,0 +1,346 @@
+{
+  "round": 2,
+  "source_commit": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+  "overlay": [
+    {
+      "path": "loom-code/skills/write-plan/SKILL.md",
+      "base_runtime_sha256": "a66dded2f8672ef67612f1b4d9e5943487a7e540b53890e85a78203a43fb267e",
+      "candidate_sha256": "c18b05c9b66b28a28f46a37d8bf4b1b7a393fc78ac78dbe5ef0c09d897701445"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/confirm-intent.md",
+      "base_runtime_sha256": "c64d5f2459ca67412c2311eff245be68ded41b798e7f0fab5d9f9f74f81d87e4",
+      "candidate_sha256": "f72a3bbfefec693504f47aef7f861029375fc22f0f099f9131e6877bb1a5beed"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/confirmation-template.md",
+      "base_runtime_sha256": "9db702f37d9651b6d97b7d5891f8813487ab8a0294fea178ac7078e5367749f2",
+      "candidate_sha256": "3d7ad06c190dcaa71f8f9f0e08455546f7bd2920c69677432c53e37f709143f3"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/no-intent-interview.md",
+      "base_runtime_sha256": "2b789f70d3e161906a6668facc729db6554a3f1fd6c31e2821dc524f96049758",
+      "candidate_sha256": "f98c8b79ab22418dcf37155d45a01b0cbdda4533b48e82e5e85f62340313d2f2"
+    },
+    {
+      "path": "loom-design/skills/capture-intent/SKILL.md",
+      "base_runtime_sha256": "caff721f98fb411545da3a9c1f37b668cf43c6800ef53e5b7e29efa65a980b70",
+      "candidate_sha256": "4738d0fed451b16eec13894148fd1e989d47ef15c8b0bb66382921ee7419a735"
+    },
+    {
+      "path": "loom-design/skills/capture-intent/references/confirmation-template.md",
+      "base_runtime_sha256": "9db702f37d9651b6d97b7d5891f8813487ab8a0294fea178ac7078e5367749f2",
+      "candidate_sha256": "3d7ad06c190dcaa71f8f9f0e08455546f7bd2920c69677432c53e37f709143f3"
+    }
+  ],
+  "model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "preflight": {
+    "synthetic_private_read_denied": true,
+    "network_bind_denied": true,
+    "variant_write_denied": true,
+    "network_probe_exit": 77,
+    "network_probe_stderr": ""
+  },
+  "cases": {
+    "code-missing-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "capture-csv": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。"
+    },
+    "capture-csv-ready": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n\n這項需求每月對帳都會用到，先暫緩發票列表的配色調整，把時間用在這個 CSV 功能；既有列表和權限繼續沿用。"
+    },
+    "capture-invoice-explicit-hold-graph-ready": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。",
+      "candidate_only": true,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n"
+    },
+    "capture-invoice-natural-default-ready": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。"
+    },
+    "code-setup-sparse": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Orbit Preview\n\nFor the existing installed version, the verified preview command is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。"
+    },
+    "code-calendar-preview-new": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Pine Calendar\n\nPine Calendar lets a team preview scheduled events. The verified local preview command for the installed version is `pine preview --locale zh-TW`.\n",
+        "SETUP.md": "# Preview\n\nAfter installing dependencies, run `pine preview --language zh-TW` to start the preview.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動行事曆預覽時，裡面的指令會失敗。已確認 README 的指令是正確的。請只把 SETUP.md 那一行的 --language 修正為 --locale，其他說明和工具行為都不動。"
+    },
+    "capture-stock-report-new": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Birch Stock\n\nBirch Stock is an internal inventory application used by warehouse staff to inspect stock. The stock list can be filtered by warehouse and category. Existing account permissions control which stock records each user may see. The current list has no PDF download action.\n\n## Current direction\nReduce manual transcription when warehouse staff prepare monthly stock reports while retaining existing access permissions.\n",
+        "PRINCIPLES.md": "# Product principles\nratified-by: Birch Stock owner 2026-11-05 (synthetic fixture)\n\n## Who\nWarehouse staff who prepare monthly stock reports.\n\n## Non-negotiables\n1. Preserve existing access permissions.\n2. Report exports must not alter stock records.\n3. Retain the chosen warehouse and category filters.\n\n## Fixed choices\nUse the existing stock list and account permissions.\n"
+      },
+      "request": "倉儲同事每月要做庫存報告，目前會把篩選後的庫存列表手動抄進文件，很花時間。請在既有庫存列表加入 PDF 下載，內容只包含目前選定倉庫與分類的庫存，沿用既有權限且不改動庫存資料。PDF 欄位依序為貨號、品名、倉庫和數量。不新增排程或自動寄送。每月報告都需要使用；這次先暫緩列表配色調整，把時間用在這項功能。"
+    }
+  },
+  "results": {
+    "code-missing-date-candidate-r1": {
+      "key": "code-missing-date-candidate-r1",
+      "case": "code-missing-date",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.0967374,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "**更正被擋住了：最新版本的發行日期目前沒有可以填入的正確日期。**\n\n發行說明（`RELEASE_NOTES.md`）的日期欄現在寫的是「to be corrected」，不是一個實際日期。你說還不知道真正的發行日期，也沒有發行紀錄可以提供。我手上沒有任何證據能判斷正確日期，所以不能替你填。\n\n我也不會用今天的日期（2026-11-05）、「TBD」或刪掉這一行來代替。這些都會讓讀者看到我無法證實的內容。\n\n目前的狀態：\n- 我沒有修改任何檔案，也沒有建立意圖或計畫檔。\n- 我沒有提交，也沒有發布。\n- 其他文字（例如「Improve note search.」）一律不動。\n\n等你取得真正的發行日期，或能提供發行紀錄時，請告訴我。到時我會只更正那一行的日期，再繼續規劃流程。",
+      "verified_live_context": {
+        "successful_hook_responses": 6,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {}
+    },
+    "capture-csv-candidate-r1": {
+      "key": "capture-csv-candidate-r1",
+      "case": "capture-csv",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1223855,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "目前還不能請你確認，因為缺了兩項決定要不要現在做的事實。我還沒寫任何檔案，也沒改任何東西。\n\n**已經從你的描述和專案文件確定的部分**\n- 問題：會計團隊每月對帳時，要從發票列表手動複製資料到試算表，很花時間。\n- 想要的結果：在既有發票列表加「匯出 CSV」按鈕，下載目前篩選後的發票資料。\n- CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。\n- 限制：\n  - 保留使用者選定的客戶與日期篩選。\n  - 沿用目前的資料存取權限，匯出不能讓人看到本來無權查看的發票。\n  - 不改動既有發票資料。\n- 不做的事：不新增自動寄送或排程。\n- 專案原則（`PRINCIPLES.md`）已經核准，內容和這些限制一致，所以不需要再做原則訪談。\n\n**還缺的事實（價值判斷用）**\n目前還缺兩項：為什麼現在要做，以及做這個會讓哪件事延後。你已經說明了現況（手動複製）。我一次只問一題，先問第一題：\n\n> **為什麼是現在做，而不是之後？** 例如：下一次月底對帳快到了、手動複製已經造成錯誤或延誤，還是有人力近期才有空？如果再等一兩個月，具體會發生什麼？\n\n你回答後，我會再問「做這件事會讓團隊暫時不做什麼」。兩題都有具體答案後，我才會寫出意圖檔，並向你送出正式確認。\n\n**你之後確認的會是什麼**\n你確認的是需求本身：問題、完成條件、上述限制和不做的範圍，不含畫面或實作方式。確認時我也會說明這次的「是」代表什麼授權。",
+      "verified_live_context": {
+        "successful_hook_responses": 6,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {}
+    },
+    "capture-csv-ready-candidate-r1": {
+      "key": "capture-csv-ready-candidate-r1",
+      "case": "capture-csv-ready",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.1529623,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "## 背景與目前方向\nCedar Accounts 是會計團隊用來準備與查看客戶發票的內部應用。發票列表已有客戶與日期篩選,發票的存取權限由既有帳號權限控管。這次的方向是減少每月對帳時的手動複製,同時沿用既有權限。\n\n## 目前問題與影響\n列表目前沒有 CSV 下載功能。會計團隊每月對帳時,得把發票資料手動複製到試算表,很花時間。\n\n## 這次要改變什麼\n會計人員可以在既有發票列表按「匯出 CSV」,把目前篩選後的發票資料下載下來,不必再手動複製。\n\n```\n┌─ 現在 ────────────────────────┐   ┌─ 預期(尚未驗證)────────────────┐\n│ 篩選發票列表                  │   │ 篩選發票列表                    │\n│   ↓                           │   │   ↓                             │\n│ 手動複製到試算表              │   │ 按「匯出 CSV」                  │\n│   ↓                           │   │   ↓                             │\n│ 對帳                          │   │ 下載 CSV → 對帳                 │\n└───────────────────────────────┘   └─────────────────────────────────┘\n```\n\n**為什麼現在做:** 每月對帳都會用到。為此暫緩的是發票列表的配色調整,這不影響對帳。\n\n## 範圍與驗收\n完成時應能觀察到:\n1. 發票列表上有「匯出 CSV」按鈕,可下載目前篩選後的發票資料。\n2. 下載內容只包含你選定的客戶與日期篩選所對應的發票。\n3. CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 使用者只能匯出自己在列表中本來就有權查看的發票。\n5. 匯出前後,既有發票資料沒有被改動。\n\n**不做:** 自動寄送、排程匯出、改動既有發票資料、發票列表配色調整(暫緩)。\n\n**限制:** 沿用既有發票列表與既有帳號權限。\n\n**已寫入的檔案:** 意圖檔 `docs/loom/intent/2026-11-05-invoice-list-csv-export.md`,狀態為 `open`(未確認)。我沒有建立分支、沒有 commit、沒有實作,也沒有發布。\n\n## 請確認\n你回答「是」,只代表你確認上面的問題與驗收條件正確。專案原則(`PRINCIPLES.md`)已存在且已核准,不需要再訪談。\n\n你回答「是」之後,我會把意圖標為已確認,建立變更分支並 commit。接著會進入規格階段,確認你在畫面上會看到什麼。\n\n這個專案沒有明確禁止自動發布,所以預設會自動發布。審查與發布檢查都通過後,「是」也會授權我兩件事:\n- 以非強制方式上傳變更分支。\n- 開啟一個可供審查的 pull request。\n\n發布前你隨時可以選擇不發布。合併是另一個獨立的決定。\n\n這是你要的功能嗎?在你回覆前,我先停在這裡。",
+      "verified_live_context": {
+        "successful_hook_responses": 6,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {
+        "docs/loom/intent/2026-11-05-invoice-list-csv-export.md": "# 發票列表匯出 CSV\noriginator: kouko\nkind: product\nneeds-design: yes — GUI 發票列表新增匯出操作與下載檔案,且沒有 DESIGN.md 或 ui-flows 涵蓋此介面\nstatus: open\nintent_confirmed_sha: pending\n\n## Problem\n會計團隊每月對帳時,必須從發票列表手動複製資料到試算表,耗費大量時間。目前發票列表已有客戶與日期篩選,但沒有 CSV 下載功能。\n\n## Proposed outcome\n會計人員能把發票列表目前篩選後的發票資料下載為 CSV,保留所選的客戶與日期篩選,不必再手動複製。\n\n## Acceptance\n1. 發票列表上有「匯出 CSV」按鈕,可下載目前篩選後的發票資料。\n2. 下載內容只包含使用者選定的客戶與日期篩選所對應的發票。\n3. CSV 欄位依序為:發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 使用者只會匯出自己在發票列表中本來就有權查看的發票。\n5. 匯出前後,既有發票資料沒有被改動。\n\n## Constraints\n- 沿用既有發票列表與既有帳號權限。\n- 匯出不得讓使用者看到本來無權查看的發票。\n- 匯出不得改動既有發票資料。\n\n## Value case\n- 受益者:會計團隊,每月對帳都會使用。\n- 急迫性:每月對帳都需要,目前靠手動複製到試算表。\n- 現有替代方案:從發票列表手動複製到試算表,很花時間。\n- 被擠掉的工作:暫緩發票列表的配色調整。\n- 判斷:GO — 每月重複發生的人工作業,且被暫緩的配色調整不影響對帳。\n\n## Out of scope\n- 自動寄送。\n- 排程匯出。\n- 改動既有發票資料。\n- 發票列表的配色調整(暫緩)。\n\n## Open questions\n- none\n"
+      }
+    },
+    "capture-invoice-explicit-hold-graph-ready-candidate-r1": {
+      "key": "capture-invoice-explicit-hold-graph-ready-candidate-r1",
+      "case": "capture-invoice-explicit-hold-graph-ready",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.22519730000000002,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        },
+        {
+          "skill": "loom-workflow:loom-visualization"
+        }
+      ],
+      "result": "## 背景與目前方向\nCedar Accounts 是會計團隊用來準備並匯出客戶發票的內部系統，每位客戶有自己的幣別設定。目前的方向是維持發票匯出可靠、匯出格式不變，並先避免一位客戶的設定影響另一位客戶的匯出。\n\n## 目前的問題與影響\n日常匯出中偶爾會出現這種情況：某位客戶的發票沿用上一位客戶的幣別設定，發票就顯示錯誤幣別。會計同事現在要逐張檢查發票，發現錯誤再重新匯出。\n\n## 修改內容\n每張發票都改用所屬客戶自己的幣別設定。下圖左邊是你回報的現況，右邊是預期結果。預期結果還沒有實作或驗證。\n\n```text\n┌────────────────────────────┐  ┌────────────────────────────┐\n│    修改前（使用者回報）    │  │         預期修改後         │\n├────────────────────────────┤  ├────────────────────────────┤\n│  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n│  │   匯出某客戶的發票   │  │  │  │   匯出某客戶的發票   │  │\n│  └──────────────────────┘  │  │  └──────────────────────┘  │\n│              │             │  │              │             │\n│              ▼             │  │              ▼             │\n│  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n│  │ 偶爾用到前一位的幣別 │  │  │  │ 使用該客戶自己的幣別 │  │\n│  └──────────────────────┘  │  │  └──────────────────────┘  │\n│              │             │  │              │             │\n│              ▼             │  │              ▼             │\n│  ┌──────────────────────┐  │  │  ┌──────────────────────┐  │\n│  │   發票顯示錯誤幣別   │  │  │  │ 發票顯示該客戶的幣別 │  │\n│  └──────────────────────┘  │  │  └──────────────────────┘  │\n└────────────────────────────┘  └────────────────────────────┘\n```\n\n先暫緩發票列表的配色調整，這次的時間優先用在修正幣別錯誤。\n\n## 範圍與驗收\n驗收條件如下：\n1. 匯出幣別不同的多位客戶發票時，每張發票顯示的都是該發票所屬客戶自己的幣別。\n2. 匯出檔案的格式與修改前相同。\n3. 既有的匯出檔沒有被改寫。\n\n範圍界線如下：\n- 只修正「使用誰的幣別設定」。\n- 不同次匯出的金額可以合理不同，我不要求金額相同。\n- 這次不改匯出格式，也不改寫既有匯出檔。\n- 發票列表的配色調整不在這次範圍內。\n\n我已把意圖寫入 `docs/loom/intent/2026-11-05-invoice-export-own-customer-currency.md`。狀態是 `open`，還沒有確認，也沒有建立分支或 commit。\n\n## 請確認\n你的「是」只確認上面的需求，也就是問題、預期結果、驗收條件和範圍。它不代表可以開始實作，我也不會替你確認。\n\n發佈暫緩仍然有效：我不會推送分支，也不會建立 PR。即使你確認了意圖，這個暫緩還是不會解除。要解除它，你需要另外明確說可以發佈。\n\n這是你要的修正嗎？如果有需要更正的地方，請直接告訴我。",
+      "verified_live_context": {
+        "successful_hook_responses": 10,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {
+        "docs/loom/intent/2026-11-05-invoice-export-own-customer-currency.md": "# 發票匯出一律使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: product\nneeds-design: no — 匯出格式維持不變，只更正每張發票採用哪位客戶的幣別設定；單一規則，無新增畫面或多狀態行為\nstatus: open\n\n## Problem\n會計團隊用 Cedar Accounts 匯出客戶發票，每位客戶各有自己的幣別設定。日常匯出中偶爾會發生：某位客戶的發票沿用上一位客戶的幣別設定，導致該發票顯示錯誤幣別。會計同事目前必須逐張檢查發票，遇到錯誤再重新匯出。不同次匯出的金額可以合理不同。\n\n## Proposed outcome\n每張匯出的發票都使用其所屬客戶自己的幣別設定，不受前一位客戶影響。\n\n## Acceptance\n1. 匯出幣別不同的多位客戶發票時，每張發票顯示的都是該發票所屬客戶自己的幣別。\n2. 匯出檔案的格式與修改前相同。\n3. 既有的匯出檔未被改寫。\n\n## Constraints\n- 匯出格式維持不變。\n- 不改寫既有匯出檔。\n- 沿用既有系統與匯出格式。\n- 只修正「使用誰的幣別設定」；不要求不同次匯出的金額相同。\n\n## Value case\n- 受益者：會計團隊，目前逐張檢查並在出錯時重新匯出。\n- 急迫性：日常匯出中偶爾就會遇到此錯誤。\n- 現有替代做法：人工逐張檢查、錯誤時重新匯出。\n- 被擱置的工作：發票列表的配色調整暫緩。\n- 判斷：GO（理由：錯誤發生在日常匯出，且目前靠人工逐張檢查補救）。\n\n## Out of scope\n- 發票列表的配色調整（暫緩）。\n- 匯出格式的任何變更。\n- 既有匯出檔的改寫。\n\n## Open questions\n- none\n"
+      }
+    },
+    "capture-invoice-natural-default-ready-candidate-r1": {
+      "key": "capture-invoice-natural-default-ready-candidate-r1",
+      "case": "capture-invoice-natural-default-ready",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.14308000000000004,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "## 背景與目前方向\nCedar Accounts 是內部會計系統。會計團隊用它準備並匯出客戶發票，每位客戶都有自己的幣別設定。目前的重點是讓發票匯出穩定可靠，同時維持既有的匯出格式。\n\n## 目前的問題與影響\n日常匯出中偶爾會出現這種情況：某位客戶的發票沿用上一位客戶的幣別設定，因此顯示錯誤的幣別。會計同事現在必須逐張檢查發票，發現錯誤後再重新匯出。\n\n## 這次會改變什麼\n| | 現在 | 修正後 |\n|---|---|---|\n| 發票使用的幣別設定 | 偶爾是上一位客戶的 | 一律是該發票所屬客戶自己的 |\n| 會計同事的作業 | 逐張檢查，有錯就重新匯出 | 不需要為了幣別逐張檢查 |\n\n## 範圍與驗收\n驗收條件：\n1. 每張匯出的發票所顯示的幣別，都來自該發票所屬客戶自己的幣別設定，包含緊接在另一位客戶發票之後匯出的發票。\n2. 匯出格式與修正前相同，已存在的匯出檔不被改寫。\n\n範圍界線：\n- 只修正「使用誰的幣別設定」。\n- 不同次匯出的金額可以不同，我不會要求金額相同。\n- 發票列表的配色調整先暫緩，由這項修正優先。這是依你說的「日常匯出偶爾就會遇到」判斷的急迫性。\n- 不變更匯出格式，也不改寫既有匯出檔。\n\n## 請確認\n以上是否就是你要的？回覆「是」，代表你確認上述問題與驗收條件。這項修正屬於內部作業，沒有需要你另外選擇的事項。\n\n回覆「是」也同時授權：待審查與發佈前檢查都通過之後，我會用一般（非強制）推送把修正分支上傳，並開啟一個可供審閱的 pull request。上傳前你隨時可以要求取消自動發佈。合併是另一個獨立的決定，不包含在這次的「是」裡。\n\n意圖草稿已寫入 `docs/loom/intent/2026-11-05-per-customer-invoice-currency.md`，狀態仍是「open」。你確認之前我不會把它標為已確認，也不會建立分支或提交。",
+      "verified_live_context": {
+        "successful_hook_responses": 10,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {
+        "docs/loom/intent/2026-11-05-per-customer-invoice-currency.md": "# 每張發票使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: product\nneeds-design: no — 匯出格式與畫面都不變，只更正發票採用哪位客戶的幣別設定，行為僅涉及單一客戶的發票\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊用 Cedar Accounts 匯出客戶發票，每位客戶有自己的幣別設定。日常匯出中偶爾會發生：某位客戶的發票沿用了上一位客戶的幣別設定，因此顯示錯誤的幣別。會計同事目前必須逐張檢查匯出的發票，發現錯誤後再重新匯出。\n\n## Proposed outcome\n每張匯出的發票都使用所屬客戶自己的幣別設定，會計同事不必再為此逐張檢查或重新匯出。\n\n## Acceptance\n1. 每張匯出的發票所顯示的幣別，都來自該發票所屬客戶自己的幣別設定，包含緊接在另一位客戶發票之後匯出的發票。\n2. 匯出格式與修正前相同，已存在的匯出檔不被改寫。\n\n## Constraints\n- 只修正「使用誰的幣別設定」；匯出格式維持不變，不改寫既有匯出檔。\n- 不同次匯出的金額可以不同，不要求金額相同。\n- 沿用既有系統與匯出格式。\n\n## Value case\n受益者：每天匯出客戶發票的會計團隊。急迫性：日常匯出中偶爾就會遇到此錯誤。現有替代方式：逐張人工檢查，錯誤時重新匯出。被擱置的工作：發票列表的配色調整，暫緩。判斷：GO（急迫性與現有替代方式的成本都有具體說明；被擱置的工作已明確指出）。\n\n## Out of scope\n- 發票列表的配色調整（暫緩）。\n- 匯出格式的變更與既有匯出檔的改寫。\n- 讓不同次匯出的金額一致。\n\n## Open questions\n- none\n"
+      }
+    },
+    "code-setup-sparse-candidate-r1": {
+      "key": "code-setup-sparse-candidate-r1",
+      "case": "code-setup-sparse",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.15353050000000001,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "目前進度：我已把需求寫成未確認的草稿，並跑完既有文件檢查，沒有警告。還沒有建立分支、也沒有改 SETUP.md。以下請你確認需求。\n\n## 背景與目前方向\nREADME.md 記載，現行已安裝版本經驗證的預覽指令是 `orbit start`。SETUP.md 是新同事啟動網站預覽時照著做的說明。\n\n## 目前問題與影響\nSETUP.md 的預覽步驟寫的是 `orbit launch`，新同事照做會失敗。\n\n## 會改變什麼\nSETUP.md 的預覽步驟會改成 `orbit start`。\n\n## 範圍與驗收\n驗收條件：\n1. SETUP.md 的預覽程式碼區塊中，指令是 `orbit start`，不再是 `orbit launch`。\n2. SETUP.md 除了這一行指令以外，內容和修改前完全相同。\n\n邊界：\n- 不改 SETUP.md 的其他說明。\n- 不改 orbit 工具的行為。\n\n## 請確認\n請問上面的問題描述和兩項驗收條件，是不是你要的？\n\n你回「是」只代表確認這份需求。我會把它記錄為已確認，接著寫實作計畫。你說過不要實作也不要發佈，所以回「是」不代表我可以改 SETUP.md、推送分支或開 pull request。這些我都不會做，除非你之後明確開放。\n\n我先停在這裡，等你回覆。",
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {
+        "docs/loom/intent/2026-11-05-fix-setup-preview-command.md": "# 修正 SETUP.md 中失效的預覽啟動指令\noriginator: kouko\nkind: engineering\nneeds-design: no — 只改既有說明文件中的一行指令，沒有新增使用者介面或多狀態行為\nevidence: [SETUP.md, README.md]\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n新同事照 SETUP.md 啟動網站預覽時，文件中的 `orbit launch` 指令會失敗。README.md 記載現行已安裝版本經驗證的預覽指令是 `orbit start`。\n\n## Proposed outcome\nSETUP.md 的預覽啟動步驟列出現行版本正確的指令。\n\n## Acceptance\n1. SETUP.md 的預覽啟動程式碼區塊中，指令為 `orbit start`，不再是 `orbit launch`。\n2. SETUP.md 除該指令行之外的內容與修改前完全相同。\n\n## Constraints\n- 只修正 SETUP.md 中的這一行指令；其他說明和工具行為保持原樣。\n\n## Out of scope\n- 修改 SETUP.md 的其他說明文字。\n- 修改 orbit 工具的行為。\n\n## Open questions\n- none\n"
+      }
+    },
+    "code-calendar-preview-new-candidate-r1": {
+      "key": "code-calendar-preview-new-candidate-r1",
+      "case": "code-calendar-preview-new",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.15193289999999998,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "## 背景與目前方向\nPine Calendar 讓團隊預覽排定的活動。README.md 寫明，已安裝版本的預覽指令是 `pine preview --locale zh-TW`，而且已經驗證過。SETUP.md 是新同事安裝後照著操作的文件。\n\n## 目前的問題與影響\nSETUP.md 的預覽指令寫成 `pine preview --language zh-TW`，新同事照做會失敗。這個旗標名稱和 README.md 不一致。我只確認了這兩份文件的內容，沒有執行過指令。\n\n## 要改什麼\nSETUP.md 那一行的 `--language` 改成 `--locale`，改完和 README.md 的指令一致。\n\n## 範圍與驗收\n驗收條件有兩條：\n1. SETUP.md 啟動預覽的那一行使用 `--locale zh-TW`，不再出現 `--language`。\n2. 除了這個旗標名稱，SETUP.md 的其餘文字和 README.md 都沒有變動。\n\n不在範圍內的有三項：SETUP.md 的其他說明、`pine` 工具的行為，以及 README.md。\n\n## 請確認\n你回「是」代表你確認上面的問題和驗收條件，這就是你要的修改。\n\n- **只確認需求：** 你已說明不要發布，所以這次的「是」不授權推送分支，也不授權建立 pull request。\n- **目前沒有改任何檔案：** 意圖草稿已寫在 `docs/loom/intent/2026-11-05-fix-setup-preview-locale-flag.md`，狀態是 open，尚未提交。SETUP.md 沒有動，也還沒建立分支。\n- **你回覆前我不會繼續：** 之後的計畫和實作要等你回「是」才會開始。若有不符，請告訴我要怎麼調整。\n\n這是你要的嗎？",
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {
+        "docs/loom/intent/2026-11-05-fix-setup-preview-locale-flag.md": "# 修正 SETUP.md 預覽指令的 --language 為 --locale\noriginator: kouko\nkind: engineering\nneeds-design: no — 只改一份說明文件中的一個旗標名稱，不新增使用者會讀到或輸入的介面行為\nevidence: [SETUP.md, README.md]\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n新同事照 SETUP.md 啟動行事曆預覽時，文件裡的指令 `pine preview --language zh-TW` 會執行失敗。README.md 寫的預覽指令 `pine preview --locale zh-TW` 已確認是正確的（README 註明它是已安裝版本的驗證過指令）。兩份文件的旗標名稱不一致。\n\n## Proposed outcome\nSETUP.md 的預覽指令使用與 README.md 相同的 `--locale` 旗標。\n\n## Acceptance\n1. SETUP.md 中啟動預覽的那一行指令使用 `--locale zh-TW`，不再出現 `--language`。\n2. SETUP.md 中除該旗標名稱外，其餘文字與 README.md 的內容都沒有變動。\n\n## Constraints\n- 只修正 SETUP.md 那一行的 `--language` 為 `--locale`。\n- 說明文字和 `pine` 工具本身的行為都不更動。\n\n## Out of scope\n- SETUP.md 其他說明文字的修改。\n- `pine` 工具行為的修改。\n- README.md 的修改。\n\n## Open questions\n- none\n"
+      }
+    },
+    "capture-stock-report-new-candidate-r1": {
+      "key": "capture-stock-report-new-candidate-r1",
+      "case": "capture-stock-report-new",
+      "variant": "candidate",
+      "exit_code": 0,
+      "is_error": false,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.15103719999999998,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "## 背景與目前方向\nBirch Stock 是倉庫同事用來查看庫存的內部應用程式。庫存列表可依倉庫與分類篩選,可看到哪些庫存由既有帳號權限決定。目前方向是減少倉庫同事製作每月庫存報告時的手動抄寫,並保留既有存取權限。\n\n## 目前問題與影響\n倉庫同事每月做庫存報告時,會先篩選倉庫與分類,再把列表內容手動抄進文件,很花時間。現有庫存列表沒有 PDF 下載。\n\n## 會改變什麼\n在既有庫存列表加入 PDF 下載,內容是目前選定倉庫與分類的庫存。\n\n```\n┌─ 現在 ───────────────────────┐   ┌─ 完成後(預期)─────────────────┐\n│ 篩選倉庫與分類                 │   │ 篩選倉庫與分類                   │\n│        ↓                      │   │        ↓                        │\n│ 手動抄進文件                   │   │ 下載 PDF                         │\n└───────────────────────────────┘   └─────────────────────────────────┘\n```\n\n## 範圍與驗收\n驗收條件(意圖檔已寫成 4 條):\n1. 庫存列表提供 PDF 下載,內容只包含目前選定倉庫與分類的庫存。\n2. PDF 欄位依序為貨號、品名、倉庫、數量。\n3. 使用者在 PDF 中只會看到自己依既有權限本來就能在列表看到的庫存。\n4. 下載前後庫存資料沒有任何變動。\n\n不在範圍內:排程、自動寄送、列表配色調整(這次暫緩)。\n\n這是每月都會用到的功能,所以我判斷值得現在做(GO)。你說明的急迫性、現有手動做法和暫緩的配色調整,已足以支撐這個判斷。`PRINCIPLES.md` 已經核可,不需要再做原則訪談。\n\n## 請確認\n你回「是」,只代表確認上面這份需求範圍(問題、驗收條件、限制和不做的事)。\n\n- 你回「是」之後,我會把意圖標記為已確認,建立變更分支並提交確認紀錄,再交給下一階段寫行為規格。因為這會改動使用者看到的畫面和檔案,所以下一階段會再請你確認「操作後看到什麼」。\n- 你這次說不要發布,所以我不會授權任何推送或開 PR。\n- 目前沒有未解決的開放問題。\n\n我已把意圖草稿寫到 `docs/loom/intent/2026-11-05-stock-list-pdf-download.md`,狀態仍是「open」,尚未提交。\n\n這是不是你要的功能?",
+      "verified_live_context": {
+        "successful_hook_responses": 10,
+        "shared_card_sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      },
+      "drafts": {
+        "docs/loom/intent/2026-11-05-stock-list-pdf-download.md": "# 庫存列表提供 PDF 下載\noriginator: kouko\nkind: product\nneeds-design: yes — 新增使用者會下載並使用的 PDF 檔案，且庫存列表尚無涵蓋此畫面的 DESIGN.md 或操作流程文件\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n倉庫同事每月要製作庫存報告。他們目前先在庫存列表篩選倉庫與分類，再把篩選後的列表手動抄進文件，這很花時間。現有庫存列表沒有 PDF 下載功能。\n\n## Proposed outcome\n倉庫同事能從庫存列表，把目前選定倉庫與分類的庫存下載成 PDF，用於每月庫存報告，不必再手動抄寫。\n\n## Acceptance\n1. 庫存列表提供 PDF 下載，下載內容只包含目前選定的倉庫與分類的庫存。\n2. PDF 欄位依序為貨號、品名、倉庫、數量。\n3. 使用者只能在 PDF 中看到自己依既有帳號權限本來就能在列表看到的庫存。\n4. 下載 PDF 前後，庫存資料沒有任何變動。\n\n## Constraints\n- 沿用既有庫存列表與既有帳號權限。\n- 匯出不得改動庫存資料。\n- 保留使用者已選的倉庫與分類篩選。\n\n## Value case\n- 受益者：每月製作庫存報告的倉庫同事。\n- 急迫性：每月報告都需要使用。\n- 現有替代做法：手動把篩選後的列表抄進文件。\n- 被擠掉的工作：列表配色調整這次先暫緩。\n- 判斷：GO（每月重複的手動抄寫，直接換成一次下載）。\n\n## Out of scope\n- 排程產生報告。\n- 自動寄送報告。\n- 列表配色調整（這次暫緩）。\n\n## Open questions\n- none\n"
+      }
+    }
+  }
+}

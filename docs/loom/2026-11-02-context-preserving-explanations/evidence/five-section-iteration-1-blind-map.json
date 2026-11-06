@@ -1,0 +1,58 @@
+{
+  "R01": {
+    "key": "capture-invoice-baseline-r1",
+    "variant": "baseline",
+    "case": "capture-invoice",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false
+  },
+  "R02": {
+    "key": "capture-csv-baseline-r1",
+    "variant": "baseline",
+    "case": "capture-csv",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false
+  },
+  "R03": {
+    "key": "code-setup-baseline-r1",
+    "variant": "baseline",
+    "case": "code-setup",
+    "repeat": 1,
+    "skill": "loom-code:write-plan",
+    "code_only": true
+  },
+  "R04": {
+    "key": "capture-csv-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-csv",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false
+  },
+  "R05": {
+    "key": "capture-invoice-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-invoice",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false
+  },
+  "R06": {
+    "key": "capture-missing-date-candidate-r1",
+    "variant": "candidate",
+    "case": "capture-missing-date",
+    "repeat": 1,
+    "skill": "loom-design:capture-intent",
+    "code_only": false
+  },
+  "R07": {
+    "key": "code-setup-candidate-r1",
+    "variant": "candidate",
+    "case": "code-setup",
+    "repeat": 1,
+    "skill": "loom-code:write-plan",
+    "code_only": true
+  }
+}

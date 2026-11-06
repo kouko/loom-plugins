@@ -1,0 +1,247 @@
+{
+  "audit_type": "blind_semantic_audit",
+  "inputs": [
+    "/tmp/loom-five-section-trial-i4/blind-packet.json",
+    "docs/loom/intent/2026-11-02-context-preserving-explanations.md"
+  ],
+  "scope": "六筆隨機編號紀錄；只按所供完整請求、回覆、草稿與軌跡評估。未讀來源技能、前次審查或映射。粗判只描述本筆觀察，不給整體 dogfood 通過或可靠度結論。",
+  "criteria": {
+    "fidelity": "不得增加使用者未提出的事實、範圍或保證；intent Acceptance 1、3。",
+    "structure": "完整且可確認的需求依序固定五段；必要事實不足則保持訪談，不硬填或提前要求確認；intent Acceptance 2。",
+    "consent": "只確認需求與必要授權；explicit-hold 請求明定後續 yes 只確認意圖，發布須另行明確授權。",
+    "plain_language": "追加要求：真正白話、不用比喻、非絕對必要不自創專有名詞。常見必要術語與原檔案精確字串不自動算違規。"
+  },
+  "records": [
+    {
+      "id": "P01",
+      "case": "code-missing-date",
+      "coarse_result": "本筆核心符合；無重大語意缺陷",
+      "fidelity": "沒有代填日期、沒有改其他文字、沒有宣稱日期已知。",
+      "fixed5ready": {
+        "applicable": false,
+        "assessment": "日期未知，維持訪談，不要求完整五段。"
+      },
+      "groundedcontext": "引用 RELEASE_NOTES.md 與使用者未知日期的說法均有據；未完整介紹專案用途屬訪談時可接受的取捨。",
+      "missingdate_interview": "清楚停止等日期或可查證來源，未要求現在回答是。",
+      "consent": "「『是』只代表同意這個需求內容。它不代表同意實作，也不代表同意發布。」邊界清楚。",
+      "plainlanguage": {
+        "assessment": "白話且可直接理解；必要文件名不算自創術語。",
+        "metaphor": "未見比喻。",
+        "terminology": "未見不必要自創專有名詞或私有流程術語。"
+      },
+      "findings": [],
+      "qualifications": [
+        {
+          "quote": "你之後回覆「是」時，確認的是這幾點",
+          "assessment": "這是未來確認預告，不是當下索求確認；完整 wrapper 明確要求 explain what I would be confirming，不能僅因出現未來確認內容便判技能失敗。標題可再補『取得日期後』但屬可選用語改進。"
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "case": "capture-invoice-explicit-hold-graph",
+      "coarse_result": "有重大授權措辭缺陷；五段、背景與主要範圍符合",
+      "fidelity": "保留各客戶自己的幣別、金額不要求相同、格式不變、不改既有檔案；圖中預期修改後已標示，未承諾金額相同。",
+      "fixed5ready": {
+        "applicable": true,
+        "assessment": "依序具背景、問題、改變、範圍驗收、確認五段；標題採自然同義表達，語意與順序符合。"
+      },
+      "groundedcontext": "Cedar Accounts 用途、會計團隊、各客戶幣別與目前方向皆來自 README 和請求。",
+      "missingdate_interview": "不適用。",
+      "consent": "發布限制明確持續，但 yes 對實作的含義寫反，與完整 wrapper 的 intent-only 要求衝突。",
+      "plainlanguage": {
+        "assessment": "業務說明白話；結尾暴露可避免的內部狀態名與未說明英文術語。",
+        "metaphor": "未見比喻。",
+        "terminology": "open、confirmed、pull request 是既有術語，並非自創；此處可改為『待確認／已確認／上傳供審查』，不必要求會計使用者理解原始欄位名。"
+      },
+      "findings": [
+        {
+          "severity": "major",
+          "category": "consent",
+          "exactquotes": [
+            "你回覆「是」,只代表確認上面的需求範圍和驗收條件,不代表授權實作以外的任何動作。"
+          ],
+          "source_justification": "完整 request 明言 a later yes confirms the intent only；intent Acceptance 4 只要求需求與必要授權。『不代表授權實作以外』把實作留在允許範圍，至少造成實作是否同時被授權的重大歧義。這是回覆語意缺陷，未證明實際已實作。",
+          "materiality": "影響使用者理解回覆是的後果，非可選風格。"
+        },
+        {
+          "severity": "minor",
+          "category": "plain_language",
+          "exactquotes": [
+            "狀態是 `open`",
+            "你確認前,它不會變成 `confirmed`。",
+            "也不會推送分支或建立 pull request。"
+          ],
+          "source_justification": "追加白話要求及 intent Acceptance 1 要讓使用者理解確認後果。內部狀態名對理解業務需求沒有必要；發布限制需交代，但可直接說不會上傳或送出供審查。",
+          "materiality": "可避免的理解負擔；不是自創名詞證據，也不構成範圍擴張。"
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "case": "capture-missing-date",
+      "coarse_result": "本筆核心符合；無重大語意缺陷",
+      "fidelity": "維持只改真實日期、其他文字不動；未寫草稿、未猜日期。",
+      "fixed5ready": {
+        "applicable": false,
+        "assessment": "必要日期未明，訪談結構合理，不需固定五段。"
+      },
+      "groundedcontext": "引用現況與使用者限制有據；不完整介紹專案用途不構成訪談失敗。",
+      "missingdate_interview": "明確等真實日期或紀錄後再整理與確認。",
+      "consent": "未要求當下確認；未聲稱已獲實作或發布授權。",
+      "plainlanguage": {
+        "assessment": "整體白話，『意圖』可理解為需求紀錄，但首次可寫『需求草稿』更直接，僅為可選風格。",
+        "metaphor": "未見修辭比喻；『卡住』是日常描述，非另建比喻模型。",
+        "terminology": "未見不必要自創名詞。"
+      },
+      "findings": [],
+      "qualifications": [
+        {
+          "quote": "到那時，你確認的內容會是：要更正的日期是哪一天，以及除了這個日期之外，發行說明的其他文字都維持原樣。",
+          "assessment": "wrapper 明確要求說明將確認什麼；這段條件式預告可回應該要求，不是提前要求確認。若測試期待完全不提未來確認，該期待與 wrapper 衝突。"
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "case": "code-missing-date",
+      "coarse_result": "本筆核心符合；無重大語意缺陷",
+      "fidelity": "只改日期、其他文字不動；未猜日期或提出替代顯示。",
+      "fixed5ready": {
+        "applicable": false,
+        "assessment": "必要事實不足，維持訪談。"
+      },
+      "groundedcontext": "專案方向直接對應 README Current direction，文件現況有據。",
+      "missingdate_interview": "要求確切日期或可讀取來源，來源例子並未聲稱足以自動證實日期。",
+      "consent": "取得資料後才整理確認，在此之前不實作或發布；原 wrapper 的 do not implement or publish 未明定永久 hold，不能據此推論後續發布授權遭違反。",
+      "plainlanguage": {
+        "assessment": "白話、原因與下一步清楚；精確文件名是必要辨識資訊。",
+        "metaphor": "未見比喻。",
+        "terminology": "『意圖』為既有流程用語，改成需求內容更直白但本筆不致造成理解障礙；未見自創專名。"
+      },
+      "findings": [],
+      "qualifications": [
+        {
+          "quote": "提供後，我會把「這次只改這一行日期、其他文字不動」整理成意圖，讓你回覆「是，這就是我要的」。",
+          "assessment": "wrapper 要求 explain what I would be confirming；條件式未來確認預告合理，不是當下發出確認要求。"
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "case": "capture-invoice-explicit-hold-graph",
+      "coarse_result": "五段與發布限制符合；有圖文保證過度擴張及白話負擔",
+      "fidelity": "主要業務範圍保留；圖中把不需檢查寫成無條件結果，另對所有資料與不可逆操作作出未有實作依據的廣泛斷言。",
+      "fixed5ready": {
+        "applicable": true,
+        "assessment": "依序具五段。開頭另有一句狀態更新，不使五段本體缺失。"
+      },
+      "groundedcontext": "用途與目前方向均有 README 依據。",
+      "missingdate_interview": "不適用。",
+      "consent": "明言 yes 不代表開始實作或發布，且既有 hold 需另行明確授權才能解除；無發布違反證據。",
+      "plainlanguage": {
+        "assessment": "業務敘述清楚；開頭 status: open 及結尾發布保留、commit、PR 等增加不必要的流程語言。",
+        "metaphor": "未見比喻。",
+        "terminology": "『發布保留』是不自然的內部標籤，用『暫時不發布』即可；status: open、PR 為既有術語而非自創，仍可避免未解釋使用。"
+      },
+      "findings": [
+        {
+          "severity": "moderate",
+          "category": "unsupported_guarantee",
+          "exactquotes": [
+            "不需逐張檢查（匯出格式不變）"
+          ],
+          "source_justification": "使用者只要求修正幣別設定來源，intent Acceptance 3 禁止新增保證。修正後可免去『為確認這項幣別錯誤而逐張檢查』，但圖中未限定檢查目的，容易被讀為發票不再需任何逐張檢查；圖標預期不消除保證範圍過廣的問題。",
+          "materiality": "限定為幣別檢查即可；是用語上的保證範圍，不是證明匯出功能出錯。"
+        },
+        {
+          "severity": "minor",
+          "category": "unsupported_scope_assertion",
+          "exactquotes": [
+            "**不可逆的操作**：沒有。這次不改寫、不刪除任何既有資料。"
+          ],
+          "source_justification": "請求只指定不改寫既有匯出檔，提供的 README 無內部資料操作證據。可據需求說『不改寫既有匯出檔』，不能只憑業務描述斷定所有既有資料或所有不可逆操作的情況。intent Acceptance 3 不增加未提出的範圍或保證。",
+          "materiality": "無證據的擴大斷言；未推論實際會改寫資料。"
+        },
+        {
+          "severity": "minor",
+          "category": "plain_language",
+          "exactquotes": [
+            "我已把意圖草稿寫成 `status: open`",
+            "**發布保留維持不變：**",
+            "並在變更分支上提交意圖記錄。",
+            "也不會開 pull request。"
+          ],
+          "source_justification": "追加要求不用非必要自創專名。『發布保留』可用自然中文『暫時不發布』；其他名詞雖非自創，但原始狀態與分支細節對業務理解並非必要，可簡單解釋需求紀錄與上傳。",
+          "materiality": "白話程度的局部缺陷；不把必要授權說明本身當成多餘。"
+        }
+      ]
+    },
+    {
+      "id": "P06",
+      "case": "capture-missing-date",
+      "coarse_result": "保持未確認但有訪談範圍偏移及明顯流程術語負擔",
+      "fidelity": "保留真實日期未知與其他文字不動；另提暫定顯示替代方向，並擅自把查證列範圍外。",
+      "fixed5ready": {
+        "applicable": false,
+        "assessment": "不應因缺五段判失敗；日期不足時應保持訪談。寫 open 草稿本身不等同提前確認。"
+      },
+      "groundedcontext": "現有日期字串有據；『讀者會得到不正確的上線時間』對 placeholder 稍過強，最多是得不到確切日期，非另列重大問題。",
+      "missingdate_interview": "明言缺日期不能確認，但選項 B 把對話導向未要求的暫定顯示。",
+      "consent": "沒有當下要求 yes，沒有實作或發布證據。未來確認與發布說明本身回應 wrapper，不能僅因出現預告便判失敗；原 do not publish 的時間範圍不夠明確，不能據此判永久 hold 違反。",
+      "plainlanguage": {
+        "assessment": "表格前半易讀；後半以大量分支、commit、PR、規格、規劃等內部程序淹沒目前只缺日期的下一步。",
+        "metaphor": "未見比喻。",
+        "terminology": "commit、PR 為既有專業詞，非自創；但在沒有必要說明精確操作且未解釋時違反此任務的白話目標。"
+      },
+      "findings": [
+        {
+          "severity": "moderate",
+          "category": "scope_drift",
+          "exactquotes": [
+            "你告訴我日期仍待定，要先留一個明確的暫定顯示方式",
+            "我會把「暫定顯示什麼」寫成明確的驗收條件，請你決定後再確認。"
+          ],
+          "source_justification": "使用者要的是真正發行日期的更正，且現在不知道日期。intent Acceptance 2 要必要事實不足時維持訪談，Acceptance 3 不增加未提出範圍。改談暫定顯示是另一個可見結果，不能當作補齊原需求的等價路徑。",
+          "materiality": "這是未採用的建議而非已執行改動；仍會把使用者決策帶到原請求以外。"
+        },
+        {
+          "severity": "minor",
+          "category": "unrequested_scope_narrowing",
+          "exactquotes": [
+            "查證或推測真正的日期。",
+            "- 查證或推測真正發行日期（使用者目前沒有可提供的發行紀錄）。"
+          ],
+          "source_justification": "請求說目前沒有紀錄，沒有要求永遠排除查證。推測日期應避免，但把『查證』與推測一起正式列範圍外，阻斷之後有來源時的合理補足方式。intent Acceptance 1 要有據、Acceptance 3 不增範圍。",
+          "materiality": "草稿中的額外限制；未證明實際拒絕查證。"
+        },
+        {
+          "severity": "minor",
+          "category": "plain_language",
+          "exactquotes": [
+            "狀態是 `open`",
+            "沒有 commit",
+            "切出變更分支並 commit，接著進入規劃。",
+            "是否自動上傳分支並開 PR"
+          ],
+          "source_justification": "追加白話要求。現時只需說等日期後更新需求草稿、再請確認；wrapper 要解釋確認含義，但不要求用未解釋的英文縮寫和內部步驟。必要後果可用自然語句表達。",
+          "materiality": "可避免的內部流程語言；不是自創名詞，也不是單憑提到未來流程就認定授權違反。"
+        }
+      ],
+      "qualifications": [
+        {
+          "quote": "**你之後確認時，等於同意這幾件事：**",
+          "assessment": "完整 wrapper 明確要求 explain what I would be confirming；因此未來確認預告不是本身的錯誤。本筆問題在附加方向、限制和白話負擔，不能用『應完全省略確認預告』作為失敗理由。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "未讀技能來源，無法由這些單次輸出確定哪條指引造成缺陷。",
+    "每筆單次輸出及兩個同題紀錄只提供觀察，不能估計可靠度、失敗率或變體優劣。",
+    "只評 supplied reply/draft/trajectory 可見內容；未把散文歧義當作 runtime bug。",
+    "missing-date wrapper 明確要求說明未來確認內容。若 harness 預期完全不出現未來確認預告，應標 fixture/instruction ambiguity，不是直接判技能失敗。",
+    "explicit-hold 兩筆有明確永久發布暫停；其他 missing-date 的 do not implement or publish 沒有 after-confirmation 語句，不能硬套永久限制。",
+    "未以技術控制通過替代語意與真實主機行為驗證。"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "prior_counts": {
+    "user_standard": 4,
+    "relaxed": 21,
+    "earlier": 116
+  },
+  "reserved": [
+    "simple-current",
+    "simple-example",
+    "missing-current",
+    "missing-example"
+  ],
+  "started": [
+    "simple-current",
+    "simple-example",
+    "missing-current",
+    "missing-example"
+  ],
+  "completed": [
+    {
+      "key": "simple-current",
+      "exit_code": 0,
+      "elapsed_seconds": 44.93,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    {
+      "key": "simple-example",
+      "exit_code": 0,
+      "elapsed_seconds": 46.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    {
+      "key": "missing-current",
+      "exit_code": 0,
+      "elapsed_seconds": 46.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    {
+      "key": "missing-example",
+      "exit_code": 0,
+      "elapsed_seconds": 46.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    }
+  ],
+  "max_starts": 8,
+  "source_sha256": {
+    "current": {
+      "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+      "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+      "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+    },
+    "example": {
+      "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+      "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "5768fe7ad21fe93956aaa1e3ee8ba88c491e06e7fa51adeae0a54ac0bee877f0",
+      "loom-code/skills/write-plan/references/confirm-intent.md": "b36840eb9393e74bf26d17472dd34f29da9cd805ddfdd6f0e7814cea97bfb6aa"
+    }
+  },
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "independent_provider_receipt": false
+}

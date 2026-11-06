@@ -1,0 +1,442 @@
+[
+  {
+    "case": "code-4",
+    "request": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
+    "reply": "我還不能確認這個變更,因為缺少一個必要事實:**最新版本實際的發佈日期**。\n\n目前 `RELEASE_NOTES.md` 寫的是 `Release date: 2026-10-12`。客戶看到上個月的日期,會以為最新版本已經很舊。你希望只更正這個日期,檔案其他內容都不動。\n\n我不會用今天的日期(2026-11-03)頂替。今天不一定是發佈日,猜錯會讓客戶看到另一個錯誤日期。\n\n請提供下列任一項:\n- 最新版本實際的發佈日期。\n- 能查到該日期的發佈紀錄,例如 tag、release 頁面或公告。\n\n拿到日期後,我會把範圍整理成一則確認訊息給你:只改發佈日期、其餘不動。你回覆 yes 後,我才會寫 intent 並進入後續流程。\n\n目前沒有建立任何 intent、分支或 commit,也沒有修改任何檔案。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; echo \"exit=$?\"; ls docs docs/loom docs/loom/intent 2>&1 | head -30; git branch --show-current; grep -n -i -E \"date|release|20[0-9]{2}\" RELEASE_NOTES.md | head -30"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirmation-examples.md"
+        }
+      }
+    ],
+    "drafts": [],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "capture-4",
+    "request": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
+    "reply": "發行說明目前寫的是「Release date: 2026-10-12」,讓客戶以為最新版本是上個月的。我還不能開始整理意圖,因為不知道正確的發行日期。\n\n我不會拿今天的日期(2026-11-03)來代替,因為那可能不是實際發行日。你能告訴我實際的發行日期,或指給我一份可以查到這個日期的發行紀錄(例如 tag、發佈頁面或變更紀錄)嗎?\n\n有了日期之後,我會把範圍整理成「只更正發行說明上顯示的那個日期,其他內容都不動」,再請你確認。目前我沒有修改任何檔案,也沒有建立意圖文件。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-4-i3/RELEASE_NOTES.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/templates/intent.md"
+        }
+      },
+      {
+        "name": "Glob",
+        "input": {
+          "pattern": "**/*",
+          "path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-4-i3/docs"
+        }
+      }
+    ],
+    "drafts": [],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "capture-5",
+    "request": "The retry policy is the rule for repeating failed background jobs. The dispatch profile selects which worker handles them. Right now one job uses another job's profile, and failed jobs repeat forever, blocking the queue. I want each job to use its own selection and stop after its configured limit. Keep existing successful jobs unchanged; this is internal behavior, with no new interface.",
+    "reply": "我已把意圖寫成草稿,狀態是 `open`,還沒確認。請你確認或修正。\n\n**要解決的問題**\n- 背景工作的「派工設定」決定由哪個 worker 處理。目前有一個工作用了另一個工作的設定。\n- 失敗的工作會無限重試,沒有停在它設定的重試上限,所以一直佔住佇列,擋住其他工作。\n\n**要達成的結果**\n1. 每個背景工作選 worker 時,用的是它自己的派工設定。\n2. 失敗的工作最多重試到它自己設定的上限,之後不再重試。\n3. 失敗工作達到上限後,不再擋住佇列裡其他工作。\n4. 原本成功的工作,行為與結果跟修改前一樣。\n\n**不包含**\n- 任何新介面、設定項目或指令。\n- 保證同一個工作每次都選到同一個 worker,或每次結果完全相同。\n- 修改各工作的重試上限數值。\n\n**要先知道的影響**\n- 目前卡在無限重試的失敗工作,修好後會在上限停止,不再重試。我沒有假設它們停止後的狀態,因為你沒提到,這部分會另外處理。\n- 這是內部行為修正,不需要另外做介面設計,確認後直接進入規劃。\n\n**回答「是」代表什麼**\n- 你確認上面的範圍和結果。\n- 你同意在審查與發布檢查都通過後,把變更分支上傳(不強制推送),並開一個可供審查的 pull request。\n- 合併是另一個決定,不包含在這次的「是」裡。\n- 如果你不想自動發布,可以在回答時說不要,我就不會上傳也不開 PR。\n\n這樣的範圍和發布方式正確嗎?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent && cat references/interview.md references/confirmation-examples.md templates/intent.md; ls /private/tmp/loom-context-claude-dogfood-retest/runs/capture-5-i3 /private/tmp/loom-context-claude-dogfood-retest/runs/capture-5-i3/docs"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-5-i3/docs/loom/intent/2026-11-03-job-own-dispatch-and-retry-limit.md",
+          "content": "# 每個背景工作使用自己的派工設定，並在重試上限停止\noriginator: kouko\nkind: engineering\nneeds-design: no — 純內部行為修正，不改變任何使用者讀取或輸入的介面，也沒有新介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n背景工作的「派工設定」決定由哪個 worker 處理該工作。目前有一個工作使用了另一個工作的派工設定。另外，失敗的工作會無限重試，沒有在其設定的重試上限停止，因此持續佔住佇列、擋住其他工作。\n\n## Proposed outcome\n每個背景工作都使用自己的派工設定來選擇 worker；失敗的工作在其設定的重試上限後停止重試，不再阻塞佇列。\n\n## Acceptance\n1. 每個背景工作選擇 worker 時，使用的是它自己的派工設定，而不是其他工作的設定。\n2. 失敗的工作最多重試到它所設定的上限，之後不再重試。\n3. 失敗工作達到上限後，佇列中其他工作不再被它阻塞。\n4. 原本成功的工作，其結果與行為與修改前一致。\n\n## Constraints\n- 這是內部行為修正，不新增任何對外介面。\n- 既有成功的工作維持不變。\n\n## Out of scope\n- 新增或變更對外介面、設定項目或指令。\n- 保證同一工作每次都選到同一個 worker，或每次結果完全相同。\n- 變更各工作的重試上限數值本身。\n\n## Open questions\n- none\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-job-own-dispatch-and-retry-limit.md",
+        "content": "# 每個背景工作使用自己的派工設定，並在重試上限停止\noriginator: kouko\nkind: engineering\nneeds-design: no — 純內部行為修正，不改變任何使用者讀取或輸入的介面，也沒有新介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n背景工作的「派工設定」決定由哪個 worker 處理該工作。目前有一個工作使用了另一個工作的派工設定。另外，失敗的工作會無限重試，沒有在其設定的重試上限停止，因此持續佔住佇列、擋住其他工作。\n\n## Proposed outcome\n每個背景工作都使用自己的派工設定來選擇 worker；失敗的工作在其設定的重試上限後停止重試，不再阻塞佇列。\n\n## Acceptance\n1. 每個背景工作選擇 worker 時，使用的是它自己的派工設定，而不是其他工作的設定。\n2. 失敗的工作最多重試到它所設定的上限，之後不再重試。\n3. 失敗工作達到上限後，佇列中其他工作不再被它阻塞。\n4. 原本成功的工作，其結果與行為與修改前一致。\n\n## Constraints\n- 這是內部行為修正，不新增任何對外介面。\n- 既有成功的工作維持不變。\n\n## Out of scope\n- 新增或變更對外介面、設定項目或指令。\n- 保證同一工作每次都選到同一個 worker，或每次結果完全相同。\n- 變更各工作的重試上限數值本身。\n\n## Open questions\n- none\n"
+      }
+    ],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "capture-6",
+    "request": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
+    "reply": "我說的「profile」是簡稱,而且我沒有交代它指的是什麼。它指的就是你前面描述的那條規則:決定每個工作由誰來執行的「worker 選擇規則」。我沒有在程式裡確認有叫這個名字的東西。這個 repo 目前只有 README 和 docs,沒有程式碼可查。所以這裡的「profile」只是我對你那句話的代稱。\n\n**我理解的需求**\n\n- **現況:** 每個工作都該有自己的一條規則,用來決定由誰執行。現在有些工作用到了別的工作的規則。\n- **影響:** 你看到的結果因此不一致。\n- **要的結果:** 每個工作都改用自己的那條規則來選執行者。\n- **不變的部分:** 目前能正常運作的工作,以及現有的使用介面,都維持原樣。\n\n**這次不承諾的事**\n\n這個修正只處理「用哪一條規則」。它不保證同一個工作每次都選到同一個 worker,也不保證每次結果完全相同。你只說了結果不一致,我沒有把它升級成更強的要求。如果你其實要的是「結果每次都一樣」,請告訴我,那會是另一個範圍。\n\n**你回答「確認」代表什麼**\n\n- 你確認上面這個範圍:各工作改用自己的選擇規則,其他維持不變。\n- 你同時授權我在審查和發佈檢查通過後,把這個變更的分支上傳(不強制推送),並開一個可供審查的 pull request。合併是另一個獨立的決定,不會自動發生。\n- 如果你不想自動發佈,請現在說,我就不會上傳或開 pull request。\n\n我還沒有把這個需求標成已確認。這樣描述符合你的需求嗎?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Grep",
+        "input": {
+          "pattern": "profile",
+          "path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-6-i3",
+          "-i": true,
+          "output_mode": "content",
+          "head_limit": 40
+        }
+      }
+    ],
+    "drafts": [],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "code-5",
+    "request": "The retry policy is the rule for repeating failed background jobs. The dispatch profile selects which worker handles them. Right now one job uses another job's profile, and failed jobs repeat forever, blocking the queue. I want each job to use its own selection and stop after its configured limit. Keep existing successful jobs unchanged; this is internal behavior, with no new interface.",
+    "reply": "我已把意圖寫成草稿,狀態仍是 `open`,還沒有確認。我沒有建立分支、沒有 commit,也沒有寫計畫。\n\n**我理解的需求:**\n- **問題:** 背景作業有時會用到別的作業的「工作者選擇規則」,也就是決定由誰執行這份作業的規則。失敗的作業還會無限重試,卡住後面的佇列。\n- **目標:** 每個作業只用自己的選擇規則。失敗的作業重試到它設定的上限就停止,不再擋住佇列。\n- **不變的部分:** 成功的作業行為維持現狀,對外介面不變,也不新增任何介面。\n\n**驗收條件:**\n1. 作業只用自己的選擇規則挑選工作者,不用別的作業的規則。\n2. 失敗的作業在達到自己設定的重試上限後停止重試。\n3. 已達上限的作業不再阻擋佇列中的其他作業。\n4. 成功的作業行為與現在相同。\n5. 沒有新增介面。\n\n**你回答「確認」代表:**\n- 你確認上述範圍。\n- 你授權我在審查與發布檢查通過後,以非強制推送的方式上傳變更分支,並開一個可供審查的 pull request。\n- 合併是另一個獨立決定,不包含在內。\n- 你可以在發布前選擇不要自動發布。\n\n**請你回覆:**\n- 這是不是你要的範圍?\n- 要不要自動發布?\n\n你確認之後,我才會建立分支、提交意圖,再寫計畫。如果你要修改,請直接告訴我。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; ls docs docs/loom docs/loom/intent 2>&1 | head -30; ls /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/runs/code-5-i3; cat /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/contract/templates/intent.md; git branch --show-current; git log --oneline | head -3"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/runs/code-5-i3; mkdir -p docs/loom/intent; cat > docs/loom/intent/2026-11-03-job-own-selection-and-retry-limit.md <<'EOF'\n# Background jobs use their own worker selection and stop at their retry limit\noriginator: kouko\nkind: engineering\nneeds-design: no — internal behavior only; no user-facing surface and no new interface\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nBackground jobs sometimes pick their worker using another job's worker-selection rule, and failed jobs are retried forever, so they block the queue behind them. This affects the maintainers and everything waiting in the queue.\n\n## Proposed outcome\nEach background job chooses its worker using its own selection rule, and a failed job stops being retried once it reaches its configured retry limit.\n\n## Acceptance\n1. A job chooses its worker using its own selection rule, never another job's rule.\n2. A failed job stops being retried after its configured retry limit.\n3. A job that has reached its retry limit no longer blocks other jobs in the queue.\n4. Jobs that succeed behave as they do today.\n5. No new interface is introduced.\n\n## Constraints\n- The existing interface stays unchanged.\n\n## Out of scope\n- Changing which worker a job picks beyond using its own rule.\n- Changing how successful jobs run.\n\n## Open questions\n- none\nEOF\n\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair standing docs/loom/intent/2026-11-03-job-own-selection-and-retry-limit.md; echo exit $?"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-job-own-selection-and-retry-limit.md",
+        "content": "# Background jobs use their own worker selection and stop at their retry limit\noriginator: kouko\nkind: engineering\nneeds-design: no — internal behavior only; no user-facing surface and no new interface\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\nBackground jobs sometimes pick their worker using another job's worker-selection rule, and failed jobs are retried forever, so they block the queue behind them. This affects the maintainers and everything waiting in the queue.\n\n## Proposed outcome\nEach background job chooses its worker using its own selection rule, and a failed job stops being retried once it reaches its configured retry limit.\n\n## Acceptance\n1. A job chooses its worker using its own selection rule, never another job's rule.\n2. A failed job stops being retried after its configured retry limit.\n3. A job that has reached its retry limit no longer blocks other jobs in the queue.\n4. Jobs that succeed behave as they do today.\n5. No new interface is introduced.\n\n## Constraints\n- The existing interface stays unchanged.\n\n## Out of scope\n- Changing which worker a job picks beyond using its own rule.\n- Changing how successful jobs run.\n\n## Open questions\n- none\n"
+      }
+    ],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "code-6",
+    "request": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
+    "reply": "先說明一點：「profile」是我上一次重述時用的詞，不是你說的。我也不知道它在你的系統裡指什麼。這個 repo 目前只有 `README.md` 和 `docs/loom/KICKOFF-DEFAULTS.md`，沒有程式碼，我查不到「profile」在實作裡對應什麼。所以我不會替它下定義，下面改用你的原話重述。\n\n## 我理解的需求（尚未寫入、尚未確認）\n\n**名詞**\n- **工作選擇（worker selection）**：決定每個工作（job）由哪個 worker 執行的規則。你說的是這個，我之前寫成「profile」。\n\n**問題**\n- 現在有些工作用到了別的工作的選擇，不是自己的。\n- 結果就是不一致：工作不是照自己的規則被派給 worker。\n- 受影響的是依賴這些工作結果的人。\n\n**期望結果**\n- 每個工作只依自己的工作選擇來決定誰執行，不受其他工作影響。\n\n**驗收（可觀察的結果）**\n1. 兩個工作的選擇規則不同時，各自依自己的規則被派給 worker，不會用到對方的。\n2. 同一個工作重複執行時，選擇規則的套用方式一致，不因其他工作的存在而改變。\n\n我只承諾「各工作的選擇互不干擾」。我不承諾「同一個工作每次都由同一個 worker 執行」，也不承諾「每次結果完全相同」，因為你沒有這樣要求。\n\n## 需要你回答的一個問題\n\n已經用了錯誤選擇而跑過的工作，要不要在這次處理？\n- **不處理**：只修正之後的行為，過去的結果保持原樣。這是預設，因為它不會動到你現有的資料。\n- **要處理**：需要重跑或更正舊結果。這會改動你現有的資料，我需要你明確授權。\n\n## 你回答「是」代表什麼\n\n- 你確認上面的問題、結果和驗收範圍。\n- 你授權我在審查和發佈檢查通過後，推送變更分支（非強制推送），並開一個可供審查的 pull request。合併是另一個獨立決定，不在這次授權內。\n- 你也可以選擇不自動發佈，我會在發佈前保留這個選項。\n\n在你回覆前，我不會寫入或提交意圖文件，也不會開始規劃。請告訴我：重述是否正確、舊結果要不要處理，以及要不要自動發佈。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; ls -R docs | head -50",
+          "description": "Check contract version and list docs"
+        }
+      },
+      {
+        "name": "Grep",
+        "input": {
+          "pattern": "profile",
+          "-i": true,
+          "output_mode": "count"
+        }
+      },
+      {
+        "name": "Grep",
+        "input": {
+          "pattern": "profile",
+          "-i": true,
+          "output_mode": "content",
+          "-C": 3,
+          "path": "/private/tmp/loom-context-claude-dogfood-retest/runs/code-6-i3/README.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      }
+    ],
+    "drafts": [],
+    "fixture_has_commit": false,
+    "reference_read_requested": false
+  },
+  {
+    "case": "capture-7",
+    "request": "Each job randomly selects a worker from its own eligible-worker list. A bug sometimes makes it use another job's list. Fix the list ownership error while preserving random choice. Capture this internal bug-fix intent without adding an interface.",
+    "reply": "我已把意圖草稿寫入 `docs/loom/intent/2026-11-03-fix-job-worker-list-ownership.md`。狀態是 `open`,我還沒有確認它、建分支或提交任何東西。\n\n**請確認以下範圍:**\n\n每個工作都有自己的合格工作者清單,並從中隨機挑一位來執行。目前有時會誤用另一個工作的清單,所以工作可能被派給不屬於它的工作者。\n\n這次修正的是挑選時用哪一份清單。修正後每個工作只會從自己的清單中隨機挑選,隨機特性保持不變,也不新增任何介面。\n\n這次不保證同一工作每次選到同一位工作者或得到相同結果,也不改變清單內容或清單的決定方式。\n\n**回答「是」代表:**\n- 你確認上述範圍。\n- 你授權我在審查和發佈檢查通過後,以非強制推送上傳變更分支,並開啟一個可供審查的 pull request。\n- 你可以在發佈前選擇退出自動發佈。\n- 合併是另一個獨立的決定。\n\n這是一個沒有取捨的內部錯誤修正,沒有需要你另外決定的難以回復的選擇。\n\n這是你要的修改嗎?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent && cat references/interview.md references/confirmation-examples.md templates/intent.md; ls /private/tmp/loom-context-claude-dogfood-retest/runs/capture-7-i3 /private/tmp/loom-context-claude-dogfood-retest/runs/capture-7-i3/docs"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "mkdir -p /private/tmp/loom-context-claude-dogfood-retest/runs/capture-7-i3/docs/loom/intent && cat > /private/tmp/loom-context-claude-dogfood-retest/runs/capture-7-i3/docs/loom/intent/2026-11-03-fix-job-worker-list-ownership.md <<'EOF'\n# 修正工作使用他人合格工作者清單的錯誤\noriginator: kouko\nkind: engineering\nneeds-design: no — 內部錯誤修正,不改變任何使用者讀取或輸入的介面,也不涉及多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n每個工作(job)都有自己的合格工作者清單,並從中隨機挑選一位工作者來執行。目前有時會誤用另一個工作的清單,因此工作可能被派給不屬於它的合格工作者。\n\n## Proposed outcome\n每個工作只從自己的合格工作者清單中隨機挑選工作者;隨機挑選的特性保持不變,現有介面也不變。\n\n## Acceptance\n1. 每個工作挑選工作者時,只會使用它自己的合格工作者清單,不會使用其他工作的清單。\n2. 工作者仍然是從該工作自己的清單中隨機挑選。\n3. 不新增任何對外介面。\n\n## Constraints\n- 必須保留隨機挑選。\n- 不新增介面。\n\n## Out of scope\n- 保證同一工作每次都選到同一位工作者,或得到相同結果。\n- 變更合格工作者清單的內容或決定方式。\n\n## Open questions\n- none\nEOF"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-fix-job-worker-list-ownership.md",
+        "content": "# 修正工作使用他人合格工作者清單的錯誤\noriginator: kouko\nkind: engineering\nneeds-design: no — 內部錯誤修正,不改變任何使用者讀取或輸入的介面,也不涉及多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n每個工作(job)都有自己的合格工作者清單,並從中隨機挑選一位工作者來執行。目前有時會誤用另一個工作的清單,因此工作可能被派給不屬於它的合格工作者。\n\n## Proposed outcome\n每個工作只從自己的合格工作者清單中隨機挑選工作者;隨機挑選的特性保持不變,現有介面也不變。\n\n## Acceptance\n1. 每個工作挑選工作者時,只會使用它自己的合格工作者清單,不會使用其他工作的清單。\n2. 工作者仍然是從該工作自己的清單中隨機挑選。\n3. 不新增任何對外介面。\n\n## Constraints\n- 必須保留隨機挑選。\n- 不新增介面。\n\n## Out of scope\n- 保證同一工作每次都選到同一位工作者,或得到相同結果。\n- 變更合格工作者清單的內容或決定方式。\n\n## Open questions\n- none\n"
+      }
+    ],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "code-8",
+    "request": "Our release notes show an incorrect release date. The actual release date is unknown and we have not verified any replacement date. I want the notes corrected only after the date is established; all other content must remain unchanged. Capture the intent and leave unknown facts unresolved.",
+    "reply": "目前還不能確認這份變更,也還沒開始規劃。\n\n**問題**:發行說明上的發布日期是錯的,會讓客戶以為最新版本很舊,造成混淆。\n\n**你希望的結果**:等實際發布日期確定後,只把發行說明裡的日期改成正確的日期。其他內容一律不動。\n\n**缺少的事實**:正確的發布日期。你說目前不知道,也沒有驗證過任何替代日期。我不會拿今天的日期或其他推測值來代替,也不會先改檔案。\n\n**需要你提供其中一項**:\n- 已查證的實際發布日期,或\n- 能查出日期的依據,例如發布紀錄、tag、發布公告或部署紀錄。你給我依據,我可以幫你查,但查到的日期要由你確認。\n\n在日期確定之前,我沒有建立 intent,沒有建立分支,也沒有 commit 或改任何檔案。日期補齊後,我會再寫一則完整的確認訊息給你,到時你回覆 yes,才會繼續規劃。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; echo \"exit=$?\"; ls docs/loom/intent 2>&1; git branch --show-current; ls docs README.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      }
+    ],
+    "drafts": [],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "capture-h1",
+    "request": "The accounting team exports invoices. Each customer has its own currency setting, but an export sometimes uses the previous customer's setting, so the invoice shows the wrong currency. Fix only whose setting is used. Invoice amounts can legitimately differ between exports; I am not asking for identical amounts. Keep the export format unchanged and do not rewrite existing export files. Capture this internal bug-fix intent and explain what I would be confirming.",
+    "reply": "我已把意圖寫成草稿,狀態是 `open`(尚未確認)。我先停在這裡等你確認,沒有建立分支,也沒有提交任何東西。\n\n草稿在 `docs/loom/intent/2026-11-03-export-use-own-customer-currency.md`。\n\n## 你的問題\n\n會計團隊匯出發票時,每位客戶都有自己的幣別設定。但匯出偶爾會改用前一位客戶的設定,結果那張發票顯示錯誤的幣別。\n\n## 你想要的結果\n\n匯出每位客戶的發票時,一律使用該客戶自己的幣別設定。只修正「用誰的設定」這一件事。\n\n## 驗收條件\n\n1. 匯出多位幣別設定不同的客戶發票時,每張發票的幣別都等於該客戶自己的設定,不受前一位客戶影響。\n2. 匯出檔的格式與修正前相同。\n3. 修正前已產生的匯出檔沒有被改寫。\n\n## 範圍與限制\n\n- **不要求金額一致:** 你說不同次匯出的金額可以合理不同,我沒有把「金額一致」寫成要求,也把金額列在範圍之外。\n- **不重新產生舊檔:** 舊的匯出檔(可能已有錯誤幣別)不會被重新產生或修正。\n- **不需要設計文件:** 這是內部修正,沒有新增畫面或介面,所以不需要先寫設計規格,確認後會直接進入規劃。\n- **沒有未決問題:** 開放問題欄寫的是「無」。\n- **不需要額外審查:** 依這個 repo 的預設,不會問你要不要找第二家模型審查。\n- **不需要標準文件:** 這個專案已豁免產品原則文件。\n\n## 你回答「是」會確認什麼\n\n- **只確認結果與範圍:** 你確認的是上面這些結果與範圍,不是任何實作方式。實作方式由我之後依程式碼決定並記錄理由。\n- **提交到新分支:** 我會把狀態改為已確認,並在新的變更分支上提交這份意圖(訊息為 `docs(loom): intent … confirmed`)。\n- **自動發布:** 你的「是」也會授權我在審查與發布前檢查通過後,以非強制推送上傳該分支,並開一個「待審查」的 pull request。\n  - **可以先退出:** 發布前你可以選擇退出自動發布。\n  - **合併另算:** 合併是另一個獨立的決定,不包含在這次確認裡。\n- **沒有不可逆的動作:** 這次變更不會刪除或改寫你現有的資料或匯出檔。\n\n這份範圍符合你的意思嗎?要確認、要自動發布,還是想先改哪一條?",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-design:capture-intent"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cd /private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-design/skills/capture-intent && cat references/interview.md references/confirmation-examples.md templates/intent.md; cd /private/tmp/loom-context-claude-dogfood-retest/runs/capture-h1-i3 && ls -R docs | head -30; cat README.md | head -30; ls PRINCIPLES.md DESIGN.md 2>&1"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "cat docs/loom/KICKOFF-DEFAULTS.md; git branch --show-current; ls docs/loom"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/runs/capture-h1-i3/docs/loom/intent/2026-11-03-export-use-own-customer-currency.md",
+          "content": "# 匯出發票時使用該客戶自己的幣別設定\noriginator: kouko\nkind: engineering\nneeds-design: no — 只修正取用哪位客戶的幣別設定,匯出格式與使用者介面皆不變\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊會匯出發票。每位客戶都有自己的幣別設定,但匯出時偶爾會改用「前一位客戶」的設定,導致該張發票顯示錯誤的幣別。\n\n## Proposed outcome\n匯出每位客戶的發票時,一律使用該客戶自己的幣別設定。\n\n## Acceptance\n1. 匯出多位幣別設定不同的客戶發票時,每張發票顯示的幣別都等於該客戶自己的幣別設定,不受前一位客戶影響。\n2. 匯出檔的格式與修正前相同。\n3. 修正前已產生的匯出檔沒有被改寫。\n\n## Constraints\n- 只修正「使用誰的設定」;不處理其他問題。\n- 匯出格式不變。\n- 不改寫既有的匯出檔。\n- 不要求不同次匯出的發票金額一致;金額在不同次匯出之間可以合理不同。\n\n## Out of scope\n- 發票金額的計算或其一致性。\n- 匯出格式的任何變更。\n- 重新產生或修正已存在的匯出檔。\n\n## Open questions\n- none\n"
+        }
+      }
+    ],
+    "drafts": [
+      {
+        "path": "docs/loom/intent/2026-11-03-export-use-own-customer-currency.md",
+        "content": "# 匯出發票時使用該客戶自己的幣別設定\noriginator: kouko\nkind: engineering\nneeds-design: no — 只修正取用哪位客戶的幣別設定,匯出格式與使用者介面皆不變\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊會匯出發票。每位客戶都有自己的幣別設定,但匯出時偶爾會改用「前一位客戶」的設定,導致該張發票顯示錯誤的幣別。\n\n## Proposed outcome\n匯出每位客戶的發票時,一律使用該客戶自己的幣別設定。\n\n## Acceptance\n1. 匯出多位幣別設定不同的客戶發票時,每張發票顯示的幣別都等於該客戶自己的幣別設定,不受前一位客戶影響。\n2. 匯出檔的格式與修正前相同。\n3. 修正前已產生的匯出檔沒有被改寫。\n\n## Constraints\n- 只修正「使用誰的設定」;不處理其他問題。\n- 匯出格式不變。\n- 不改寫既有的匯出檔。\n- 不要求不同次匯出的發票金額一致;金額在不同次匯出之間可以合理不同。\n\n## Out of scope\n- 發票金額的計算或其一致性。\n- 匯出格式的任何變更。\n- 重新產生或修正已存在的匯出檔。\n\n## Open questions\n- none\n"
+      }
+    ],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  },
+  {
+    "case": "code-h2",
+    "request": "The setup guide tells customers to run orbit launch, which is the old command and now fails. I verified the correct command is orbit start. Change only that command line; every other part of the guide must stay the same. Capture this documentation-correction intent and stop for my confirmation.",
+    "reply": "安裝指南目前要客戶執行 `orbit launch` 來啟動應用程式。這是舊指令,現在會失敗,所以客戶照著做會卡在第一步。你已確認正確指令是 `orbit start`。\n\n我打算只把那一行指令從 `orbit launch` 改成 `orbit start`。指南的其他內容(其他文字、步驟、格式)都不動,也不新增或移除任何東西。\n\n你回覆「是」就表示確認這個範圍,並授權我在檢查通過後,以非強制方式上傳變更分支,再開一個可供審閱的 pull request。發佈前你隨時可以選擇不發佈。合併是另一個獨立的決定,不包含在這次確認裡。\n\n這是你要的修正嗎?\n\n在你確認之前,我不會寫計畫、不會提交任何東西,也不會動指南檔案。",
+    "permission_denials": [],
+    "tools": [
+      {
+        "name": "Skill",
+        "input": {
+          "skill": "loom-code:write-plan"
+        }
+      },
+      {
+        "name": "Bash",
+        "input": {
+          "command": "\"/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/scripts/loom-python\" --repair contract --require 2.1; echo \"exit=$?\"; ls docs docs/loom docs/loom/intent 2>&1 | head -30; grep -rn \"orbit launch\" --include=*.md . | head"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirmation-examples.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/no-intent-interview.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/loom-context-claude-dogfood-retest/candidate-bundle/loom-code/skills/write-plan/references/confirm-intent.md"
+        }
+      },
+      {
+        "name": "Grep",
+        "input": {
+          "pattern": "orbit (launch|start)",
+          "output_mode": "content",
+          "path": "/private/tmp/loom-context-claude-dogfood-retest/runs/code-h2-i3"
+        }
+      }
+    ],
+    "drafts": [],
+    "fixture_has_commit": false,
+    "reference_read_requested": true
+  }
+]

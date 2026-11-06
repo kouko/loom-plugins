@@ -1,0 +1,50 @@
+{
+  "Z01": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "code-missing-date-candidate-r1"
+  },
+  "Z02": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1"
+  },
+  "Z03": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "code-known-date-candidate-r1"
+  },
+  "Z04": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "code-missing-date-candidate-r1"
+  },
+  "Z05": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "capture-invoice-natural-default-candidate-r1"
+  },
+  "Z06": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "capture-missing-date-candidate-r2"
+  },
+  "Z07": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "capture-csv-candidate-r1"
+  },
+  "Z08": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "code-missing-date-candidate-r2"
+  },
+  "Z09": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "capture-missing-date-candidate-r2"
+  },
+  "Z10": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "code-known-wrong-date-candidate-r1"
+  },
+  "Z11": {
+    "root": "/tmp/loom-correct-consistent-trial",
+    "key": "code-known-date-candidate-r1"
+  },
+  "Z12": {
+    "root": "/tmp/loom-value-state-trial",
+    "key": "capture-missing-date-candidate-r1"
+  }
+}

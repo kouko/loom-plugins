@@ -1,0 +1,62 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-02-context-preserving-explanations",
+  "content_digest": "8fdf65003b054b431db3a780abb93ca0ca6caccd",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py",
+      "artifact": "loom-design/tests/spec/test_capture_intent_contract.py",
+      "result": "pass",
+      "command_digest": "87e785e4e8bbbe8d6620550d224c1a3a4f87f9118ca3455478f085b33eeb5a32"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/final_reviewer_one",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "/root/final_reviewer_two",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "44276606332c340a1d5fed8c8c4ab2b2900dac2a",
+  "tested_commit": "f81993851f9007d146643657c435e6e924f61041",
+  "reviewed_commit": "d3b4412b5bc9f6abeb0f8708b7f8eaee5e0e432b",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "partly"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "partly"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}

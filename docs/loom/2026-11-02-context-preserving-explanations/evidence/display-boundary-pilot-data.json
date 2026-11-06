@@ -1,0 +1,239 @@
+{
+  "model": "claude-sonnet-5-5",
+  "effort": "medium requested",
+  "host": "Claude Code 2.1.317",
+  "preflight": {
+    "synthetic_read_denied": true,
+    "network_bind_exit": 77,
+    "outside_write_denied": true,
+    "initial_network_probe": "failed: sandbox denied user conda Python; reran system Python successfully"
+  },
+  "scripts": {
+    "hook.py": "import json\nimport sys\nimport time\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parent\npayload = json.load(sys.stdin)\nevent = payload.get('hook_event_name')\nrecord = {'event': event, 'time_ns': time.monotonic_ns(),\n          'active': payload.get('stop_hook_active'),\n          'last': payload.get('last_assistant_message'),\n          'delta': payload.get('delta'), 'index': payload.get('index'),\n          'final': payload.get('final')}\nwith (root / 'hook-events.jsonl').open('a') as out:\n    out.write(json.dumps(record, ensure_ascii=False) + '\\n')\nif event == 'Stop' and not payload.get('stop_hook_active'):\n    print(json.dumps({'decision': 'block', 'reason': 'This is an isolated hook test. Now reply only: REVISED_MARKER'}))\nelse:\n    print('{}')\n",
+    "run.py": "import json\nimport os\nimport subprocess\nimport time\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parent\nmodel = 'claude-sonnet-5-5'\nroutes = ('ANTHROPIC_BASE_URL', 'ANTHROPIC_MODEL', 'ANTHROPIC_DEFAULT_SONNET_MODEL',\n          'CLAUDE_CODE_USE_BEDROCK', 'CLAUDE_CODE_USE_VERTEX', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY')\nassert not any(os.environ.get(key) for key in routes), 'Routing override present'\nassert not (root / 'events.jsonl').exists(), 'No overwriting an earlier run'\nsettings = {'autoMemoryEnabled': False, 'claudeMdExcludes': ['/Users/kouko/**'],\n            'hooks': {'Stop': [{'hooks': [{'type': 'command',\n                 'command': '/usr/bin/sandbox-exec -f ' + str(root / 'hooks.sb') + ' /usr/bin/python3 ' + str(root / 'hook.py')}]}]},\n            'sandbox': {'enabled': True, 'autoAllowBashIfSandboxed': True,\n                        'allowUnsandboxedCommands': False, 'failIfUnavailable': True,\n                        'filesystem': {'denyRead': ['/Users/kouko/'], 'denyWrite': ['/Users/kouko/']},\n                        'network': {'allowedDomains': [], 'strictAllowlist': True}}}\n(root / 'settings.json').write_text(json.dumps(settings, indent=2))\nargs = ['/Users/kouko/.local/bin/claude', '-p', '--model', model, '--effort', 'medium',\n        '--restricted', '--strict-mcp-config', '--setting-sources', '', '--settings', str(root / 'settings.json'),\n        '--tools', '', '--output-format', 'stream-json', '--verbose', '--include-partial-messages',\n        '--include-hook-events', '--no-session-persistence', '--max-budget-usd', '0.20']\nprompt = 'This is a harmless synthetic streaming test. Reply with exactly ORIGINAL_MARKER and nothing else.'\n(root / 'invocation.json').write_text(json.dumps({'argv': args, 'prompt': prompt}, indent=2))\nenv = os.environ.copy()\nenv.update(GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_CONFIG_NOSYSTEM='1', TMPDIR=str(root))\nwith (root / 'stderr.txt').open('x') as err, (root / 'events.jsonl').open('x') as out:\n    p = subprocess.Popen(args, cwd=root, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,\n                         stderr=err, text=True, bufsize=1)\n    p.stdin.write(prompt)\n    p.stdin.close()\n    for line in p.stdout:\n        item = {'time_ns': time.monotonic_ns(), 'event': json.loads(line)}\n        out.write(json.dumps(item, ensure_ascii=False) + '\\n')\n        out.flush()\n    code = p.wait(timeout=180)\nassert code == 0, 'CLI did not complete'\nevents = [json.loads(line)['event'] for line in (root / 'events.jsonl').read_text().splitlines()]\nfinal = next(x for x in reversed(events) if x.get('type') == 'result')\nassert not final.get('is_error') and list(final.get('modelUsage', {})) == [model]\nprint(json.dumps({'result': final.get('result'), 'modelUsage': list(final['modelUsage']),\n                  'cost_usd': final.get('total_cost_usd')}, ensure_ascii=False))\n",
+    "display_hook.py": "import json\nimport sys\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parent\npayload = json.load(sys.stdin)\nrecord = {k: payload.get(k) for k in ('hook_event_name', 'delta', 'index', 'final')}\nwith (root / 'display-hook-events.jsonl').open('a') as out:\n    out.write(json.dumps(record) + '\\n')\nprint(json.dumps({'hookSpecificOutput': {'hookEventName': 'MessageDisplay',\n                                         'displayContent': 'DISPLAY_REPLACED_MARKER'}}))\n",
+    "run_display.py": "import json\nimport os\nimport subprocess\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parent\nroutes = ('ANTHROPIC_BASE_URL', 'ANTHROPIC_MODEL', 'ANTHROPIC_DEFAULT_SONNET_MODEL',\n          'CLAUDE_CODE_USE_BEDROCK', 'CLAUDE_CODE_USE_VERTEX', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY')\nassert not any(os.environ.get(key) for key in routes)\nsettings = json.loads((root / 'settings.json').read_text())\nsettings['hooks'] = {'MessageDisplay': [{'hooks': [{'type': 'command',\n    'command': '/usr/bin/sandbox-exec -f ' + str(root / 'hooks.sb') + ' /usr/bin/python3 ' + str(root / 'display_hook.py')}]}]}\n(root / 'settings-display.json').write_text(json.dumps(settings, indent=2))\nargs = ['/Users/kouko/.local/bin/claude', '-p', '--model', 'claude-sonnet-5-5', '--effort', 'medium',\n        '--restricted', '--strict-mcp-config', '--setting-sources', '', '--settings', str(root / 'settings-display.json'),\n        '--tools', '', '--output-format', 'stream-json', '--verbose', '--include-partial-messages',\n        '--include-hook-events', '--no-session-persistence', '--max-budget-usd', '0.20']\nenv = os.environ.copy()\nenv.update(GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_CONFIG_NOSYSTEM='1', TMPDIR=str(root))\noutpath = root / 'display-events.jsonl'\nassert not outpath.exists()\nwith outpath.open('x') as out, (root / 'display-stderr.txt').open('x') as err:\n    p = subprocess.run(args, cwd=root, env=env, input='Reply with exactly ORIGINAL_DISPLAY_MARKER.',\n                       stdout=out, stderr=err, text=True, timeout=180)\nassert p.returncode == 0\nevents = [json.loads(s) for s in outpath.read_text().splitlines()]\nfinal = next(x for x in reversed(events) if x.get('type') == 'result')\nassert not final.get('is_error') and list(final.get('modelUsage', {})) == ['claude-sonnet-5-5']\nprint(json.dumps({'result': final.get('result'), 'modelUsage': list(final['modelUsage']),\n                  'cost_usd': final.get('total_cost_usd'),\n                  'hook_log_exists': (root / 'display-hook-events.jsonl').exists()}))\n",
+    "run_failure.py": "import json\nimport os\nimport subprocess\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parent\nroutes = ('ANTHROPIC_BASE_URL', 'ANTHROPIC_MODEL', 'ANTHROPIC_DEFAULT_SONNET_MODEL',\n          'CLAUDE_CODE_USE_BEDROCK', 'CLAUDE_CODE_USE_VERTEX', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY')\nassert not any(os.environ.get(k) for k in routes)\nsettings = json.loads((root / 'settings-display.json').read_text())\nsettings['hooks']['MessageDisplay'][0]['hooks'][0]['command'] = '/usr/bin/false'\n(root / 'settings-display-failure.json').write_text(json.dumps(settings, indent=2))\nargs = ['/Users/kouko/.local/bin/claude', '-p', '--model', 'claude-sonnet-5-5', '--effort', 'medium',\n        '--restricted', '--strict-mcp-config', '--setting-sources', '', '--settings', str(root / 'settings-display-failure.json'),\n        '--tools', '', '--output-format', 'stream-json', '--verbose', '--include-partial-messages',\n        '--include-hook-events', '--no-session-persistence', '--max-budget-usd', '0.20']\nenv = os.environ.copy()\nenv.update(GIT_CONFIG_GLOBAL='/dev/null', GIT_CONFIG_SYSTEM='/dev/null', GIT_CONFIG_NOSYSTEM='1', TMPDIR=str(root))\npath = root / 'failure-events.jsonl'\nassert not path.exists()\nwith path.open('x') as out, (root / 'failure-stderr.txt').open('x') as err:\n    p = subprocess.run(args, cwd=root, env=env, input='Reply with exactly FAILURE_TEST_MARKER.',\n                       stdout=out, stderr=err, text=True, timeout=180)\nassert p.returncode == 0\nevents = [json.loads(s) for s in path.read_text().splitlines()]\nfinal = next(x for x in reversed(events) if x.get('type') == 'result')\nassert not final.get('is_error') and list(final.get('modelUsage', {})) == ['claude-sonnet-5-5']\nprint(json.dumps({'result': final.get('result'), 'modelUsage': list(final['modelUsage']),\n                  'cost_usd': final.get('total_cost_usd')}))\n",
+    "hooks.sb": "(version 1)\n(allow default)\n(deny network*)\n(deny file-read* (subpath \"/Users/kouko\"))\n(deny file-read* (literal \"/private/tmp/loom-display-boundary-pilot/private-sentinel\"))\n(deny file-write*)\n(allow file-write* (subpath \"/private/tmp/loom-display-boundary-pilot\"))\n(allow file-write* (literal \"/dev/null\"))\n"
+  },
+  "streams": {
+    "events.jsonl": [
+      {
+        "type": "stream_event",
+        "subtype": null,
+        "text": "ORIGINAL_"
+      },
+      {
+        "type": "stream_event",
+        "subtype": null,
+        "text": "MARKER"
+      },
+      {
+        "type": "assistant",
+        "subtype": null,
+        "text": [
+          "ORIGINAL_MARKER"
+        ]
+      },
+      {
+        "type": "system",
+        "subtype": "hook_started",
+        "hook_event": "Stop",
+        "exit_code": null,
+        "outcome": null
+      },
+      {
+        "type": "system",
+        "subtype": "hook_response",
+        "hook_event": "Stop",
+        "exit_code": 0,
+        "outcome": "success"
+      },
+      {
+        "type": "assistant",
+        "subtype": null,
+        "text": []
+      },
+      {
+        "type": "stream_event",
+        "subtype": null,
+        "text": "REVISED_M"
+      },
+      {
+        "type": "stream_event",
+        "subtype": null,
+        "text": "ARKER"
+      },
+      {
+        "type": "assistant",
+        "subtype": null,
+        "text": [
+          "REVISED_MARKER"
+        ]
+      },
+      {
+        "type": "system",
+        "subtype": "hook_started",
+        "hook_event": "Stop",
+        "exit_code": null,
+        "outcome": null
+      },
+      {
+        "type": "system",
+        "subtype": "hook_response",
+        "hook_event": "Stop",
+        "exit_code": 0,
+        "outcome": "success"
+      },
+      {
+        "type": "result",
+        "subtype": "success",
+        "result": "REVISED_MARKER",
+        "is_error": false,
+        "total_cost_usd": 0.0089027,
+        "modelUsage": {
+          "claude-sonnet-5-5": {
+            "inputTokens": 4,
+            "outputTokens": 80,
+            "cacheReadInputTokens": 2427,
+            "cacheCreationInputTokens": 1963,
+            "webSearchRequests": 0,
+            "costUSD": 0.0089027,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 128000,
+            "thinkingTokens": 55,
+            "cacheCreationEphemeral5mInputTokens": 0,
+            "cacheCreationEphemeral1hInputTokens": 1963,
+            "canonicalModel": "claude-sonnet-5-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        }
+      }
+    ],
+    "display-events.jsonl": [
+      {
+        "type": "system",
+        "subtype": "hook_started",
+        "hook_event": "MessageDisplay",
+        "exit_code": null,
+        "outcome": null
+      },
+      {
+        "type": "system",
+        "subtype": "hook_response",
+        "hook_event": "MessageDisplay",
+        "exit_code": 0,
+        "outcome": "success"
+      },
+      {
+        "type": "assistant",
+        "subtype": null,
+        "text": [
+          "DISPLAY_REPLACED_MARKER"
+        ]
+      },
+      {
+        "type": "result",
+        "subtype": "success",
+        "result": "DISPLAY_REPLACED_MARKER",
+        "is_error": false,
+        "total_cost_usd": 0.0026936,
+        "modelUsage": {
+          "claude-sonnet-5-5": {
+            "inputTokens": 2,
+            "outputTokens": 21,
+            "cacheReadInputTokens": 1516,
+            "cacheCreationInputTokens": 582,
+            "webSearchRequests": 0,
+            "costUSD": 0.0026936,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 128000,
+            "thinkingTokens": 0,
+            "cacheCreationEphemeral5mInputTokens": 0,
+            "cacheCreationEphemeral1hInputTokens": 582,
+            "canonicalModel": "claude-sonnet-5-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        }
+      }
+    ],
+    "failure-events.jsonl": [
+      {
+        "type": "system",
+        "subtype": "hook_started",
+        "hook_event": "MessageDisplay",
+        "exit_code": null,
+        "outcome": null
+      },
+      {
+        "type": "system",
+        "subtype": "hook_response",
+        "hook_event": "MessageDisplay",
+        "exit_code": 1,
+        "outcome": "error"
+      },
+      {
+        "type": "assistant",
+        "subtype": null,
+        "text": [
+          "FAILURE_TEST_MARKER"
+        ]
+      },
+      {
+        "type": "result",
+        "subtype": "success",
+        "result": "FAILURE_TEST_MARKER",
+        "is_error": false,
+        "total_cost_usd": 0.0026236000000000002,
+        "modelUsage": {
+          "claude-sonnet-5-5": {
+            "inputTokens": 2,
+            "outputTokens": 16,
+            "cacheReadInputTokens": 1516,
+            "cacheCreationInputTokens": 577,
+            "webSearchRequests": 0,
+            "costUSD": 0.0026236000000000002,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 128000,
+            "thinkingTokens": 0,
+            "cacheCreationEphemeral5mInputTokens": 0,
+            "cacheCreationEphemeral1hInputTokens": 577,
+            "canonicalModel": "claude-sonnet-5-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        }
+      }
+    ]
+  },
+  "hook_inputs": {
+    "hook-events.jsonl": [
+      {
+        "event": "Stop",
+        "active": false,
+        "last": "ORIGINAL_MARKER",
+        "delta": null,
+        "index": null,
+        "final": null
+      },
+      {
+        "event": "Stop",
+        "active": true,
+        "last": "REVISED_MARKER",
+        "delta": null,
+        "index": null,
+        "final": null
+      }
+    ],
+    "display-hook-events.jsonl": [
+      {
+        "hook_event_name": "MessageDisplay",
+        "delta": "ORIGINAL_DISPLAY_MARKER",
+        "index": 0,
+        "final": true
+      }
+    ]
+  }
+}

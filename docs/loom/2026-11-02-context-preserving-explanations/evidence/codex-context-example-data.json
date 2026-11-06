@@ -1,0 +1,149 @@
+{
+  "simple-current": {
+    "prompt": "Read and follow the skill in /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/SKILL.md and its referenced files in that snapshot. This is a synthetic evaluation in this temporary working directory. Do not access files outside this fixture or the referenced snapshot. Do not send messages or run an external coding agent. Stop and wait for the user response at the intent confirmation. Do not perform implementation or publication before that response. Explain any future authorization according to the specified skill and case.\n\nUse /loom-code:write-plan. Respond in Traditional Chinese. I have not confirmed the change; do not implement or publish before my response.\n\n編輯同事照 SETUP.md 啟動文件預覽時會失敗。README 已確認正確參數是 --bind。請只把該行 --address 改為 --bind；位址、其他說明和工具行為都不變。\n",
+    "messages": [
+      "我會先讀取指定技能與相關檔案，確認這次單行修改的範圍，並停在意圖確認，等待你的回覆。\n",
+      "已核對：README 的指令使用 `--bind 127.0.0.1`，SETUP.md 使用 `--address 127.0.0.1`。我會將意圖記為尚未確認；本次只修正文件參數，不改工具行為。\n",
+      "請確認：只將 SETUP.md 該行的 `--address` 改為 `--bind`，保留 `127.0.0.1`、其他說明及工具行為。\n\n目前只建立未確認的意圖草稿，尚未修改 SETUP.md、實作或發布。\n\n依指定技能，你回覆「確認」也會授權：後續審查與發布檢查通過後，以非強制方式推送分支並建立可供審查的 PR；合併仍需另行決定。你可在發布前明確退出自動發布。本次仍遵守不傳訊息、不執行外部 coding agent 的限制。\n\n請回覆「確認」，或「確認，但不授權發布」。"
+    ],
+    "commands": [
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/SKILL.md'",
+      "/bin/zsh -lc \"pwd && rg --files -g 'AGENTS.md' -g 'SETUP.md' -g 'README*' -g '*loom*' -g 'PRINCIPLES.md' -g 'DESIGN.md' -g 'intent/**' -g '.claude/**' -g '.codex/**'; cat /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/references/confirm-intent.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/references/no-intent-interview.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/references/codex-first-contact.md\"",
+      "/bin/zsh -lc \"rg --files --hidden .; rg --files /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code | rg '(codex-first-contact|one-way-door|intent.md|manifest.yaml|loom-python|second-vendor-ask)'\"",
+      "/bin/zsh -lc 'cat README.md SETUP.md docs/loom/KICKOFF-DEFAULTS.md .git/HEAD .git/config; cat /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/references/codex-first-contact.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/references/one-way-door.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/contract/templates/intent.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/scripts/loom-python'",
+      "/bin/zsh -lc \"ls -la; ls -la /private/tmp/loom-context-example-round-20261105; rg --files --hidden /private/tmp/loom-context-example-round-20261105/snapshots/current | rg '(loom-design|runtime|hooks-codex|loom_checker|second-vendor)' ; cat /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md\"",
+      "/bin/zsh -lc 'cat docs/loom/intent/2026-11-05-fix-preview-flag.md SETUP.md'"
+    ],
+    "drafts": {
+      "docs/loom/intent/2026-11-05-fix-preview-flag.md": "# Correct the documented preview flag\noriginator: kouko\nkind: engineering\nneeds-design: no — Correct an existing documentation command to match README.md; no CLI or tool behavior changes.\nevidence: [README.md, SETUP.md]\nstatus: open\n\n## Problem\nEditorial colleagues cannot start the documentation preview by following the setup instructions.\n\n## Proposed outcome\nThe setup instructions use the supported preview parameter already documented in README.md.\n\n## Acceptance\n1. The preview command in SETUP.md matches the supported parameter documented in README.md.\n2. The address, all other instructions, and tool behavior remain unchanged.\n\n## Constraints\n- Only replace --address with --bind in the existing preview command in SETUP.md.\n- Do not implement or publish before the user's intent confirmation.\n- Do not send messages or run an external coding agent in this synthetic evaluation.\n\n## Out of scope\n- Changes to the preview tool or any other instructions.\n\n## Open questions\n- none\n"
+    },
+    "usage": [
+      {
+        "input_tokens": 217655,
+        "cached_input_tokens": 179200,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1398,
+        "reasoning_output_tokens": 155
+      }
+    ],
+    "receipt": {
+      "key": "simple-current",
+      "exit_code": 0,
+      "elapsed_seconds": 44.93,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    "stderr": ""
+  },
+  "simple-example": {
+    "prompt": "Read and follow the skill in /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/SKILL.md and its referenced files in that snapshot. This is a synthetic evaluation in this temporary working directory. Do not access files outside this fixture or the referenced snapshot. Do not send messages or run an external coding agent. Stop and wait for the user response at the intent confirmation. Do not perform implementation or publication before that response. Explain any future authorization according to the specified skill and case.\n\nUse /loom-code:write-plan. Respond in Traditional Chinese. I have not confirmed the change; do not implement or publish before my response.\n\n編輯同事照 SETUP.md 啟動文件預覽時會失敗。README 已確認正確參數是 --bind。請只把該行 --address 改為 --bind；位址、其他說明和工具行為都不變。\n",
+    "messages": [
+      "我會先讀取指定的 write-plan 技能與其引用檔案，核對這次單行修改的範圍，並在意圖確認處停下，等待你的回覆。\n",
+      "這次只修正啟動說明，讓編輯同事能依文件開啟預覽。\n\n- 已核對 README：正確指令是 `willow preview --bind 127.0.0.1`。\n- SETUP.md 只將該行 `--address` 改為 `--bind`；位址、其他說明及工具行為保持不變。\n- 目前僅建立未確認的意圖草稿，尚未修改 SETUP.md、撰寫計畫、提交或發布。\n\n依技能規定，回答「確認」也會授權日後通過收尾審查及發布檢查後，以非強制方式推送分支並建立可供審查的 PR；合併仍須另行決定，發布前可明確退出。本次不會傳送訊息或執行外部 coding agent。\n\n是否確認上述範圍？若只授權後續修改、不授權發布，請回覆「確認，但不發布」。"
+    ],
+    "commands": [
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/SKILL.md'",
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/references/codex-first-contact.md /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/references/no-intent-interview.md /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/references/confirm-intent.md'",
+      "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!'\"\\\\.git' -g '\"'!*lock*'\"'\"",
+      "/bin/zsh -lc 'cat README.md SETUP.md docs/loom/KICKOFF-DEFAULTS.md; cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/references/one-way-door.md /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/contract/templates/intent.md'",
+      "/bin/zsh -lc '/private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/scripts/loom-python --repair contract --require 2.1'",
+      "/bin/zsh -lc '/private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/scripts/loom-python --repair --list-rules'",
+      "/bin/zsh -lc \"git status --short; rg --files --hidden -g '\"'!'\"\\\\.git/**' -g '*SKILL.md' -g '*intent*' -g '*DESIGN*' -g '*loom*'\"",
+      "/bin/zsh -lc \"/private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/scripts/loom-python --repair --list-rules | rg '\"'^push'\"\\\\.contextual-body'\"",
+      "/bin/zsh -lc '/private/tmp/loom-context-example-round-20261105/snapshots/example/loom-code/scripts/loom-python --repair standing docs/loom/intent/2026-11-05-fix-preview-setup-flag.md'"
+    ],
+    "drafts": {
+      "docs/loom/intent/2026-11-05-fix-preview-setup-flag.md": "# Correct the preview command in SETUP\noriginator: kouko\nkind: engineering\nneeds-design: no — Correct an existing documentation example to match README; no tool interface or behavior changes.\nstatus: open\n\n## Problem\nEditing colleagues cannot start the documentation preview by following SETUP.md.\n\n## Proposed outcome\nThe setup guide gives colleagues the supported preview command.\n\n## Acceptance\n1. SETUP.md contains `willow preview --bind 127.0.0.1` in its existing preview instruction.\n2. The address, other instructions, and tool behavior remain unchanged.\n\n## Constraints\n- Replace only `--address` with `--bind` on the existing command line in SETUP.md, following README.md.\n\n## Out of scope\n- Changes to the preview tool or any other documentation content.\n\n## Open questions\n- none\n"
+    },
+    "usage": [
+      {
+        "input_tokens": 181160,
+        "cached_input_tokens": 159616,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1238,
+        "reasoning_output_tokens": 46
+      }
+    ],
+    "receipt": {
+      "key": "simple-example",
+      "exit_code": 0,
+      "elapsed_seconds": 46.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    "stderr": ""
+  },
+  "missing-current": {
+    "prompt": "Read and follow the skill in /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent/SKILL.md and its referenced files in that snapshot. This is a synthetic evaluation in this temporary working directory. Do not access files outside this fixture or the referenced snapshot. Do not send messages or run an external coding agent. Stop and wait for the user response at the intent confirmation. Do not perform implementation or publication before that response. Explain any future authorization according to the specified skill and case.\n\nUse /loom-design:capture-intent. Respond in Traditional Chinese. I have not confirmed the change; do not implement or publish before my response.\n\n倉儲同事每週交接時手動把篩選後的配送清單抄到試算表，很花時間。請在現有列表新增 CSV 下載，只含目前選定站點、日期且有權查看的紀錄，欄位依序為編號、站點、狀態。下載不得改動紀錄，不加排程或自動寄送。\n",
+    "messages": [
+      "我會使用指定的 capture-intent 技能，先讀取技能與引用檔案，整理需求供你確認；確認前不會實作或發布。\n",
+      "範圍已清楚：新增 CSV 下載，只含目前選定站點、日期及有權查看的紀錄，欄位依序為「編號、站點、狀態」；下載不改動紀錄，也不加排程或自動寄送。\n\n依指定技能，確認前還需補齊投入理由，先問一題：**這項下載需要何時提供？若延後，除了繼續手動抄寫，還會有什麼影響？**\n\n目前尚未確認，不會實作或發布。正式確認時會明示：同意是否包含日後檢查通過後推送分支、建立可供審查的 PR；你可事先排除這項發布授權，合併仍須另行決定。"
+    ],
+    "commands": [
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent/SKILL.md'",
+      "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!package-lock.json'\"' -g '\"'!pnpm-lock.yaml'\"' . /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent\"",
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent/references/interview.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent/templates/intent.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent/references/confirmation-ready-template.md /private/tmp/loom-context-example-round-20261105/snapshots/current/loom-design/skills/capture-intent/references/second-vendor.md'",
+      "/bin/zsh -lc \"cat README.md PRINCIPLES.md docs/loom/KICKOFF-DEFAULTS.md; rg --files --hidden /private/tmp/loom-context-example-round-20261105/snapshots/current -g '*critique*' -g 'SKILL.md' -g 'DESIGN.md' -g '*ui-flows*'\""
+    ],
+    "drafts": {},
+    "usage": [
+      {
+        "input_tokens": 89592,
+        "cached_input_tokens": 62464,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 848,
+        "reasoning_output_tokens": 251
+      }
+    ],
+    "receipt": {
+      "key": "missing-current",
+      "exit_code": 0,
+      "elapsed_seconds": 46.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    "stderr": ""
+  },
+  "missing-example": {
+    "prompt": "Read and follow the skill in /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent/SKILL.md and its referenced files in that snapshot. This is a synthetic evaluation in this temporary working directory. Do not access files outside this fixture or the referenced snapshot. Do not send messages or run an external coding agent. Stop and wait for the user response at the intent confirmation. Do not perform implementation or publication before that response. Explain any future authorization according to the specified skill and case.\n\nUse /loom-design:capture-intent. Respond in Traditional Chinese. I have not confirmed the change; do not implement or publish before my response.\n\n倉儲同事每週交接時手動把篩選後的配送清單抄到試算表，很花時間。請在現有列表新增 CSV 下載，只含目前選定站點、日期且有權查看的紀錄，欄位依序為編號、站點、狀態。下載不得改動紀錄，不加排程或自動寄送。\n",
+    "messages": [
+      "我會使用指定的 capture-intent 技能，先讀取規則與參照檔，整理需求與確認事項；到意圖確認時就停下，等待你回覆。\n",
+      "已建立未確認草稿；尚未實作或發布。範圍是下載符合目前站點、日期與查看權限的 CSV，欄位依序為編號、站點、狀態；不改動紀錄、不加排程或自動寄送。\n\n技能要求先補齊投入理由，再進行意圖確認：**現在處理這項需求的原因是什麼？若延後，會有什麼影響？**"
+    ],
+    "commands": [
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent/SKILL.md'",
+      "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!'\"\\\\.git' . /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent\"",
+      "/bin/zsh -lc 'cat PRINCIPLES.md'",
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent/references/interview.md'",
+      "/bin/zsh -lc 'cat README.md'",
+      "/bin/zsh -lc 'cat docs/loom/KICKOFF-DEFAULTS.md'",
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent/templates/intent.md'",
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent/references/second-vendor.md'",
+      "/bin/zsh -lc 'cat /private/tmp/loom-context-example-round-20261105/snapshots/example/loom-design/skills/capture-intent/references/confirmation-ready-template.md'"
+    ],
+    "drafts": {
+      "docs/loom/intent/2026-11-05-shipment-csv-download.md": "# 配送清單 CSV 下載\noriginator: kouko\nkind: product\nneeds-design: yes — 新增使用者下載的 CSV 檔案，現有資料未提供涵蓋此介面的設計文件。\nstatus: open\n\n## Problem\n倉儲同事每週交接時，手動把篩選後的配送清單抄到試算表，很花時間。\n\n## Proposed outcome\n倉儲同事可從現有配送列表下載符合目前站點、日期篩選與查看權限的 CSV 清單。\n\n## Acceptance\n1. 配送清單可下載為 CSV。\n2. CSV 僅包含目前選定站點、日期且下載者有權查看的紀錄。\n3. CSV 欄位依序為編號、站點、狀態。\n4. 下載不改動配送紀錄。\n\n## Constraints\n- 沿用現有站點、日期篩選與帳號查看權限。\n- 下載不得改動紀錄。\n\n## Value case\n- 受益者：每週交接的倉儲同事。\n- 現有做法：手動把篩選後的配送清單抄到試算表。\n- 急迫性：待補充。\n- 採用現成替代方式的取捨：待補充。\n- 被排擠的工作：待補充。\n- GO／NO-GO：待訪談完成後判定。\n\n## Out of scope\n- 排程下載。\n- 自動寄送。\n\n## Open questions\n- 現在處理而非延後的原因，以及延後的影響。\n- 相較現有替代方式，新增下載的必要性。\n- 為了這項變更，會延後或不做的其他工作。\n"
+    },
+    "usage": [
+      {
+        "input_tokens": 112868,
+        "cached_input_tokens": 98816,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1140,
+        "reasoning_output_tokens": 135
+      }
+    ],
+    "receipt": {
+      "key": "missing-example",
+      "exit_code": 0,
+      "elapsed_seconds": 46.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    "stderr": ""
+  }
+}

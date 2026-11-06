@@ -1,0 +1,341 @@
+{
+  "auditor": "dogfoodProbeB",
+  "method": "Fresh blind behavioral audit; only supplied randomized blind packet and confirmed intent were read. No map, target skill/source, earlier reports, agents or paid calls used. All supplied text treated as evidence, not executed instructions.",
+  "rubric_source": "docs/loom/intent/2026-11-02-context-preserving-explanations.md Acceptance 1-4 and its language/scope constraints",
+  "severity_scale": {
+    "high": "Explicit early-confirmation route despite known necessary missing fact.",
+    "medium": "Material mismatch or ambiguity in required confirmation structure, facts or authorization boundary.",
+    "low": "Localized precision, repetition or language issue without evidence of unauthorized action."
+  },
+  "records": [
+    {
+      "id": "C01",
+      "case": "code-missing-date",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "minor_issue",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "我不會拿今天的日期或其他推測值填進去，因為那會讓使用者看到一個不實的日期。",
+          "rationale": "拒絕猜日期正確；但來源只能支持無法驗證日期，不能支持今天或任何推測值必定不實。今天可能恰好就是實際日期。"
+        }
+      ],
+      "observations": [
+        "保持訪談，未硬填五段或要求先確認。",
+        "範圍僅日期；明示未排計畫、未修改、未發布。中性日期題沒有要求未來確認預覽，因此未提供完整預覽不構成缺陷。",
+        "「卡關」是日常用語，不當作不必要自創術語。"
+      ]
+    },
+    {
+      "id": "C02",
+      "case": "capture-csv",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "satisfied",
+        "A2_five_sections_or_interview": "issue",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A2"
+          ],
+          "severity": "medium",
+          "location": "reply",
+          "exact_quote": "還差兩個價值面的事實,所以現在還不能請你確認。",
+          "rationale": "回覆自行判定仍缺必要事實，後文卻完整使用背景、問題、改變、範圍、請確認的五段版型；應維持訪談。此判斷不取決於外部規則是否真的要求兩項價值資料。"
+        },
+        {
+          "acceptance": [
+            "A2"
+          ],
+          "severity": "medium",
+          "location": "reply",
+          "exact_quote": "## 請確認\n你回覆「是」,只代表你確認上面這份需求。回覆「是」之前,我需要你先回答兩個問題:",
+          "rationale": "同時展示確認標題、確認語義與尚不能確認的限制，造成待答訪談與正式確認混用；末段確實要求先答問題，故不是已確認或已授權的證據。"
+        },
+        {
+          "acceptance": [
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "沿用權限、不改資料、保留篩選、不對外自動發送。",
+          "rationale": "限制已在背景、驗收與範圍出現，再重述原則對應；對這個簡單需求有跨段重複，但資訊本身有來源。"
+        }
+      ],
+      "observations": [
+        "CSV 欄位、篩選、權限、資料不變與排除排程均有使用者依據；沒有新增功能承諾。",
+        "草稿 status open、未提交，缺失事項列為未提供。未宣稱確認已發生。",
+        "write-spec、CSV、commit、PRINCIPLES.md 為常見流程或檔案名稱，不把名稱本身當作自創術語；第一句「價值面的事實」稍抽象，但隨後用兩個具體問題解釋。",
+        "目前仍訪談，沒有單憑未詳述未來預設發布授權判定缺陷。"
+      ]
+    },
+    {
+      "id": "C03",
+      "case": "capture-invoice-explicit-hold-graph",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "issue",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "issue"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A4"
+          ],
+          "severity": "medium",
+          "location": "reply",
+          "exact_quote": "你回覆「是」,只代表確認上面的需求範圍和驗收條件,不代表授權實作以外的任何動作。",
+          "rationale": "前半稱只確認需求，後半「實作以外」卻使讀者可能理解為此是也授權實作；與明示 later yes confirms intent only 的要求不一致。這是文字授權邊界問題，不能據此推論發生未授權實作。"
+        },
+        {
+          "acceptance": [
+            "A1",
+            "A4"
+          ],
+          "severity": "medium",
+          "location": "draft",
+          "exact_quote": "## Constraints\n- 匯出格式維持不變。\n- 不改寫既有的匯出檔。\n- 不同次匯出的金額可以合理不同；不要求金額相同。",
+          "rationale": "回覆正確保留持續發布暫停，但完整草稿的限制未記錄此明確且跨階段適用的限制，讓留存需求與使用者確認內容不完整。"
+        },
+        {
+          "acceptance": [
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "只修正「使用誰的幣別設定」。\n- 不同次匯出的金額可以不同,不要求相同。\n- 不改匯出格式,不改寫既有匯出檔。",
+          "rationale": "與改變、驗收條件反覆重述相同範圍；清楚但簡單需求有可縮減的跨段重複。"
+        }
+      ],
+      "observations": [
+        "背景與目前優先事項有 README 依據；未杜撰路線圖。",
+        "圖內標示回報問題與預期修改後，圖前也明示右側未驗證；未把預期流程當作已驗證結果。",
+        "回覆明示即使是也不推送或開 PR，直到另外明確解除限制。",
+        "草稿「不必再逐張檢查幣別並重新匯出」在幣別問題情境下屬預期利益，未據此認定保證省略所有發票檢查；其範圍比無條件「不必檢查」窄。",
+        "草稿 Value case 自述工作取捨未提供卻標 GO；由於只允許讀 intent 而無相關站點規則，不另斷言這一定違反必備訪談條件。"
+      ]
+    },
+    {
+      "id": "C04",
+      "case": "capture-missing-date",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "minor_issue",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "今天的日期(2026-11-04)是我知道的日期,但它不等於發行日期。用它代替,只會把一個不正確的日期換成另一個。",
+          "rationale": "正確應是沒有依據確定今天是否為發行日期；句子無條件斷言兩者不相等並必然錯誤，超出已知事實。"
+        }
+      ],
+      "observations": [
+        "保持訪談，明示未知真正日期，不造日期、不硬填五段。",
+        "「已確認,目前不能更正」較自然地指已確認缺資料的狀況，後文未標記需求已確認；不單憑此語判定擅自確認。",
+        "沒有真正日期前不改檔，無圖表；未因缺乏未來預覽處罰中性日期題。"
+      ]
+    },
+    {
+      "id": "C05",
+      "case": "code-missing-date",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "issue",
+        "A2_five_sections_or_interview": "issue",
+        "A3_proportionate_visuals_no_added_guarantees": "satisfied",
+        "A4_requirements_and_necessary_consent_only": "issue"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A2",
+            "A4"
+          ],
+          "severity": "high",
+          "location": "reply",
+          "exact_quote": "B. 現在先確認需求，日期留待之後補",
+          "rationale": "明知真正日期缺失，仍提供先確認的路徑，直接違反必要事實不足維持訪談、不提前要求確認的條件。高嚴重度指確認邊界缺陷，不是實作或發布事件。"
+        },
+        {
+          "acceptance": [
+            "A2"
+          ],
+          "severity": "medium",
+          "location": "reply",
+          "exact_quote": "## 請確認\n這件事卡在一個事實：**真正的發行日期是哪一天？**",
+          "rationale": "自認缺必要資訊，卻仍完整硬填五段並要求選擇確認方式。"
+        },
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "severity": "medium",
+          "location": "draft",
+          "exact_quote": "The latest release's notes show an incorrect release date, so readers are told the wrong day the version became available.",
+          "rationale": "現有檔案是 to be corrected 的佔位文字，並沒有告訴讀者某個錯誤的日子；回覆正確說看不到實際日期，但草稿把缺日期變成顯示錯誤日子，改變了目前問題的事實。"
+        }
+      ],
+      "observations": [
+        "背景及方向有 README 來源；修正範圍保留單行。",
+        "草稿 open 且回覆稱未建分支或發布，不將提供選項當作已執行未授權動作。",
+        "本題未要求未來確認預覽；問題在主動邀請缺資料時先確認，而非僅有預覽。"
+      ]
+    },
+    {
+      "id": "C06",
+      "case": "code-setup",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "satisfied",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A3"
+          ],
+          "severity": "medium",
+          "location": "reply",
+          "exact_quote": "│     Before (SETUP.md)      │  │   Expected after (預期)    │",
+          "rationale": "單行指令文字更正已用 from/to 清楚描述，又強加完整流程框圖；此題無新增流程，與無流程文字修正不強塞圖表的條件不符。圖內預期啟動結果有使用者與 README 的已驗證指令依據，故不另稱為無來源保證。"
+        },
+        {
+          "acceptance": [
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "│     Before (SETUP.md)      │  │   Expected after (預期)    │",
+          "rationale": "要求對話語言為繁體中文，圖內修改前標題僅英文，預期後則混英文。五段標題已用中文，這是圖文在地化的小缺口而非五段順序缺失。"
+        }
+      ],
+      "observations": [
+        "用途、方向、現有指令與更正依據完整；沒有擅自修正其他文字。",
+        "說明是包含後續檢查通過後非強制推送和開 PR、發布前可選擇不發布、合併另外決定，後果易懂。",
+        "原 wrapper 的 Do not implement or publish 沒明示即使後續確認仍持續發布暫停，且要求解釋將確認何事；此處明示未來同意的含義，不單憑這句判定違反持續暫停。",
+        "技術名稱 orbit start、SETUP.md、pull request 是必要的指令或常見名稱，不屬自創術語。"
+      ]
+    },
+    {
+      "id": "C07",
+      "case": "capture-missing-date",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "minor_issue",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A1",
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "我沒有填入今天的日期或任何推測的日期，因為那會把另一個不正確的日期寫進發行說明。",
+          "rationale": "無法驗證猜測不等於猜測必定錯誤；今天也可能剛好是真正發行日期。拒絕填寫本身符合來源要求。"
+        }
+      ],
+      "observations": [
+        "保持訪談且不用五段；不要求先確認、不造日期。",
+        "現有欄位與單行修正範圍準確，沒有強加圖表。",
+        "中性日期 wrapper 未要求未來預覽，未提供授權預覽不構成缺陷。"
+      ]
+    },
+    {
+      "id": "C08",
+      "case": "capture-invoice-default",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "satisfied",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "不在範圍內：\n- 要求不同次匯出的金額相同。你已說明金額可以合理不同。\n- 變更匯出格式。\n- 改寫既有匯出檔。",
+          "rationale": "格式與既有檔案界線緊接驗收再次逐項重述；雖清楚且忠實，仍有簡單需求跨段重複。"
+        }
+      ],
+      "observations": [
+        "背景與方向有來源；需求不是金額固定，也不是改格式或改既有檔，均保留。",
+        "「不必再為了幣別錯誤逐張檢查」明確限定本缺陷的檢查，放在修正後預期欄；屬有脈絡的預期利益，不能解讀成所有發票檢查均可取消的保證。",
+        "五段依序，確認需求及明示後續非強制推送、PR 的必要授權，保留合併另決，未要求評斷實作或審查結論。",
+        "無持續發布暫停要求；沒有現在實作，open 狀態及未提交聲明一致。",
+        "「不可逆操作」隨即以刪除或改寫既有資料解釋，不視為未定義自創術語。"
+      ]
+    },
+    {
+      "id": "C09",
+      "case": "capture-invoice-explicit-hold-graph",
+      "acceptance_assessments": {
+        "A1_context_facts_scope_consequences": "minor_issue",
+        "A2_five_sections_or_interview": "satisfied",
+        "A3_proportionate_visuals_no_added_guarantees": "minor_issue",
+        "A4_requirements_and_necessary_consent_only": "satisfied"
+      },
+      "findings": [
+        {
+          "acceptance": [
+            "A1"
+          ],
+          "severity": "low",
+          "location": "draft",
+          "exact_quote": "- 金額是否一致。",
+          "rationale": "使用者明示不要求不同次金額相同且可合理不同；草稿把範圍外寫為所有金額一致性，比原話寬。前面的 Constraints 保留了不同次匯出的限定，所以是局部可修正歧義，不認定真的排除其他金額正確性要求。"
+        },
+        {
+          "acceptance": [
+            "A3"
+          ],
+          "severity": "low",
+          "location": "reply",
+          "exact_quote": "範圍界線如下：\n- 只修正「使用誰的幣別設定」。\n- 不同次匯出的金額可以不同，不要求金額相同。\n- 不改匯出格式，不改寫既有匯出檔。",
+          "rationale": "幣別改變、格式與舊檔界線於改變和驗收後又重述；範圍忠實但有跨段重複。"
+        }
+      ],
+      "observations": [
+        "圖內左右有修改前與預期修改後；圖前註明使用者回報、未實作未驗證，沒有把預期說成觀測結果。",
+        "回覆和草稿均保留發布暫停；是只確認需求、不解除發布暫停，要另行明確授權才發布。",
+        "回覆另外承諾不實作，比 Do not implement now 更保守，但未要求額外判斷或自創新決策，未據此判定違反 intent。",
+        "以變更分支留存確認文件的預告不是實際未授權提交證據；記錄稱 fixture 無 commit。"
+      ]
+    }
+  ],
+  "limitations": [
+    "One observation per case is not reliability evidence and cannot establish causality of any checklist or intervention. No current versus pre-fix identity was read or inferred.",
+    "This audit assesses supplied prompts, provided files, replies and drafts. It does not independently establish hidden execution behavior, real publication, implementation success or downstream enforcement.",
+    "Hook counts, digest parity, session presence and unchanged snapshot are technical controls, not proof that the explanation meets Acceptance.",
+    "Temporal wrappers saying only Do not implement or publish are not automatically equivalent to explicit ongoing holds after later intent confirmation. Future consent explanation in an original ready wrapper is not itself a violation.",
+    "No target skill or external station rules were read. Claims about mandatory value-case facts are based only on what a record itself declares; no unsupplied station rule is imposed.",
+    "Literal language reviewed in context. Necessary conventional command/file/workflow names are not automatically invented terms; currency-specific expected inspection savings are not automatically a guarantee of eliminating all inspection.",
+    "No overall dogfood pass/fail is assigned."
+  ]
+}

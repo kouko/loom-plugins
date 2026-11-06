@@ -1,0 +1,38 @@
+{
+  "C01": {
+    "root": "/tmp/loom-five-section-natural-interview-i4",
+    "key": "code-missing-date-candidate-r1"
+  },
+  "C02": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "capture-csv-candidate-r1"
+  },
+  "C03": {
+    "root": "/tmp/loom-five-section-trial-i4",
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1"
+  },
+  "C04": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "capture-missing-date-candidate-r1"
+  },
+  "C05": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "code-missing-date-candidate-r1"
+  },
+  "C06": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "code-setup-candidate-r1"
+  },
+  "C07": {
+    "root": "/tmp/loom-five-section-natural-interview-i4",
+    "key": "capture-missing-date-candidate-r1"
+  },
+  "C08": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "capture-invoice-default-candidate-r1"
+  },
+  "C09": {
+    "root": "/tmp/loom-six-checks-trial",
+    "key": "capture-invoice-explicit-hold-graph-candidate-r1"
+  }
+}

@@ -1,0 +1,292 @@
+{
+  "fixture_kind": "synthetic",
+  "source_versions": {
+    "baseline": "4fb8925051e7a9f96b1d251d586d54c4d06965d3",
+    "candidate": "69ba1fe272f7b3f36da30445e40aea6e4ad39d3e"
+  },
+  "controls": "Matched requests, fixture files, model, tools and hook isolation. Three matched cases; one candidate-only missing-fact boundary. Counterbalanced order. Global customizations excluded.",
+  "limits": "Exploratory one run per cell. Explicit skill invocation does not establish trigger accuracy, installed-host behavior, statistical superiority or improved human comprehension.",
+  "preflight": {
+    "isolation": {
+      "synthetic_private_read_denied": true,
+      "network_bind_denied": true,
+      "variant_write_denied": true,
+      "network_probe_exit": 77,
+      "network_probe_stderr": ""
+    },
+    "profile_sha256": "b194688afd65fb98d5778e06e317e8cb7146557d13f863c44629c160677f9738"
+  },
+  "cli_estimated_cost_usd": 0.9370625000000001,
+  "records": [
+    {
+      "key": "capture-invoice-baseline-r1",
+      "variant": "baseline",
+      "case": "capture-invoice",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "source_commit": "4fb8925051e7a9f96b1d251d586d54c4d06965d3",
+      "request": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "reply": "我已起草意圖,狀態仍是 `open`。**你還沒確認,所以我沒有開分支、沒有提交,也沒有改任何程式。**\n\n意圖草稿放在 `docs/loom/intent/2026-11-04-invoice-export-own-customer-currency.md`。\n\n## 若你回覆「確認」,你確認的內容\n\n**問題:** 會計團隊匯出客戶發票時,偶爾會沿用上一位客戶的幣別設定。這位客戶的發票就會顯示錯誤幣別,同事得逐張檢查,遇到錯誤再重新匯出。\n\n**目標:** 每張發票都使用所屬客戶自己的幣別設定,同事不必再逐張檢查幣別。\n\n**驗收條件(最後會逐條回報結果給你):**\n\n| # | 驗收條件 |\n|---|---|\n| 1 | 連續匯出幣別設定不同的多位客戶的發票時,每張發票的幣別都等於該客戶自己的設定。 |\n| 2 | 不論匯出順序或次數,同一位客戶的發票幣別都等於該客戶自己的設定。不同次匯出的金額可以不同,我不要求金額相同。 |\n| 3 | 匯出格式與修正前相同,既有匯出檔不被改寫。 |\n\n**範圍界線:**\n\n| 項目 | 處理 |\n|---|---|\n| 使用誰的幣別設定 | 修正 |\n| 金額計算方式 | 不動 |\n| 匯出格式 | 不動 |\n| 既有已匯出的檔案 | 不重新產生,也不改寫 |\n\n## 我自行判定的部分(不需要你回答)\n\n- **類型:** 這是維持既有格式的錯誤修正,所以我歸為工程類(`engineering`),不需要另寫產品規格(`needs-design: no`)。\n- **一次性決定:** 沒有。這次不涉及費用、長期義務或改寫你現有的資料。\n- **其他事項:** 本專案設定為免寫常駐文件、不需另做複雜度評估,也沒有需要你回答的跨模型審查問題。\n\n## 「確認」同時授權的事項\n\n只有在審查與發布前檢查都通過後,你的「是」才同時授權兩件事:\n\n1. 把變更分支推上遠端(非強制推送)。\n2. 開啟一個可供審閱的 pull request。\n\n在發布前,你隨時可以選擇不發布。是否合併是另一個獨立的決定,不包含在這次確認內。\n\n「是」只確認上述結果,不代表認可任何實作方式。如果有要修改的地方,請直接告訴我,我會改寫後再請你確認。\n\n**請回覆:這樣是你要的嗎?**",
+      "drafts": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-export-own-customer-currency.md",
+          "content": "# 發票匯出須使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: engineering\nneeds-design: no — 匯出格式維持不變,沒有新增或改動使用者讀取或輸入的介面,也不涉及多狀態行為\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊用系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定,讓這位客戶的發票顯示錯誤幣別。會計同事必須逐張檢查,遇到錯誤再重新匯出。\n\n## Proposed outcome\n每張匯出的發票都使用其所屬客戶自己的幣別設定,不受先前匯出的其他客戶影響,會計同事不再需要逐張檢查幣別。\n\n## Acceptance\n1. 連續匯出幣別設定不同的多位客戶的發票時,每張發票顯示的幣別都等於該發票所屬客戶自己的幣別設定。\n2. 不論匯出順序或匯出次數,同一位客戶的發票幣別都等於該客戶自己的設定;不同次匯出的金額可以不同,不要求相同。\n3. 匯出檔的格式與修正前相同,既有已匯出的檔案未被改寫。\n\n## Constraints\n- 匯出格式維持不變。\n- 不改寫既有匯出檔。\n- 只修正「使用誰的幣別設定」;不改變金額如何計算。\n\n## Out of scope\n- 不改變發票金額的計算方式,也不要求不同次匯出的金額相同。\n- 不改變匯出格式。\n- 不重新產生或改寫既有已匯出的檔案。\n\n## Open questions\n- none\n"
+        }
+      ],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.15612320000000005,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 10,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    },
+    {
+      "key": "capture-invoice-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-invoice",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "source_commit": "69ba1fe272f7b3f36da30445e40aea6e4ad39d3e",
+      "request": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "reply": "**背景與目前方向**\n\nCedar Accounts 是內部會計系統。會計團隊用它準備客戶發票並下載交付,每位客戶都有自己的幣別設定。目前的重點是讓發票匯出可靠,同時維持現有匯出格式。這次修正正好對應「避免一位客戶的設定影響另一位客戶的匯出」。\n\n**目前的問題與影響**\n\n匯出發票時,偶爾會沿用上一位客戶的幣別設定,讓這位客戶的發票顯示錯誤幣別。會計同事只能逐張檢查,發現錯誤再重新匯出。\n\n**要改變什麼**\n\n```\n            今天                         修正後\n  ┌──────────────────────┐     ┌──────────────────────┐\n  │ 發票 B 偶爾用客戶 A  │     │ 每張發票都用所屬客戶 │\n  │ 的幣別設定           │ ──▶ │ 自己的幣別設定       │\n  │ → 要人工逐張檢查     │     │ → 不必逐張檢查       │\n  └──────────────────────┘     └──────────────────────┘\n```\n\n只改「使用誰的幣別設定」。\n\n**範圍與驗收**\n\n| # | 驗收條件 |\n|---|---|\n| 1 | 連續匯出幣別設定不同的多位客戶的發票時,每張發票的幣別都等於該客戶自己的設定 |\n| 2 | 同一位客戶的發票,不論前一張匯出的是誰、順序如何,幣別都相同,且等於該客戶自己的設定 |\n| 3 | 匯出檔格式與修正前相同 |\n| 4 | 修正前已匯出的檔案沒有被改寫 |\n\n不在範圍內:\n- 要求不同次匯出的金額相同。你說過金額可以合理不同。\n- 修改匯出格式。\n- 改寫既有匯出檔。\n- 修改各客戶幣別設定的內容。\n\n**請確認**\n\n- **回覆「是」代表什麼:** 你確認上面的問題描述和四條驗收條件就是你要的。這只確認結果,不代表核准任何實作方式。\n- **回覆「是」之後的發布授權:** 只有在審查和發布前檢查都通過後,「是」才會授權我做兩件事:\n  - 以非強制推送的方式上傳這個變更分支。\n  - 開一個可供審閱的 pull request。\n\n  發布前你隨時可以選擇不發布。合併是另一個獨立決定,不包含在這次的「是」裡。\n- **不會被改到的資料:** 這次沒有會改寫或刪除既有資料的動作。\n- **我自行決定的事項:** 這算工程性修正,因為匯出格式與介面都不變。所以不需要先寫設計規格,確認後直接進入規劃。\n\n這樣對嗎?如果有要修改的地方,請告訴我。\n\n我已把草稿寫成 `docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md`,狀態仍是 `open`。在你回覆前,我不會標記為已確認,也不會建立分支、提交、實作或發布。",
+      "drafts": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-uses-own-customer-currency.md",
+          "content": "# 每張匯出的發票都使用所屬客戶自己的幣別設定\noriginator: kouko\nkind: engineering\nneeds-design: no — 匯出格式維持不變,沒有新增或改變使用者讀取/輸入的介面;只修正發票取用哪位客戶的幣別設定\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊用 Cedar Accounts 匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定,讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查發票,遇到錯誤再重新匯出。\n\n## Proposed outcome\n每張匯出的發票都使用所屬客戶自己的幣別設定,不再受其他客戶(例如上一位處理的客戶)的設定影響。\n\n## Acceptance\n1. 連續匯出幣別設定不同的多位客戶的發票時,每張發票顯示的幣別都等於該發票所屬客戶自己的幣別設定。\n2. 同一位客戶的發票,不論前一張匯出的是哪位客戶、以什麼順序匯出,顯示的幣別都相同,且等於該客戶自己的設定。\n3. 匯出檔的格式與修正前相同。\n4. 修正前已經匯出的檔案沒有被改寫。\n\n## Constraints\n- 匯出格式維持不變。\n- 不改寫既有的匯出檔。\n- 不同次匯出的金額可以合理不同;不要求金額相同。\n\n## Out of scope\n- 要求不同次匯出的金額一致。\n- 修改匯出格式。\n- 改寫或重新產生既有匯出檔。\n- 修改各客戶幣別設定本身的內容。\n\n## Open questions\n- none\n"
+        }
+      ],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.16375450000000003,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 10,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    },
+    {
+      "key": "capture-csv-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-csv",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "source_commit": "69ba1fe272f7b3f36da30445e40aea6e4ad39d3e",
+      "request": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "reply": "**結論:我已寫好意圖草稿,現在停下來等你確認。** 你的回覆如果是「對,就是這樣」,才算確認。目前沒有建立分支、沒有 commit、沒有實作,也沒有發佈。\n\n草稿在 `docs/loom/intent/2026-11-04-invoice-list-csv-export.md`,狀態是 `open`。`PRINCIPLES.md` 已經是核可狀態,所以不需要另外做原則訪談。\n\n## 背景與目前方向\n這個 repo 是會計團隊用來開發票、對帳的工具。原則文件已經定下三點:沿用現有權限、匯出不改動發票資料、保留使用者的篩選條件。這次的需求符合這個方向。\n\n## 目前的問題與影響\n會計團隊每月對帳時,得從發票列表一筆一筆手動複製資料到試算表。這很花時間,而且每個月都要重做。\n\n## 會改變什麼\n```\n┌─ 現在 ────────────────────┐   ┌─ 之後(預期)──────────────┐\n│ 發票列表 → 手動複製        │   │ 發票列表(套用客戶/日期篩選)│\n│ → 貼到試算表               │   │ → 匯出 CSV → 直接對帳      │\n└───────────────────────────┘   └───────────────────────────┘\n```\n\n## 範圍與驗收條件\n| # | 驗收條件 |\n|---|---|\n| 1 | 套用客戶與日期篩選後匯出,CSV 只含目前篩選結果,筆數與內容和列表所見一致 |\n| 2 | 欄位依序為:發票號碼、客戶名稱、開立日期、幣別、總金額 |\n| 3 | 匯出的發票不超出該使用者在列表中本來有權查看的範圍 |\n| 4 | 匯出前後,既有發票資料沒有任何變更 |\n\n**不做的事:**\n- 自動寄送或排程。\n- 對外散布帳務資料。\n- 修改既有發票資料。\n\n**價值判斷:** GO。受益者、每月重複的成本和現有替代方案(手動複製)都很具體。你沒提到這件事會擠掉什麼工作,我已寫進草稿,但不影響判斷。\n\n## 請確認\n你回「yes」代表兩件事:\n\n1. **確認需求。** 你確認上面的問題、結果與四項驗收條件。這只確認「要達成什麼」,不代表同意任何實作方式。\n2. **授權發佈。** 只有在審查和發佈前檢查都通過後,這個「yes」才授權兩件事:\n   - 上傳這個變更分支(不使用強制推送)。\n   - 開啟一個可供審查的 pull request。\n\n   發佈前你隨時可以退出。合併是另一個獨立的決定,不在這次授權裡。\n\n**確認之後的流程:**\n- 這是產品變更,而且列表畫面新增了匯出動作,所以下一步是撰寫規格(write-spec)。\n- 規格會用「你操作 X、看到 Y」的方式請你再確認一次可見行為。\n- 最後你會看到逐條驗收報告,再決定是否接受。\n\n這次沒有需要你做的不可逆選擇:匯出只讀取資料,不改動或刪除任何既有資料。\n\n要確認嗎?如果有任何要修正的地方,請告訴我,我會改寫後再讓你確認一次。",
+      "drafts": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-list-csv-export.md",
+          "content": "# 發票列表匯出 CSV\noriginator: kouko\nkind: product\nneeds-design: yes — 使用者會看到並操作的畫面新增匯出動作與下載檔案,且目前沒有 DESIGN.md 或流程文件涵蓋此畫面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊每月對帳時,必須從發票列表一筆一筆手動複製資料到試算表。這個步驟很花時間,每個月都要重複一次。\n\n## Proposed outcome\n會計人員能把發票列表中目前篩選出的發票資料下載成 CSV 檔,直接用於對帳,不必再手動複製。\n\n## Acceptance\n1. 在發票列表選定客戶與日期篩選後匯出,下載的 CSV 只包含目前篩選結果中的發票,筆數與內容和列表所見一致。\n2. CSV 的欄位依序為:發票號碼、客戶名稱、開立日期、幣別、總金額。\n3. 匯出的發票不超出該使用者在既有發票列表中本來有權查看的範圍。\n4. 匯出前後,既有發票資料沒有任何變更。\n\n## Constraints\n- 沿用現有發票列表與現有帳號權限。\n- 匯出內容必須保留使用者選定的客戶與日期篩選。\n\n## Value case\n- 受益者:每月對帳的會計團隊。\n- 急迫性:對帳每月發生,手動複製的時間成本每月重複。\n- 現有替代方案:從列表手動複製到試算表(即目前做法)。\n- 被擠壓的工作:使用者尚未說明;這是本案較弱的一項,不影響判斷。\n- 判斷:GO — 受益者、重複成本與現有替代方案都具體。\n\n## Out of scope\n- 自動寄送或排程匯出。\n- 對外部第三方散布帳務資料。\n- 修改既有發票資料。\n\n## Open questions\n- none\n"
+        }
+      ],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.14076260000000002,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    },
+    {
+      "key": "capture-csv-baseline-r1",
+      "variant": "baseline",
+      "case": "capture-csv",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "source_commit": "4fb8925051e7a9f96b1d251d586d54c4d06965d3",
+      "request": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n",
+      "provided_files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "reply": "我已把意圖寫成草稿，狀態是「open」，等你回覆。你還沒確認，所以我沒有建分支、沒有 commit，也沒有實作或發布任何東西。\n\n草稿在 `docs/loom/intent/2026-11-04-invoice-list-csv-export.md`。倉庫裡的 `PRINCIPLES.md` 已經核准，三條不可妥協項目是：沿用權限、不改動資料、保留篩選。這份意圖跟它們一致，所以不需要再做原則訪談。\n\n**我理解的問題**\n會計團隊每月對帳，得從發票列表手動複製資料到試算表，很花時間。\n\n**你確認後，我會當成目標的結果**\n1. 發票列表上有「匯出 CSV」，可以下載目前篩選結果的發票資料。\n2. 下載內容保留你選的客戶與日期篩選，不多出範圍外的發票。\n3. 欄位依序是發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 只包含該使用者原本就有權查看的發票。\n5. 匯出前後，既有發票資料完全沒有變動。\n\n**範圍外**：自動寄送、排程、修改發票資料、上述五個欄位以外的資料。\n\n**要先請你回答三件事**\n我不想替你猜，所以這三項先留在「待釐清」：\n1. 「目前篩選後的發票資料」是符合篩選的**全部**發票，還是只有畫面上**目前那一頁**？\n2. 為什麼是現在做？不做的話會怎樣？\n3. 做這件事的期間，什麼工作會因此延後？\n\n第 2、3 題是評估這件事值不值得做的依據。目前兩題都沒答案，所以我還不能下 GO 的結論。\n\n**你回覆「是」會代表什麼**\n- 你確認的只是上面這些結果和範圍，不是任何實作方式。\n- 因為這會新增使用者會點的按鈕和下載檔案，下一步會先寫一份規格，到時我會用「你按下 X，會看到 Y」的方式讓你再確認一次。\n- 審查和發布前檢查**都通過**後，你的「是」會同時授權兩件事：把變更分支推上遠端（不強制推送），並開一個可供審閱的 pull request。\n- 在發布前你隨時可以選擇不要自動發布。合併是另一個獨立的決定，不包含在這次的「是」裡。\n\n請先回答上面三題，再告訴我結果是否正確。",
+      "drafts": [
+        {
+          "path": "docs/loom/intent/2026-11-04-invoice-list-csv-export.md",
+          "content": "# 發票列表匯出 CSV\noriginator: kouko\nkind: product\nneeds-design: yes — 新增使用者會點選的按鈕與下載的檔案成品，現有文件沒有涵蓋這個介面\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n會計團隊每月對帳時，得從發票列表手動把資料複製到試算表，很花時間。受影響的是負責每月對帳的會計團隊成員。\n\n## Proposed outcome\n會計人員可以在既有的發票列表，直接把目前篩選後的發票資料下載成 CSV 檔，不必再手動複製。\n\n## Acceptance\n1. 發票列表上有「匯出 CSV」的操作，使用者可以下載目前篩選結果的發票資料。\n2. 下載內容保留使用者當下選定的客戶與日期篩選，沒有多出篩選範圍以外的發票。\n3. CSV 欄位依序為：發票號碼、客戶名稱、開立日期、幣別、總金額。\n4. 匯出內容只包含該使用者原本就有權在發票列表查看的發票；沒有權限的發票不會出現。\n5. 匯出前後，既有發票資料沒有任何變動。\n\n## Constraints\n- 沿用目前的資料存取權限。\n- 在既有發票列表上新增，不另建新頁面。\n- 不新增自動寄送或排程。\n- 不改動既有發票資料。\n\n## Value case\n受益者：每月對帳的會計團隊。現有替代做法：從列表手動複製到試算表（耗時）。急迫性與「這次會因此排不進什麼工作」尚未回答，GO / NO-GO 待這兩項補齊後判斷。\n\n## Out of scope\n- 自動寄送或排程匯出。\n- 任何對既有發票資料的修改。\n- 指定欄位以外的資料。\n\n## Open questions\n- 「目前篩選後的發票資料」是指符合篩選條件的全部發票，還是只有畫面上目前顯示的那一頁？\n- 為什麼是現在做（不做會怎樣）？\n- 做這件事的這段時間，什麼事會因此延後？\n"
+        }
+      ],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.1342533,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    },
+    {
+      "key": "code-setup-baseline-r1",
+      "variant": "baseline",
+      "case": "code-setup",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "source_commit": "4fb8925051e7a9f96b1d251d586d54c4d06965d3",
+      "request": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。\n",
+      "provided_files": {
+        "README.md": "# Orbit Preview\n\nOrbit Preview is a local website preview tool. Its setup guide helps a new contributor start the existing preview server.\n\n## Current direction\nKeep the getting-started instructions accurate without changing the preview tool's behavior. The verified command for the existing installed version is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "reply": "**確認前不會動任何檔案。** 我只讀了 SETUP.md 和 README.md，沒有建立意圖檔、沒有改檔、沒有 commit。\n\n## 我理解的需求\n\n| 項目 | 內容 |\n|---|---|\n| 問題 | 新同事照 SETUP.md 啟動網站預覽，會執行到第 6 行的 `orbit launch`，這個指令會失敗，他們因此卡在第一步。 |\n| 已確認的事實 | 目前版本的正確指令是 `orbit start`，README 第 6 行也有記錄。 |\n| 想要的結果 | 新同事照 SETUP.md 執行，可以順利啟動網站預覽。 |\n| 驗收條件 | SETUP.md 裡的 `orbit launch` 改成 `orbit start`，而且只改這一行指令。 |\n| 範圍外 | SETUP.md 的其他說明、README、`orbit` 工具本身的行為，全部保持原樣。 |\n\n這是一次純文件修正（`kind: engineering`），不新增功能，所以不需要另寫規格，也沒有需要你決定的取捨或不可回復的操作。\n\n## 你回覆「是」代表什麼\n\n1. 你確認上面的問題和驗收條件，就是你要的內容。\n2. 我才會寫下並提交意圖檔，接著寫計畫，然後進入建置。\n3. 審查和發布檢查都通過後，「是」同時授權兩件事：用一般推送（不強制）上傳這個變更分支，並開一個可供審查的 pull request。\n4. 發布前你隨時可以選擇不發布。合併是另一個獨立的決定，不包含在這次的「是」裡。\n\n請回覆「是」，或告訴我哪裡要修正。",
+      "drafts": [],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.12080830000000001,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 8,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    },
+    {
+      "key": "code-setup-candidate-r1",
+      "variant": "candidate",
+      "case": "code-setup",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "source_commit": "69ba1fe272f7b3f36da30445e40aea6e4ad39d3e",
+      "request": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。\n",
+      "provided_files": {
+        "README.md": "# Orbit Preview\n\nOrbit Preview is a local website preview tool. Its setup guide helps a new contributor start the existing preview server.\n\n## Current direction\nKeep the getting-started instructions accurate without changing the preview tool's behavior. The verified command for the existing installed version is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "reply": "這是一個只動文件的小修正。目前沒有任何檔案被改動，也沒有建立分支或提交。下面是等你確認的內容：\n\n## 1. 背景與目前方向\nSETUP.md 是新同事啟動網站預覽時照著做的說明。README 已記錄，這個已安裝版本的預覽指令是 `orbit start`。這次要讓說明和實際可用的指令一致。\n\n## 2. 目前的問題與影響\nSETUP.md 第 6 行寫的是 `orbit launch`。新同事照著執行會失敗，無法啟動預覽。\n\n## 3. 要改變什麼\n| | 現在 | 完成後 |\n|---|---|---|\n| SETUP.md 第 6 行 | `orbit launch` | `orbit start` |\n| SETUP.md 其他內容 | 原樣 | 原樣 |\n| README 與 `orbit` 工具的行為 | 原樣 | 原樣 |\n\n## 4. 範圍與驗收\n驗收條件：\n1. SETUP.md 的啟動指令是 `orbit start`，不再出現 `orbit launch`。\n2. SETUP.md 除這一行以外沒有任何差異。\n3. README 和工具行為沒有被改動。\n\n不在範圍內：改寫其他說明、調整 `orbit` 的行為、新增別名或相容 `orbit launch`。\n\n我的判斷如下：\n- 這是文件修正，屬於 `kind: engineering`。\n- 不涉及新的介面或多狀態行為，所以不需要另外寫規格（`needs-design: no`）。\n- 計畫只會有一個任務，只改 SETUP.md。\n\n## 5. 請確認\n你回「是」，代表確認上面的問題和三項驗收條件。之後我會建立計畫並進入實作。\n\n按流程，審查和發佈檢查都通過後，「是」才會同時授權兩件事：推送變更分支（不強制推送），以及開一個可供審查的 pull request。發佈前隨時可以取消，合併是另一個獨立的決定。你已說明不要發佈，所以除非你另外說要，否則我會當作你選擇不自動發佈，不寫入發佈授權。\n\n還有一件事我沒做：流程中的「標準文件檢查」需要先有意圖檔才能執行，所以尚未跑。如果它有警告，我會在你確認前原文轉述。\n\n你確認前，我不會動手。",
+      "drafts": [],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.1132579,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 6,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    },
+    {
+      "key": "capture-missing-date-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-missing-date",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "source_commit": "69ba1fe272f7b3f36da30445e40aea6e4ad39d3e",
+      "request": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+      "provided_files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "reply": "**目前還不能請你確認,因為缺少一項必要的事實:更正後要顯示什麼日期。** 我沒有寫入任何檔案,也沒有把意圖標為已確認。\n\n**我看到的現況**\n`RELEASE_NOTES.md` 裡的發行日期那一行目前是 `Release date: to be corrected`,也就是佔位文字。你說還不知道真正的日期,也沒有發行紀錄,所以我無法替你填入任何日期。憑空填一個日期,會讓發行說明顯示一個沒有依據的日期。\n\n**我需要你回答的一個問題:在拿到真正日期之前,這一行要顯示什麼?**\n\n| 選項 | 結果 | 備註 |\n|---|---|---|\n| A. 先不改,等你有真正日期再做這項變更 | 檔案維持現狀 | **我的建議。** 這樣不會留下錯誤的日期。 |\n| B. 你指定一段暫代文字,例如「日期待定」 | 只有日期那一行的文字改變 | 請你直接給我要顯示的字句。 |\n| C. 刪除日期那一行 | 發行說明不再顯示日期 | 這會刪掉一整行,不只是更正日期,與「其他文字不要動」不完全一致。 |\n\n**之後你會確認的內容**\n等這個問題有答案,我會用你的語言寫一則確認訊息,包含背景、問題與影響、改變內容、範圍與驗收條件,以及最後的確認問題。範圍會是:\n- 只更改最新版本發行說明的日期顯示。\n- 其他文字(標題與「Improve note search.」)完全不動。\n- 驗收條件是日期那一行顯示你指定的內容,其餘內容逐字不變。\n\n你回答 yes 之後,會有兩件事發生:\n- 這份意圖才算確認。\n- 在審查與發佈檢查都通過後,才會推送變更分支並開啟一個待審的 pull request。你可以在發佈前隨時選擇不發佈,合併是另外一個決定。\n\n這項變更屬於文件類的工程變更,不涉及產品畫面,所以不需要另外撰寫規格。\n\n請告訴我 A、B(請附上要顯示的字句)或 C。",
+      "drafts": [],
+      "exit_code": 0,
+      "requested_model": "claude-sonnet-5-5",
+      "requested_effort": "medium",
+      "returned_models": [
+        "claude-sonnet-5-5"
+      ],
+      "cli_estimated_cost_usd": 0.1081027,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "verified_live_context": {
+        "successful_hook_responses": 6,
+        "shared_card_sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c",
+        "session_context_present": true,
+        "plugin_snapshot_unchanged": true,
+        "fixture_has_commit": false
+      }
+    }
+  ]
+}

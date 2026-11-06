@@ -1,0 +1,2294 @@
+diff --git a/README.md b/README.md
+index 94d14834..d883f0d5 100644
+--- a/README.md
++++ b/README.md
+@@ -13,9 +13,9 @@ Codex, Antigravity CLI and OpenCode:
+ 
+ | Plugin | Version | Skills | Role in the flow |
+ | --- | --- | --- | --- |
+-| [`loom-design`](loom-design/README.md) | 2.20.1 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+-| [`loom-code`](loom-code/README.md) | 3.57.1 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+-| [`loom-workflow`](loom-workflow/README.md) | 5.19.2 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
++| [`loom-design`](loom-design/README.md) | 2.21.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
++| [`loom-code`](loom-code/README.md) | 3.58.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
++| [`loom-workflow`](loom-workflow/README.md) | 5.20.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
+ 
+ Each plugin keeps its own manifest, version, tests and changelog. Plugin
+ links open its README; skill links below open the detailed usage guide.
+@@ -93,7 +93,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
+ 
+ ## loom-design
+ 
+-Version 2.20.1. Turns a rough idea into a confirmed intent and a risk-declared
++Version 2.21.0. Turns a rough idea into a confirmed intent and a risk-declared
+ spec, and provides product-definition tools. Requires `loom-code` for
+ planning onward; intent and spec work alone.
+ 
+@@ -108,7 +108,7 @@ planning onward; intent and spec work alone.
+ 
+ ## loom-code
+ 
+-Version 3.57.1. Five stations carry one change from plan to PR with
++Version 3.58.0. Five stations carry one change from plan to PR with
+ content-bound verification, one closing review and a GitHub-enforced PR floor.
+ 
+ | Skill | Role |
+@@ -126,7 +126,7 @@ agents that the stations dispatch.
+ 
+ ## loom-workflow
+ 
+-Version 5.19.2. Workflow tools used around the stations; most work without
++Version 5.20.0. Workflow tools used around the stations; most work without
+ `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
+ code, plan or decision reviews need it. See
+ [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
+diff --git a/loom-code/.claude-plugin/plugin.json b/loom-code/.claude-plugin/plugin.json
+index 0e4b86d9..1c44e300 100644
+--- a/loom-code/.claude-plugin/plugin.json
++++ b/loom-code/.claude-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-code",
+-  "version": "3.57.1",
++  "version": "3.58.0",
+   "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with consented external review, content-bound verification, one closing review, and a GitHub-enforced PR floor. Claude Code, Codex + Antigravity CLI.",
+   "author": {
+     "name": "kouko",
+diff --git a/loom-code/.codex-plugin/plugin.json b/loom-code/.codex-plugin/plugin.json
+index 9a17a709..e08e7da7 100644
+--- a/loom-code/.codex-plugin/plugin.json
++++ b/loom-code/.codex-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-code",
+-  "version": "3.57.1",
++  "version": "3.58.0",
+   "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with consented external review, content-bound verification, one closing review, and a GitHub-enforced PR floor. Claude Code, Codex + Antigravity CLI.",
+   "author": {
+     "name": "kouko",
+diff --git a/loom-code/CHANGELOG.md b/loom-code/CHANGELOG.md
+index ccde64eb..e63ba0ec 100644
+--- a/loom-code/CHANGELOG.md
++++ b/loom-code/CHANGELOG.md
+@@ -1,5 +1,17 @@
+ # Changelog
+ 
++## [3.58.0] — 2026-11-04 — grounded five-section intent confirmation
++
++- Code-only intent confirmation uses five ordered, localized sections: background and current direction, current problem and impact, what changes, scope and acceptance, and confirmation. Connect known project or function context to the request, with brief evidence-backed sections; broader direction and impact appear only when evidenced and needed, without filling unsupported benefit claims. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. The existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
++- Load a short primary content template before intake drafting or replies, with optional relevant illustrations and parity coverage for both portable file pairs. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. State each live-case fact once, preserving its abstraction, present affected population and supplied boundaries.
++- Load the primary template directly from the main code-only entry before both new-intent drafting and open-intent confirmation, retaining the already-confirmed fast path. The no-intent reader loads its rules before writing; restore the original numbered consent-policy anchors without changing their routing or private/user-message separation.
++- Apply six private questions to the actual proposed reply at the existing composer, revising unsupported context or scope, unclear wording or consent, premature structure, unchecked diagrams and unnecessary repetition or private inventory while retaining required disclosures. Explicitly condition both non-forced branch upload and ready-for-review pull request opening on completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
++- Illustrate the structure with concrete invoice and CSV requests, preserving missing-fact interviews. Use titled ASCII comparisons when helpful, marking expected results and reusing optional visualization tooling with a readable standalone fallback.
++- Preserve existing publication holds until explicitly lifted; bind the full public reply to the five-section skeleton, ground its opening in available project context, and invoke the optional visualization procedure before generating and checking diagrams. Keep unavailable-fact interviews focused and preserve filtered-result qualifiers.
++- Read the available overview and request-relevant evidence at intake entry before interviews or choice replies; use documented facts instead of treating them as unanswered questions, retaining source-scoped uncertainty.
++- Load the five-section layout only for confirmation-ready requests, keeping early grounding/interviews separate. Draft and explain constraints at the source's abstraction, retaining target nouns and qualifiers rather than inferring internal-method restrictions or broader absence/data-preservation claims. Keep the unavailable-date interview in its required grounding reader; keep complete ready invoice/CSV illustrations in the existing optional gallery, linked from the concise ready layout. Stop missing-fact interviews before confirmation preparation, and load the existing titled-flow template before generating a comparison. Explain literally without analogies or unnecessary new terminology.
++- Route incomplete intake through the interview before loading ready confirmation instructions; preserve missing required content in Open questions across both intent templates. Confirmation cannot replace evidence for an unknown date, and absence of evidence establishes neither equality with today nor a different date. Ground the saved Problem and public reply in the same inspected state and supported effects: a missing date is distinct from an incorrect calendar value, and neither establishes announcement history or guaranteed reader understanding.
++
+ ## [3.57.1] — 2026-11-03 — link readable skill guides from the README catalogs
+ 
+ - Add human-facing guides for all seven skills, with usage examples, outputs, boundaries and links to their runtime instructions.
+diff --git a/loom-code/README.ja.md b/loom-code/README.ja.md
+index 938e7181..0ecc8612 100644
+--- a/loom-code/README.ja.md
++++ b/loom-code/README.ja.md
+@@ -12,7 +12,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ
+ > 検査することです — 書く agent がレビューする agent になることは決して
+ > ありません。
+ 
+-**バージョン**: 3.57.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
++**バージョン**: 3.58.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
+ **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
+ **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
+ 
+diff --git a/loom-code/README.md b/loom-code/README.md
+index 96450e29..8e66338c 100644
+--- a/loom-code/README.md
++++ b/loom-code/README.md
+@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
+ > from machines checking machines — the agent that writes is never the agent
+ > that reviews.
+ 
+-**Version**: 3.57.1 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
++**Version**: 3.58.0 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
+ **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
+ **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
+ 
+diff --git a/loom-code/README.zh-TW.md b/loom-code/README.zh-TW.md
+index 658b71d9..930d1214 100644
+--- a/loom-code/README.zh-TW.md
++++ b/loom-code/README.zh-TW.md
+@@ -10,7 +10,7 @@
+ > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
+ > 審的 agent。
+ 
+-**版本**：3.57.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
++**版本**：3.58.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+ **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
+ **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
+ 
+diff --git a/loom-code/contract/templates/intent.md b/loom-code/contract/templates/intent.md
+index f39819e2..306e0745 100644
+--- a/loom-code/contract/templates/intent.md
++++ b/loom-code/contract/templates/intent.md
+@@ -9,7 +9,7 @@ intent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over t
+ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication
+ 
+ ## Problem
+-<present pain, who it affects, and consequence; no diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
++<evidence-backed present state, affected people and effects; distinguish absent values from incorrect values; separate reported symptoms from inspected evidence; leave unsupported effects unknown. No diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
+ 
+ ## Proposed outcome
+ <wanted capability or state; no scenario, UI reaction, state transition, or implementation>
+@@ -18,13 +18,13 @@ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only af
+ 1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>
+ 
+ ## Constraints
+-- <already-fixed boundaries, not agent preferences>
++- <Keep already-fixed user/standing-policy boundaries at source abstraction; no agent preferences or inferred method bans>
+ 
+ ## Value case
+-<optional; product beneficiary, urgency, and GO/NO-GO; omit obvious engineering value>
++<product: beneficiary, urgency, existing alternative, displaced work, and GO/NO-GO; missing required answers stay open and block confirmation. Omit for engineering when value is obvious>
+ 
+ ## Out of scope
+-- <excluded capabilities, actors, systems, or data; not deferred implementation tasks>
++- <Keep explicitly excluded capabilities, actors, systems or data at source abstraction; no inferred method bans or deferred implementation tasks>
+ 
+ ## Open questions
+-- <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none
++- <unresolved outcome/scope choices or missing required content; both block confirmation; delegate spec and engineering questions> # write `- none` when there are none
+diff --git a/loom-code/package.json b/loom-code/package.json
+index b7e74d1b..4f88d57e 100644
+--- a/loom-code/package.json
++++ b/loom-code/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-code",
+-  "version": "3.57.1",
++  "version": "3.58.0",
+   "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with consented external review, content-bound verification, one closing review, and a GitHub-enforced PR floor. Claude Code, Codex + Antigravity CLI.",
+   "private": true,
+   "type": "module",
+diff --git a/loom-code/plugin.json b/loom-code/plugin.json
+index 6c1f9dd7..fef2cf0c 100644
+--- a/loom-code/plugin.json
++++ b/loom-code/plugin.json
+@@ -1,5 +1,5 @@
+ {
+   "name": "loom-code",
+-  "version": "3.57.1",
++  "version": "3.58.0",
+   "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with consented external review, content-bound verification, one closing review, and a GitHub-enforced PR floor. Claude Code, Codex + Antigravity CLI."
+ }
+diff --git a/loom-code/skills/write-plan/SKILL.md b/loom-code/skills/write-plan/SKILL.md
+index f2f2aee6..6eeda990 100644
+--- a/loom-code/skills/write-plan/SKILL.md
++++ b/loom-code/skills/write-plan/SKILL.md
+@@ -9,6 +9,14 @@ version: 1.0.1
+ 
+ Relative paths in this document are relative to this skill's own directory.
+ 
++For code-only intake of a new or unconfirmed intent:
++Read the available README or equivalent project overview and relevant current direction,
++plus request-relevant evidence, before composing any intake reply, including an
++interview or choice discussion. Read narrowly; documented facts are not interview
++gaps. If no overview exists, use known request/function context and qualify only
++material unknowns. Keep uncertainty scoped to its source: the user not knowing
++does not mean nobody knows, and undocumented does not mean absent.
++
+ Turn one intent into `docs/loom/<change-id>/plan.md`: waved tasks with files,
+ Acceptance ownership, positive and negative or boundary cases, and risk. Do **not**
+ implement or ask the user to approve task splitting; decide and record why.
+@@ -143,8 +151,12 @@ the user named a change, match the slug.
+ 
+ - `loom-design` is installed → this is not your station. Tell the user the
+   change starts at `capture-intent`, and stop.
+-- `loom-design` is not installed → read `references/no-intent-interview.md`
+-  and follow it.
++- `loom-design` is not installed → code-only intake.
++  Read `references/confirmation-template.md` before drafting or replying.
++  Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
++  Then read `references/no-intent-interview.md` and follow it.
++  When required facts are sufficient, write an open intent from the supplied
++  request before step 2 and any confirmation.
+ 
+ <!-- gate: write-plan.no-plan-without-confirmed-intent -->
+ **No plan is written without a confirmed intent.** If `status:` is not
+@@ -185,7 +197,13 @@ When `status:` is already `confirmed`, skip confirmation:
+ Fix `needs-design:` with one new commit quoting the changed line verbatim
+ in its body.
+ 
+-Otherwise read `references/confirm-intent.md` and follow it fully before step 4,
++Otherwise assess the open intent for required facts first.
++Read `references/confirmation-template.md` before drafting or replying.
++If required facts are missing, follow its interview branch and stop before loading
++the ready confirmation reader; keep missing content in Open questions. A yes
++cannot replace missing evidence or make the intent ready.
++Only when required facts are settled:
++Read `references/confirm-intent.md` and follow it fully before step 4,
+ in the single message it describes, ending with the intent's confirmation
+ commit. Step 5 writes the question list kept per that reference.
+ 
+diff --git a/loom-code/skills/write-plan/references/confirm-intent.md b/loom-code/skills/write-plan/references/confirm-intent.md
+index cb8cfe97..c466adf1 100644
+--- a/loom-code/skills/write-plan/references/confirm-intent.md
++++ b/loom-code/skills/write-plan/references/confirm-intent.md
+@@ -10,14 +10,27 @@ above this file.
+ When this station performs code-only intake, use the same capture boundary:
+ ask only for missing required-field content, never a fixed intake question
+ quota; existing decision points remain unchanged.
+-Problem holds present pain, who it affects, and the consequence, with no
+-diagnosis or fix; Proposed outcome holds the wanted capability;
++Read `confirmation-template.md` before drafting or replying.
++If required facts are missing, use its interview branch and stop before
++confirmation preparation.
++Before drafting: Preserve supplied facts and outcome strength, including
++qualifiers. Leave unknown facts unresolved pending user answers/evidence.
++Keep own-rule isolation separate from same-worker or same-result guarantees.
++Lead interviews with the user's problem or missing fact, minimizing workflow
++labels and bookkeeping; retain consequence/authorization disclosures.
++Keep missing required facts in the existing interview, asking only for the
++needed fact and why it matters.
++Problem holds present pain, who it affects, and the evidence-backed consequence,
++with no diagnosis or fix; distinguish absent values from incorrect values,
++keeping reports and inspected observations distinct. Leave unsupported effects unknown.
++Proposed outcome holds the wanted capability;
+ Acceptance holds each observable delivery outcome, not value, complete
+ scenarios, UI placement, state transitions, test steps, or implementation;
+-Constraints are already fixed; product Value case gives beneficiary, urgency,
+-and GO/NO-GO, while an engineering intent omits obvious value;
+-Out of scope names excluded capability; Open questions contains only unresolved
+-outcome or scope choices. After drafting, make one author pass: **Keep,
++Keep already-fixed user/standing-policy boundaries as Constraints; product Value case gives beneficiary, urgency,
++existing alternative, displaced work, and GO/NO-GO, while an engineering intent omits obvious value;
++Keep Out of scope to explicitly excluded capabilities or data at source abstraction.
++Open questions contains only unresolved outcome/scope choices or missing required
++content; both block confirmation. After drafting, make one author pass: **Keep,
+ neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
+ plan, and unsupported detail is deleted. This pass creates no field, ID,
+ requirement, scenario, product behaviour, or review loop.
+@@ -37,29 +50,15 @@ insufficient; reopen means move it to Open questions, stop confirmation, and
+ the intent must remain `open`.
+ <!-- /gate -->
+ 
+-Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
++Any intent-file section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
+ numbered list, diagrams stay at intent altitude (no UI reactions or state
+ transitions), a product Problem holds no identifiers (Mermaid node ids
+ included), and chat shows text tables or text diagrams, not Mermaid.
+ 
+-Compose **one message**. Everything below goes in it; you do not stop
+-twice.
++### Private preparation
+ 
+-1. **The restatement.** Problem and Acceptance in the user's own plain
+-   words — no file paths, no identifiers, no mechanism names:
+-
+-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
+-   >
+-   > (You want ___, and when it is done you will be able to ___, ___ and
+-   > ___. Is that right?)
+-
+-   For the current contract, automatic publication is the default. This same
+-   restatement explicitly says that answering yes authorizes a later non-forced
+-   push and Ready PR after `closing-review` and publication checks pass, while merge
+-   remains a separate decision. Say that the user may explicitly opt out before
+-   publication. Write
+-   `publication: automatic — authorized <date> by <name>` only after that
+-   informed yes; an opt-out leaves the field absent.
++Privately prepare applicable consequences/questions as inputs to the ready layout,
++not as another reply outline.
+ 
+ 2. **The engineering one-way doors found so far**, in consequence form, per
+    `one-way-door.md` — load that file before deciding whether a question is
+@@ -124,6 +123,34 @@ The closing-review station has a dimension for exactly this, `user-judgment-leak
+ and it returns NEEDS_REVISION when it finds one. Ask nothing about spec
+ quality, task splitting, or review verdicts.
+ 
++### User message
++
++Read `confirmation-format.md` only when required facts are settled.
++Compose **one message** for the user's confirmation, then wait; this is the only
++confirmation stop this station makes.
++Use applicable consequences/questions; omit private records and inventory.
++
++Restate Problem and Acceptance: subject, problem, impact, outcome and
++confirmation scope. Use the user's plain words, never paths, identifiers or
++mechanism names. Supply necessary context: unfamiliar terms, affected people,
++intent altitude. Use five ordered sections from
++`confirmation-format.md` as the whole public reply, with headings required.
++Choose wording and length freely, keeping familiar requests short.
++Check these connections and what yes confirms and authorizes; never implementation approval.
++
++Honor a prior publication hold or opt-out until the user explicitly lifts it.
++Otherwise automatic publication is the default.
++Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
++BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
++with opt-out available anytime before publication and a separate merge decision.
++
++Apply `confirmation-template.md` final-message check before sending.
++
++### Private records and reply handling
++
++Record `publication: automatic — authorized <date> by <name>` after informed
++publication consent only; prior holds leave it absent.
++
+ **Write down every question you asked.** Keep a running list from this
+ point — every question put to the user at ①, and at ② if you run it here —
+ as `{decision_point, text, type}` with `type` one of `what` / `behaviour` /
+diff --git a/loom-code/skills/write-plan/references/confirmation-examples.md b/loom-code/skills/write-plan/references/confirmation-examples.md
+new file mode 100644
+index 00000000..80ad9a92
+--- /dev/null
++++ b/loom-code/skills/write-plan/references/confirmation-examples.md
+@@ -0,0 +1,240 @@
++# Optional confirmation illustrations
++
++Read the primary `confirmation-template.md` first. Use only the relevant section
++when an illustration is needed; these examples supply no facts for another case.
++The missing-fact interview remains in the required grounding reader; ready examples
++apply only after required facts are settled.
++The examples below are supplementary; they define no additional reply structure.
++
++
++
++## Known correction
++
++Context: release notes show an old date and make the latest release look outdated.
++The user supplies the verified release date, 2 November; only that date may change.
++
++Good:
++> ### Background and current direction
++> The release notes describe when the software shipped. This correction concerns the displayed release date.
++>
++> ### Current problem and impact
++> The incorrect date makes the latest release look outdated.
++>
++> ### What changes
++> Replace the displayed date with the verified 2 November.
++>
++> ### Scope and acceptance
++> Check that this date is correct and the rest of the release notes remain unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the correction you want?
++
++Bad:
++> ### Background and current direction
++> The release notes describe when the software shipped. This correction concerns the displayed release date.
++>
++> ### Current problem and impact
++> The incorrect date makes the latest release look outdated.
++>
++> ### What changes
++> Replace the displayed date with the verified 2 November.
++>
++> ### Scope and acceptance
++> Check that this date is correct and the rest of the release notes remain unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the correction you want?
++> The intent is open and engineering with no design needed. Standing-document
++> checks passed. The current branch has no commits, both handoff lists are empty,
++> and review defaults are unchanged. Next I will commit the intent, plan and
++> implement; the intent commit message will follow the station's naming rule.
++
++Both replies preserve identical facts, scope and necessary authorization. Only
++the bad reply appends internal work inventory: its extra sentences add no help
++understanding the correction or deciding what to authorize.
++
++## Multiple problems
++
++Context: a worker is whoever executes a background job. Jobs borrow another
++job's worker-selection rule; failed jobs retry forever and block the queue.
++Each should use its own rule and stop at its configured retry limit, preserving
++successful jobs and the existing interface.
++
++Good:
++> ### Background and current direction
++> Background jobs run work through workers. This change concerns their selection rules and configured retry limits.
++>
++> ### Current problem and impact
++> Jobs borrow another job's selection rule; failed jobs retry forever and block the queue.
++>
++> ### What changes
++> Each job should use its own rule for choosing who executes it, and failed jobs should stop at their configured retry limit.
++>
++> ### Scope and acceptance
++> Check rule ownership and retry stopping separately. Successful jobs and the existing interface stay unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is this the scope you want?
++
++Bad:
++> Fix dispatch profile and retry policy. Every job will always choose the same
++> worker and produce the same result. Please also choose a new default-worker
++> policy and approve the retry implementation before confirming.
++
++The bad reply replaces explanation with labels, adds guarantees and turns an
++unestablished edge case into an additional outcome choice.
++
++## Repairing shorthand
++
++Context: the user already explained worker selection as the rule choosing who
++runs each job. The assistant called it "profile" without explanation; the user
++asks for detail after reporting borrowed rules and inconsistent results.
++
++Good:
++> ### Background and current direction
++> Worker selection is the rule choosing who runs each job. I used "profile" as shorthand for that supplied role, not a verified application object.
++>
++> ### Current problem and impact
++> My shorthand omitted that connection. You reported that jobs borrow another job's rule and get inconsistent results.
++>
++> ### What changes
++> The correction is to use each job's own selection rule.
++>
++> ### Scope and acceptance
++> Check which rule each job uses. This alone promises neither the same worker nor identical results on every run.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Does that match your request?
++
++Bad:
++> I cannot explain profile because you never defined it. Tell me its exact
++> meaning. I will require the same job to pick the same worker and return an
++> identical result every time, and leave publication for another question.
++
++The good reply repairs the assistant's wording using supplied context without
++pretending to have verified an application object with that name. The bad reply
++returns the omission to the user and strengthens the requested outcome.
++
++## Interface boundary
++
++Context: jobs randomly choose workers from their own eligible lists but sometimes
++use another job's list. Random selection must remain, with no new interface.
++
++Good:
++> ### Background and current direction
++> Jobs randomly choose workers from their own eligible lists. This correction concerns which list each job uses.
++>
++> ### Current problem and impact
++> Jobs sometimes use another job's list.
++>
++> ### What changes
++> Each job should randomly select from its own eligible workers.
++>
++> ### Scope and acceptance
++> Check list ownership while preserving randomness and the existing interface.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the change you want?
++
++Bad:
++> Confirm that every job always chooses the same worker, and that no functions,
++> options, settings or commands may be added anywhere. Would you prefer a new
++> interface for jobs with no list? Publication is off unless you separately opt in.
++
++The bad reply contradicts randomness, expands an interface constraint into an
++implementation prohibition, invents an additional scope choice and reverses the
++publication default.
++
++## Invoice currency correction
++
++Context: accounting staff export invoices; the supplied priority is customer-setting isolation with the current format retained. Exports sometimes borrow the previous customer's currency. Amounts can differ, format stays unchanged, and existing files must remain untouched. The user explicitly asked to capture requirements only and not publish.
++
++Good:
++> ### Background and current direction
++> The accounting team exports invoices. The stated priority is to isolate customer settings while preserving the export format.
++>
++> ### Current problem and impact
++> An export sometimes uses the previous customer's currency setting, so the invoice shows the wrong currency.
++>
++> ### What changes
++> Use the invoice customer's own currency setting. The comparison shows the reported failing case and the expected correction:
++>
++> ```text
++> ┌──────────────────────────────┐  ┌──────────────────────────────┐
++> │    Before (reported bug)     │  │        Expected after        │
++> ├──────────────────────────────┤  ├──────────────────────────────┤
++> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
++> │  │     Export invoice     │  │  │  │  Export invoice  │        │
++> │  └────────────────────────┘  │  │  └──────────────────┘        │
++> │               │              │  │            │                 │
++> │               ▼              │  │            ▼                 │
++> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
++> │  │ May use prior currency │  │  │  │ Use own currency │        │
++> │  └────────────────────────┘  │  │  └──────────────────┘        │
++> │               │              │  │            │                 │
++> │               ▼              │  │            ▼                 │
++> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
++> │  │     Wrong currency     │  │  │  │ Correct currency │        │
++> │  └────────────────────────┘  │  │  └──────────────────┘        │
++> └──────────────────────────────┘  └──────────────────────────────┘
++> ```
++>
++> ### Scope and acceptance
++> Check exports for customers with different currencies. Keep the format unchanged and existing export files untouched. Amounts may legitimately differ between exports; identical amounts are not required.
++>
++> ### Please confirm
++> Your confirmation covers these requirements only. You asked not to publish;
++> I will keep that restriction unless you explicitly lift it.
++> Is that the correction you want?
++
++Bad:
++> Fix currency profile. All future invoice amounts will be identical; regenerate every existing export.
++> Your yes also permits publication despite your restriction.
++> Keep every existing datum untouched and prohibit changes to how customer settings are entered or stored.
++> No per-invoice inspection will be needed for any reason.
++
++The bad reply hides the setting's role, broadens named export-file preservation to all data, invents method restrictions, and overrides existing publication restrictions. The good diagram illustrates the failing path, not every export; a result boundary does not ban an unrequested internal fix method. When the request supplies checking for wrong currency, preserve that reason: correcting currency does not eliminate every other reason to inspect an invoice.
++
++## Filtered CSV export
++
++Context: accounting staff inspect filtered invoices. There is no CSV download of that result. They request CSV export of the current filtered result, with invoice number, customer, currency and amount columns, retaining current permissions. No broader project direction or intended use is supplied.
++
++Good:
++> ### Background and current direction
++> Accounting staff inspect filtered invoices; this request concerns exporting that result.
++>
++> ### Current problem and impact
++> They currently cannot download the filtered result as a CSV file.
++>
++> ### What changes
++> Add CSV export for the current filtered result.
++>
++> ### Scope and acceptance
++> The download uses the current filtered result, with invoice number, customer, currency and amount columns. Existing access permissions stay unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the capability you want?
++
++Bad:
++> We are modernizing the entire accounting platform. Approve a background export service and a new permission model.
++> There is no CSV download, so there are no download actions at all.
++
++The bad reply invents a project direction and implementation decision, and expands the absence of one capability into the absence of all downloads. The good reply retains the supplied CSV qualifier and permission boundary.
+diff --git a/loom-code/skills/write-plan/references/confirmation-format.md b/loom-code/skills/write-plan/references/confirmation-format.md
+new file mode 100644
+index 00000000..224a2f7d
+--- /dev/null
++++ b/loom-code/skills/write-plan/references/confirmation-format.md
+@@ -0,0 +1,57 @@
++# Ready confirmation layout
++
++Read only at the confirmation composer after required facts are settled.
++If a required fact is missing, return to `confirmation-template.md` and stop
++before confirmation preparation; the layout and ready examples do not apply.
++The grounding and interview rules remain in `confirmation-template.md`.
++
++Use five sections in this order, translating headings and replacing bracketed
++guidance with only necessary, evidence-backed content. A brief sentence can
++suffice for a section; no paragraph or filled purpose/direction/impact/benefit
++slot is required. Keep critical scope, authorization, constraints, consequences
++and required questions even in a short reply:
++
++```markdown
++## Background and current direction
++[Known project or function context connected to this request; broader direction only when evidenced and needed.]
++
++## Current problem and impact
++[The supported problem or limitation; include affected people, situation and impact as needed and evidenced. Define necessary unfamiliar terms by their role.]
++
++## What changes
++[Wanted behavior and its difference from today; use a useful table or diagram when it helps.]
++
++## Scope and acceptance
++[Observable completion conditions and source-scoped preservation/exclusion boundaries.]
++
++## Please confirm
++[Requirement scope and the applicable consent branch below. Ask the necessary question and wait.]
++```
++
++Keep the whole public reply for a ready confirmation inside these five sections,
++excluding private prefaces and postscripts. Required WARN notices, cost/egress,
++one-way-door consequences, principles and carried details belong in the applicable section.
++
++Invoke `loom-workflow:loom-visualization` before composing a diagram when available.
++For a simple comparison, a Markdown table may convey the difference; draw a
++flow when its sequence clarifies the change or the user requests one.
++For a before/after flow, read its `templates/02-linear-steps.md` and use
++"Reproduce the titled comparison" to generate both complete outer frames,
++with titles inside and unverified changes labeled expected. Preserve actual
++steps and branches. Generate with width-aware tools and run final alignment
++on the complete composition, including titled frames; invoking the skill
++alone does not load its template.
++If the optional skill is unavailable, use verified host tools or readable
++table/text fallback. A wording correction needs no flowchart.
++
++Honor a prior publication hold or opt-out until the user explicitly lifts it.
++Under that restriction, confirmation covers requirements only; omit the default grant.
++Otherwise retain the normal automatic-publication default.
++Disclose automatic publication, opt-out and the separate merge decision in the same yes when publication is enabled.
++Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
++BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
++with opt-out available anytime before publication and a separate merge decision.
++
++When an illustration is needed, read the relevant Invoice currency correction
++or Filtered CSV export section in `confirmation-examples.md`. Adapt information
++connections only; example facts apply only to their stated case.
+diff --git a/loom-code/skills/write-plan/references/confirmation-template.md b/loom-code/skills/write-plan/references/confirmation-template.md
+new file mode 100644
+index 00000000..534dc8df
+--- /dev/null
++++ b/loom-code/skills/write-plan/references/confirmation-template.md
+@@ -0,0 +1,103 @@
++# Intent grounding and focused interview
++
++Write in the user's conversation language.
++This includes the saved intent's title and prose fields as well as the reply;
++keep the required schema keys and section headings unchanged.
++State literally who does what, what the user sees and what changes.
++Use no metaphors or analogies. Introduce no new terminology unless necessary;
++define a necessary unfamiliar name by its role, without creating another name.
++
++Keep missing required facts in the existing interview, asking only what is needed and why.
++When the user already lacks the required fact and evidence, state what is blocked
++and wait; invent neither a replacement/deletion choice nor a future confirmation preview.
++
++## Unknown date
++
++Context: the user reports a "wrong release date", but the inspected date field
++reads "to be corrected", not a calendar date. Only that field should change.
++The actual release date is unknown, and the user has no release record to supply.
++
++Good:
++> The date field has no actual date: it reads "to be corrected". The actual
++> release date is still unknown, and you cannot provide a release
++> record. I cannot replace it accurately from the available evidence, so the
++> correction is blocked until that evidence becomes available.
++
++Bad:
++> I created an open engineering intent with needs-design: no. Confirm today's
++> date as the fallback, then choose whether I should publish. Next I will run
++> planning, build and closing-review. Is this plan technically correct?
++> The notes give readers an incorrect calendar day. Using TBD means the date has
++> not been announced and readers will not be misled.
++
++The bad reply invents a date, serializes bookkeeping and adds a publication
++choice and implementation judgment. It also converts missing data into an
++incorrect value and invents announcement history and reader understanding.
++The good reply leaves the unavailable fact
++unresolved and states why correction is blocked, rather than proposing deletion,
++temporary text or a future confirmation. Publication details belong to a ready
++confirmation with enabled publication. A lack of supplied records does not put
++verification out of scope; it leaves the date unknown until evidence is available.
++Do not turn "only change the date" into a ban on checking it.
++An unknown release date could coincide with today's date; no reliable evidence
++establishes either equality or difference. A confirmation cannot supply that evidence.
++
++## Grounded drafting
++
++Connect sourced project or function purpose to this request, including
++established direction or impact only when evidenced and needed. Use established
++goals, not procedural waivers. Unknown broader direction needs no new interview
++or filler disclaimer; state material uncertainty briefly.
++
++Show each fact once, instead of copying Problem/Outcome/Acceptance/Scope fields.
++
++Ground every factual clause in this request/current evidence.
++Require actual-request support or evidence for every date, role, impact and constraint.
++When stating a time or frequency, reuse the source's qualifier with the event
++it describes; translate it only as needed for the user's language. Omit a
++frequency that the source does not establish for that event.
++Preserve abstraction and present-versus-desired quantifiers.
++Treat a rule role separately from any unverified representation: list, file, cache, algorithm or UI.
++Keep present affected population distinct from desired coverage.
++Include only supplied boundaries; inconsistent results establish no identical-result guarantee.
++Preserve source targets and qualifiers in absence, preservation and exclusion claims,
++leaving unmentioned alternatives unknown.
++Trace each boundary privately to an actual user or current-document clause;
++omit unsupported assertions and inferred input/storage/fix-method restrictions.
++Repair assistant shorthand using the already supplied role.
++Its conversational meaning establishes no named application object.
++Preserve a supplied interface boundary while leaving private helpers to implementation choices.
++Borrow only information connections, keeping example details as case-specific facts.
++
++## Final-message check
++
++Check each sentence of the actual proposed reply for grounded context, scope,
++outcome or a required decision or consent using these six questions. Revise the
++offending sentences for the current phase before sending. Keep this check private; do not append the
++questions or a claim that all checks passed to the public reply.
++
++1. Does the known project or function context explain its connection to this
++   request, including broader direction or impact only when evidenced and needed,
++   without filling unsupported purpose, direction, impact or benefit slots?
++2. Do the proposed reply and delivered intent (when written) agree on evidence-backed facts,
++   scope boundaries, constraints and guarantees, retaining source targets,
++   qualifiers and strength without invented additions?
++3. Does the reply state literally who does what and what the user sees, without
++   analogies or unnecessary new terminology, explaining necessary names by role?
++4. Does the confirmation say plainly exactly what yes authorizes, honoring prior
++   holds and the applicable conditional publication default? Replace double
++   negatives or exception phrasing that could imply extra consent.
++5. Are the five ordered sections used only when required facts are settled,
++   with missing facts kept in the interview? Where a diagram helps, are comparison
++   flows fully framed and titled, unverified changes labeled expected, and the
++   complete composition checked for alignment?
++6. Can repetition or detail unnecessary for understanding be removed: private
++   status, paths, classifications, GO/waiver labels, unrun checks, next-station
++   and handoff inventories unless requested? Retain required disclosures:
++   verbatim WARN notices, cost/egress, one-way-door consequences, principles and carried details.
++
++When reporting file changes, distinguish any written intent from unchanged
++project files.
++
++Honor a prior publication hold or opt-out until the user explicitly lifts it.
++Under that restriction, confirmation covers requirements only; omit the default grant.
+diff --git a/loom-code/skills/write-plan/references/no-intent-interview.md b/loom-code/skills/write-plan/references/no-intent-interview.md
+index dbeb3138..5675386c 100644
+--- a/loom-code/skills/write-plan/references/no-intent-interview.md
++++ b/loom-code/skills/write-plan/references/no-intent-interview.md
+@@ -4,8 +4,15 @@ Loaded by step 1 of `../SKILL.md` when no intent exists and `loom-design`
+ is not installed. Relative paths here are relative to this file's
+ directory; step numbers are that SKILL.md's.
+ 
+-When you write the intent, apply the intent-writing rules in
+-`confirm-intent.md`.
++Read `confirmation-template.md` before drafting or replying.
++When you write the intent, use `../../../contract/templates/intent.md` for its
++field boundaries. Missing required content stays in Open questions and blocks
++confirmation; a yes cannot supply missing evidence. Stay in this interview until
++the facts are settled; do not load the ready confirmation reader or layout yet.
++Then return to step 2; step 3 loads `confirm-intent.md` only for ready confirmation.
++
++Once required facts are settled, write the open intent from those facts before
++requesting confirmation; this also applies to a small, fully specified request.
+ 
+ - `loom-design` is not installed → hand the user the template path,
+   `contract/templates/intent.md` inside the `loom-code` plugin, and stop
+diff --git a/loom-code/tests/test_write_plan_shape_text.py b/loom-code/tests/test_write_plan_shape_text.py
+index ce4e6ffb..86ff047d 100644
+--- a/loom-code/tests/test_write_plan_shape_text.py
++++ b/loom-code/tests/test_write_plan_shape_text.py
+@@ -76,7 +76,8 @@ _MOVED_INTAKE_RULES = {
+         "When this station performs code-only intake, use the same capture boundary:",
+         "**Keep, neutralize, defer, reopen, or delete**",
+         "the intent must remain `open`. <!-- /gate -->",
+-        "Any intent section may use a Markdown table or a Mermaid `flowchart`;",
++        "Any intent-file section may use a Markdown table or a Mermaid `flowchart`;",
++        "and chat shows text tables or text diagrams, not Mermaid.",
+     ),
+ }
+ 
+diff --git a/loom-code/tests/test_write_plan_station_text.py b/loom-code/tests/test_write_plan_station_text.py
+index d439bfb4..43278b71 100644
+--- a/loom-code/tests/test_write_plan_station_text.py
++++ b/loom-code/tests/test_write_plan_station_text.py
+@@ -6,7 +6,7 @@ instead of restating its caps or its edits-after policy list.
+ from __future__ import annotations
+ 
+ # Version sync constant - updated only on releases
+-CURRENT_VERSION = "3.57.1"
++CURRENT_VERSION = "3.58.0"
+ 
+ # One literal is load-bearing and pinned here: the SKILL.md sentence naming
+ # `artifacts.plan.charter`.
+diff --git a/loom-design/.claude-plugin/plugin.json b/loom-design/.claude-plugin/plugin.json
+index d087d4b9..98c05a22 100644
+--- a/loom-design/.claude-plugin/plugin.json
++++ b/loom-design/.claude-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-design",
+-  "version": "2.20.1",
++  "version": "2.21.0",
+   "requires-contract": ">=2.1",
+   "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles, design-system and architecture-design tools. Claude Code, Codex + Antigravity CLI.",
+   "author": {
+diff --git a/loom-design/.codex-plugin/plugin.json b/loom-design/.codex-plugin/plugin.json
+index 15310c90..8706f18d 100644
+--- a/loom-design/.codex-plugin/plugin.json
++++ b/loom-design/.codex-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-design",
+-  "version": "2.20.1",
++  "version": "2.21.0",
+   "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles, design-system and architecture-design tools. Claude Code, Codex + Antigravity CLI.",
+   "author": {
+     "name": "kouko",
+diff --git a/loom-design/CHANGELOG.md b/loom-design/CHANGELOG.md
+index 89108de4..99eb2081 100644
+--- a/loom-design/CHANGELOG.md
++++ b/loom-design/CHANGELOG.md
+@@ -12,6 +12,19 @@ as the `## Predecessor plugin histories` section at the end, so this file
+ is the whole record. Their version numbers never continued here —
+ `loom-design` started fresh at 0.1.0.
+ 
++## [2.21.0] — 2026-11-04 — grounded five-section intent confirmation
++
++- `capture-intent` uses five ordered, localized sections: background and current direction, current problem and impact, what changes, scope and acceptance, and confirmation. Connect known project or function context to the request, with brief evidence-backed sections; broader direction and impact appear only when evidenced and needed, without filling unsupported benefit claims. Preserve supplied facts, qualifiers and outcome strength before drafting, leave unknown facts unresolved, and distinguish rule ownership from deterministic selection or results. The existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
++- Add behavioral prompts for a short familiar request, unfamiliar concepts, a detailed follow-up, random own-list selection and an unknown factual date, for independent conversational exercises.
++- Load grounded intake guidance before drafting or replies and the five-section layout only when confirmation is ready; read relevant optional illustrations only when needed. Separate private preparation and reply records from the actual user-message composer; missing required facts stay in the existing interview. Preserve each live-case fact's abstraction, present affected population and supplied boundaries without repeating artifact fields.
++- Preserve the original numbered consent-policy anchors after separating private preparation, retaining no-spec outcome/authorization routing and its existing regression coverage.
++- Bound example facts to their stated cases and use a neutral missing-date interview. The composer applies six private questions to the actual proposed reply, revising unsupported context or scope, unclear wording or consent, premature structure, unchecked diagrams and unnecessary repetition or private inventory while preserving required disclosures. Both non-forced branch upload and ready-for-review pull request opening wait for completed review and publication checks; opt-out remains available anytime before publication and merge stays separate.
++- Illustrate the structure with concrete invoice and CSV requests. Use titled ASCII comparisons when helpful, marking expected results and reusing optional visualization tooling with a readable standalone fallback.
++- Preserve existing publication holds until explicitly lifted; bind the full public reply to the five-section skeleton, ground its opening in available project context, and invoke the optional visualization procedure before generating and checking diagrams. Keep unavailable-fact interviews focused and preserve filtered-result qualifiers.
++- Read the available overview and request-relevant evidence at intake entry before interviews or choice replies; use documented facts instead of treating them as unanswered questions, retaining source-scoped uncertainty.
++- Load the five-section layout only for confirmation-ready requests, keeping early grounding/interviews separate. Draft and explain constraints at the source's abstraction, retaining target nouns and qualifiers rather than inferring internal-method restrictions or broader absence/data-preservation claims. Keep the unavailable-date interview in its required grounding reader; keep complete ready invoice/CSV illustrations in the existing optional gallery, linked from the concise ready layout. Stop missing-fact interviews before confirmation preparation, and load the existing titled-flow template before generating a comparison. Explain literally without analogies or unnecessary new terminology.
++- Stop incomplete interviews before loading later confirmation readers, and preserve missing required content in both intent templates. Confirmation cannot replace evidence for an unknown date, and absence of evidence establishes neither equality with today nor a different date. Ground the saved Problem and public reply in the same inspected state and supported effects: a missing date is distinct from an incorrect calendar value, and neither establishes announcement history or guaranteed reader understanding.
++
+ ## [2.20.1] — 2026-11-03 — publish linked guides for the design skills
+ 
+ - Add human-facing guides for all six skills, including examples, outputs, confirmation points and boundaries.
+diff --git a/loom-design/README.ja.md b/loom-design/README.ja.md
+index a0a94e8f..c7eee314 100644
+--- a/loom-design/README.ja.md
++++ b/loom-design/README.ja.md
+@@ -10,7 +10,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ
+ > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
+ > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
+ 
+-**Version**: 2.20.1 — 5 skills + 任意のルーター 1 個。リリースは
++**Version**: 2.21.0 — 5 skills + 任意のルーター 1 個。リリースは
+ [CHANGELOG.md](CHANGELOG.md) を参照。
+ **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
+ **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
+diff --git a/loom-design/README.md b/loom-design/README.md
+index b218bbe1..6f460a0c 100644
+--- a/loom-design/README.md
++++ b/loom-design/README.md
+@@ -10,7 +10,7 @@ Skill guides open in English unless a matching translation is available.
+ > never grades. Every verdict on what it produces is rendered by
+ > `loom-code:closing-review`, by an agent that did not write the draft.
+ 
+-**Version**: 2.20.1 — 5 skills + 1 optional router. See
++**Version**: 2.21.0 — 5 skills + 1 optional router. See
+ [CHANGELOG.md](CHANGELOG.md) for releases.
+ **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
+ **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
+diff --git a/loom-design/README.zh-TW.md b/loom-design/README.zh-TW.md
+index 1972c00c..0fe6a273 100644
+--- a/loom-design/README.zh-TW.md
++++ b/loom-design/README.zh-TW.md
+@@ -9,7 +9,7 @@
+ > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
+ > 下判斷的 agent 不是寫草稿的那一個。
+ 
+-**Version**: 2.20.1 — 5 個 skill + 1 個可選入口路由。版本資訊見
++**Version**: 2.21.0 — 5 個 skill + 1 個可選入口路由。版本資訊見
+ [CHANGELOG.md](CHANGELOG.md)。
+ **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
+ **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
+diff --git a/loom-design/package.json b/loom-design/package.json
+index b9c16fdb..ef6a264e 100644
+--- a/loom-design/package.json
++++ b/loom-design/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-design",
+-  "version": "2.20.1",
++  "version": "2.21.0",
+   "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles, design-system and architecture-design tools. Claude Code, Codex + Antigravity CLI.",
+   "private": true,
+   "type": "module",
+diff --git a/loom-design/plugin.json b/loom-design/plugin.json
+index 0d4b4269..747a48db 100644
+--- a/loom-design/plugin.json
++++ b/loom-design/plugin.json
+@@ -1,5 +1,5 @@
+ {
+   "name": "loom-design",
+-  "version": "2.20.1",
++  "version": "2.21.0",
+   "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles, design-system and architecture-design tools. Claude Code, Codex + Antigravity CLI."
+ }
+diff --git a/loom-design/skills/capture-intent/SKILL.md b/loom-design/skills/capture-intent/SKILL.md
+index 225b1e8b..1405fe95 100644
+--- a/loom-design/skills/capture-intent/SKILL.md
++++ b/loom-design/skills/capture-intent/SKILL.md
+@@ -7,11 +7,14 @@ version: 1.0.0
+ 
+ ## What this station does
+ 
+-Relative paths in this document are relative to this skill's own directory.
++Resolve relative paths from this skill's directory.
+ 
+-Ask only until the wanted outcome is clear, write
+-`docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
+-confirmed intent onward. Do not design, plan, or ask the user to judge quality.
++Read the available README or equivalent project overview, current direction and
++request evidence narrowly before composing any intake reply. Documented facts are
++not gaps. Without an overview, use known context; qualify material unknowns.
++
++Clarify and write `docs/loom/intent/<change-id>.md`, then confirm it in
++the user's words before hand-off. Do not design, plan or request quality judgment.
+ 
+ ## Artifact vocabulary
+ 
+@@ -19,8 +22,7 @@ confirmed intent onward. Do not design, plan, or ask the user to judge quality.
+ `kind: engineering` covers internal work, tooling, tests, and docs.
+ `<change-id>` is `<start-date YYYY-MM-DD>-<title-in-kebab-case>`.
+ 
+-`loom-code`'s stations consume this output and check its format, so
+-preserve the required shapes.
++Preserve the shapes that `loom-code` consumes and checks.
+ 
+ ## Station summary
+ 
+@@ -64,15 +66,22 @@ or updated.
+ 
+ ## Step 1 — Interview
+ 
+-Read `references/interview.md`; ask only for missing required-field content.
+-Draft directly when already sufficient. No intake question quota applies.
+-Problems/outcomes are valid before choosing features or implementation.
+-Existing decision points remain unchanged.
++Read `references/interview.md`.
++Read `references/confirmation-template.md` before drafting or replying.
++Keep missing required facts in the existing interview, asking for the
++needed fact and why; stop before confirmation preparation or
++later readers. Resume Step 2 when settled.
++Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
++Before drafting: Preserve supplied facts, outcome strength and qualifiers.
++Leave unknown facts unresolved pending user answers/evidence.
++Keep own-rule isolation separate from same-worker or same-result guarantees.
++Lead interviews with the user's problem or missing fact, minimizing workflow
++labels and bookkeeping; retain consequence/authorization disclosures.
++Draft directly when already sufficient.
+ 
+-Cover affected people, workaround, clean-environment observable outcomes,
+-fixed constraints, and exclusions. For product also cover urgency, existing
+-alternatives, and displaced work. End with GO or NO-GO plus one reason; write
+-NO-GO as `status: withdrawn — <reason>` and stop.
++For product also cover urgency, existing alternatives, and displaced work.
++Record GO or NO-GO with one reason privately; write
++NO-GO as `status: withdrawn — <reason>` and stop, explaining why.
+ 
+ **Every question you ask must be of type `what`** — what do you want, what
+ happens today, what would you be able to do. Nothing about how it should
+@@ -83,27 +92,27 @@ Constraints and Out of scope can all be filled in without guessing.
+ 
+ Keep every field at intent altitude:
+ 
+-- **Problem** — present pain, affected people, and consequence; no diagnosis,
+-  file list, or fix. Put missing current behaviour, workaround, or consequence
+-  in Open questions; do not infer it.
++- **Problem** — evidenced pain, affected people, effects; no diagnosis, file list, fix.
++  Distinguish absent and incorrect values. Put unknown behaviour, workaround or
++  effects in Open questions without inference.
+ - **Proposed outcome** — wanted capability or state; no complete scenarios,
+   UI reactions, state transitions, or implementation design.
+ - **Acceptance** — numbered observable delivery outcomes with external
+   pass/fail evidence acceptance testing can produce; no value claim, scenario, test step, UI placement,
+   architecture, or task split.
+-- **Constraints** — already-fixed boundaries; no agent preference or
++- **Constraints** — Keep already-fixed user/standing-policy boundaries; no agent preference or
+   speculative guardrail.
+ - **Value case** — for a product intent: beneficiary, urgency, existing alternative,
+   displaced work, and GO/NO-GO. Count each missing answer separately;
+   confirmation of other fields is not evidence. Omit for an engineering intent
+   with obvious value.
+-- **Out of scope** — excluded capabilities, actors, systems, or data; no
+-  deferred implementation list.
++- **Out of scope** — Keep explicitly excluded capabilities, actors, systems or data
++  at source abstraction; no inferred method bans or deferred implementation list.
+ - **Open questions** — only unresolved outcome/scope choices or missing required
+   content; both block confirmation. Carry downstream spec/engineering questions
+   in the hand-off, not this section.
+ 
+-Any section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
++Any intent-file section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
+ for example current versus wanted, or who is affected. Acceptance stays a
+ numbered list, a diagram stays at intent altitude (no UI reactions or state
+ transitions), and a product Problem still holds no identifiers, Mermaid node
+@@ -176,25 +185,9 @@ intent in step 4.
+ 
+ ## Step 4 — Decision point ①: restate and confirm
+ 
+-Compose **one message**. Everything below goes into it; you do not stop
+-twice, and this is the only stop this station makes.
++### Private preparation
+ 
+-1. **The restatement.** Problem and Acceptance in the user's own plain
+-   words — no file paths, no identifiers, no mechanism names:
+-
+-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
+-   >
+-   > (You want ___, and when it is done you will be able to ___, ___ and
+-   > ___. Is that right?)
+-
+-   For the current contract, automatic publication is the default. This same
+-   restatement explicitly says that answering yes authorizes a later non-forced
+-   push and Ready PR after `closing-review` and publication checks pass, while merge
+-   remains a separate decision. Say that the user may explicitly opt out before
+-   publication. Do not hide that consequence in mechanism language or add it
+-   after the user has answered. Write
+-   `publication: automatic — authorized <date> by <name>` only after that
+-   informed yes; an opt-out leaves the field absent.
++Prepare inputs privately; the ready layout orders replies.
+ 
+ 2. **The engineering one-way doors found so far**, in consequence form. A
+    product change's one-way doors, class (e) actions included, are handled at
+@@ -269,14 +262,36 @@ at `ship`), or state one-way-door consequences. Decide implementation choices
+ from repo evidence and record the reason; asking the user is a
+ `user-judgment-leak` review failure.
+ 
+-**Write down every question you asked**, as `{decision_point, text, type}`
+-with `type` one of `what` / `behaviour` / `done` / `consequence`. The
+-intent file has no section for this list, and inventing one would put a
+-second schema next to the contract's. The canonical carrier is the plan's
+-`## Questions asked` section. So **you pass the list forward in your hand-off
+-message in step 5, verbatim**, and say that the receiving station must write
+-it into that section. A question asked and not recorded makes the flow look
+-quieter than it is.
++### User message
++
++Read `references/confirmation-format.md` only when required facts are settled.
++Compose **one message** for the user's confirmation, then wait; this is the only
++confirmation stop this station makes.
++
++Restate Problem and Acceptance: subject, problem, impact, outcome and
++confirmation scope. Use the user's plain words, never paths, identifiers or
++mechanism names. Supply necessary context: unfamiliar terms, affected people,
++intent altitude. Use five ordered sections from
++`references/confirmation-format.md` as the whole public reply, with headings required.
++Choose wording and length freely, keeping familiar requests short.
++Check these connections and what yes confirms and authorizes.
++
++Honor a prior publication hold or opt-out until the user explicitly lifts it.
++Otherwise automatic publication is the default.
++Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
++BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
++with opt-out available anytime before publication and a separate merge decision.
++
++Apply `references/confirmation-template.md` final-message check before sending.
++
++### Private records and reply handling
++
++**Write down every question you asked** as `{decision_point, text, type}` with
++`type` one of `what` / `behaviour` / `done` / `consequence`. Pass the list verbatim
++in step 5's hand-off for the receiving station to write into the plan's
++`## Questions asked`; never invent an intent section for it.
++Record `publication: automatic — authorized <date> by <name>` after informed
++publication consent only; prior holds leave it absent.
+ 
+ **Keep a carried-details list** beside the question list: flow or reaction
+ details the user stated or explicitly agreed to, before or during intake.
+@@ -298,8 +313,8 @@ detail. This self-check creates no fields, IDs, requirements, scenarios, or
+ product behaviour.
+ 
+ Publication and second-reviewer authorisation never enter Problem, Proposed
+-outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+-intent's `publication:` frontmatter line. The sole Constraints exception is
++outcome, Acceptance, or Out of scope. Use `publication:` for publication consent.
++The sole Constraints exception is
+ `- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
+ skipped. It records the selected family; a direct request's verbatim quote,
+ target and final `selected_executor` belong in JSON `authorization_source`
+@@ -309,10 +324,8 @@ hand-off.
+ Visible effects with an unknown surface and no spec require
+ `needs-design: yes` with a surface-neutral reason; internal files alone do not.
+ 
+-Use only user-supplied product claims: add no product nouns, interfaces, states,
+-scope dimensions, or guarantees. Put only unresolved outcome/scope choices or
+-missing required content in Open questions; either keeps the intent `open`.
+-Carry downstream spec/engineering questions in the hand-off.
++Add no product nouns, interfaces, states, scope dimensions, or guarantees.
++Unresolved outcome/scope or required content in Open questions keeps intent `open`.
+ Complete Step 2's altitude pass before confirmation. A fork with materially
+ different outcomes for the user or scope needs an explicit answer; an accepted
+ restatement is insufficient; reopen it — move it to Open questions, stop confirmation,
+@@ -326,9 +339,8 @@ the intent and restate again; there is no limit on rounds here.
+ **On "yes":**
+ 
+ 1. Write `status: confirmed <date>` into the intent. When the confirmed
+-   restatement explicitly authorizes automatic publication, also write
+-   `publication: automatic — authorized <date> by <name>`; never derive it
+-   from status or prose. When step 3 ran, write
++   restatement explicitly authorizes automatic publication, record it as above;
++   never derive it from status or prose. When step 3 ran, write
+    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
+    After all confirmed intent frontmatter, including `publication:`, is written,
+    replace the template's `intent_confirmed_sha: <sha7>` with
+@@ -383,10 +395,6 @@ next station must record each item in the spec. When the list is non-empty and
+ (`spec-minimal`) to hold them. An empty list forces no spec and adds nothing
+ to the hand-off.
+ 
+-Say two things so the next station is not re-run by accident: `write-plan`
+-will **not** run decision point ① again, because `status:` is already
+-`confirmed` — it reads the intent and starts planning. And decision point
+-② — "you type ___ and you see ___" — happens where the product spec is
+-written: at `write-spec`, or at `write-plan` when `needs-design: no` and
+-carried details force a spec. Engineering changes go from here to a plan with
+-no further stop until acceptance.
++Confirmed intents bypass ① at `write-plan`. Product ② occurs where its spec is
++written: `write-spec`, or `write-plan` when carried details force one.
++Engineering changes continue to planning with no further stop until acceptance.
+diff --git a/loom-design/skills/capture-intent/references/confirmation-examples.md b/loom-design/skills/capture-intent/references/confirmation-examples.md
+new file mode 100644
+index 00000000..80ad9a92
+--- /dev/null
++++ b/loom-design/skills/capture-intent/references/confirmation-examples.md
+@@ -0,0 +1,240 @@
++# Optional confirmation illustrations
++
++Read the primary `confirmation-template.md` first. Use only the relevant section
++when an illustration is needed; these examples supply no facts for another case.
++The missing-fact interview remains in the required grounding reader; ready examples
++apply only after required facts are settled.
++The examples below are supplementary; they define no additional reply structure.
++
++
++
++## Known correction
++
++Context: release notes show an old date and make the latest release look outdated.
++The user supplies the verified release date, 2 November; only that date may change.
++
++Good:
++> ### Background and current direction
++> The release notes describe when the software shipped. This correction concerns the displayed release date.
++>
++> ### Current problem and impact
++> The incorrect date makes the latest release look outdated.
++>
++> ### What changes
++> Replace the displayed date with the verified 2 November.
++>
++> ### Scope and acceptance
++> Check that this date is correct and the rest of the release notes remain unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the correction you want?
++
++Bad:
++> ### Background and current direction
++> The release notes describe when the software shipped. This correction concerns the displayed release date.
++>
++> ### Current problem and impact
++> The incorrect date makes the latest release look outdated.
++>
++> ### What changes
++> Replace the displayed date with the verified 2 November.
++>
++> ### Scope and acceptance
++> Check that this date is correct and the rest of the release notes remain unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the correction you want?
++> The intent is open and engineering with no design needed. Standing-document
++> checks passed. The current branch has no commits, both handoff lists are empty,
++> and review defaults are unchanged. Next I will commit the intent, plan and
++> implement; the intent commit message will follow the station's naming rule.
++
++Both replies preserve identical facts, scope and necessary authorization. Only
++the bad reply appends internal work inventory: its extra sentences add no help
++understanding the correction or deciding what to authorize.
++
++## Multiple problems
++
++Context: a worker is whoever executes a background job. Jobs borrow another
++job's worker-selection rule; failed jobs retry forever and block the queue.
++Each should use its own rule and stop at its configured retry limit, preserving
++successful jobs and the existing interface.
++
++Good:
++> ### Background and current direction
++> Background jobs run work through workers. This change concerns their selection rules and configured retry limits.
++>
++> ### Current problem and impact
++> Jobs borrow another job's selection rule; failed jobs retry forever and block the queue.
++>
++> ### What changes
++> Each job should use its own rule for choosing who executes it, and failed jobs should stop at their configured retry limit.
++>
++> ### Scope and acceptance
++> Check rule ownership and retry stopping separately. Successful jobs and the existing interface stay unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is this the scope you want?
++
++Bad:
++> Fix dispatch profile and retry policy. Every job will always choose the same
++> worker and produce the same result. Please also choose a new default-worker
++> policy and approve the retry implementation before confirming.
++
++The bad reply replaces explanation with labels, adds guarantees and turns an
++unestablished edge case into an additional outcome choice.
++
++## Repairing shorthand
++
++Context: the user already explained worker selection as the rule choosing who
++runs each job. The assistant called it "profile" without explanation; the user
++asks for detail after reporting borrowed rules and inconsistent results.
++
++Good:
++> ### Background and current direction
++> Worker selection is the rule choosing who runs each job. I used "profile" as shorthand for that supplied role, not a verified application object.
++>
++> ### Current problem and impact
++> My shorthand omitted that connection. You reported that jobs borrow another job's rule and get inconsistent results.
++>
++> ### What changes
++> The correction is to use each job's own selection rule.
++>
++> ### Scope and acceptance
++> Check which rule each job uses. This alone promises neither the same worker nor identical results on every run.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Does that match your request?
++
++Bad:
++> I cannot explain profile because you never defined it. Tell me its exact
++> meaning. I will require the same job to pick the same worker and return an
++> identical result every time, and leave publication for another question.
++
++The good reply repairs the assistant's wording using supplied context without
++pretending to have verified an application object with that name. The bad reply
++returns the omission to the user and strengthens the requested outcome.
++
++## Interface boundary
++
++Context: jobs randomly choose workers from their own eligible lists but sometimes
++use another job's list. Random selection must remain, with no new interface.
++
++Good:
++> ### Background and current direction
++> Jobs randomly choose workers from their own eligible lists. This correction concerns which list each job uses.
++>
++> ### Current problem and impact
++> Jobs sometimes use another job's list.
++>
++> ### What changes
++> Each job should randomly select from its own eligible workers.
++>
++> ### Scope and acceptance
++> Check list ownership while preserving randomness and the existing interface.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the change you want?
++
++Bad:
++> Confirm that every job always chooses the same worker, and that no functions,
++> options, settings or commands may be added anywhere. Would you prefer a new
++> interface for jobs with no list? Publication is off unless you separately opt in.
++
++The bad reply contradicts randomness, expands an interface constraint into an
++implementation prohibition, invents an additional scope choice and reverses the
++publication default.
++
++## Invoice currency correction
++
++Context: accounting staff export invoices; the supplied priority is customer-setting isolation with the current format retained. Exports sometimes borrow the previous customer's currency. Amounts can differ, format stays unchanged, and existing files must remain untouched. The user explicitly asked to capture requirements only and not publish.
++
++Good:
++> ### Background and current direction
++> The accounting team exports invoices. The stated priority is to isolate customer settings while preserving the export format.
++>
++> ### Current problem and impact
++> An export sometimes uses the previous customer's currency setting, so the invoice shows the wrong currency.
++>
++> ### What changes
++> Use the invoice customer's own currency setting. The comparison shows the reported failing case and the expected correction:
++>
++> ```text
++> ┌──────────────────────────────┐  ┌──────────────────────────────┐
++> │    Before (reported bug)     │  │        Expected after        │
++> ├──────────────────────────────┤  ├──────────────────────────────┤
++> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
++> │  │     Export invoice     │  │  │  │  Export invoice  │        │
++> │  └────────────────────────┘  │  │  └──────────────────┘        │
++> │               │              │  │            │                 │
++> │               ▼              │  │            ▼                 │
++> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
++> │  │ May use prior currency │  │  │  │ Use own currency │        │
++> │  └────────────────────────┘  │  │  └──────────────────┘        │
++> │               │              │  │            │                 │
++> │               ▼              │  │            ▼                 │
++> │  ┌────────────────────────┐  │  │  ┌──────────────────┐        │
++> │  │     Wrong currency     │  │  │  │ Correct currency │        │
++> │  └────────────────────────┘  │  │  └──────────────────┘        │
++> └──────────────────────────────┘  └──────────────────────────────┘
++> ```
++>
++> ### Scope and acceptance
++> Check exports for customers with different currencies. Keep the format unchanged and existing export files untouched. Amounts may legitimately differ between exports; identical amounts are not required.
++>
++> ### Please confirm
++> Your confirmation covers these requirements only. You asked not to publish;
++> I will keep that restriction unless you explicitly lift it.
++> Is that the correction you want?
++
++Bad:
++> Fix currency profile. All future invoice amounts will be identical; regenerate every existing export.
++> Your yes also permits publication despite your restriction.
++> Keep every existing datum untouched and prohibit changes to how customer settings are entered or stored.
++> No per-invoice inspection will be needed for any reason.
++
++The bad reply hides the setting's role, broadens named export-file preservation to all data, invents method restrictions, and overrides existing publication restrictions. The good diagram illustrates the failing path, not every export; a result boundary does not ban an unrequested internal fix method. When the request supplies checking for wrong currency, preserve that reason: correcting currency does not eliminate every other reason to inspect an invoice.
++
++## Filtered CSV export
++
++Context: accounting staff inspect filtered invoices. There is no CSV download of that result. They request CSV export of the current filtered result, with invoice number, customer, currency and amount columns, retaining current permissions. No broader project direction or intended use is supplied.
++
++Good:
++> ### Background and current direction
++> Accounting staff inspect filtered invoices; this request concerns exporting that result.
++>
++> ### Current problem and impact
++> They currently cannot download the filtered result as a CSV file.
++>
++> ### What changes
++> Add CSV export for the current filtered result.
++>
++> ### Scope and acceptance
++> The download uses the current filtered result, with invoice number, customer, currency and amount columns. Existing access permissions stay unchanged.
++>
++> ### Please confirm
++> Only after review and publication checks pass does saying yes authorize
++> both a non-forced branch upload and a pull request ready for review. You may
++> opt out anytime before publication; merging remains separate.
++> Is that the capability you want?
++
++Bad:
++> We are modernizing the entire accounting platform. Approve a background export service and a new permission model.
++> There is no CSV download, so there are no download actions at all.
++
++The bad reply invents a project direction and implementation decision, and expands the absence of one capability into the absence of all downloads. The good reply retains the supplied CSV qualifier and permission boundary.
+diff --git a/loom-design/skills/capture-intent/references/confirmation-format.md b/loom-design/skills/capture-intent/references/confirmation-format.md
+new file mode 100644
+index 00000000..224a2f7d
+--- /dev/null
++++ b/loom-design/skills/capture-intent/references/confirmation-format.md
+@@ -0,0 +1,57 @@
++# Ready confirmation layout
++
++Read only at the confirmation composer after required facts are settled.
++If a required fact is missing, return to `confirmation-template.md` and stop
++before confirmation preparation; the layout and ready examples do not apply.
++The grounding and interview rules remain in `confirmation-template.md`.
++
++Use five sections in this order, translating headings and replacing bracketed
++guidance with only necessary, evidence-backed content. A brief sentence can
++suffice for a section; no paragraph or filled purpose/direction/impact/benefit
++slot is required. Keep critical scope, authorization, constraints, consequences
++and required questions even in a short reply:
++
++```markdown
++## Background and current direction
++[Known project or function context connected to this request; broader direction only when evidenced and needed.]
++
++## Current problem and impact
++[The supported problem or limitation; include affected people, situation and impact as needed and evidenced. Define necessary unfamiliar terms by their role.]
++
++## What changes
++[Wanted behavior and its difference from today; use a useful table or diagram when it helps.]
++
++## Scope and acceptance
++[Observable completion conditions and source-scoped preservation/exclusion boundaries.]
++
++## Please confirm
++[Requirement scope and the applicable consent branch below. Ask the necessary question and wait.]
++```
++
++Keep the whole public reply for a ready confirmation inside these five sections,
++excluding private prefaces and postscripts. Required WARN notices, cost/egress,
++one-way-door consequences, principles and carried details belong in the applicable section.
++
++Invoke `loom-workflow:loom-visualization` before composing a diagram when available.
++For a simple comparison, a Markdown table may convey the difference; draw a
++flow when its sequence clarifies the change or the user requests one.
++For a before/after flow, read its `templates/02-linear-steps.md` and use
++"Reproduce the titled comparison" to generate both complete outer frames,
++with titles inside and unverified changes labeled expected. Preserve actual
++steps and branches. Generate with width-aware tools and run final alignment
++on the complete composition, including titled frames; invoking the skill
++alone does not load its template.
++If the optional skill is unavailable, use verified host tools or readable
++table/text fallback. A wording correction needs no flowchart.
++
++Honor a prior publication hold or opt-out until the user explicitly lifts it.
++Under that restriction, confirmation covers requirements only; omit the default grant.
++Otherwise retain the normal automatic-publication default.
++Disclose automatic publication, opt-out and the separate merge decision in the same yes when publication is enabled.
++Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
++BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
++with opt-out available anytime before publication and a separate merge decision.
++
++When an illustration is needed, read the relevant Invoice currency correction
++or Filtered CSV export section in `confirmation-examples.md`. Adapt information
++connections only; example facts apply only to their stated case.
+diff --git a/loom-design/skills/capture-intent/references/confirmation-template.md b/loom-design/skills/capture-intent/references/confirmation-template.md
+new file mode 100644
+index 00000000..534dc8df
+--- /dev/null
++++ b/loom-design/skills/capture-intent/references/confirmation-template.md
+@@ -0,0 +1,103 @@
++# Intent grounding and focused interview
++
++Write in the user's conversation language.
++This includes the saved intent's title and prose fields as well as the reply;
++keep the required schema keys and section headings unchanged.
++State literally who does what, what the user sees and what changes.
++Use no metaphors or analogies. Introduce no new terminology unless necessary;
++define a necessary unfamiliar name by its role, without creating another name.
++
++Keep missing required facts in the existing interview, asking only what is needed and why.
++When the user already lacks the required fact and evidence, state what is blocked
++and wait; invent neither a replacement/deletion choice nor a future confirmation preview.
++
++## Unknown date
++
++Context: the user reports a "wrong release date", but the inspected date field
++reads "to be corrected", not a calendar date. Only that field should change.
++The actual release date is unknown, and the user has no release record to supply.
++
++Good:
++> The date field has no actual date: it reads "to be corrected". The actual
++> release date is still unknown, and you cannot provide a release
++> record. I cannot replace it accurately from the available evidence, so the
++> correction is blocked until that evidence becomes available.
++
++Bad:
++> I created an open engineering intent with needs-design: no. Confirm today's
++> date as the fallback, then choose whether I should publish. Next I will run
++> planning, build and closing-review. Is this plan technically correct?
++> The notes give readers an incorrect calendar day. Using TBD means the date has
++> not been announced and readers will not be misled.
++
++The bad reply invents a date, serializes bookkeeping and adds a publication
++choice and implementation judgment. It also converts missing data into an
++incorrect value and invents announcement history and reader understanding.
++The good reply leaves the unavailable fact
++unresolved and states why correction is blocked, rather than proposing deletion,
++temporary text or a future confirmation. Publication details belong to a ready
++confirmation with enabled publication. A lack of supplied records does not put
++verification out of scope; it leaves the date unknown until evidence is available.
++Do not turn "only change the date" into a ban on checking it.
++An unknown release date could coincide with today's date; no reliable evidence
++establishes either equality or difference. A confirmation cannot supply that evidence.
++
++## Grounded drafting
++
++Connect sourced project or function purpose to this request, including
++established direction or impact only when evidenced and needed. Use established
++goals, not procedural waivers. Unknown broader direction needs no new interview
++or filler disclaimer; state material uncertainty briefly.
++
++Show each fact once, instead of copying Problem/Outcome/Acceptance/Scope fields.
++
++Ground every factual clause in this request/current evidence.
++Require actual-request support or evidence for every date, role, impact and constraint.
++When stating a time or frequency, reuse the source's qualifier with the event
++it describes; translate it only as needed for the user's language. Omit a
++frequency that the source does not establish for that event.
++Preserve abstraction and present-versus-desired quantifiers.
++Treat a rule role separately from any unverified representation: list, file, cache, algorithm or UI.
++Keep present affected population distinct from desired coverage.
++Include only supplied boundaries; inconsistent results establish no identical-result guarantee.
++Preserve source targets and qualifiers in absence, preservation and exclusion claims,
++leaving unmentioned alternatives unknown.
++Trace each boundary privately to an actual user or current-document clause;
++omit unsupported assertions and inferred input/storage/fix-method restrictions.
++Repair assistant shorthand using the already supplied role.
++Its conversational meaning establishes no named application object.
++Preserve a supplied interface boundary while leaving private helpers to implementation choices.
++Borrow only information connections, keeping example details as case-specific facts.
++
++## Final-message check
++
++Check each sentence of the actual proposed reply for grounded context, scope,
++outcome or a required decision or consent using these six questions. Revise the
++offending sentences for the current phase before sending. Keep this check private; do not append the
++questions or a claim that all checks passed to the public reply.
++
++1. Does the known project or function context explain its connection to this
++   request, including broader direction or impact only when evidenced and needed,
++   without filling unsupported purpose, direction, impact or benefit slots?
++2. Do the proposed reply and delivered intent (when written) agree on evidence-backed facts,
++   scope boundaries, constraints and guarantees, retaining source targets,
++   qualifiers and strength without invented additions?
++3. Does the reply state literally who does what and what the user sees, without
++   analogies or unnecessary new terminology, explaining necessary names by role?
++4. Does the confirmation say plainly exactly what yes authorizes, honoring prior
++   holds and the applicable conditional publication default? Replace double
++   negatives or exception phrasing that could imply extra consent.
++5. Are the five ordered sections used only when required facts are settled,
++   with missing facts kept in the interview? Where a diagram helps, are comparison
++   flows fully framed and titled, unverified changes labeled expected, and the
++   complete composition checked for alignment?
++6. Can repetition or detail unnecessary for understanding be removed: private
++   status, paths, classifications, GO/waiver labels, unrun checks, next-station
++   and handoff inventories unless requested? Retain required disclosures:
++   verbatim WARN notices, cost/egress, one-way-door consequences, principles and carried details.
++
++When reporting file changes, distinguish any written intent from unchanged
++project files.
++
++Honor a prior publication hold or opt-out until the user explicitly lifts it.
++Under that restriction, confirmation covers requirements only; omit the default grant.
+diff --git a/loom-design/skills/capture-intent/references/interview.md b/loom-design/skills/capture-intent/references/interview.md
+index a587aa7a..35a234fa 100644
+--- a/loom-design/skills/capture-intent/references/interview.md
++++ b/loom-design/skills/capture-intent/references/interview.md
+@@ -53,11 +53,13 @@ question count merely to make the interview look complete.
+ 3. **(what)** What concretely loses this time — what will you not do
+    instead? If nothing is displaced, the appetite is hollow.
+ 
+-End with GO or NO-GO and one reason. One weak answer alongside two
++Record GO or NO-GO and one reason privately. One weak answer alongside two
+ concrete ones can still be a GO — name the weak one. Two or more weak
+ answers are a NO-GO for now, never a hopeful GO. A NO-GO is written into
+ the intent as `status: withdrawn — <reason>`; the reasoning is preserved so
+ nobody re-argues it blind.
++Explain a blocking outcome and its user-relevant reason plainly; keep judgment
++labels and bookkeeping private.
+ 
+ ## One bad / good pair per section
+ 
+diff --git a/loom-design/skills/capture-intent/templates/intent.md b/loom-design/skills/capture-intent/templates/intent.md
+index f39819e2..306e0745 100644
+--- a/loom-design/skills/capture-intent/templates/intent.md
++++ b/loom-design/skills/capture-intent/templates/intent.md
+@@ -9,7 +9,7 @@ intent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over t
+ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication
+ 
+ ## Problem
+-<present pain, who it affects, and consequence; no diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
++<evidence-backed present state, affected people and effects; distinguish absent values from incorrect values; separate reported symptoms from inspected evidence; leave unsupported effects unknown. No diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
+ 
+ ## Proposed outcome
+ <wanted capability or state; no scenario, UI reaction, state transition, or implementation>
+@@ -18,13 +18,13 @@ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only af
+ 1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>
+ 
+ ## Constraints
+-- <already-fixed boundaries, not agent preferences>
++- <Keep already-fixed user/standing-policy boundaries at source abstraction; no agent preferences or inferred method bans>
+ 
+ ## Value case
+-<optional; product beneficiary, urgency, and GO/NO-GO; omit obvious engineering value>
++<product: beneficiary, urgency, existing alternative, displaced work, and GO/NO-GO; missing required answers stay open and block confirmation. Omit for engineering when value is obvious>
+ 
+ ## Out of scope
+-- <excluded capabilities, actors, systems, or data; not deferred implementation tasks>
++- <Keep explicitly excluded capabilities, actors, systems or data at source abstraction; no inferred method bans or deferred implementation tasks>
+ 
+ ## Open questions
+-- <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none
++- <unresolved outcome/scope choices or missing required content; both block confirmation; delegate spec and engineering questions> # write `- none` when there are none
+diff --git a/loom-design/skills/capture-intent/test-prompts.json b/loom-design/skills/capture-intent/test-prompts.json
+index 133ef014..348177ec 100644
+--- a/loom-design/skills/capture-intent/test-prompts.json
++++ b/loom-design/skills/capture-intent/test-prompts.json
+@@ -2,7 +2,7 @@
+   "skill_name": "capture-intent",
+   "schema_version": 1,
+   "created": "2026-09-13",
+-  "last_reviewed": "2026-09-13",
++  "last_reviewed": "2026-11-03",
+   "prompts": [
+     {
+       "id": 1,
+@@ -33,6 +33,41 @@
+         "value case",
+         "prohibited design questions"
+       ]
++    },
++    {
++      "id": 4,
++      "category": "happy-path",
++      "prompt": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
++      "expected_behavior": "Keep the five ordered sections short, connecting available project context, the release notes, misleading date, customer confusion and wanted correction. Use natural sentences rather than a fixed script. Preserve any prior publication restriction; otherwise include the default publication consequence. Keep one confirmation stop and ask for outcome confirmation, not implementation approval; stay in a focused interview if the actual date remains unknown.",
++      "edge_case_dimensions": ["simple familiar request", "concise connected context", "flexible expression"]
++    },
++    {
++      "id": 5,
++      "category": "edge-case",
++      "prompt": "The retry policy is the rule for repeating failed background jobs. The dispatch profile selects which worker handles them. Right now one job uses another job's profile, and failed jobs repeat forever, blocking the queue. I want each job to use its own selection and stop after its configured limit. Keep existing successful jobs unchanged; this is internal behavior, with no new interface.",
++      "expected_behavior": "Explain the two concepts in terms of their roles, link each current problem to its effects and wanted result, and preserve the compatibility boundary. Choose enough context for independent understanding without turning the explanation into implementation design or requesting technical approval. Confirm the requirements and existing authorization consequences together.",
++      "edge_case_dimensions": ["unfamiliar concepts", "multiple connected problems", "intent altitude"]
++    },
++    {
++      "id": 6,
++      "category": "stress",
++      "prompt": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
++      "expected_behavior": "Repair the missing context using the supplied meaning, affected jobs, inconsistent results and wanted correct selection. Explain more fully because the user requested detail; do not repeat the unexplained label, guess a diagnosis or ask for implementation approval. Keep any renewed confirmation within the existing correction round, without adding a new decision point.",
++      "edge_case_dimensions": ["detailed follow-up", "unexplained label", "correction round"]
++    },
++    {
++      "id": 7,
++      "category": "edge-case",
++      "prompt": "Each background job owns a list of eligible workers and randomly chooses one worker from that list each time it runs. A bug makes some jobs use another job's list. Please make every job select from its own list while keeping random selection. Explain what you will fix before asking me to confirm.",
++      "expected_behavior": "Preserve own-list selection and randomness without adding repeatable worker choice or universally consistent outputs. Explain the cross-job mix-up and wanted isolation in ordinary language; include concrete publication consequences in the existing confirmation, without asking for implementation approval.",
++      "edge_case_dimensions": ["random own-list selection", "unsupported stronger guarantee", "supplied outcome strength"]
++    },
++    {
++      "id": 8,
++      "category": "edge-case",
++      "prompt": "The release notes show the wrong release date. I don't know the actual release date yet, and I have no release record to give you. Only correct that date once it is established.",
++      "expected_behavior": "Keep the factual date unresolved pending an answer or evidence, and keep the intent open. Do not recommend today or another convenient date as a fallback. Lead concisely with the missing fact and its consequence, without workflow labels, branch bookkeeping or a premature confirmation claim.",
++      "edge_case_dimensions": ["unknown factual date", "unsupported fallback", "proportionate context"]
+     }
+   ]
+ }
+diff --git a/loom-design/tests/spec/test_capture_intent_contract.py b/loom-design/tests/spec/test_capture_intent_contract.py
+index 1f219b9f..14936750 100644
+--- a/loom-design/tests/spec/test_capture_intent_contract.py
++++ b/loom-design/tests/spec/test_capture_intent_contract.py
+@@ -1,4 +1,4 @@
+-# concern: capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
++# concern: first confirmation loses grounded context or its five ordered localized sections, reverses its content obligations or forces a sentence script; capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
+ """capture-intent station contract (plan W2-01).
+ 
+ The station is loom-design's entry point. These tests check its structure:
+@@ -22,6 +22,8 @@ import re
+ import sys
+ from pathlib import Path
+ 
++import pytest
++
+ REPO = Path(__file__).resolve().parents[3]
+ sys.path.insert(0, str(REPO / "loom-code/scripts"))
+ 
+@@ -97,10 +99,42 @@ def test_decision_point_one_asks_only_unresolved_outcomes_or_authorization() ->
+ 
+ STEP_4 = "## Step 4 — Decision point ①: restate and confirm"
+ 
++RESTATEMENT_CONTENT = (
++    ("Restate", "Problem and Acceptance", "subject, problem, impact", "outcome", "confirmation scope"),
++    ("Supply", "necessary context", "unfamiliar terms", "affected people", "intent altitude"),
++    ("Choose", "wording and length freely", "keeping familiar requests short"),
++    ("Use", "five ordered sections", "headings required"),
++    ("Check", "these connections", "what yes confirms and authorizes"),
++    ("Preserve", "supplied facts", "outcome strength"),
++    ("Leave", "unknown facts unresolved", "user answers", "evidence"),
++    ("Lead", "user's problem or missing fact", "workflow labels", "bookkeeping"),
++    ("Explain", "uploading the change branch", "pull request ready for review", "non-forced push", "separate merge decision"),
++)
++
++
++@pytest.mark.parametrize("owner", [SKILL, REPO / "loom-code/skills/write-plan/references/confirm-intent.md"])
++def test_first_confirmation_preserves_context_in_five_sections(owner: Path) -> None:
++    """A1-A4: both entry owners carry the connected content and self-check."""
++    text = _flat(owner.read_text(encoding="utf-8"))
++    for verb, literal, *extras in RESTATEMENT_CONTENT:
++        assert affirms(text, verb, literal, *extras), (owner, literal)
++    assert "你要的是 ___" not in text
++    assert "Examples, scripts and headings are optional." not in text
++    assert "Use the user's plain words, never paths, identifiers or mechanism names." in text
++
++
++@pytest.mark.parametrize("rule", RESTATEMENT_CONTENT)
++def test_first_confirmation_content_rejects_reversed_obligations(rule: tuple[str, ...]) -> None:
++    """A1-A3 negative: preserving the vocabulary cannot hide negation."""
++    verb, literal, *extras = rule
++    sentence = f"{verb} {literal}, {', '.join(extras)}."
++    assert affirms(sentence, verb, literal, *extras)
++    assert not affirms("Do not " + sentence, verb, literal, *extras)
++
+ # Whole sentences, not keyword subsets: a keyword pin lets reversed meaning pass.
+ NO_SECOND_STOP = (
+-    "Compose **one message**. Everything below goes into it; you do not stop "
+-    "twice, and this is the only stop this station makes."
++    "Compose **one message** for the user's confirmation, then wait; "
++    "this is the only confirmation stop this station makes."
+ )
+ COMPLEXITY_CHECK = (
+     "When the user's request or an option under discussion would add a "
+@@ -257,21 +291,21 @@ def test_loom_design_version_2_17_0_consistent() -> None:
+         (REPO / "loom-design/package.json").read_text(encoding="utf-8")
+     )
+     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
+-    assert claude_manifest["version"] == "2.20.1"
+-    assert codex_manifest["version"] == "2.20.1"
+-    assert agy_manifest["version"] == "2.20.1"
+-    assert package_manifest["version"] == "2.20.1"
+-    assert "## [2.20.1]" in changelog
++    assert claude_manifest["version"] == "2.21.0"
++    assert codex_manifest["version"] == "2.21.0"
++    assert agy_manifest["version"] == "2.21.0"
++    assert package_manifest["version"] == "2.21.0"
++    assert "## [2.21.0]" in changelog
+     assert "## [2.2.1]" not in changelog
+     readme_pins = {
+-        "README.md": "| [`loom-design`](loom-design/README.md) | 2.20.1 |",
+-        "loom-design/README.md": "**Version**: 2.20.1",
+-        "loom-design/README.ja.md": "**Version**: 2.20.1",
+-        "loom-design/README.zh-TW.md": "**Version**: 2.20.1",
++        "README.md": "| [`loom-design`](loom-design/README.md) | 2.21.0 |",
++        "loom-design/README.md": "**Version**: 2.21.0",
++        "loom-design/README.ja.md": "**Version**: 2.21.0",
++        "loom-design/README.zh-TW.md": "**Version**: 2.21.0",
+     }
+     for name, pin in readme_pins.items():
+         assert pin in (REPO / name).read_text(encoding="utf-8"), name
+-    assert "## loom-design\n\nVersion 2.20.1." in (REPO / "README.md").read_text(encoding="utf-8")
++    assert "## loom-design\n\nVersion 2.21.0." in (REPO / "README.md").read_text(encoding="utf-8")
+ 
+ 
+ def test_capture_intent_bare_branch_absent() -> None:
+diff --git a/loom-design/tests/spec/test_intent_drafting_fidelity.py b/loom-design/tests/spec/test_intent_drafting_fidelity.py
+new file mode 100644
+index 00000000..6f1c4b24
+--- /dev/null
++++ b/loom-design/tests/spec/test_intent_drafting_fidelity.py
+@@ -0,0 +1,281 @@
++"""W1-01 continued: fidelity applies before any outcome is drafted."""
++
++from pathlib import Path
++import re
++import sys
++
++import pytest
++
++REPO = Path(__file__).resolve().parents[3]
++sys.path.insert(0, str(REPO / "loom-code/scripts"))
++from prose_pin import affirms  # noqa: E402
++
++RULES = (
++    ("Preserve", "supplied facts", "outcome strength", "qualifiers"),
++    ("Leave", "unknown facts unresolved", "user answers", "evidence"),
++    ("Keep", "own-rule isolation separate from", "same-worker", "same-result guarantees"),
++    ("Keep", "missing required facts", "existing interview", "needed fact and why"),
++)
++EXAMPLE_RULES = (
++    ("Write", "user's conversation language"),
++    ("Connect", "sourced project or function purpose", "established direction", "this request"),
++    ("Keep", "missing required facts", "existing interview"),
++    ("Repair", "assistant shorthand", "already supplied role"),
++    ("Preserve", "interface boundary", "private helpers"),
++    ("Borrow", "information connections", "case-specific facts"),
++    ("Require", "actual-request support or evidence", "date, role, impact and constraint"),
++    ("Check", "each sentence", "grounded context", "scope", "outcome", "required decision or consent"),
++    ("Retain", "required disclosures", "WARN", "cost/egress", "one-way-door", "carried details"),
++    ("Ground", "every factual clause", "this request/current evidence"),
++    ("Preserve", "abstraction", "present-versus-desired quantifiers"),
++    ("Treat", "rule role separately from", "unverified representation", "list, file, cache, algorithm or UI"),
++    ("Keep", "present affected population distinct from desired coverage"),
++    ("Include", "only supplied boundaries"),
++)
++LOAD_RULE = ("Read", "confirmation-template.md", "before drafting or replying")
++FINAL_CHECK = ("Apply", "confirmation-template.md", "final-message check", "before sending")
++AUTH_RULE = ("Explain", "only after review AND publication checks pass",
++             "BOTH uploading the change branch", "AND opening a pull request ready for review",
++             "anytime before publication", "separate merge decision", "publication is enabled")
++HOLD_RULE = ("Honor", "prior publication hold or opt-out", "user explicitly lifts it")
++PUBLIC_RULE = ("Keep", "whole public reply", "five sections", "private prefaces", "postscripts")
++CONTEXT_RULE = ("Read", "available README or equivalent project overview", "current direction", "before composing")
++DIAGRAM_RULE = ("Invoke", "loom-workflow:loom-visualization", "before composing a diagram", "when available")
++FORMAT_LOAD = ("Read", "confirmation-format.md", "only when required facts are settled")
++TARGET_RULE = ("Preserve", "source targets and qualifiers", "absence, preservation and exclusion claims", "unmentioned alternatives unknown")
++BOUNDARY_RULE = ("Trace", "each boundary privately", "actual user or current-document clause")
++CONSTRAINT_RULE = ("Keep", "already-fixed user/standing-policy boundaries")
++EXCLUSION_RULE = ("Keep", "explicitly excluded", "source abstraction")
++FORMAT_RULES = (
++    ("Use", "five sections in this order"),
++    ("Disclose", "same yes", "automatic publication", "opt-out", "separate merge", "publication is enabled"),
++    PUBLIC_RULE, DIAGRAM_RULE, AUTH_RULE,
++)
++
++
++@pytest.mark.parametrize(("path", "draft_boundary"), [
++    ("loom-design/skills/capture-intent/SKILL.md", "Draft directly when already sufficient."),
++    ("loom-code/skills/write-plan/references/confirm-intent.md", "Problem holds present pain"),
++])
++def test_fidelity_precedes_first_drafting_instruction(path: str, draft_boundary: str) -> None:
++    text = " ".join((REPO / path).read_text(encoding="utf-8").split())
++    before_draft = text[:text.index(draft_boundary)]
++    for verb, literal, *extras in RULES:
++        assert affirms(before_draft, verb, literal, *extras), (path, literal)
++    assert affirms(before_draft, *LOAD_RULE), path
++    link = re.search(r"Read `([^`]*confirmation-template\.md)` before drafting or replying", before_draft)
++    assert link, path
++    owner = REPO / path
++    target = owner.parent / link.group(1)
++    local_dir = owner.parent / "references" if owner.name == "SKILL.md" else owner.parent
++    assert target.is_file() and target.resolve().parent == local_dir.resolve(), target
++
++
++@pytest.mark.parametrize("filename", ["confirmation-template.md", "confirmation-examples.md", "confirmation-format.md"])
++def test_local_confirmation_examples_are_portable_and_identical(filename: str) -> None:
++    paths = [REPO / root / filename for root in (
++        "loom-design/skills/capture-intent/references",
++        "loom-code/skills/write-plan/references",
++    )]
++    text = paths[0].read_text(encoding="utf-8")
++    assert text == paths[1].read_text(encoding="utf-8")
++    assert "loom-design/" not in text and "loom-code/" not in text
++    if filename == "confirmation-template.md":
++        for rule in (*EXAMPLE_RULES, HOLD_RULE, TARGET_RULE, BOUNDARY_RULE):
++            assert affirms(" ".join(text.split()), *rule), rule
++        assert "```markdown" not in text and "## Please confirm" not in text
++        return
++    if filename == "confirmation-format.md":
++        for rule in FORMAT_RULES:
++            assert affirms(" ".join(text.split()), *rule), rule
++        skeleton = text.split("```markdown\n", 1)[1].split("```", 1)[0]
++        assert re.findall(r"^## (.+)$", skeleton, re.M) == [
++            "Background and current direction", "Current problem and impact",
++            "What changes", "Scope and acceptance", "Please confirm"]
++        return
++    for case in ("Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
++        example = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
++        assert "Good:" in example and "Bad:" in example
++    grounding = paths[0].with_name("confirmation-template.md").read_text()
++    pending = grounding.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
++    good_interview = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
++    assert "pull request" not in good_interview and "Saying yes" not in good_interview
++    assert "blocked" in good_interview
++    assert "old" not in pending.lower() and "customer" not in pending.lower()
++    pair = text.split("## Known correction", 1)[1].split("\n## ", 1)[0]
++    good, bad = pair.split("Good:", 1)[1].split("Bad:", 1)
++    good = " ".join(line[2:] for line in good.splitlines() if line.startswith("> "))
++    bad = " ".join(line[2:] for line in bad.splitlines() if line.startswith("> "))
++    assert bad.startswith(good) and bad != good
++    for case in ("Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
++        section = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
++        positive = " ".join(section.split("Good:", 1)[1].split("Bad:", 1)[0].replace("> ", "").split())
++        assert "Only after review and publication checks pass" in positive
++        assert "both a non-forced branch upload and a pull request ready for review" in positive
++        assert "anytime before publication" in positive
++        headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
++        assert headings == ["Background and current direction", "Current problem and impact",
++                            "What changes", "Scope and acceptance", "Please confirm"]
++    for case in ("Invoice currency correction", "Filtered CSV export"):
++        section = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
++        assert "Good:" in section and "Bad:" in section
++        headings = re.findall(r"^> ### (.+)$", section.split("Good:", 1)[1].split("Bad:", 1)[0], re.M)
++        assert headings == ["Background and current direction", "Current problem and impact",
++                            "What changes", "Scope and acceptance", "Please confirm"]
++        positive = section.split("Good:", 1)[1].split("Bad:", 1)[0]
++        if case == "Invoice currency correction":
++            assert "requirements only" in positive and "explicitly lift" in positive
++            assert "Only after review and publication checks pass" not in positive
++        else:
++            assert "current filtered result" in positive and "visible" not in positive
++
++
++@pytest.mark.parametrize("path", [
++    "loom-design/skills/capture-intent/SKILL.md",
++    "loom-code/skills/write-plan/references/confirm-intent.md",
++])
++def test_user_composer_is_separate_from_private_work(path: str) -> None:
++    text = (REPO / path).read_text(encoding="utf-8")
++    preparation = text.index("### Private preparation")
++    composer = text.index("### User message")
++    records = text.index("### Private records and reply handling")
++    assert preparation < composer < records
++    message = text[composer:records]
++    assert "Compose **one message**" in message and "Restate Problem and Acceptance" in message
++    assert "Everything below goes" not in message
++    assert "uploading the change branch" in message and "separate merge decision" in message
++    assert "**Write down every question" not in message and "`decision_point" not in message
++    assert "**The complexity check" not in message and "`second-vendor:" not in message
++    assert affirms(" ".join(message.split()), *FINAL_CHECK)
++    assert affirms(" ".join(message.split()), *AUTH_RULE)
++    assert affirms(" ".join(message.split()), *HOLD_RULE)
++    assert affirms(" ".join(message.split()), *FORMAT_LOAD)
++    ready_link = re.search(r"Read `([^`]*confirmation-format\.md)` only when required facts are settled", message)
++    assert ready_link and ((REPO / path).parent / ready_link.group(1)).is_file()
++    assert "confirmation-format.md" not in text[:composer]
++    final_link = re.search(r"Apply .*?`([^`]*confirmation-template\.md)`", message)
++    assert final_link and ((REPO / path).parent / final_link.group(1)).is_file()
++
++
++@pytest.mark.parametrize("path", [
++    "loom-design/skills/capture-intent/SKILL.md",
++    "loom-code/skills/write-plan/references/confirm-intent.md",
++    "loom-design/skills/capture-intent/templates/intent.md",
++    "loom-code/contract/templates/intent.md",
++])
++def test_intent_boundaries_retain_source_scope(path: str) -> None:
++    text = " ".join((REPO / path).read_text().split())
++    assert affirms(text, *CONSTRAINT_RULE)
++    assert affirms(text, *EXCLUSION_RULE)
++
++
++def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
++    owner = REPO / "loom-code/skills/write-plan/SKILL.md"
++    text = owner.read_text(encoding="utf-8")
++    step1 = text.split("## Step 1 — Find the intent", 1)[1].split("\n## ", 1)[0]
++    no_intent = step1.split("- `loom-design` is not installed", 1)[1]
++    step3 = text.split("## Step 3 — Decision point ①: restate and confirm", 1)[1].split("\n## ", 1)[0]
++    confirmed, open_intent = step3.split("Otherwise", 1)
++    assert "confirmation-template.md" not in confirmed and "confirmation-examples.md" not in confirmed
++    assert "confirmation-format.md" not in confirmed
++    assert "confirmation-format.md" not in open_intent
++    assert "confirmation-format.md" not in no_intent
++    for route, child in ((no_intent, "references/no-intent-interview.md"),
++                         (open_intent, "references/confirm-intent.md")):
++        load = route.index("references/confirmation-template.md")
++        assert load < route.index(child)
++        assert affirms(" ".join(route.split()), *LOAD_RULE)
++    reader = owner.parent / "references/no-intent-interview.md"
++    before_draft = reader.read_text(encoding="utf-8").split("When you write the intent", 1)[0]
++    assert affirms(" ".join(before_draft.split()), *LOAD_RULE)
++    for entry in (text, (REPO / "loom-design/skills/capture-intent/SKILL.md").read_text()):
++        before_reader = entry.split("Read `references/confirmation-template.md`", 1)[0]
++        assert affirms(" ".join(before_reader.split()), *CONTEXT_RULE)
++        assert re.search(r"Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed", " ".join(entry.split()))
++        assert not re.search(r"Read `[^`]*confirmation-examples\.md` before drafting or replying", entry)
++    for child in (reader, owner.parent / "references/confirm-intent.md"):
++        assert not re.search(r"Read `[^`]*confirmation-examples\.md`.*before drafting or replying", child.read_text())
++
++
++@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, HOLD_RULE, CONTEXT_RULE,
++                                 FORMAT_LOAD, TARGET_RULE, BOUNDARY_RULE, CONSTRAINT_RULE,
++                                 EXCLUSION_RULE, *FORMAT_RULES, *EXAMPLE_RULES))
++def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
++    verb, literal, *extras = rule
++    sentence = f"{verb} {literal}, {', '.join(extras)}."
++    assert affirms(sentence, verb, literal, *extras)
++    assert not affirms("Do not " + sentence, verb, literal, *extras)
++    if rule == AUTH_RULE:
++        assert not affirms(sentence.replace("publication is enabled", "publication is disabled"), *rule)
++    if "separate from" in literal:
++        assert not affirms(sentence.replace("separate from", "equivalent to"),
++                           verb, literal, *extras)
++    late = "Draft directly when already sufficient. " + sentence
++    assert not affirms(late.split("Draft directly", 1)[0], verb, literal, *extras)
++
++
++def test_phase_examples_resolve_from_their_local_reader() -> None:
++    """Keep missing-fact guidance required and ready illustrations locally reachable."""
++    root = REPO / "loom-design/skills/capture-intent/references"
++    grounding = (root / "confirmation-template.md").read_text()
++    ready = (root / "confirmation-format.md").read_text()
++    gallery = (root / "confirmation-examples.md").read_text()
++    pending = grounding.split("## Unknown date", 1)[1].split("\n## ", 1)[0]
++    positive = pending.split("Good:", 1)[1].split("Bad:", 1)[0]
++    assert "blocked" in positive and "### Please confirm" not in positive
++    assert "verification" in pending and "out of scope" in pending
++    assert "## Unknown date" not in ready + gallery
++    link = re.search(r"`([^`]*confirmation-examples\.md)`", ready)
++    assert link, "ready illustrations must resolve through a local gallery link"
++    target = root / link.group(1)
++    assert target.is_file() and target.resolve().parent == root.resolve()
++    assert target.read_text() == gallery
++    for case in ("Invoice currency correction", "Filtered CSV export"):
++        assert f"## {case}" in gallery and f"## {case}" not in ready
++    assert "templates/02-linear-steps.md" in ready
++    assert "read" in ready.split("templates/02-linear-steps.md", 1)[0].splitlines()[-1].lower()
++    assert "no diagrams" not in ready.lower()
++
++
++def test_missing_fact_branch_stops_before_confirmation_preparation() -> None:
++    for relative in ("loom-design/skills/capture-intent/SKILL.md",
++                     "loom-code/skills/write-plan/references/confirm-intent.md"):
++        text = (REPO / relative).read_text()
++        branch = text.split("before drafting or replying.", 1)[1].split("Before drafting:", 1)[0]
++        assert "missing" in branch.lower() and "stop" in branch
++        assert "confirmation preparation" in branch
++    main = (REPO / "loom-code/skills/write-plan/SKILL.md").read_text()
++    assert "confirmation-format.md" not in main
++
++
++def test_primary_reader_uses_literal_explanation_without_private_terms() -> None:
++    text = (REPO / "loom-design/skills/capture-intent/references/confirmation-template.md").read_text()
++    assert affirms(" ".join(text.split()), "State", "who does what", "user sees", "what changes")
++    assert "metaphors or analogies" in text
++    assert "new terminology" in text and "necessary" in text
++
++
++def test_incomplete_code_intake_cannot_enter_ready_reader() -> None:
++    root = REPO / "loom-code/skills/write-plan"
++    interview = (root / "references/no-intent-interview.md").read_text()
++    before_draft = interview.split("When you write the intent", 1)[0]
++    assert "confirm-intent.md" not in before_draft
++    step3 = (root / "SKILL.md").read_text().split(
++        "## Step 3 — Decision point ①: restate and confirm", 1)[1].split("\n## ", 1)[0]
++    open_route = step3.split("Otherwise", 1)[1]
++    stop = open_route.index("stop before loading")
++    assert stop < open_route.index("Read `references/confirm-intent.md`")
++    assert "required facts" in open_route[:stop]
++    assert "Only when required facts are settled" in open_route[:open_route.index("Read `references/confirm-intent.md`")]
++
++
++@pytest.mark.parametrize("path", [
++    "loom-code/skills/write-plan/references/confirm-intent.md",
++    "loom-design/skills/capture-intent/SKILL.md",
++    "loom-code/contract/templates/intent.md",
++    "loom-design/skills/capture-intent/templates/intent.md",
++])
++def test_open_questions_preserves_required_content_blocker(path: str) -> None:
++    text = " ".join((REPO / path).read_text().split())
++    assert re.search(r"[Oo]pen questions.{0,130}missing required content", text)
++    assert "both block confirmation" in text
+diff --git a/loom-workflow/.claude-plugin/plugin.json b/loom-workflow/.claude-plugin/plugin.json
+index b5839017..fb56f586 100644
+--- a/loom-workflow/.claude-plugin/plugin.json
++++ b/loom-workflow/.claude-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-workflow",
+-  "version": "5.19.2",
++  "version": "5.20.0",
+   "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — persistent Outcome Maps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), recap, handoff, project-retro (one project session), skill-retro (recurring skill issues), chat visualizations (tables / ASCII / Mermaid, reasoning pages) and editable diagrams for standalone or Loom discussions, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills.",
+   "author": {
+     "name": "kouko",
+diff --git a/loom-workflow/.codex-plugin/plugin.json b/loom-workflow/.codex-plugin/plugin.json
+index ec18adaf..6136de2c 100644
+--- a/loom-workflow/.codex-plugin/plugin.json
++++ b/loom-workflow/.codex-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-workflow",
+-  "version": "5.19.2",
++  "version": "5.20.0",
+   "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — persistent Outcome Maps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), recap, handoff, project-retro (one project session), skill-retro (recurring skill issues), chat visualizations (tables / ASCII / Mermaid, reasoning pages) and editable diagrams for standalone or Loom discussions, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills.",
+   "author": {
+     "name": "kouko",
+diff --git a/loom-workflow/CHANGELOG.md b/loom-workflow/CHANGELOG.md
+index 1372e56f..1fb12fb0 100644
+--- a/loom-workflow/CHANGELOG.md
++++ b/loom-workflow/CHANGELOG.md
+@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
+ Format follows [Keep a Changelog](https://keepachangelog.com/).
+ Versioning follows [Semantic Versioning](https://semver.org/).
+ 
++## [5.20.0] — 2026-11-04 — scope option guidance to real user decisions
++
++- Compare alternatives for unresolved user outcome or preference decisions; consider later, smaller and combined versions only when they are actual alternatives.
++- Keep unavailable necessary facts unresolved without invented substitute outcomes or extra confirmation. Preserve direct confirmations and explicit requests for a different outcome.
++- Synchronize full and coexistence prompt cards with the plain-language guide and generated host rule. This clarification does not establish improved behavioral reliability.
++
+ ## [5.19.2] — 2026-11-03 — titled before/after flow illustrations
+ 
+ - Add a reusable comparison illustration to the existing linear-flow template, with a title inside each outer frame and corresponding steps aligned where applicable.
+diff --git a/loom-workflow/README.ja.md b/loom-workflow/README.ja.md
+index 96491d20..f9ccc49e 100644
+--- a/loom-workflow/README.ja.md
++++ b/loom-workflow/README.ja.md
+@@ -8,7 +8,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
+ 
+ > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
+ 
+-**Version**：5.19.2 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
++**Version**：5.20.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+ 
+ ## 名前の移行
+ 
+diff --git a/loom-workflow/README.md b/loom-workflow/README.md
+index 0d93e2bf..49d499ce 100644
+--- a/loom-workflow/README.md
++++ b/loom-workflow/README.md
+@@ -8,7 +8,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
+ 
+ > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
+ 
+-**Version**: 5.19.2 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
++**Version**: 5.20.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+ 
+ ## Name migration
+ 
+diff --git a/loom-workflow/README.zh-TW.md b/loom-workflow/README.zh-TW.md
+index 2aa7b298..e02f5b6a 100644
+--- a/loom-workflow/README.zh-TW.md
++++ b/loom-workflow/README.zh-TW.md
+@@ -8,7 +8,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
+ 
+ > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
+ 
+-**Version**：5.19.2 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
++**Version**：5.20.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+ 
+ ## 名稱遷移
+ 
+diff --git a/loom-workflow/package.json b/loom-workflow/package.json
+index 1d986c63..b9f1b7e9 100644
+--- a/loom-workflow/package.json
++++ b/loom-workflow/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loom-workflow",
+-  "version": "5.19.2",
++  "version": "5.20.0",
+   "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — persistent Outcome Maps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), recap, handoff, project-retro (one project session), skill-retro (recurring skill issues), chat visualizations (tables / ASCII / Mermaid, reasoning pages) and editable diagrams for standalone or Loom discussions, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills.",
+   "private": true,
+   "type": "module",
+diff --git a/loom-workflow/plugin.json b/loom-workflow/plugin.json
+index bf5c2c78..26e8a842 100644
+--- a/loom-workflow/plugin.json
++++ b/loom-workflow/plugin.json
+@@ -1,5 +1,5 @@
+ {
+   "name": "loom-workflow",
+-  "version": "5.19.2",
++  "version": "5.20.0",
+   "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — persistent Outcome Maps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), recap, handoff, project-retro (one project session), skill-retro (recurring skill issues), chat visualizations (tables / ASCII / Mermaid, reasoning pages) and editable diagrams for standalone or Loom discussions, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills."
+ }
+diff --git a/loom-workflow/rules/AGENTS.md b/loom-workflow/rules/AGENTS.md
+index 673245cd..46ddebe3 100644
+--- a/loom-workflow/rules/AGENTS.md
++++ b/loom-workflow/rules/AGENTS.md
+@@ -4,15 +4,16 @@ Reply to the user in their language. 1) First sentence: the conclusion and
+ what it means for the user; details after. 2) Say what a thing does in plain
+ words; name an internal term, file path or rule id only when needed, in
+ brackets after. 3) Be literal: who does what, what the user sees, what
+-changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+-diagrams: before explaining comparisons of 2+ options, flows of 3+ steps,
+-branching decisions, states or lifecycles, actor sequences, architectures,
+-reasoning chains, progress, a before and after, what each choice means,
+-readiness, confirmed against unconfirmed, findings, risks or supported
+-environments, or typing any box-drawing diagram (┌─┐, +--+), invoke
+-`loom-visualization` FIRST and lead with its table or diagram. Skip
+-loom-visualization for one-paragraph answers; never decorate. When asking or
+-answering how to do something, offer 2+ workable options in a table,
+-recommending one; list or rule out doing nothing or later, a smaller version,
+-and combining two; for plainer explanations, read loom-visualization's
+-`references/plain-language.md` first.
++changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or diagrams: invoke
++`loom-visualization` FIRST for comparisons, flows of 3+ steps, branching,
++states or lifecycles, actor sequences, architectures, reasoning chains,
++progress, a before and after, choice consequences, readiness, confirmed against
++unconfirmed, findings, risks, supported environments or box-drawing diagrams.
++Lead with its form; skip loom-visualization for one-paragraph answers; never
++decorate.
++Compare actual alternatives for unresolved user outcome or preference choices
++in markdown tables, recommending one. Unavailable facts stay unresolved,
++without invented alternatives or confirmation. Ask confirmations directly.
++For decisions, user-requested changed outcomes and plainer explanations, read
++loom-visualization's `references/plain-language.md` first; consider later,
++smaller or combined versions only as actual alternatives.
+diff --git a/loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md b/loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md
+index af4ec501..803152cd 100644
+--- a/loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md
++++ b/loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md
+@@ -3,16 +3,17 @@ Reply to the user in their language. 1) First sentence: the conclusion and
+ what it means for the user; details after. 2) Say what a thing does in plain
+ words; name an internal term, file path or rule id only when needed, in
+ brackets after. 3) Be literal: who does what, what the user sees, what
+-changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+-for comparisons, branching decisions, reasoning chains, timelines, sequences,
+-quantities, data models, reasoning pages, progress, a before and after, what
+-each choice means, readiness, confirmed against unconfirmed, findings, risks
+-or supported environments, invoke `loom-visualization` FIRST, leading with
+-its form. Comparisons get a markdown table, ASCII only when needed. Verify
+-prescribed box diagrams with loom-visualization's `scripts/align.py`; the
+-ascii-graph card covers flows, state machines and architecture; follow it.
+-Skip loom-visualization for one-paragraph answers; never decorate. When
+-asking or answering how to do something, offer 2+ workable options in a
+-table, recommending one; list or rule out doing nothing or later, a smaller
+-version, and combining two; for plainer explanations, read
+-loom-visualization's `references/plain-language.md` first.
++changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams: invoke
++`loom-visualization` FIRST for comparisons, branching, reasoning chains,
++timelines, sequences, quantities, data models, reasoning pages, progress,
++a before and after, choice consequences, readiness, confirmed against
++unconfirmed, findings, risks or supported environments. Lead with its form;
++verify boxes with loom-visualization's `scripts/align.py`. Follow the
++ascii-graph card for flows, states and architecture. Skip loom-visualization
++for one-paragraph answers; never decorate.
++Compare actual alternatives for unresolved user outcome or preference choices
++in markdown tables, recommending one. Unavailable facts stay unresolved,
++without invented alternatives or confirmation. Ask confirmations directly.
++For decisions, user-requested changed outcomes and plainer explanations, read
++loom-visualization's `references/plain-language.md` first; consider later,
++smaller or combined versions only as actual alternatives.
+diff --git a/loom-workflow/skills/loom-visualization/assets/trigger-card.md b/loom-workflow/skills/loom-visualization/assets/trigger-card.md
+index fb347c87..6c18a4b3 100644
+--- a/loom-workflow/skills/loom-visualization/assets/trigger-card.md
++++ b/loom-workflow/skills/loom-visualization/assets/trigger-card.md
+@@ -3,15 +3,16 @@ Reply to the user in their language. 1) First sentence: the conclusion and
+ what it means for the user; details after. 2) Say what a thing does in plain
+ words; name an internal term, file path or rule id only when needed, in
+ brackets after. 3) Be literal: who does what, what the user sees, what
+-changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+-diagrams: before explaining comparisons of 2+ options, flows of 3+ steps,
+-branching decisions, states or lifecycles, actor sequences, architectures,
+-reasoning chains, progress, a before and after, what each choice means,
+-readiness, confirmed against unconfirmed, findings, risks or supported
+-environments, or typing any box-drawing diagram (┌─┐, +--+), invoke
+-`loom-visualization` FIRST and lead with its table or diagram. Skip
+-loom-visualization for one-paragraph answers; never decorate. When asking or
+-answering how to do something, offer 2+ workable options in a table,
+-recommending one; list or rule out doing nothing or later, a smaller version,
+-and combining two; for plainer explanations, read loom-visualization's
+-`references/plain-language.md` first.
++changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or diagrams: invoke
++`loom-visualization` FIRST for comparisons, flows of 3+ steps, branching,
++states or lifecycles, actor sequences, architectures, reasoning chains,
++progress, a before and after, choice consequences, readiness, confirmed against
++unconfirmed, findings, risks, supported environments or box-drawing diagrams.
++Lead with its form; skip loom-visualization for one-paragraph answers; never
++decorate.
++Compare actual alternatives for unresolved user outcome or preference choices
++in markdown tables, recommending one. Unavailable facts stay unresolved,
++without invented alternatives or confirmation. Ask confirmations directly.
++For decisions, user-requested changed outcomes and plainer explanations, read
++loom-visualization's `references/plain-language.md` first; consider later,
++smaller or combined versions only as actual alternatives.
+diff --git a/loom-workflow/skills/loom-visualization/references/plain-language.md b/loom-workflow/skills/loom-visualization/references/plain-language.md
+index ae32da95..705ee405 100644
+--- a/loom-workflow/skills/loom-visualization/references/plain-language.md
++++ b/loom-workflow/skills/loom-visualization/references/plain-language.md
+@@ -62,15 +62,19 @@ Replace an abstract noun with "you do X, you see Y".
+ ### 5. Ask decision questions with real alternatives
+ 
+ A yes-or-no confirmation (publish, delete, confirm a restatement) is asked
+-directly, with no invented alternatives. When asking or answering how to do
+-something (you ask the user to decide how, or the user asks you how), the
+-reply lists at least two workable alternatives and marks the one you
+-recommend. Before sending, check three commonly missed alternatives: do
+-nothing or later, a smaller or simpler version, and combining two of the
+-listed options. For each of the three, the reply either lists it or says in
+-one short clause why it is ruled out, however many other options are listed;
+-when only two alternatives remain, those clauses say why there is no third.
+-Give each option one sentence on what choosing it changes for the user.
++directly, with no invented alternatives. Compare options when the user has an
++unresolved outcome or preference decision with at least two real, workable
++alternatives. Mark the one you recommend and give each option one sentence on
++what choosing it changes for the user. Consider doing nothing or later, a
++smaller or simpler version, and combining two of the listed options only when
++they are actual alternatives for that decision; omit inapplicable variants
++rather than filling a required count or explaining why every variant is absent.
++
++A necessary fact known to be unavailable is not an outcome decision. Keep that
++fact unresolved and state what it blocks; do not invent a substitute outcome,
++repeat a request for evidence the user already lacks, or add a confirmation to
++satisfy an options format. If the user explicitly requests a different outcome,
++that request can create a real decision; assess its alternatives on their merits.
+ 
+ Why: in Paul Nutt's study of 400 business decisions, about half failed, and
+ failure was more likely when the first idea was adopted
+diff --git a/loom-workflow/tests/scripts/test_release_metadata.py b/loom-workflow/tests/scripts/test_release_metadata.py
+index aa688ab8..82ee48e7 100644
+--- a/loom-workflow/tests/scripts/test_release_metadata.py
++++ b/loom-workflow/tests/scripts/test_release_metadata.py
+@@ -16,7 +16,7 @@ import pytest
+ 
+ REPO = Path(__file__).resolve().parents[3]
+ PLUGIN = REPO / "loom-workflow"
+-CURRENT = "5.19.2"
++CURRENT = "5.20.0"
+ 
+ 
+ @pytest.mark.parametrize(
