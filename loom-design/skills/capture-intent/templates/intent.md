@@ -9,7 +9,7 @@ intent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over t
 publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication
 
 ## Problem
-<evidence-backed present state, affected people and effects; distinguish absent values from incorrect values; separate reported symptoms from inspected evidence; leave unsupported effects unknown. No diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
+<present pain, who it affects, and consequence; no diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>
 
 ## Proposed outcome
 <wanted capability or state; no scenario, UI reaction, state transition, or implementation>
@@ -18,13 +18,13 @@ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only af
 1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>
 
 ## Constraints
-- <Keep already-fixed user/standing-policy boundaries at source abstraction; no agent preferences or inferred method bans>
+- <already-fixed boundaries, not agent preferences>
 
 ## Value case
 <optional; product beneficiary, urgency, and GO/NO-GO; omit obvious engineering value>
 
 ## Out of scope
-- <Keep explicitly excluded capabilities, actors, systems or data at source abstraction; no inferred method bans or deferred implementation tasks>
+- <excluded capabilities, actors, systems, or data; not deferred implementation tasks>
 
 ## Open questions
-- <unresolved outcome/scope choices or missing required content; both block confirmation; delegate spec and engineering questions> # write `- none` when there are none
+- <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none

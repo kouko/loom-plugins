@@ -10,27 +10,14 @@ above this file.
 When this station performs code-only intake, use the same capture boundary:
 ask only for missing required-field content, never a fixed intake question
 quota; existing decision points remain unchanged.
-Read `confirmation-template.md` before drafting or replying.
-If required facts are missing, use its interview branch and stop before
-confirmation preparation.
-Before drafting: Preserve supplied facts and outcome strength, including
-qualifiers. Leave unknown facts unresolved pending user answers/evidence.
-Keep own-rule isolation separate from same-worker or same-result guarantees.
-Lead interviews with the user's problem or missing fact, minimizing workflow
-labels and bookkeeping; retain consequence/authorization disclosures.
-Keep missing required facts in the existing interview, asking only for the
-needed fact and why it matters.
-Problem holds present pain, who it affects, and the evidence-backed consequence,
-with no diagnosis or fix; distinguish absent values from incorrect values,
-keeping reports and inspected observations distinct. Leave unsupported effects unknown.
-Proposed outcome holds the wanted capability;
+Problem holds present pain, who it affects, and the consequence, with no
+diagnosis or fix; Proposed outcome holds the wanted capability;
 Acceptance holds each observable delivery outcome, not value, complete
 scenarios, UI placement, state transitions, test steps, or implementation;
-Keep already-fixed user/standing-policy boundaries as Constraints; product Value case gives beneficiary, urgency,
+Constraints are already fixed; product Value case gives beneficiary, urgency,
 and GO/NO-GO, while an engineering intent omits obvious value;
-Keep Out of scope to explicitly excluded capabilities or data at source abstraction.
-Open questions contains only unresolved outcome/scope choices or missing required
-content; both block confirmation. After drafting, make one author pass: **Keep,
+Out of scope names excluded capability; Open questions contains only unresolved
+outcome or scope choices. After drafting, make one author pass: **Keep,
 neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
 plan, and unsupported detail is deleted. This pass creates no field, ID,
 requirement, scenario, product behaviour, or review loop.
@@ -50,15 +37,40 @@ insufficient; reopen means move it to Open questions, stop confirmation, and
 the intent must remain `open`.
 <!-- /gate -->
 
-Any intent-file section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
+Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
 numbered list, diagrams stay at intent altitude (no UI reactions or state
 transitions), a product Problem holds no identifiers (Mermaid node ids
 included), and chat shows text tables or text diagrams, not Mermaid.
 
-### Private preparation
+Compose **one message**. Everything below goes in it; you do not stop
+twice.
 
-Privately prepare applicable consequences/questions as inputs to the ready layout,
-not as another reply outline.
+1. **The restatement.** Only when required facts are settled, cover what is
+   needed in the user's plain language; five optional sections are:
+   background and current direction; current problem and impact; what changes;
+   scope and acceptance; and what the user is confirming. Connect known,
+   necessary project or function context to the request. Use only supplied or
+   evidenced facts, requirements, boundaries and guarantees; do not infer
+   unspecified restrictions from goals or examples. For example, "results may
+   differ" does not mean "the method cannot change"; do not copy example facts. For context, connect supplied facts:
+   <person> faces <problem>; this change enables <outcome>.
+   Preserve supplied ordering and conditions that affect acceptance.
+   Keep sections proportionate and avoid repetition. If required facts are
+   missing, continue the existing interview without asking for confirmation.
+   Use a table for a helpful comparison, or an ASCII flow for a useful or
+   requested flow comparison; label before and expected after inside each
+   frame and align the frame edges on every line. Follow the existing
+   visualization skill when available. Do not force
+   a diagram for a wording correction. Avoid paths, identifiers, and mechanism
+   names unless needed to understand the request.
+
+   For the current contract, automatic publication is the default. This same
+   restatement explicitly says that answering yes authorizes a later non-forced
+   push and Ready PR after `closing-review` and publication checks pass, while merge
+   remains a separate decision. Say that the user may explicitly opt out before
+   publication. Write
+   `publication: automatic — authorized <date> by <name>` only after that
+   informed yes; an opt-out leaves the field absent.
 
 2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is
@@ -122,33 +134,6 @@ reason as `agent-decided`.
 The closing-review station has a dimension for exactly this, `user-judgment-leak`,
 and it returns NEEDS_REVISION when it finds one. Ask nothing about spec
 quality, task splitting, or review verdicts.
-
-### User message
-
-Read `confirmation-format.md` only when required facts are settled.
-Compose **one message** for the user's confirmation, then wait; this is the only
-confirmation stop this station makes.
-Use applicable consequences/questions; omit private records and inventory.
-
-Restate Problem and Acceptance: subject, problem, impact, outcome and
-confirmation scope. Use the user's plain words, never paths, identifiers or
-mechanism names. Supply necessary context: unfamiliar terms, affected people,
-intent altitude. Use five ordered sections from
-`confirmation-format.md` as the whole public reply, with headings required.
-Choose wording and length freely, keeping familiar requests short.
-Check these connections and what yes confirms and authorizes; never implementation approval.
-
-Honor a prior publication hold or opt-out until the user explicitly lifts it.
-Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
-BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
-with opt-out available anytime before publication and a separate merge decision.
-
-Apply `confirmation-template.md` final-message check before sending.
-
-### Private records and reply handling
-
-Record `publication: automatic — authorized <date> by <name>` after informed
-publication consent only; prior holds leave it absent.
 
 **Write down every question you asked.** Keep a running list from this
 point — every question put to the user at ①, and at ② if you run it here —

@@ -1,0 +1,376 @@
+{
+  "round": 10,
+  "source_commit": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+  "overlay": [
+    {
+      "path": "loom-code/contract/templates/intent.md",
+      "base_runtime_sha256": "53b3dcad082bccf6b73928d0430dc9743b3ee7ec9ddf5bf97c91c4cb7786f629",
+      "candidate_sha256": "b5b5961f037091bc11d46f916878abb3c799036548b18ea247ca585615ca8c1b"
+    },
+    {
+      "path": "loom-code/skills/write-plan/SKILL.md",
+      "base_runtime_sha256": "a66dded2f8672ef67612f1b4d9e5943487a7e540b53890e85a78203a43fb267e",
+      "candidate_sha256": "c18b05c9b66b28a28f46a37d8bf4b1b7a393fc78ac78dbe5ef0c09d897701445"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/confirm-intent.md",
+      "base_runtime_sha256": "c64d5f2459ca67412c2311eff245be68ded41b798e7f0fab5d9f9f74f81d87e4",
+      "candidate_sha256": "2884d65b55ffce2eefa6c2736388e2cc086ab52eb3c511be2b6faedb9c1c2589"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/confirmation-format.md",
+      "base_runtime_sha256": "e79fcb3b4ca092f434fcd08da8897eaf74e45bd63f3d7d286e5eba1ed1a8f942",
+      "candidate_sha256": "8ed31134706bbdfb3a7a5b5307f7fc38ca686982bd14af3e0750f36edde8760a"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/confirmation-template.md",
+      "base_runtime_sha256": "9db702f37d9651b6d97b7d5891f8813487ab8a0294fea178ac7078e5367749f2",
+      "candidate_sha256": "406a16ea0844d5e41bdb76f63962de954439020a26b1952b18af63e91067d9c6"
+    },
+    {
+      "path": "loom-code/skills/write-plan/references/no-intent-interview.md",
+      "base_runtime_sha256": "2b789f70d3e161906a6668facc729db6554a3f1fd6c31e2821dc524f96049758",
+      "candidate_sha256": "f98c8b79ab22418dcf37155d45a01b0cbdda4533b48e82e5e85f62340313d2f2"
+    },
+    {
+      "path": "loom-design/skills/capture-intent/SKILL.md",
+      "base_runtime_sha256": "caff721f98fb411545da3a9c1f37b668cf43c6800ef53e5b7e29efa65a980b70",
+      "candidate_sha256": "4738d0fed451b16eec13894148fd1e989d47ef15c8b0bb66382921ee7419a735"
+    },
+    {
+      "path": "loom-design/skills/capture-intent/references/confirmation-format.md",
+      "base_runtime_sha256": "e79fcb3b4ca092f434fcd08da8897eaf74e45bd63f3d7d286e5eba1ed1a8f942",
+      "candidate_sha256": "8ed31134706bbdfb3a7a5b5307f7fc38ca686982bd14af3e0750f36edde8760a"
+    },
+    {
+      "path": "loom-design/skills/capture-intent/references/confirmation-template.md",
+      "base_runtime_sha256": "9db702f37d9651b6d97b7d5891f8813487ab8a0294fea178ac7078e5367749f2",
+      "candidate_sha256": "406a16ea0844d5e41bdb76f63962de954439020a26b1952b18af63e91067d9c6"
+    },
+    {
+      "path": "loom-design/skills/capture-intent/templates/intent.md",
+      "base_runtime_sha256": "53b3dcad082bccf6b73928d0430dc9743b3ee7ec9ddf5bf97c91c4cb7786f629",
+      "candidate_sha256": "b5b5961f037091bc11d46f916878abb3c799036548b18ea247ca585615ca8c1b"
+    }
+  ],
+  "model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "preflight": {
+    "synthetic_private_read_denied": true,
+    "network_bind_denied": true,
+    "variant_write_denied": true,
+    "network_probe_exit": 77,
+    "network_probe_stderr": ""
+  },
+  "cases": {
+    "capture-invoice": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "capture-csv": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。"
+    },
+    "code-setup": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Orbit Preview\n\nOrbit Preview is a local website preview tool. Its setup guide helps a new contributor start the existing preview server.\n\n## Current direction\nKeep the getting-started instructions accurate without changing the preview tool's behavior. The verified command for the existing installed version is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。"
+    },
+    "capture-invoice-default": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "conditional-consent-positive-control-no-matched-baseline",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "capture-missing-date": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n",
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+    },
+    "capture-invoice-explicit-hold-graph": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。",
+      "candidate_only": true,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n"
+    },
+    "code-missing-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "code-known-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n",
+        "RELEASE_RECORD.md": "# Release record\n\nLatest release date: 2026-11-04\nVerified release-publication metadata for this synthetic project.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-known-date-positive-control-equal-fixture-today",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "capture-invoice-natural-default": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。"
+    },
+    "code-known-wrong-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: 2026-10-31\n\n- Improve note search.\n",
+        "RELEASE_RECORD.md": "# Release record\n\nLatest release date: 2026-11-04\nVerified release-publication metadata for this synthetic project.\n"
+      },
+      "request": "最新版本的發行說明目前把日期寫成 2026-10-31，但已確認真正的發行日期是 2026-11-04，RELEASE_RECORD.md 有這項發行紀錄。請只更正顯示的發行日期，其他文字不要動。",
+      "code_only": true,
+      "comparison_role": "unmatched-actual-wrong-calendar-value-positive-control",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "code-setup-sparse": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Orbit Preview\n\nFor the existing installed version, the verified preview command is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。"
+    },
+    "capture-explicit-placeholder": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "真正的發行日期還查不到。這次不要填真正日期；我決定將日期欄位改成「日期待確認」，其他文字不動。請先整理這個改動的需求，等我確認，不要實作或發布。",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n",
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+    },
+    "capture-format-choice": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Exports\n\nAn internal accounting tool. Team A imports reconciliation data into a system that accepts CSV only. Team B needs an Excel workbook with multiple worksheets. Both currently copy data manually.\n\nCurrent direction: support these existing workflows while preserving current access permissions. Neither CSV nor XLSX export exists yet.\n"
+      },
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary synthetic project. We have not chosen the wanted export format. Do not create an intent file, implement, publish or merge yet.\n\n",
+      "request": "我們這次只能先做一種匯出格式，但還沒決定要優先支援 A 團隊還是 B 團隊。請比較 CSV 與 XLSX 對這兩個團隊的實際差別，給一個有條件的建議，並讓我選擇。不要替我宣告已決定，也不要自己編造期限、預算或兩隊人數。"
+    },
+    "capture-csv-ready": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n\n這項需求每月對帳都會用到，先暫緩發票列表的配色調整，把時間用在這個 CSV 功能；既有列表和權限繼續沿用。"
+    },
+    "capture-invoice-explicit-hold-graph-ready": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。",
+      "candidate_only": true,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n"
+    },
+    "capture-invoice-natural-default-ready": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。"
+    },
+    "code-calendar-preview-new": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Pine Calendar\n\nPine Calendar lets a team preview scheduled events. The verified local preview command for the installed version is `pine preview --locale zh-TW`.\n",
+        "SETUP.md": "# Preview\n\nAfter installing dependencies, run `pine preview --language zh-TW` to start the preview.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動行事曆預覽時，裡面的指令會失敗。已確認 README 的指令是正確的。請只把 SETUP.md 那一行的 --language 修正為 --locale，其他說明和工具行為都不動。"
+    },
+    "capture-stock-report-new": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Birch Stock\n\nBirch Stock is an internal inventory application used by warehouse staff to inspect stock. The stock list can be filtered by warehouse and category. Existing account permissions control which stock records each user may see. The current list has no PDF download action.\n\n## Current direction\nReduce manual transcription when warehouse staff prepare monthly stock reports while retaining existing access permissions.\n",
+        "PRINCIPLES.md": "# Product principles\nratified-by: Birch Stock owner 2026-11-05 (synthetic fixture)\n\n## Who\nWarehouse staff who prepare monthly stock reports.\n\n## Non-negotiables\n1. Preserve existing access permissions.\n2. Report exports must not alter stock records.\n3. Retain the chosen warehouse and category filters.\n\n## Fixed choices\nUse the existing stock list and account permissions.\n"
+      },
+      "request": "倉儲同事每月要做庫存報告，目前會把篩選後的庫存列表手動抄進文件，很花時間。請在既有庫存列表加入 PDF 下載，內容只包含目前選定倉庫與分類的庫存，沿用既有權限且不改動庫存資料。PDF 欄位依序為貨號、品名、倉庫和數量。不新增排程或自動寄送。每月報告都需要使用；這次先暫緩列表配色調整，把時間用在這項功能。"
+    }
+  },
+  "scheduled": [
+    {
+      "key": "code-missing-date-candidate-r1",
+      "variant": "candidate",
+      "case": "code-missing-date",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request"
+    },
+    {
+      "key": "capture-csv-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-csv",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "retained-request-candidate-rerun"
+    },
+    {
+      "key": "capture-csv-ready-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-csv-ready",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "retained-request-candidate-rerun"
+    },
+    {
+      "key": "capture-invoice-explicit-hold-graph-ready-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-invoice-explicit-hold-graph-ready",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request"
+    },
+    {
+      "key": "capture-invoice-natural-default-ready-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-invoice-natural-default-ready",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope"
+    },
+    {
+      "key": "code-setup-sparse-candidate-r1",
+      "variant": "candidate",
+      "case": "code-setup-sparse",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "retained-request-candidate-rerun"
+    },
+    {
+      "key": "code-calendar-preview-new-candidate-r1",
+      "variant": "candidate",
+      "case": "code-calendar-preview-new",
+      "repeat": 1,
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "comparison_role": "retained-request-candidate-rerun"
+    },
+    {
+      "key": "capture-stock-report-new-candidate-r1",
+      "variant": "candidate",
+      "case": "capture-stock-report-new",
+      "repeat": 1,
+      "skill": "loom-design:capture-intent",
+      "code_only": false,
+      "comparison_role": "retained-request-candidate-rerun"
+    }
+  ],
+  "results": {
+    "code-missing-date-candidate-r1": {
+      "key": "code-missing-date-candidate-r1",
+      "case": "code-missing-date",
+      "variant": "candidate",
+      "exit_code": 1,
+      "is_error": true,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.0760982,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-code:write-plan"
+        }
+      ],
+      "result": "You've hit your 5-hour limit · resets 11:10am (Asia/Taipei)",
+      "drafts": []
+    },
+    "capture-csv-candidate-r1": {
+      "key": "capture-csv-candidate-r1",
+      "case": "capture-csv",
+      "variant": "candidate",
+      "exit_code": 1,
+      "is_error": true,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.0752253,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "You've hit your 5-hour limit · resets 11:10am (Asia/Taipei)",
+      "drafts": []
+    },
+    "capture-csv-ready-candidate-r1": {
+      "key": "capture-csv-ready-candidate-r1",
+      "case": "capture-csv-ready",
+      "variant": "candidate",
+      "exit_code": 1,
+      "is_error": true,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "cost_usd": 0.0780473,
+      "permission_denials": [],
+      "skill_calls": [
+        {
+          "skill": "loom-design:capture-intent"
+        }
+      ],
+      "result": "You've hit your 5-hour limit · resets 11:10am (Asia/Taipei)",
+      "drafts": []
+    }
+  }
+}

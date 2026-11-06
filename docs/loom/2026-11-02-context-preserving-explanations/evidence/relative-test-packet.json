@@ -1,0 +1,3491 @@
+{
+  "description": "Prepared relative native test; no model call executed",
+  "model": "claude-sonnet-5-5",
+  "provider": "Anthropic native Claude Code",
+  "requested_effort": "medium",
+  "number_of_calls": 16,
+  "per_call_cli_budget_usd": 0.5,
+  "budget_note": "CLI limit per session, not a guarantee of total billed cost",
+  "synthetic_cases": {
+    "capture-csv": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。"
+    },
+    "capture-csv-ready": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application used by the accounting team to prepare and inspect customer invoices. The invoice list already supports customer and date filters. Access to invoice records is controlled by existing account permissions.\n\n## Current direction\nReduce manual copying during the accounting team's monthly reconciliation while retaining the existing access permissions. The current list has no CSV download action.\n",
+        "PRINCIPLES.md": "# Product principles — Cedar Accounts\nratified-by: Cedar Accounts owner 2026-11-04 (synthetic fixture seed)\n\n## Who\nThe internal accounting team preparing invoices and reconciling customer accounts.\n\n## Non-negotiables\n1. A convenience action must retain the user's existing access permissions.\n2. Viewing or exporting records must not alter the underlying invoice data.\n3. Preserve the user's chosen customer and date filters for the action.\n\n## Won't do\nAutomatically distribute accounting records to third parties.\n\n## Failure we must avoid\nAn export reveals invoices that the user could not view in the existing list.\n\n## Fixed choices\nContinue using the existing invoice list and account permissions.\n"
+      },
+      "request": "會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n\n這項需求每月對帳都會用到，先暫緩發票列表的配色調整，把時間用在這個 CSV 功能；既有列表和權限繼續沿用。"
+    },
+    "capture-invoice-explicit-hold-graph-ready": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。",
+      "candidate_only": true,
+      "comparison_role": "unmatched-diagnostic-explicit-ongoing-publication-hold-and-graph-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n"
+    },
+    "capture-invoice-natural-default-ready": {
+      "skill": "loom-design:capture-intent",
+      "candidate_only": true,
+      "comparison_role": "unmatched-natural-default-diagnostic-without-capture-only-scope",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n",
+      "files": {
+        "README.md": "# Cedar Accounts\n\nCedar Accounts is an internal accounting application. The accounting team prepares customer invoices and downloads them for delivery. Each customer has its own currency setting.\n\n## Current direction\nKeep invoice exports dependable while preserving the existing export format. The current priority is to stop one customer's settings from leaking into another customer's export.\n"
+      },
+      "request": "會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。"
+    },
+    "capture-stock-report-new": {
+      "skill": "loom-design:capture-intent",
+      "files": {
+        "README.md": "# Birch Stock\n\nBirch Stock is an internal inventory application used by warehouse staff to inspect stock. The stock list can be filtered by warehouse and category. Existing account permissions control which stock records each user may see. The current list has no PDF download action.\n\n## Current direction\nReduce manual transcription when warehouse staff prepare monthly stock reports while retaining existing access permissions.\n",
+        "PRINCIPLES.md": "# Product principles\nratified-by: Birch Stock owner 2026-11-05 (synthetic fixture)\n\n## Who\nWarehouse staff who prepare monthly stock reports.\n\n## Non-negotiables\n1. Preserve existing access permissions.\n2. Report exports must not alter stock records.\n3. Retain the chosen warehouse and category filters.\n\n## Fixed choices\nUse the existing stock list and account permissions.\n"
+      },
+      "request": "倉儲同事每月要做庫存報告，目前會把篩選後的庫存列表手動抄進文件，很花時間。請在既有庫存列表加入 PDF 下載，內容只包含目前選定倉庫與分類的庫存，沿用既有權限且不改動庫存資料。PDF 欄位依序為貨號、品名、倉庫和數量。不新增排程或自動寄送。每月報告都需要使用；這次先暫緩列表配色調整，把時間用在這項功能。"
+    },
+    "code-calendar-preview-new": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Pine Calendar\n\nPine Calendar lets a team preview scheduled events. The verified local preview command for the installed version is `pine preview --locale zh-TW`.\n",
+        "SETUP.md": "# Preview\n\nAfter installing dependencies, run `pine preview --language zh-TW` to start the preview.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動行事曆預覽時，裡面的指令會失敗。已確認 README 的指令是正確的。請只把 SETUP.md 那一行的 --language 修正為 --locale，其他說明和工具行為都不動。"
+    },
+    "code-missing-date": {
+      "skill": "loom-code:write-plan",
+      "candidate_only": true,
+      "files": {
+        "README.md": "# Harbor Notes\n\nHarbor Notes is a shared note application. Its release notes tell users when a version became available and what changed.\n\n## Current direction\nKeep published release information accurate without changing the application's behavior.\n",
+        "RELEASE_NOTES.md": "# Latest release\n\nRelease date: to be corrected\n\n- Improve note search.\n"
+      },
+      "request": "最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。",
+      "code_only": true,
+      "comparison_role": "unmatched-neutral-wrapper-diagnostic-no-future-confirmation-request",
+      "prompt_prefix": "Use /{skill} for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n"
+    },
+    "code-setup-sparse": {
+      "skill": "loom-code:write-plan",
+      "code_only": true,
+      "files": {
+        "README.md": "# Orbit Preview\n\nFor the existing installed version, the verified preview command is `orbit start`.\n",
+        "SETUP.md": "# Start the preview\n\nAfter installing the project dependencies, run:\n\n```sh\norbit launch\n```\n\nThen open the local address printed by the preview server.\n"
+      },
+      "request": "新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。"
+    }
+  },
+  "exact_prompts": {
+    "code-missing-date-baseline-r1": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+    "code-missing-date-candidate-r1": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed any change. Do not implement or publish.\n\n最新版本的發行說明日期有誤，請只更正顯示的發行日期，其他文字不要動。我還不知道真正的發行日期，也沒有可提供的發行紀錄。\n",
+    "capture-csv-baseline-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n",
+    "capture-csv-candidate-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n",
+    "capture-csv-ready-baseline-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n\n這項需求每月對帳都會用到，先暫緩發票列表的配色調整，把時間用在這個 CSV 功能；既有列表和權限繼續沿用。\n",
+    "capture-csv-ready-candidate-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n會計團隊每月對帳時，現在得從發票列表手動複製資料到試算表，很花時間。我想在既有發票列表加一個『匯出 CSV』按鈕，下載目前篩選後的發票資料，保留使用者選定的客戶與日期篩選。CSV 欄位依序為發票號碼、客戶名稱、開立日期、幣別、總金額。沿用目前的資料存取權限，不能因為匯出而看到本來無權查看的發票；不新增自動寄送或排程，也不改動既有發票資料。\n\n這項需求每月對帳都會用到，先暫緩發票列表的配色調整，把時間用在這個 CSV 功能；既有列表和權限繼續沿用。\n",
+    "capture-invoice-explicit-hold-graph-ready-candidate-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。\n",
+    "capture-invoice-explicit-hold-graph-ready-baseline-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement now. Do not publish this change, even after I confirm the intent; a later yes confirms the intent only and does not lift this publication hold. Keep the hold until I separately and explicitly authorize publication.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n請用 ASCII 流程對比圖說明修改前後的差別。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。\n",
+    "capture-invoice-natural-default-ready-candidate-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。\n",
+    "capture-invoice-natural-default-ready-baseline-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. I have not confirmed this change.\n\n會計團隊用這個系統匯出客戶發票。目前偶爾會沿用上一位客戶的幣別設定，讓這位客戶的發票顯示錯誤幣別。會計同事現在必須逐張檢查，遇到錯誤再重新匯出。請只修正『使用誰的幣別設定』：每張發票都應使用所屬客戶自己的設定。不同次匯出的金額可以合理不同，我沒有要求金額相同。匯出格式維持不變，不要改寫既有匯出檔。\n\n日常匯出中偶爾就會遇到這個錯誤。先暫緩發票列表的配色調整，把時間優先用在修正幣別錯誤；繼續沿用既有系統與匯出格式。\n",
+    "code-setup-sparse-candidate-r1": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。\n",
+    "code-setup-sparse-baseline-r1": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n新同事照 SETUP.md 啟動網站預覽時，裡面的 `orbit launch` 指令會失敗。已確認目前版本正確指令是 `orbit start`，README 也有這項紀錄。請只修正 SETUP.md 這一行指令，其他說明和工具行為都保持原樣。\n",
+    "code-calendar-preview-new-candidate-r1": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n新同事照 SETUP.md 啟動行事曆預覽時，裡面的指令會失敗。已確認 README 的指令是正確的。請只把 SETUP.md 那一行的 --language 修正為 --locale，其他說明和工具行為都不動。\n",
+    "code-calendar-preview-new-baseline-r1": "Use /loom-code:write-plan for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n新同事照 SETUP.md 啟動行事曆預覽時，裡面的指令會失敗。已確認 README 的指令是正確的。請只把 SETUP.md 那一行的 --language 修正為 --locale，其他說明和工具行為都不動。\n",
+    "capture-stock-report-new-baseline-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n倉儲同事每月要做庫存報告，目前會把篩選後的庫存列表手動抄進文件，很花時間。請在既有庫存列表加入 PDF 下載，內容只包含目前選定倉庫與分類的庫存，沿用既有權限且不改動庫存資料。PDF 欄位依序為貨號、品名、倉庫和數量。不新增排程或自動寄送。每月報告都需要使用；這次先暫緩列表配色調整，把時間用在這項功能。\n",
+    "capture-stock-report-new-candidate-r1": "Use /loom-design:capture-intent for this request. Respond in Traditional Chinese. This is a temporary repository containing a synthetic project. Only capture the intent and explain what I would be confirming. Stop for my response; I have not confirmed it. Do not implement or publish.\n\n倉儲同事每月要做庫存報告，目前會把篩選後的庫存列表手動抄進文件，很花時間。請在既有庫存列表加入 PDF 下載，內容只包含目前選定倉庫與分類的庫存，沿用既有權限且不改動庫存資料。PDF 欄位依序為貨號、品名、倉庫和數量。不新增排程或自動寄送。每月報告都需要使用；這次先暫緩列表配色調整，把時間用在這項功能。\n"
+  },
+  "source_manifests": {
+    "baseline": {
+      "source_commit": "41211a0b363cd970e0b13a1e451aafcfffaf6849",
+      "files": [
+        {
+          "path": "loom-code/.claude-plugin/plugin.json",
+          "bytes": 864,
+          "sha256": "f6203c5bf318b145f3cac89d363dfad1a60d39149fab468914d1741ee33f1baa"
+        },
+        {
+          "path": "loom-code/README.ja.md",
+          "bytes": 18097,
+          "sha256": "c44fa2e4fdb638477b18517384059416cbee8d03f62ada9fed6fd67f7f417483"
+        },
+        {
+          "path": "loom-code/README.md",
+          "bytes": 14322,
+          "sha256": "830119f090e8c501765900367a432021e9a46ba33801418831d7abcbab06ea86"
+        },
+        {
+          "path": "loom-code/README.zh-TW.md",
+          "bytes": 13823,
+          "sha256": "ea5d184de9ebe4ddd891c073729e177501710166b8f4b31dea254cbe864282a0"
+        },
+        {
+          "path": "loom-code/agents/acceptance-tester.md",
+          "bytes": 6700,
+          "sha256": "c165f056583cb8e10c30a34b7f0442882566e485c361a0536bbdca3b24a0bce3"
+        },
+        {
+          "path": "loom-code/agents/adversary.md",
+          "bytes": 4799,
+          "sha256": "80129afb72a6d9af5d3d2b21de57f4eb06f4e21edf69d6284b61445540579c37"
+        },
+        {
+          "path": "loom-code/agents/implementer.md",
+          "bytes": 6716,
+          "sha256": "7f9b27204a57d8f4a96982e2e2de6b20ac2964d94eda8d156cc08d781446ab5c"
+        },
+        {
+          "path": "loom-code/agents/reviewer.md",
+          "bytes": 10214,
+          "sha256": "84470682fad376ecec27bea34852abdae6e3e9b41321d853c026e6d7421c672c"
+        },
+        {
+          "path": "loom-code/contract/README.md",
+          "bytes": 1390,
+          "sha256": "dcb344c726c6b4259b91ce58308743b7bdd3f3fa094e31c95d237882433a748f"
+        },
+        {
+          "path": "loom-code/contract/manifest.yaml",
+          "bytes": 20877,
+          "sha256": "a3068b326963b962f9d85cd9475f2270d6defaaeb4ec893465bd53d89c5aebef"
+        },
+        {
+          "path": "loom-code/contract/templates/KICKOFF-DEFAULTS.md",
+          "bytes": 1284,
+          "sha256": "d512114bdfe48e09395ff503b637da8a9e3bac8596a210f6ddc23df5d5053b0d"
+        },
+        {
+          "path": "loom-code/contract/templates/PRINCIPLES-interview.md",
+          "bytes": 1195,
+          "sha256": "6ed1ba79c3318a0fb32d99fb5abe6ddfe264373158186c759e4f2647d9c78461"
+        },
+        {
+          "path": "loom-code/contract/templates/PURPOSE.md",
+          "bytes": 718,
+          "sha256": "0672cef8dd769980d27e3216e3bcf316b8372c4857028e73485e724cbe9801f5"
+        },
+        {
+          "path": "loom-code/contract/templates/attestation.json",
+          "bytes": 354,
+          "sha256": "91bfe01f7fbb6243d5107ad94d6fd5d10bc6508eb4d88f5edec31e237aada5c1"
+        },
+        {
+          "path": "loom-code/contract/templates/intent.md",
+          "bytes": 1482,
+          "sha256": "1264141ffc8dae8c26a8acb227c45bfc496741df297316b715aceac2d09d1ca9"
+        },
+        {
+          "path": "loom-code/contract/templates/plan.md",
+          "bytes": 2300,
+          "sha256": "0e3d6a3df7f0b0de64e9ed2d4758e8c95ae792602226f40710d4579d01809480"
+        },
+        {
+          "path": "loom-code/contract/templates/spec-minimal.md",
+          "bytes": 1689,
+          "sha256": "8938057bedaa1eeae73a1afad1cd98a5721606d92dd313bee50f9d415b932fdd"
+        },
+        {
+          "path": "loom-code/hooks.json",
+          "bytes": 1087,
+          "sha256": "2599d85eb9ab6901bea7062dfe30c8de9ca459bba9835a8c6cf791c8f81d79c9"
+        },
+        {
+          "path": "loom-code/hooks/agy_adapter.py",
+          "bytes": 12037,
+          "sha256": "f9edbdc2291dfabf82a42f8509a2548c6adced397c358e4d442ceb5e9415279e"
+        },
+        {
+          "path": "loom-code/hooks/hooks-codex.json",
+          "bytes": 968,
+          "sha256": "e32e2d2dbc8262fb792158caab943e9029fbd0dd332f9ab0af6578c6f35b2589"
+        },
+        {
+          "path": "loom-code/hooks/hooks-opencode.json",
+          "bytes": 1343,
+          "sha256": "98bc0e2bec1d0801ea5b20233ed8adc2ea8c7631248f65b9c4e33cf385eb8df9"
+        },
+        {
+          "path": "loom-code/hooks/hooks.json",
+          "bytes": 2833,
+          "sha256": "a532238eba9797435fd4d1db4a5a83f2765dccfd506e747e04c3ba3a8c4a94b9"
+        },
+        {
+          "path": "loom-code/hooks/language-anchor.py",
+          "bytes": 1573,
+          "sha256": "a94be22c089dd7a3c8df2b71a95faedf8a96838c4357fa538d78d4f3b16192e1"
+        },
+        {
+          "path": "loom-code/hooks/session-start",
+          "bytes": 6753,
+          "sha256": "0184d6068bec23db42b4630f7bd86e0f22413a6bc3dfc36bb4f08dfe945ebf46"
+        },
+        {
+          "path": "loom-code/package.json",
+          "bytes": 374,
+          "sha256": "69be2c89290448d0ed9a1d20412b97a47cdb392e5bff58b62b0444045d04fab3"
+        },
+        {
+          "path": "loom-code/plugin.json",
+          "bytes": 313,
+          "sha256": "3df13a4f8e12d8208acd04c417465791247a8314ec53afa932aabb271044ae9b"
+        },
+        {
+          "path": "loom-code/references/antigravity-tools.md",
+          "bytes": 5117,
+          "sha256": "202d5b2a9eb69c2af3a92fa0196a54e8ca9e6f1c687aef9387c21b3a34ab31af"
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "bytes": 12065,
+          "sha256": "2ce068749f81d35718326289e89537b1011f08cb037da0ff6cfa789fd06d885e"
+        },
+        {
+          "path": "loom-code/references/engineering-baseline.md",
+          "bytes": 8883,
+          "sha256": "3a56469dfdb24404f6f23cdfda0fc13613b36ddf55b53ed9d794476150bcd263"
+        },
+        {
+          "path": "loom-code/references/opencode-tools.md",
+          "bytes": 2551,
+          "sha256": "bd17eea55d0de83b7e39fabe7c6fb269acb144a843b20db8ec6d2deaeface839"
+        },
+        {
+          "path": "loom-code/scripts/_migration_history.py",
+          "bytes": 1618,
+          "sha256": "4dc54a9020cb6cd7d392505945d4b9129dc6be4ee2e6788828113e4be1fd4902"
+        },
+        {
+          "path": "loom-code/scripts/check-skill-crossrefs.py",
+          "bytes": 9438,
+          "sha256": "81278039345084c19eb74e5f6b16bd7e0a734b81e6f2afe7c4b989cd2e1d73a2"
+        },
+        {
+          "path": "loom-code/scripts/check_contract_citations.py",
+          "bytes": 19623,
+          "sha256": "7f27ddf58e61e76b4fc041f564ef3d9a854b1c5f303d60934d683a86bbb89e1f"
+        },
+        {
+          "path": "loom-code/scripts/check_doc_citations.py",
+          "bytes": 39518,
+          "sha256": "71a9356d4505c34c0cdcf2f9d7400036569ca50da2877ba43090cc5cedaa0220"
+        },
+        {
+          "path": "loom-code/scripts/check_mechanisms.py",
+          "bytes": 33409,
+          "sha256": "c4546faf93bc483e09b855b94ca9c6aad6e8c6d922359ec47fe9019585415d3c"
+        },
+        {
+          "path": "loom-code/scripts/claude_reviewer.py",
+          "bytes": 5562,
+          "sha256": "e446940dcb07b75eaa0f4aa65dd77922b2d71f6843aa9aa4450f934bcbe5423e"
+        },
+        {
+          "path": "loom-code/scripts/coldread_role_split.py",
+          "bytes": 22461,
+          "sha256": "6f2b24164af36dabb7c1d388af1fa9ade241cb9985e7c6c4699aece42f98a605"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "bytes": 13604,
+          "sha256": "fd5675b38b9c01617712ed93c85c9eaec6c195c170eca92c12582fc4b55b5347"
+        },
+        {
+          "path": "loom-code/scripts/external_review.py",
+          "bytes": 30835,
+          "sha256": "66490ab8c9ea6d7a496b4660d46b867a768daa6063471cbde8d5ee0c10c57487"
+        },
+        {
+          "path": "loom-code/scripts/git_exec.py",
+          "bytes": 3871,
+          "sha256": "9c721b8e2f8fae0e4c31da5d6ab41b42e0ae4eeb8cecbf164a36fce7dd61e7c7"
+        },
+        {
+          "path": "loom-code/scripts/loom-python",
+          "bytes": 4129,
+          "sha256": "2ada1d8b058f33a668017e6d86bea0ef89f980cd1b20c34838fc0c92b72c46f7"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker.py",
+          "bytes": 4395,
+          "sha256": "33223a2a8369bd1af9c069c981ec8b1d386728e33315857f16956c3dfdf8886f"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/__init__.py",
+          "bytes": 50,
+          "sha256": "505284c9ee5e524251b8b5fef4e83f5dd72fc9f4647833c1d668915f7590ebab"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/artifact_types.py",
+          "bytes": 703,
+          "sha256": "1782b55638715894cad06d1372886d9bdcc727d9d5275521a3567e3420691cf5"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/attestation.py",
+          "bytes": 18810,
+          "sha256": "44d3c43fce3b973cbf171e3d6aeb2c50640379df2057ed796c203a498e9e292d"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/__init__.py",
+          "bytes": 37,
+          "sha256": "f2f5689a90938f2445a5cc4c7416fdf956778bac5ffa2d0829a063a37310ef56"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/charter.py",
+          "bytes": 2502,
+          "sha256": "76db04f856dfdce93ca6b4ab33eb4074451982ab4f434fd46433078e5108d299"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/contract.py",
+          "bytes": 1374,
+          "sha256": "2d6d2776e343e09c69822fb0b51a5deb4b9b7b955c49af4820050cc861d8dab7"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/finalize.py",
+          "bytes": 23859,
+          "sha256": "0d5f4720e571b889c33009198cd1492299d714d6c633b69aeb901b3b221d600a"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/github_rules.py",
+          "bytes": 11515,
+          "sha256": "a824bf232f065a0896fda43451cdac6ccc132b3b3931a3c50e409f9a79a89e30"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/intake.py",
+          "bytes": 4873,
+          "sha256": "21f401faa7eb2111631337fdb1e3a217e0e0ae1e42090e87ab96a9dc979ac167"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/intent.py",
+          "bytes": 2316,
+          "sha256": "3679240ab3eec499174980b3d610dc37c2c620255eeb050f30de2dc325f0712c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/intents.py",
+          "bytes": 4828,
+          "sha256": "44d3d40b28c88339459e8dbaa4eba2652cf1434d9f772b12b86216f2d8789112"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/land.py",
+          "bytes": 48038,
+          "sha256": "7ef2d8b86735ef7077baffff6594f527d88f28f3d35d18b6d21f5d3f575c469f"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/plan.py",
+          "bytes": 1261,
+          "sha256": "3eeaba448c6c88d317290e4cda4700df89d63cfe533d4a057085b1fe34ffab26"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/pr_floor.py",
+          "bytes": 2681,
+          "sha256": "c251a8bbbdf30c1a38b7111569a0cf7da531d07ac082c2e3b602b2146a5826bd"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/publish.py",
+          "bytes": 28944,
+          "sha256": "858e9fd175916b105418a9c45605729ae88b143a73c1e494038ad2dfb3a34e6f"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/push.py",
+          "bytes": 4625,
+          "sha256": "7dd28d6448bac4fbe00a17c0a72b502c9401ee639b8afea2a605a141f9285066"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/reviewer_count.py",
+          "bytes": 781,
+          "sha256": "4eeb2aa6cd336891eacbb36e4733c8ace8079407b3ad69e3823ba55e2c539ed8"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/standing.py",
+          "bytes": 1473,
+          "sha256": "a13da94986fd81b0ad07b0465eef1559ae2e91eeca55c95da0fb47b01a923173"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/sync.py",
+          "bytes": 18151,
+          "sha256": "19013ded87f78b3f5c338ca8cd29ccdde3ff98f9908a90378437af8ea00b54c5"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/digest.py",
+          "bytes": 2469,
+          "sha256": "0f62a1d3df118d19157783270e97127724373e23f4ad02b9a66fbd1cde0328a3"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/helpers.py",
+          "bytes": 15178,
+          "sha256": "eb37187c7f1be98f9ca6d540522c38c9daa4fec77351697f8cc51651d8f16b8c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/intent_state.py",
+          "bytes": 11354,
+          "sha256": "56bbc007420bc4dc2af8b6dac3143e402a459a456520563fe94e53561bd9d288"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/parsing.py",
+          "bytes": 1723,
+          "sha256": "d6e4c523a559f795d2001e5c930e027fdf30dcfc33ef440f878b715280da23c0"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/probe_results.py",
+          "bytes": 31454,
+          "sha256": "d9e7fd9469a387172811c90d85462018c7af91159539316d33269346e0f1fca6"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/probes.py",
+          "bytes": 38638,
+          "sha256": "3dd76d753942756e17988b86d0d0649fa56537e3f6f1cd7cb8188cebace6424a"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/reviewers.py",
+          "bytes": 24849,
+          "sha256": "2a12790c6cd53384f5117ac4fcf907f4eec6fdc65ea92184f4915d01ab458882"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/__init__.py",
+          "bytes": 69,
+          "sha256": "0a50c7c5e3e0b4372f9a28052e66d697cdda7ceabd64bb19009629c8a661b251"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/charter.py",
+          "bytes": 7302,
+          "sha256": "23f447338975b6fab09b405acc4bcce47eef3942b81ef952b0490d5babf5df42"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/commit_identity.py",
+          "bytes": 4457,
+          "sha256": "a243c52c6a4bd7214d3772a90bcddbd12c1d91a6891139af69f502d00bf974ed"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/contract.py",
+          "bytes": 1634,
+          "sha256": "011efcd05386dbb5fdb1b357439725a7aa7e53414fa712475c14bf2d36d1f491"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/evidence_coverage.py",
+          "bytes": 6778,
+          "sha256": "e7ceece813400324458bc899024798b21b937016962b199a6ad37782ab6c2bba"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/intake.py",
+          "bytes": 32993,
+          "sha256": "be0a82bfa296e1e4e4603d17cf8b47b28825350120c5be8efc706360889b2862"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/intent.py",
+          "bytes": 18950,
+          "sha256": "03922a02b043322ae12749282948f57ee2cf9951ad51af2310fe4d97703edbe4"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/intent_version.py",
+          "bytes": 5704,
+          "sha256": "88278f579785ea40164a3406c7f7d9523ac598375c492148566529a38cb8a8e7"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/plan_boundary_tests.py",
+          "bytes": 5814,
+          "sha256": "b353e44c477b123066a59b2c34909e6b70fc4b730cd6c2b0f1b863f946c8eef9"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/publish.py",
+          "bytes": 7976,
+          "sha256": "e6a024af9b6d7de37419e5bdd32c3000a4164cf86a02e7eb1015a1b47b4cee4c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/push.py",
+          "bytes": 3819,
+          "sha256": "a229f87e286bad8bef475004b24424df39e7e8594d372273e7c1bfca931d91f1"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/standing.py",
+          "bytes": 5142,
+          "sha256": "655b4f602c21dcda210b75e4ccf0f0eff63ad596abf022a457d304883fd57974"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rules.py",
+          "bytes": 10470,
+          "sha256": "da3975457314c05d809813a6c81b0e8c0fd3d07f83ca8340a5b8850a3a718d4c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/verification.py",
+          "bytes": 6203,
+          "sha256": "bdde8fcb26b8b68a81ee41ea6fa9859978acbe1a1bf25767402f82d5e8b33439"
+        },
+        {
+          "path": "loom-code/scripts/prose_pin.py",
+          "bytes": 3103,
+          "sha256": "10e40d114b0e4ac800dd999705f46639c55493d7fb880d37246b08229b968486"
+        },
+        {
+          "path": "loom-code/scripts/rehearse_probes.py",
+          "bytes": 17657,
+          "sha256": "254e8bf59f9cd00e80b9f4c5517efdef83901d8fe682f188b7572ae2e30bd624"
+        },
+        {
+          "path": "loom-code/scripts/repo_files.py",
+          "bytes": 7651,
+          "sha256": "62333168fb9eacabb6877d0f185f08081175d8681444465173b18d712ca26399"
+        },
+        {
+          "path": "loom-code/scripts/second_vendor_policy.py",
+          "bytes": 10688,
+          "sha256": "0924f6986a050e25b8778fd8987baac77880d5166f3c9534e4d9fbc8f5d7a2d7"
+        },
+        {
+          "path": "loom-code/skills/build/README.md",
+          "bytes": 1576,
+          "sha256": "96fd445be8fd6a7cbecf477fdca1edd7ec68d2345d035a5d849bfa6f853694df"
+        },
+        {
+          "path": "loom-code/skills/build/SKILL.md",
+          "bytes": 11963,
+          "sha256": "cd1f317370c98c8e5c187da1afbcd814036e4e47d851a943972fa77fa5c8895c"
+        },
+        {
+          "path": "loom-code/skills/closing-review/README.md",
+          "bytes": 1742,
+          "sha256": "eb5f2afd0d378b7e0ebb31d709d5f31d2fd71bc516342f008692c3c09c64ba08"
+        },
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "bytes": 29588,
+          "sha256": "cda38793b83c89b522b5230b238c97abb33d2cd09121d74419752859691b5e3a"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/acceptance-test-report.md",
+          "bytes": 5492,
+          "sha256": "68b397d7b6815635670f8ad81daaa1ba35c0883fcf50fb9ff5572a76c322f3e1"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial-code.md",
+          "bytes": 1584,
+          "sha256": "2fcdf348894f9ff1738c53b8bddedbdfe14af0aa7de5de4dd06a5c7da0db233f"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial-skill-gate.md",
+          "bytes": 629,
+          "sha256": "82f5dfc187f1a9c2e7252059910001f1b7bf69f62f0d3fe266b46fab9260bd59"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial-spec.md",
+          "bytes": 463,
+          "sha256": "63c93007bbfce41edaf1d5350f903fb6f401c6b0f01bc4e5d65ea02faa220fbe"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial.md",
+          "bytes": 13534,
+          "sha256": "05c97c7d69db4bb1ae73c1ae1ae89d5d5bd52303adec0f66d52ca03337411aaa"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/lenses.md",
+          "bytes": 14849,
+          "sha256": "6ffc412011b4ee414cbb5716a2c7977536de5ee9d6488730059ecae551fa4260"
+        },
+        {
+          "path": "loom-code/skills/external-review/README.md",
+          "bytes": 1837,
+          "sha256": "85745f31dacce076da6fbcb710f3906875db2018c261e80d1c323733126b2c74"
+        },
+        {
+          "path": "loom-code/skills/external-review/SKILL.md",
+          "bytes": 10740,
+          "sha256": "fd60f87f48fce53e35d078d734c96d3abe47108715b76c90b13c954278e80c09"
+        },
+        {
+          "path": "loom-code/skills/maintain/README.md",
+          "bytes": 1438,
+          "sha256": "6ef59220645b44db7b72a48386909bdfd3cb6e0a1b29317fd12b05ef2ccdf901"
+        },
+        {
+          "path": "loom-code/skills/maintain/SKILL.md",
+          "bytes": 1147,
+          "sha256": "d35317b82602f8af72837e290da87fa0e0300d28210c8a8f07d9a8f9581c4b76"
+        },
+        {
+          "path": "loom-code/skills/ship/README.md",
+          "bytes": 1807,
+          "sha256": "48b4cd7dc5117ecb920130bf65e0719a6f67ca2ef0118473c8b171c00f656398"
+        },
+        {
+          "path": "loom-code/skills/ship/SKILL.md",
+          "bytes": 15549,
+          "sha256": "02cfda8a4d3d393a3d2a98e8c4f8ab346e957c58e9b2e4fc4948b8b79293fe74"
+        },
+        {
+          "path": "loom-code/skills/using-loom-code/README.md",
+          "bytes": 1500,
+          "sha256": "a6605db32b049b12161b3d0d36b80020b467a15747ec64479ca03233ccbcf663"
+        },
+        {
+          "path": "loom-code/skills/using-loom-code/SKILL.md",
+          "bytes": 1496,
+          "sha256": "74215bc06b51b0d9bbdc7d9ffe43ec8b7582304e2f5195a2b131e4a6d9ac3474"
+        },
+        {
+          "path": "loom-code/skills/write-plan/README.md",
+          "bytes": 1783,
+          "sha256": "fa57a91de28a3b8efb8654dacf8be5caeaf28968818d27789afba3dd585171fa"
+        },
+        {
+          "path": "loom-code/skills/write-plan/SKILL.md",
+          "bytes": 20874,
+          "sha256": "a4d80c569da0898cdd74433455fc4f6a71b20a7226f2b7a64059a97819b19a54"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/codex-first-contact.md",
+          "bytes": 2172,
+          "sha256": "3efdab0ead3d5502c919fdef8bd400660fb91011eae68a34c9b475f093e883e3"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/confirm-intent.md",
+          "bytes": 9889,
+          "sha256": "5ce664cf1a5f51b5423a3bde4d5c31add665613a05c7628634a7035109a0c03b"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/no-intent-interview.md",
+          "bytes": 1257,
+          "sha256": "ebadf846e84860c4003d76370517be306508badf99996234c780653d75a3bf68"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/one-way-door.md",
+          "bytes": 4642,
+          "sha256": "79482166208fff06866097f8a72682c0c44bba8aed8af3e432eef65f7e41b124"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/plan-simplicity.md",
+          "bytes": 946,
+          "sha256": "8b7f65400b10c9c0815f5805c9781970b566e5fbc98ac992ce0a5c91df47fa8e"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md",
+          "bytes": 10274,
+          "sha256": "a86e55787764e1c9a94fb831112ec446738a9b31969431b9b7311b53243d2268"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/self-written-spec.md",
+          "bytes": 4078,
+          "sha256": "464ca83d31165ad74d829efb6a87f3a6fb66796310cace67561c342cd1eb4822"
+        },
+        {
+          "path": "loom-code/skills/write-plan/test-prompts.json",
+          "bytes": 2103,
+          "sha256": "f1c7e3ec156e5300215de948adf7c26dc886a4ae03b8c70001170b5a26485896"
+        },
+        {
+          "path": "loom-code/templates/loom-pr-floor.yml",
+          "bytes": 871,
+          "sha256": "c64f64bda25de7168fc76d9427f13af7f14f9d25bdd3e708f794355e95b83d2b"
+        },
+        {
+          "path": "loom-design/.claude-plugin/plugin.json",
+          "bytes": 993,
+          "sha256": "3b0b320b798d6756ed1973b1973e6738cbc9ca3c6b1cc2a316edff3ed28fc096"
+        },
+        {
+          "path": "loom-design/README.ja.md",
+          "bytes": 12551,
+          "sha256": "0f57f9739a7d15d54b181aa8875e764849bbca7428c0d2f9847154dc203064e1"
+        },
+        {
+          "path": "loom-design/README.md",
+          "bytes": 10288,
+          "sha256": "706b91599971a9d9bfb5d18729c5c83171d3764f0eaf886306fbff616eb01c03"
+        },
+        {
+          "path": "loom-design/README.zh-TW.md",
+          "bytes": 10094,
+          "sha256": "eda55e7c084965623ac16b80de8b970a4781214dded06f981b1243f13d540b80"
+        },
+        {
+          "path": "loom-design/package.json",
+          "bytes": 458,
+          "sha256": "17ab0db4431e41d49e51dc04b0dc4e76c1b673f6996768299c222b396827c9e8"
+        },
+        {
+          "path": "loom-design/plugin.json",
+          "bytes": 397,
+          "sha256": "6399db3f936b1fea60a9f671646b1bd0397fcea7a940a559498777ed407d4081"
+        },
+        {
+          "path": "loom-design/scripts/architecture-design/validate_architecture_output.py",
+          "bytes": 8474,
+          "sha256": "62902958cff72ff475c5ab5555e382944ae3ac664a2d8faaabc5bf093ab61013"
+        },
+        {
+          "path": "loom-design/scripts/interface/design_md_spec_keys.py",
+          "bytes": 1645,
+          "sha256": "5c861205e4507bc20e8aee8b735cfcbeaa1352bd379cd46dd2fbe12a85343e8a"
+        },
+        {
+          "path": "loom-design/scripts/interface/validate_design_output.py",
+          "bytes": 5593,
+          "sha256": "98b0cd82eaa32fd145220d469e9a8a3c26954163b9ab976d88f495b9bb7ca70d"
+        },
+        {
+          "path": "loom-design/scripts/principles/validate_principles_output.py",
+          "bytes": 8500,
+          "sha256": "0a809d9e0af280d8b52a78df500133b02c82922922e09a2127507d83401dc1e3"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/README.md",
+          "bytes": 1891,
+          "sha256": "7b5d9984ad63283e7d3f9fd0e6524fdd28c1c01d3b4d4424d148616d3b2e0e1e"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/SKILL.md",
+          "bytes": 6285,
+          "sha256": "24c988e501b33aa4349c2a9f7255e196f66b1cf2bf9422348617b472e54d281d"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/references/architecture-md-schema.md",
+          "bytes": 3546,
+          "sha256": "238218893bea05d515d512e004db5b84409028518d5837f77e51efa5a43f8050"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/references/design-know-how.md",
+          "bytes": 8929,
+          "sha256": "beab1a10ceb56cd93c43b8fd2ecfb0bb730a8bda797a84a5abb094aa63c08651"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/README.md",
+          "bytes": 1886,
+          "sha256": "50e4bee026607afa53300f20fed968491c560a7f1e6c3914fe7fc1e025bfef09"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/SKILL.md",
+          "bytes": 23951,
+          "sha256": "0e3dbaead5c126acb1116787876bb1c000abf39876e1f44dd78cd0168e683b62"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/interview.md",
+          "bytes": 4444,
+          "sha256": "cce3d0e9093334bb7c7d87721dc0d9f1fb5acf670a58b0e89d35e6ba6a45f546"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/second-vendor.md",
+          "bytes": 4635,
+          "sha256": "d3bd394aea3b0a2c23ac530e7bff13a9af13aed50ca85dbd42cbc153382a4680"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/templates/KICKOFF-DEFAULTS.md",
+          "bytes": 1284,
+          "sha256": "d512114bdfe48e09395ff503b637da8a9e3bac8596a210f6ddc23df5d5053b0d"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/templates/PRINCIPLES-interview.md",
+          "bytes": 1195,
+          "sha256": "6ed1ba79c3318a0fb32d99fb5abe6ddfe264373158186c759e4f2647d9c78461"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/templates/intent.md",
+          "bytes": 1482,
+          "sha256": "1264141ffc8dae8c26a8acb227c45bfc496741df297316b715aceac2d09d1ca9"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/test-prompts.json",
+          "bytes": 2247,
+          "sha256": "fc0ba72355be669f157ca7f1840ec5d5433f7cfc0d2334fd236343ee2900fe3c"
+        },
+        {
+          "path": "loom-design/skills/design-system/README.md",
+          "bytes": 1482,
+          "sha256": "791457208bfa49c15b142fb34b9c36e3622b42817028c5f3377d06ce14287014"
+        },
+        {
+          "path": "loom-design/skills/design-system/SKILL.md",
+          "bytes": 4729,
+          "sha256": "90f3b4ce0192060c9b429fb27a34b8834d88f6d10e3fec7777c939641a54f068"
+        },
+        {
+          "path": "loom-design/skills/design-system/references/design-md-schema.md",
+          "bytes": 17094,
+          "sha256": "eba305536ff8ce8bcbfbc30372f4189e0f47d204e82fe36a64842e403f2ab3f2"
+        },
+        {
+          "path": "loom-design/skills/design-system/references/knowledge-triage.md",
+          "bytes": 5492,
+          "sha256": "4fc3b01ae5fe5a84eb22bfb3bd6f6d795f2336899681460e559a3fdf862ec342"
+        },
+        {
+          "path": "loom-design/skills/product-principles/README.md",
+          "bytes": 1419,
+          "sha256": "99ae20d55dc73d69430b9069122a93d8960979f198aaa9d2922a45f1b6a98915"
+        },
+        {
+          "path": "loom-design/skills/product-principles/SKILL.md",
+          "bytes": 4269,
+          "sha256": "735a8ca4fb3344452e0bfd40133a883ca619d9523aff5a647f5d74bfda6b0f2e"
+        },
+        {
+          "path": "loom-design/skills/using-loom-design/README.md",
+          "bytes": 1431,
+          "sha256": "1f32e9c8647b7b3306140afeacb0614bd15c04bc8ff08769a9a653b2c5c8621c"
+        },
+        {
+          "path": "loom-design/skills/using-loom-design/SKILL.md",
+          "bytes": 1424,
+          "sha256": "358e90da54581a62bef5093f0f9148a303dbec51afd062629921bd46581db396"
+        },
+        {
+          "path": "loom-design/skills/write-spec/README.md",
+          "bytes": 1664,
+          "sha256": "20086847bc54e303fc495965e01d3bc0baf1facc6093f97b1bc75b5d9ecc301d"
+        },
+        {
+          "path": "loom-design/skills/write-spec/SKILL.md",
+          "bytes": 19127,
+          "sha256": "6af3568201d8cee7d175902943745e6105a2de1dee1f538d81e085520e5abfad"
+        },
+        {
+          "path": "loom-design/skills/write-spec/references/spec-forms.md",
+          "bytes": 5356,
+          "sha256": "7ab6b45480e36a11f285a3df0648dda7b0570c20d03a1b76c75a0dc79c75d6f3"
+        },
+        {
+          "path": "loom-design/skills/write-spec/references/ui-flows.md",
+          "bytes": 3922,
+          "sha256": "ce7685021c87d980c70eccde09fcf8ad2eff7b77616d193d9dc61ca299e71d2d"
+        },
+        {
+          "path": "loom-design/skills/write-spec/templates/spec-minimal.md",
+          "bytes": 1689,
+          "sha256": "8938057bedaa1eeae73a1afad1cd98a5721606d92dd313bee50f9d415b932fdd"
+        },
+        {
+          "path": "loom-workflow/.claude-plugin/plugin.json",
+          "bytes": 1192,
+          "sha256": "61bb3f61b803d2be205febe698d1667a6ebfef3d04f416eb2a280d0ac434bde6"
+        },
+        {
+          "path": "loom-workflow/README.ja.md",
+          "bytes": 20875,
+          "sha256": "a397372fadcccefee32b7d8e3757fd2f880a8eed7d4b0a65c52b7567765b253b"
+        },
+        {
+          "path": "loom-workflow/README.md",
+          "bytes": 17233,
+          "sha256": "deb4c4d58e005a7c9052bc21aad4a076122a817e0a14944442ce7cdf1a3d23d0"
+        },
+        {
+          "path": "loom-workflow/README.zh-TW.md",
+          "bytes": 16701,
+          "sha256": "6adae13809bbbd18f1d8dfeaf52596f84123a7874d9414fba2e0e189f448387c"
+        },
+        {
+          "path": "loom-workflow/hooks.json",
+          "bytes": 348,
+          "sha256": "934fd4ec46da230fcdc0a8401e7c60c711f8e1d9fef6fe9b257db76509689a80"
+        },
+        {
+          "path": "loom-workflow/hooks/hooks-codex.json",
+          "bytes": 269,
+          "sha256": "e51e5565c771bede10112ce679366c4606b652466b1e4669eb9da05fdb9377af"
+        },
+        {
+          "path": "loom-workflow/hooks/hooks-opencode.json",
+          "bytes": 522,
+          "sha256": "f4ad84a02f708c1848c67fe48e4650bb5f2981765184eede05f9a1223604c2a8"
+        },
+        {
+          "path": "loom-workflow/hooks/hooks.json",
+          "bytes": 779,
+          "sha256": "00f0c254d56f113f3937b1138519ddb746ad056f92f370ec11a9eb3f5d719da8"
+        },
+        {
+          "path": "loom-workflow/hooks/memory-mirror-reminder",
+          "bytes": 3514,
+          "sha256": "619c079203531aad4ec87956663d12cfecb2cf81023a5d170deb121ca864565c"
+        },
+        {
+          "path": "loom-workflow/hooks/visualization-card",
+          "bytes": 4892,
+          "sha256": "d5db2176577a43db5c21cbf68e6bd7f214c8b282385696b0e503b9b8effff77e"
+        },
+        {
+          "path": "loom-workflow/package.json",
+          "bytes": 688,
+          "sha256": "c4153c12e3ccc21c0d6a28b879fc8a0ea191895b90387c817e1934e16dff1970"
+        },
+        {
+          "path": "loom-workflow/plugin.json",
+          "bytes": 627,
+          "sha256": "62f4f2fdb78c6b869b4f6feccff8a89d908ec5392be75e9daeca97f6ef429ea7"
+        },
+        {
+          "path": "loom-workflow/rules/AGENTS.md",
+          "bytes": 1350,
+          "sha256": "81ab6bec7eaf2b2ece2263e92c3bea85913ac69a47567f900886d6f325940841"
+        },
+        {
+          "path": "loom-workflow/scripts/agy-validate-skill-folder.sh",
+          "bytes": 3767,
+          "sha256": "16f402b83a7aef9733ef50a8b007e6d5d01038121985bd59ef69b35b50647823"
+        },
+        {
+          "path": "loom-workflow/scripts/validate-skill-folder-structure.sh",
+          "bytes": 3337,
+          "sha256": "05b131a19299e06ed7959c7655df4ca225f853468a9573972b23ff793f6229b3"
+        },
+        {
+          "path": "loom-workflow/skills/critique/LICENSE",
+          "bytes": 1785,
+          "sha256": "4202ff76b6ca65ec2daf3a45b78895d2f501c5af0fb16d321f20108efc739e07"
+        },
+        {
+          "path": "loom-workflow/skills/critique/NOTICE",
+          "bytes": 5280,
+          "sha256": "1ba5be1cf92594493bbb6884fc387044dc6663f35075ba0fb9a97be53d1e5429"
+        },
+        {
+          "path": "loom-workflow/skills/critique/README.ja.md",
+          "bytes": 4351,
+          "sha256": "f4f442888efab836477124f644400a8572897ab8f6767802c3d0ae917e1bf172"
+        },
+        {
+          "path": "loom-workflow/skills/critique/README.md",
+          "bytes": 3690,
+          "sha256": "d6f12b302151349ea4538c36398afdca83277027bd48257bd67dff15586dfd5f"
+        },
+        {
+          "path": "loom-workflow/skills/critique/README.zh-TW.md",
+          "bytes": 3705,
+          "sha256": "efda523ae4d549f2f55363db6b3027f8ae3194012a5854818d0d3de4b92864ae"
+        },
+        {
+          "path": "loom-workflow/skills/critique/SKILL.md",
+          "bytes": 15232,
+          "sha256": "741df016b89bad8c2a51c8fab78fd14767f6d2323b8bd192cae74da1772f4ffc"
+        },
+        {
+          "path": "loom-workflow/skills/critique/evals/body-validation.md",
+          "bytes": 8971,
+          "sha256": "ae992d83600ba11d87f2b15609bb7335400349b86db224ea08f7e66b5f5fd74e"
+        },
+        {
+          "path": "loom-workflow/skills/critique/evals/trigger-eval.json",
+          "bytes": 4314,
+          "sha256": "a49addb4d1b5f8178cc7bf3108965e5574ab8c5d49831318e8ff08e878274e62"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-data-over-abstractions.md",
+          "bytes": 6534,
+          "sha256": "7400fdd6c47f652cc1427ee74a734dca58f96738bbb0c4788595a63d4182634e"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-design-is-taking-apart.md",
+          "bytes": 7882,
+          "sha256": "ab2539910381d09817da3c1cd615a2defe452612953a17c6b06c7c31d4b0fd4a"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-expensive-to-add-later.md",
+          "bytes": 8247,
+          "sha256": "e3905887b70495dff6992f9be462acd5acbb660ead5af0148fdf75a738b29076"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-simplicity-vs-easy.md",
+          "bytes": 8250,
+          "sha256": "5ac01314759afbaa6e9aff0a1c7870f97af8c66c5085b2f731562920ba4ed961"
+        },
+        {
+          "path": "loom-workflow/skills/critique/test-prompts.json",
+          "bytes": 4699,
+          "sha256": "27ca522fc7b5e415e5e10156800f93c95f2a90f769465b268105cdfb0be9249d"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/README.md",
+          "bytes": 1712,
+          "sha256": "a2c1bd41f02c071c3502072114efc378f02f4cd47fc3ea29624d66f1fa31d6d4"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/SKILL.md",
+          "bytes": 21319,
+          "sha256": "001b9185764b14349d2917a98f5c1e15c527e86abfa985fc8ad7a9487d5dbd10"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/checklists/dbt-model-self-check.md",
+          "bytes": 4306,
+          "sha256": "1cfe9b7b859c5c03e5236bc56284b907254d7aa1640014ebfd9849c683eca754"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/references/dotstar-passthrough.md",
+          "bytes": 4086,
+          "sha256": "78aea11b750e6c0a092687bf970eebe42407ea6cad54e8dda6b97e347984f7e5"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/references/example-model.sql",
+          "bytes": 4503,
+          "sha256": "e97ccc17286705b49624c7b1e206365890a9cd165430f97ce74830b7abb5bdba"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/scripts/validate_header.py",
+          "bytes": 12843,
+          "sha256": "77e086a5628f7faa247eb3b0b462d00bb5bd1cc8c410986c84322e4b6297bc47"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/README.md",
+          "bytes": 2125,
+          "sha256": "e79714d6b346ebce231a8ae006c50ddad24293bc99c06f9bdb813dae0c1154a1"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/SKILL.md",
+          "bytes": 10969,
+          "sha256": "29f1df6965475135d8ddf7a934f91461f68deca4093b41b9b74e8958f3540e2f"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/references/map-format.md",
+          "bytes": 13653,
+          "sha256": "4086c18d32b7ab951e241602ff7614068c662f99a6ef6c0623c5bfc6974c2d79"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/references/prototype-contract.md",
+          "bytes": 3684,
+          "sha256": "d62dcab4bab3c92760c397f29ff578e79364bf56b84959f33c1634695af57238"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/check_map_fog.py",
+          "bytes": 13769,
+          "sha256": "3c5d380372422533026a72a4b363fea379761158eaf13d0e1a52d296e8f022ae"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/check_map_links.py",
+          "bytes": 4827,
+          "sha256": "2f77cf7d8b65954f42fcbd29622ef43ef950ed5836d0d39473223e9313087df8"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/delivery_binding.py",
+          "bytes": 19460,
+          "sha256": "9e8155dd9c959543c64dc4379232f56a8b756bfef599ea59d1aa8695857b87f3"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/delivery_evidence.py",
+          "bytes": 13179,
+          "sha256": "0baf7fecbcc2109bc3b37481c19ad762e514b75a4e487a1d19b339efb4e4e620"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_close_transaction.py",
+          "bytes": 12776,
+          "sha256": "e11c7c357299c679dcf700c2861e70c2af53d632b208df1519e26974aa1cc49d"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_documents.py",
+          "bytes": 11711,
+          "sha256": "bba72737978d955dba64ba4b85c3054063eaf46c77c69cb096e24ae54ece0576"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_init.py",
+          "bytes": 3073,
+          "sha256": "bd26ce24e673d7b850a0f2f8647d04bf108be543b56a937f878378d42ad58dc9"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_lifecycle.py",
+          "bytes": 13647,
+          "sha256": "e03057741a872221f57bcb0aa88c3dfcb80f9c86105c07e8bbb028ef470b542c"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_lock.py",
+          "bytes": 4932,
+          "sha256": "bafb0ee9b5a35844fb81192de1280abb961a475a8f8ea2f0691b964e05abd3b4"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_persistence.py",
+          "bytes": 11566,
+          "sha256": "afaacf4aa02fbf32d770980280d04290080e7f3c878ad36f3b2520f7362acc7d"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_progress.py",
+          "bytes": 22605,
+          "sha256": "90f8577be5214488df637bd77e3fa5dd393e17acbb7859228ce26c260ed2fb19"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_store.py",
+          "bytes": 20061,
+          "sha256": "4c97d376f9942a7cf1c6f5d7f0769bfcb02d12a982c2faf0bf6cda8b7b60faeb"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_ticket_mutations.py",
+          "bytes": 7482,
+          "sha256": "490d57c386182a34543352078500e4f5d8b43bef5905563329bc52c9910ba023"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_transaction.py",
+          "bytes": 13227,
+          "sha256": "2ef27413e53bebfc625ae835521542269e93601304ff9118fa181399f03df111"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_validation.py",
+          "bytes": 23623,
+          "sha256": "541066381fe809fa3c293535930123f014098c08577c1e101018f60e7014afde"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/migrate_map_v3.py",
+          "bytes": 17454,
+          "sha256": "e53ebcba547f1769ea1a6383399cc917b7e97773586cf92c57609ff4e9424f68"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/start_delivery.py",
+          "bytes": 7804,
+          "sha256": "203c9f5018e007c85ea8783170537b9530b5447cb60f63daf60ef17140f1908e"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/README.md",
+          "bytes": 1805,
+          "sha256": "5ead28ab8a6b1477ef73acc500160bab44e2621d57c0e106a32ef1f1e08a15f4"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/SKILL.md",
+          "bytes": 12787,
+          "sha256": "ca23922394c9789bf1adf00ea3c90c6ec7d97a95d46ae0ea945b2a0f9d47ea7b"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/compose-commit.md",
+          "bytes": 8075,
+          "sha256": "b820af25e8315e87fbd9b0dfb126f46e1fa703a1bba8ca49d4fc3f9238023fde"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/compose-pr.md",
+          "bytes": 11800,
+          "sha256": "b4fc923ffd810c0f675956a2298103fce9b11b6284aa3cbd0fbb934566698103"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/privacy-judge-spec.md",
+          "bytes": 6421,
+          "sha256": "fb12252feb59749113c086593aeab907808701e27e0fe8729626f4391faa3743"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/recall.md",
+          "bytes": 3815,
+          "sha256": "9adb0679dade903ee6fef86badc8c61fbd28906f69f3965edb3dccd9bdee2d88"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/scripts/memory-grep.sh",
+          "bytes": 47464,
+          "sha256": "7b17dfaf5ebb4d69ffa4777002924a74e626f5b298ae1206a8f365ee653ec868"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/scripts/privacy-scan.py",
+          "bytes": 7534,
+          "sha256": "ab97b310e2bce4475b93567eb0012b1fb2c6a99649f15f2f27c811d2b15f49fb"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/standards/memory-conventions.md",
+          "bytes": 15730,
+          "sha256": "215c7fa789aabcea0bd26600adc7fa3495c12cadc3728e6533ecfd66d2c82785"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/test-prompts.json",
+          "bytes": 2294,
+          "sha256": "a3461b82b1d1358783a116ff7de7367b69f25ac7ae3d5259fdb1716327d1bf1c"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/README.ja.md",
+          "bytes": 4045,
+          "sha256": "111b3525af7bf431dfc89addd4e0d3f1dc7ebe9e4754f45b59946a3be00e7d1e"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/README.md",
+          "bytes": 3372,
+          "sha256": "35ed3fcb58cccc0ee0a1e9a8e9cff79bd445fb2ead01c1013b7bdbb901e67750"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/README.zh-TW.md",
+          "bytes": 3164,
+          "sha256": "3e2e656d9dcacbfc7f135681dbfc67ba603c6e6d556a5d07307e9f2028865b1a"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/SKILL.md",
+          "bytes": 7619,
+          "sha256": "72837c2b0087e4a2d4d703a47ce778084fdb10b44b576706cbd196ddbe68e546"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/references/goal-shape.md",
+          "bytes": 6443,
+          "sha256": "b45baa1cecac1afe7afdaf5e211ca87fdc38e3497d840afb5ec8936f733ac412"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/references/input-floor.md",
+          "bytes": 5858,
+          "sha256": "cd19832f7e31f734f187698ce5fd6aed6b590edaac0336e72425081d1017ee9d"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/scripts/goal_lint.py",
+          "bytes": 9938,
+          "sha256": "450dc1fa7107871705d8a83f358aa4c08401e69d4334f8695f7ddce588eaf2dd"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/README.ja.md",
+          "bytes": 7186,
+          "sha256": "6e583375b02916266dd45dd5b38d8e3eee75d0eb4121b0936f55ade551b5bd17"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/README.md",
+          "bytes": 5882,
+          "sha256": "fec00e6ef92018c3513a7e53477d5bbf1534c26dc7267dbfc16d78c173701984"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/README.zh-TW.md",
+          "bytes": 5716,
+          "sha256": "3005e51952e3132c7b8ebc9abb49f11f28063bc33e30ec70113e79122b2d2b65"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/SKILL.md",
+          "bytes": 8273,
+          "sha256": "a34ddde4101ebb4e25a253c98c7c7c757fbc19074650e3cab71e5eb8e5416359"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/references/handoff-schema.md",
+          "bytes": 32551,
+          "sha256": "668e45b5c16372e8cbd80bd1e676f341449cc64eff2f4c250b9716595263488d"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/README.ja.md",
+          "bytes": 5934,
+          "sha256": "71417f324b7390b4536ffb6a17bd52f863b510714960188b49268cd4b1d3719c"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/README.md",
+          "bytes": 5112,
+          "sha256": "0c523b02415d4a02ab19cbcc84b4d0bee3397222ca50b345fd4c510e5dc3e4fa"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/README.zh-TW.md",
+          "bytes": 4541,
+          "sha256": "f0469a87dd3a5ee38a8ed71e907704da2efc4c0a380d6bde7ac36f2a7cca005a"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/SKILL.md",
+          "bytes": 17768,
+          "sha256": "cdb7ab903a071269dedf096581eee6732bef08815722c42b0a663df94f427f2b"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/references/dispatch-protocol.md",
+          "bytes": 4186,
+          "sha256": "6c6f2d84512b0bc49f0fdbfe7fc5fe24ad4e5b13db20b0759dd775f27f67b3a0"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/references/executor-detection.md",
+          "bytes": 3315,
+          "sha256": "ee86a42d0bc6b16d97e857791ed6edfb9be661eaf8fe5ddd70e63f9c05f9bf9b"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/references/report-contract.md",
+          "bytes": 3221,
+          "sha256": "db8c1a3f3601e3041e29d94eece9f43e7f78b5977872cbb39adc8513104b23a5"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/test-prompts.json",
+          "bytes": 8738,
+          "sha256": "431b997335885985c567ebed31320744e6d6be6260da9768c75fe0f8014f6e35"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/README.md",
+          "bytes": 2124,
+          "sha256": "dcc2a91d7ea08dbb235e45096abdb9c61ecd544277617c8edaedb3225f5a998e"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/SKILL.md",
+          "bytes": 5781,
+          "sha256": "fd0d25d5e51a6511a802b4733f0d4e138fda6b465c67738da3f134e80dd256e3"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/backends/demo_json.py",
+          "bytes": 1952,
+          "sha256": "5de05fe3308ff02a1f721e142992b9f5e12361110a8da27bd973afdbf25611dc"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/backends/drawio.py",
+          "bytes": 3536,
+          "sha256": "3a52c15a7ce4732a6c84707b9b7fb6d9a72f6fe0c891e442b9897d8c44b3fa49"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/references/backends.md",
+          "bytes": 788,
+          "sha256": "95b5bd86fa4818fd956f9f2a307df682768ea965298afbd603f6e75b9ed4db97"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/references/editor-setup.md",
+          "bytes": 4619,
+          "sha256": "e2e3bb7b830fdb66dae33f8ca8d109278af42b018cc79a830c7aae44e4be1372"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/references/projection.md",
+          "bytes": 1736,
+          "sha256": "398e99e78984fb9075a44c0926507bc0ad9506c21a5f0268b55d16bba486437d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py",
+          "bytes": 15014,
+          "sha256": "bbd9e079317c7db0bfb7d56251e56c5e8ee83ab838721aaf591341976d40985c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/scripts/wait_for_save.py",
+          "bytes": 1678,
+          "sha256": "a65956ce27e3dec04f8cd05e77d69fbc52d6f8996d6646d13934f0bd4096c5f8"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/README.md",
+          "bytes": 1815,
+          "sha256": "95653e7aad163298211136a2f4d3b9bb77947c17e14cc29bc18ef27ee1e3a702"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/SKILL.md",
+          "bytes": 10251,
+          "sha256": "b69956de14d7f836235fb1fa7e672dd837cefc2f0ae33529a1411bcc8490fb42"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/host-memory-trigger-cases.json",
+          "bytes": 2285,
+          "sha256": "0ec1fabf7c10109db6c30ef188169cc627580dd6e82c28bb871ce46bbc998238"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/host-memory-trigger.md",
+          "bytes": 2375,
+          "sha256": "72b87268e22cea97066886d61fd991c6c04810c2700b9ddf2928a230640b3457"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/record-timing-cases.json",
+          "bytes": 5498,
+          "sha256": "f64a87d63f856357db8d1b7731b2749c13a051cead04b9e40c39b6d6257901bc"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/record-timing.md",
+          "bytes": 14883,
+          "sha256": "23c3f657d8a4471da1eb9b1d68457339fccf63651fc7b1b4244c009f24009515"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/references/okf-profile.md",
+          "bytes": 4133,
+          "sha256": "1ddc7a2ad56a6730ab3426290bd15acab892769dfa6a0733cdd1b91f7ad19455"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/references/operations.md",
+          "bytes": 7558,
+          "sha256": "6f1fc2d7aea3b9dffc0fb3deb08e9dc17ef0d974a75bb7213ab55fb0108cdf8c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/scripts/loom_memory.py",
+          "bytes": 29215,
+          "sha256": "8382b91b5bc1bd91390c8dff13a6cbda5ca156b3402c5f0525b693faddd1de88"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/scripts/migrate_legacy_store.py",
+          "bytes": 14964,
+          "sha256": "e7ee79a9f892cbf3e2a4a95721e7809d9b5e0b42eb8a9ec4192c25ed799da052"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/templates/memory-store-README.md",
+          "bytes": 2028,
+          "sha256": "870d3327484b8afa64c9fe24884156df93ff5caadcf15c1d37d2cb7b8982cd2a"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/templates/memory-store-index.md",
+          "bytes": 261,
+          "sha256": "cadd2b053c2f22a069bb8e0db50457c6da1d52d6483e98998fa29694271c766c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/NOTICE.md",
+          "bytes": 2359,
+          "sha256": "7fb3bc1f66b1852a3c1ada8b498ac81391fd3522eac82ccaaa15343b3ec984c0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/README.md",
+          "bytes": 1825,
+          "sha256": "d86c3a4afa4d2e5c9451906af180d48109c4e8e4f5ce6bc514d83190bbc79cba"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/SKILL.md",
+          "bytes": 11012,
+          "sha256": "0ab70c0f1e554219bb78dc4dbdd05c593ce7c1658fac01b9ee69a5965ebc9561"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/assets/cot-report-template.md",
+          "bytes": 4635,
+          "sha256": "6552edef8874b59f71c34fc701a0b80bea260003aac61164457edd85abc54085"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md",
+          "bytes": 1279,
+          "sha256": "dbf29e51d403bf7147b250cdcd2be5b7996bcaee6331c7f448eb55a338ab51a9"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/assets/trigger-card.md",
+          "bytes": 1171,
+          "sha256": "9f8c6b15b25b57f3881cea15188387e3ca1cab2b79b5e6b6d99aa844c8673f0c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/client-matrix.md",
+          "bytes": 3112,
+          "sha256": "d3cca910d4fcd80758a3f6b91b91c739ad9e9ab3add745ed17fa97d5af3e2166"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/fidelity-check.md",
+          "bytes": 6142,
+          "sha256": "38d89253857042c5f8d986caf123282fd9d1974e451e4b4fbcd603a0a3231704"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/mermaid-cot-spec.md",
+          "bytes": 18650,
+          "sha256": "a25891d21ea2423f5e352e530f4a7c7bc64c145ec1be70de767cbccf5d876000"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/node-structure.md",
+          "bytes": 2754,
+          "sha256": "2ac7a6b6f63a01c3c04725a62e9f4fa495012cf8ef8bc24e7ec026b46469af06"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/page-mode.md",
+          "bytes": 19341,
+          "sha256": "6893778d0596dd5dc7d26e6e51d379edd12261ee7aa4e10bc9b228d10792b215"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/plain-language.md",
+          "bytes": 19745,
+          "sha256": "016ff0747b53e2956b6eb68532c050c7a0f08cd1f780d7712b1eba2d68b7ff3d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/tables-business.md",
+          "bytes": 17179,
+          "sha256": "7d9e3abf2dbe2fab8da094c9ee68dae42caf7cd7f7f247eca084ac8dad20cbf0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/tables-design.md",
+          "bytes": 10744,
+          "sha256": "022fc5d86617f3dd07c696dfb47647457dbdb3fb61e486016e6af16d92c5e17c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/tables-software.md",
+          "bytes": 23261,
+          "sha256": "29448109e3bac104173498f2199be3d92949c3ce4ffed0f07184748b8d55fdc0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/align.py",
+          "bytes": 2915,
+          "sha256": "e1303d9546d49b9851b7d01785db61dcda15a1e574d0119816acf830cf20295b"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_kink.py",
+          "bytes": 6792,
+          "sha256": "2bbaa600f7b51b0428e99a51f4171cfaf41351f29862626ea54eef2f2787816c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_nodes.py",
+          "bytes": 7890,
+          "sha256": "9740163a79aea992b2c4e170fbb74f93226726a7b81c87c62f0dc620d5f5deeb"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_seam.py",
+          "bytes": 2427,
+          "sha256": "89d6c9f808240447a18ca691f70367876781a219f21012036c3fc1d9566f3453"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_table.py",
+          "bytes": 4737,
+          "sha256": "65c3b3398af75314b36f06f3564d03aa1a038eb0caed8914b44552c9ecb2792e"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/detect_client.py",
+          "bytes": 2770,
+          "sha256": "8f1f338d6dc62adb635e76d0ba30f3f3f22c5022f36614e4ee7168f16079d574"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_arch.py",
+          "bytes": 11604,
+          "sha256": "862ea02e650ca329886c1c506493fc261a8d6ed21090b42fba5d68a80a22a344"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_bar.py",
+          "bytes": 1598,
+          "sha256": "4a66864b7e6f1591c2d2237b9f2b295eba918b84810d3667c5b6f6fff08ec6d6"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_flow.py",
+          "bytes": 7568,
+          "sha256": "a105c8b9c82258664bf98a29dbaf727fc16ce4a76f5abd6c9e6c9e2738c43e5c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_seq.py",
+          "bytes": 9898,
+          "sha256": "b0af4a89ff613d8d77b0e6fe415802cf78fc6dae2931933064b0655722e159db"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_table.py",
+          "bytes": 2573,
+          "sha256": "f96173dedd602d0e7da57d1bc84c7b43b5baaec821bb63ee8900d14335a34d6c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_tree.py",
+          "bytes": 3302,
+          "sha256": "c6266738c345067083bbe497678544c6dd6076f755877a68901d3a839a0512f0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/generate.py",
+          "bytes": 2875,
+          "sha256": "9f9eded353261bd70b2299477843f3bec2425e60ed1e0e4c7e9c6f75624a15ab"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/glyphs.py",
+          "bytes": 1065,
+          "sha256": "fdaa29ca72a88327ffac6a56c76961af1fa18934f6b699d6dab9008e663065fa"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/render_cot_html.py",
+          "bytes": 44961,
+          "sha256": "62738fcc9270ff21422734c47706b6ebbb527085b1131c14e2cd138a0c1e6c97"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/verify_cot_html.py",
+          "bytes": 42730,
+          "sha256": "f669bce886978085c565ec953a8d368eff36ce289635dd41bda795814f7428e4"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/width.py",
+          "bytes": 8815,
+          "sha256": "a33da4e7561d3a6d31727c31eed7131e77ec8dcf329a182f3d1df0aa1fedbfbb"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/01-option-comparison.md",
+          "bytes": 2509,
+          "sha256": "4ab99023e4eeecde72f8de6f5ba8e0295be4b8a9cabd72f3b55062e0710e5b25"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/02-linear-steps.md",
+          "bytes": 7680,
+          "sha256": "0ed0530d485eda385801cefb3ecf4397b86d433834b9ab4e39d8064380d68d56"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/03-branching-decision.md",
+          "bytes": 2411,
+          "sha256": "5a45ef50ddf95d4b8b1a69fec0d0cc09f9081d4cc1ee3b3895b7a8b3bd584d06"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/04-reasoning-chain.md",
+          "bytes": 3946,
+          "sha256": "1e05f81ac04c1b1f5a073651bce53084e994ce64238ad12a08330bb5ad7ac9d6"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/05-state-lifecycle.md",
+          "bytes": 3092,
+          "sha256": "062ecf3f11899192f2f4a390840d8af9006159993d55260dbe34f79d2410d022"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/06-actor-sequence.md",
+          "bytes": 2219,
+          "sha256": "05a054641edf0882ca2192e0139795ecfe4739e1747cf81b1613afc7b41c676c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/07-hierarchy.md",
+          "bytes": 1607,
+          "sha256": "963cd9181c72e0759855e7d2f236505f86aa9814e79f687af01272498ead512d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/08-system-architecture.md",
+          "bytes": 3311,
+          "sha256": "b3d19a876fcecd2714ae47e72c79e8bc4142e92e688759a5b9b794de8b49423c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/09-data-model.md",
+          "bytes": 1635,
+          "sha256": "3373522d295b832382f166342437d9af9a7980e9a06d9efd5e65e11162fee57d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/10-timeline.md",
+          "bytes": 1393,
+          "sha256": "acf06aab2955f28e9bf751446874db22dbb9a8e740447ce3cf8f792eb53cb4e4"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/11-quantity.md",
+          "bytes": 1233,
+          "sha256": "a6d3cc31924ba0071d0eaafc5527d1b765523f0a51cb74f4c28d86b1b42f56d8"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/12-task-dependencies.md",
+          "bytes": 1909,
+          "sha256": "60979d68062ea3fd3d7be07b0e1ff573fe97c5a3d8767efcb460fd840ea3608d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/13-cross-role-workflow.md",
+          "bytes": 1977,
+          "sha256": "60a81ad13112b84803ab5e2f62d930786350566ca4f7d10a8d1d3fd20ba85c28"
+        },
+        {
+          "path": "loom-workflow/skills/project-retro/README.md",
+          "bytes": 1631,
+          "sha256": "cf349eb388b007393c573bf1e80a12dab992db1e9762934d306e13ba264c58f0"
+        },
+        {
+          "path": "loom-workflow/skills/project-retro/SKILL.md",
+          "bytes": 4488,
+          "sha256": "3c6aaab146ccbaf25c7e416f3bbc88e312515423c330ab2c247e8dad838c219b"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/README.ja.md",
+          "bytes": 5066,
+          "sha256": "294538364c19bfb2e46e6496d6d4dcbc7eac3931e472ef4518906531c2d4758e"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/README.md",
+          "bytes": 4510,
+          "sha256": "f18f840ec3a2f209d6d035d58da2526718c794b5c9dac8dd0e7631230d6215bd"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/README.zh-TW.md",
+          "bytes": 4197,
+          "sha256": "2602c01b7d6b0c905fb4b93282b9869cbac99dad34e3d4afc706f79baec195d1"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/SKILL.md",
+          "bytes": 3842,
+          "sha256": "576d5bf0a35390c381356ed847cccb5670e175b5a051e7f4b2a447846866c578"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/references/seven-block-schema.md",
+          "bytes": 11943,
+          "sha256": "dd93ae657f755edfc2ccb2791e1964e09f86e57c54c7dbf9bc81d0138f457f2b"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/README.ja.md",
+          "bytes": 5748,
+          "sha256": "a8e61f239b19bbc1983062fd85e7b5e638a309dc45c3807a2842b002ac87f5c1"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/README.md",
+          "bytes": 5097,
+          "sha256": "1ced13ce0c3520335449b252276412dc44997d877c8802de3047cadba55cd127"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/README.zh-TW.md",
+          "bytes": 4480,
+          "sha256": "c1e0b2317c3fafa4208fb4db23d294b3a35039ef46dba5fe9ceca7511cf43c2c"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/SKILL.md",
+          "bytes": 6747,
+          "sha256": "3362e1ee64f16dbb5f3e8fc91fe52a9a9d9af29ad256c586d257fb9d9b1cc8c4"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/agents/prompt-advisory-analyst.md",
+          "bytes": 16522,
+          "sha256": "b2f5a8df656a3dbe55daaff5c6a7fc38680eb042e431120ea4fac742ff08ab1d"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/agents/prompt-failure-analysis.md",
+          "bytes": 9213,
+          "sha256": "d9252e2bf85695d73d285e16fb3152459731268a2f186ad34e1ed982764c1dcd"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/agents/prompt-success-analysis.md",
+          "bytes": 10002,
+          "sha256": "478da9cfed6607c614eccc78fc198a2163333299ba2fa0e8148be4ae3758ecb0"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/claude-code-tools.md",
+          "bytes": 2555,
+          "sha256": "36c6013f9cfc4ea5449b1c2ac0517f691a293f6709034fa703ba25619746f67c"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/codex-tools.md",
+          "bytes": 2282,
+          "sha256": "ba78ce41e318af435057aac8b41fc1644120ca618537bb6e5490a187537a9b75"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/runtime-protocol.md",
+          "bytes": 7716,
+          "sha256": "b958ce2373a13cd6006a41a6259c3c32824d4607fd5c133b4f6971a0bb790523"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/source-inspection.md",
+          "bytes": 2934,
+          "sha256": "a74cefb3369d536bb12823c0843e72fd0c6063e68d41fc307c1c73c80b023bd6"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/aggregate.py",
+          "bytes": 20083,
+          "sha256": "6024250f9758fd230786232037fcab813dc11d350c2716d679bbfa4150576caa"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/cluster.py",
+          "bytes": 7880,
+          "sha256": "b5b48cb4184a6d71240913a17a016c09dc401b66c679df186a9bf48d3e845745"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/event.py",
+          "bytes": 3455,
+          "sha256": "8d8beab7556b9938fe35050e28c11b5f1ce79287288629a98806803be1e427a0"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/facets.py",
+          "bytes": 6873,
+          "sha256": "69bbd86ddb9248f4ea347f7955634137a309f4e096a4275bebba73b1cb2b00ca"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/fixture_subagent_results.json",
+          "bytes": 2326,
+          "sha256": "09384aa6d8872a57b01bddd9238196794064fa375dba8dbe0d826040819538b2"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/friction_signals.py",
+          "bytes": 13396,
+          "sha256": "93931f33887514927883f8228cc85772009df5040fb8e61e16335f32cb2d13ea"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/ingest.py",
+          "bytes": 19038,
+          "sha256": "02d0d1e07afadc811be6a6ebfbe4c34c26a04e8b50276ebed4f7003f0e8ed706"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/main.py",
+          "bytes": 25052,
+          "sha256": "0f6af4c6ec95eeafaa8033def28c93fed5e58ac012f8b245980508d4cbc9fe7e"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/propose.py",
+          "bytes": 32628,
+          "sha256": "d8caf9e68933e8dcc72be419220152c78ef51bfc6955f9c68e8958760888a52e"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/report.py",
+          "bytes": 6389,
+          "sha256": "3e91d3f3a96a39594d01c0b70539f25a02687185aeff3e224f521f6d0d1d98fe"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/test-prompts.json",
+          "bytes": 2233,
+          "sha256": "551dcd034f46372d634c2d16711cbfb4aedd5faf56aacae77606ddd15d0c7776"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/trigger-eval.json",
+          "bytes": 1823,
+          "sha256": "6ffc99b332e793af457cfa0044b441c8b1cd7048fb457d33377221974f44dc4e"
+        },
+        {
+          "path": "loom-workflow/skills/using-loom-workflow/README.md",
+          "bytes": 1566,
+          "sha256": "7391483e2afccb213d7d582f27c5b6256bfb76734851b6c4b20ac025014f09c0"
+        },
+        {
+          "path": "loom-workflow/skills/using-loom-workflow/SKILL.md",
+          "bytes": 2994,
+          "sha256": "3cbe4105910a48c8c6395048e2e0a2cb0a9effef4f31dce9474b8fa6e762fc0c"
+        }
+      ]
+    },
+    "candidate": {
+      "source_commit": "9b9c7d87914f08febcedcb5d78489c400ba7614c",
+      "files": [
+        {
+          "path": "loom-code/.claude-plugin/plugin.json",
+          "bytes": 864,
+          "sha256": "dc5246a47f60ed6c7be911a7f4e509c47ecf7412f6ed930dfb64d37f2834913f"
+        },
+        {
+          "path": "loom-code/README.ja.md",
+          "bytes": 18097,
+          "sha256": "c21ed4ed0cf06c08f1335f4608095d7326de56e63060c663a27c35dd359544ed"
+        },
+        {
+          "path": "loom-code/README.md",
+          "bytes": 14322,
+          "sha256": "f44995ee16fcf9464a151bbe378f4d68f36638e65da08285b86aed9339360c8d"
+        },
+        {
+          "path": "loom-code/README.zh-TW.md",
+          "bytes": 13823,
+          "sha256": "2bec81a517c5e98dd31b1a1ff720fea6e3ccbbfffa0bea2255aef80433b2695a"
+        },
+        {
+          "path": "loom-code/agents/acceptance-tester.md",
+          "bytes": 6700,
+          "sha256": "c165f056583cb8e10c30a34b7f0442882566e485c361a0536bbdca3b24a0bce3"
+        },
+        {
+          "path": "loom-code/agents/adversary.md",
+          "bytes": 4799,
+          "sha256": "80129afb72a6d9af5d3d2b21de57f4eb06f4e21edf69d6284b61445540579c37"
+        },
+        {
+          "path": "loom-code/agents/implementer.md",
+          "bytes": 6716,
+          "sha256": "7f9b27204a57d8f4a96982e2e2de6b20ac2964d94eda8d156cc08d781446ab5c"
+        },
+        {
+          "path": "loom-code/agents/reviewer.md",
+          "bytes": 10214,
+          "sha256": "84470682fad376ecec27bea34852abdae6e3e9b41321d853c026e6d7421c672c"
+        },
+        {
+          "path": "loom-code/contract/README.md",
+          "bytes": 1390,
+          "sha256": "dcb344c726c6b4259b91ce58308743b7bdd3f3fa094e31c95d237882433a748f"
+        },
+        {
+          "path": "loom-code/contract/manifest.yaml",
+          "bytes": 20877,
+          "sha256": "a3068b326963b962f9d85cd9475f2270d6defaaeb4ec893465bd53d89c5aebef"
+        },
+        {
+          "path": "loom-code/contract/templates/KICKOFF-DEFAULTS.md",
+          "bytes": 1284,
+          "sha256": "d512114bdfe48e09395ff503b637da8a9e3bac8596a210f6ddc23df5d5053b0d"
+        },
+        {
+          "path": "loom-code/contract/templates/PRINCIPLES-interview.md",
+          "bytes": 1195,
+          "sha256": "6ed1ba79c3318a0fb32d99fb5abe6ddfe264373158186c759e4f2647d9c78461"
+        },
+        {
+          "path": "loom-code/contract/templates/PURPOSE.md",
+          "bytes": 718,
+          "sha256": "0672cef8dd769980d27e3216e3bcf316b8372c4857028e73485e724cbe9801f5"
+        },
+        {
+          "path": "loom-code/contract/templates/attestation.json",
+          "bytes": 354,
+          "sha256": "91bfe01f7fbb6243d5107ad94d6fd5d10bc6508eb4d88f5edec31e237aada5c1"
+        },
+        {
+          "path": "loom-code/contract/templates/intent.md",
+          "bytes": 1813,
+          "sha256": "53b3dcad082bccf6b73928d0430dc9743b3ee7ec9ddf5bf97c91c4cb7786f629"
+        },
+        {
+          "path": "loom-code/contract/templates/plan.md",
+          "bytes": 2300,
+          "sha256": "0e3d6a3df7f0b0de64e9ed2d4758e8c95ae792602226f40710d4579d01809480"
+        },
+        {
+          "path": "loom-code/contract/templates/spec-minimal.md",
+          "bytes": 1689,
+          "sha256": "8938057bedaa1eeae73a1afad1cd98a5721606d92dd313bee50f9d415b932fdd"
+        },
+        {
+          "path": "loom-code/hooks.json",
+          "bytes": 1087,
+          "sha256": "2599d85eb9ab6901bea7062dfe30c8de9ca459bba9835a8c6cf791c8f81d79c9"
+        },
+        {
+          "path": "loom-code/hooks/agy_adapter.py",
+          "bytes": 12037,
+          "sha256": "f9edbdc2291dfabf82a42f8509a2548c6adced397c358e4d442ceb5e9415279e"
+        },
+        {
+          "path": "loom-code/hooks/hooks-codex.json",
+          "bytes": 968,
+          "sha256": "e32e2d2dbc8262fb792158caab943e9029fbd0dd332f9ab0af6578c6f35b2589"
+        },
+        {
+          "path": "loom-code/hooks/hooks-opencode.json",
+          "bytes": 1343,
+          "sha256": "98bc0e2bec1d0801ea5b20233ed8adc2ea8c7631248f65b9c4e33cf385eb8df9"
+        },
+        {
+          "path": "loom-code/hooks/hooks.json",
+          "bytes": 2833,
+          "sha256": "a532238eba9797435fd4d1db4a5a83f2765dccfd506e747e04c3ba3a8c4a94b9"
+        },
+        {
+          "path": "loom-code/hooks/language-anchor.py",
+          "bytes": 1573,
+          "sha256": "a94be22c089dd7a3c8df2b71a95faedf8a96838c4357fa538d78d4f3b16192e1"
+        },
+        {
+          "path": "loom-code/hooks/session-start",
+          "bytes": 6753,
+          "sha256": "0184d6068bec23db42b4630f7bd86e0f22413a6bc3dfc36bb4f08dfe945ebf46"
+        },
+        {
+          "path": "loom-code/package.json",
+          "bytes": 374,
+          "sha256": "c74b321c877a91d795ba3bbe348e543c05d8ec4542d1a6eec15ba2b93dd9e066"
+        },
+        {
+          "path": "loom-code/plugin.json",
+          "bytes": 313,
+          "sha256": "19e74842629355d98540935e23d94a141612dd7826124a4208510275eeefa4ed"
+        },
+        {
+          "path": "loom-code/references/antigravity-tools.md",
+          "bytes": 5117,
+          "sha256": "202d5b2a9eb69c2af3a92fa0196a54e8ca9e6f1c687aef9387c21b3a34ab31af"
+        },
+        {
+          "path": "loom-code/references/dispatch-profile.md",
+          "bytes": 12065,
+          "sha256": "2ce068749f81d35718326289e89537b1011f08cb037da0ff6cfa789fd06d885e"
+        },
+        {
+          "path": "loom-code/references/engineering-baseline.md",
+          "bytes": 8883,
+          "sha256": "3a56469dfdb24404f6f23cdfda0fc13613b36ddf55b53ed9d794476150bcd263"
+        },
+        {
+          "path": "loom-code/references/opencode-tools.md",
+          "bytes": 2551,
+          "sha256": "bd17eea55d0de83b7e39fabe7c6fb269acb144a843b20db8ec6d2deaeface839"
+        },
+        {
+          "path": "loom-code/scripts/_migration_history.py",
+          "bytes": 1618,
+          "sha256": "4dc54a9020cb6cd7d392505945d4b9129dc6be4ee2e6788828113e4be1fd4902"
+        },
+        {
+          "path": "loom-code/scripts/check-skill-crossrefs.py",
+          "bytes": 9438,
+          "sha256": "81278039345084c19eb74e5f6b16bd7e0a734b81e6f2afe7c4b989cd2e1d73a2"
+        },
+        {
+          "path": "loom-code/scripts/check_contract_citations.py",
+          "bytes": 19623,
+          "sha256": "7f27ddf58e61e76b4fc041f564ef3d9a854b1c5f303d60934d683a86bbb89e1f"
+        },
+        {
+          "path": "loom-code/scripts/check_doc_citations.py",
+          "bytes": 39518,
+          "sha256": "71a9356d4505c34c0cdcf2f9d7400036569ca50da2877ba43090cc5cedaa0220"
+        },
+        {
+          "path": "loom-code/scripts/check_mechanisms.py",
+          "bytes": 33409,
+          "sha256": "c4546faf93bc483e09b855b94ca9c6aad6e8c6d922359ec47fe9019585415d3c"
+        },
+        {
+          "path": "loom-code/scripts/claude_reviewer.py",
+          "bytes": 5562,
+          "sha256": "e446940dcb07b75eaa0f4aa65dd77922b2d71f6843aa9aa4450f934bcbe5423e"
+        },
+        {
+          "path": "loom-code/scripts/coldread_role_split.py",
+          "bytes": 22461,
+          "sha256": "6f2b24164af36dabb7c1d388af1fa9ade241cb9985e7c6c4699aece42f98a605"
+        },
+        {
+          "path": "loom-code/scripts/dispatch_profile.py",
+          "bytes": 13604,
+          "sha256": "fd5675b38b9c01617712ed93c85c9eaec6c195c170eca92c12582fc4b55b5347"
+        },
+        {
+          "path": "loom-code/scripts/external_review.py",
+          "bytes": 30835,
+          "sha256": "66490ab8c9ea6d7a496b4660d46b867a768daa6063471cbde8d5ee0c10c57487"
+        },
+        {
+          "path": "loom-code/scripts/git_exec.py",
+          "bytes": 3871,
+          "sha256": "9c721b8e2f8fae0e4c31da5d6ab41b42e0ae4eeb8cecbf164a36fce7dd61e7c7"
+        },
+        {
+          "path": "loom-code/scripts/loom-python",
+          "bytes": 4129,
+          "sha256": "2ada1d8b058f33a668017e6d86bea0ef89f980cd1b20c34838fc0c92b72c46f7"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker.py",
+          "bytes": 4395,
+          "sha256": "33223a2a8369bd1af9c069c981ec8b1d386728e33315857f16956c3dfdf8886f"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/__init__.py",
+          "bytes": 50,
+          "sha256": "505284c9ee5e524251b8b5fef4e83f5dd72fc9f4647833c1d668915f7590ebab"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/artifact_types.py",
+          "bytes": 703,
+          "sha256": "1782b55638715894cad06d1372886d9bdcc727d9d5275521a3567e3420691cf5"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/attestation.py",
+          "bytes": 18810,
+          "sha256": "44d3c43fce3b973cbf171e3d6aeb2c50640379df2057ed796c203a498e9e292d"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/__init__.py",
+          "bytes": 37,
+          "sha256": "f2f5689a90938f2445a5cc4c7416fdf956778bac5ffa2d0829a063a37310ef56"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/charter.py",
+          "bytes": 2502,
+          "sha256": "76db04f856dfdce93ca6b4ab33eb4074451982ab4f434fd46433078e5108d299"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/contract.py",
+          "bytes": 1374,
+          "sha256": "2d6d2776e343e09c69822fb0b51a5deb4b9b7b955c49af4820050cc861d8dab7"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/finalize.py",
+          "bytes": 23859,
+          "sha256": "0d5f4720e571b889c33009198cd1492299d714d6c633b69aeb901b3b221d600a"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/github_rules.py",
+          "bytes": 11515,
+          "sha256": "a824bf232f065a0896fda43451cdac6ccc132b3b3931a3c50e409f9a79a89e30"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/intake.py",
+          "bytes": 4873,
+          "sha256": "21f401faa7eb2111631337fdb1e3a217e0e0ae1e42090e87ab96a9dc979ac167"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/intent.py",
+          "bytes": 2316,
+          "sha256": "3679240ab3eec499174980b3d610dc37c2c620255eeb050f30de2dc325f0712c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/intents.py",
+          "bytes": 4828,
+          "sha256": "44d3d40b28c88339459e8dbaa4eba2652cf1434d9f772b12b86216f2d8789112"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/land.py",
+          "bytes": 48038,
+          "sha256": "7ef2d8b86735ef7077baffff6594f527d88f28f3d35d18b6d21f5d3f575c469f"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/plan.py",
+          "bytes": 1261,
+          "sha256": "3eeaba448c6c88d317290e4cda4700df89d63cfe533d4a057085b1fe34ffab26"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/pr_floor.py",
+          "bytes": 2681,
+          "sha256": "c251a8bbbdf30c1a38b7111569a0cf7da531d07ac082c2e3b602b2146a5826bd"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/publish.py",
+          "bytes": 28944,
+          "sha256": "858e9fd175916b105418a9c45605729ae88b143a73c1e494038ad2dfb3a34e6f"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/push.py",
+          "bytes": 4625,
+          "sha256": "7dd28d6448bac4fbe00a17c0a72b502c9401ee639b8afea2a605a141f9285066"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/reviewer_count.py",
+          "bytes": 781,
+          "sha256": "4eeb2aa6cd336891eacbb36e4733c8ace8079407b3ad69e3823ba55e2c539ed8"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/standing.py",
+          "bytes": 1473,
+          "sha256": "a13da94986fd81b0ad07b0465eef1559ae2e91eeca55c95da0fb47b01a923173"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/command_handlers/sync.py",
+          "bytes": 18151,
+          "sha256": "19013ded87f78b3f5c338ca8cd29ccdde3ff98f9908a90378437af8ea00b54c5"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/digest.py",
+          "bytes": 2469,
+          "sha256": "0f62a1d3df118d19157783270e97127724373e23f4ad02b9a66fbd1cde0328a3"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/helpers.py",
+          "bytes": 15178,
+          "sha256": "eb37187c7f1be98f9ca6d540522c38c9daa4fec77351697f8cc51651d8f16b8c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/intent_state.py",
+          "bytes": 11354,
+          "sha256": "56bbc007420bc4dc2af8b6dac3143e402a459a456520563fe94e53561bd9d288"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/parsing.py",
+          "bytes": 1723,
+          "sha256": "d6e4c523a559f795d2001e5c930e027fdf30dcfc33ef440f878b715280da23c0"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/probe_results.py",
+          "bytes": 31454,
+          "sha256": "d9e7fd9469a387172811c90d85462018c7af91159539316d33269346e0f1fca6"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/probes.py",
+          "bytes": 38638,
+          "sha256": "3dd76d753942756e17988b86d0d0649fa56537e3f6f1cd7cb8188cebace6424a"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/reviewers.py",
+          "bytes": 24849,
+          "sha256": "2a12790c6cd53384f5117ac4fcf907f4eec6fdc65ea92184f4915d01ab458882"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/__init__.py",
+          "bytes": 69,
+          "sha256": "0a50c7c5e3e0b4372f9a28052e66d697cdda7ceabd64bb19009629c8a661b251"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/charter.py",
+          "bytes": 7302,
+          "sha256": "23f447338975b6fab09b405acc4bcce47eef3942b81ef952b0490d5babf5df42"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/commit_identity.py",
+          "bytes": 4457,
+          "sha256": "a243c52c6a4bd7214d3772a90bcddbd12c1d91a6891139af69f502d00bf974ed"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/contract.py",
+          "bytes": 1634,
+          "sha256": "011efcd05386dbb5fdb1b357439725a7aa7e53414fa712475c14bf2d36d1f491"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/evidence_coverage.py",
+          "bytes": 6778,
+          "sha256": "e7ceece813400324458bc899024798b21b937016962b199a6ad37782ab6c2bba"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/intake.py",
+          "bytes": 32993,
+          "sha256": "be0a82bfa296e1e4e4603d17cf8b47b28825350120c5be8efc706360889b2862"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/intent.py",
+          "bytes": 18950,
+          "sha256": "03922a02b043322ae12749282948f57ee2cf9951ad51af2310fe4d97703edbe4"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/intent_version.py",
+          "bytes": 5704,
+          "sha256": "88278f579785ea40164a3406c7f7d9523ac598375c492148566529a38cb8a8e7"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/plan_boundary_tests.py",
+          "bytes": 5814,
+          "sha256": "b353e44c477b123066a59b2c34909e6b70fc4b730cd6c2b0f1b863f946c8eef9"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/publish.py",
+          "bytes": 7976,
+          "sha256": "e6a024af9b6d7de37419e5bdd32c3000a4164cf86a02e7eb1015a1b47b4cee4c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/push.py",
+          "bytes": 3819,
+          "sha256": "a229f87e286bad8bef475004b24424df39e7e8594d372273e7c1bfca931d91f1"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rule_checks/standing.py",
+          "bytes": 5142,
+          "sha256": "655b4f602c21dcda210b75e4ccf0f0eff63ad596abf022a457d304883fd57974"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/rules.py",
+          "bytes": 10470,
+          "sha256": "da3975457314c05d809813a6c81b0e8c0fd3d07f83ca8340a5b8850a3a718d4c"
+        },
+        {
+          "path": "loom-code/scripts/loom_checker/verification.py",
+          "bytes": 6203,
+          "sha256": "bdde8fcb26b8b68a81ee41ea6fa9859978acbe1a1bf25767402f82d5e8b33439"
+        },
+        {
+          "path": "loom-code/scripts/prose_pin.py",
+          "bytes": 3103,
+          "sha256": "10e40d114b0e4ac800dd999705f46639c55493d7fb880d37246b08229b968486"
+        },
+        {
+          "path": "loom-code/scripts/rehearse_probes.py",
+          "bytes": 17657,
+          "sha256": "254e8bf59f9cd00e80b9f4c5517efdef83901d8fe682f188b7572ae2e30bd624"
+        },
+        {
+          "path": "loom-code/scripts/repo_files.py",
+          "bytes": 7651,
+          "sha256": "62333168fb9eacabb6877d0f185f08081175d8681444465173b18d712ca26399"
+        },
+        {
+          "path": "loom-code/scripts/second_vendor_policy.py",
+          "bytes": 10688,
+          "sha256": "0924f6986a050e25b8778fd8987baac77880d5166f3c9534e4d9fbc8f5d7a2d7"
+        },
+        {
+          "path": "loom-code/skills/build/README.md",
+          "bytes": 1576,
+          "sha256": "96fd445be8fd6a7cbecf477fdca1edd7ec68d2345d035a5d849bfa6f853694df"
+        },
+        {
+          "path": "loom-code/skills/build/SKILL.md",
+          "bytes": 11963,
+          "sha256": "cd1f317370c98c8e5c187da1afbcd814036e4e47d851a943972fa77fa5c8895c"
+        },
+        {
+          "path": "loom-code/skills/closing-review/README.md",
+          "bytes": 1742,
+          "sha256": "eb5f2afd0d378b7e0ebb31d709d5f31d2fd71bc516342f008692c3c09c64ba08"
+        },
+        {
+          "path": "loom-code/skills/closing-review/SKILL.md",
+          "bytes": 29588,
+          "sha256": "cda38793b83c89b522b5230b238c97abb33d2cd09121d74419752859691b5e3a"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/acceptance-test-report.md",
+          "bytes": 5492,
+          "sha256": "68b397d7b6815635670f8ad81daaa1ba35c0883fcf50fb9ff5572a76c322f3e1"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial-code.md",
+          "bytes": 1584,
+          "sha256": "2fcdf348894f9ff1738c53b8bddedbdfe14af0aa7de5de4dd06a5c7da0db233f"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial-skill-gate.md",
+          "bytes": 629,
+          "sha256": "82f5dfc187f1a9c2e7252059910001f1b7bf69f62f0d3fe266b46fab9260bd59"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial-spec.md",
+          "bytes": 463,
+          "sha256": "63c93007bbfce41edaf1d5350f903fb6f401c6b0f01bc4e5d65ea02faa220fbe"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/adversarial.md",
+          "bytes": 13534,
+          "sha256": "05c97c7d69db4bb1ae73c1ae1ae89d5d5bd52303adec0f66d52ca03337411aaa"
+        },
+        {
+          "path": "loom-code/skills/closing-review/references/lenses.md",
+          "bytes": 14849,
+          "sha256": "6ffc412011b4ee414cbb5716a2c7977536de5ee9d6488730059ecae551fa4260"
+        },
+        {
+          "path": "loom-code/skills/external-review/README.md",
+          "bytes": 1837,
+          "sha256": "85745f31dacce076da6fbcb710f3906875db2018c261e80d1c323733126b2c74"
+        },
+        {
+          "path": "loom-code/skills/external-review/SKILL.md",
+          "bytes": 10740,
+          "sha256": "fd60f87f48fce53e35d078d734c96d3abe47108715b76c90b13c954278e80c09"
+        },
+        {
+          "path": "loom-code/skills/maintain/README.md",
+          "bytes": 1438,
+          "sha256": "6ef59220645b44db7b72a48386909bdfd3cb6e0a1b29317fd12b05ef2ccdf901"
+        },
+        {
+          "path": "loom-code/skills/maintain/SKILL.md",
+          "bytes": 1147,
+          "sha256": "d35317b82602f8af72837e290da87fa0e0300d28210c8a8f07d9a8f9581c4b76"
+        },
+        {
+          "path": "loom-code/skills/ship/README.md",
+          "bytes": 1807,
+          "sha256": "48b4cd7dc5117ecb920130bf65e0719a6f67ca2ef0118473c8b171c00f656398"
+        },
+        {
+          "path": "loom-code/skills/ship/SKILL.md",
+          "bytes": 15549,
+          "sha256": "02cfda8a4d3d393a3d2a98e8c4f8ab346e957c58e9b2e4fc4948b8b79293fe74"
+        },
+        {
+          "path": "loom-code/skills/using-loom-code/README.md",
+          "bytes": 1500,
+          "sha256": "a6605db32b049b12161b3d0d36b80020b467a15747ec64479ca03233ccbcf663"
+        },
+        {
+          "path": "loom-code/skills/using-loom-code/SKILL.md",
+          "bytes": 1496,
+          "sha256": "74215bc06b51b0d9bbdc7d9ffe43ec8b7582304e2f5195a2b131e4a6d9ac3474"
+        },
+        {
+          "path": "loom-code/skills/write-plan/README.md",
+          "bytes": 1783,
+          "sha256": "fa57a91de28a3b8efb8654dacf8be5caeaf28968818d27789afba3dd585171fa"
+        },
+        {
+          "path": "loom-code/skills/write-plan/SKILL.md",
+          "bytes": 21988,
+          "sha256": "a66dded2f8672ef67612f1b4d9e5943487a7e540b53890e85a78203a43fb267e"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/codex-first-contact.md",
+          "bytes": 2172,
+          "sha256": "3efdab0ead3d5502c919fdef8bd400660fb91011eae68a34c9b475f093e883e3"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/confirm-intent.md",
+          "bytes": 11489,
+          "sha256": "c64d5f2459ca67412c2311eff245be68ded41b798e7f0fab5d9f9f74f81d87e4"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/confirmation-examples.md",
+          "bytes": 12825,
+          "sha256": "db1c80330b8c063c2d3a47f2b46605a3c8c91bde1e4b8da13c56eeb25d44e7d7"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/confirmation-format.md",
+          "bytes": 3126,
+          "sha256": "e79fcb3b4ca092f434fcd08da8897eaf74e45bd63f3d7d286e5eba1ed1a8f942"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/confirmation-template.md",
+          "bytes": 5741,
+          "sha256": "9db702f37d9651b6d97b7d5891f8813487ab8a0294fea178ac7078e5367749f2"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/no-intent-interview.md",
+          "bytes": 1639,
+          "sha256": "2b789f70d3e161906a6668facc729db6554a3f1fd6c31e2821dc524f96049758"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/one-way-door.md",
+          "bytes": 4642,
+          "sha256": "79482166208fff06866097f8a72682c0c44bba8aed8af3e432eef65f7e41b124"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/plan-simplicity.md",
+          "bytes": 946,
+          "sha256": "8b7f65400b10c9c0815f5805c9781970b566e5fbc98ac992ce0a5c91df47fa8e"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md",
+          "bytes": 10274,
+          "sha256": "a86e55787764e1c9a94fb831112ec446738a9b31969431b9b7311b53243d2268"
+        },
+        {
+          "path": "loom-code/skills/write-plan/references/self-written-spec.md",
+          "bytes": 4078,
+          "sha256": "464ca83d31165ad74d829efb6a87f3a6fb66796310cace67561c342cd1eb4822"
+        },
+        {
+          "path": "loom-code/skills/write-plan/test-prompts.json",
+          "bytes": 2103,
+          "sha256": "f1c7e3ec156e5300215de948adf7c26dc886a4ae03b8c70001170b5a26485896"
+        },
+        {
+          "path": "loom-code/templates/loom-pr-floor.yml",
+          "bytes": 871,
+          "sha256": "c64f64bda25de7168fc76d9427f13af7f14f9d25bdd3e708f794355e95b83d2b"
+        },
+        {
+          "path": "loom-design/.claude-plugin/plugin.json",
+          "bytes": 993,
+          "sha256": "fb73ca75c1a22bf60363f22896c8f270d4623d8fa773a76e068955025807edf5"
+        },
+        {
+          "path": "loom-design/README.ja.md",
+          "bytes": 12551,
+          "sha256": "3010624ce9d3eef03a39f74244ae96a0a09c47f0c987a1fd5fa61f268a0f2b43"
+        },
+        {
+          "path": "loom-design/README.md",
+          "bytes": 10288,
+          "sha256": "c85d0dd2e0b4889de3c0a9a38d37ba591017561202f4bd2ac806acab83f4774a"
+        },
+        {
+          "path": "loom-design/README.zh-TW.md",
+          "bytes": 10094,
+          "sha256": "4afc7f466b1806ab5268d241b78ab11d3c4750b149f2ea51756b1ab06038b59a"
+        },
+        {
+          "path": "loom-design/package.json",
+          "bytes": 458,
+          "sha256": "0ca7d3aa7904c53477c751a6f45fd0b6f7b8a6219a7c7ce9f0670ea28e7c3c90"
+        },
+        {
+          "path": "loom-design/plugin.json",
+          "bytes": 397,
+          "sha256": "c661c60e2c45514aa6e48d6ecfe792063982a5e92608359d8a5bb0c18504bd37"
+        },
+        {
+          "path": "loom-design/scripts/architecture-design/validate_architecture_output.py",
+          "bytes": 8474,
+          "sha256": "62902958cff72ff475c5ab5555e382944ae3ac664a2d8faaabc5bf093ab61013"
+        },
+        {
+          "path": "loom-design/scripts/interface/design_md_spec_keys.py",
+          "bytes": 1645,
+          "sha256": "5c861205e4507bc20e8aee8b735cfcbeaa1352bd379cd46dd2fbe12a85343e8a"
+        },
+        {
+          "path": "loom-design/scripts/interface/validate_design_output.py",
+          "bytes": 5593,
+          "sha256": "98b0cd82eaa32fd145220d469e9a8a3c26954163b9ab976d88f495b9bb7ca70d"
+        },
+        {
+          "path": "loom-design/scripts/principles/validate_principles_output.py",
+          "bytes": 8500,
+          "sha256": "0a809d9e0af280d8b52a78df500133b02c82922922e09a2127507d83401dc1e3"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/README.md",
+          "bytes": 1891,
+          "sha256": "7b5d9984ad63283e7d3f9fd0e6524fdd28c1c01d3b4d4424d148616d3b2e0e1e"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/SKILL.md",
+          "bytes": 6285,
+          "sha256": "24c988e501b33aa4349c2a9f7255e196f66b1cf2bf9422348617b472e54d281d"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/references/architecture-md-schema.md",
+          "bytes": 3546,
+          "sha256": "238218893bea05d515d512e004db5b84409028518d5837f77e51efa5a43f8050"
+        },
+        {
+          "path": "loom-design/skills/architecture-design/references/design-know-how.md",
+          "bytes": 8929,
+          "sha256": "beab1a10ceb56cd93c43b8fd2ecfb0bb730a8bda797a84a5abb094aa63c08651"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/README.md",
+          "bytes": 1886,
+          "sha256": "50e4bee026607afa53300f20fed968491c560a7f1e6c3914fe7fc1e025bfef09"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/SKILL.md",
+          "bytes": 24357,
+          "sha256": "caff721f98fb411545da3a9c1f37b668cf43c6800ef53e5b7e29efa65a980b70"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/confirmation-examples.md",
+          "bytes": 12825,
+          "sha256": "db1c80330b8c063c2d3a47f2b46605a3c8c91bde1e4b8da13c56eeb25d44e7d7"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/confirmation-format.md",
+          "bytes": 3126,
+          "sha256": "e79fcb3b4ca092f434fcd08da8897eaf74e45bd63f3d7d286e5eba1ed1a8f942"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/confirmation-template.md",
+          "bytes": 5741,
+          "sha256": "9db702f37d9651b6d97b7d5891f8813487ab8a0294fea178ac7078e5367749f2"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/interview.md",
+          "bytes": 4563,
+          "sha256": "b0af6a2d4233f360c616a2f89151b9505c154f3f5cf54ee31236746efdf0f6ba"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/references/second-vendor.md",
+          "bytes": 4635,
+          "sha256": "d3bd394aea3b0a2c23ac530e7bff13a9af13aed50ca85dbd42cbc153382a4680"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/templates/KICKOFF-DEFAULTS.md",
+          "bytes": 1284,
+          "sha256": "d512114bdfe48e09395ff503b637da8a9e3bac8596a210f6ddc23df5d5053b0d"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/templates/PRINCIPLES-interview.md",
+          "bytes": 1195,
+          "sha256": "6ed1ba79c3318a0fb32d99fb5abe6ddfe264373158186c759e4f2647d9c78461"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/templates/intent.md",
+          "bytes": 1813,
+          "sha256": "53b3dcad082bccf6b73928d0430dc9743b3ee7ec9ddf5bf97c91c4cb7786f629"
+        },
+        {
+          "path": "loom-design/skills/capture-intent/test-prompts.json",
+          "bytes": 6457,
+          "sha256": "b8ff1eb3fdfb6fc95a9c678eda272e8f3b94433b022c6b588f02add7ca1a9d5d"
+        },
+        {
+          "path": "loom-design/skills/design-system/README.md",
+          "bytes": 1482,
+          "sha256": "791457208bfa49c15b142fb34b9c36e3622b42817028c5f3377d06ce14287014"
+        },
+        {
+          "path": "loom-design/skills/design-system/SKILL.md",
+          "bytes": 4729,
+          "sha256": "90f3b4ce0192060c9b429fb27a34b8834d88f6d10e3fec7777c939641a54f068"
+        },
+        {
+          "path": "loom-design/skills/design-system/references/design-md-schema.md",
+          "bytes": 17094,
+          "sha256": "eba305536ff8ce8bcbfbc30372f4189e0f47d204e82fe36a64842e403f2ab3f2"
+        },
+        {
+          "path": "loom-design/skills/design-system/references/knowledge-triage.md",
+          "bytes": 5492,
+          "sha256": "4fc3b01ae5fe5a84eb22bfb3bd6f6d795f2336899681460e559a3fdf862ec342"
+        },
+        {
+          "path": "loom-design/skills/product-principles/README.md",
+          "bytes": 1419,
+          "sha256": "99ae20d55dc73d69430b9069122a93d8960979f198aaa9d2922a45f1b6a98915"
+        },
+        {
+          "path": "loom-design/skills/product-principles/SKILL.md",
+          "bytes": 4269,
+          "sha256": "735a8ca4fb3344452e0bfd40133a883ca619d9523aff5a647f5d74bfda6b0f2e"
+        },
+        {
+          "path": "loom-design/skills/using-loom-design/README.md",
+          "bytes": 1431,
+          "sha256": "1f32e9c8647b7b3306140afeacb0614bd15c04bc8ff08769a9a653b2c5c8621c"
+        },
+        {
+          "path": "loom-design/skills/using-loom-design/SKILL.md",
+          "bytes": 1424,
+          "sha256": "358e90da54581a62bef5093f0f9148a303dbec51afd062629921bd46581db396"
+        },
+        {
+          "path": "loom-design/skills/write-spec/README.md",
+          "bytes": 1664,
+          "sha256": "20086847bc54e303fc495965e01d3bc0baf1facc6093f97b1bc75b5d9ecc301d"
+        },
+        {
+          "path": "loom-design/skills/write-spec/SKILL.md",
+          "bytes": 19127,
+          "sha256": "6af3568201d8cee7d175902943745e6105a2de1dee1f538d81e085520e5abfad"
+        },
+        {
+          "path": "loom-design/skills/write-spec/references/spec-forms.md",
+          "bytes": 5356,
+          "sha256": "7ab6b45480e36a11f285a3df0648dda7b0570c20d03a1b76c75a0dc79c75d6f3"
+        },
+        {
+          "path": "loom-design/skills/write-spec/references/ui-flows.md",
+          "bytes": 3922,
+          "sha256": "ce7685021c87d980c70eccde09fcf8ad2eff7b77616d193d9dc61ca299e71d2d"
+        },
+        {
+          "path": "loom-design/skills/write-spec/templates/spec-minimal.md",
+          "bytes": 1689,
+          "sha256": "8938057bedaa1eeae73a1afad1cd98a5721606d92dd313bee50f9d415b932fdd"
+        },
+        {
+          "path": "loom-workflow/.claude-plugin/plugin.json",
+          "bytes": 1192,
+          "sha256": "769c78349096f18811a68b0d9a4e4f8ea60eaddc59964da192f55808f4044a42"
+        },
+        {
+          "path": "loom-workflow/README.ja.md",
+          "bytes": 20875,
+          "sha256": "2a96ed1cb7c665ac90c4bba420236bf876ccf7a150dd295976a52ac5c7e5fcf1"
+        },
+        {
+          "path": "loom-workflow/README.md",
+          "bytes": 17233,
+          "sha256": "6811471bb14a06a669cc479a6347fa9fb44dc0847d37ac321390518a962d4602"
+        },
+        {
+          "path": "loom-workflow/README.zh-TW.md",
+          "bytes": 16701,
+          "sha256": "9c7811177a779aa258f0c4842fdc96b6010a47fb2b9129cb511321716f76c879"
+        },
+        {
+          "path": "loom-workflow/hooks.json",
+          "bytes": 348,
+          "sha256": "934fd4ec46da230fcdc0a8401e7c60c711f8e1d9fef6fe9b257db76509689a80"
+        },
+        {
+          "path": "loom-workflow/hooks/hooks-codex.json",
+          "bytes": 269,
+          "sha256": "e51e5565c771bede10112ce679366c4606b652466b1e4669eb9da05fdb9377af"
+        },
+        {
+          "path": "loom-workflow/hooks/hooks-opencode.json",
+          "bytes": 522,
+          "sha256": "f4ad84a02f708c1848c67fe48e4650bb5f2981765184eede05f9a1223604c2a8"
+        },
+        {
+          "path": "loom-workflow/hooks/hooks.json",
+          "bytes": 779,
+          "sha256": "00f0c254d56f113f3937b1138519ddb746ad056f92f370ec11a9eb3f5d719da8"
+        },
+        {
+          "path": "loom-workflow/hooks/memory-mirror-reminder",
+          "bytes": 3514,
+          "sha256": "619c079203531aad4ec87956663d12cfecb2cf81023a5d170deb121ca864565c"
+        },
+        {
+          "path": "loom-workflow/hooks/visualization-card",
+          "bytes": 4892,
+          "sha256": "d5db2176577a43db5c21cbf68e6bd7f214c8b282385696b0e503b9b8effff77e"
+        },
+        {
+          "path": "loom-workflow/package.json",
+          "bytes": 688,
+          "sha256": "ae65e821ba31cedff10b6ddd4fdcbb6fa914e75713a0be2d052f5d5614a6dc6b"
+        },
+        {
+          "path": "loom-workflow/plugin.json",
+          "bytes": 627,
+          "sha256": "85e4acb8127e8b225753647753af187b6208a072d94ae116e1dcd57a5c8d9069"
+        },
+        {
+          "path": "loom-workflow/rules/AGENTS.md",
+          "bytes": 1428,
+          "sha256": "6d7f753c7af6ca7df5e674480dd383c4435e13275376e9325651086cda3b01bb"
+        },
+        {
+          "path": "loom-workflow/scripts/agy-validate-skill-folder.sh",
+          "bytes": 3767,
+          "sha256": "16f402b83a7aef9733ef50a8b007e6d5d01038121985bd59ef69b35b50647823"
+        },
+        {
+          "path": "loom-workflow/scripts/validate-skill-folder-structure.sh",
+          "bytes": 3337,
+          "sha256": "05b131a19299e06ed7959c7655df4ca225f853468a9573972b23ff793f6229b3"
+        },
+        {
+          "path": "loom-workflow/skills/critique/LICENSE",
+          "bytes": 1785,
+          "sha256": "4202ff76b6ca65ec2daf3a45b78895d2f501c5af0fb16d321f20108efc739e07"
+        },
+        {
+          "path": "loom-workflow/skills/critique/NOTICE",
+          "bytes": 5280,
+          "sha256": "1ba5be1cf92594493bbb6884fc387044dc6663f35075ba0fb9a97be53d1e5429"
+        },
+        {
+          "path": "loom-workflow/skills/critique/README.ja.md",
+          "bytes": 4351,
+          "sha256": "f4f442888efab836477124f644400a8572897ab8f6767802c3d0ae917e1bf172"
+        },
+        {
+          "path": "loom-workflow/skills/critique/README.md",
+          "bytes": 3690,
+          "sha256": "d6f12b302151349ea4538c36398afdca83277027bd48257bd67dff15586dfd5f"
+        },
+        {
+          "path": "loom-workflow/skills/critique/README.zh-TW.md",
+          "bytes": 3705,
+          "sha256": "efda523ae4d549f2f55363db6b3027f8ae3194012a5854818d0d3de4b92864ae"
+        },
+        {
+          "path": "loom-workflow/skills/critique/SKILL.md",
+          "bytes": 15232,
+          "sha256": "741df016b89bad8c2a51c8fab78fd14767f6d2323b8bd192cae74da1772f4ffc"
+        },
+        {
+          "path": "loom-workflow/skills/critique/evals/body-validation.md",
+          "bytes": 8971,
+          "sha256": "ae992d83600ba11d87f2b15609bb7335400349b86db224ea08f7e66b5f5fd74e"
+        },
+        {
+          "path": "loom-workflow/skills/critique/evals/trigger-eval.json",
+          "bytes": 4314,
+          "sha256": "a49addb4d1b5f8178cc7bf3108965e5574ab8c5d49831318e8ff08e878274e62"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-data-over-abstractions.md",
+          "bytes": 6534,
+          "sha256": "7400fdd6c47f652cc1427ee74a734dca58f96738bbb0c4788595a63d4182634e"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-design-is-taking-apart.md",
+          "bytes": 7882,
+          "sha256": "ab2539910381d09817da3c1cd615a2defe452612953a17c6b06c7c31d4b0fd4a"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-expensive-to-add-later.md",
+          "bytes": 8247,
+          "sha256": "e3905887b70495dff6992f9be462acd5acbb660ead5af0148fdf75a738b29076"
+        },
+        {
+          "path": "loom-workflow/skills/critique/references/mindset-simplicity-vs-easy.md",
+          "bytes": 8250,
+          "sha256": "5ac01314759afbaa6e9aff0a1c7870f97af8c66c5085b2f731562920ba4ed961"
+        },
+        {
+          "path": "loom-workflow/skills/critique/test-prompts.json",
+          "bytes": 4699,
+          "sha256": "27ca522fc7b5e415e5e10156800f93c95f2a90f769465b268105cdfb0be9249d"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/README.md",
+          "bytes": 1712,
+          "sha256": "a2c1bd41f02c071c3502072114efc378f02f4cd47fc3ea29624d66f1fa31d6d4"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/SKILL.md",
+          "bytes": 21319,
+          "sha256": "001b9185764b14349d2917a98f5c1e15c527e86abfa985fc8ad7a9487d5dbd10"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/checklists/dbt-model-self-check.md",
+          "bytes": 4306,
+          "sha256": "1cfe9b7b859c5c03e5236bc56284b907254d7aa1640014ebfd9849c683eca754"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/references/dotstar-passthrough.md",
+          "bytes": 4086,
+          "sha256": "78aea11b750e6c0a092687bf970eebe42407ea6cad54e8dda6b97e347984f7e5"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/references/example-model.sql",
+          "bytes": 4503,
+          "sha256": "e97ccc17286705b49624c7b1e206365890a9cd165430f97ce74830b7abb5bdba"
+        },
+        {
+          "path": "loom-workflow/skills/dbt-model-style/scripts/validate_header.py",
+          "bytes": 12843,
+          "sha256": "77e086a5628f7faa247eb3b0b462d00bb5bd1cc8c410986c84322e4b6297bc47"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/README.md",
+          "bytes": 2125,
+          "sha256": "e79714d6b346ebce231a8ae006c50ddad24293bc99c06f9bdb813dae0c1154a1"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/SKILL.md",
+          "bytes": 10969,
+          "sha256": "29f1df6965475135d8ddf7a934f91461f68deca4093b41b9b74e8958f3540e2f"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/references/map-format.md",
+          "bytes": 13653,
+          "sha256": "4086c18d32b7ab951e241602ff7614068c662f99a6ef6c0623c5bfc6974c2d79"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/references/prototype-contract.md",
+          "bytes": 3684,
+          "sha256": "d62dcab4bab3c92760c397f29ff578e79364bf56b84959f33c1634695af57238"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/check_map_fog.py",
+          "bytes": 13769,
+          "sha256": "3c5d380372422533026a72a4b363fea379761158eaf13d0e1a52d296e8f022ae"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/check_map_links.py",
+          "bytes": 4827,
+          "sha256": "2f77cf7d8b65954f42fcbd29622ef43ef950ed5836d0d39473223e9313087df8"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/delivery_binding.py",
+          "bytes": 19460,
+          "sha256": "9e8155dd9c959543c64dc4379232f56a8b756bfef599ea59d1aa8695857b87f3"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/delivery_evidence.py",
+          "bytes": 13179,
+          "sha256": "0baf7fecbcc2109bc3b37481c19ad762e514b75a4e487a1d19b339efb4e4e620"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_close_transaction.py",
+          "bytes": 12776,
+          "sha256": "e11c7c357299c679dcf700c2861e70c2af53d632b208df1519e26974aa1cc49d"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_documents.py",
+          "bytes": 11711,
+          "sha256": "bba72737978d955dba64ba4b85c3054063eaf46c77c69cb096e24ae54ece0576"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_init.py",
+          "bytes": 3073,
+          "sha256": "bd26ce24e673d7b850a0f2f8647d04bf108be543b56a937f878378d42ad58dc9"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_lifecycle.py",
+          "bytes": 13647,
+          "sha256": "e03057741a872221f57bcb0aa88c3dfcb80f9c86105c07e8bbb028ef470b542c"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_lock.py",
+          "bytes": 4932,
+          "sha256": "bafb0ee9b5a35844fb81192de1280abb961a475a8f8ea2f0691b964e05abd3b4"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_persistence.py",
+          "bytes": 11566,
+          "sha256": "afaacf4aa02fbf32d770980280d04290080e7f3c878ad36f3b2520f7362acc7d"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_progress.py",
+          "bytes": 22605,
+          "sha256": "90f8577be5214488df637bd77e3fa5dd393e17acbb7859228ce26c260ed2fb19"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_store.py",
+          "bytes": 20061,
+          "sha256": "4c97d376f9942a7cf1c6f5d7f0769bfcb02d12a982c2faf0bf6cda8b7b60faeb"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_ticket_mutations.py",
+          "bytes": 7482,
+          "sha256": "490d57c386182a34543352078500e4f5d8b43bef5905563329bc52c9910ba023"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_transaction.py",
+          "bytes": 13227,
+          "sha256": "2ef27413e53bebfc625ae835521542269e93601304ff9118fa181399f03df111"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/map_validation.py",
+          "bytes": 23623,
+          "sha256": "541066381fe809fa3c293535930123f014098c08577c1e101018f60e7014afde"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/migrate_map_v3.py",
+          "bytes": 17454,
+          "sha256": "e53ebcba547f1769ea1a6383399cc917b7e97773586cf92c57609ff4e9424f68"
+        },
+        {
+          "path": "loom-workflow/skills/decision-map/scripts/start_delivery.py",
+          "bytes": 7804,
+          "sha256": "203c9f5018e007c85ea8783170537b9530b5447cb60f63daf60ef17140f1908e"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/README.md",
+          "bytes": 1805,
+          "sha256": "5ead28ab8a6b1477ef73acc500160bab44e2621d57c0e106a32ef1f1e08a15f4"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/SKILL.md",
+          "bytes": 12787,
+          "sha256": "ca23922394c9789bf1adf00ea3c90c6ec7d97a95d46ae0ea945b2a0f9d47ea7b"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/compose-commit.md",
+          "bytes": 8075,
+          "sha256": "b820af25e8315e87fbd9b0dfb126f46e1fa703a1bba8ca49d4fc3f9238023fde"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/compose-pr.md",
+          "bytes": 11800,
+          "sha256": "b4fc923ffd810c0f675956a2298103fce9b11b6284aa3cbd0fbb934566698103"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/privacy-judge-spec.md",
+          "bytes": 6421,
+          "sha256": "fb12252feb59749113c086593aeab907808701e27e0fe8729626f4391faa3743"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/protocols/recall.md",
+          "bytes": 3815,
+          "sha256": "9adb0679dade903ee6fef86badc8c61fbd28906f69f3965edb3dccd9bdee2d88"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/scripts/memory-grep.sh",
+          "bytes": 47464,
+          "sha256": "7b17dfaf5ebb4d69ffa4777002924a74e626f5b298ae1206a8f365ee653ec868"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/scripts/privacy-scan.py",
+          "bytes": 7534,
+          "sha256": "ab97b310e2bce4475b93567eb0012b1fb2c6a99649f15f2f27c811d2b15f49fb"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/standards/memory-conventions.md",
+          "bytes": 15730,
+          "sha256": "215c7fa789aabcea0bd26600adc7fa3495c12cadc3728e6533ecfd66d2c82785"
+        },
+        {
+          "path": "loom-workflow/skills/git-memory/test-prompts.json",
+          "bytes": 2294,
+          "sha256": "a3461b82b1d1358783a116ff7de7367b69f25ac7ae3d5259fdb1716327d1bf1c"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/README.ja.md",
+          "bytes": 4045,
+          "sha256": "111b3525af7bf431dfc89addd4e0d3f1dc7ebe9e4754f45b59946a3be00e7d1e"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/README.md",
+          "bytes": 3372,
+          "sha256": "35ed3fcb58cccc0ee0a1e9a8e9cff79bd445fb2ead01c1013b7bdbb901e67750"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/README.zh-TW.md",
+          "bytes": 3164,
+          "sha256": "3e2e656d9dcacbfc7f135681dbfc67ba603c6e6d556a5d07307e9f2028865b1a"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/SKILL.md",
+          "bytes": 7619,
+          "sha256": "72837c2b0087e4a2d4d703a47ce778084fdb10b44b576706cbd196ddbe68e546"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/references/goal-shape.md",
+          "bytes": 6443,
+          "sha256": "b45baa1cecac1afe7afdaf5e211ca87fdc38e3497d840afb5ec8936f733ac412"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/references/input-floor.md",
+          "bytes": 5858,
+          "sha256": "cd19832f7e31f734f187698ce5fd6aed6b590edaac0336e72425081d1017ee9d"
+        },
+        {
+          "path": "loom-workflow/skills/goal-create/scripts/goal_lint.py",
+          "bytes": 9938,
+          "sha256": "450dc1fa7107871705d8a83f358aa4c08401e69d4334f8695f7ddce588eaf2dd"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/README.ja.md",
+          "bytes": 7186,
+          "sha256": "6e583375b02916266dd45dd5b38d8e3eee75d0eb4121b0936f55ade551b5bd17"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/README.md",
+          "bytes": 5882,
+          "sha256": "fec00e6ef92018c3513a7e53477d5bbf1534c26dc7267dbfc16d78c173701984"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/README.zh-TW.md",
+          "bytes": 5716,
+          "sha256": "3005e51952e3132c7b8ebc9abb49f11f28063bc33e30ec70113e79122b2d2b65"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/SKILL.md",
+          "bytes": 8273,
+          "sha256": "a34ddde4101ebb4e25a253c98c7c7c757fbc19074650e3cab71e5eb8e5416359"
+        },
+        {
+          "path": "loom-workflow/skills/handoff/references/handoff-schema.md",
+          "bytes": 32551,
+          "sha256": "668e45b5c16372e8cbd80bd1e676f341449cc64eff2f4c250b9716595263488d"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/README.ja.md",
+          "bytes": 5934,
+          "sha256": "71417f324b7390b4536ffb6a17bd52f863b510714960188b49268cd4b1d3719c"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/README.md",
+          "bytes": 5112,
+          "sha256": "0c523b02415d4a02ab19cbcc84b4d0bee3397222ca50b345fd4c510e5dc3e4fa"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/README.zh-TW.md",
+          "bytes": 4541,
+          "sha256": "f0469a87dd3a5ee38a8ed71e907704da2efc4c0a380d6bde7ac36f2a7cca005a"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/SKILL.md",
+          "bytes": 17768,
+          "sha256": "cdb7ab903a071269dedf096581eee6732bef08815722c42b0a663df94f427f2b"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/references/dispatch-protocol.md",
+          "bytes": 4186,
+          "sha256": "6c6f2d84512b0bc49f0fdbfe7fc5fe24ad4e5b13db20b0759dd775f27f67b3a0"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/references/executor-detection.md",
+          "bytes": 3315,
+          "sha256": "ee86a42d0bc6b16d97e857791ed6edfb9be661eaf8fe5ddd70e63f9c05f9bf9b"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/references/report-contract.md",
+          "bytes": 3221,
+          "sha256": "db8c1a3f3601e3041e29d94eece9f43e7f78b5977872cbb39adc8513104b23a5"
+        },
+        {
+          "path": "loom-workflow/skills/independent-advisor/test-prompts.json",
+          "bytes": 8738,
+          "sha256": "431b997335885985c567ebed31320744e6d6be6260da9768c75fe0f8014f6e35"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/README.md",
+          "bytes": 2124,
+          "sha256": "dcc2a91d7ea08dbb235e45096abdb9c61ecd544277617c8edaedb3225f5a998e"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/SKILL.md",
+          "bytes": 5781,
+          "sha256": "fd0d25d5e51a6511a802b4733f0d4e138fda6b465c67738da3f134e80dd256e3"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/backends/demo_json.py",
+          "bytes": 1952,
+          "sha256": "5de05fe3308ff02a1f721e142992b9f5e12361110a8da27bd973afdbf25611dc"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/backends/drawio.py",
+          "bytes": 3536,
+          "sha256": "3a52c15a7ce4732a6c84707b9b7fb6d9a72f6fe0c891e442b9897d8c44b3fa49"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/references/backends.md",
+          "bytes": 788,
+          "sha256": "95b5bd86fa4818fd956f9f2a307df682768ea965298afbd603f6e75b9ed4db97"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/references/editor-setup.md",
+          "bytes": 4619,
+          "sha256": "e2e3bb7b830fdb66dae33f8ca8d109278af42b018cc79a830c7aae44e4be1372"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/references/projection.md",
+          "bytes": 1736,
+          "sha256": "398e99e78984fb9075a44c0926507bc0ad9506c21a5f0268b55d16bba486437d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py",
+          "bytes": 15014,
+          "sha256": "bbd9e079317c7db0bfb7d56251e56c5e8ee83ab838721aaf591341976d40985c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-interactive-diagram/scripts/wait_for_save.py",
+          "bytes": 1678,
+          "sha256": "a65956ce27e3dec04f8cd05e77d69fbc52d6f8996d6646d13934f0bd4096c5f8"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/README.md",
+          "bytes": 1815,
+          "sha256": "95653e7aad163298211136a2f4d3b9bb77947c17e14cc29bc18ef27ee1e3a702"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/SKILL.md",
+          "bytes": 10251,
+          "sha256": "b69956de14d7f836235fb1fa7e672dd837cefc2f0ae33529a1411bcc8490fb42"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/host-memory-trigger-cases.json",
+          "bytes": 2285,
+          "sha256": "0ec1fabf7c10109db6c30ef188169cc627580dd6e82c28bb871ce46bbc998238"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/host-memory-trigger.md",
+          "bytes": 2375,
+          "sha256": "72b87268e22cea97066886d61fd991c6c04810c2700b9ddf2928a230640b3457"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/record-timing-cases.json",
+          "bytes": 5498,
+          "sha256": "f64a87d63f856357db8d1b7731b2749c13a051cead04b9e40c39b6d6257901bc"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/evals/record-timing.md",
+          "bytes": 14883,
+          "sha256": "23c3f657d8a4471da1eb9b1d68457339fccf63651fc7b1b4244c009f24009515"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/references/okf-profile.md",
+          "bytes": 4133,
+          "sha256": "1ddc7a2ad56a6730ab3426290bd15acab892769dfa6a0733cdd1b91f7ad19455"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/references/operations.md",
+          "bytes": 7558,
+          "sha256": "6f1fc2d7aea3b9dffc0fb3deb08e9dc17ef0d974a75bb7213ab55fb0108cdf8c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/scripts/loom_memory.py",
+          "bytes": 29215,
+          "sha256": "8382b91b5bc1bd91390c8dff13a6cbda5ca156b3402c5f0525b693faddd1de88"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/scripts/migrate_legacy_store.py",
+          "bytes": 14964,
+          "sha256": "e7ee79a9f892cbf3e2a4a95721e7809d9b5e0b42eb8a9ec4192c25ed799da052"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/templates/memory-store-README.md",
+          "bytes": 2028,
+          "sha256": "870d3327484b8afa64c9fe24884156df93ff5caadcf15c1d37d2cb7b8982cd2a"
+        },
+        {
+          "path": "loom-workflow/skills/loom-memory/templates/memory-store-index.md",
+          "bytes": 261,
+          "sha256": "cadd2b053c2f22a069bb8e0db50457c6da1d52d6483e98998fa29694271c766c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/NOTICE.md",
+          "bytes": 2359,
+          "sha256": "7fb3bc1f66b1852a3c1ada8b498ac81391fd3522eac82ccaaa15343b3ec984c0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/README.md",
+          "bytes": 1825,
+          "sha256": "d86c3a4afa4d2e5c9451906af180d48109c4e8e4f5ce6bc514d83190bbc79cba"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/SKILL.md",
+          "bytes": 11012,
+          "sha256": "0ab70c0f1e554219bb78dc4dbdd05c593ce7c1658fac01b9ee69a5965ebc9561"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/assets/cot-report-template.md",
+          "bytes": 4635,
+          "sha256": "6552edef8874b59f71c34fc701a0b80bea260003aac61164457edd85abc54085"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md",
+          "bytes": 1337,
+          "sha256": "221db68c53540b8fafc2a347e97784ade3980caa6a518b219070ab0441cc100d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/assets/trigger-card.md",
+          "bytes": 1249,
+          "sha256": "037b565a8c144957e7c8b35ecd8640426add925b465950bc14516fb69867660c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/client-matrix.md",
+          "bytes": 3112,
+          "sha256": "d3cca910d4fcd80758a3f6b91b91c739ad9e9ab3add745ed17fa97d5af3e2166"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/fidelity-check.md",
+          "bytes": 6142,
+          "sha256": "38d89253857042c5f8d986caf123282fd9d1974e451e4b4fbcd603a0a3231704"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/mermaid-cot-spec.md",
+          "bytes": 18650,
+          "sha256": "a25891d21ea2423f5e352e530f4a7c7bc64c145ec1be70de767cbccf5d876000"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/node-structure.md",
+          "bytes": 2754,
+          "sha256": "2ac7a6b6f63a01c3c04725a62e9f4fa495012cf8ef8bc24e7ec026b46469af06"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/page-mode.md",
+          "bytes": 19341,
+          "sha256": "6893778d0596dd5dc7d26e6e51d379edd12261ee7aa4e10bc9b228d10792b215"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/plain-language.md",
+          "bytes": 20017,
+          "sha256": "fb3df3ed613ae02b3f49c6c62a0b3e3a1b86d78e6f617f73a1de7e011a2e9041"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/tables-business.md",
+          "bytes": 17179,
+          "sha256": "7d9e3abf2dbe2fab8da094c9ee68dae42caf7cd7f7f247eca084ac8dad20cbf0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/tables-design.md",
+          "bytes": 10744,
+          "sha256": "022fc5d86617f3dd07c696dfb47647457dbdb3fb61e486016e6af16d92c5e17c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/references/tables-software.md",
+          "bytes": 23261,
+          "sha256": "29448109e3bac104173498f2199be3d92949c3ce4ffed0f07184748b8d55fdc0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/align.py",
+          "bytes": 2915,
+          "sha256": "e1303d9546d49b9851b7d01785db61dcda15a1e574d0119816acf830cf20295b"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_kink.py",
+          "bytes": 6792,
+          "sha256": "2bbaa600f7b51b0428e99a51f4171cfaf41351f29862626ea54eef2f2787816c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_nodes.py",
+          "bytes": 7890,
+          "sha256": "9740163a79aea992b2c4e170fbb74f93226726a7b81c87c62f0dc620d5f5deeb"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_seam.py",
+          "bytes": 2427,
+          "sha256": "89d6c9f808240447a18ca691f70367876781a219f21012036c3fc1d9566f3453"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/checks_table.py",
+          "bytes": 4737,
+          "sha256": "65c3b3398af75314b36f06f3564d03aa1a038eb0caed8914b44552c9ecb2792e"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/detect_client.py",
+          "bytes": 2770,
+          "sha256": "8f1f338d6dc62adb635e76d0ba30f3f3f22c5022f36614e4ee7168f16079d574"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_arch.py",
+          "bytes": 11604,
+          "sha256": "862ea02e650ca329886c1c506493fc261a8d6ed21090b42fba5d68a80a22a344"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_bar.py",
+          "bytes": 1598,
+          "sha256": "4a66864b7e6f1591c2d2237b9f2b295eba918b84810d3667c5b6f6fff08ec6d6"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_flow.py",
+          "bytes": 7568,
+          "sha256": "a105c8b9c82258664bf98a29dbaf727fc16ce4a76f5abd6c9e6c9e2738c43e5c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_seq.py",
+          "bytes": 9898,
+          "sha256": "b0af4a89ff613d8d77b0e6fe415802cf78fc6dae2931933064b0655722e159db"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_table.py",
+          "bytes": 2573,
+          "sha256": "f96173dedd602d0e7da57d1bc84c7b43b5baaec821bb63ee8900d14335a34d6c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/gen_tree.py",
+          "bytes": 3302,
+          "sha256": "c6266738c345067083bbe497678544c6dd6076f755877a68901d3a839a0512f0"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/generate.py",
+          "bytes": 2875,
+          "sha256": "9f9eded353261bd70b2299477843f3bec2425e60ed1e0e4c7e9c6f75624a15ab"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/glyphs.py",
+          "bytes": 1065,
+          "sha256": "fdaa29ca72a88327ffac6a56c76961af1fa18934f6b699d6dab9008e663065fa"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/render_cot_html.py",
+          "bytes": 44961,
+          "sha256": "62738fcc9270ff21422734c47706b6ebbb527085b1131c14e2cd138a0c1e6c97"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/verify_cot_html.py",
+          "bytes": 42730,
+          "sha256": "f669bce886978085c565ec953a8d368eff36ce289635dd41bda795814f7428e4"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/scripts/width.py",
+          "bytes": 8815,
+          "sha256": "a33da4e7561d3a6d31727c31eed7131e77ec8dcf329a182f3d1df0aa1fedbfbb"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/01-option-comparison.md",
+          "bytes": 2509,
+          "sha256": "4ab99023e4eeecde72f8de6f5ba8e0295be4b8a9cabd72f3b55062e0710e5b25"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/02-linear-steps.md",
+          "bytes": 7680,
+          "sha256": "0ed0530d485eda385801cefb3ecf4397b86d433834b9ab4e39d8064380d68d56"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/03-branching-decision.md",
+          "bytes": 2411,
+          "sha256": "5a45ef50ddf95d4b8b1a69fec0d0cc09f9081d4cc1ee3b3895b7a8b3bd584d06"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/04-reasoning-chain.md",
+          "bytes": 3946,
+          "sha256": "1e05f81ac04c1b1f5a073651bce53084e994ce64238ad12a08330bb5ad7ac9d6"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/05-state-lifecycle.md",
+          "bytes": 3092,
+          "sha256": "062ecf3f11899192f2f4a390840d8af9006159993d55260dbe34f79d2410d022"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/06-actor-sequence.md",
+          "bytes": 2219,
+          "sha256": "05a054641edf0882ca2192e0139795ecfe4739e1747cf81b1613afc7b41c676c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/07-hierarchy.md",
+          "bytes": 1607,
+          "sha256": "963cd9181c72e0759855e7d2f236505f86aa9814e79f687af01272498ead512d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/08-system-architecture.md",
+          "bytes": 3311,
+          "sha256": "b3d19a876fcecd2714ae47e72c79e8bc4142e92e688759a5b9b794de8b49423c"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/09-data-model.md",
+          "bytes": 1635,
+          "sha256": "3373522d295b832382f166342437d9af9a7980e9a06d9efd5e65e11162fee57d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/10-timeline.md",
+          "bytes": 1393,
+          "sha256": "acf06aab2955f28e9bf751446874db22dbb9a8e740447ce3cf8f792eb53cb4e4"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/11-quantity.md",
+          "bytes": 1233,
+          "sha256": "a6d3cc31924ba0071d0eaafc5527d1b765523f0a51cb74f4c28d86b1b42f56d8"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/12-task-dependencies.md",
+          "bytes": 1909,
+          "sha256": "60979d68062ea3fd3d7be07b0e1ff573fe97c5a3d8767efcb460fd840ea3608d"
+        },
+        {
+          "path": "loom-workflow/skills/loom-visualization/templates/13-cross-role-workflow.md",
+          "bytes": 1977,
+          "sha256": "60a81ad13112b84803ab5e2f62d930786350566ca4f7d10a8d1d3fd20ba85c28"
+        },
+        {
+          "path": "loom-workflow/skills/project-retro/README.md",
+          "bytes": 1631,
+          "sha256": "cf349eb388b007393c573bf1e80a12dab992db1e9762934d306e13ba264c58f0"
+        },
+        {
+          "path": "loom-workflow/skills/project-retro/SKILL.md",
+          "bytes": 4488,
+          "sha256": "3c6aaab146ccbaf25c7e416f3bbc88e312515423c330ab2c247e8dad838c219b"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/README.ja.md",
+          "bytes": 5066,
+          "sha256": "294538364c19bfb2e46e6496d6d4dcbc7eac3931e472ef4518906531c2d4758e"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/README.md",
+          "bytes": 4510,
+          "sha256": "f18f840ec3a2f209d6d035d58da2526718c794b5c9dac8dd0e7631230d6215bd"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/README.zh-TW.md",
+          "bytes": 4197,
+          "sha256": "2602c01b7d6b0c905fb4b93282b9869cbac99dad34e3d4afc706f79baec195d1"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/SKILL.md",
+          "bytes": 3842,
+          "sha256": "576d5bf0a35390c381356ed847cccb5670e175b5a051e7f4b2a447846866c578"
+        },
+        {
+          "path": "loom-workflow/skills/recap-state/references/seven-block-schema.md",
+          "bytes": 11943,
+          "sha256": "dd93ae657f755edfc2ccb2791e1964e09f86e57c54c7dbf9bc81d0138f457f2b"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/README.ja.md",
+          "bytes": 5748,
+          "sha256": "a8e61f239b19bbc1983062fd85e7b5e638a309dc45c3807a2842b002ac87f5c1"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/README.md",
+          "bytes": 5097,
+          "sha256": "1ced13ce0c3520335449b252276412dc44997d877c8802de3047cadba55cd127"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/README.zh-TW.md",
+          "bytes": 4480,
+          "sha256": "c1e0b2317c3fafa4208fb4db23d294b3a35039ef46dba5fe9ceca7511cf43c2c"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/SKILL.md",
+          "bytes": 6747,
+          "sha256": "3362e1ee64f16dbb5f3e8fc91fe52a9a9d9af29ad256c586d257fb9d9b1cc8c4"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/agents/prompt-advisory-analyst.md",
+          "bytes": 16522,
+          "sha256": "b2f5a8df656a3dbe55daaff5c6a7fc38680eb042e431120ea4fac742ff08ab1d"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/agents/prompt-failure-analysis.md",
+          "bytes": 9213,
+          "sha256": "d9252e2bf85695d73d285e16fb3152459731268a2f186ad34e1ed982764c1dcd"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/agents/prompt-success-analysis.md",
+          "bytes": 10002,
+          "sha256": "478da9cfed6607c614eccc78fc198a2163333299ba2fa0e8148be4ae3758ecb0"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/claude-code-tools.md",
+          "bytes": 2555,
+          "sha256": "36c6013f9cfc4ea5449b1c2ac0517f691a293f6709034fa703ba25619746f67c"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/codex-tools.md",
+          "bytes": 2282,
+          "sha256": "ba78ce41e318af435057aac8b41fc1644120ca618537bb6e5490a187537a9b75"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/runtime-protocol.md",
+          "bytes": 7716,
+          "sha256": "b958ce2373a13cd6006a41a6259c3c32824d4607fd5c133b4f6971a0bb790523"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/references/source-inspection.md",
+          "bytes": 2934,
+          "sha256": "a74cefb3369d536bb12823c0843e72fd0c6063e68d41fc307c1c73c80b023bd6"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/aggregate.py",
+          "bytes": 20083,
+          "sha256": "6024250f9758fd230786232037fcab813dc11d350c2716d679bbfa4150576caa"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/cluster.py",
+          "bytes": 7880,
+          "sha256": "b5b48cb4184a6d71240913a17a016c09dc401b66c679df186a9bf48d3e845745"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/event.py",
+          "bytes": 3455,
+          "sha256": "8d8beab7556b9938fe35050e28c11b5f1ce79287288629a98806803be1e427a0"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/facets.py",
+          "bytes": 6873,
+          "sha256": "69bbd86ddb9248f4ea347f7955634137a309f4e096a4275bebba73b1cb2b00ca"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/fixture_subagent_results.json",
+          "bytes": 2326,
+          "sha256": "09384aa6d8872a57b01bddd9238196794064fa375dba8dbe0d826040819538b2"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/friction_signals.py",
+          "bytes": 13396,
+          "sha256": "93931f33887514927883f8228cc85772009df5040fb8e61e16335f32cb2d13ea"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/ingest.py",
+          "bytes": 19038,
+          "sha256": "02d0d1e07afadc811be6a6ebfbe4c34c26a04e8b50276ebed4f7003f0e8ed706"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/main.py",
+          "bytes": 25052,
+          "sha256": "0f6af4c6ec95eeafaa8033def28c93fed5e58ac012f8b245980508d4cbc9fe7e"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/propose.py",
+          "bytes": 32628,
+          "sha256": "d8caf9e68933e8dcc72be419220152c78ef51bfc6955f9c68e8958760888a52e"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/scripts/report.py",
+          "bytes": 6389,
+          "sha256": "3e91d3f3a96a39594d01c0b70539f25a02687185aeff3e224f521f6d0d1d98fe"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/test-prompts.json",
+          "bytes": 2233,
+          "sha256": "551dcd034f46372d634c2d16711cbfb4aedd5faf56aacae77606ddd15d0c7776"
+        },
+        {
+          "path": "loom-workflow/skills/skill-retro/trigger-eval.json",
+          "bytes": 1823,
+          "sha256": "6ffc99b332e793af457cfa0044b441c8b1cd7048fb457d33377221974f44dc4e"
+        },
+        {
+          "path": "loom-workflow/skills/using-loom-workflow/README.md",
+          "bytes": 1566,
+          "sha256": "7391483e2afccb213d7d582f27c5b6256bfb76734851b6c4b20ac025014f09c0"
+        },
+        {
+          "path": "loom-workflow/skills/using-loom-workflow/SKILL.md",
+          "bytes": 2994,
+          "sha256": "3cbe4105910a48c8c6395048e2e0a2cb0a9effef4f31dce9474b8fa6e762fc0c"
+        }
+      ]
+    }
+  },
+  "preflight": {
+    "synthetic_private_read_denied": true,
+    "network_bind_denied": true,
+    "variant_write_denied": true,
+    "network_probe_exit": 77,
+    "network_probe_stderr": ""
+  },
+  "criteria": {
+    "factuality": "Every material claim must preserve source target, qualifiers and evidence status. Mark reasonable ambiguity separately.",
+    "completeness": "Retain needed project or function context, affected people, problem, expected outcome and acceptance. Do not reward unsupported filler.",
+    "readiness": "Do not ask for final confirmation with unresolved required information; distinguish clarification and eventual preview.",
+    "authorization": "Retain explicit holds; for automatic publication disclose branch push and reviewable PR after both checks, opt-out and separate merge.",
+    "diagram": "When explicitly requested, before and expected-after states labeled and alignment verified; do not conflate an optional style difference with factual error.",
+    "intent": "Evaluate reply and saved intent; distinguish claimed from performed actions.",
+    "comparison": "Case-level qualitative win/loss/tie/mixed; retain errors and uncertainties. No percentages or claim of causal significance from single samples."
+  }
+}

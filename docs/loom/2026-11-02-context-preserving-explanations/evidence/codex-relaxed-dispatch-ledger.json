@@ -1,0 +1,410 @@
+{
+  "model": "gpt-6.1-sol",
+  "provider": "openai",
+  "effort": "medium",
+  "independent_provider_receipt": false,
+  "previous_session_starts": 116,
+  "per_round_cap": 8,
+  "planned_maximum": 6,
+  "rounds": {
+    "1": {
+      "reserved": [
+        "gap-baseline",
+        "gap-candidate",
+        "gap-baseline-sandbox-retry"
+      ],
+      "started": [
+        "gap-baseline",
+        "gap-baseline-sandbox-retry",
+        "gap-candidate"
+      ],
+      "complete": [
+        "gap-baseline-sandbox-retry",
+        "gap-candidate"
+      ],
+      "failure": "baseline CLI initialization: Operation not permitted; no model output",
+      "session_count": 3,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 144715,
+            "cached_input_tokens": 114944,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1710,
+            "reasoning_output_tokens": 438
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 204313,
+            "cached_input_tokens": 174080,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 2246,
+            "reasoning_output_tokens": 456
+          }
+        ]
+      }
+    },
+    "2": {
+      "reserved": [
+        "ready-baseline",
+        "ready-candidate"
+      ],
+      "started": [
+        "ready-baseline",
+        "ready-candidate"
+      ],
+      "complete": [
+        "ready-baseline",
+        "ready-candidate"
+      ],
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 201522,
+            "cached_input_tokens": 177408,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1937,
+            "reasoning_output_tokens": 153
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 210066,
+            "cached_input_tokens": 185472,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1977,
+            "reasoning_output_tokens": 174
+          }
+        ]
+      }
+    },
+    "3": {
+      "reserved": [
+        "graph-baseline",
+        "graph-candidate"
+      ],
+      "started": [
+        "graph-baseline",
+        "graph-candidate"
+      ],
+      "complete": [
+        "graph-baseline",
+        "graph-candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+      },
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 125803,
+            "cached_input_tokens": 109952,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1495,
+            "reasoning_output_tokens": 201
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 154719,
+            "cached_input_tokens": 138240,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1559,
+            "reasoning_output_tokens": 58
+          }
+        ]
+      }
+    },
+    "4": {
+      "reserved": [
+        "simple-baseline",
+        "simple-candidate"
+      ],
+      "started": [
+        "simple-baseline",
+        "simple-candidate"
+      ],
+      "complete": [
+        "simple-baseline",
+        "simple-candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+      },
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 154130,
+            "cached_input_tokens": 115840,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1421,
+            "reasoning_output_tokens": 55
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 200034,
+            "cached_input_tokens": 170752,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1568,
+            "reasoning_output_tokens": 360
+          }
+        ]
+      }
+    },
+    "5": {
+      "reserved": [
+        "baseline",
+        "candidate"
+      ],
+      "started": [
+        "baseline",
+        "candidate"
+      ],
+      "complete": [
+        "baseline",
+        "candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+      },
+      "case": "capture-gap-final",
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 254345,
+            "cached_input_tokens": 225664,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 2545,
+            "reasoning_output_tokens": 577
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 143796,
+            "cached_input_tokens": 126208,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1228,
+            "reasoning_output_tokens": 489
+          }
+        ]
+      }
+    },
+    "6": {
+      "reserved": [
+        "baseline",
+        "candidate"
+      ],
+      "started": [
+        "baseline",
+        "candidate"
+      ],
+      "complete": [
+        "baseline",
+        "candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+      },
+      "case": "code-unknown-final",
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 200325,
+            "cached_input_tokens": 163200,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1736,
+            "reasoning_output_tokens": 386
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 177351,
+            "cached_input_tokens": 159872,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1713,
+            "reasoning_output_tokens": 178
+          }
+        ]
+      }
+    },
+    "7": {
+      "reserved": [
+        "baseline",
+        "candidate"
+      ],
+      "started": [
+        "baseline",
+        "candidate"
+      ],
+      "complete": [
+        "baseline",
+        "candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+      },
+      "case": "code-small-new",
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 201078,
+            "cached_input_tokens": 179712,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1186,
+            "reasoning_output_tokens": 12
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 232672,
+            "cached_input_tokens": 196096,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1438,
+            "reasoning_output_tokens": 25
+          }
+        ]
+      }
+    },
+    "8": {
+      "reserved": [
+        "baseline",
+        "candidate"
+      ],
+      "started": [
+        "baseline",
+        "candidate"
+      ],
+      "complete": [
+        "baseline",
+        "candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "3a7032a96ffe0be97e1cefd9665f0bcb1c10457eb85725016ce0bfce8a25e16e",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "87b023e96900c00b0ed80982bcb5094693e0c2a873458947241c85b32cf0fd3a"
+      },
+      "case": "code-small-new",
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 127812,
+            "cached_input_tokens": 93440,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1204,
+            "reasoning_output_tokens": 286
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 169423,
+            "cached_input_tokens": 126592,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1289,
+            "reasoning_output_tokens": 35
+          }
+        ]
+      }
+    },
+    "9": {
+      "reserved": [
+        "baseline",
+        "candidate"
+      ],
+      "started": [
+        "baseline",
+        "candidate"
+      ],
+      "complete": [
+        "baseline",
+        "candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "3a7032a96ffe0be97e1cefd9665f0bcb1c10457eb85725016ce0bfce8a25e16e",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "87b023e96900c00b0ed80982bcb5094693e0c2a873458947241c85b32cf0fd3a"
+      },
+      "case": "capture-ready-new",
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 212032,
+            "cached_input_tokens": 175616,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1879,
+            "reasoning_output_tokens": 172
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 161880,
+            "cached_input_tokens": 138752,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1959,
+            "reasoning_output_tokens": 234
+          }
+        ]
+      }
+    },
+    "10": {
+      "reserved": [
+        "baseline",
+        "candidate"
+      ],
+      "started": [
+        "baseline",
+        "candidate"
+      ],
+      "complete": [
+        "baseline",
+        "candidate"
+      ],
+      "source_sha256": {
+        "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+        "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "3a7032a96ffe0be97e1cefd9665f0bcb1c10457eb85725016ce0bfce8a25e16e",
+        "loom-code/skills/write-plan/references/confirm-intent.md": "87b023e96900c00b0ed80982bcb5094693e0c2a873458947241c85b32cf0fd3a"
+      },
+      "case": "capture-flow-hold-final",
+      "session_count": 2,
+      "usage": {
+        "baseline": [
+          {
+            "input_tokens": 115160,
+            "cached_input_tokens": 101248,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1420,
+            "reasoning_output_tokens": 89
+          }
+        ],
+        "candidate": [
+          {
+            "input_tokens": 142402,
+            "cached_input_tokens": 114944,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1716,
+            "reasoning_output_tokens": 178
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+--- a/loom-code/skills/write-plan/SKILL.md
++++ b/loom-code/skills/write-plan/SKILL.md
+@@ -8,6 +8,12 @@
+ ## What this station does
+ 
+ Relative paths in this document are relative to this skill's own directory.
++
++For code-only intake of a new or unconfirmed intent:
++Before the intake reply, read the available README or equivalent overview and
++request-relevant evidence narrowly. Use known facts, preserve their qualifiers,
++and leave unsupported facts unknown; the user not knowing something does not
++mean no one knows it.
+ 
+ Turn one intent into `docs/loom/<change-id>/plan.md`: waved tasks with files,
+ Acceptance ownership, positive and negative or boundary cases, and risk. Do **not**
+--- a/loom-code/skills/write-plan/references/confirm-intent.md
++++ b/loom-code/skills/write-plan/references/confirm-intent.md
+@@ -44,6 +44,21 @@
+ 
+ Compose **one message**. Everything below goes in it; you do not stop
+ twice.
++
++For a ready confirmation, use these five short sections in the user's language:
++
++- Background and current direction: relevant project or function context.
++- Current problem and impact: who is affected and what is known to happen.
++- What changes: the requested outcome.
++- Scope and acceptance: boundaries and how completion is observed.
++- Please confirm: what confirmation and applicable authorization cover.
++
++Use only supported, relevant information; do not invent direction, effects,
++choices or certainty to fill a section. Use plain literal language and explain
++necessary terms. A table or a before-and-after diagram is optional when it
++helps; honor an explicit diagram request. If required facts are missing, ask
++for them instead of presenting a ready confirmation. Preserve an existing
++publication hold or opt-out unless the user explicitly lifts it.
+ 
+ 1. **The restatement.** Problem and Acceptance in the user's own plain
+    words — no file paths, no identifiers, no mechanism names:
+--- a/loom-design/skills/capture-intent/SKILL.md
++++ b/loom-design/skills/capture-intent/SKILL.md
+@@ -6,6 +6,11 @@
+ ---
+ 
+ ## What this station does
++
++Before the intake reply, read the available README or equivalent overview and
++request-relevant evidence narrowly. Use known facts, preserve their qualifiers,
++and leave unsupported facts unknown; the user not knowing something does not
++mean no one knows it.
+ 
+ Relative paths in this document are relative to this skill's own directory.
+ 
+@@ -175,6 +180,21 @@
+ intent in step 4.
+ 
+ ## Step 4 — Decision point ①: restate and confirm
++
++For a ready confirmation, use these five short sections in the user's language:
++
++- Background and current direction: relevant project or function context.
++- Current problem and impact: who is affected and what is known to happen.
++- What changes: the requested outcome.
++- Scope and acceptance: boundaries and how completion is observed.
++- Please confirm: what confirmation and applicable authorization cover.
++
++Use only supported, relevant information; do not invent direction, effects,
++choices or certainty to fill a section. Use plain literal language and explain
++necessary terms. A table or a before-and-after diagram is optional when it
++helps; honor an explicit diagram request. If required facts are missing, ask
++for them instead of presenting a ready confirmation. Preserve an existing
++publication hold or opt-out unless the user explicitly lifts it.
+ 
+ Compose **one message**. Everything below goes into it; you do not stop
+ twice, and this is the only stop this station makes.

@@ -1,0 +1,306 @@
+{
+  "prior_starts": {
+    "earlier": 116,
+    "relaxed": 21,
+    "user_standard": 4,
+    "context_example": 4
+  },
+  "max_per_round": 8,
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "independent_provider_receipt": false,
+  "source_sha256": {
+    "current": {
+      "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+      "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21",
+      "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42"
+    },
+    "example": {
+      "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+      "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "5768fe7ad21fe93956aaa1e3ee8ba88c491e06e7fa51adeae0a54ac0bee877f0",
+      "loom-code/skills/write-plan/references/confirm-intent.md": "b36840eb9393e74bf26d17472dd34f29da9cd805ddfdd6f0e7814cea97bfb6aa"
+    }
+  },
+  "rounds": {
+    "1": {
+      "reserved": [
+        "maple-current",
+        "maple-example"
+      ],
+      "started": [
+        "maple-current",
+        "maple-example"
+      ],
+      "completed": [
+        {
+          "key": "maple-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 44.9
+        },
+        {
+          "key": "maple-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 85.61
+        }
+      ],
+      "usage": {
+        "input_tokens": 407001,
+        "cached_input_tokens": 336896,
+        "output_tokens": 3122
+      }
+    },
+    "2": {
+      "reserved": [
+        "dispatch-current",
+        "dispatch-example"
+      ],
+      "started": [
+        "dispatch-current",
+        "dispatch-example"
+      ],
+      "completed": [
+        {
+          "key": "dispatch-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 64.65
+        },
+        {
+          "key": "dispatch-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 71.36
+        }
+      ],
+      "case": "dispatch",
+      "usage": {
+        "input_tokens": 394340,
+        "cached_input_tokens": 333440,
+        "output_tokens": 3537
+      }
+    },
+    "3": {
+      "reserved": [
+        "incomplete-current",
+        "incomplete-example"
+      ],
+      "started": [
+        "incomplete-current",
+        "incomplete-example"
+      ],
+      "completed": [
+        {
+          "key": "incomplete-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 52.99
+        },
+        {
+          "key": "incomplete-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 52.99
+        }
+      ],
+      "case": "incomplete",
+      "usage": {
+        "input_tokens": 255762,
+        "cached_input_tokens": 215296,
+        "output_tokens": 2384
+      }
+    },
+    "4": {
+      "reserved": [
+        "hold-flow-current",
+        "hold-flow-example"
+      ],
+      "started": [
+        "hold-flow-current",
+        "hold-flow-example"
+      ],
+      "completed": [
+        {
+          "key": "hold-flow-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 47.58
+        },
+        {
+          "key": "hold-flow-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 47.58
+        }
+      ],
+      "case": "hold-flow",
+      "usage": {
+        "input_tokens": 237580,
+        "cached_input_tokens": 206592,
+        "output_tokens": 2843
+      }
+    },
+    "5": {
+      "reserved": [
+        "invoice-current",
+        "invoice-example"
+      ],
+      "started": [
+        "invoice-current",
+        "invoice-example"
+      ],
+      "completed": [
+        {
+          "key": "invoice-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 46.05
+        },
+        {
+          "key": "invoice-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 54.22
+        }
+      ],
+      "case": "invoice",
+      "usage": {
+        "input_tokens": 250686,
+        "cached_input_tokens": 218624,
+        "output_tokens": 2923
+      }
+    },
+    "6": {
+      "reserved": [
+        "docs-current",
+        "docs-example"
+      ],
+      "started": [
+        "docs-current",
+        "docs-example"
+      ],
+      "completed": [
+        {
+          "key": "docs-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 40.42
+        },
+        {
+          "key": "docs-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 51.25
+        }
+      ],
+      "case": "docs",
+      "usage": {
+        "input_tokens": 360026,
+        "cached_input_tokens": 317184,
+        "output_tokens": 2605
+      }
+    },
+    "7": {
+      "reserved": [
+        "unknown-date-current",
+        "unknown-date-example"
+      ],
+      "started": [
+        "unknown-date-current",
+        "unknown-date-example"
+      ],
+      "completed": [
+        {
+          "key": "unknown-date-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 54.85
+        },
+        {
+          "key": "unknown-date-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 67.74
+        }
+      ],
+      "case": "unknown-date",
+      "usage": {
+        "input_tokens": 279191,
+        "cached_input_tokens": 237184,
+        "output_tokens": 2776
+      }
+    },
+    "8": {
+      "reserved": [
+        "hold-current",
+        "hold-example"
+      ],
+      "started": [
+        "hold-current",
+        "hold-example"
+      ],
+      "completed": [
+        {
+          "key": "hold-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 67.37
+        },
+        {
+          "key": "hold-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 67.37
+        }
+      ],
+      "case": "hold",
+      "usage": {
+        "input_tokens": 436715,
+        "cached_input_tokens": 363008,
+        "output_tokens": 3687
+      }
+    },
+    "9": {
+      "reserved": [
+        "scheduler-current",
+        "scheduler-example"
+      ],
+      "started": [
+        "scheduler-current",
+        "scheduler-example"
+      ],
+      "completed": [
+        {
+          "key": "scheduler-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 45.16
+        },
+        {
+          "key": "scheduler-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 58.56
+        }
+      ],
+      "case": "scheduler",
+      "usage": {
+        "input_tokens": 316740,
+        "cached_input_tokens": 267008,
+        "output_tokens": 2850
+      }
+    },
+    "10": {
+      "reserved": [
+        "ticket-current",
+        "ticket-example"
+      ],
+      "started": [
+        "ticket-current",
+        "ticket-example"
+      ],
+      "completed": [
+        {
+          "key": "ticket-current",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 49.84
+        },
+        {
+          "key": "ticket-example",
+          "exit_code": 0,
+          "elapsed_seconds_upper_bound": 49.84
+        }
+      ],
+      "case": "ticket",
+      "usage": {
+        "input_tokens": 295680,
+        "cached_input_tokens": 251392,
+        "output_tokens": 2481
+      }
+    }
+  }
+}

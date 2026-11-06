@@ -4,12 +4,6 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
-## [5.20.0] — 2026-11-04 — scope option guidance to real user decisions
-
-- Compare alternatives for unresolved user outcome or preference decisions; consider later, smaller and combined versions only when they are actual alternatives.
-- Keep unavailable necessary facts unresolved without invented substitute outcomes or extra confirmation. Preserve direct confirmations and explicit requests for a different outcome.
-- Synchronize full and coexistence prompt cards with the plain-language guide and generated host rule. This clarification does not establish improved behavioral reliability.
-
 ## [5.19.2] — 2026-11-03 — titled before/after flow illustrations
 
 - Add a reusable comparison illustration to the existing linear-flow template, with a title inside each outer frame and corresponding steps aligned where applicable.

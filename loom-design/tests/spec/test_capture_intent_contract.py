@@ -1,4 +1,4 @@
-# concern: first confirmation loses grounded context or its five ordered localized sections, reverses its content obligations or forces a sentence script; capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
+# concern: capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
 """capture-intent station contract (plan W2-01).
 
 The station is loom-design's entry point. These tests check its structure:
@@ -21,8 +21,6 @@ import json
 import re
 import sys
 from pathlib import Path
-
-import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "loom-code/scripts"))
@@ -99,42 +97,10 @@ def test_decision_point_one_asks_only_unresolved_outcomes_or_authorization() -> 
 
 STEP_4 = "## Step 4 — Decision point ①: restate and confirm"
 
-RESTATEMENT_CONTENT = (
-    ("Restate", "Problem and Acceptance", "subject, problem, impact", "outcome", "confirmation scope"),
-    ("Supply", "necessary context", "unfamiliar terms", "affected people", "intent altitude"),
-    ("Choose", "wording and length freely", "keeping familiar requests short"),
-    ("Use", "five ordered sections", "headings required"),
-    ("Check", "these connections", "what yes confirms and authorizes"),
-    ("Preserve", "supplied facts", "outcome strength"),
-    ("Leave", "unknown facts unresolved", "user answers", "evidence"),
-    ("Lead", "user's problem or missing fact", "workflow labels", "bookkeeping"),
-    ("Explain", "uploading the change branch", "pull request ready for review", "non-forced push", "separate merge decision"),
-)
-
-
-@pytest.mark.parametrize("owner", [SKILL, REPO / "loom-code/skills/write-plan/references/confirm-intent.md"])
-def test_first_confirmation_preserves_context_in_five_sections(owner: Path) -> None:
-    """A1-A4: both entry owners carry the connected content and self-check."""
-    text = _flat(owner.read_text(encoding="utf-8"))
-    for verb, literal, *extras in RESTATEMENT_CONTENT:
-        assert affirms(text, verb, literal, *extras), (owner, literal)
-    assert "你要的是 ___" not in text
-    assert "Examples, scripts and headings are optional." not in text
-    assert "Use the user's plain words, never paths, identifiers or mechanism names." in text
-
-
-@pytest.mark.parametrize("rule", RESTATEMENT_CONTENT)
-def test_first_confirmation_content_rejects_reversed_obligations(rule: tuple[str, ...]) -> None:
-    """A1-A3 negative: preserving the vocabulary cannot hide negation."""
-    verb, literal, *extras = rule
-    sentence = f"{verb} {literal}, {', '.join(extras)}."
-    assert affirms(sentence, verb, literal, *extras)
-    assert not affirms("Do not " + sentence, verb, literal, *extras)
-
 # Whole sentences, not keyword subsets: a keyword pin lets reversed meaning pass.
 NO_SECOND_STOP = (
-    "Compose **one message** for the user's confirmation, then wait; "
-    "this is the only confirmation stop this station makes."
+    "Compose **one message**. Everything below goes into it; you do not stop "
+    "twice, and this is the only stop this station makes."
 )
 COMPLEXITY_CHECK = (
     "When the user's request or an option under discussion would add a "

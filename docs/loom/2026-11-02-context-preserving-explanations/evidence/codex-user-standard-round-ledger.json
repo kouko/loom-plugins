@@ -1,0 +1,66 @@
+{
+  "prior_relaxed_starts": 21,
+  "prior_earlier_starts": 116,
+  "max_starts": 8,
+  "reserved": [
+    "simple-baseline",
+    "simple-candidate",
+    "missing-baseline",
+    "missing-candidate"
+  ],
+  "started": [
+    "simple-baseline",
+    "simple-candidate",
+    "missing-baseline",
+    "missing-candidate"
+  ],
+  "completed": [
+    {
+      "key": "simple-baseline",
+      "exit_code": 0,
+      "elapsed_seconds": 72.19,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    {
+      "key": "simple-candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 83.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    {
+      "key": "missing-baseline",
+      "exit_code": 0,
+      "elapsed_seconds": 83.81,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    },
+    {
+      "key": "missing-candidate",
+      "exit_code": 0,
+      "elapsed_seconds": 84.15,
+      "requested_model": "gpt-6.1-sol",
+      "requested_provider": "openai",
+      "requested_effort": "medium"
+    }
+  ],
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "independent_provider_receipt": false,
+  "source_sha256": {
+    "baseline": {
+      "loom-design/skills/capture-intent/SKILL.md": "0e3dbaead5c126acb1116787876bb1c000abf39876e1f44dd78cd0168e683b62",
+      "loom-code/skills/write-plan/references/confirm-intent.md": "5ce664cf1a5f51b5423a3bde4d5c31add665613a05c7628634a7035109a0c03b"
+    },
+    "candidate": {
+      "loom-design/skills/capture-intent/SKILL.md": "247471e6b4b79ab6bd0de3043b2355076b2b6a29a4976f3045ab2780278d1af3",
+      "loom-code/skills/write-plan/references/confirm-intent.md": "18347430de550b4609c0873b1cac2754d729928494ceff6af75c8ae3792f4f42",
+      "loom-design/skills/capture-intent/references/confirmation-ready-template.md": "a08176ba13159395b92a62a79bef5eaa736849a461ab60aefcf7738663131d21"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+--- a/loom-design/skills/capture-intent/SKILL.md
++++ b/loom-design/skills/capture-intent/SKILL.md
+@@ -179,13 +179,18 @@
+ Compose **one message**. Everything below goes into it; you do not stop
+ twice, and this is the only stop this station makes.
+ 
+-1. **The restatement.** Problem and Acceptance in the user's own plain
+-   words — no file paths, no identifiers, no mechanism names:
+-
+-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
+-   >
+-   > (You want ___, and when it is done you will be able to ___, ___ and
+-   > ___. Is that right?)
++1. **The restatement.** In the user's plain language, use five brief sections:
++   background and current direction; current problem and impact; what changes;
++   scope and acceptance; and what the user is confirming. Connect known,
++   necessary project or function context to the request. Use only supplied or
++   evidenced facts; do not invent missing context, effects, or guarantees.
++   Keep sections proportionate and avoid repetition. If required facts are
++   missing, continue the existing interview instead of asking for confirmation.
++   Use a table for a helpful comparison, or an ASCII flow for a useful or
++   requested flow comparison; label before and expected after inside each
++   frame. Follow the existing visualization skill when available. Do not force
++   a diagram for a wording correction. Avoid paths, identifiers, and mechanism
++   names unless needed to understand the request.
+ 
+    For the current contract, automatic publication is the default. This same
+    restatement explicitly says that answering yes authorizes a later non-forced
+--- a/loom-code/skills/write-plan/references/confirm-intent.md
++++ b/loom-code/skills/write-plan/references/confirm-intent.md
+@@ -45,13 +45,18 @@
+ Compose **one message**. Everything below goes in it; you do not stop
+ twice.
+ 
+-1. **The restatement.** Problem and Acceptance in the user's own plain
+-   words — no file paths, no identifiers, no mechanism names:
+-
+-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
+-   >
+-   > (You want ___, and when it is done you will be able to ___, ___ and
+-   > ___. Is that right?)
++1. **The restatement.** In the user's plain language, use five brief sections:
++   background and current direction; current problem and impact; what changes;
++   scope and acceptance; and what the user is confirming. Connect known,
++   necessary project or function context to the request. Use only supplied or
++   evidenced facts; do not invent missing context, effects, or guarantees.
++   Keep sections proportionate and avoid repetition. If required facts are
++   missing, continue the existing interview instead of asking for confirmation.
++   Use a table for a helpful comparison, or an ASCII flow for a useful or
++   requested flow comparison; label before and expected after inside each
++   frame. Follow the existing visualization skill when available. Do not force
++   a diagram for a wording correction. Avoid paths, identifiers, and mechanism
++   names unless needed to understand the request.
+ 
+    For the current contract, automatic publication is the default. This same
+    restatement explicitly says that answering yes authorizes a later non-forced

@@ -9,14 +9,6 @@ version: 1.0.1
 
 Relative paths in this document are relative to this skill's own directory.
 
-For code-only intake of a new or unconfirmed intent:
-Read the available README or equivalent project overview and relevant current direction,
-plus request-relevant evidence, before composing any intake reply, including an
-interview or choice discussion. Read narrowly; documented facts are not interview
-gaps. If no overview exists, use known request/function context and qualify only
-material unknowns. Keep uncertainty scoped to its source: the user not knowing
-does not mean nobody knows, and undocumented does not mean absent.
-
 Turn one intent into `docs/loom/<change-id>/plan.md`: waved tasks with files,
 Acceptance ownership, positive and negative or boundary cases, and risk. Do **not**
 implement or ask the user to approve task splitting; decide and record why.
@@ -151,10 +143,8 @@ the user named a change, match the slug.
 
 - `loom-design` is installed → this is not your station. Tell the user the
   change starts at `capture-intent`, and stop.
-- `loom-design` is not installed → code-only intake.
-  Read `references/confirmation-template.md` before drafting or replying.
-  Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
-  Then read `references/no-intent-interview.md` and follow it.
+- `loom-design` is not installed → read `references/no-intent-interview.md`
+  and follow it.
 
 <!-- gate: write-plan.no-plan-without-confirmed-intent -->
 **No plan is written without a confirmed intent.** If `status:` is not
@@ -195,13 +185,7 @@ When `status:` is already `confirmed`, skip confirmation:
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
 
-Otherwise assess the open intent for required facts first.
-Read `references/confirmation-template.md` before drafting or replying.
-If required facts are missing, follow its interview branch and stop before loading
-the ready confirmation reader; keep missing content in Open questions. A yes
-cannot replace missing evidence or make the intent ready.
-Only when required facts are settled:
-Read `references/confirm-intent.md` and follow it fully before step 4,
+Otherwise read `references/confirm-intent.md` and follow it fully before step 4,
 in the single message it describes, ending with the intent's confirmation
 commit. Step 5 writes the question list kept per that reference.
 

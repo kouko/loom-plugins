@@ -7,14 +7,11 @@ version: 1.0.0
 
 ## What this station does
 
-Resolve relative paths from this skill's directory.
+Relative paths in this document are relative to this skill's own directory.
 
-Read the available README or equivalent project overview, current direction and
-request evidence narrowly before composing any intake reply. Documented facts are
-not gaps. Without an overview, use known context; qualify material unknowns.
-
-Clarify the outcome, write `docs/loom/intent/<change-id>.md`, and confirm it in
-the user's words before hand-off. Do not design, plan or request quality judgment.
+Ask only until the wanted outcome is clear, write
+`docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
+confirmed intent onward. Do not design, plan, or ask the user to judge quality.
 
 ## Artifact vocabulary
 
@@ -67,22 +64,15 @@ or updated.
 
 ## Step 1 — Interview
 
-Read `references/interview.md`.
-Read `references/confirmation-template.md` before drafting or replying.
-Keep missing required facts in the existing interview, asking for the
-needed fact and why; stop before confirmation preparation or
-later readers. Resume Step 2 when settled.
-Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
-Before drafting: Preserve supplied facts, outcome strength and qualifiers.
-Leave unknown facts unresolved pending user answers/evidence.
-Keep own-rule isolation separate from same-worker or same-result guarantees.
-Lead interviews with the user's problem or missing fact, minimizing workflow
-labels and bookkeeping; retain consequence/authorization disclosures.
-Draft directly when already sufficient.
+Read `references/interview.md`; ask only for missing required-field content.
+Draft directly when already sufficient. No intake question quota applies.
+Problems/outcomes are valid before choosing features or implementation.
+Existing decision points remain unchanged.
 
-For product also cover urgency, existing alternatives, and displaced work.
-Record GO or NO-GO with one reason privately; write
-NO-GO as `status: withdrawn — <reason>` and stop, explaining why.
+Cover affected people, workaround, clean-environment observable outcomes,
+fixed constraints, and exclusions. For product also cover urgency, existing
+alternatives, and displaced work. End with GO or NO-GO plus one reason; write
+NO-GO as `status: withdrawn — <reason>` and stop.
 
 **Every question you ask must be of type `what`** — what do you want, what
 happens today, what would you be able to do. Nothing about how it should
@@ -93,27 +83,27 @@ Constraints and Out of scope can all be filled in without guessing.
 
 Keep every field at intent altitude:
 
-- **Problem** — evidenced pain, affected people, effects; no diagnosis, file list, fix.
-  Distinguish absent and incorrect values. Put unknown behaviour, workaround or
-  effects in Open questions without inference.
+- **Problem** — present pain, affected people, and consequence; no diagnosis,
+  file list, or fix. Put missing current behaviour, workaround, or consequence
+  in Open questions; do not infer it.
 - **Proposed outcome** — wanted capability or state; no complete scenarios,
   UI reactions, state transitions, or implementation design.
 - **Acceptance** — numbered observable delivery outcomes with external
   pass/fail evidence acceptance testing can produce; no value claim, scenario, test step, UI placement,
   architecture, or task split.
-- **Constraints** — Keep already-fixed user/standing-policy boundaries; no agent preference or
+- **Constraints** — already-fixed boundaries; no agent preference or
   speculative guardrail.
 - **Value case** — for a product intent: beneficiary, urgency, existing alternative,
   displaced work, and GO/NO-GO. Count each missing answer separately;
   confirmation of other fields is not evidence. Omit for an engineering intent
   with obvious value.
-- **Out of scope** — Keep explicitly excluded capabilities, actors, systems or data
-  at source abstraction; no inferred method bans or deferred implementation list.
+- **Out of scope** — excluded capabilities, actors, systems, or data; no
+  deferred implementation list.
 - **Open questions** — only unresolved outcome/scope choices or missing required
   content; both block confirmation. Carry downstream spec/engineering questions
   in the hand-off, not this section.
 
-Any intent-file section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
+Any section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
 for example current versus wanted, or who is affected. Acceptance stays a
 numbered list, a diagram stays at intent altitude (no UI reactions or state
 transitions), and a product Problem still holds no identifiers, Mermaid node
@@ -186,9 +176,20 @@ intent in step 4.
 
 ## Step 4 — Decision point ①: restate and confirm
 
-### Private preparation
+Compose **one message**. Everything below goes into it; you do not stop
+twice, and this is the only stop this station makes.
 
-Prepare inputs privately; the ready layout orders replies.
+1. **The restatement.** Once required facts are settled and this existing
+   confirmation step is ready, read `references/confirmation-ready-template.md`.
+
+   For the current contract, automatic publication is the default. This same
+   restatement explicitly says that answering yes authorizes a later non-forced
+   push and Ready PR after `closing-review` and publication checks pass, while merge
+   remains a separate decision. Say that the user may explicitly opt out before
+   publication. Do not hide that consequence in mechanism language or add it
+   after the user has answered. Write
+   `publication: automatic — authorized <date> by <name>` only after that
+   informed yes; an opt-out leaves the field absent.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -263,35 +264,14 @@ at `ship`), or state one-way-door consequences. Decide implementation choices
 from repo evidence and record the reason; asking the user is a
 `user-judgment-leak` review failure.
 
-### User message
-
-Read `references/confirmation-format.md` only when required facts are settled.
-Compose **one message** for the user's confirmation, then wait; this is the only
-confirmation stop this station makes.
-
-Restate Problem and Acceptance: subject, problem, impact, outcome and
-confirmation scope. Use the user's plain words, never paths, identifiers or
-mechanism names. Supply necessary context: unfamiliar terms, affected people,
-intent altitude. Use five ordered sections from
-`references/confirmation-format.md` as the whole public reply, with headings required.
-Choose wording and length freely, keeping familiar requests short.
-Check these connections and what yes confirms and authorizes.
-
-Honor a prior publication hold or opt-out until the user explicitly lifts it.
-Explain, when publication is enabled, that only after review AND publication checks pass does yes authorize
-BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
-with opt-out available anytime before publication and a separate merge decision.
-
-Apply `references/confirmation-template.md` final-message check before sending.
-
-### Private records and reply handling
-
-**Write down every question you asked** as `{decision_point, text, type}` with
-`type` one of `what` / `behaviour` / `done` / `consequence`. Pass the list verbatim
-in step 5's hand-off for the receiving station to write into the plan's
-`## Questions asked`; never invent an intent section for it.
-Record `publication: automatic — authorized <date> by <name>` after informed
-publication consent only; prior holds leave it absent.
+**Write down every question you asked**, as `{decision_point, text, type}`
+with `type` one of `what` / `behaviour` / `done` / `consequence`. The
+intent file has no section for this list, and inventing one would put a
+second schema next to the contract's. The canonical carrier is the plan's
+`## Questions asked` section. So **you pass the list forward in your hand-off
+message in step 5, verbatim**, and say that the receiving station must write
+it into that section. A question asked and not recorded makes the flow look
+quieter than it is.
 
 **Keep a carried-details list** beside the question list: flow or reaction
 details the user stated or explicitly agreed to, before or during intake.
@@ -313,8 +293,8 @@ detail. This self-check creates no fields, IDs, requirements, scenarios, or
 product behaviour.
 
 Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, or Out of scope. Use `publication:` for publication consent.
-The sole Constraints exception is
+outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+intent's `publication:` frontmatter line. The sole Constraints exception is
 `- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
 skipped. It records the selected family; a direct request's verbatim quote,
 target and final `selected_executor` belong in JSON `authorization_source`
@@ -324,8 +304,10 @@ hand-off.
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
 
-Add no product nouns, interfaces, states, scope dimensions, or guarantees.
-Unresolved outcome/scope or required content in Open questions keeps intent `open`.
+Use only user-supplied product claims: add no product nouns, interfaces, states,
+scope dimensions, or guarantees. Put only unresolved outcome/scope choices or
+missing required content in Open questions; either keeps the intent `open`.
+Carry downstream spec/engineering questions in the hand-off.
 Complete Step 2's altitude pass before confirmation. A fork with materially
 different outcomes for the user or scope needs an explicit answer; an accepted
 restatement is insufficient; reopen it — move it to Open questions, stop confirmation,
@@ -339,8 +321,9 @@ the intent and restate again; there is no limit on rounds here.
 **On "yes":**
 
 1. Write `status: confirmed <date>` into the intent. When the confirmed
-   restatement explicitly authorizes automatic publication, record it as above;
-   never derive it from status or prose. When step 3 ran, write
+   restatement explicitly authorizes automatic publication, also write
+   `publication: automatic — authorized <date> by <name>`; never derive it
+   from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
    After all confirmed intent frontmatter, including `publication:`, is written,
    replace the template's `intent_confirmed_sha: <sha7>` with
@@ -395,6 +378,10 @@ next station must record each item in the spec. When the list is non-empty and
 (`spec-minimal`) to hold them. An empty list forces no spec and adds nothing
 to the hand-off.
 
-Confirmed intents bypass ① at `write-plan`. Product ② occurs where its spec is
-written: `write-spec`, or `write-plan` when carried details force one.
-Engineering changes continue to planning with no further stop until acceptance.
+Say two things so the next station is not re-run by accident: `write-plan`
+will **not** run decision point ① again, because `status:` is already
+`confirmed` — it reads the intent and starts planning. And decision point
+② — "you type ___ and you see ___" — happens where the product spec is
+written: at `write-spec`, or at `write-plan` when `needs-design: no` and
+carried details force a spec. Engineering changes go from here to a plan with
+no further stop until acceptance.

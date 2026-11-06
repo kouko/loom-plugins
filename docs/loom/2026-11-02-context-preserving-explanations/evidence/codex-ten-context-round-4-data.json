@@ -1,0 +1,600 @@
+{
+  "hold-flow-current": {
+    "prompt": "Read and follow the skill in /private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/SKILL.md and its referenced files in that snapshot. This is a synthetic evaluation in this temporary working directory. Do not access files outside this fixture or the referenced snapshot. Do not send messages or run an external coding agent. Stop and wait for the user response at the intent confirmation. Do not perform implementation or publication before that response. Explain any future authorization according to the specified skill and case.\n\nUse /loom-design:capture-intent. Respond in Traditional Chinese. Stop for my reply before implementing. Do not publish this change even after I confirm intent; only a later explicit authorization can lift this hold.\n\n同事匯出團隊報告時偶爾會用到上一個團隊的標題，發現錯誤後必須手動更正再重匯。請讓每份報告都使用所屬團隊自己的標題；維持匯出格式，不改寫已匯出的報告。不同次匯出的數值可不同，不要求相同。先暫緩列表配色，優先處理。請用 ASCII 圖比較修改前和預期修改後。\n",
+    "events": [
+      {
+        "type": "thread.started",
+        "thread_id": "01a1ac25-a909-7183-a7d3-68645cbdabff"
+      },
+      {
+        "type": "turn.started"
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_0",
+          "type": "agent_message",
+          "text": "我會使用指定的 capture-intent 技能，先讀取規則與案例、整理需求，再用 ASCII 圖確認修改前後；這一輪會停在意圖確認，等待你的回覆。\n"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat /private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/SKILL.md'",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat /private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/SKILL.md'",
+          "aggregated_output": "---\nname: capture-intent\ndescription: |\n  Capture and confirm a change intent. Use for any software request to add a feature or fix a bug, before editing files, even when loom is not named or the repo has no loom folder. Skip a typo or a rename that changes no behaviour (unless loom is asked for), skip non-software work, and skip a request inside an active change (its station continues it).\nversion: 1.0.0\n---\n\n## What this station does\n\nRelative paths in this document are relative to this skill's own directory.\n\nAsk only until the wanted outcome is clear, write\n`docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a\nconfirmed intent onward. Do not design, plan, or ask the user to judge quality.\n\n## Artifact vocabulary\n\n`kind: product` changes what a user reads, types, or sees happen;\n`kind: engineering` covers internal work, tooling, tests, and docs.\n`<change-id>` is `<start-date YYYY-MM-DD>-<title-in-kebab-case>`.\n\n`loom-code`'s stations consume this output and check its format, so\npreserve the required shapes.\n\n## Station summary\n\n| station | artifact | who decides | checker | checkpoint |\n|---|---|---|---|---|\n| capture-intent | intent — `docs/loom/intent/<change-id>.md`; `PRINCIPLES.md` and `DESIGN.md` at the repo root are side outputs of the tools it calls | user — decision point ① | `intent.schema`, `intent.product-no-identifiers`, `intent.needs-design-reason`, `intent.needs-design-recompute` | N/A |\n| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no independent acceptance testing; `not-required`: none |\n| write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | a fresh `plan`-lens reviewer checks for a simpler shape before Build; invokes the required spec review only when it authored the spec |\n| build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |\n| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus an acceptance test report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |\n| ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.contextual-body` and `publish.preconditions`; the verification status is disclosed, not a refusal; no functional replay | before push; publication-only fixes reuse matching evidence |\n| maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |\n\n## What you will be asked, in plain words\n\nGive the user this list if they ask what is coming. These are the decision\npoints, and a legacy intent at ship or changed requirements can add a stop.\n\n1. **Here:** one message confirms the restated intent, for an engineering\n   change every expensive-to-undo choice in consequence form (a product\n   change's wait for item 2, unless no spec will be written), a product's new\n   principles when needed, and —\n   only for `second-vendor: ask` without a direct user request naming the\n   outside agent and an unambiguous active target — whether to use another vendor.\n   `suggest` adds no question at capture-intent; write-plan owns its post-plan\n   notice.\n2. **Where the product spec is written:** confirm visible behaviour and any\n   carried details (\"you type ___ and see ___\"), and the product's one-way\n   doors in consequence form — at `write-spec`, or at\n   `loom-code:write-plan` when `needs-design: no` and carried details force a\n   spec. Engineering changes skip this; a product change with no spec has\n   consequences disclosed at item 1, with questions there only\n   for unresolved outcomes or authorization.\n3. **At the end:** accept or reject the report showing how each Acceptance\n   line was tried and what happened.\n\nNothing about task splitting, review mechanics, or verification is put to the\nuser. With `loom-code` alone, `write-plan` performs this station's questions;\nCodex may also need one authorisation stop when the plugin is newly installed\nor updated.\n\n## Step 1 — Interview\n\nRead `references/interview.md`; ask only for missing required-field content.\nDraft directly when already sufficient. No intake question quota applies.\nProblems/outcomes are valid before choosing features or implementation.\nExisting decision points remain unchanged.\n\nCover affected people, workaround, clean-environment observable outcomes,\nfixed constraints, and exclusions. For product also cover urgency, existing\nalternatives, and displaced work. End with GO or NO-GO plus one reason; write\nNO-GO as `status: withdrawn — <reason>` and stop.\n\n**Every question you ask must be of type `what`** — what do you want, what\nhappens today, what would you be able to do. Nothing about how it should\nbe built. The test is concrete: if the user would have to read code to\nanswer, it is not a question for them — decide it yourself later and write\ndown why. Keep going until Problem, Proposed outcome, Acceptance,\nConstraints and Out of scope can all be filled in without guessing.\n\nKeep every field at intent altitude:\n\n- **Problem** — present pain, affected people, and consequence; no diagnosis,\n  file list, or fix. Put missing current behaviour, workaround, or consequence\n  in Open questions; do not infer it.\n- **Proposed outcome** — wanted capability or state; no complete scenarios,\n  UI reactions, state transitions, or implementation design.\n- **Acceptance** — numbered observable delivery outcomes with external\n  pass/fail evidence acceptance testing can produce; no value claim, scenario, test step, UI placement,\n  architecture, or task split.\n- **Constraints** — already-fixed boundaries; no agent preference or\n  speculative guardrail.\n- **Value case** — for a product intent: beneficiary, urgency, existing alternative,\n  displaced work, and GO/NO-GO. Count each missing answer separately;\n  confirmation of other fields is not evidence. Omit for an engineering intent\n  with obvious value.\n- **Out of scope** — excluded capabilities, actors, systems, or data; no\n  deferred implementation list.\n- **Open questions** — only unresolved outcome/scope choices or missing required\n  content; both block confirmation. Carry downstream spec/engineering questions\n  in the hand-off, not this section.\n\nAny section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —\nfor example current versus wanted, or who is affected. Acceptance stays a\nnumbered list, a diagram stays at intent altitude (no UI reactions or state\ntransitions), and a product Problem still holds no identifiers, Mermaid node\nids included. When restating in chat, show text tables or text diagrams, not\nMermaid: a terminal shows it as raw code.\n\n## Step 2 — Write the intent\n\nWrite the intent and decision-point dialogue in the user's language; plans,\nspecs, reviews, evidence, tests, and commits are English; acceptance test reports\nand PR bodies use the user's language.\n\nWrite `docs/loom/intent/<change-id>.md` from `templates/intent.md`. Fill in:\n\n- `originator: <the user's name>` — or `map:<id>` when a decision map\n  raised it.\n- `kind:` — `product` when the product's user-visible behaviour changes,\n  `engineering` otherwise.\n- `needs-design:` — `yes` when either holds, and the line always carries\n  the reason:\n  - **(a)** the change touches a surface the user reads or types into — a\n    GUI, a TUI, CLI arguments and output, an external API, or a file artifact a\n    user or external system depends on — and no `DESIGN.md` or ui-flows\n    document already covers that surface; or\n  - **(b)** the behaviour is multi-state or multi-object and there is no\n    spec for it.\n\n  Otherwise `no — <reason>`. This applies to both kinds. The checker recomputes\n  `no` (`intent.needs-design-recompute`) against the repo's interface-surface\n  globs and blocks a mismatch.\n\n  Example: a new uncovered CLI due-date surface is\n  `needs-design: yes — CLI surface changes, no ui-flows cover due dates`.\n\n- `status: open` for now; step 4 turns it into `confirmed`.\n- `## Open questions` — the checker requires the section to be non-empty, so\n  when the interview left nothing open write exactly `- none` under the\n  heading. An empty section is a schema failure, not a statement that there\n  are no questions.\n\nThe confirmation gate below performs the altitude pass after this list has\nbeen filled.\n\n<!-- gate: capture-intent.product-problem-plain-words -->\n<!-- The `gate:` markers in this file are prose gates: rules this station must follow, registered in the mechanism population and checked by cold-read evals — not checker rule ids. The checker rules are the `intent.*` / `standing.*` / `contract.*` ids named in this file. -->\n**A product Problem section is written in plain words only.** No file\npaths, no function or class identifiers, no script filenames — the section\nis what the user reads to recognise their own problem, and the checker\nrule `intent.product-no-identifiers` rejects the file otherwise.\nEngineering intents may name paths freely.\n<!-- /gate -->\n\n## Step 3 — Standing documents\n\nFor `kind: product` only, read `PRINCIPLES.md` at the repo root. It is\nratified when it carries a `ratified-by: <name> <date>` line and a\n`## Non-negotiables` section with at least three items. When it is missing\nor not ratified, run the interview in `templates/PRINCIPLES-interview.md`\n**now, in this same conversation** — not as a separate stop and not as a question about\nwhether to do it. Open with the template's opening line, translated into\nthe user's language — the template's current English sentence is:\n\n> \"Before building a product feature, this repo needs a set of product\n> principles first. I'll ask you a few questions to produce it (about ten\n> minutes), then confirm it together with the intent.\"\n\nAsk its questions until the answers are clear, write `PRINCIPLES.md` with\nits `ratified-by:` line left pending, and restate it together with the\nintent in step 4.\n\n## Step 4 — Decision point ①: restate and confirm\n\nCompose **one message**. Everything below goes into it; you do not stop\ntwice, and this is the only stop this station makes.\n\n1. **The restatement.** Once required facts are settled and this existing\n   confirmation step is ready, read `references/confirmation-ready-template.md`.\n\n   For the current contract, automatic publication is the default. This same\n   restatement explicitly says that answering yes authorizes a later non-forced\n   push and Ready PR after `closing-review` and publication checks pass, while merge\n   remains a separate decision. Say that the user may explicitly opt out before\n   publication. Do not hide that consequence in mechanism language or add it\n   after the user has answered. Write\n   `publication: automatic — authorized <date> by <name>` only after that\n   informed yes; an opt-out leaves the field absent.\n\n2. **The engineering one-way doors found so far**, in consequence form. A\n   product change's one-way doors, class (e) actions included, are handled at\n   decision point ② of the station writing its spec — `write-spec`, or\n   `loom-code:write-plan` when it writes the spec — when a spec will be\n   written. Their consequences are disclosed in this message instead when no spec will be\n   written; a spec written later does not ask a settled question again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing\n   obligation**; **(c) Limits what the user can do in future**; **(d) Sets the\n   ceiling on output quality**; and **(e) An irreversible action on the user's\n   existing state**. These classes flag a consequence to disclose, not an\n   automatic choice for the user. Hard to swap later alone does not require a user question.\n   Three or more trade-offs alone do not require a user question. Class (e)\n   counts without a fork: rewriting, deleting, or sending the user's existing data\n   off their machine requires explicit consent. If Constraints or\n   `PRINCIPLES.md` already pinned the choice or authorized the action, do not ask again;\n   restate the pinned handling and consequence so the user still sees it.\n\n   Four gates, in order: **check** the intent's Acceptance and Constraints\n   and `PRINCIPLES.md` first — an axis already pinned there is not asked,\n   you pick what complies and say which line pinned it; **measure** first\n   when the candidates can be compared quickly on the user's own samples,\n   then make the technical choice `agent-decided` and record the reason; **threshold** — for\n   class (d), any axis differing by at least 20%, or the presence versus\n   absence of money, privacy or coverage flags a consequence, not a question;\n   **merge** — ask here only when alternatives materially change the user's outcome\n   and the user's preference remains unresolved after checking, or when an action\n   requires authorization. Fold that question into this message.\n   Never open an extra stop.\n\n   Disclose the user-relevant consequence of a major choice and the reason\n   for an agent-decided option. When a user outcome remains unresolved, state\n   the options as consequences and recommend one with a reason. With no fork,\n   state the irreversible consequence and safeguard (for example, what is\n   rewritten, what stops reading it, and where the backup is kept).\n\n3. **The cross-model review question, only for `second-vendor: ask` without\n   a qualifying direct user request.** Read `references/second-vendor.md` for\n   mode routing. A missing line is `second-vendor: suggest` and adds no question.\n   When defaults carry `second-vendor: ask`, use the reference's host-aware\n   native question or fallback only if the user hasn't named an outside coding\n   agent and unambiguous review target. That request supplies one review's\n   authorization; disclose cost, egress and local execution before dispatch.\n   A fixed CLI adds no question.\n\n4. **The principles confirmation**, if step 3 ran the interview — restated\n   in the same message, confirmed by the same yes.\n\n5. **The carried details, `kind: engineering` only.**\n   Show them as a table, one row per detail in the user's language,\n   confirmed by the same yes; no extra stop. With an empty list, no table appears. Every product change\n   shows them at decision point ② of the station that writes its spec —\n   `write-spec`, or `loom-code:write-plan` when the list forces a spec for a\n   change that skips design. A product change's carried details never appear\n   in this message.\n\n6. **The complexity check, when the scope adds cost.** When the user's\n   request or an option under discussion would add a mechanism, field, rule\n   or step, run `loom-workflow:critique` in complexity mode before you\n   compose this message. Carry only its verdict and its smaller alternative\n   into this message, in the user's plain words; this adds no stop, and the\n   user still chooses. Never paste critique's full response, its mindset or\n   its question-by-question shape. Answer critique's own questions from the\n   draft intent; never put them to the user. A request that adds no such\n   cost, such as a bug fix or a wording change, does not run it. A wording\n   change that adds a mechanism, field, rule or step still runs it. When\n   loom-workflow is not installed, skip this item; the rest of this message\n   is unchanged.\n\nQuestions may only ask what the user wants, what they will see (reserved for\ndecision point ②, where the product spec is written), whether acceptance worked (decision point ③\nat `ship`), or state one-way-door consequences. Decide implementation choices\nfrom repo evidence and record the reason; asking the user is a\n`user-judgment-leak` review failure.\n\n**Write down every question you asked**, as `{decision_point, text, type}`\nwith `type` one of `what` / `behaviour` / `done` / `consequence`. The\nintent file has no section for this list, and inventing one would put a\nsecond schema next to the contract's. The canonical carrier is the plan's\n`## Questions asked` section. So **you pass the list forward in your hand-off\nmessage in step 5, verbatim**, and say that the receiving station must write\nit into that section. A question asked and not recorded makes the flow look\nquieter than it is.\n\n**Keep a carried-details list** beside the question list: flow or reaction\ndetails the user stated or explicitly agreed to, before or during intake.\nOnly an explicit yes from the user counts as agreement: a proposal left\nunanswered, deferred (\"later\"), or answered about something else is dropped.\nNever carry an agent proposal the user did not agree to, or detail you\ninferred. Carry only details about what the command or screen does or how it\nreacts. A remark about background or usage context, such as when or where the\nuser runs it, is not a carried detail. Quote the user's words for each carried detail —\nfor an agreed proposal, quote the proposal the user said yes to. Add no explanation, implication, or inference of your own. The list\nnever enters the intent file; its sections stay unchanged\nand detailed flows stay out.\n\n<!-- gate: capture-intent.no-confirmed-without-restatement -->\n**No intent becomes `confirmed` without the restatement being answered.**\nAfter drafting, make one altitude pass: **Keep, neutralize, defer, reopen, or\ndelete**. Defer behaviour to spec and method to plan; delete unsupported\ndetail. This self-check creates no fields, IDs, requirements, scenarios, or\nproduct behaviour.\n\nPublication and second-reviewer authorisation never enter Problem, Proposed\noutcome, Acceptance, or Out of scope. Keep publication authorisation in the\nintent's `publication:` frontmatter line. The sole Constraints exception is\n`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is\nskipped. It records the selected family; a direct request's verbatim quote,\ntarget and final `selected_executor` belong in JSON `authorization_source`\nat dispatch, never this machine line. Keep only actual questions in the step-5\nhand-off.\n\nVisible effects with an unknown surface and no spec require\n`needs-design: yes` with a surface-neutral reason; internal files alone do not.\n\nUse only user-supplied product claims: add no product nouns, interfaces, states,\nscope dimensions, or guarantees. Put only unresolved outcome/scope choices or\nmissing required content in Open questions; either keeps the intent `open`.\nCarry downstream spec/engineering questions in the hand-off.\nComplete Step 2's altitude pass before confirmation. A fork with materially\ndifferent outcomes for the user or scope needs an explicit answer; an accepted\nrestatement is insufficient; reopen it — move it to Open questions, stop confirmation,\nand the intent must remain `open`. Only an explicit answer makes it\n`user-decided`. Implementation-only choices defer as\n`agent-decided`.\nYou do not write `status: confirmed` because the request seemed clear, and\nyou never confirm on the user's behalf. On \"no\" or a correction, rewrite\nthe intent and restate again; there is no limit on rounds here.\n\n**On \"yes\":**\n\n1. Write `status: confirmed <date>` into the intent. When the confirmed\n   restatement explicitly authorizes automatic publication, also write\n   `publication: automatic — authorized <date> by <name>`; never derive it\n   from status or prose. When step 3 ran, write\n   `ratified-by: <name> <date>` into `PRINCIPLES.md`.\n   After all confirmed intent frontmatter, including `publication:`, is written,\n   replace the template's `intent_confirmed_sha: <sha7>` with\n   `intent_confirmed_sha: <computed-sha>`, using the output of\n   `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.\n   This hashes the confirmed intent excluding its status and pin lines.\n   Changes require reconfirmation with matching pin; byte-based\n   confirmation does not establish a substantive requirements change;\n   `loom-code:closing-review`'s `review.bounded-episode` owns episode/task continuity.\n2. **Branch before the first commit.** Before the confirmation commit, make\n   HEAD the change's branch with `git switch -c <type>/<change-id>`, picking\n   `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.\n   If HEAD is already on this change's branch, reuse it. If that branch is checked\n   out in another worktree, work in that worktree. Otherwise, on the trunk, create\n   it, or if `<type>/<change-id>` already exists, switch to it with\n   `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.\n   On an unrelated branch or a detached HEAD, do not commit there: resolve\n   that first and preserve existing work, no reset, no discard, no\n   `git switch`. Resolve it with `git worktree add <path> <type>/<change-id>`\n   when the branch already exists, else\n   `git worktree add -b <type>/<change-id> <path> <trunk>`, and continue in\n   that new worktree — on this or any move to another worktree, first move\n   every uncommitted file this change produced (the intent draft, a\n   `PRINCIPLES.md` edit) there, to be committed on the change branch, so the\n   original checkout keeps exactly its own earlier work. Carry a\n   `PRINCIPLES.md` edit as its diff, and if applying it conflicts, stop and\n   ask the maintainer. Then commit\n   with the message `docs(loom): intent <change-id> confirmed`. Its\n   body **must contain the `needs-design:` line verbatim** — the checker\n   compares the two strings character for character.\n\n`loom-code:write-plan` runs the intent check on this file before planning.\n<!-- /gate -->\n\n## Step 5 — Hand off\n\nBranch: everything after the intent lives on the change branch of Step 4.\n\nRead the `needs-design:` line you wrote:\n\n- **`yes`** → hand the change to `loom-design:write-spec`.\n- **`no`** → hand it to `loom-code:write-plan`.\n\nIn the hand-off message, name the change-id and paste the list of\nquestions you asked, one per line as\n`<decision point> — <type> — <text>`, saying it belongs in the plan's\n`## Questions asked` section.\n\nNext to it, paste the carried-details list verbatim, one per line, and say the\nnext station must record each item in the spec. When the list is non-empty and\n`needs-design: no`, `loom-code:write-plan` must still write a spec\n(`spec-minimal`) to hold them. An empty list forces no spec and adds nothing\nto the hand-off.\n\nSay two things so the next station is not re-run by accident: `write-plan`\nwill **not** run decision point ① again, because `status:` is already\n`confirmed` — it reads the intent and starts planning. And decision point\n② — \"you type ___ and you see ___\" — happens where the product spec is\nwritten: at `write-spec`, or at `write-plan` when `needs-design: no` and\ncarried details force a spec. Engineering changes go from here to a plan with\nno further stop until acceptance.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!vendor'\"' -g '\"'!pnpm-lock.yaml'\"' . /private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!vendor'\"' -g '\"'!pnpm-lock.yaml'\"' . /private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent\"",
+          "aggregated_output": "/private/tmp/loom-ten-context-20261105/r4/runs/hold-flow-current\n./README.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/test-prompts.json\n./docs/loom/KICKOFF-DEFAULTS.md\n./PRINCIPLES.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/README.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/templates/PRINCIPLES-interview.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/interview.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/templates/intent.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/confirmation-ready-template.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/templates/KICKOFF-DEFAULTS.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/second-vendor.md\n/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/SKILL.md\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_3",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/interview.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_4",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/templates/intent.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_5",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/confirmation-ready-template.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_6",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/second-vendor.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_4",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/templates/intent.md'\"",
+          "aggregated_output": "# <title>\noriginator: <who>            # a person's name, \"maintenance-loop\", or map:<id>\nkind: product | engineering\nneeds-design: yes | no — <reason>\nmap: <map-id>                # optional\nevidence: [<paths>]          # optional; write-spec/review must read it\nstatus: open                 # open | confirmed <date> | closed <date> — PR #<N> | withdrawn — <reason>; absent = open\nintent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over this file WITHOUT its status: line and WITHOUT this line itself\npublication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication\n\n## Problem\n<present pain, who it affects, and consequence; no diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>\n\n## Proposed outcome\n<wanted capability or state; no scenario, UI reaction, state transition, or implementation>\n\n## Acceptance\n1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>\n\n## Constraints\n- <already-fixed boundaries, not agent preferences>\n\n## Value case\n<optional; product beneficiary, urgency, and GO/NO-GO; omit obvious engineering value>\n\n## Out of scope\n- <excluded capabilities, actors, systems, or data; not deferred implementation tasks>\n\n## Open questions\n- <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_3",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/interview.md'\"",
+          "aggregated_output": "# Interview question bank\n\nEvery question here is tagged with its type. `what` is the only type this\nstation may ask: what do you want, what happens today, what would you be\nable to do. `behaviour` (\"you type X and you see Y\") belongs to\n`write-spec`, and `done` (\"did it work\") to acceptance at the end — they\nare listed nowhere in this file, on purpose.\n\nAsk one question at a time and let the answer choose the next one. Reject\nan aspiration offered as an answer: when the reply stays abstract, ask for\nan example rather than accepting confidence as evidence.\n\nTreat the questions below as a gap-driven bank, not a checklist. Existing\nconversation and evidence may already be sufficient. Stop when the field boundaries\nin `SKILL.md` can be satisfied without guessing; never ask a fixed\nquestion count merely to make the interview look complete.\n\n## Engineering question bank\n\n1. **(what)** What goes wrong today, and who notices it?\n2. **(what)** What do you or the team do instead right now, each time it\n   happens?\n3. **(what)** When this is finished, what will you be able to do that you\n   cannot do today? Give me one sentence per thing.\n4. **(what)** What must not change while we do it — anything that would\n   break for someone else?\n5. **(what)** Is anything already fixed: language, platform, a service we\n   pay for, a data format we cannot move?\n6. **(what)** What is explicitly out of scope this time?\n\n## Product question bank\n\n1. **(what)** Who is this for? Describe one of them.\n2. **(what)** What are they trying to get done, and how do they do it\n   today — including the workarounds?\n3. **(what)** What is the worst part of doing it that way?\n4. **(what)** When this is finished, what will they be able to do? One\n   sentence each, in their words.\n5. **(what)** How would you know it worked, without asking me?\n6. **(what)** What must it never do?\n7. **(what)** Is anything already decided that cannot change — platform,\n   language, a paid service, a data format?\n8. **(what)** What happens if we get it wrong — who is hurt, and how badly?\n9. **(what)** What is out of scope for this change?\n10. **(what)** Is there anything you already know users will ask for next,\n    that we are deliberately not doing now?\n\n## Value case question bank — product only\n\n1. **(what)** Why now rather than later or never? What changes if you wait?\n2. **(what)** Why build it rather than use something that already exists,\n   or do nothing?\n3. **(what)** What concretely loses this time — what will you not do\n   instead? If nothing is displaced, the appetite is hollow.\n\nEnd with GO or NO-GO and one reason. One weak answer alongside two\nconcrete ones can still be a GO — name the weak one. Two or more weak\nanswers are a NO-GO for now, never a hopeful GO. A NO-GO is written into\nthe intent as `status: withdrawn — <reason>`; the reasoning is preserved so\nnobody re-argues it blind.\n\n## One bad / good pair per section\n\n**Engineering.**\nBad: \"Should the six scripts share a helper module or a base class?\" — the\nuser would have to read the scripts to answer; it is a design fork you\ndecide yourself and note the reason.\nGood: \"What goes wrong today when one of those scripts changes?\" — they\ncan answer from their own experience, and the answer becomes Problem.\n\n**Product.**\nBad: \"Do you want the due date stored as an ISO string or a timestamp?\" —\nstorage is invisible to the user; nothing in their answer would be\nevidence.\nGood: \"When this is finished, what will you be able to do with a due\ndate?\" — the answer is an Acceptance line, provable by someone running the\nchange for the first time.\n\n**Value case.**\nBad: \"Is this valuable?\" — no answer to that is falsifiable.\nGood: \"What will you not do this month if you do this instead?\" — names a\nreal competing commitment, or reveals there is none.\n\n## Writing the answers down\n\nAcceptance lines are the load-bearing output: each one states an observable\ndelivery outcome that independent acceptance testing in a clean environment can decide pass or\nfail. Rewrite anything that is not. \"The code is cleaner\" fails. \"A task can\ncarry a due date, and the due date is visible where tasks are listed\" passes.\nDo not expand the outcome\ninto complete scenarios, UI placement, state transitions, or test steps; those\nbelong to spec or later verification.\n\nKeep a running list of every question you actually asked, with its type, to\npass forward at hand-off.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_5",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/confirmation-ready-template.md'\"",
+          "aggregated_output": "# Ready confirmation restatement\n\nIn the user's plain language, cover what is needed; five optional sections are:\nbackground and current direction; current problem and impact; what changes;\nscope and acceptance; and what the user is confirming. Translate any headings.\nConnect known, necessary\nproject or function context to this request. Retain the applicable same-message\nauthorization and any existing publication hold or opt-out.\n\nUse only supplied or evidenced facts, requirements, boundaries and guarantees;\ndo not infer unspecified restrictions from goals or examples. For example,\n\"results may differ\" does not mean \"the method cannot change\"; do not copy\nexample facts. Preserve supplied ordering and conditions that affect acceptance.\nKeep sections proportionate and avoid repetition or filling unknown context.\n\nUse a table for a helpful comparison, or an ASCII flow for a useful or requested\nflow comparison; label before and expected after inside each frame and align\nits edges. Follow the existing visualization skill when available. Do not force\na diagram for a wording correction. Avoid paths,\nidentifiers and mechanism names unless needed to understand the request.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_6",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/current/loom-design/skills/capture-intent/references/second-vendor.md'\"",
+          "aggregated_output": "# Second-vendor mode routing\n\nAn independent cross-model review counts only when the selected model's provider\nfamily differs from the current model's family. A CLI name does not establish\nits family: `agy` can list models from several families. Locally check installed\n`claude`, `codex` and `agy` as candidate executors on Codex, Claude Code or\nAntigravity CLI; exclude the current model family once known. An installed\n`agy` with no selected model is availability-unverified, not a verified\noutside reviewer. The downstream `loom-code:external-review` skill selects\nand checks an explicit model and effort after authorization. Detect a candidate with\n`command -v <cli>` **and** a probe that it runs — `<cli> --version` must\nexit 0. In zsh `command -v` may print an alias or a function body rather\nthan a path; do not try to parse it. **Any non-empty output plus a\n`<cli> --version` that exits 0 counts as present**, and nothing else\ndoes. Never `which`: it reports shell aliases and stale hashes, and\nsuggesting a tool that turns out not to run costs the user a question for\nnothing. A different executable alone does not establish independence.\n\nWhen `docs/loom/KICKOFF-DEFAULTS.md` has no `second-vendor:` line, create\nthe file from capture-intent's `templates/KICKOFF-DEFAULTS.md` if\nneeded and record `second-vendor: suggest`. `suggest` adds no question at\ncapture-intent. Pass the observed mode forward; write-plan owns the\npost-plan availability or recommendation notice and its response timing.\n\nThis standalone plugin does not call `second_vendor_policy.py` and does not\nreimplement its risk mapping. That executable belongs to loom-code.\n\n**`ask`** puts one cross-model review question into decision point ① only when\nthe user has not already made a qualifying choice. Skip the per-change question when a direct user request names an outside coding agent and an unambiguous active review target.\nQuote that request, target and final `selected_executor` as\n`authorization_source` in the downstream execution record; a direct request\nauthorizes one bounded review without a\nsecond confirmation. Show cost, vendor-egress, `review_root`, outside-root\nread and local-execution disclosures before discovery or dispatch. If the\nprovider or target is ambiguous, or material scope expands, ask for the\nmissing choice. A suggestion alone does not authorize execution; under `ask`\nthe question below still applies. Probe local candidates first. With a\nrunnable candidate, prefer the current host's native question tool. Claude Code\nuses `AskUserQuestion` when available in the current agent; the authoritative\ntool reference names that tool and owns its live schema\n([Claude Code tools reference](https://code.claude.com/docs/en/tools-reference)).\nCodex uses `request_user_input` only when the host exposes it in the active\nmode; its live tool schema owns the valid question shape and availability, and\nthe official implementation enforces both mode and root-thread availability\n([Codex handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/request_user_input.rs)).\nTreat the two choice meanings as `decline this change` and `use <tool>`, and\nrender both choices in the user's current conversation language. If the\ninterface requires a recommended choice, mark `decline this change` as\nrecommended so quota use and repository-data egress remain opt-in. If the\ncandidate runs but no native question tool is available, ask one blocking\nplain-language Markdown question with the same choices and no fabricated\nrecommendation. If there is no runnable candidate, state that no local review\nexecutor is available and continue without asking. An `agy` candidate without\nselected model evidence is unverified, not a confirmed model family.\n\nThe answer governs this change only and never rewrites the KICKOFF line. Add\nan actual question to the running list kept in SKILL.md, so it lands in the\nplan's `## Questions asked`; a direct request adds no question. Pass the\naccepted CLI or decline to Closing Review. A named CLI is not a confirmed\nprovider family until a concrete model is selected and checked.\n\nA **fixed CLI** is the standing reviewer choice and adds no intent question.\nProbe it with the same local availability rule before downstream use; never\nreplace it silently with another vendor. Antigravity can be an executor when\n`agy` lists a concrete non-host-family model and the shared runner accepts its\nexplicit model and effort; local installation alone proves neither property.\nWhen selection or execution fails, Closing Review reports the limitation and\nnever silently drops the second vendor.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_7",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'PRINCIPLES.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_7",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'PRINCIPLES.md'\"",
+          "aggregated_output": "# Product principles\nratified-by: Fir owner 2026-11-05 (synthetic)\n\n## Non-negotiables\n1. Each report uses its own team title.\n2. Preserve the existing export format.\n3. Never rewrite previously exported reports.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_8",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'README.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_9",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'docs/loom/KICKOFF-DEFAULTS.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_8",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'README.md'\"",
+          "aggregated_output": "# Fir Reports\n\nFir Reports produces internal team reports. Each team has its own title setting. Keep team titles separate and preserve the export format.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_9",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'docs/loom/KICKOFF-DEFAULTS.md'\"",
+          "aggregated_output": "- second-vendor: suggest — synthetic fixture default\n- standing-docs: waived — synthetic intake fixture\n- package-tests: none — capture intent and stop before confirmation\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_10",
+          "type": "file_change",
+          "changes": [
+            {
+              "path": "/private/tmp/loom-ten-context-20261105/r4/runs/hold-flow-current/docs/loom/intent/2026-11-05-report-team-titles.md",
+              "kind": "add"
+            }
+          ],
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_10",
+          "type": "file_change",
+          "changes": [
+            {
+              "path": "/private/tmp/loom-ten-context-20261105/r4/runs/hold-flow-current/docs/loom/intent/2026-11-05-report-team-titles.md",
+              "kind": "add"
+            }
+          ],
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_11",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat docs/loom/intent/2026-11-05-report-team-titles.md'",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_11",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat docs/loom/intent/2026-11-05-report-team-titles.md'",
+          "aggregated_output": "# 每份報告使用所屬團隊自己的標題\noriginator: kouko\nkind: product\nneeds-design: yes — 報告是使用者依賴的匯出成品；目前沒有涵蓋此匯出內容的設計文件或多團隊行為規格。\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n同事匯出團隊報告時，偶爾會用到上一個團隊的標題；發現錯誤後，必須手動更正再重新匯出。\n\n## Proposed outcome\n每份報告都使用所屬團隊自己的標題，免除因標題錯用而手動更正及重新匯出的工作。\n\n## Acceptance\n1. 新匯出的每份報告，其標題皆符合該報告所屬團隊自己的標題。\n2. 匯出格式維持原樣。\n3. 已匯出的報告不被改寫。\n\n## Constraints\n- 維持既有匯出格式。\n- 不改寫已匯出的報告。\n- 不同次匯出的數值可以不同，不要求相同。\n\n## Value case\n- 受益者：匯出團隊報告的同事。\n- 優先性：使用者要求優先處理此問題。\n- 現有替代方式：發現標題錯誤後，手動更正再重新匯出。\n- 被排後的工作：列表配色先暫緩。\n- GO — 優先消除標題錯用造成的手動更正及重新匯出工作。\n\n## Out of scope\n- 列表配色調整。\n- 已匯出報告的修正。\n- 不同次匯出數值一致性的保證。\n\n## Open questions\n- none\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_12",
+          "type": "agent_message",
+          "text": "請確認：優先修正報告標題錯用，讓每份報告都使用所屬團隊自己的標題。\n\nA、B 代表不同團隊；修改前，B 的報告偶爾沿用 A 的標題：\n\n```text\n+-------------------------------+\n| BEFORE                        |\n| Team A -> Report A -> Title A  |\n| Team B -> Report B -> Title A! |\n+-------------------------------+\n\n+-------------------------------+\n| EXPECTED AFTER                |\n| Team A -> Report A -> Title A  |\n| Team B -> Report B -> Title B  |\n+-------------------------------+\n```\n\n- 維持既有匯出格式，不改寫已匯出的報告。\n- 不同次匯出的數值可以不同，不要求相同。\n- 列表配色暫緩，先處理此問題。\n\n[意圖草稿](docs/loom/intent/2026-11-05-report-team-titles.md)已寫入，狀態仍為待確認；尚未實作。\n\n依指定技能，確認後會先整理並確認具體行為規格，再進入實作。**你這次確認不授權發布**；即使後續檢查通過，推送分支或建立可供審查的 PR 仍須你另行明確授權，合併也另行決定。\n\n以上是否符合你的意圖？"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 113497,
+          "cached_input_tokens": 99072,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1429,
+          "reasoning_output_tokens": 175
+        }
+      }
+    ],
+    "stderr": "",
+    "receipt": {
+      "key": "hold-flow-current",
+      "exit_code": 0,
+      "elapsed_seconds_upper_bound": 47.58
+    },
+    "drafts": {
+      "docs/loom/intent/2026-11-05-report-team-titles.md": "# 每份報告使用所屬團隊自己的標題\noriginator: kouko\nkind: product\nneeds-design: yes — 報告是使用者依賴的匯出成品；目前沒有涵蓋此匯出內容的設計文件或多團隊行為規格。\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n同事匯出團隊報告時，偶爾會用到上一個團隊的標題；發現錯誤後，必須手動更正再重新匯出。\n\n## Proposed outcome\n每份報告都使用所屬團隊自己的標題，免除因標題錯用而手動更正及重新匯出的工作。\n\n## Acceptance\n1. 新匯出的每份報告，其標題皆符合該報告所屬團隊自己的標題。\n2. 匯出格式維持原樣。\n3. 已匯出的報告不被改寫。\n\n## Constraints\n- 維持既有匯出格式。\n- 不改寫已匯出的報告。\n- 不同次匯出的數值可以不同，不要求相同。\n\n## Value case\n- 受益者：匯出團隊報告的同事。\n- 優先性：使用者要求優先處理此問題。\n- 現有替代方式：發現標題錯誤後，手動更正再重新匯出。\n- 被排後的工作：列表配色先暫緩。\n- GO — 優先消除標題錯用造成的手動更正及重新匯出工作。\n\n## Out of scope\n- 列表配色調整。\n- 已匯出報告的修正。\n- 不同次匯出數值一致性的保證。\n\n## Open questions\n- none\n"
+    }
+  },
+  "hold-flow-example": {
+    "prompt": "Read and follow the skill in /private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/SKILL.md and its referenced files in that snapshot. This is a synthetic evaluation in this temporary working directory. Do not access files outside this fixture or the referenced snapshot. Do not send messages or run an external coding agent. Stop and wait for the user response at the intent confirmation. Do not perform implementation or publication before that response. Explain any future authorization according to the specified skill and case.\n\nUse /loom-design:capture-intent. Respond in Traditional Chinese. Stop for my reply before implementing. Do not publish this change even after I confirm intent; only a later explicit authorization can lift this hold.\n\n同事匯出團隊報告時偶爾會用到上一個團隊的標題，發現錯誤後必須手動更正再重匯。請讓每份報告都使用所屬團隊自己的標題；維持匯出格式，不改寫已匯出的報告。不同次匯出的數值可不同，不要求相同。先暫緩列表配色，優先處理。請用 ASCII 圖比較修改前和預期修改後。\n",
+    "events": [
+      {
+        "type": "thread.started",
+        "thread_id": "01a1ac25-a909-7bf2-a89f-8574406c7139"
+      },
+      {
+        "type": "turn.started"
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_0",
+          "type": "agent_message",
+          "text": "我會使用指定的 capture-intent 技能，先讀取規則與案例，再整理需求及修改前後的 ASCII 圖；到意圖確認時停下，等你回覆。\n"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat /private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/SKILL.md'",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat /private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/SKILL.md'",
+          "aggregated_output": "---\nname: capture-intent\ndescription: |\n  Capture and confirm a change intent. Use for any software request to add a feature or fix a bug, before editing files, even when loom is not named or the repo has no loom folder. Skip a typo or a rename that changes no behaviour (unless loom is asked for), skip non-software work, and skip a request inside an active change (its station continues it).\nversion: 1.0.0\n---\n\n## What this station does\n\nRelative paths in this document are relative to this skill's own directory.\n\nAsk only until the wanted outcome is clear, write\n`docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a\nconfirmed intent onward. Do not design, plan, or ask the user to judge quality.\n\n## Artifact vocabulary\n\n`kind: product` changes what a user reads, types, or sees happen;\n`kind: engineering` covers internal work, tooling, tests, and docs.\n`<change-id>` is `<start-date YYYY-MM-DD>-<title-in-kebab-case>`.\n\n`loom-code`'s stations consume this output and check its format, so\npreserve the required shapes.\n\n## Station summary\n\n| station | artifact | who decides | checker | checkpoint |\n|---|---|---|---|---|\n| capture-intent | intent — `docs/loom/intent/<change-id>.md`; `PRINCIPLES.md` and `DESIGN.md` at the repo root are side outputs of the tools it calls | user — decision point ① | `intent.schema`, `intent.product-no-identifiers`, `intent.needs-design-reason`, `intent.needs-design-recompute` | N/A |\n| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no independent acceptance testing; `not-required`: none |\n| write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | a fresh `plan`-lens reviewer checks for a simpler shape before Build; invokes the required spec review only when it authored the spec |\n| build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |\n| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus an acceptance test report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |\n| ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.contextual-body` and `publish.preconditions`; the verification status is disclosed, not a refusal; no functional replay | before push; publication-only fixes reuse matching evidence |\n| maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |\n\n## What you will be asked, in plain words\n\nGive the user this list if they ask what is coming. These are the decision\npoints, and a legacy intent at ship or changed requirements can add a stop.\n\n1. **Here:** one message confirms the restated intent, for an engineering\n   change every expensive-to-undo choice in consequence form (a product\n   change's wait for item 2, unless no spec will be written), a product's new\n   principles when needed, and —\n   only for `second-vendor: ask` without a direct user request naming the\n   outside agent and an unambiguous active target — whether to use another vendor.\n   `suggest` adds no question at capture-intent; write-plan owns its post-plan\n   notice.\n2. **Where the product spec is written:** confirm visible behaviour and any\n   carried details (\"you type ___ and see ___\"), and the product's one-way\n   doors in consequence form — at `write-spec`, or at\n   `loom-code:write-plan` when `needs-design: no` and carried details force a\n   spec. Engineering changes skip this; a product change with no spec has\n   consequences disclosed at item 1, with questions there only\n   for unresolved outcomes or authorization.\n3. **At the end:** accept or reject the report showing how each Acceptance\n   line was tried and what happened.\n\nNothing about task splitting, review mechanics, or verification is put to the\nuser. With `loom-code` alone, `write-plan` performs this station's questions;\nCodex may also need one authorisation stop when the plugin is newly installed\nor updated.\n\n## Step 1 — Interview\n\nRead `references/interview.md`; ask only for missing required-field content.\nDraft directly when already sufficient. No intake question quota applies.\nProblems/outcomes are valid before choosing features or implementation.\nExisting decision points remain unchanged.\n\nCover affected people, workaround, clean-environment observable outcomes,\nfixed constraints, and exclusions. For product also cover urgency, existing\nalternatives, and displaced work. End with GO or NO-GO plus one reason; write\nNO-GO as `status: withdrawn — <reason>` and stop.\n\n**Every question you ask must be of type `what`** — what do you want, what\nhappens today, what would you be able to do. Nothing about how it should\nbe built. The test is concrete: if the user would have to read code to\nanswer, it is not a question for them — decide it yourself later and write\ndown why. Keep going until Problem, Proposed outcome, Acceptance,\nConstraints and Out of scope can all be filled in without guessing.\n\nKeep every field at intent altitude:\n\n- **Problem** — present pain, affected people, and consequence; no diagnosis,\n  file list, or fix. Put missing current behaviour, workaround, or consequence\n  in Open questions; do not infer it.\n- **Proposed outcome** — wanted capability or state; no complete scenarios,\n  UI reactions, state transitions, or implementation design.\n- **Acceptance** — numbered observable delivery outcomes with external\n  pass/fail evidence acceptance testing can produce; no value claim, scenario, test step, UI placement,\n  architecture, or task split.\n- **Constraints** — already-fixed boundaries; no agent preference or\n  speculative guardrail.\n- **Value case** — for a product intent: beneficiary, urgency, existing alternative,\n  displaced work, and GO/NO-GO. Count each missing answer separately;\n  confirmation of other fields is not evidence. Omit for an engineering intent\n  with obvious value.\n- **Out of scope** — excluded capabilities, actors, systems, or data; no\n  deferred implementation list.\n- **Open questions** — only unresolved outcome/scope choices or missing required\n  content; both block confirmation. Carry downstream spec/engineering questions\n  in the hand-off, not this section.\n\nAny section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —\nfor example current versus wanted, or who is affected. Acceptance stays a\nnumbered list, a diagram stays at intent altitude (no UI reactions or state\ntransitions), and a product Problem still holds no identifiers, Mermaid node\nids included. When restating in chat, show text tables or text diagrams, not\nMermaid: a terminal shows it as raw code.\n\n## Step 2 — Write the intent\n\nWrite the intent and decision-point dialogue in the user's language; plans,\nspecs, reviews, evidence, tests, and commits are English; acceptance test reports\nand PR bodies use the user's language.\n\nWrite `docs/loom/intent/<change-id>.md` from `templates/intent.md`. Fill in:\n\n- `originator: <the user's name>` — or `map:<id>` when a decision map\n  raised it.\n- `kind:` — `product` when the product's user-visible behaviour changes,\n  `engineering` otherwise.\n- `needs-design:` — `yes` when either holds, and the line always carries\n  the reason:\n  - **(a)** the change touches a surface the user reads or types into — a\n    GUI, a TUI, CLI arguments and output, an external API, or a file artifact a\n    user or external system depends on — and no `DESIGN.md` or ui-flows\n    document already covers that surface; or\n  - **(b)** the behaviour is multi-state or multi-object and there is no\n    spec for it.\n\n  Otherwise `no — <reason>`. This applies to both kinds. The checker recomputes\n  `no` (`intent.needs-design-recompute`) against the repo's interface-surface\n  globs and blocks a mismatch.\n\n  Example: a new uncovered CLI due-date surface is\n  `needs-design: yes — CLI surface changes, no ui-flows cover due dates`.\n\n- `status: open` for now; step 4 turns it into `confirmed`.\n- `## Open questions` — the checker requires the section to be non-empty, so\n  when the interview left nothing open write exactly `- none` under the\n  heading. An empty section is a schema failure, not a statement that there\n  are no questions.\n\nThe confirmation gate below performs the altitude pass after this list has\nbeen filled.\n\n<!-- gate: capture-intent.product-problem-plain-words -->\n<!-- The `gate:` markers in this file are prose gates: rules this station must follow, registered in the mechanism population and checked by cold-read evals — not checker rule ids. The checker rules are the `intent.*` / `standing.*` / `contract.*` ids named in this file. -->\n**A product Problem section is written in plain words only.** No file\npaths, no function or class identifiers, no script filenames — the section\nis what the user reads to recognise their own problem, and the checker\nrule `intent.product-no-identifiers` rejects the file otherwise.\nEngineering intents may name paths freely.\n<!-- /gate -->\n\n## Step 3 — Standing documents\n\nFor `kind: product` only, read `PRINCIPLES.md` at the repo root. It is\nratified when it carries a `ratified-by: <name> <date>` line and a\n`## Non-negotiables` section with at least three items. When it is missing\nor not ratified, run the interview in `templates/PRINCIPLES-interview.md`\n**now, in this same conversation** — not as a separate stop and not as a question about\nwhether to do it. Open with the template's opening line, translated into\nthe user's language — the template's current English sentence is:\n\n> \"Before building a product feature, this repo needs a set of product\n> principles first. I'll ask you a few questions to produce it (about ten\n> minutes), then confirm it together with the intent.\"\n\nAsk its questions until the answers are clear, write `PRINCIPLES.md` with\nits `ratified-by:` line left pending, and restate it together with the\nintent in step 4.\n\n## Step 4 — Decision point ①: restate and confirm\n\nCompose **one message**. Everything below goes into it; you do not stop\ntwice, and this is the only stop this station makes.\n\n1. **The restatement.** Once required facts are settled and this existing\n   confirmation step is ready, read `references/confirmation-ready-template.md`.\n\n   For the current contract, automatic publication is the default. This same\n   restatement explicitly says that answering yes authorizes a later non-forced\n   push and Ready PR after `closing-review` and publication checks pass, while merge\n   remains a separate decision. Say that the user may explicitly opt out before\n   publication. Do not hide that consequence in mechanism language or add it\n   after the user has answered. Write\n   `publication: automatic — authorized <date> by <name>` only after that\n   informed yes; an opt-out leaves the field absent.\n\n2. **The engineering one-way doors found so far**, in consequence form. A\n   product change's one-way doors, class (e) actions included, are handled at\n   decision point ② of the station writing its spec — `write-spec`, or\n   `loom-code:write-plan` when it writes the spec — when a spec will be\n   written. Their consequences are disclosed in this message instead when no spec will be\n   written; a spec written later does not ask a settled question again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing\n   obligation**; **(c) Limits what the user can do in future**; **(d) Sets the\n   ceiling on output quality**; and **(e) An irreversible action on the user's\n   existing state**. These classes flag a consequence to disclose, not an\n   automatic choice for the user. Hard to swap later alone does not require a user question.\n   Three or more trade-offs alone do not require a user question. Class (e)\n   counts without a fork: rewriting, deleting, or sending the user's existing data\n   off their machine requires explicit consent. If Constraints or\n   `PRINCIPLES.md` already pinned the choice or authorized the action, do not ask again;\n   restate the pinned handling and consequence so the user still sees it.\n\n   Four gates, in order: **check** the intent's Acceptance and Constraints\n   and `PRINCIPLES.md` first — an axis already pinned there is not asked,\n   you pick what complies and say which line pinned it; **measure** first\n   when the candidates can be compared quickly on the user's own samples,\n   then make the technical choice `agent-decided` and record the reason; **threshold** — for\n   class (d), any axis differing by at least 20%, or the presence versus\n   absence of money, privacy or coverage flags a consequence, not a question;\n   **merge** — ask here only when alternatives materially change the user's outcome\n   and the user's preference remains unresolved after checking, or when an action\n   requires authorization. Fold that question into this message.\n   Never open an extra stop.\n\n   Disclose the user-relevant consequence of a major choice and the reason\n   for an agent-decided option. When a user outcome remains unresolved, state\n   the options as consequences and recommend one with a reason. With no fork,\n   state the irreversible consequence and safeguard (for example, what is\n   rewritten, what stops reading it, and where the backup is kept).\n\n3. **The cross-model review question, only for `second-vendor: ask` without\n   a qualifying direct user request.** Read `references/second-vendor.md` for\n   mode routing. A missing line is `second-vendor: suggest` and adds no question.\n   When defaults carry `second-vendor: ask`, use the reference's host-aware\n   native question or fallback only if the user hasn't named an outside coding\n   agent and unambiguous review target. That request supplies one review's\n   authorization; disclose cost, egress and local execution before dispatch.\n   A fixed CLI adds no question.\n\n4. **The principles confirmation**, if step 3 ran the interview — restated\n   in the same message, confirmed by the same yes.\n\n5. **The carried details, `kind: engineering` only.**\n   Show them as a table, one row per detail in the user's language,\n   confirmed by the same yes; no extra stop. With an empty list, no table appears. Every product change\n   shows them at decision point ② of the station that writes its spec —\n   `write-spec`, or `loom-code:write-plan` when the list forces a spec for a\n   change that skips design. A product change's carried details never appear\n   in this message.\n\n6. **The complexity check, when the scope adds cost.** When the user's\n   request or an option under discussion would add a mechanism, field, rule\n   or step, run `loom-workflow:critique` in complexity mode before you\n   compose this message. Carry only its verdict and its smaller alternative\n   into this message, in the user's plain words; this adds no stop, and the\n   user still chooses. Never paste critique's full response, its mindset or\n   its question-by-question shape. Answer critique's own questions from the\n   draft intent; never put them to the user. A request that adds no such\n   cost, such as a bug fix or a wording change, does not run it. A wording\n   change that adds a mechanism, field, rule or step still runs it. When\n   loom-workflow is not installed, skip this item; the rest of this message\n   is unchanged.\n\nQuestions may only ask what the user wants, what they will see (reserved for\ndecision point ②, where the product spec is written), whether acceptance worked (decision point ③\nat `ship`), or state one-way-door consequences. Decide implementation choices\nfrom repo evidence and record the reason; asking the user is a\n`user-judgment-leak` review failure.\n\n**Write down every question you asked**, as `{decision_point, text, type}`\nwith `type` one of `what` / `behaviour` / `done` / `consequence`. The\nintent file has no section for this list, and inventing one would put a\nsecond schema next to the contract's. The canonical carrier is the plan's\n`## Questions asked` section. So **you pass the list forward in your hand-off\nmessage in step 5, verbatim**, and say that the receiving station must write\nit into that section. A question asked and not recorded makes the flow look\nquieter than it is.\n\n**Keep a carried-details list** beside the question list: flow or reaction\ndetails the user stated or explicitly agreed to, before or during intake.\nOnly an explicit yes from the user counts as agreement: a proposal left\nunanswered, deferred (\"later\"), or answered about something else is dropped.\nNever carry an agent proposal the user did not agree to, or detail you\ninferred. Carry only details about what the command or screen does or how it\nreacts. A remark about background or usage context, such as when or where the\nuser runs it, is not a carried detail. Quote the user's words for each carried detail —\nfor an agreed proposal, quote the proposal the user said yes to. Add no explanation, implication, or inference of your own. The list\nnever enters the intent file; its sections stay unchanged\nand detailed flows stay out.\n\n<!-- gate: capture-intent.no-confirmed-without-restatement -->\n**No intent becomes `confirmed` without the restatement being answered.**\nAfter drafting, make one altitude pass: **Keep, neutralize, defer, reopen, or\ndelete**. Defer behaviour to spec and method to plan; delete unsupported\ndetail. This self-check creates no fields, IDs, requirements, scenarios, or\nproduct behaviour.\n\nPublication and second-reviewer authorisation never enter Problem, Proposed\noutcome, Acceptance, or Out of scope. Keep publication authorisation in the\nintent's `publication:` frontmatter line. The sole Constraints exception is\n`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is\nskipped. It records the selected family; a direct request's verbatim quote,\ntarget and final `selected_executor` belong in JSON `authorization_source`\nat dispatch, never this machine line. Keep only actual questions in the step-5\nhand-off.\n\nVisible effects with an unknown surface and no spec require\n`needs-design: yes` with a surface-neutral reason; internal files alone do not.\n\nUse only user-supplied product claims: add no product nouns, interfaces, states,\nscope dimensions, or guarantees. Put only unresolved outcome/scope choices or\nmissing required content in Open questions; either keeps the intent `open`.\nCarry downstream spec/engineering questions in the hand-off.\nComplete Step 2's altitude pass before confirmation. A fork with materially\ndifferent outcomes for the user or scope needs an explicit answer; an accepted\nrestatement is insufficient; reopen it — move it to Open questions, stop confirmation,\nand the intent must remain `open`. Only an explicit answer makes it\n`user-decided`. Implementation-only choices defer as\n`agent-decided`.\nYou do not write `status: confirmed` because the request seemed clear, and\nyou never confirm on the user's behalf. On \"no\" or a correction, rewrite\nthe intent and restate again; there is no limit on rounds here.\n\n**On \"yes\":**\n\n1. Write `status: confirmed <date>` into the intent. When the confirmed\n   restatement explicitly authorizes automatic publication, also write\n   `publication: automatic — authorized <date> by <name>`; never derive it\n   from status or prose. When step 3 ran, write\n   `ratified-by: <name> <date>` into `PRINCIPLES.md`.\n   After all confirmed intent frontmatter, including `publication:`, is written,\n   replace the template's `intent_confirmed_sha: <sha7>` with\n   `intent_confirmed_sha: <computed-sha>`, using the output of\n   `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.\n   This hashes the confirmed intent excluding its status and pin lines.\n   Changes require reconfirmation with matching pin; byte-based\n   confirmation does not establish a substantive requirements change;\n   `loom-code:closing-review`'s `review.bounded-episode` owns episode/task continuity.\n2. **Branch before the first commit.** Before the confirmation commit, make\n   HEAD the change's branch with `git switch -c <type>/<change-id>`, picking\n   `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.\n   If HEAD is already on this change's branch, reuse it. If that branch is checked\n   out in another worktree, work in that worktree. Otherwise, on the trunk, create\n   it, or if `<type>/<change-id>` already exists, switch to it with\n   `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.\n   On an unrelated branch or a detached HEAD, do not commit there: resolve\n   that first and preserve existing work, no reset, no discard, no\n   `git switch`. Resolve it with `git worktree add <path> <type>/<change-id>`\n   when the branch already exists, else\n   `git worktree add -b <type>/<change-id> <path> <trunk>`, and continue in\n   that new worktree — on this or any move to another worktree, first move\n   every uncommitted file this change produced (the intent draft, a\n   `PRINCIPLES.md` edit) there, to be committed on the change branch, so the\n   original checkout keeps exactly its own earlier work. Carry a\n   `PRINCIPLES.md` edit as its diff, and if applying it conflicts, stop and\n   ask the maintainer. Then commit\n   with the message `docs(loom): intent <change-id> confirmed`. Its\n   body **must contain the `needs-design:` line verbatim** — the checker\n   compares the two strings character for character.\n\n`loom-code:write-plan` runs the intent check on this file before planning.\n<!-- /gate -->\n\n## Step 5 — Hand off\n\nBranch: everything after the intent lives on the change branch of Step 4.\n\nRead the `needs-design:` line you wrote:\n\n- **`yes`** → hand the change to `loom-design:write-spec`.\n- **`no`** → hand it to `loom-code:write-plan`.\n\nIn the hand-off message, name the change-id and paste the list of\nquestions you asked, one per line as\n`<decision point> — <type> — <text>`, saying it belongs in the plan's\n`## Questions asked` section.\n\nNext to it, paste the carried-details list verbatim, one per line, and say the\nnext station must record each item in the spec. When the list is non-empty and\n`needs-design: no`, `loom-code:write-plan` must still write a spec\n(`spec-minimal`) to hold them. An empty list forces no spec and adds nothing\nto the hand-off.\n\nSay two things so the next station is not re-run by accident: `write-plan`\nwill **not** run decision point ① again, because `status:` is already\n`confirmed` — it reads the intent and starts planning. And decision point\n② — \"you type ___ and you see ___\" — happens where the product spec is\nwritten: at `write-spec`, or at `write-plan` when `needs-design: no` and\ncarried details force a spec. Engineering changes go from here to a plan with\nno further stop until acceptance.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!'\"\\\\.git' . /private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!'\"\\\\.git' . /private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent\"",
+          "aggregated_output": "/private/tmp/loom-ten-context-20261105/r4/runs/hold-flow-example\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/test-prompts.json\n./README.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/templates/PRINCIPLES-interview.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/templates/intent.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/templates/KICKOFF-DEFAULTS.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/SKILL.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/README.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/interview.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/confirmation-ready-template.md\n/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/second-vendor.md\n./PRINCIPLES.md\n./docs/loom/KICKOFF-DEFAULTS.md\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_3",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'PRINCIPLES.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_4",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'docs/loom/KICKOFF-DEFAULTS.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_4",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'docs/loom/KICKOFF-DEFAULTS.md'\"",
+          "aggregated_output": "- second-vendor: suggest — synthetic fixture default\n- standing-docs: waived — synthetic intake fixture\n- package-tests: none — capture intent and stop before confirmation\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_3",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'PRINCIPLES.md'\"",
+          "aggregated_output": "# Product principles\nratified-by: Fir owner 2026-11-05 (synthetic)\n\n## Non-negotiables\n1. Each report uses its own team title.\n2. Preserve the existing export format.\n3. Never rewrite previously exported reports.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_5",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'README.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_6",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/interview.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_7",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/confirmation-ready-template.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_5",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat 'README.md'\"",
+          "aggregated_output": "# Fir Reports\n\nFir Reports produces internal team reports. Each team has its own title setting. Keep team titles separate and preserve the export format.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_6",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/interview.md'\"",
+          "aggregated_output": "# Interview question bank\n\nEvery question here is tagged with its type. `what` is the only type this\nstation may ask: what do you want, what happens today, what would you be\nable to do. `behaviour` (\"you type X and you see Y\") belongs to\n`write-spec`, and `done` (\"did it work\") to acceptance at the end — they\nare listed nowhere in this file, on purpose.\n\nAsk one question at a time and let the answer choose the next one. Reject\nan aspiration offered as an answer: when the reply stays abstract, ask for\nan example rather than accepting confidence as evidence.\n\nTreat the questions below as a gap-driven bank, not a checklist. Existing\nconversation and evidence may already be sufficient. Stop when the field boundaries\nin `SKILL.md` can be satisfied without guessing; never ask a fixed\nquestion count merely to make the interview look complete.\n\n## Engineering question bank\n\n1. **(what)** What goes wrong today, and who notices it?\n2. **(what)** What do you or the team do instead right now, each time it\n   happens?\n3. **(what)** When this is finished, what will you be able to do that you\n   cannot do today? Give me one sentence per thing.\n4. **(what)** What must not change while we do it — anything that would\n   break for someone else?\n5. **(what)** Is anything already fixed: language, platform, a service we\n   pay for, a data format we cannot move?\n6. **(what)** What is explicitly out of scope this time?\n\n## Product question bank\n\n1. **(what)** Who is this for? Describe one of them.\n2. **(what)** What are they trying to get done, and how do they do it\n   today — including the workarounds?\n3. **(what)** What is the worst part of doing it that way?\n4. **(what)** When this is finished, what will they be able to do? One\n   sentence each, in their words.\n5. **(what)** How would you know it worked, without asking me?\n6. **(what)** What must it never do?\n7. **(what)** Is anything already decided that cannot change — platform,\n   language, a paid service, a data format?\n8. **(what)** What happens if we get it wrong — who is hurt, and how badly?\n9. **(what)** What is out of scope for this change?\n10. **(what)** Is there anything you already know users will ask for next,\n    that we are deliberately not doing now?\n\n## Value case question bank — product only\n\n1. **(what)** Why now rather than later or never? What changes if you wait?\n2. **(what)** Why build it rather than use something that already exists,\n   or do nothing?\n3. **(what)** What concretely loses this time — what will you not do\n   instead? If nothing is displaced, the appetite is hollow.\n\nEnd with GO or NO-GO and one reason. One weak answer alongside two\nconcrete ones can still be a GO — name the weak one. Two or more weak\nanswers are a NO-GO for now, never a hopeful GO. A NO-GO is written into\nthe intent as `status: withdrawn — <reason>`; the reasoning is preserved so\nnobody re-argues it blind.\n\n## One bad / good pair per section\n\n**Engineering.**\nBad: \"Should the six scripts share a helper module or a base class?\" — the\nuser would have to read the scripts to answer; it is a design fork you\ndecide yourself and note the reason.\nGood: \"What goes wrong today when one of those scripts changes?\" — they\ncan answer from their own experience, and the answer becomes Problem.\n\n**Product.**\nBad: \"Do you want the due date stored as an ISO string or a timestamp?\" —\nstorage is invisible to the user; nothing in their answer would be\nevidence.\nGood: \"When this is finished, what will you be able to do with a due\ndate?\" — the answer is an Acceptance line, provable by someone running the\nchange for the first time.\n\n**Value case.**\nBad: \"Is this valuable?\" — no answer to that is falsifiable.\nGood: \"What will you not do this month if you do this instead?\" — names a\nreal competing commitment, or reveals there is none.\n\n## Writing the answers down\n\nAcceptance lines are the load-bearing output: each one states an observable\ndelivery outcome that independent acceptance testing in a clean environment can decide pass or\nfail. Rewrite anything that is not. \"The code is cleaner\" fails. \"A task can\ncarry a due date, and the due date is visible where tasks are listed\" passes.\nDo not expand the outcome\ninto complete scenarios, UI placement, state transitions, or test steps; those\nbelong to spec or later verification.\n\nKeep a running list of every question you actually asked, with its type, to\npass forward at hand-off.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_7",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/confirmation-ready-template.md'\"",
+          "aggregated_output": "# Ready confirmation restatement\n\nIn the user's plain language, cover what is needed; five optional sections are:\nbackground and current direction; current problem and impact; what changes;\nscope and acceptance; and what the user is confirming. Translate any headings.\nConnect known, necessary\nproject or function context to this request. Retain the applicable same-message\nauthorization and any existing publication hold or opt-out.\n\nUse only supplied or evidenced facts, requirements, boundaries and guarantees;\ndo not infer unspecified restrictions from goals or examples. For example,\n\"results may differ\" does not mean \"the method cannot change\"; do not copy\nexample facts. For context, connect supplied facts:\n<person> faces <problem>; this change enables <outcome>.\nPreserve supplied ordering and conditions that affect acceptance.\nKeep sections proportionate and avoid repetition or filling unknown context.\n\nUse a table for a helpful comparison, or an ASCII flow for a useful or requested\nflow comparison; label before and expected after inside each frame and align\nits edges. Follow the existing visualization skill when available. Do not force\na diagram for a wording correction. Avoid paths,\nidentifiers and mechanism names unless needed to understand the request.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_8",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/second-vendor.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_9",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/templates/intent.md'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_9",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/templates/intent.md'\"",
+          "aggregated_output": "# <title>\noriginator: <who>            # a person's name, \"maintenance-loop\", or map:<id>\nkind: product | engineering\nneeds-design: yes | no — <reason>\nmap: <map-id>                # optional\nevidence: [<paths>]          # optional; write-spec/review must read it\nstatus: open                 # open | confirmed <date> | closed <date> — PR #<N> | withdrawn — <reason>; absent = open\nintent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over this file WITHOUT its status: line and WITHOUT this line itself\npublication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication\n\n## Problem\n<present pain, who it affects, and consequence; no diagnosis or fix. product: no file paths, function/class identifiers, or script filenames>\n\n## Proposed outcome\n<wanted capability or state; no scenario, UI reaction, state transition, or implementation>\n\n## Acceptance\n1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>\n\n## Constraints\n- <already-fixed boundaries, not agent preferences>\n\n## Value case\n<optional; product beneficiary, urgency, and GO/NO-GO; omit obvious engineering value>\n\n## Out of scope\n- <excluded capabilities, actors, systems, or data; not deferred implementation tasks>\n\n## Open questions\n- <unresolved outcome or scope choice; delegate spec and engineering questions> # write `- none` when there are none\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_8",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"cat '/private/tmp/loom-ten-context-20261105/snapshots/example/loom-design/skills/capture-intent/references/second-vendor.md'\"",
+          "aggregated_output": "# Second-vendor mode routing\n\nAn independent cross-model review counts only when the selected model's provider\nfamily differs from the current model's family. A CLI name does not establish\nits family: `agy` can list models from several families. Locally check installed\n`claude`, `codex` and `agy` as candidate executors on Codex, Claude Code or\nAntigravity CLI; exclude the current model family once known. An installed\n`agy` with no selected model is availability-unverified, not a verified\noutside reviewer. The downstream `loom-code:external-review` skill selects\nand checks an explicit model and effort after authorization. Detect a candidate with\n`command -v <cli>` **and** a probe that it runs — `<cli> --version` must\nexit 0. In zsh `command -v` may print an alias or a function body rather\nthan a path; do not try to parse it. **Any non-empty output plus a\n`<cli> --version` that exits 0 counts as present**, and nothing else\ndoes. Never `which`: it reports shell aliases and stale hashes, and\nsuggesting a tool that turns out not to run costs the user a question for\nnothing. A different executable alone does not establish independence.\n\nWhen `docs/loom/KICKOFF-DEFAULTS.md` has no `second-vendor:` line, create\nthe file from capture-intent's `templates/KICKOFF-DEFAULTS.md` if\nneeded and record `second-vendor: suggest`. `suggest` adds no question at\ncapture-intent. Pass the observed mode forward; write-plan owns the\npost-plan availability or recommendation notice and its response timing.\n\nThis standalone plugin does not call `second_vendor_policy.py` and does not\nreimplement its risk mapping. That executable belongs to loom-code.\n\n**`ask`** puts one cross-model review question into decision point ① only when\nthe user has not already made a qualifying choice. Skip the per-change question when a direct user request names an outside coding agent and an unambiguous active review target.\nQuote that request, target and final `selected_executor` as\n`authorization_source` in the downstream execution record; a direct request\nauthorizes one bounded review without a\nsecond confirmation. Show cost, vendor-egress, `review_root`, outside-root\nread and local-execution disclosures before discovery or dispatch. If the\nprovider or target is ambiguous, or material scope expands, ask for the\nmissing choice. A suggestion alone does not authorize execution; under `ask`\nthe question below still applies. Probe local candidates first. With a\nrunnable candidate, prefer the current host's native question tool. Claude Code\nuses `AskUserQuestion` when available in the current agent; the authoritative\ntool reference names that tool and owns its live schema\n([Claude Code tools reference](https://code.claude.com/docs/en/tools-reference)).\nCodex uses `request_user_input` only when the host exposes it in the active\nmode; its live tool schema owns the valid question shape and availability, and\nthe official implementation enforces both mode and root-thread availability\n([Codex handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/request_user_input.rs)).\nTreat the two choice meanings as `decline this change` and `use <tool>`, and\nrender both choices in the user's current conversation language. If the\ninterface requires a recommended choice, mark `decline this change` as\nrecommended so quota use and repository-data egress remain opt-in. If the\ncandidate runs but no native question tool is available, ask one blocking\nplain-language Markdown question with the same choices and no fabricated\nrecommendation. If there is no runnable candidate, state that no local review\nexecutor is available and continue without asking. An `agy` candidate without\nselected model evidence is unverified, not a confirmed model family.\n\nThe answer governs this change only and never rewrites the KICKOFF line. Add\nan actual question to the running list kept in SKILL.md, so it lands in the\nplan's `## Questions asked`; a direct request adds no question. Pass the\naccepted CLI or decline to Closing Review. A named CLI is not a confirmed\nprovider family until a concrete model is selected and checked.\n\nA **fixed CLI** is the standing reviewer choice and adds no intent question.\nProbe it with the same local availability rule before downstream use; never\nreplace it silently with another vendor. Antigravity can be an executor when\n`agy` lists a concrete non-host-family model and the shared runner accepts its\nexplicit model and effort; local installation alone proves neither property.\nWhen selection or execution fails, Closing Review reports the limitation and\nnever silently drops the second vendor.\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_10",
+          "type": "agent_message",
+          "text": "需求已足夠：優先修正報告標題歸屬，維持匯出格式，不改寫既有報告，也不要求不同次匯出的數值一致。我會寫下意圖草稿、核對範圍，再請你確認；列表配色本次不處理。\n"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_11",
+          "type": "file_change",
+          "changes": [
+            {
+              "path": "/private/tmp/loom-ten-context-20261105/r4/runs/hold-flow-example/docs/loom/intent/2026-11-05-team-report-titles.md",
+              "kind": "add"
+            }
+          ],
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_11",
+          "type": "file_change",
+          "changes": [
+            {
+              "path": "/private/tmp/loom-ten-context-20261105/r4/runs/hold-flow-example/docs/loom/intent/2026-11-05-team-report-titles.md",
+              "kind": "add"
+            }
+          ],
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_12",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat docs/loom/intent/2026-11-05-team-report-titles.md'",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_12",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat docs/loom/intent/2026-11-05-team-report-titles.md'",
+          "aggregated_output": "# 每份報告使用所屬團隊的標題\noriginator: kouko\nkind: product\nneeds-design: yes — 變更使用者閱讀的匯出報告，現有文件未涵蓋此輸出，且尚無多團隊報告行為的規格。\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n同事匯出團隊報告時，偶爾會用到上一個團隊的標題。發現錯誤後，必須手動更正再重新匯出。\n\n## Proposed outcome\n每份報告都使用所屬團隊自己的標題。\n\n## Acceptance\n1. 匯出的每份報告，其標題皆符合所屬團隊自己的標題。\n2. 匯出格式維持不變。\n3. 已匯出的報告維持原樣。\n\n## Constraints\n- 維持匯出格式。\n- 不改寫已匯出的報告。\n- 不同次匯出的數值可不同，不要求相同。\n\n## Value case\n- 受益者：匯出團隊報告的同事。\n- 優先原因：避免錯誤標題造成手動更正與重新匯出，依使用者要求優先處理。\n- 現有替代方式：發現錯誤後手動更正，再重新匯出。\n- 排擠工作：先暫緩列表配色。\n- GO — 標題錯誤造成明確的重工，且使用者已指定優先於列表配色。\n\n## Out of scope\n- 列表配色調整。\n- 已匯出報告的更正或改寫。\n- 保證不同次匯出的數值相同。\n\n## Open questions\n- none\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_13",
+          "type": "agent_message",
+          "text": "本次優先讓每份報告使用所屬團隊自己的標題，先暫緩列表配色。\n\nA、B 代表不同團隊；以下比較標題歸屬，不表示實作方式。\n\n```text\n+-- BEFORE -------------------------------+\n| Team A -> Report A -> Title A           |\n| Team B -> Report B -> Title A (at times) |\n+-----------------------------------------+\n\n+-- EXPECTED AFTER -----------------------+\n| Team A -> Report A -> Title A           |\n| Team B -> Report B -> Title B           |\n+-----------------------------------------+\n```\n\n驗收範圍：\n\n- 每份匯出報告的標題符合所屬團隊。\n- 維持匯出格式，不改寫已匯出的報告。\n- 不要求不同次匯出的數值一致。\n\n[意圖草稿](docs/loom/intent/2026-11-05-team-report-titles.md)已寫入，目前仍為待確認，尚未實作。GO：這能減少手動更正與重新匯出的重工。\n\n**請確認：上述意圖是否正確？** 確認後會進入規格階段，再確認具體行為，之後才實作。依技能，本來確認可包含日後推送與建立待審查 PR 的授權；但你已明確暫停發布，因此**本次確認不授權發布**，後續仍須你另行明確授權。合併也須另行決定。"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 124083,
+          "cached_input_tokens": 107520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1414,
+          "reasoning_output_tokens": 72
+        }
+      }
+    ],
+    "stderr": "",
+    "receipt": {
+      "key": "hold-flow-example",
+      "exit_code": 0,
+      "elapsed_seconds_upper_bound": 47.58
+    },
+    "drafts": {
+      "docs/loom/intent/2026-11-05-team-report-titles.md": "# 每份報告使用所屬團隊的標題\noriginator: kouko\nkind: product\nneeds-design: yes — 變更使用者閱讀的匯出報告，現有文件未涵蓋此輸出，且尚無多團隊報告行為的規格。\nstatus: open\nintent_confirmed_sha: <sha7>\n\n## Problem\n同事匯出團隊報告時，偶爾會用到上一個團隊的標題。發現錯誤後，必須手動更正再重新匯出。\n\n## Proposed outcome\n每份報告都使用所屬團隊自己的標題。\n\n## Acceptance\n1. 匯出的每份報告，其標題皆符合所屬團隊自己的標題。\n2. 匯出格式維持不變。\n3. 已匯出的報告維持原樣。\n\n## Constraints\n- 維持匯出格式。\n- 不改寫已匯出的報告。\n- 不同次匯出的數值可不同，不要求相同。\n\n## Value case\n- 受益者：匯出團隊報告的同事。\n- 優先原因：避免錯誤標題造成手動更正與重新匯出，依使用者要求優先處理。\n- 現有替代方式：發現錯誤後手動更正，再重新匯出。\n- 排擠工作：先暫緩列表配色。\n- GO — 標題錯誤造成明確的重工，且使用者已指定優先於列表配色。\n\n## Out of scope\n- 列表配色調整。\n- 已匯出報告的更正或改寫。\n- 保證不同次匯出的數值相同。\n\n## Open questions\n- none\n"
+    }
+  }
+}
