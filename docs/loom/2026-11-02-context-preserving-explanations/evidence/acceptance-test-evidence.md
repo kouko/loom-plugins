@@ -30,3 +30,15 @@ Requested model/provider/effort were `gpt-6.1-sol`/`openai`/medium; no independe
 ## Earlier results
 
 Previous report and evidence were preserved in `acceptance-report-pre-09a58419-historical.md` and `acceptance-evidence-pre-09a58419-historical.md`. Earlier results remain historical and are not represented as tests of this commit.
+
+## Re-run on 2026-11-06, at 45870a1ae3439a9792545e7588dbca7e694ca4c2
+
+- Clean clone: `git clone --no-local --no-checkout . /private/tmp/loom-final-acceptance-45870a1` followed by detached checkout of this exact commit. The README's Codex marketplace installation targets the user's global installation; that external operation was not run. Installed-plugin automatic triggering remains unverified.
+- Setup checks: `python3 scripts/sync_codex_manifests.py --check --all` exited 0. The clean clone passed the three focused test modules with 94 tests using the locked offline environment. The complete suite remains the finalization check, not this acceptance test.
+- The full diff from 09a58419 contains the prior acceptance report/evidence, three byte-preserved historical research runners renamed to `.py.txt`, and path-only updates in two historical research reports. The skill entry points and both confirmation references compare byte-for-byte equal to the earlier clean clone.
+- 1: carried over — the actual diff did not change runtime instructions affecting project context, problem, outcome or consent; the earlier behavioral observations and their partial result remain unchanged.
+- 2: carried over — no runtime instructions or requirements for missing facts or headings changed; the earlier behavioral observations remain applicable.
+- 3: carried over — no format, diagram instruction or runtime file changed; the earlier graph and incomplete-background observations remain applicable.
+- 4: carried over — no confirmation or publication authorization instruction changed; the earlier hold and candidate-only default authorization controls remain applicable.
+- The original-versus-candidate control remains unverified after automatic review rejected sending the private baseline to OpenAI. No additional model call was made and neither the previous 7 starts nor the rejected pre-start request was erased.
+- The immediately preceding acceptance report is preserved in `acceptance-report-pre-45870a1-historical.md`; no prior observations were overwritten.
