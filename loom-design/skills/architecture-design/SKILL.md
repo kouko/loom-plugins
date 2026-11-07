@@ -10,6 +10,13 @@ version: 1.0.0
 Relative paths in this document are relative to this skill's own
 directory.
 
+Deliver local documents with actual absolute paths from the active worktree or
+external location, including in copyable instructions. For known local Markdown
+support, use the document's project-relative path as link text (external files:
+basename) and absolute targets; otherwise show full absolute paths. Enclose
+targets with spaces in angle brackets: `[doc.md](</worktree name/doc.md>)`. Preserve bundled references, stored
+relative paths, quoted examples and incidental filenames.
+
 The user asks for an architecture for a repository. You design it with the
 user — read what exists, propose options with trade-offs, let the user pick
 — then draft `ARCHITECTURE.md` in a temporary copy holding **the

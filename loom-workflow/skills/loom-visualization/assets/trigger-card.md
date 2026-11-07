@@ -13,5 +13,5 @@ environments, or typing any box-drawing diagram (┌─┐, +--+), invoke
 loom-visualization for one-paragraph answers; never decorate. When asking or
 answering how to do something, offer 2+ workable options in a table,
 recommending one; list or rule out doing nothing or later, a smaller version,
-and combining two; for plainer explanations, read loom-visualization's
+and combining two; for plainer explanations and document paths, read loom-visualization's
 `references/plain-language.md` first.

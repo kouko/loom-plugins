@@ -8,11 +8,11 @@ for comparisons, branching decisions, reasoning chains, timelines, sequences,
 quantities, data models, reasoning pages, progress, a before and after, what
 each choice means, readiness, confirmed against unconfirmed, findings, risks
 or supported environments, invoke `loom-visualization` FIRST, leading with
-its form. Comparisons get a markdown table, ASCII only when needed. Verify
+it. Compare with Markdown tables, ASCII only when needed. Verify
 prescribed box diagrams with loom-visualization's `scripts/align.py`; the
 ascii-graph card covers flows, state machines and architecture; follow it.
 Skip loom-visualization for one-paragraph answers; never decorate. When
-asking or answering how to do something, offer 2+ workable options in a
+asking or answering how to proceed, offer 2+ workable options in a
 table, recommending one; list or rule out doing nothing or later, a smaller
-version, and combining two; for plainer explanations, read
+version, and combining two; for plainer explanations and document paths, read
 loom-visualization's `references/plain-language.md` first.

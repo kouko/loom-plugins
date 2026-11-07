@@ -16,6 +16,13 @@ rules of the skill or repository that owns them.
 Reply in the user's language and script: Traditional Chinese stays
 Traditional, Simplified stays Simplified.
 
+Deliver local documents with actual absolute paths from the active worktree or
+external location, including in copyable instructions. For known local Markdown
+support, use the document's project-relative path as link text (external files:
+basename) and absolute targets; otherwise show full absolute paths. Enclose
+targets with spaces in angle brackets: `[doc.md](</worktree name/doc.md>)`. Preserve bundled references, stored
+relative paths, quoted examples and incidental filenames.
+
 ## The seven rules
 
 ### 1. Put the conclusion and its impact first
