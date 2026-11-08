@@ -1,0 +1,23 @@
+{
+  "command": "python3 /private/tmp/engineering-research-language-supplement-20261109/verify_evidence_integrity.py",
+  "archives": {
+    "first-trial": {
+      "sha256": "62617e305320a67ab24135b7517e119ff7ba9a1cc237c2a6b7a9e4e091e81ea6",
+      "members": 122,
+      "inventory_verified": true,
+      "native_assignments_verified": 9
+    },
+    "supplemental": {
+      "sha256": "7695ca3f454edd6710c0231ec93f79c0600cfef96f5c43990ff4f26c965e5c77",
+      "members": 47,
+      "inventory_verified": true,
+      "native_assignments_verified": 4
+    }
+  },
+  "freeze_mismatches": [],
+  "missing_report_links": [],
+  "hidden_reasoning_records": 0,
+  "first_trial_report_local_links_checked": 48,
+  "report_local_links_checked": 9,
+  "status": "verified structural integrity only; no semantic or workflow verdict"
+}

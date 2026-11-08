@@ -1,0 +1,617 @@
+{
+  "archive": "first-trial.tar.gz",
+  "sha256": "62617e305320a67ab24135b7517e119ff7ba9a1cc237c2a6b7a9e4e091e81ea6",
+  "format": "ustar+gzip; sorted regular files; gzip mtime=0; normalized mode/uid/gid/mtime",
+  "members": [
+    {
+      "path": "first-trial/audit-packet/cases/C01/actions.json",
+      "size": 1314,
+      "sha256": "5d608127ba42b0c3d8fe13ca06c911c8261c79591d33a5bd8ec670fc92aa66ad"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C01/answer.txt",
+      "size": 1475,
+      "sha256": "818aafa07c62143b6bad9e6518dcb9b6584e32f12a62ed0442636676ba7aa46f"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C01/prompt.txt",
+      "size": 242,
+      "sha256": "a564923e5e6dfb2f315930830618ab6ea3e09d379553c4dfe614c124b32b7d61"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C01/workspace/docs/loom/research/2026-11-09-small-pr-two-maintainers.md",
+      "size": 6819,
+      "sha256": "28e9baad7da9ba85e18b517cb50254f3ec99cb75272a84a6ec842d8238a9b9db"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C02/actions.json",
+      "size": 1089,
+      "sha256": "578e8be9d9f1c18d713ac221030f6bd2edb39d75d64889f852c10cbbf89734da"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C02/answer.txt",
+      "size": 1036,
+      "sha256": "98550ea295bd203a7b64e71348a8b1bd4dd10e422ebe96265151a1da6c0cd2ef"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C02/prompt.txt",
+      "size": 248,
+      "sha256": "3a85aa63422994487d92e963c8605c362ca48226a848345a028ab5e5f234e226"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C02/workspace/docs/loom/research/2026-11-09-git-branch-delete-guarantees.md",
+      "size": 2532,
+      "sha256": "fdb7c897fc8476ce5e742a547e7f9170a5c6f30307ed3019d36c15b5689980d5"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C03/actions.json",
+      "size": 883,
+      "sha256": "95409925edf7ad3ad56481020119ed81e8e55df77111ee179266b8ebaa54789f"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C03/answer.txt",
+      "size": 567,
+      "sha256": "f6f0f53662d8b39c70611a7ae6d63f1d2798fc5972542658a26c47269eb2b748"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C03/prompt.txt",
+      "size": 218,
+      "sha256": "1d5e130630bcec900eaf4dae79ff531dbd54b58a72504fc1e454fa3be481c9f1"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C03/workspace/docs/loom/research/2026-11-09-package-name-major-version.md",
+      "size": 1887,
+      "sha256": "c354d77fdd1991560809ad929a1bd23a385ebe6a46973584a5476e75e78425b8"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C03/workspace/plugin.json",
+      "size": 1001,
+      "sha256": "90cfe33d4de8e422918fe1c461389d4a2c336d77e68c18b72cb4fc853e893e17"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C04/actions.json",
+      "size": 4198,
+      "sha256": "3e38fdb04d460f869a7d78716125938a2a5bfdd1c79e7e4a971ef7d27cd11339"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C04/answer.txt",
+      "size": 2316,
+      "sha256": "5ab7a87ebfc505f9be81675341d1e41e392a5704d9ea0256ef05b7d375e1b466"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C04/prompt.txt",
+      "size": 314,
+      "sha256": "37dac18a9725d7f2809ccb5467875790645de197167b7b4b1469fd021f2c3947"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C04/workspace/docs/loom/research/2026-11-09-rime-save-options.md",
+      "size": 10083,
+      "sha256": "9f5e1ea222f7227a5b901e2e939792e236cc98e80014de6d6b03353e4d6d570f"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C05/actions.json",
+      "size": 1753,
+      "sha256": "2679dd092be987ba9f3487428dbe0785fd06fdcbac7ad32e55e0d2aff1b601b8"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C05/answer.txt",
+      "size": 2410,
+      "sha256": "65c35f6bee230b68d6e1d4f6cb77fd1fc05f3d39929b3427357ec4bf79224762"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C05/prompt.txt",
+      "size": 294,
+      "sha256": "d83faf18b845a0b685c6b30b597c106992b171cf0c1b47ee85c2a50d7757983e"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C05/workspace/docs/loom/research/2026-11-09-toss-readability-cohesion.md",
+      "size": 6727,
+      "sha256": "55f1e37888977f2b4b732a0608a29d396fde24b5b05f2c952d4572501a6f3a8d"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C06/actions.json",
+      "size": 1106,
+      "sha256": "8b84ace002bbfce4493f6967ef8b0f6f4839a7a9cc8f0947e73bc0738a8d4e5f"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C06/answer.txt",
+      "size": 1091,
+      "sha256": "7ae5cde8d64b6f31db4db506fc5c0e1edae1ad0eea08049d474ab28b994a036b"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C06/prompt.txt",
+      "size": 257,
+      "sha256": "21aa4763e73e9acfe23268e86f4fc952cab2650d83a6dc99cbc52857e0329e18"
+    },
+    {
+      "path": "first-trial/audit-packet/cases/C06/workspace/docs/loom/research/2026-11-09-ydb-online-read-only.md",
+      "size": 3091,
+      "sha256": "db3edfd0dbb25988e503278efd743d73dd47aa7be5b06dcd639d16d5738f819b"
+    },
+    {
+      "path": "first-trial/audit-packet/rubric.md",
+      "size": 3086,
+      "sha256": "e120bd2ce09faab6eeade75160ac952dbb9283ef1b03910efa0407d1720b552c"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C01/provenance.json",
+      "size": 894,
+      "sha256": "b86fb1816220098ee677cf97d5359aa2351dc780e085f10c8c339e64efa6e6aa"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C01/trajectory.jsonl",
+      "size": 54542,
+      "sha256": "a001fdb15913cd58e0a0a3ee4f69751ce83ed1f08cf8047ae14de0a8eb3f6c06"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C02/provenance.json",
+      "size": 629,
+      "sha256": "68b929f626c21888b5913e7cfb7ac79d97f06d0d3a29732df3a5a5012d36653b"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C02/trajectory.jsonl",
+      "size": 51122,
+      "sha256": "16c2ae4bce86d9278d6fa6847ce2ffec78638ea4d55acebb50f1dc71c9603f34"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C03/provenance.json",
+      "size": 770,
+      "sha256": "0c5711eb199f91f77fd06a87b5ae5de2d33ecad8f4b2fb9af34f014f058cb4aa"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C03/trajectory.jsonl",
+      "size": 35729,
+      "sha256": "c025053c934a0857b3151d7ab03df69e5dd124577d2197722c6cf786b4222627"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C04/provenance.json",
+      "size": 743,
+      "sha256": "590824be4771425b59b9a8a1f1306260b561da19a0c951a49f96e8caadf12447"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C04/trajectory.jsonl",
+      "size": 96500,
+      "sha256": "0678efef10f362cf2577d362229947048aa725fe0d7362f3a6093d59dd220028"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C05/provenance.json",
+      "size": 629,
+      "sha256": "fa8ede56b8a698a2c9f1a6847d259080cb33bd16e9406c4004868bef6bfe891d"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C05/trajectory.jsonl",
+      "size": 50645,
+      "sha256": "d39d8eb3a3ab9604e1f165ba2c27eb859aaa63f80b067109f7c2459cc6b131ec"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C06/provenance.json",
+      "size": 602,
+      "sha256": "3ee8be6ec7e3d258c2b8b600838ed99b7c6a82374e29ec71673103649e717662"
+    },
+    {
+      "path": "first-trial/audit-packet/traces/C06/trajectory.jsonl",
+      "size": 42676,
+      "sha256": "265a64fd28e410a502470d68ca21b71ec42b678ee3e642cda5efb41607ebcfd7"
+    },
+    {
+      "path": "first-trial/audit-packet-freeze.json",
+      "size": 4246,
+      "sha256": "b704f31ab03f171f9fa4c4c35c35cba9c2c2a34b85180313aa6eb52d86f0bfec"
+    },
+    {
+      "path": "first-trial/audits/A01.json",
+      "size": 16414,
+      "sha256": "dad3212bea19c50daff2f46f9b78bcd0fbb73af8ce07f2c38477f6be5d51adf0"
+    },
+    {
+      "path": "first-trial/audits/A02.json",
+      "size": 24576,
+      "sha256": "c391e25b83fce7edca9d7adeafcdcb4a80d5a862b140ac2d8272dbe387cc8f30"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/README.md",
+      "size": 1079,
+      "sha256": "cf8cfecfb9271544f3229cbc6cd84aec7956ad054c3993dcce74a998f544394a"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/SKILL.md",
+      "size": 9865,
+      "sha256": "7ed0335f850a467d332e8cfb4da053018f9bd6e3bb3abe2bc7ca6c7e4a63cd43"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/references/evaluation-selection.md",
+      "size": 9237,
+      "sha256": "5a95eabd656e96b81f48b18d151826542daf0215e99e0e7a5242ec4db2bcf78b"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/references/preservation.md",
+      "size": 4364,
+      "sha256": "3b4007c9c14905c43a3eaeb4a358de075ee4b26306ba3f2940f878cb9475953e"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/references/research-methods.md",
+      "size": 4612,
+      "sha256": "bfada6dddb9ae104ddc3a7e48c3a701a1eb2ea3f0955cd1f3424a41e6a668ca5"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/references/source-policy.md",
+      "size": 6210,
+      "sha256": "c9424edd2191c7ead231a82da98ae3f35c504a00454c1338512313a1d7fd16c3"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/references/structured-relations.md",
+      "size": 2970,
+      "sha256": "dc0c65ab06534a369ee02fa76ed8d8b9d59769ee5578552c7da19a6888808d1d"
+    },
+    {
+      "path": "first-trial/baseline/engineering-research/templates/research.md",
+      "size": 2672,
+      "sha256": "62757b98a15cb64caadbba067803864e1297fbabbacd0162eba1d88e2cafa69e"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/README.md",
+      "size": 1079,
+      "sha256": "cf8cfecfb9271544f3229cbc6cd84aec7956ad054c3993dcce74a998f544394a"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/SKILL.md",
+      "size": 9865,
+      "sha256": "7ed0335f850a467d332e8cfb4da053018f9bd6e3bb3abe2bc7ca6c7e4a63cd43"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/references/evaluation-selection.md",
+      "size": 9237,
+      "sha256": "5a95eabd656e96b81f48b18d151826542daf0215e99e0e7a5242ec4db2bcf78b"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/references/preservation.md",
+      "size": 4364,
+      "sha256": "3b4007c9c14905c43a3eaeb4a358de075ee4b26306ba3f2940f878cb9475953e"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/references/research-methods.md",
+      "size": 4612,
+      "sha256": "bfada6dddb9ae104ddc3a7e48c3a701a1eb2ea3f0955cd1f3424a41e6a668ca5"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/references/source-policy.md",
+      "size": 7611,
+      "sha256": "5ac32bc13f3c58210624a9220234d074a1570bbb0cd380b7c01293241c1bfc6e"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/references/structured-relations.md",
+      "size": 2970,
+      "sha256": "dc0c65ab06534a369ee02fa76ed8d8b9d59769ee5578552c7da19a6888808d1d"
+    },
+    {
+      "path": "first-trial/candidate/engineering-research/templates/research.md",
+      "size": 2672,
+      "sha256": "62757b98a15cb64caadbba067803864e1297fbabbacd0162eba1d88e2cafa69e"
+    },
+    {
+      "path": "first-trial/candidate.diff",
+      "size": 1803,
+      "sha256": "8e74ea3a33145f03f8f315a9bbc1c29b10383404f4c46ae5f0594c3a21bca9b8"
+    },
+    {
+      "path": "first-trial/cold-reader.txt",
+      "size": 8143,
+      "sha256": "5c1742883bd919d8095bb7c1b9088043e33ddb716b6e3e102ba40ade89d23e06"
+    },
+    {
+      "path": "first-trial/collect_traces.py",
+      "size": 7410,
+      "sha256": "f0a212ac6c9cfefd135c905d588e4de849b652c20186d3deaadd1945ea7035a8"
+    },
+    {
+      "path": "first-trial/comparison.json",
+      "size": 1510,
+      "sha256": "5b14ea27c308cd40fbe415c5a0327b99f1845fc7492f11ec62b7798afb18e4c2"
+    },
+    {
+      "path": "first-trial/freeze.json",
+      "size": 3370,
+      "sha256": "52975efd1a84456d8df41712882eaf5eb06a3c9e23cba21ad4eb0fba3d87a736"
+    },
+    {
+      "path": "first-trial/original-return-verification.json",
+      "size": 232,
+      "sha256": "3c0e4844a61209c108c3e5c94e215937dcf6b1f277b991d66653ee4a5494759a"
+    },
+    {
+      "path": "first-trial/preliminary-report.md",
+      "size": 4132,
+      "sha256": "e8d8dddec46fc1a1f7e3b9c628fc1a0faab903fb90089f3b4f58095be016f541"
+    },
+    {
+      "path": "first-trial/protocol.md",
+      "size": 3997,
+      "sha256": "63b843dfbd51c5c1bebceb73c234bbf17a71df43f6afef6299540d16f5cd1178"
+    },
+    {
+      "path": "first-trial/rubric.md",
+      "size": 3086,
+      "sha256": "e120bd2ce09faab6eeade75160ac952dbb9283ef1b03910efa0407d1720b552c"
+    },
+    {
+      "path": "first-trial/runs/C01/actions.json",
+      "size": 1314,
+      "sha256": "5d608127ba42b0c3d8fe13ca06c911c8261c79591d33a5bd8ec670fc92aa66ad"
+    },
+    {
+      "path": "first-trial/runs/C01/answer.txt",
+      "size": 1475,
+      "sha256": "818aafa07c62143b6bad9e6518dcb9b6584e32f12a62ed0442636676ba7aa46f"
+    },
+    {
+      "path": "first-trial/runs/C01/prompt.txt",
+      "size": 242,
+      "sha256": "a564923e5e6dfb2f315930830618ab6ea3e09d379553c4dfe614c124b32b7d61"
+    },
+    {
+      "path": "first-trial/runs/C01/workspace/docs/loom/research/2026-11-09-small-pr-two-maintainers.md",
+      "size": 6819,
+      "sha256": "28e9baad7da9ba85e18b517cb50254f3ec99cb75272a84a6ec842d8238a9b9db"
+    },
+    {
+      "path": "first-trial/runs/C02/actions.json",
+      "size": 1089,
+      "sha256": "578e8be9d9f1c18d713ac221030f6bd2edb39d75d64889f852c10cbbf89734da"
+    },
+    {
+      "path": "first-trial/runs/C02/answer.txt",
+      "size": 1036,
+      "sha256": "98550ea295bd203a7b64e71348a8b1bd4dd10e422ebe96265151a1da6c0cd2ef"
+    },
+    {
+      "path": "first-trial/runs/C02/prompt.txt",
+      "size": 248,
+      "sha256": "3a85aa63422994487d92e963c8605c362ca48226a848345a028ab5e5f234e226"
+    },
+    {
+      "path": "first-trial/runs/C02/workspace/docs/loom/research/2026-11-09-git-branch-delete-guarantees.md",
+      "size": 2532,
+      "sha256": "fdb7c897fc8476ce5e742a547e7f9170a5c6f30307ed3019d36c15b5689980d5"
+    },
+    {
+      "path": "first-trial/runs/C03/actions.json",
+      "size": 883,
+      "sha256": "95409925edf7ad3ad56481020119ed81e8e55df77111ee179266b8ebaa54789f"
+    },
+    {
+      "path": "first-trial/runs/C03/answer.txt",
+      "size": 567,
+      "sha256": "f6f0f53662d8b39c70611a7ae6d63f1d2798fc5972542658a26c47269eb2b748"
+    },
+    {
+      "path": "first-trial/runs/C03/prompt.txt",
+      "size": 218,
+      "sha256": "1d5e130630bcec900eaf4dae79ff531dbd54b58a72504fc1e454fa3be481c9f1"
+    },
+    {
+      "path": "first-trial/runs/C03/workspace/docs/loom/research/2026-11-09-package-name-major-version.md",
+      "size": 1887,
+      "sha256": "c354d77fdd1991560809ad929a1bd23a385ebe6a46973584a5476e75e78425b8"
+    },
+    {
+      "path": "first-trial/runs/C03/workspace/plugin.json",
+      "size": 1001,
+      "sha256": "90cfe33d4de8e422918fe1c461389d4a2c336d77e68c18b72cb4fc853e893e17"
+    },
+    {
+      "path": "first-trial/runs/C04/actions.json",
+      "size": 4198,
+      "sha256": "3e38fdb04d460f869a7d78716125938a2a5bfdd1c79e7e4a971ef7d27cd11339"
+    },
+    {
+      "path": "first-trial/runs/C04/answer.txt",
+      "size": 2316,
+      "sha256": "5ab7a87ebfc505f9be81675341d1e41e392a5704d9ea0256ef05b7d375e1b466"
+    },
+    {
+      "path": "first-trial/runs/C04/prompt.txt",
+      "size": 314,
+      "sha256": "37dac18a9725d7f2809ccb5467875790645de197167b7b4b1469fd021f2c3947"
+    },
+    {
+      "path": "first-trial/runs/C04/workspace/docs/loom/research/2026-11-09-rime-save-options.md",
+      "size": 10083,
+      "sha256": "9f5e1ea222f7227a5b901e2e939792e236cc98e80014de6d6b03353e4d6d570f"
+    },
+    {
+      "path": "first-trial/runs/C05/actions.json",
+      "size": 1753,
+      "sha256": "2679dd092be987ba9f3487428dbe0785fd06fdcbac7ad32e55e0d2aff1b601b8"
+    },
+    {
+      "path": "first-trial/runs/C05/answer.txt",
+      "size": 2410,
+      "sha256": "65c35f6bee230b68d6e1d4f6cb77fd1fc05f3d39929b3427357ec4bf79224762"
+    },
+    {
+      "path": "first-trial/runs/C05/prompt.txt",
+      "size": 294,
+      "sha256": "d83faf18b845a0b685c6b30b597c106992b171cf0c1b47ee85c2a50d7757983e"
+    },
+    {
+      "path": "first-trial/runs/C05/workspace/docs/loom/research/2026-11-09-toss-readability-cohesion.md",
+      "size": 6727,
+      "sha256": "55f1e37888977f2b4b732a0608a29d396fde24b5b05f2c952d4572501a6f3a8d"
+    },
+    {
+      "path": "first-trial/runs/C06/actions.json",
+      "size": 1106,
+      "sha256": "8b84ace002bbfce4493f6967ef8b0f6f4839a7a9cc8f0947e73bc0738a8d4e5f"
+    },
+    {
+      "path": "first-trial/runs/C06/answer.txt",
+      "size": 1091,
+      "sha256": "7ae5cde8d64b6f31db4db506fc5c0e1edae1ad0eea08049d474ab28b994a036b"
+    },
+    {
+      "path": "first-trial/runs/C06/prompt.txt",
+      "size": 257,
+      "sha256": "21aa4763e73e9acfe23268e86f4fc952cab2650d83a6dc99cbc52857e0329e18"
+    },
+    {
+      "path": "first-trial/runs/C06/workspace/docs/loom/research/2026-11-09-ydb-online-read-only.md",
+      "size": 3091,
+      "sha256": "db3edfd0dbb25988e503278efd743d73dd47aa7be5b06dcd639d16d5738f819b"
+    },
+    {
+      "path": "first-trial/source-return-supplement.json",
+      "size": 1631,
+      "sha256": "de52e2657451e4c11299872da3d7180ee45c9bd26c641e7a9fcff4afa9e8a93c"
+    },
+    {
+      "path": "first-trial/trace-export-summary.json",
+      "size": 7034,
+      "sha256": "4c835540329c06d3fb56604a38903d08e0c2fc88322e0c91e38ade246c33b299"
+    },
+    {
+      "path": "first-trial/traces/lang_audit_01/audit-trajectory.jsonl",
+      "size": 185706,
+      "sha256": "5db3e0bd7e9bb3e409766f8244874832254ec2e2c586de25d48ac797c48bbd96"
+    },
+    {
+      "path": "first-trial/traces/lang_audit_01/provenance.json",
+      "size": 506,
+      "sha256": "5f365c24361e5b98c9e3a5d92f079e498c509170b29e5bfdbb8e15a3a0f9315b"
+    },
+    {
+      "path": "first-trial/traces/lang_audit_01/trajectory.jsonl",
+      "size": 185706,
+      "sha256": "5db3e0bd7e9bb3e409766f8244874832254ec2e2c586de25d48ac797c48bbd96"
+    },
+    {
+      "path": "first-trial/traces/lang_audit_02/audit-trajectory.jsonl",
+      "size": 243602,
+      "sha256": "82a66cb0651659b5848ba027569665f16374cdf39eb3b493dfa17df783f41314"
+    },
+    {
+      "path": "first-trial/traces/lang_audit_02/provenance.json",
+      "size": 506,
+      "sha256": "4f068d305d6c834a6f1a7ef386946dc232f0227a7cbe7ebe1a3f90f50ab699c8"
+    },
+    {
+      "path": "first-trial/traces/lang_audit_02/trajectory.jsonl",
+      "size": 243602,
+      "sha256": "82a66cb0651659b5848ba027569665f16374cdf39eb3b493dfa17df783f41314"
+    },
+    {
+      "path": "first-trial/traces/lang_cold_reader/audit-trajectory.jsonl",
+      "size": 41614,
+      "sha256": "7d5d6698be8a83bbcc2235f811fc8093ab867e6a6b51bec08f50caa6fdfdc0bf"
+    },
+    {
+      "path": "first-trial/traces/lang_cold_reader/provenance.json",
+      "size": 1005,
+      "sha256": "571cacec0f78c9dba3751f389471fa28fb0cacbd37e15c8e19762bf053e9eee6"
+    },
+    {
+      "path": "first-trial/traces/lang_cold_reader/trajectory.jsonl",
+      "size": 83224,
+      "sha256": "39dac54ae7ba91b902371c88ab89f2d77c96391ab2c4e425e896f462b11d4423"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c01/audit-trajectory.jsonl",
+      "size": 54678,
+      "sha256": "07fcb4ba5a0128adfe7d00087b75487c29f3624c2ae7a8d6fcb5272a4101cbc7"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c01/provenance.json",
+      "size": 941,
+      "sha256": "4ef658f0d7d33ac8a3cb08837825739586292ebfb8f39225c847179bf7f25c0c"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c01/trajectory.jsonl",
+      "size": 88917,
+      "sha256": "6e0a2327630bf48fac6d85844af7f9b031aa8b26811d1379f82bedf3d96a22ee"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c02/audit-trajectory.jsonl",
+      "size": 51190,
+      "sha256": "fdc90abb2a9bf26bd3c5ed05db544160d0489193da2fd017b6f38a9f19c57dc4"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c02/provenance.json",
+      "size": 676,
+      "sha256": "b16185cd6616df0cd3f15700324dcc3a99c474befa97adcc16ff5d803edd8640"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c02/trajectory.jsonl",
+      "size": 61177,
+      "sha256": "c9e0589718db0941f48a54171091d443fc9af392f35fde6567162e8d9caa8451"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c03/audit-trajectory.jsonl",
+      "size": 35729,
+      "sha256": "c025053c934a0857b3151d7ab03df69e5dd124577d2197722c6cf786b4222627"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c03/provenance.json",
+      "size": 817,
+      "sha256": "538ac183efaab55d3c6d626255cd88147605cdbde3975dd0dd3e4dd1601f646b"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c03/trajectory.jsonl",
+      "size": 61624,
+      "sha256": "4df1c7fb6f95158b55a40f40720daf81bb13058be0c6897c4c56e00cd948602d"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c04/audit-trajectory.jsonl",
+      "size": 97476,
+      "sha256": "55bd138faee1e42acd3f1b086e4d67a79ed04ff2b0ebce5b3684652b77b2958f"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c04/provenance.json",
+      "size": 790,
+      "sha256": "7e8c87b995c420b9002d333371807dded8f0ab625f0453df547f2b209ce57e8e"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c04/trajectory.jsonl",
+      "size": 133484,
+      "sha256": "754a78823065fef5a1310b243fcc77a47657f657ebc7a38b6390ce0869bdb52e"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c05/audit-trajectory.jsonl",
+      "size": 50781,
+      "sha256": "9e3782a8f0151c891057a02ae25884804886e7b05dc83c518edb17c2b76b19db"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c05/provenance.json",
+      "size": 676,
+      "sha256": "dfd1d9a79fa8ea8638b870a5a7a382bde2730d0a5b81cbdc8e839ad6977f6333"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c05/trajectory.jsonl",
+      "size": 60768,
+      "sha256": "fc25fb8d716cc45e28bc5e759df49f0a3b25a5353104100e53aa32e6bd26ddae"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c06/audit-trajectory.jsonl",
+      "size": 42945,
+      "sha256": "d529ccbba16a13104d9afb20c4df410f3ea055f5e9e8cf3cc4b7a1074f8a757f"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c06/provenance.json",
+      "size": 649,
+      "sha256": "90109ac050b60699391f74f80210f2c9ed8cdf01515bda5ac46ffdc2da732d69"
+    },
+    {
+      "path": "first-trial/traces/lang_exec_c06/trajectory.jsonl",
+      "size": 53499,
+      "sha256": "3a79734fcb5e07c2540ac3203ce0f1a130fdb3424355c732622a90d3f506247b"
+    },
+    {
+      "path": "first-trial/verification.json",
+      "size": 1297,
+      "sha256": "c831e9f2394b06179a41c6abd62c495db73536d330479ae56115e505dc9c50ab"
+    },
+    {
+      "path": "first-trial/workspace/docs/skill-dogfood/2026-11-09-engineering-research-language-policy/report.md",
+      "size": 15146,
+      "sha256": "e1feb697df99fd8b6bf5567f0676cf81ecf806887c140c32dd196e1871c28d75"
+    }
+  ]
+}
