@@ -1,0 +1,1 @@
+BLOCK intake.intent-version: the intent no longer matches confirmation commit da402f1 (confirmed bd80f2c, current 75b8b06); every Acceptance line may be affected. recompute it with `grep -v -e '^status:' -e '^intent_confirmed_sha:' docs/loom/intent/2026-11-08-engineering-research-skill.md | git hash-object --stdin` and re-confirm the intent before closing review
