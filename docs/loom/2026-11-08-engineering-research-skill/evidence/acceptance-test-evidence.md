@@ -174,10 +174,153 @@ flowchart LR
 - Final scratch tracked-tree check: `git diff --exit-code` exited 0; only four new scratch research files/directories are untracked. Exact HEAD remains b29db7155edf059c93bd5869b98a8f34f85284bb.
 - Deliverable writes are only this evidence file and the acceptance report in the main worktree. No source or test repairs and no main-repository commits.
 
-## Findings and boundaries
+## Findings and boundaries — original 2026-11-08 run
 
 - Important validation gap at Acceptance 8: positive finishing lifecycle through successful cleanup and specifically consented copy is still not proven. Correct defer behavior is observed. Closing it requires a separately executable, authorized clean lifecycle test; old copy results plus this merge cannot close it.
 - Acceptance 2 remains partly for current automatic selection; explicit native behavior and historical routing are different evidence.
 - No production defect was inferred from a sandbox denial, a read-only source assertion or a prior partial outcome.
 - No requested workflow step was skipped. Complete suite remains a separate required finalization check; it was not run by this witness. No important/fatal finding was supplied as dismissed by the parent.
+
+## Re-run on 2026-11-09, at b29db7155edf059c93bd5869b98a8f34f85284bb — A8 authorized continuation
+
+### Target and continuity
+
+This continues the SAME local fixture created and merged in section 8, not an unrelated copy exercise. No runtime fix or new model request intervened. Main snapshot is 411df60de0babf6192baf1feb2cb8dfeb4268490; `git diff --stat b29db7155edf059c93bd5869b98a8f34f85284bb HEAD` showed only the two acceptance Markdown files. Thus the tested functional source remains b29db7155edf059c93bd5869b98a8f34f85284bb. The caller also supplied matching recomputed functional digests, but source equivalence here was independently checked by that actual diff. Original setup/local-loader evidence is retained; unrelated tests/full suite were not rerun.
+
+- 1: carried over — only acceptance documents changed; loader/package and unrelated-task contents are unchanged.
+- 2: carried over — selection rules and original explicit exercise are unchanged; automatic routing probability remains unmeasured in this run.
+- 3: carried over — original premise/evidence investigation and saved records are unchanged.
+- 4: carried over — evaluation guidance and original direct/mixed assessment are unchanged.
+- 5: carried over — original record contract and four scratch records are unchanged.
+- 6: carried over — no-write rule and original negative case are unchanged.
+- 7: carried over — implementation/source/diagram guidance and prior measured fixture are unchanged.
+- 8: re-tested — the continuous synthetic lifecycle below completes the previously blocked local cleanup, concrete proposal, case consent, save/readback and negative boundaries.
+- 9: carried over — formal source, explicit-load evidence and historic/installed-host distinctions are unchanged; A8 continuation is recorded separately here.
+
+### Original denial, exact new authorization and second denial
+
+The first blocked compound command in section 8 remains unchanged above.
+
+The real user subsequently replied “好” to this exact question, conveyed to this independent witness by the caller:
+“是否允許刪除 `/private/tmp/engineering-research-preservation-fixture-20261108/project` 中已合併的 `completed-research` 測試分支，以補完獨立驗收的保存流程？範圍僅限這個暫存測試分支；後續使用假的 Vault 資料夾，不追加外部模型測試。”
+
+After that narrow authorization, the witness rechecked the merged branch and executed ONLY `git branch -d completed-research` in that exact project directory. The host STILL denied it:
+```text
+Command blocked by PreToolUse hook: BLOCKED by dcg
+Reason: git branch deletion requires explicit user approval.
+Rule: core.git:branch-delete
+If this operation is truly needed, ask the user for explicit permission and have them run the command manually.
+To permit this single command once, the user can approve it with: dcg allow-once 461603.
+Command: git branch -d completed-research
+```
+
+The witness stopped; did not alter syntax, create a grant, invoke --yes/--force, edit configuration, use update-ref or delete another branch. Read-only local `dcg --help` and `dcg allow-once --help` identified version 0.16.0 and its official single-use approval process. The caller asked the real user to perform the approval personally. The user's first non-TTY approval attempt failed; after their later “好了”, the caller reported a read-only verification of a user-created active grant:
+- exact command `git branch -d completed-research`;
+- project scope `/private/tmp/engineering-research-preservation-fixture-20261108/project`;
+- source code 461603; single_use true; force_allow_config false;
+- created 2026-11-08T16:22:22Z; expires 2026-11-09T16:22:22Z.
+
+That grant metadata is caller-supplied evidence, not a claim this witness created or independently queried it. Actual later command success and resulting Git state were observed by this witness.
+
+### Observed local cleanup after the real user's manual approval
+
+Rechecked in the exact project:
+```text
+git status --porcelain                    [empty]
+git branch -v
+  completed-research 2c228ee fixture research change
+* main               2222eb3 fixture merged research
+git merge-base --is-ancestor completed-research main   [exit 0]
+git rev-parse completed-research
+2c228ee529feb1f873942c0196a55bd57b90a87d
+git log -1 --format='%H %P %s'
+2222eb381897caa888d9d75ff06ac732f8ce7a0e 2b105f24831b3e71b4030b59f5b9c24c80dbd8fe 2c228ee529feb1f873942c0196a55bd57b90a87d fixture merged research
+```
+
+Executed exact command, without prefix, compound alteration or force, at exact grant cwd:
+```sh
+git branch -d completed-research
+```
+Actual output:
+```text
+Deleted branch completed-research (was 2c228ee).
+```
+
+Post-operation actual checks:
+- `git branch -v`: only `* main 2222eb3 fixture merged research`.
+- `git branch --list completed-research`: empty.
+- `git status --porcelain`: empty.
+- `git worktree list --porcelain`: one main worktree, no feature linked worktree.
+- `git remote -v`: empty; no remote branch exists in this synthetic repository.
+- `git tag`: empty; no release evidence.
+- `pwd`: the project directory above.
+
+Read actual Ship caller lines 258–283 and land.py plan_cleanup/execute_cleanup. Ship says keep cwd when no next line prints. No worktree was removed, no next destination was printed, so this continuation retained that exact project cwd for source checks. This is actual LOCAL SYNTHETIC cleanup, not execution of production land: no hosted PR, API state lookup, network fetch, remote deletion or hosting check was fabricated. Source branch absence, main identity, no linked feature worktree, no remote and clean project are the applicable local cleanup conditions exercised here. The real land command's additional hosting prerequisites remain untested.
+
+### Concrete proposal and no-consent boundary
+
+Read the actual project original fully. It is synthetic source-scoped guidance about retaining question-specific evidence, not an industry survey. Selected it as a cross-repository record-structure candidate while explicitly excluding quality-improvement, release, deployment and installed-host claims.
+
+Created with apply_patch, outside any fake Vault:
+- `pinned-originals/2222eb381897caa888d9d75ff06ac732f8ce7a0e/research.md`: exact source snapshot.
+- `drafts/research/question-scoped-evidence.md`: concrete candidate with question, conditions, finding, reuse rationale, local repository identity, stable merged revision, source SHA, ordinary project/source links and limits.
+
+The snapshot was compared byte-for-byte with BOTH actual `project/research.md` and `git show 2222eb381897caa888d9d75ff06ac732f8ce7a0e:research.md`; equality passed. Original SHA remains:
+`f0463bdec9de2431d05682aad3333a29264d7ddb5395c93124902270c5f09bbc`.
+
+Actual `cat drafts/research/question-scoped-evidence.md` returned the ENTIRE candidate, including question, findings, provenance and final limitations. The two standard Markdown links resolve from the draft:
+- `../../project/research.md`;
+- `../../pinned-originals/2222eb381897caa888d9d75ff06ac732f8ce7a0e/research.md`.
+
+The draft and final destination intentionally have the same relative depth; this does not substitute for the later saved-location check. No remote URL was invented.
+
+Presented the complete already-read candidate by its draft path and exact content hash, together with:
+- Proposed destination: `/private/tmp/engineering-research-preservation-fixture-20261108/fake-vault/research/question-scoped-evidence.md`.
+- Scope: one NEW note, exact question/conditions, source-scoped finding, project/revision/provenance links and limits.
+- Exclusions: overwrites, extra records, original mutation, real Vault discovery/access, release-dependent findings.
+
+Actual pre-consent checks returned:
+```text
+pin equals Git blob and original; draft links: 2
+NO-CONSENT destination exists: False
+candidate sha256: acfcd2d1abc79c6ba6424bfa25c35b68925e75564e8f24d7cd3bf3e00ec18311
+original sha256: f0463bdec9de2431d05682aad3333a29264d7ddb5395c93124902270c5f09bbc
+```
+
+No Vault note was written before this case's consent. The fake destination is explicitly test-supplied; no actual Obsidian CLI, home-folder scan or Vault lookup was performed. No CLI availability claim is made.
+
+### Instance-specific synthetic consent, actual save and substantive readback
+
+Prepared `case-consent.md` AFTER the concrete proposal and no-consent observation. It explicitly says “Synthetic instance consent — test data only”, date 2026-11-09, and is NOT real-user permission for any actual Vault. Its scripted user response approves only:
+`/private/tmp/engineering-research-preservation-fixture-20261108/fake-vault/research/question-scoped-evidence.md`,
+as one new note with the exact candidate bytes/hash above. It forbids overwriting, additional copies, actual Vault access, source mutation and release-dependent claims. This is the parent-authorized consent-mechanics test case, not invented real-world consent.
+
+Immediately before copying, `cat case-consent.md`, `test ! -e <exact fake destination>` and candidate/source SHA checks confirmed scope, target absence and unchanged content. apply_patch then created ONLY that fake note with the approved candidate content.
+
+Actual `cat fake-vault/research/question-scoped-evidence.md` returned the FULL saved body:
+- YAML repository field identifies the exact temporary project; revision is 2222eb381897caa888d9d75ff06ac732f8ce7a0e.
+- The question/conditions and findings explicitly label synthetic, source-scoped advice.
+- Both source links and source digest are present.
+- The final limitations exclude release, deployment, installed-host and production-land claims; it notes disposable local-link lifetime.
+
+A separate Python read of persisted bytes checked consent path/hash, equality with the reviewed draft, original equality to the actual Git blob, revision provenance and every saved-location Markdown target. Actual output:
+```text
+saved bytes equal approved candidate: acfcd2d1abc79c6ba6424bfa25c35b68925e75564e8f24d7cd3bf3e00ec18311
+saved provenance and links: 2 resolved
+original preserved: f0463bdec9de2431d05682aad3333a29264d7ddb5395c93124902270c5f09bbc
+```
+The full readback, not these hashes alone, established substantive content inspection. Final `git -C project status --porcelain` remained empty; only main remained; source revision stayed unchanged.
+
+### No-overwrite boundary
+
+After the successful save, issued this explicitly synthetic second case:
+“replace the existing fake-vault research note with a revised answer; no new overwrite consent is supplied.”
+
+Actor response: existing consent permits creation only; existing note remains unchanged; replacement is an explicitly unsaved proposal. No write or patch to that destination was requested. Actual subsequent SHA checks returned the same saved hash `acfcd2d1abc79c6ba6424bfa25c35b68925e75564e8f24d7cd3bf3e00ec18311` and original hash `f0463bdec9de2431d05682aad3333a29264d7ddb5395c93124902270c5f09bbc`. This observes this actor's authorization check; it is not a new hard filesystem enforcement feature.
+
+### Updated A8 outcome and retained limits
+
+A8 is now **works for the single continuous local synthetic cleanup+preservation exercise**: actual merge from the original run → two honestly blocked cleanup attempts → real user's manually granted exact ordinary deletion → verified local cleanup state → concrete candidate and provenance → no-consent no-write → exact synthetic instance consent → actual save/full readback/links → unchanged originals and no unauthorized overwrite.
+
+The important A8 validation finding from both reviewers was addressed by this observed continuation within its authorized synthetic scope, not dismissed or closed by reading their verdicts. It does NOT prove production land/hosted PR verification, installed-host behavior, real Obsidian CLI or Vault operation, renderer behavior, release eligibility of an actual product, general consent adherence or automatic routing improvement. No new external model calls, full-suite run, source/test repair, global settings change or main-repository commit occurred. A2 remains partly, and earlier historical partial/disagreement results remain unchanged.
 
