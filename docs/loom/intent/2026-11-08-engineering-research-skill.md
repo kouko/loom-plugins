@@ -1,9 +1,9 @@
-# 將軟體工程研究能力納入 Loom
+# 將軟體工程研究能力納入 loom-code
 originator: kouko
 kind: engineering
 needs-design: yes — 新增可持續保存的研究文件及跨任務收尾的知識保存行為，涉及多個文件與條件分支，現有試驗稿尚非正式規格。
 evidence: [docs/loom/2026-11-07-engineering-research-trial/revision-5-framework-selection/decisions.md, docs/skill-dogfood/2026-11-08-engineering-research-frameworks/report.md, docs/loom/research/2026-11-08-engineering-evaluation-framework-selection.md]
-intent_confirmed_sha: 75b8b06be4b1b4d708567aa40b43518eb2370034
+intent_confirmed_sha: 9f188f839c203a32bcc39b13c135b7cf97d05bc1
 status: confirmed 2026-11-08
 publication: automatic — authorized 2026-11-08 by kouko
 

@@ -79,6 +79,13 @@ Requirement continuity section defines.
 - Test: Verify every tracked runner/helper byte against a deterministic source archive before deleting only those files. Preserve all raw trials. Remove the now-unused exact census admission through its owner; rerun the package runner and existing adversarial tests.
 - Risk: agent-decided — Four paired cases did not establish a general research-quality advantage. The helper remains an archived prototype rather than maintained plugin code. Runtime research behavior and requirement/attempt history stay unchanged; archival links disclose historical execution paths.
 
+### Wave 7 — Repair the existing ownership confirmation record
+
+**W7-01 Make the approved ownership confirmation discoverable** after: W6-01 acceptance: 1,9
+- Files: docs/loom/intent/2026-11-08-engineering-research-skill.md, docs/loom/2026-11-08-engineering-research-skill/plan.md
+- Test: Existing finalize-review correctly rejected the stale canonical confirmation ancestry. Retain that RED; verify the existing intent-version rule against a canonical confirmation commit, run its regression tests and repeat Build's complete suite plus existing adversarial programs before the same reviewers verify the fix.
+- Risk: agent-decided — Defect class: noncanonical intent reconfirmation commit title. The whole 983-path branch delta and A1/A9 surfaces were searched; the single live occurrence is ownership commit 7c1b6042, with spec/plan references already pointing to it. Clarify only the intent title's code ownership, recompute its existing content pin and use the required canonical confirmation subject/body. The original user-approved outcome, all nine Acceptance lines, constraints, authorization and confirmation date stay unchanged. This records the already explicit ownership approval; it is no new requirement or confirmation on the user's behalf. The finalization failure and fix consume the next functional digest in the same bounded Review episode, without resetting prior attempts or partial evidence.
+
 ## Simplicity check
 - none found
 
