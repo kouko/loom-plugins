@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.61.0] — 2026-11-09 — evidence-led search languages for engineering research
+
+- Normally start external exploratory discovery with separate English and Japanese queries, preserving exact technical identifiers. Reuse sufficient local artifacts, existing evidence or applicable official sources and stop without a language-count quota.
+- Consider Chinese and Korean independently when original material, regional conditions or consequential unresolved gaps warrant them; use known relevant original languages early and allow other necessary languages. Translations and repeated summaries remain one source, with existing acceptance, authorization, recording and stopping rules preserved.
+- Adopt bounded guidance supported by eight observed tasks. Delayed language expansion remains unobserved, query-specific attribution is partial in one supplemental case, one supplemental query has a malformed site operator, and the original factual disagreement remains unresolved. These observations do not establish general quality gains, stable activation rates or host compatibility.
+
 ## [3.60.0] — 2026-11-08 — optional engineering research and preservation handoff
 
 - Add the optional code-owned `engineering-research` skill for consequential evidence gaps during Loom tasks and standalone engineering discussions, with question-scoped Markdown records, applicable source checks and proportionate evaluation methods.

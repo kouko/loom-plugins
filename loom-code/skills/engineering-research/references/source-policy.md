@@ -21,6 +21,14 @@ supporting content, applicable implementation or a permitted reproduction.
 GitHub and GitLab are hosting platforms, not credibility levels: distinguish
 upstream implementations from forks, mirrors, examples and copied summaries.
 
+## Search languages
+
+When external exploratory search is needed, normally start separate English and Japanese queries for the same evidence gap; run them in parallel when the available tool supports it. Preserve exact product names, versions, API identifiers and error text while adapting surrounding terms naturally to each language.
+Do not add searches merely to meet a language count when local artifacts, adequate existing evidence or an already identified applicable official source answer the question. Reuse those sources and stop when sufficient support is available.
+Independently add Chinese or Korean when primary project material or maintainer discussion uses that language, regional products/environments matter, or the initial results leave consequential gaps or contradictions. Neither language automatically requires the other.
+Use a relevant primary language from the first round when it is already known; do not require English/Japanese failure before consulting it. These defaults do not exclude another language that a consequential source or project warrants.
+Different-language translations, mirrors and repeated summaries of one source are not independent corroboration. Keep the existing source-acceptance, authorization and stopping rules; note a material language choice or exception briefly in the existing method rationale, without a separate checklist or metadata field.
+
 ## Repository investigations require source inspection
 
 When researching repository behavior or implementation, README is orientation,

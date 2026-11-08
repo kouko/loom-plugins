@@ -1,0 +1,242 @@
+{
+  "archive": "supplemental.tar.gz",
+  "sha256": "7695ca3f454edd6710c0231ec93f79c0600cfef96f5c43990ff4f26c965e5c77",
+  "format": "ustar+gzip; sorted regular files; gzip mtime=0; normalized mode/uid/gid/mtime",
+  "members": [
+    {
+      "path": "supplemental/audit-packet/cases/S01/initial-evidence.md",
+      "size": 698,
+      "sha256": "9e81b0c982a0da9aca210c3c835451230e6f492bc95860f9cb0044631abba2e1"
+    },
+    {
+      "path": "supplemental/audit-packet/cases/S01/task.md",
+      "size": 660,
+      "sha256": "2fe568eba245c0087241fc8b9e7b7a96af1777cd5de286bcfadb255153c9a96a"
+    },
+    {
+      "path": "supplemental/audit-packet/cases/S02/initial-evidence.md",
+      "size": 717,
+      "sha256": "cc92fd5095a0078a7c57afa209bba1a7b8f26dcc3b491d78acf8b27dcb7bc183"
+    },
+    {
+      "path": "supplemental/audit-packet/cases/S02/task.md",
+      "size": 710,
+      "sha256": "d6ca5058ce028dd876acbd3518548e4f2c59692da05d14e26adfeaeb47cbc9b9"
+    },
+    {
+      "path": "supplemental/audit-packet/outputs/S01/docs/loom/research/2026-11-09-leaf-2017-double-buffer.md",
+      "size": 4137,
+      "sha256": "c1de4d59c5a1196f9df68ebdcb5a926281fa6c210fbe6f5679755433839a38d6"
+    },
+    {
+      "path": "supplemental/audit-packet/outputs/S02/docs/loom/research/2026-11-09-kakaopay-quiz-reward-lock.md",
+      "size": 6677,
+      "sha256": "e5779b696ea5b4c9667e2a154c23a9f290796f909e93011f9a4a301c6c60456d"
+    },
+    {
+      "path": "supplemental/audit-packet/rubric.md",
+      "size": 2103,
+      "sha256": "8a3f8b988f40ad629bed28650231672d655196a386f2009ab6a76f4eb503132b"
+    },
+    {
+      "path": "supplemental/audit-packet/traces/S01/answer.txt",
+      "size": 862,
+      "sha256": "ca7620022c4054a38ff8d849068e0c7eb9325fbcd384caa943b33155e152716c"
+    },
+    {
+      "path": "supplemental/audit-packet/traces/S01/provenance.json",
+      "size": 475,
+      "sha256": "6bc462f9b366eb3c781bf85af86bfe56c3149ed4bd7373e9f96ceca364bd35aa"
+    },
+    {
+      "path": "supplemental/audit-packet/traces/S01/trajectory.jsonl",
+      "size": 36211,
+      "sha256": "5b72668d5faeaa793ca3d7f5b2ed1df0522582ef43177fcf017fb0a47256b3ff"
+    },
+    {
+      "path": "supplemental/audit-packet/traces/S02/answer.txt",
+      "size": 1120,
+      "sha256": "21ee33742f490e4e5c38d61a97fb170b715616956905672a6aeaf3d68c9a130e"
+    },
+    {
+      "path": "supplemental/audit-packet/traces/S02/provenance.json",
+      "size": 475,
+      "sha256": "bc23f62131d74d275ebc2359921f3a2e0183d4cbf0106e7cbec93dae503e3bd7"
+    },
+    {
+      "path": "supplemental/audit-packet/traces/S02/trajectory.jsonl",
+      "size": 44324,
+      "sha256": "4ea9eb96ed0a3e0e4ad6e714fa56c39df8b1da30c2c83e0cfc881e2ec599c97d"
+    },
+    {
+      "path": "supplemental/audit-packet-freeze.json",
+      "size": 1431,
+      "sha256": "030f519a8895acbb061e498ad330ac137027c51be2b13913892a382943e42fa9"
+    },
+    {
+      "path": "supplemental/audits/A01.md",
+      "size": 7738,
+      "sha256": "b77b574be1bb6aee6e3671cf0273ea968c52d3ff5c93f30bd8a175e9d6941f49"
+    },
+    {
+      "path": "supplemental/audits/A02.md",
+      "size": 8683,
+      "sha256": "10d4e8141bd3449b339ca7f2f84e197b456bf383aeb49b83d20773afda98c3f5"
+    },
+    {
+      "path": "supplemental/cases/S01/initial-evidence.md",
+      "size": 698,
+      "sha256": "9e81b0c982a0da9aca210c3c835451230e6f492bc95860f9cb0044631abba2e1"
+    },
+    {
+      "path": "supplemental/cases/S01/task.md",
+      "size": 660,
+      "sha256": "2fe568eba245c0087241fc8b9e7b7a96af1777cd5de286bcfadb255153c9a96a"
+    },
+    {
+      "path": "supplemental/cases/S02/initial-evidence.md",
+      "size": 717,
+      "sha256": "cc92fd5095a0078a7c57afa209bba1a7b8f26dcc3b491d78acf8b27dcb7bc183"
+    },
+    {
+      "path": "supplemental/cases/S02/task.md",
+      "size": 710,
+      "sha256": "d6ca5058ce028dd876acbd3518548e4f2c59692da05d14e26adfeaeb47cbc9b9"
+    },
+    {
+      "path": "supplemental/export_exact_children.py",
+      "size": 5348,
+      "sha256": "933c21c8b5b33bab0a20ef2780aadc2736b53a6ca05d1507eac91c9a4fdeb94e"
+    },
+    {
+      "path": "supplemental/freeze.json",
+      "size": 1650,
+      "sha256": "2e3be3f62bbebfdb945d123d6c06fbe8ca086d29214418ac9fb853e082e18561"
+    },
+    {
+      "path": "supplemental/oracle.md",
+      "size": 1468,
+      "sha256": "1b813780462f49df3ff2677891896d0bbcf86658bcbf05872e989e0f6e06e1bc"
+    },
+    {
+      "path": "supplemental/package_evidence.py",
+      "size": 1813,
+      "sha256": "c1f0edb15bd7c9d4e728e65aa6daa215d5905a9c54de8d3857d865929b62923b"
+    },
+    {
+      "path": "supplemental/protocol.md",
+      "size": 1842,
+      "sha256": "7c8a486ed7b4e0a8a1a66369ba35a068d5eb94bcef9a5f1e41645f8d0809d47d"
+    },
+    {
+      "path": "supplemental/rubric.md",
+      "size": 2103,
+      "sha256": "8a3f8b988f40ad629bed28650231672d655196a386f2009ab6a76f4eb503132b"
+    },
+    {
+      "path": "supplemental/runs/S01/workspace/docs/loom/research/2026-11-09-leaf-2017-double-buffer.md",
+      "size": 4137,
+      "sha256": "c1de4d59c5a1196f9df68ebdcb5a926281fa6c210fbe6f5679755433839a38d6"
+    },
+    {
+      "path": "supplemental/runs/S02/workspace/docs/loom/research/2026-11-09-kakaopay-quiz-reward-lock.md",
+      "size": 6677,
+      "sha256": "e5779b696ea5b4c9667e2a154c23a9f290796f909e93011f9a4a301c6c60456d"
+    },
+    {
+      "path": "supplemental/station-dispatch.json",
+      "size": 629,
+      "sha256": "daa6641d1c50f0ee00387b4262eaa56ee23f8e72819fa817688a25a75a299a22"
+    },
+    {
+      "path": "supplemental/trace-export-summary.json",
+      "size": 2027,
+      "sha256": "551bdf26e2eca5b4ca28c8585877bccfa40f966f64ab4d08d392509fbf770f25"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_01/answer.txt",
+      "size": 669,
+      "sha256": "52790aba9a6c52b873861cc8e225f742815ad8181f23c13b79fd495c89c32faf"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_01/audit-trajectory.jsonl",
+      "size": 103540,
+      "sha256": "6f477cceaef85067bedee11b5257036c5f13c1c8e409690975715faa1da8fbdd"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_01/provenance.json",
+      "size": 475,
+      "sha256": "17db0c431596e90b07ae7cdfac519cd1feaec61a6dd8e5ee9b33063e1b5b3674"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_01/trajectory.jsonl",
+      "size": 103540,
+      "sha256": "6f477cceaef85067bedee11b5257036c5f13c1c8e409690975715faa1da8fbdd"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_02/answer.txt",
+      "size": 754,
+      "sha256": "181d42125e9e726a65b6e3e8e252b94eb9a79d530ada777f2f5ce8b310fd78d3"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_02/audit-trajectory.jsonl",
+      "size": 114302,
+      "sha256": "b758ad2d96ca19e873dd98ccd7d5beb66cca5c6510cd55552ee9a89a5ad94349"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_02/provenance.json",
+      "size": 475,
+      "sha256": "37e54836d88221069793e3abb986d30a3fa7373b82594d72bc26e60d360d748b"
+    },
+    {
+      "path": "supplemental/traces/supp_audit_02/trajectory.jsonl",
+      "size": 114302,
+      "sha256": "b758ad2d96ca19e873dd98ccd7d5beb66cca5c6510cd55552ee9a89a5ad94349"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s01/answer.txt",
+      "size": 862,
+      "sha256": "ca7620022c4054a38ff8d849068e0c7eb9325fbcd384caa943b33155e152716c"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s01/audit-trajectory.jsonl",
+      "size": 36255,
+      "sha256": "3812addd24ea299b074b056fb2a0fb11c633c5ab14818a3f3820898d33903f67"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s01/provenance.json",
+      "size": 475,
+      "sha256": "6bc462f9b366eb3c781bf85af86bfe56c3149ed4bd7373e9f96ceca364bd35aa"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s01/trajectory.jsonl",
+      "size": 73140,
+      "sha256": "c7bf1da012efe31d935e7fe5bcff71c8afe48e106dc6f82b9bfe8b737ad8e4ff"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s02/answer.txt",
+      "size": 1120,
+      "sha256": "21ee33742f490e4e5c38d61a97fb170b715616956905672a6aeaf3d68c9a130e"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s02/audit-trajectory.jsonl",
+      "size": 44482,
+      "sha256": "0e8542b443e7b88b3cb021bcff5ce9ef06b4102428ba65d31c74f98605be9e5d"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s02/provenance.json",
+      "size": 475,
+      "sha256": "bc23f62131d74d275ebc2359921f3a2e0183d4cbf0106e7cbec93dae503e3bd7"
+    },
+    {
+      "path": "supplemental/traces/supp_exec_s02/trajectory.jsonl",
+      "size": 80332,
+      "sha256": "149fbe97690b040d70c59e22076b3b8f855213112e54792695db2f1156e3597e"
+    },
+    {
+      "path": "supplemental/verify_evidence_integrity.py",
+      "size": 4383,
+      "sha256": "19a3c77f66919c75a6bfa7dd5ce27a211a0454a7b163bf866150d773046dc56e"
+    }
+  ]
+}
