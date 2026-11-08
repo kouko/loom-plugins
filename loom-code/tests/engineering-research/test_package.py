@@ -1,3 +1,4 @@
+# concern: source-policy guidance can become unreachable or nonportable when bundled references drift.
 """Portable package invariants, not proof of research-agent behavior."""
 
 from pathlib import Path
