@@ -3,7 +3,7 @@ originator: kouko
 kind: engineering
 needs-design: yes — 新增可持續保存的研究文件及跨任務收尾的知識保存行為，涉及多個文件與條件分支，現有試驗稿尚非正式規格。
 evidence: [docs/loom/2026-11-07-engineering-research-trial/revision-5-framework-selection/decisions.md, docs/skill-dogfood/2026-11-08-engineering-research-frameworks/report.md, docs/loom/research/2026-11-08-engineering-evaluation-framework-selection.md]
-intent_confirmed_sha: bd80f2c5840966f36ef1df243e79d8c482215828
+intent_confirmed_sha: 75b8b06be4b1b4d708567aa40b43518eb2370034
 status: confirmed 2026-11-08
 publication: automatic — authorized 2026-11-08 by kouko
 
@@ -16,14 +16,14 @@ kouko 希望一般工程討論中會影響決策的前提、功能與完成聲�
 
 ## Proposed outcome
 
-在 loom-workflow 提供按需使用的軟體工程研究 skill，供 Loom 任務與獨立工程
+在 loom-code 提供按需使用的軟體工程研究 skill，供開發任務與獨立工程
 討論使用。它能依待決問題核對前提、取得適用證據、選擇適當研究或評估方法，
 留下可追溯紀錄，再將有根據的結論或尚未解決的不確定性帶回原任務。適合長期
 保存的研究，能在變更完成後提出保存提議，經使用者當次授權才寫入 Obsidian。
 
 ## Acceptance
 
-1. 正式 loom-workflow 可發現並使用 engineering-research；既有 Loom 任務仍可在未使用此能力時正常進行。
+1. 正式 loom-code 可發現並使用 engineering-research；loom-design 不直接引用或引導至此技能，既有 Loom 任務仍可在未使用此能力時正常進行。
 2. 在代表性工程證據缺口與一般查詢中，研究能力能按問題的重要性適當使用，保留原任務的目標與授權範圍。
 3. 研究能核對前提及適用條件，對結論提供可回查的證據，並區分來源推論、實際執行與尚未驗證的聲明；所聲稱的研究產物可實際核對。
 4. 工程評估能按問題選用合適方法；單純問題可直接查證，混合問題可使用必要的互補方法，不強制套用全部框架、工具或來源。
@@ -36,6 +36,7 @@ kouko 希望一般工程討論中會影響決策的前提、功能與完成聲�
 ## Constraints
 
 - 以第 5 版試驗稿的已討論行為為實作基礎，研究是按需能力，不新增 Loom 站點或強制品質閘。
+- engineering-research 由 loom-code 維護；loom-design 的專門研究內容留待另行設計，本次不新增該技能或對 engineering-research 的直接引導。
 - 研究按問題分檔並採用 frontmatter；相同問題與條件延續原紀錄，重大條件變化保留原決策依據。
 - 研究方法、框架、來源及 Mermaid 均按問題需要選用，不設固定數量或一律執行的完整清單。
 - 研究原始紀錄保留於專案；Obsidian 保存由使用者當次確認目的地與範圍，不因偵測到 Vault 便自動寫入。
@@ -47,6 +48,7 @@ kouko 希望一般工程討論中會影響決策的前提、功能與完成聲�
 - 用程式保證每次研究必然啟用，或宣稱框架指引已證明提升所有模型的研究品質。
 - 對既有 Obsidian 筆記的自動同步、批次重整、刪除或未授權覆寫。
 - 新的背景研究服務、排程服務或常駐 Vault 監控。
+- loom-design 專用 research skill 的設計與實作。
 - 自動合併本次變更，以及更新使用者既有 plugin 安裝與個人設定。
 
 ## Open questions
