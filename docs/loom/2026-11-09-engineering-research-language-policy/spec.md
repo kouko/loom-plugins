@@ -28,6 +28,7 @@ REQ-6 — Portable integration
 - agent-decided — Start from the frozen candidate's eight added source-policy lines, since the first six cases support its default and exception paths; adopt only after the two supplements are observed and independently assessed (REQ-1–4).
 - agent-decided — Supply genuine initial evidence with an attributable unanswered question, without directing actors toward a language or suppressing later adequate sources; a resolved gap without the anticipated query remains a valid observed result (REQ-4).
 - agent-decided — Retain public evidence as an immutable archive with SHA-256/member inventory and a readable report; do not add experimental runners to the runtime or maintained suite (REQ-5).
+- Source reference for REQ-4–5: the frozen input root is `/private/tmp/engineering-research-language-dogfood-20261109`; use `candidate/engineering-research/`, `candidate.diff`, `freeze.json`, `audit-packet-freeze.json` and `workspace/docs/skill-dogfood/2026-11-09-engineering-research-language-policy/report.md` there. W1-01 retains that complete root under this change's `evidence/` with an extraction/integrity inventory; the archive becomes the portable implementation input.
 - agent-decided — Update only source policy, its focused contract tests and required release metadata; no new station, gate, dependency or research-record field is needed (REQ-6).
 - agent-decided — Native fresh actors and independent judges use public material; no external-host invocation, private-data export, global installation or real Vault modification is needed.
 
