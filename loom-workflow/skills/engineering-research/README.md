@@ -1,6 +1,6 @@
 # Engineering research
 
-[Loom](../../../README.md) / [loom-workflow](../../README.md) / engineering-research
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / engineering-research
 
 Resolve factual uncertainties that could change an engineering decision,
 within a Loom task or a standalone discussion. Research can include a small
