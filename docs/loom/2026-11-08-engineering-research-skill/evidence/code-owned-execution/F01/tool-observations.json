@@ -1,0 +1,47 @@
+[
+  {
+    "id": "item_1",
+    "command": "/bin/zsh -lc \"pwd; rg --files -g 'AGENTS.md' -g 'SKILL.md' -g 'fixture-cleanup.json' -g 'provenance.json' -g 'sample-receipt.json' -g '2026-11-08-package-test-roots.md' -g '*bundle*'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 221,
+    "output_sha256": "ee6585aa46edb279bfeba1be1515ddddc44ca2866b718cda4c461cb27c83b344"
+  },
+  {
+    "id": "item_2",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9333,
+    "output_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+  },
+  {
+    "id": "item_3",
+    "command": "/bin/zsh -lc 'cat docs/loom/research/2026-11-08-package-test-roots.md skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md fixture-cleanup.json provenance.json sample-receipt.json'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 19882,
+    "output_sha256": "d2f5078e4c590a9dea3e822fd23a83cf014df6ebcfda7065ba64245c6f9ca1b8"
+  },
+  {
+    "id": "item_5",
+    "command": "/bin/zsh -lc \"nl -ba src/scripts/run_package_tests.py | sed -n '1,200p'\nnl -ba src/tests/test_run_package_tests.py | sed -n '215,320p'\nshasum -a 256 src/scripts/run_package_tests.py src/tests/test_run_package_tests.py\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 14703,
+    "output_sha256": "24459012bf9fde3d81f32e786f6f756b9a658ebaf775c5790680029552dd6e95"
+  },
+  {
+    "id": "item_7",
+    "command": "/bin/zsh -lc 'cat docs/loom/research/2026-11-08-package-test-roots.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 5302,
+    "output_sha256": "10330ffa866cdc984124afc7ecd5b73b38843216895dc68bff2224a2b967ac57"
+  }
+]

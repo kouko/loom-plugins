@@ -1,0 +1,19 @@
+{
+  "provenance.json": "8d9a1ad6d67c408c7a254d66b1b3543a4a7a32802936454009198a10d7621364",
+  "sample-receipt.json": "92edc1d9e4f5fbb1cc095f70752672b99ccde8018c1ff87960ae72b3df85ac06",
+  "fixture-cleanup.json": "ec429ed6bac0d824619cb675c532521efb7b9b866858a390c37cfb6ac915cac5",
+  "snapshots/original-research.md": "c54f28727453f125762110fe3516b4cb0eee9673f74ecddb1da6cc6d14631283",
+  "src/tests/test_run_package_tests.py": "b7ed3d4e19fd4d03c68df5d8ca796d03442a859874745564c20ddaeb7780da28",
+  "src/scripts/run_package_tests.py": "6730a53e11d862d5d3d93eadcdafb2011b81f2595332e4a57ae49a504f660d54",
+  "src/loom-code/scripts/git_exec.py": "9c721b8e2f8fae0e4c31da5d6ab41b42e0ae4eeb8cecbf164a36fce7dd61e7c7",
+  "src/loom-code/scripts/repo_files.py": "62333168fb9eacabb6877d0f185f08081175d8681444465173b18d712ca26399",
+  "docs/loom/research/2026-11-08-package-test-roots.md": "c54f28727453f125762110fe3516b4cb0eee9673f74ecddb1da6cc6d14631283",
+  "docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md": "228c273254c9360e61d9a630c163e67108cf89ae2f7b20236e65af75467c0d41",
+  "skill/engineering-research/SKILL.md": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716",
+  "skill/engineering-research/references/source-policy.md": "c9424edd2191c7ead231a82da98ae3f35c504a00454c1338512313a1d7fd16c3",
+  "skill/engineering-research/references/structured-relations.md": "dc0c65ab06534a369ee02fa76ed8d8b9d59769ee5578552c7da19a6888808d1d",
+  "skill/engineering-research/references/research-methods.md": "bfada6dddb9ae104ddc3a7e48c3a701a1eb2ea3f0955cd1f3424a41e6a668ca5",
+  "skill/engineering-research/references/preservation.md": "10d2e7871282302e5aed14e8e9b8f18b4e4ec30c56748189051521bcbeb25e04",
+  "skill/engineering-research/references/evaluation-selection.md": "5a95eabd656e96b81f48b18d151826542daf0215e99e0e7a5242ec4db2bcf78b",
+  "skill/engineering-research/templates/research.md": "62757b98a15cb64caadbba067803864e1297fbabbacd0162eba1d88e2cafa69e"
+}

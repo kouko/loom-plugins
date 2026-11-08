@@ -1,0 +1,10 @@
+{
+  "corpus.json": "bf8df6029782b3f010ab9fcdd4ae078d5dcbd14c793d52108321414b6bd989a4",
+  "harness.py": "2db66c295211184ae55c7b613e04d7bd40ab15b20933e11bb8ed37dc782d2994",
+  "design.md": "366a12991f7fc46cd16d282906647e23523097e6aeb0be52620f919333b167e9",
+  "adjacent/independent-advisor/SKILL.md": "aab77f0f6e9b86c19d33de1c0b05951c7edfe87d1bb4f8d074e443badfc6ffca",
+  "adjacent/project-retro/SKILL.md": "c534634f85c6bba4a39b0fea68e6650cf9b7467c5496ecc960be08eacbaaa73c",
+  "adjacent/build/SKILL.md": "b3ac09cce7bbba8b5d5aa9f2b6b0d3e13987e6cfcddd3e4f0a48facbb7e1bcf6",
+  "adjacent/critique/SKILL.md": "ec3e43494ffb853e5903c04588fc67c26709a9e7af23c1dc2fc7d0b9535f9684",
+  "adjacent/write-plan/SKILL.md": "a26695f89276cbda92a17705b0f18fc4a18b0a2238ac7dae44b1782f71fd954b"
+}

@@ -1,0 +1,42 @@
+{
+  "observed_utc": "2026-11-08T10:52:11.214757+00:00",
+  "status": "six native actor runs complete; independent audits pending; no self grade",
+  "raw_root": "/private/tmp/code-owned-engineering-research-execution-20261108",
+  "auditor_input": "/private/tmp/code-owned-engineering-research-execution-20261108/auditor-input",
+  "target_owner": "loom-code",
+  "target_commit": "fe2a78328bb5a7c77cab4917a6de846fcacb02a6",
+  "frozen_files": 30,
+  "frozen_hash_mismatches": [],
+  "prior_attempts": "Original six infrastructure failures and network-review rejection preserved unchanged under /private/tmp/formal-engineering-research-execution; new explicit user authorization at /private/tmp/loom-code-owned-dogfood-authorization.json permitted this fresh run.",
+  "actor_count": 6,
+  "exit_codes": {
+    "F01": 0,
+    "F02": 0,
+    "F03": 0,
+    "F04": 0,
+    "F05": 0,
+    "F06": 0
+  },
+  "elapsed_actor_seconds": 440.779,
+  "usage_totals": {
+    "input_tokens": 900556,
+    "cached_input_tokens": 758528,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 16617,
+    "reasoning_output_tokens": 863
+  },
+  "money_cost": "not provided by native receipts; no estimate invented",
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "server_confirmed_model": null,
+  "concurrency": 2,
+  "all_auth_symlinks_removed": true,
+  "cleanup": {
+    "auth_symlinks_remaining": []
+  },
+  "reasoning_events_excluded": 0,
+  "self_grade": "not performed",
+  "live_Vault_writes": "none; temporary fixtureVault only",
+  "lifecycle_limit": "Topic branch retained after pre-execution guard rejection; actual narrow clean-main observation retained, no fuller cleanup/release/install claim."
+}

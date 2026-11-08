@@ -1,0 +1,74 @@
+[
+  {
+    "id": "item_1",
+    "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!node_modules'\"' -g '\"'!'\"\\\\.git'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 731,
+    "output_sha256": "b249ea5b849789f4c7ce6b8b48e98f77b5deb67c64542e3e38770d441c9c4774"
+  },
+  {
+    "id": "item_2",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9333,
+    "output_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+  },
+  {
+    "id": "item_3",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/references/preservation.md skill/engineering-research/templates/research.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 17417,
+    "output_sha256": "cd458b5d6d5a033feea91c6c88fd0b834eeaca8f0df63ec80ca4c8ba403a5da9"
+  },
+  {
+    "id": "item_5",
+    "command": "/bin/zsh -lc 'cat docs/loom/research/2026-11-08-package-test-roots.md provenance.json sample-receipt.json fixture-cleanup.json snapshots/original-research.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9365,
+    "output_sha256": "fc92cbf2fc2664250d9074d9cbe32aaa111f1a9531bf80004d51fb83c95404e4"
+  },
+  {
+    "id": "item_6",
+    "command": "/bin/zsh -lc 'git status --short --branch; git log --all --graph --decorate --format=fuller -8; git ls-files; ls -ld fixtureVault fixtureVault/research fixtureVault/research/2026-11-08-package-test-roots.md'",
+    "command_truncated": false,
+    "exit_code": 1,
+    "status": "failed",
+    "output_characters": 1482,
+    "output_sha256": "2e5ec4ccc59e4d90481401821796283c74b7412d5308fc21e0fd9d66cf182a6d"
+  },
+  {
+    "id": "item_7",
+    "command": "/bin/zsh -lc \"nl -ba src/scripts/run_package_tests.py; nl -ba src/loom-code/scripts/repo_files.py; nl -ba src/loom-code/scripts/git_exec.py; sed -n '200,320p' src/tests/test_run_package_tests.py; git diff HEAD --; git diff HEAD\"'^1 HEAD --stat; git show HEAD:docs/loom/research/2026-11-08-package-test-roots.md; shasum -a 256 src/scripts/run_package_tests.py src/loom-code/scripts/repo_files.py src/loom-code/scripts/git_exec.py src/tests/test_run_package_tests.py docs/loom/research/2026-11-08-package-test-roots.md snapshots/original-research.md provenance.json'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 31662,
+    "output_sha256": "4bfeb075204f7a0d1f20b3fa40663b26819430f52a7c83613525ca9f76bcfa99"
+  },
+  {
+    "id": "item_9",
+    "command": "/bin/zsh -lc \"python3 - <<'PY'\nfrom pathlib import Path\nimport hashlib, json, stat, subprocess\nroot=Path.cwd()\nsource=Path('docs/loom/research/2026-11-08-package-test-roots.md')\ntarget=Path('fixtureVault/research/2026-11-08-package-test-roots.md')\nfor p in [Path('fixtureVault'), target.parent]:\n    if not stat.S_ISDIR(p.lstat().st_mode):\n        raise RuntimeError(f'Not an ordinary directory: {p}')\nif target.exists() or target.is_symlink():\n    raise RuntimeError('Destination already exists; overwrite not authorized')\nraw=source.read_bytes()\nsha=lambda b:hashlib.sha256(b).hexdigest()\nrevision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\nassert revision=='4959e620a78e15678a3cc2a8a0c18f79de58dc73'\nassert subprocess.check_output(['git','show',f'{revision}:{source.as_posix()}'])==raw\nassert subprocess.check_output(['git','diff','HEAD','--'])==b''\nprov=json.loads(Path('provenance.json').read_text())\nfor f in prov['files']:\n    assert sha((Path('src')/f['path']).read_bytes())==f['sha256']\ncontent=raw.decode().replace('../../../','../../')\ncontent+='''\n## Preservation provenance and verification — 2026-11-08\n\nThis human-readable copy was saved directly to the user-authorized temporary fixture Vault at \"'`fixtureVault/research/2026-11-08-package-test-roots.md`. Obsidian CLI was unavailable; no app, plugin, installation, or host integration was used or verified.",
+    "command_truncated": true,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 242,
+    "output_sha256": "6696ec50705110eb0111b211481c8c14ad034c8c5a4a8d680237d631814fd2e3"
+  },
+  {
+    "id": "item_10",
+    "command": "/bin/zsh -lc \"cat fixtureVault/research/2026-11-08-package-test-roots.md; shasum -a 256 fixtureVault/research/2026-11-08-package-test-roots.md docs/loom/research/2026-11-08-package-test-roots.md; git status --short; python3 - <<'PY'\nfrom pathlib import Path\nimport re\np=Path('fixtureVault/research/2026-11-08-package-test-roots.md')\ns=p.read_text()\nfor link in re.findall(r'\\\\]\\\\(([\"'^)]+)'\"\\\\)',s):\n    resolved=(p.parent/link).resolve()\n    assert resolved.is_relative_to(Path.cwd()) and resolved.is_file(), link\n    print('Resolved link:',link)\noriginal=Path('docs/loom/research/2026-11-08-package-test-roots.md').read_text()\nassert s.split('\\\\n## Preservation provenance and verification')[0]==original.replace('../../../','../../')\nprint('Read-back: original body retained with only relative-link adaptations; provenance section present.')\nPY\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 6919,
+    "output_sha256": "85c32aa7b6d70e1ebf22a6c780a2952f4e35e65cdf1309f7f34b4f110f67b433"
+  }
+]

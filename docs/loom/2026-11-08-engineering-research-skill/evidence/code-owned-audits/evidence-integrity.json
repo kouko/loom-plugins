@@ -1,0 +1,26 @@
+{
+  "utc": "2026-11-08T11:01:40.333467+00:00",
+  "hashes": {
+    "A01/answer.txt": "5469ba7adb24649c2ce63fd682a42018d1feeffde6d2b6e57242154c563954c2",
+    "A01/events.jsonl": "91277668e7291340702d3d07363f8c81a498978cd4531edd927564af9fbcea85",
+    "A01/invocation.json": "64f621ec3d855d94fc6d7f02a2a09a7d1e92ea62d5ea6fbfb6f975ef2fbdc06d",
+    "A01/receipt.json": "fe18053294eacc2c68ae5e45ef736701edcfc47f9c0f748d21f2badd3af96941",
+    "A01/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "A02/answer.txt": "a6f9878bd51cc0ef168aec047bb857aebbcfbf264f30aa4500e4326e2887e11c",
+    "A02/events.jsonl": "0f132d72889a7da55f22869ab2ae76a7406411fcc0405762b1afee6c0d1b652a",
+    "A02/invocation.json": "4adb474fec0925e14159de4f982909b9a6714f5ba66896b2f8e61327bda1d8a2",
+    "A02/receipt.json": "e67ab1bb02fb0e7ff54b9e9852d65e67301897c784746c63ea684aab77081b69",
+    "A02/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cleanup.json": "fbd0612a7ca5a3af30a8d45ccb41c4ef9526d7cf653f6a161595ee5d3e960d98",
+    "comparison.json": "48b75b7c8bdb0a064086f120edb31d877f12bdfd8716b76b95cee71111baef17",
+    "comparison.md": "7e5670ab196e7f7ebfad9cf49df8dd6a02515a4f73f1847663936dc7318e6be2",
+    "configuration.txt": "5a0f487807aa4e75bebe84c91deaa714c2d09053a788ef6a7ae45809703bcabf",
+    "freeze.json": "bc9d4c9b8027136fd6744c2119d653acca2ba695cb4428c10a8259826c9dd778",
+    "prompt.txt": "d0620d8d69ab039b5e005b3efddb2fe1bd41af5c19bae46d1e574123ed5dc16c",
+    "receipts.json": "1490c20d73284d72f34ab882dc63cd20e8f55c944704d3ba90f9948830de0411",
+    "shared-declared-contract.md": "df32e224e5dd70aec0cb63cea475214d403a8b385109724515b278dca6b33c80"
+  },
+  "raw_root": "/private/tmp/code-owned-engineering-research-audits-20261108",
+  "raw_reasoning": "excluded",
+  "executable_files_copied": false
+}

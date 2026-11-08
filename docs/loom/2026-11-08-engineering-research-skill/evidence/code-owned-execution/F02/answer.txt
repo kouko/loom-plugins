@@ -1,0 +1,5 @@
+不能套用。未使用 `--loom-family` 時，runner 會將 `tests/local/test_example.py` 原樣交給 pytest，不會加入 preset 的 `local/` 排除參數。
+
+已保留原決策，另存並讀回確認新研究：[001-explicit-local-test-arguments.md](/private/tmp/code-owned-engineering-research-execution-20261108/F02/project/docs/loom/fixture-explicit-args/research/001-explicit-local-test-arguments.md)。
+
+全程未跑測試。結論限於來源碼的參數轉交行為；實際收集、執行及通過與否仍未驗證。fixture 的本地 merge／cleanup 證據不代表真實部署或完整 CI 驗證。

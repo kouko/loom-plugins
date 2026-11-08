@@ -1,0 +1,8 @@
+已核實並保存至授權的[研究副本](/private/tmp/code-owned-engineering-research-execution-20261108/F06/project/fixtureVault/research/2026-11-08-package-test-roots.md)。
+
+- 本地合併版本：`4959e620a78e15678a3cc2a8a0c18f79de58dc73`。
+- 來源快照版本：`d5a7f0da247214bdb9c61fe90c550256432e5f76`；四份來源 hash 均符合 provenance。
+- 已讀回副本、核對相對連結；原研究未修改。
+- 副本 SHA-256：`69400d334d3f96e8de7cf5095113bdfd53c20833ddfd949a5a41e64b3ff3eb7e`。
+
+原研究的測試根目錄與 `local/` 排除結論獲靜態來源支持。清理收據僅證明當時的 fixture 狀態，目前有未追蹤檔案。未執行測試；執行結果、完整 CI、Obsidian 顯示及真實安裝／部署仍未驗證。此次合併與保存不代表發布或安裝。

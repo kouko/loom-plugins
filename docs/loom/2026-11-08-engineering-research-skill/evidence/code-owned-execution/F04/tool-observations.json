@@ -1,0 +1,92 @@
+[
+  {
+    "id": "item_1",
+    "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!'\"\\\\.git' -g 'AGENTS.md' -g 'SKILL.md' -g '*receipt*' -g '*provenance*' -g '*cleanup*' -g '*package-test-roots*' -g '*bundle*'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 221,
+    "output_sha256": "66190fdafc93198db3d370f4df602801e254895098b870f8d33cda0039450d75"
+  },
+  {
+    "id": "item_2",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9333,
+    "output_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+  },
+  {
+    "id": "item_3",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 13482,
+    "output_sha256": "9b655741d13ab38f8e53a169bf46db46b9c1bab44c5c7a2ba8505841fb9342ff"
+  },
+  {
+    "id": "item_4",
+    "command": "/bin/zsh -lc 'rg --files docs snapshots src; cat sample-receipt.json provenance.json fixture-cleanup.json; cat docs/loom/research/2026-11-08-package-test-roots.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 6622,
+    "output_sha256": "0cd8c7b2b170fe0b67a2d2a6588f1851ba8fe9411da31719f78e7405199e4f16"
+  },
+  {
+    "id": "item_6",
+    "command": "/bin/zsh -lc 'cat snapshots/original-research.md; nl -ba src/tests/test_run_package_tests.py'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 19115,
+    "output_sha256": "3610dbd0d0b832dc289da150160b5527a55c99614982305c5b46af1d51a8d513"
+  },
+  {
+    "id": "item_7",
+    "command": "/bin/zsh -lc 'nl -ba src/scripts/run_package_tests.py; nl -ba src/loom-code/scripts/repo_files.py; nl -ba src/loom-code/scripts/git_exec.py'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 22647,
+    "output_sha256": "19c124702ca080ce6655129afa8dce344e8769be8d8ba0719e8899f65f98d3a8"
+  },
+  {
+    "id": "item_8",
+    "command": "/bin/zsh -lc \"git status --porcelain; git log -5 --oneline --decorate; git branch --list; rg --files -g '\"'!src/**'\"' -g '\"'!skill/**'\"'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 351,
+    "output_sha256": "7e29095c457b0366212cd3e2df6457ce811c5ca9de033e4b139e72ea3c6f593e"
+  },
+  {
+    "id": "item_9",
+    "command": "/bin/zsh -lc \"python3 - <<'PY'\nfrom pathlib import Path\nimport hashlib,json,re\nroot=Path.cwd()\np=json.loads((root/'provenance.json').read_text())\nfor key,prefix in [('files','src'),('skill_files','skill/engineering-research')]:\n for entry in p[key]:\n  f=root/prefix/entry['path']\n  actual=hashlib.sha256(f.read_bytes()).hexdigest()\n  print(f'{f.relative_to(root)} sha256={actual} match={actual==entry[\\\"sha256\\\"]}')\na=root/'docs/loom/research/2026-11-08-package-test-roots.md'\nb=root/'snapshots/original-research.md'\nprint('record_equals_snapshot=',a.read_bytes()==b.read_bytes())\nfor f in (a,b):\n for target in re.findall(r'\\\\]\\\\(([\"'^)]+)'\"\\\\)',f.read_text()):\n  dest=(f.parent/target).resolve()\n  inside=dest.is_relative_to(root)\n  print(f'{f.relative_to(root)} link={target} inside_fixture={inside} exists={dest.exists() if inside else \\\"not accessed\\\"}')\nPY\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 1899,
+    "output_sha256": "d4f061b1366672a946c2e45df5b36e658c688b30742a753aa1f82f92ac056bb7"
+  },
+  {
+    "id": "item_10",
+    "command": "/bin/zsh -lc \"git log -3 --format='%H %P %s'; git show --stat --oneline HEAD; cat src/loom-code/scripts/git_exec.py; cat snapshots/original-research.md\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 7476,
+    "output_sha256": "2f0bebf7a75e94a503a4b0ee89cecbad6a36f3ea54794b4ac9b2f862ce09914f"
+  },
+  {
+    "id": "item_13",
+    "command": "/bin/zsh -lc \"cat docs/loom/research/2026-11-08-package-test-evidence-boundaries.md; python3 - <<'PY'\nfrom pathlib import Path\nimport re\nroot=Path.cwd()\nf=root/'docs/loom/research/2026-11-08-package-test-evidence-boundaries.md'\nlinks=re.findall(r'\\\\]\\\\(([\"'^)]+)'\"\\\\)',f.read_text())\nfor target in links:\n p=(f.parent/target).resolve()\n inside=p.is_relative_to(root)\n print(target, 'OK' if inside and p.is_file() else 'INVALID')\nprint('links_checked',len(links))\nprint('prior_record_preserved', (root/'docs/loom/research/2026-11-08-package-test-roots.md').read_bytes()==(root/'snapshots/original-research.md').read_bytes())\nPY\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 10313,
+    "output_sha256": "5d6dd51532063e6f3c777993171648392c9be24c3c2e68d337459f6dd0dc0d80"
+  }
+]

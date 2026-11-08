@@ -1,0 +1,29 @@
+{
+  "utc": "2026-11-08T11:36:32.106249+00:00",
+  "hashes": {
+    "A01/answer.txt": "7ac0ec2da44c0ce088350418a458dde42cf2eed1bf7e0de7b1d7cf7b412530a2",
+    "A01/events.jsonl": "bf9942a85f2984b0efa5853bfccaa2f87c02d226e259c31068dc6c8fe49a3f30",
+    "A01/invocation.json": "38135770479da5df9fb9002d0aacc5f10b0af6ae00754a6afd9c39a36255ea81",
+    "A01/receipt.json": "c1733a6fcf2b659437b86281ab1aa0b85709ca2bd1d6d1134626ab23330f4f34",
+    "A01/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "A02/answer.txt": "576f48bf816d15a5ea8b94d959df23247c8252bd9b4234a660e04b444375dc84",
+    "A02/events.jsonl": "01c2bbc1c324d7eac13e579864a4230c431e430ca1988d6c1ff88e72c3d95433",
+    "A02/invocation.json": "4e58e2da8acb6d9e8ef94207aec851d5cd5cdcc51cdd27c6ea2382e6c42ab8af",
+    "A02/receipt.json": "83aeb2bba09c47809dc66c86cc223e8feeb85a51e67a5efe6250230ec6f9f6df",
+    "A02/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cleanup.json": "fbd0612a7ca5a3af30a8d45ccb41c4ef9526d7cf653f6a161595ee5d3e960d98",
+    "comparison.json": "b2ee54beb6fb582854749e183cc62c325957ae15b8e1353b821f2fd7b984ec70",
+    "comparison.md": "99feba382308df023990231a5f9760556620de8cc85ed8f2ab23087f496fc2a9",
+    "configuration.txt": "5a0f487807aa4e75bebe84c91deaa714c2d09053a788ef6a7ae45809703bcabf",
+    "freeze.json": "11ad40a4f553ec1eb5b2cacca4062cec83758f90a0d940bf6a1e03bc1e392d4b",
+    "postprocess-verification.json": "ee335651de012314f9341ec087d60f0cd87d43426f1948935286b5debc3c660f",
+    "prompt.txt": "24f06178a99bc2de52be7a5fd078cfe3e76583c55da44b75740dd601d93cf536",
+    "receipts.json": "347e2f0c32ecc30ce82862bea81f714d030781f36c14e38d4cdfeed43f47c93e",
+    "shared-declared-contract.md": "df32e224e5dd70aec0cb63cea475214d403a8b385109724515b278dca6b33c80",
+    "usage.json": "ce02026ddfb1786e731610fb121b1379fd86aba83e15d9e815374835d8b79ba0"
+  },
+  "raw_root": "/private/tmp/claude-code-engineering-research-audits-20261108",
+  "packet_root": "/private/tmp/claude-code-engineering-research-audits-20261108/packet",
+  "raw_reasoning": "excluded",
+  "executable_files_copied": false
+}

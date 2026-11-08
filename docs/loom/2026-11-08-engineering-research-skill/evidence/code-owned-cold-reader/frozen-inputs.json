@@ -1,0 +1,43 @@
+{
+  "source_root": "/private/tmp/loom-engineering-research-delivery/loom-code/skills/engineering-research",
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+    },
+    {
+      "path": "references/evaluation-selection.md",
+      "sha256": "5a95eabd656e96b81f48b18d151826542daf0215e99e0e7a5242ec4db2bcf78b"
+    },
+    {
+      "path": "references/preservation.md",
+      "sha256": "10d2e7871282302e5aed14e8e9b8f18b4e4ec30c56748189051521bcbeb25e04"
+    },
+    {
+      "path": "references/research-methods.md",
+      "sha256": "bfada6dddb9ae104ddc3a7e48c3a701a1eb2ea3f0955cd1f3424a41e6a668ca5"
+    },
+    {
+      "path": "references/source-policy.md",
+      "sha256": "c9424edd2191c7ead231a82da98ae3f35c504a00454c1338512313a1d7fd16c3"
+    },
+    {
+      "path": "references/structured-relations.md",
+      "sha256": "dc0c65ab06534a369ee02fa76ed8d8b9d59769ee5578552c7da19a6888808d1d"
+    },
+    {
+      "path": "templates/research.md",
+      "sha256": "62757b98a15cb64caadbba067803864e1297fbabbacd0162eba1d88e2cafa69e"
+    }
+  ],
+  "request_sha256": "871e20172e5246d705d7d2638c021b9ca4c06d503abbcd2d46f35f7f6be66b77",
+  "config_sha256": "1793c0c62d4557f4f72c1ca9745cc316ae05d1fa21d95bf8f5b0645c67665c39",
+  "cli": "/Users/kouko/.local/bin/codex",
+  "cli_version": "0.167.0",
+  "requested_provider": "openai",
+  "requested_model": "gpt-6.1-sol",
+  "requested_effort": "medium",
+  "author_context_provided": false,
+  "orchestrator_model": null,
+  "orchestrator_effort": null
+}

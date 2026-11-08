@@ -1,0 +1,21 @@
+我正在收尾:紀錄已寫入並讀回確認,下面是結論。
+
+**結論:不會。** 一般的 `--loom-family` preset 不會跑根目錄 `tests/local/` 的 Python 或 shell tests。
+
+**依據**(靜態讀 `src/scripts/run_package_tests.py`,沒有執行任何測試或 runner):
+- 一般 preset 的 `only=None`,所以會建出 `code` 和 `workflow-shell` 兩組(第 124、134 行)。
+- Python:`_tests_session`(第 76–85 行)只看 `local/` 以外是否有測試,而且只要 `local/` 存在就加上 `--ignore=<root>/local`。
+- Shell:`_shell_tests`(第 88–95 行)會排除 parents 含 `<root>/local` 的 `test-*.sh`。
+- `src/tests/test_run_package_tests.py` 第 222 行和第 285 行的測試定義了同樣的預期,但我只讀了,沒有跑。
+- runner 和測試檔的 SHA256 重新量過,與 `provenance.json` 一致,所以沿用既有證據,也沒做新實驗。
+
+**紀錄:**
+- 路徑是 `docs/loom/research/2026-11-08-package-test-roots.md`,仍是同一份檔案。我新增了「Continuation」段落。
+- 我也把舊 finding 裡一處行號從 76–86 修成 76–85。
+- 第 22 行其餘舊行號沒有直接改,只在 Continuation 裡註記更正:`code` 組是 124–128、`_shell_tests` 是 88–95。
+- 沒有 commit。工作樹裡只有這份紀錄有修改,`skill/` 和 `fixture-cleanup.json` 本來就是未追蹤檔案。
+
+**不確定事項:**
+- 只排除直接位於 root 下的 `local/`。更深層的 `tests/hooks/local/` 這類路徑,這段程式碼不會排除,我沒查實際有沒有這種目錄。
+- 明確指定路徑、裸 `pytest`,或非 preset 的明確參數模式,仍可能跑到 `tests/local/`。
+- CI 設定和實際安裝版本不在提供的快照內,沒有驗證。

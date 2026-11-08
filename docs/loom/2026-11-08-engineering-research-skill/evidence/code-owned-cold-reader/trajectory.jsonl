@@ -1,0 +1,4 @@
+{"type": "thread.started", "thread_id": "01a1bac5-bd55-7a13-a7a1-52111666d913"}
+{"type": "turn.started"}
+{"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "answer_artifact": "answer.md", "text_sha256": "ba4888fecbe5e169df0e2856fa6ce9f3bc4a328c3779876899c8a626a9a341ef"}}
+{"type": "turn.completed", "usage": {"input_tokens": 18113, "cached_input_tokens": 8960, "cache_write_input_tokens": 0, "output_tokens": 1420, "reasoning_output_tokens": 154}}
