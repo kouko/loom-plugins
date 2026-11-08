@@ -55,6 +55,18 @@ Requirement continuity section defines.
 - Test: Live boundary checks cover traversal, external paths, symlink escapes and writes; omit command tools. Reuse six prompts/fixtures/rubric; run one fresh old/new pair each with identical confined tools. Two independent revision-blinded auditors inspect trajectories. Preserve earlier native-tool results separately.
 - Risk: agent-decided — Confinement is a fixed harness control, not production safety or skill improvement. Six pairs give directional evidence only. Retain first-party Anthropic/OpenAI identities and existing data boundaries; no real Vault, installation, publication, merge or trigger claims.
 
+### Wave 5 — User-approved save-result tool experiment
+
+**W5-01 Prototype one confined save operation with substantive results** after: W4-02 acceptance: 3,8,9
+- Files: loom-code/tests/local/engineering_research_save_probe/, docs/loom/2026-11-08-engineering-research-skill/evidence/save-result-prototype/, docs/skill-dogfood/2026-11-08-code-owned-engineering-research/
+- Test: RED/GREEN tests cover real persisted-body output, local-link results, missing/outside links, unauthorized paths, symlink escapes, no-write, collision and stale updates. Exercise the stdio adapter locally; public native-host control precedes private behavioral runs.
+- Risk: agent-decided — User said continue after the save-result proposal. Prototype stays test-local; runtime skill, gate, schema and installations remain unchanged. A complete tool result is evidence availability, not proof the agent inspected it or judged research correctly.
+
+**W5-02 Compare save-result behavior under an unchanged research contract** after: W5-01 acceptance: 3,8,9
+- Files: loom-code/tests/local/engineering_research_save_probe/, docs/loom/2026-11-08-engineering-research-skill/evidence/save-result-prototype/, docs/skill-dogfood/2026-11-08-code-owned-engineering-research/
+- Test: Freeze matched save-confirmation/full-result tools and current skill. Prioritize F04 creation, F01 update, F06 authorized copy; include no-write control. Preserve histories and independent trajectory judgments. Confirm native custom-tool isolation before transmitting private fixtures.
+- Risk: agent-decided — This tests a tool intervention, not another prose revision or automatic activation. Preserve W4 residual failures and attempts. No production promotion or external transmission beyond specifically authorized payloads; prepare concrete frozen inputs before any required permission request.
+
 ## Simplicity check
 - none found
 
@@ -69,3 +81,4 @@ Requirement continuity section defines.
 5. The spec received independent spec+adversarial PASS against da402f1b; engineering exemption applies to decision point ②, and the plan is agent-decided. The next user decision is acceptance after publication checks.
 6. W3 changes the ownership and design-integration obligation by explicit user reconfirmation; it does not reopen completed word-cap, portability or archive fixes, reset their attempts, or authorize the still-blocked native-model payload transmission.
 7. W4 retains original findings/attempts. Specific provider permissions and explicit repair/retest approval govern this bounded rerun, without provider substitution or broader data collection. Report lack of improvement rather than iterate indefinitely.
+8. W5 changes the experimentally manipulated tool result, not the outcome or earlier failed task identity. Keep the same current skill and criteria across arms. If host isolation cannot be established, retain local results and report the untested behavioral boundary.
