@@ -98,7 +98,7 @@ def test_revision_blinding_removes_only_runtime_read_results(tmp_path):
       {'type':'user','message':{'content':[{'type':'tool_result','tool_use_id':'denied','content':'outside path denied','is_error':True}]}}
     ]
     raw=''.join(json.dumps(e)+'\n' for e in events)
-    redacted,receipt=packager.blind_runtime_reads(raw,work)
+    redacted,receipt=packager.mask_skill_reads(raw,work)
     assert secret not in redacted and 'ACTUAL_SAVED_FINDING' in redacted and 'outside path denied' in redacted
     actual=[json.loads(l) for l in redacted.splitlines()]
     assert len(actual)==len(events)

@@ -119,3 +119,22 @@ execution is unavailable. They remain harness observations, not actor-executed
 tests or CI. Original prompts/fixtures and declared evaluation criteria remain
 the comparison basis; any common adapter and changed tool menu are disclosed.
 One fresh pair per case is directional evidence, not a statistical rate claim.
+
+### Persisted-save result prototype
+
+The user's subsequent instruction to continue authorizes testing the proposed
+save-result intervention against the same completion outcomes. W5 retains the
+W4 runtime skill and all residual failures. A test-local save tool compares
+confirmation-only output with actual persisted-content, hash and bounded local
+link observations; both modes enforce identical instance write policies and
+perform the same underlying operations. No runtime helper, gate, mandatory MCP
+dependency, schema or installed configuration is added by this experiment.
+
+Native custom-tool testing uses restricted file tools with explicit session-only
+MCP/settings, because safe mode disables custom MCP servers. Two public synthetic
+controls establish actual tool calls and matching persisted-body results, plus
+denied traversal writes; explicit settings and public instruction canaries
+support context isolation. These are bounded host observations, not a general
+filesystem sandbox proof. Private runs remain contingent on frozen inputs and
+the applicable payload-specific transmission approval. Returning full content
+establishes evidence availability, not comprehension or research correctness.

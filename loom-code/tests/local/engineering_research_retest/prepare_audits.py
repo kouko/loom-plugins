@@ -32,7 +32,7 @@ def dump(p, obj):
     p.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + '\n')
 
 
-def blind_runtime_reads(raw, work):
+def mask_skill_reads(raw, work):
     """Hide runtime source bodies, retaining event positions and non-source data."""
     source_root = (work/'skill/engineering-research').resolve()
     calls, output, redacted = {}, [], []
@@ -104,7 +104,7 @@ def prepare():
         src = RUN/actor; dest = source/actor; dest.mkdir()
         for name in ['prompt.txt','answer.txt','receipt.json','before.json','after.json','stderr.txt']:
             shutil.copy2(src/name,dest/name)
-        blinded, blinding_receipt = blind_runtime_reads((src/'events.jsonl').read_text(), src/'project')
+        blinded, blinding_receipt = mask_skill_reads((src/'events.jsonl').read_text(), src/'project')
         (dest/'events.jsonl').write_text(blinded)
         dump(dest/'source-read-blinding.json',blinding_receipt)
         shutil.copytree(src/'project',dest/'project',ignore=shutil.ignore_patterns('skill'))

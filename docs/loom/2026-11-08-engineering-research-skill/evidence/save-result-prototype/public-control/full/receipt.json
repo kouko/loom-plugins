@@ -1,0 +1,75 @@
+{
+  "actor": "full",
+  "case": "PUBLIC_SYNTHETIC",
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 11.745,
+  "requested_provider": "first-party Anthropic native account; no provider env inherited",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_effort": "medium",
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 1122,
+      "cache_read_input_tokens": 15160,
+      "output_tokens": 918,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 1122,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 539,
+          "cache_read_input_tokens": 5286,
+          "cache_creation_input_tokens": 613,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 613
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 6,
+        "outputTokens": 918,
+        "cacheReadInputTokens": 15160,
+        "cacheCreationInputTokens": 1122,
+        "webSearchRequests": 0,
+        "costUSD": 0.015196,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 0,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 1122,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.015196,
+    "permission_denials": [],
+    "num_turns": 4
+  },
+  "changed_files": [],
+  "added_files": [
+    "docs/loom/research/public-control.md"
+  ],
+  "deleted_files": [],
+  "cost_scope": "CLI list-price equivalent, not subscription bill"
+}

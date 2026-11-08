@@ -1,0 +1,14 @@
+{
+  "claudeMdExcludes": [
+    "/**"
+  ],
+  "autoMemoryEnabled": false,
+  "disableAllHooks": true,
+  "pluginConfigs": {
+    "cc-plugin-agents-md@builtin": {
+      "options": {
+        "instructionFiles": "managed-only"
+      }
+    }
+  }
+}

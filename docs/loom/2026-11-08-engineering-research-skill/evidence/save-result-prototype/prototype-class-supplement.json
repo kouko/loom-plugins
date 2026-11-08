@@ -1,0 +1,198 @@
+{
+  "class": "Post-write parsing failures must not lose written/readback state",
+  "whole_files_scanned": [
+    "loom-code/tests/local/engineering_research_save_probe/README.md",
+    "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+    "loom-code/tests/local/engineering_research_save_probe/server.py",
+    "loom-code/tests/local/engineering_research_save_probe/test_experiment.py",
+    "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py"
+  ],
+  "timing": "supplement after prototype edge correction; original whole-branch sweep retained separately",
+  "matches": [
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/README.md",
+      "line": 30,
+      "text": "Atomic file replacement/create-if-absent is followed by a point-in-time readback;"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 7,
+      "text": "from urllib.parse import unquote, urlsplit"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 15,
+      "text": "    def __init__(self, message, *, written=False):"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 17,
+      "text": "        self.written = written"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 78,
+      "text": "            raise SaveError('size exceeds complete-result cap; nothing written')"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 81,
+      "text": "        written = False"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 100,
+      "text": "            written = True"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 103,
+      "text": "                raise SaveError('saved bytes changed before readback', written=True)"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 105,
+      "text": "            result = {'written': True, 'path': target.relative_to(self.root).as_posix()}"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 107,
+      "text": "                        readback_complete=True, observation_scope='point-in-time persisted bytes; no semantic correctness verdict',"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 110,
+      "text": "        except SaveError:"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 112,
+      "text": "        except OSError as exc:"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 113,
+      "text": "            raise SaveError('save/readback IO failed: ' + str(exc), written=written) from exc"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 137,
+      "text": "                parsed = urlsplit(raw)"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+      "line": 138,
+      "text": "            except ValueError:"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/server.py",
+      "line": 32,
+      "text": "        except (SaveError, TypeError) as exc:"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/server.py",
+      "line": 33,
+      "text": "            result, error = {'written': getattr(exc, 'written', False), 'error': str(exc)}, True"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/server.py",
+      "line": 34,
+      "text": "        return {'content': [{'type': 'text', 'text': json.dumps(result, ensure_ascii=False)}], 'isError': error}"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/server.py",
+      "line": 52,
+      "text": "            reply = {'jsonrpc': '2.0', 'id': request['id'], 'result': dispatch(request, tool)}"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/server.py",
+      "line": 53,
+      "text": "        except (ValueError, TypeError) as exc:"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/server.py",
+      "line": 55,
+      "text": "            reply = {'jsonrpc': '2.0', 'id': request.get('id') if isinstance(request, dict) else None,"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 28,
+      "text": "    assert result['written'] and result['readback_complete']"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 37,
+      "text": "    assert brief == {'written': True, 'path': 'docs/loom/research/q.md'}"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 49,
+      "text": "    assert t.save_record('fixtureVault/research/exact.md','# approved')['written']"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 120,
+      "text": "    assert result['written'] and result['readback_complete']"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 132,
+      "text": "    assert exc.value.written is True"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 138,
+      "text": "    request=[{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2024-11-05'}},"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 139,
+      "text": "      {'jsonrpc':'2.0','method':'notifications/initialized'},"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 140,
+      "text": "      {'jsonrpc':'2.0','id':2,'method':'tools/list'},"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 141,
+      "text": "      {'jsonrpc':'2.0','id':3,'method':'tools/call','params':{'name':'save_record','arguments':{'path':'docs/loom/research/q.md','content':'# Complete\\n\\nActual body'}}},"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 142,
+      "text": "      {'jsonrpc':'2.0','id':4,'method':'tools/call','params':{'name':'save_record','arguments':{'path':'../outside.md','content':'no'}}}]"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 149,
+      "text": "    assert not replies[2]['result']['isError'] and replies[3]['result']['isError']"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 150,
+      "text": "    assert json.loads(replies[3]['result']['content'][0]['text'])['written'] is False"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 158,
+      "text": "    requests=[{'jsonrpc':'2.0','id':1,'method':'tools/call','params':None},"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 159,
+      "text": "              {'jsonrpc':'2.0','id':2,'method':'ping'}]"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 168,
+      "text": "    request={'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':'save_record','arguments':{'path':'docs/loom/research/q.md','content':'[x](http://[)'}}}"
+    },
+    {
+      "path": "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py",
+      "line": 173,
+      "text": "    assert body['written'] and body['persisted_content']=='[x](http://[)'"
+    }
+  ]
+}

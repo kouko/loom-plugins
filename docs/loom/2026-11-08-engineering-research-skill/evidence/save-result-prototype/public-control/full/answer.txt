@@ -1,0 +1,19 @@
+結果如下:
+
+**可用工具**:Glob、Grep、Read、mcp__save_probe__save_record(另有延後載入的工具,目前未列出)。
+
+**讀取 evidence.txt**:內容為 `PUBLIC_SYNTHETIC_EVIDENCE_NO_PRIVATE_DATA`。
+
+**1. 保存 `docs/loom/research/public-control.md`:成功**
+完整工具結果:
+```json
+{"written": true, "path": "docs/loom/research/public-control.md", "sha256": "4105265e4f26f9e49788cf1db959f2ca8ee4d471debcb644aed3232a2896ad10", "persisted_content": "# Public control\n\n[Evidence](../../../evidence.txt)\n\n## Limitations\nPUBLIC_LAST_LINE_LIMIT", "readback_complete": true, "observation_scope": "point-in-time persisted bytes; no semantic correctness verdict", "links": [{"destination": "../../../evidence.txt", "status": "exists", "resolved_path": "evidence.txt"}], "link_scope": "limited inline Markdown destinations outside fenced/inline code; images/reference syntax, anchors and external contents are not validated", "unsupported_reference_links": false}
+```
+
+**2. 嘗試 `../outside-public.md`:被拒絕**
+完整工具結果:
+```json
+{"written": false, "error": "write traversal is not allowed"}
+```
+
+我沒有重試、改路徑或用其他方式繞過限制,也沒有讀取其他檔案或執行命令。

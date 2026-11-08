@@ -1,0 +1,60 @@
+{
+  "utc": "2026-11-08T12:30:45.757594+00:00",
+  "public_data_only": true,
+  "sources": {
+    "experiment.py": "b9105e2c6c59bb2771c8f97542b4305a28a46c9d1a994c5a024f222603fad4e7",
+    "public_runner.py": "98a6631f5f73ed58378a8b5284db1692457b09670041c16efec36295faadfeef",
+    "save_tool.py": "d929b2dedd1290475cd7a63d43413b221a4130d112dd132eeb04101fbd16acc1",
+    "server.py": "5b5f01675cafc0b0611fbee96121236e93858773e8aa66ad6bbeeaedc53fceca"
+  },
+  "inputs": {
+    "confirmation": {
+      "project": {
+        ".claude/rules/public-canary.md": "c85f5c8e747f01e06733d376cc60b5900c6fccc3f6663f184713589631f05970",
+        "AGENTS.md": "8af5086cf0235ab52cae80319de86b4ee3f476fc28b22c0619e22907f221a36f",
+        "CLAUDE.md": "2bbcc27704e3efba167ab3512b4c41b354752dd99888357f729fa9d18ca96222",
+        "evidence.txt": "17e586f582b42f790b7198b88e3f27511e1ed839fb6cae59bccfe3eed39104ea"
+      },
+      "configuration": {
+        "mcp.json": "3141c382a767568d43afffa1da51c2a7cefb411d78096327ef58f22d1c7a49ac",
+        "policy.json": "fd9f4d2b6705ac274e3d32a3df76087d8c11856d8c3ec81e0fd324040867f5c7",
+        "prompt.txt": "32e77927fc41d54c3dfb2dc43a0b8226b9462545b3bf0d1454a572ab977808aa"
+      }
+    },
+    "full": {
+      "project": {
+        ".claude/rules/public-canary.md": "c85f5c8e747f01e06733d376cc60b5900c6fccc3f6663f184713589631f05970",
+        "AGENTS.md": "8af5086cf0235ab52cae80319de86b4ee3f476fc28b22c0619e22907f221a36f",
+        "CLAUDE.md": "2bbcc27704e3efba167ab3512b4c41b354752dd99888357f729fa9d18ca96222",
+        "evidence.txt": "17e586f582b42f790b7198b88e3f27511e1ed839fb6cae59bccfe3eed39104ea"
+      },
+      "configuration": {
+        "mcp.json": "42ad70817aa2ac382f586d8ae49c8b41ca247a9e4318f2779aebfdb5eb09cdd9",
+        "policy.json": "ce98446b0c331296c6073737acccec53c7b6609abfb74c81c9aa9930a89a11e1",
+        "prompt.txt": "32e77927fc41d54c3dfb2dc43a0b8226b9462545b3bf0d1454a572ab977808aa"
+      }
+    }
+  },
+  "settings_sha256": "717ea799a86830ed6f99c11ca2051a5187195569f698b74e5f6644a3e66d49ba",
+  "cli_sha256": "09f153b46b5df9e8b3454716d682a91901de020cbca630f61dec1a015b32b5e9",
+  "cli_realpath": "/Users/kouko/.local/share/claude/versions/2.1.317",
+  "model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "provider": "first-party Anthropic",
+  "timeout_seconds": 120,
+  "environment_keys": [
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "LOGNAME",
+    "PATH",
+    "PYTHONDONTWRITEBYTECODE",
+    "SECURITYSESSIONID",
+    "SHELL",
+    "TMPDIR",
+    "USER",
+    "__CF_USER_TEXT_ENCODING"
+  ],
+  "source_mode": "restricted with explicit scoped MCP; safe-mode omitted because it disables MCP",
+  "native_customization_isolation": "must be evaluated from public result; not assumed"
+}

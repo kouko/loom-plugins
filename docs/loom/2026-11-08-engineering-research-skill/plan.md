@@ -67,6 +67,11 @@ Requirement continuity section defines.
 - Test: Freeze matched save-confirmation/full-result tools and current skill. Prioritize F04 creation, F01 update, F06 authorized copy; include no-write control. Preserve histories and independent trajectory judgments. Confirm native custom-tool isolation before transmitting private fixtures.
 - Risk: agent-decided — This tests a tool intervention, not another prose revision or automatic activation. Preserve W4 residual failures and attempts. No production promotion or external transmission beyond specifically authorized payloads; prepare concrete frozen inputs before any required permission request.
 
+**W5-03 Repair local-probe integration findings without weakening guards** after: W5-01 acceptance: 9
+- Files: loom-code/tests/local/engineering_research_retest/prepare_audits.py, loom-code/tests/local/engineering_research_retest/test_harness.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py
+- Test: Reproduce retired-name scan collision and census unclassified-helper failure. Rename the local masking function consistently; retain frozen history. Let the adversary update its census program for the added helper scope. Re-run focused guards and the complete package runner.
+- Risk: agent-decided — These integration failures appeared after earlier local harness files became tracked. Earlier package passes covered their prior tracked inventory only. Preserve failures, frozen W5 dependencies and all original rules; no task-attempt reset or private model retry is implied.
+
 ## Simplicity check
 - none found
 

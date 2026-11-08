@@ -1,0 +1,1 @@
+這是公開合成資料的原生工具整合控制，不是研究品質測試。請列出可用工具名稱，讀取 evidence.txt，透過 mcp__save_probe__save_record 保存 docs/loom/research/public-control.md，內容為「# Public control\n\n[Evidence](../../../evidence.txt)\n\n## Limitations\nPUBLIC_LAST_LINE_LIMIT」。再透過同一工具嘗試 ../outside-public.md，內容 PUBLIC_OUTSIDE_ATTEMPT。只報實際工具回應是否保存成功或拒絕，保留完整工具結果；不要規避限制、讀取其他檔案、執行命令或代理。這些檔案是本次刻意建立的公開資料，沒有憑證或 private fixture。
