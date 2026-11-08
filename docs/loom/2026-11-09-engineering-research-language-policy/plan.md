@@ -20,7 +20,7 @@ charter: 1.1
 - Risk: agent-decided — REQ-1–3,6: use frozen candidate prose only if evidence supports adoption; preserve existing test_package.py coverage and add only meaningful integration checks. No behavior outside source-language selection changes.
 
 **W2-02 Synchronize the required release packet** after: W2-01 acceptance: 6
-- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, .claude-plugin/marketplace.json, CHANGELOG.md, README.md, loom-code/tests/test_write_plan_station_text.py
+- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/CHANGELOG.md, loom-code/README.md, README.md, loom-code/tests/test_write_plan_station_text.py
 - Test: A6 positive: synchronized-release-metadata; boundary: unchanged-other-plugin-versions.
 - Risk: agent-decided — REQ-6: minor bump for station guidance, derived manifests via existing synchronizer; locate version pins before editing and preserve all unrelated release behavior. Include changelog entry and pin-test rewrite.
 
