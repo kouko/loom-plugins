@@ -1153,11 +1153,6 @@ def _classify(path: Path) -> tuple[str, dict]:
 # Explicit, visible overrides applied after automatic classification (fix
 # round). Each row prints `auto=<class>, override=<class>` in the table.
 MANUAL_OVERRIDES = {
-    "loom-code/tests/local/engineering_research_save_probe/save_tool.py": (
-        "not-prose",
-        "test-local persisted-byte/link helper, not a test module; its .md "
-        "suffix checks process record data and assert no contract prose",
-    ),
     "loom-code/tests/test_adversary_recipe_shape.py": (
         "structure",
         "split_sentences feeds a duplicate-sentence check across recipe files; "
