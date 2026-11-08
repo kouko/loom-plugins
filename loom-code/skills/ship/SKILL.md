@@ -287,3 +287,16 @@ answers yes to the printed list.
 
 Report the attestation digest when one exists, else the verification status
 publish printed, publication checks, PR URL, CI state, and land's output.
+
+After verified merge into main and successful cleanup, follow land's printed
+`next:` destination before further filesystem work. If the completed change
+has relevant research records and `loom-workflow:engineering-research` is
+available, invoke that skill by name for its optional long-term preservation
+guidance. Do not read another plugin's files directly. It checks enduring or
+cross-repository value, merged revision and release-dependent evidence, and
+prepares concrete candidate content, provenance, destination and scope before
+asking for that instance's Vault-write consent. Prior task or merge permission
+does not authorize a Vault copy. Missing skill, declined consent, unavailable
+Vault, pending release or failed cleanup never blocks original task completion;
+defer preservation when its conditions are unmet. Ship remains usable without
+loom-workflow or Obsidian.

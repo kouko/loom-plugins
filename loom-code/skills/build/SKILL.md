@@ -15,6 +15,13 @@ generate publication evidence.
 Read the confirmed intent, retained spec and plan when present, current branch,
 and branch base. Preserve unrelated and untracked work. Work only on scoped paths.
 
+If an unresolved factual premise or repeated failed attempt could change an
+implementation decision, consider `loom-workflow:engineering-research` when
+available. Bring its retained record and evidence or uncertainty back to the
+owning task; preserve Build's scope and authorization. This optional handoff
+does not replace tests, advance user decisions or make routine lookups a new
+prerequisite.
+
 When the user changes requirements during implementation, the main agent must
 obtain renewed intent confirmation before implementing the changed requirements.
 The main agent must record the substantive difference, affected obligations and

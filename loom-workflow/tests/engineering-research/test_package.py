@@ -12,6 +12,7 @@ RESOURCES = {
     "references/source-policy.md",
     "references/evaluation-selection.md",
     "references/structured-relations.md",
+    "references/preservation.md",
     "templates/research.md",
 }
 

@@ -136,3 +136,11 @@ ordinary URLs for external sources; paths must resolve from the record.
 This is an on-demand capability, not another Loom station. Identify the pending decision and the factual gap before doing work. Preserve the active station and confirmed authorization. If evidence is already sufficient, reuse it in the retained record and return without additional investigation. Otherwise inspect relevant local artifacts, consult applicable original sources, or run the smallest authorized measurement. Use an existing research tool when its scope fits.
 
 Return the decision, the actual saved record path, and remaining material uncertainty in the conversation; resume the owning task within its authorization. Verify the record content before calling it saved or complete. Do not start a new goal, install tools, publish, or advance a human decision point on the user's behalf.
+
+## Optional long-term preservation
+
+Only when finishing a merged change with relevant research, or explicitly asked
+to preserve research from an earlier merged change, read
+[preservation guidance](references/preservation.md). This optional proposal
+does not block the owning task or authorize a Vault write. Ordinary research
+does not load this reference.
