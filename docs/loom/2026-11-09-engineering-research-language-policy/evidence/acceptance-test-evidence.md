@@ -86,3 +86,48 @@ env UV_CACHE_DIR=/private/tmp/loom-uv-relative-cache uv run --offline --isolated
 ## Reproducibility of independent archive checks
 
 The inventory check iterates `first-trial` and `supplemental`: load `<stem>.inventory.json`; assert SHA-256 of the named archive; open it with `tarfile`; assert the ordered member names equal `members[].path`; for each zipped entry assert regular file, read bytes, compare `size` and SHA-256. Extract only after all checks pass. For each extracted root, load `freeze.json` and recompute each relative `hashes` entry, then load `audit-packet-freeze.json` and recompute each `files` entry relative to `audit-packet/`. The exact source data are the committed inventory/freeze files, not the historical verifier's absolute directory.
+
+## Re-run on 2026-11-09, at 03b1aedf488852f8e3375cf6d6a80f449a180296
+
+### Clean setup and fix-diff audit
+
+- Created another fresh clone: `git clone --no-hardlinks /private/tmp/loom-engineering-research-language-policy-delivery /private/tmp/loom-language-policy-acceptance-clean-round2`; then `git checkout --detach 03b1aedf488852f8e3375cf6d6a80f449a180296`. Output: `HEAD is now at 03b1aedf4 docs(loom-code): record supported finalizer command repair`. Initial porcelain status was empty.
+- Inspected the complete fix diff `ceaab3c2fc04b0e7504a704ad73646271cbb626c..03b1aedf488852f8e3375cf6d6a80f449a180296`. Exactly two changed paths: `plan.md` and [finalize-command-repair.md](finalize-command-repair.md), within this change. Runtime skill, maintained tests, release metadata, archived cases and prior acceptance evidence are unchanged.
+- Rechecked root README installation/development instructions and skill README runtime link, then actually read the clean `SKILL.md`, research methods, source policy and record template. Explicit raw loading remains the authorized setup; no global installation or installed-host/routing claim.
+
+### Per-row carry-over audit
+
+- 1: carried over — Search-language instructions, exact identifiers and prior actual query traces are untouched by this two-document command-invocation repair. No new external exploratory search is claimed.
+- 2: carried over — Sufficiency/stopping rules and prior local/official-source observations are untouched. The current setup check does not relabel previous behavior as freshly observed discovery.
+- 3: carried over — Original-language and translation guidance plus all eight trajectories are untouched. The partly result retains both delayed expansion and active duplicate-translation handling as unobserved.
+- 4: carried over — Supplemental neutral tasks, initial evidence, actual actions, saved notes and both independent assessments are untouched. No manufactured failed search or forced language selection was added.
+- 5: carried over — Both archives, inventories, freezes, original six cases, audits, cold reader and limitations are untouched. The earlier integrity checks and unresolved disagreement remain historical results; they were not rerun or silently revised.
+- 6: re-tested — The validation invocation is the only affected surface. Re-tested explicit source loading, bounded research retention/readback, installed command recognition, focused policy package tests and the full release-pin/station module in the new clean copy. No full package suite was run by this acceptance tester.
+
+### Row 6 actual execution and retained record
+
+Read the actual installed `loom_checker/probes.py` path named in the repair record. In the locked isolated environment, called `command_executes_artifact` with the historical env-prefixed string and the direct uv string against `loom-code/tests/engineering-research/test_package.py`:
+
+```text
+env-prefixed recognized: False
+direct uv recognized: True
+```
+
+Both assertions completed with exit 0. This reproduces declaration recognition only; it does not claim finalization succeeded. The historical refusal was before tests, rather than a failed package test, and remains retained in the linked repair record.
+
+Executed from the new clean clone:
+
+```sh
+UV_CACHE_DIR=/private/tmp/loom-uv-relative-cache uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/engineering-research/test_package.py loom-code/tests/test_write_plan_station_text.py -q
+```
+
+The cache setting is supplied by the shell launcher, while the executable declaration being recognized begins with `uv`. Actual output, exit 0:
+
+```text
+................................................                         [100%]
+48 passed in 0.15s
+```
+
+Saved scratch record: `/private/tmp/loom-language-policy-acceptance-clean-round2/docs/loom/2026-11-09-engineering-research-language-policy/research/acceptance-command-revalidation.md`. Read the whole saved record with `cat`: it states the new tested commit, question, local-inspection rationale, unchanged runtime, actual focused command results, recognition boundary, decision impact and untested paths. Resolved all three relative evidence links to the intended clean-copy skill, policy and repair record; all returned true. No web search was needed to settle this local question, and no unauthorized external action occurred.
+
+Full-suite Build round 2 output was supplied separately by the station (4139 passed, 6 skipped); this tester did not run or independently recalculate it and does not substitute it for the required finalizer execution. The full suite is not skipped, and finalization will run it again and block on failure. No future finalizer result is asserted. No important-or-higher dismissed finding was supplied. No new fatal or important defect was reproduced; all prior limitations remain.
