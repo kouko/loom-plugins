@@ -1,0 +1,170 @@
+[
+  {
+    "id": "P01",
+    "query": "We are discussing whether to use SQLite on a shared network drive. The whole approach depends on concurrent writer safety, and we have no reliable evidence yet. Investigate before recommending an approach.",
+    "should_trigger": true,
+    "rationale": "standalone feasibility"
+  },
+  {
+    "id": "P02",
+    "query": "正在討論登入設計，方案成立的前提是 refresh token 能跨裝置撤銷；我們還沒查證，請先確認這個能力。",
+    "should_trigger": true,
+    "rationale": "standalone capability zh"
+  },
+  {
+    "id": "P03",
+    "query": "設計案を議論しています。候補 SDK が iOS のバックグラウンドで使えるか不明で、方式が変わります。根拠を調べてください。",
+    "should_trigger": true,
+    "rationale": "standalone platform ja"
+  },
+  {
+    "id": "P04",
+    "query": "Before committing to our upgrade plan, confirm the oldest supported runtime for this dependency; an incompatible requirement would force us to postpone. A short official-document check may settle it.",
+    "should_trigger": true,
+    "rationale": "cheap consequential version"
+  },
+  {
+    "id": "P05",
+    "query": "只要查官方文件一小段：這個版本是否支援 atomic rename？我們的資料保護方案取決於它，先查清楚再定案。",
+    "should_trigger": true,
+    "rationale": "cheap consequential capability zh"
+  },
+  {
+    "id": "P06",
+    "query": "公式の互換表を一つ確認するだけでよいです。対象 CPU に未対応なら今の案は捨てるので、対応可否を確かめてください。",
+    "should_trigger": true,
+    "rationale": "cheap consequential architecture ja"
+  },
+  {
+    "id": "P07",
+    "query": "Our intent for export assumes customers can run this CLI without Python installed. Resolve that assumption before we confirm the intent.",
+    "should_trigger": true,
+    "rationale": "intent environment"
+  },
+  {
+    "id": "P08",
+    "query": "Loom 的 intent 正在比較兩種儲存方式；其中一種能否離線使用尚無證據，會影響我們選哪個。請先釐清。",
+    "should_trigger": true,
+    "rationale": "intent option zh"
+  },
+  {
+    "id": "P09",
+    "query": "We are drafting the spec, but the API docs disagree on whether an acknowledged event can be delivered twice. Investigate the actual guarantee before we design deduplication.",
+    "should_trigger": true,
+    "rationale": "spec contradiction"
+  },
+  {
+    "id": "P10",
+    "query": "仕様を書く前に、今の API で管理者だけが鍵を削除できるのか確認したいです。そうでなければ権限設計を変えます。",
+    "should_trigger": true,
+    "rationale": "spec permission ja"
+  },
+  {
+    "id": "P11",
+    "query": "The implementation plan assumes an in-place index migration is online. Find evidence for our version before we schedule this; otherwise we need a maintenance window.",
+    "should_trigger": true,
+    "rationale": "plan capability"
+  },
+  {
+    "id": "P12",
+    "query": "計畫排定前，請確認供應商目前是否允許把這個 SDK 隨應用程式散布；不允許就得改用另一種整合。",
+    "should_trigger": true,
+    "rationale": "plan distribution zh"
+  },
+  {
+    "id": "P13",
+    "query": "Three attempts to enable GPU acceleration failed. Before changing more code, establish whether our OS, driver and library version combination is supported at all.",
+    "should_trigger": true,
+    "rationale": "repeated build support"
+  },
+  {
+    "id": "P14",
+    "query": "build が同じ TLS エラーで止まり続けています。もう一度設定を変える前に、この古い OS が要求される暗号方式に対応するか調べてください。",
+    "should_trigger": true,
+    "rationale": "repeated build platform ja"
+  },
+  {
+    "id": "P15",
+    "query": "A vendor blog says the cache is process-safe, but the reference manual limits safety to threads. That difference changes our worker design. Resolve which statement applies.",
+    "should_trigger": true,
+    "rationale": "contradictory applicability"
+  },
+  {
+    "id": "P16",
+    "query": "我們想用此服務保留刪除資料供稽核，但文件對 retention 的說法互相矛盾。查清楚目前方案適用哪一條，才能決定是否採用。",
+    "should_trigger": true,
+    "rationale": "contradictory policy zh"
+  },
+  {
+    "id": "P17",
+    "query": "We are choosing between two parsers. Existing speed claims use different input sizes, so we do not yet know whether they justify a migration. Determine what the evidence supports.",
+    "should_trigger": true,
+    "rationale": "comparison evidence"
+  },
+  {
+    "id": "P18",
+    "query": "圧縮方式を選ぶ相談です。速度の比較資料が別のハードウェアで測定されていて、採用判断に使えるか分かりません。根拠を評価してください。",
+    "should_trigger": true,
+    "rationale": "comparison applicability ja"
+  },
+  {
+    "id": "P19",
+    "query": "Could we ship this browser extension on Firefox as well? We need a specific API that may only exist in Chromium. Investigate that premise before answering feasibility.",
+    "should_trigger": true,
+    "rationale": "standalone cross-platform"
+  },
+  {
+    "id": "P20",
+    "query": "這只是工程討論，還沒有要實作：如果資料庫不支援可序列化交易，訂位方案就要重設。請先查明所用版本的保證。",
+    "should_trigger": true,
+    "rationale": "standalone no implementation zh"
+  },
+  {
+    "id": "N01",
+    "query": "What is the shell command to print the current directory? Just answer the command.",
+    "should_trigger": false,
+    "rationale": "routine lookup"
+  },
+  {
+    "id": "N02",
+    "query": "請查一下 Python 如何把字串轉成小寫，直接給一行範例即可。沒有任何待決定的方案。",
+    "should_trigger": false,
+    "rationale": "routine syntax zh"
+  },
+  {
+    "id": "N03",
+    "query": "Git の現在のブランチ名を表示するコマンドを教えてください。",
+    "should_trigger": false,
+    "rationale": "routine command ja"
+  },
+  {
+    "id": "N04",
+    "query": "Critique whether adding another notification channel is worth the ongoing product and support cost. Technical feasibility is already settled.",
+    "should_trigger": false,
+    "rationale": "critique"
+  },
+  {
+    "id": "N05",
+    "query": "Please ask an independent coding agent to review the already collected evidence for our design. We need a second opinion, not new research.",
+    "should_trigger": false,
+    "rationale": "independent advisor"
+  },
+  {
+    "id": "N06",
+    "query": "Review this coding session for process lessons: requirements were clear, we implemented them, but tests ran late. There is no unresolved technical premise.",
+    "should_trigger": false,
+    "rationale": "project retro"
+  },
+  {
+    "id": "N07",
+    "query": "The intent and compatibility investigation are approved. Write an implementation plan for the agreed keyboard shortcut.",
+    "should_trigger": false,
+    "rationale": "write plan"
+  },
+  {
+    "id": "N08",
+    "query": "I want a button to restore deleted drafts. Help define the user problem and acceptance criteria; we have no known feasibility question.",
+    "should_trigger": false,
+    "rationale": "capture intent"
+  }
+]

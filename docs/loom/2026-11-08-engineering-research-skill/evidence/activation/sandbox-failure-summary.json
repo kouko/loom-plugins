@@ -1,0 +1,17 @@
+{
+  "completed": 9,
+  "exit_codes": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "reason": "workspace routing discovery failed; network sandbox",
+  "classification_valid": false,
+  "stopped_by_scoped_SIGTERM": true
+}
