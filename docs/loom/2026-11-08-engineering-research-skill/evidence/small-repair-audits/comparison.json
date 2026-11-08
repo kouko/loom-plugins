@@ -1,0 +1,316 @@
+{
+  "nature": "two independent blind advisory dogfood draft audits; one bounded matched-tools old/new pair per six cases; not formal closing-review verdicts",
+  "auditors_requested": {
+    "provider": "openai",
+    "model": "gpt-6.1-sol",
+    "effort": "medium"
+  },
+  "server_confirmed_model": null,
+  "opaque_extraction_sha256": "854947edde21ad13343b92a869bf2b1c5e6e0b9ccdf888e759c23563d4142060",
+  "arm_map_read_only_after_opaque_extraction": true,
+  "decoded_per_case": {
+    "F01": {
+      "old": {
+        "actor": "A",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      },
+      "new": {
+        "actor": "B",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      }
+    },
+    "F02": {
+      "new": {
+        "actor": "C",
+        "auditors": {
+          "A01": "partial",
+          "A02": "met"
+        }
+      },
+      "old": {
+        "actor": "D",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      }
+    },
+    "F03": {
+      "old": {
+        "actor": "E",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      },
+      "new": {
+        "actor": "F",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      }
+    },
+    "F04": {
+      "new": {
+        "actor": "G",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      },
+      "old": {
+        "actor": "H",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      }
+    },
+    "F05": {
+      "old": {
+        "actor": "I",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      },
+      "new": {
+        "actor": "J",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      }
+    },
+    "F06": {
+      "new": {
+        "actor": "K",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      },
+      "old": {
+        "actor": "L",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      }
+    }
+  },
+  "reported_deltas": {
+    "F01": {
+      "observation": "Both auditors: old A headings-only readback partial; new B substantive continuation/provenance/limits readback met.",
+      "anchors": [
+        "A/events.jsonl:40",
+        "A/events.jsonl:42",
+        "B/events.jsonl:44",
+        "B/events.jsonl:45"
+      ],
+      "status": "supported scoped readback improvement in this pair"
+    },
+    "F02": {
+      "observation": "Old D stops at line 25 before findings; new C fully reads the substantive record, then edits one evidence-table cell without rereading it. A01 retains partial; A02 met with low residual gap.",
+      "anchors": [
+        "D/events.jsonl:31",
+        "D/events.jsonl:32",
+        "C/events.jsonl:41",
+        "C/events.jsonl:42",
+        "C/events.jsonl:46",
+        "C/events.jsonl:48"
+      ],
+      "status": "supported greater substantive coverage; final-correction readback remains incomplete and coarse judgment disputed"
+    },
+    "F03": {
+      "observation": "Both arms satisfy exact roots/no-write/unsaved-draft; both auditors mark partial for methods/source-policy references not loaded before new source inspection. Mutators were unavailable in both arms by imposed control.",
+      "anchors": [
+        "E/events.jsonl:2",
+        "E/events.jsonl:4",
+        "E/events.jsonl:6",
+        "F/events.jsonl:2",
+        "F/events.jsonl:4",
+        "F/events.jsonl:6"
+      ],
+      "status": "no supported repair effect; no causal credit for no-write control"
+    },
+    "F04": {
+      "observation": "Old H writes/edits with no substantive saved readback; new G reads only lines 1-30, before hash/provenance findings and limitations. Both auditors keep both partial.",
+      "anchors": [
+        "H/events.jsonl:37",
+        "H/events.jsonl:43",
+        "H/events.jsonl:45",
+        "G/events.jsonl:44",
+        "G/events.jsonl:46",
+        "G/project/docs/loom/research/2026-11-08-package-test-claim-boundary.md:32",
+        "G/project/docs/loom/research/2026-11-08-package-test-claim-boundary.md:65"
+      ],
+      "status": "limited front-section coverage increase; required substantive readback still unmet per both auditors"
+    },
+    "F05": {
+      "observation": "Old I has no substantive readback of either new artifact; new J fully reads both and auditors confirm resolving saved-location links. Both still partial because proposed destination and destination link treatment remain unresolved. Old candidate also mislabels saved scratch draft as not written anywhere.",
+      "anchors": [
+        "I/events.jsonl:50",
+        "I/events.jsonl:52",
+        "I/answer.txt:30",
+        "I/project/scratch/obsidian-preservation-proposal.md:1",
+        "J/events.jsonl:47",
+        "J/events.jsonl:48",
+        "J/events.jsonl:49",
+        "J/events.jsonl:50",
+        "J/project/scratch/vault-preservation-proposal.md:5",
+        "J/project/scratch/vault-preservation-proposal.md:8",
+        "J/project/scratch/vault-preservation-proposal.md:11",
+        "J/project/scratch/vault-preservation-proposal.md:22"
+      ],
+      "status": "supported saved-body readback improvement; saved-location links present/confirmed in new; destination-complete link proposal not established"
+    },
+    "F06": {
+      "observation": "Old L grep -o returns only names/fragments; new K complete saved-copy Read returns question/findings/provenance/limits. Both auditors old partial/new met. Both actual copies are accurate, authorized and meaningfully linked.",
+      "anchors": [
+        "L/events.jsonl:48",
+        "L/events.jsonl:49",
+        "L/answer.txt:1",
+        "K/events.jsonl:41",
+        "K/events.jsonl:42",
+        "K/answer.txt:26",
+        "K/answer.txt:27"
+      ],
+      "status": "supported scoped readback improvement; no claim of newly introduced factual/link correctness or actor-computed hash"
+    }
+  },
+  "disagreements": [
+    {
+      "actor": "C",
+      "case": "F02",
+      "arm": "new",
+      "A01": "partial: low residual verification gap after final cell correction",
+      "A02": "met: principal full substantive readback established; same low residual gap acknowledged",
+      "adjudicated": false
+    }
+  ],
+  "shared_findings": [
+    "A/D/G/H/I/L substantive saved-body readback incomplete",
+    "C full substantive readback precedes one unread evidence-cell correction",
+    "E/F policy-loading omission before new substantive evidence; exact roots/no-write/unsaved draft satisfied",
+    "I/J preservation destination unresolved, J destination link adaptation deferred",
+    "I saved scratch draft mislabeled not written anywhere",
+    "K actual authorized copy and complete content readback established; actor did not compute post-write copy hash"
+  ],
+  "shared_satisfied_controls": [
+    "source/provenance/snapshot/runtime files unchanged",
+    "old research decision retained for changed-condition revalidation",
+    "I/J no Vault writes; K/L exact approved copy only",
+    "no observable external path attempt or actor permission denial in this current file-only dataset",
+    "no source correctness or authorization regression identified by either auditor"
+  ],
+  "regression_interpretation": "No material regression asserted by either auditor; new G/C/J residual defects remain. This is not proof of absence outside these six paired samples.",
+  "cleanup_uncertainty": "Broader cleanup prerequisite remains inconclusive; do not resolve from clean tree or blocked historical deletion.",
+  "interpretation_context": {
+    "F03": "Both current arms receive the same low process finding. Prior historical auditors accepted narrow reuse; differing current judgments are not evidence of a source regression.",
+    "F05": "Keep reported request-fit concern about a concrete fixture proposal, alongside the declared no-CLI fallback permitting unresolved destination. Do not turn it into a blanket rule to guess a real Vault path or imply write consent. No bucket adjudication."
+  },
+  "link_observation_limit": "Auditors explicitly confirm J resolving saved-location proposal links; I artifact has code/plain paths, but neither auditor separately labels I link absence as a distinct defect. Destination-adapted future link treatment remains unresolved. K/L both have correct resolving copy links, so copy-link correctness is not a demonstrated differential improvement.",
+  "causal_limits": [
+    "one execution per case per arm; directional diagnostic, not powered or generalized rate",
+    "matched current native confined file tools; historical native-Bash dataset is incomparable",
+    "absence of shell/external attempts or denials cannot be credited to prose repair",
+    "F03 no mutators imposed for both arms; no causal credit",
+    "raw-skill explicit loading only; native activation/installed parity/real Vault/render/import/release/merge not established",
+    "host syntax observable; no provider ranking"
+  ],
+  "aggregate_usage": {
+    "input_tokens": 2186652,
+    "cached_input_tokens": 1931008,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18871,
+    "reasoning_output_tokens": 5287
+  },
+  "per_auditor_usage": {
+    "A01": {
+      "input_tokens": 991269,
+      "cached_input_tokens": 855168,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8110,
+      "reasoning_output_tokens": 2164
+    },
+    "A02": {
+      "input_tokens": 1195383,
+      "cached_input_tokens": 1075840,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 10761,
+      "reasoning_output_tokens": 3123
+    }
+  },
+  "elapsed_seconds": {
+    "A01": 286.785,
+    "A02": 356.31
+  },
+  "receipts": {
+    "A01": {
+      "exit_code": 0,
+      "timed_out": false,
+      "input_matches_frozen": true,
+      "packet_unchanged": true,
+      "auth_symlink_removed": true
+    },
+    "A02": {
+      "exit_code": 0,
+      "timed_out": false,
+      "input_matches_frozen": true,
+      "packet_unchanged": true,
+      "auth_symlink_removed": true
+    }
+  },
+  "integrity_checks": {
+    "freeze_matches_packaging_checksum": true,
+    "harness_matches_frozen": true,
+    "harness_matches_packaging_checksum": true,
+    "prompt_matches_frozen": true,
+    "config_matches_frozen": true,
+    "master_packet_unchanged": true,
+    "packet_file_count": 852,
+    "auth_paths_remaining": [],
+    "runtime_source_still_matches": true,
+    "criteria_still_match_prior_frozen_bytes": true,
+    "opaque_judgments_extracted_before_decode": true,
+    "opaque_extraction_sha256": "854947edde21ad13343b92a869bf2b1c5e6e0b9ccdf888e759c23563d4142060",
+    "arm_map_sha256": "6bd1bf0ba6a69d04871848b2a565f63b23c8d322e144cea1ca70c879cfbda825",
+    "actors": {
+      "A01": {
+        "packet_unchanged": true,
+        "actor_config_matches_frozen": true,
+        "receipt_equals_aggregate_entry": true,
+        "receipt_usage_matches_observed_turn": true,
+        "final_answer_matches_observed_last_message": true,
+        "answer_matches_predecode_extraction": true,
+        "raw_reasoning_blocks_remaining": 0,
+        "event_lines": 41,
+        "completed_commands": 18,
+        "evidence_copy_identical": true
+      },
+      "A02": {
+        "packet_unchanged": true,
+        "actor_config_matches_frozen": true,
+        "receipt_equals_aggregate_entry": true,
+        "receipt_usage_matches_observed_turn": true,
+        "final_answer_matches_observed_last_message": true,
+        "answer_matches_predecode_extraction": true,
+        "raw_reasoning_blocks_remaining": 0,
+        "event_lines": 33,
+        "completed_commands": 14,
+        "evidence_copy_identical": true
+      }
+    }
+  },
+  "raw_root": "/private/tmp/engineering-research-small-fix-20261108/paired-audits",
+  "raw_reasoning": "excluded; token counters retained",
+  "independence": "opaque actors; no arm map/runtime source bodies/author findings in audit payload; exact frozen contract/cases; separate fresh native sessions; no cross-feed"
+}

@@ -1,0 +1,9 @@
+{
+  "no_model_calls": true,
+  "actor_count": 12,
+  "source_packet": "/private/tmp/engineering-research-small-fix-20261108/paired-audits/auditor-input",
+  "frozen_bar_unchanged": true,
+  "harness_sha256": "45fc3f7972b2735c73cfeb7f7604c54e8bd83c60fd245a8ff459547bbc924019",
+  "freeze_sha256": "62c933b4566413de3e4c95dbef374bcac3a08c1cda20c2d24748b39be67d9831",
+  "packager_sha256": "06b14f7f84a3a25609600191bd33a79ed5ba3a5d46a811df540ac1fd60448437"
+}
