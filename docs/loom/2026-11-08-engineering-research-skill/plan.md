@@ -52,7 +52,7 @@ Requirement continuity section defines.
 
 **W4-02 Bound test tools and rerun both versions under identical conditions** after: W4-01 acceptance: 2,3,8,9
 - Files: loom-code/tests/local/engineering_research_retest/, docs/loom/2026-11-08-engineering-research-skill/evidence/, docs/skill-dogfood/2026-11-08-code-owned-engineering-research/
-- Test: RED/GREEN boundary checks cover traversal, external paths, symlink escapes, writes and commands. Reuse six prompts/fixtures/rubric; run one fresh old/new pair each with identical confined tools. Two independent revision-blinded auditors inspect trajectories. Preserve earlier native-tool results separately.
+- Test: Live boundary checks cover traversal, external paths, symlink escapes and writes; omit command tools. Reuse six prompts/fixtures/rubric; run one fresh old/new pair each with identical confined tools. Two independent revision-blinded auditors inspect trajectories. Preserve earlier native-tool results separately.
 - Risk: agent-decided — Confinement is a fixed harness control, not production safety or skill improvement. Six pairs give directional evidence only. Retain first-party Anthropic/OpenAI identities and existing data boundaries; no real Vault, installation, publication, merge or trigger claims.
 
 ## Simplicity check

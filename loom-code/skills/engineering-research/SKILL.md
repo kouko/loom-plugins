@@ -45,9 +45,16 @@ Use evidence proportionate to the engineering question.
 
 5. Verify this research's claims and records. Before declaring a finding,
    experiment or research document complete, inspect the actual evidence and
-   read back the saved record. A successful exit, file existence or completion
-   message alone does not establish the claimed finding. Reuse adequate
-   verification; report any remaining uncertainty. Ordinary implementation and
+   use a read operation to return the saved record's substantive content:
+   question/conditions, findings, evidence/provenance and limitations. Read a
+   short record in full; for a longer update, inspect the changed content and
+   the claims it affects. Resolve local Markdown link targets from the saved
+   record's directory and check that they identify the intended evidence.
+   A header, hash, file existence or successful write alone does not inspect
+   those contents; a tool's completion message does not waive this check.
+   Reuse adequate verification and report only checks actually performed,
+   including any remaining uncertainty. If saving is prohibited or unavailable,
+   return the explicitly unsaved draft instead. Ordinary implementation and
    delivery verification remains the owning task's responsibility.
 
 ## Research method and source selection

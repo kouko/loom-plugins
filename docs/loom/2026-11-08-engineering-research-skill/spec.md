@@ -97,3 +97,25 @@ egress rejection. This user agreement supplies ownership consent, not that
 separate external-transmission consent. No closing Review episode has started;
 the completed word-cap, guide-portability and archive fixes retain their failure
 history rather than being reset or reclassified as new requirements.
+
+### Bounded repair after formal dogfood observations
+
+The user's 2026-11-08 instruction to perform the proposed small repair and
+controlled retest continues REQ-2, REQ-3, REQ-8 and REQ-9. It changes no acceptance
+outcome, owner, description, method selection or retained-record schema. W4
+makes the already-required substantive saved-content inspection and evidence
+navigation concrete. The original medium observations and auditor disagreement
+remain preserved, not converted to passing evidence by a documentation edit.
+
+The next old/new execution comparison holds a restricted file-tool interface
+constant across both revisions. The earlier CLI explicitly exposed Bash, whose
+commands were not confined by the native file-tool boundary. A public synthetic
+control without Bash observed denials for external relative/absolute/symlink
+reads and an external write; external Glob returned no matches, not an explicit
+denial. That is host-tool enforcement evidence, not a production sandbox added
+by this skill or a measured improvement in its instructions. Fixed local
+git/hash observations may be supplied equally to both arms because shell
+execution is unavailable. They remain harness observations, not actor-executed
+tests or CI. Original prompts/fixtures and declared evaluation criteria remain
+the comparison basis; any common adapter and changed tool menu are disclosed.
+One fresh pair per case is directional evidence, not a statistical rate claim.

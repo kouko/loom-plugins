@@ -27,14 +27,18 @@ task without an export proposal.
 Prepare the proposed note content with its question, applicable conditions,
 findings, evidence limits and project provenance. Include repository identity,
 the stable revision and ordinary Markdown links to pinned research originals
-and source references. Keep the project originals in place. Relative project
-links must be adapted for the destination rather than copied as broken links.
-Do not imply a proposed note has already been saved.
+and source references. Keep the project originals in place. A project draft
+uses working Markdown links from its current location even when the Vault
+destination is unresolved; code-formatted paths alone do not provide navigation.
+Adapt and verify the links again for the authorized destination before copying.
+Do not invent a remote URL or imply a proposed note has already been saved.
 
-Discover destinations only through available capabilities. When an official
-Obsidian CLI is available, use `obsidian:obsidian-cli` when installed and inspect
-local CLI help/version before choosing supported Vault-query syntax. Do not
-guess commands or a home-folder Vault path. Discovery is read-only; do not
+Discover destinations only through available capabilities and within the task's
+authorized filesystem scope; read-only discovery does not expand that scope.
+When an official Obsidian CLI is available, use `obsidian:obsidian-cli` when
+installed and inspect local CLI help/version before choosing supported
+Vault-query syntax. Do not guess commands or a home-folder Vault path.
+Discovery is read-only; do not
 install tools or start a service for it. A detected Vault or folder name is
 neither a destination preference nor write consent. With several results,
 present candidates and let the user select. Without the CLI, use a user-supplied
@@ -59,8 +63,10 @@ using an available authorized mechanism. Do not broaden this into a batch,
 reorganization, deletion or synchronization. If writing is prohibited or fails,
 return the explicitly unsaved candidate and the missing saved artifact.
 
-Read back the actual saved note and inspect content, destination and provenance
-before calling it saved. Report the confirmed path and any remaining limits.
+Read back the actual saved note's substantive content and copy provenance,
+and resolve its evidence links from the saved destination before calling it
+saved. Hashes, link existence and write success alone do not inspect its body.
+Report the confirmed path, checks actually performed and any remaining limits.
 Distinguish this saved-copy result from research correctness, merged/released
 state, isolated-loader evidence and installed-host behavior; one does not prove
 the others. An untested host remains untested.
