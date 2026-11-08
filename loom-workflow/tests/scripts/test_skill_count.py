@@ -1,7 +1,7 @@
-"""loom-workflow ships fourteen skills: nine counted tools, three standalone
+"""loom-workflow ships fifteen skills: ten counted tools, three standalone
 tools, out-of-contract loom-memory, and one optional discovery router.
 
-The loom 1.0 budget counts nine tools in loom-code's contract manifest.
+The loom 1.0 budget counts ten tools in loom-code's contract manifest.
 `goal-create`, `dbt-model-style`, and `project-retro` sit outside the loom flow and are marked
 `standalone: true` there, so they ship here but are not counted
 (user-decided 2026-09-02). `loom-memory` joined this plugin's skill
@@ -11,7 +11,7 @@ retired from [loom-code's] contract ... owned solely by the independent
 `loom-memory` plugin" (test_contract_manifest.py) — survives the move: the
 manifest still does not name it, counted or standalone. This test pins all
 boundaries: the directory set on disk, the manifest's agreement on its own
-twelve tools, and the deliberate absence of `loom-memory` and the optional
+thirteen tools, and the deliberate absence of `loom-memory` and the optional
 `using-loom-workflow` discovery router from that manifest. Adding discovery
 does not change the lifecycle tool budget.
 """
@@ -24,6 +24,7 @@ MANIFEST = REPO_ROOT / "loom-code" / "contract" / "manifest.yaml"
 COUNTED = {
     "critique",
     "decision-map",
+    "engineering-research",
     "skill-retro",
     "git-memory",
     "handoff",
@@ -62,11 +63,11 @@ def _manifest_tools() -> dict[str, bool]:
     return tools
 
 
-def test_fourteen_skill_directories_ship():
+def test_fifteen_skill_directories_ship():
     on_disk = {p.name for p in SKILLS_DIR.iterdir() if p.is_dir()}
 
     assert on_disk == COUNTED | STANDALONE | OUT_OF_CONTRACT | OPTIONAL_ROUTERS
-    assert len(on_disk) == 14
+    assert len(on_disk) == 15
 
 
 def test_every_skill_has_a_skill_md():
@@ -79,11 +80,11 @@ def test_manifest_agrees_on_the_three_standalone_skills():
 
     assert set(tools) == COUNTED | STANDALONE
     assert {name for name, standalone in tools.items() if standalone} == STANDALONE
-    assert len([name for name, standalone in tools.items() if not standalone]) == 9
+    assert len([name for name, standalone in tools.items() if not standalone]) == 10
 
 
 def test_loom_memory_stays_out_of_the_contract_manifest():
-    """`loom-memory` ships on disk (`test_fourteen_skill_directories_ship`) but
+    """`loom-memory` ships on disk (`test_fifteen_skill_directories_ship`) but
     must not appear in loom-code's contract manifest — the relocation moved
     its files, not its relationship to loom-code's mechanism budget."""
     assert "loom-memory" not in _manifest_tools()

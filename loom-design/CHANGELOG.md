@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.23.0] — 2026-11-08 — optional research at intent and specification gaps
+
+- Intent and specification work may delegate decision-critical evidence gaps to `loom-workflow:engineering-research`, retaining the owning station's goal and authorization.
+- Research remains optional and introduces no new station, decision point or quality gate.
+
 ## [2.22.0] — 2026-11-06 — keep local design document delivery concise
 
 - Deliver local documents from all five document-producing skills, including standalone invocations, with their actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.

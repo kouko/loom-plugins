@@ -13,9 +13,9 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.22.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/README.md) | 3.59.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/README.md) | 5.20.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
+| [`loom-design`](loom-design/README.md) | 2.23.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-code`](loom-code/README.md) | 3.60.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 15 | Tools around the stations: engineering research, memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
 links open its README; skill links below open the detailed usage guide.
@@ -93,7 +93,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.22.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.23.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -108,7 +108,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.59.0. Five stations carry one change from plan to PR with
+Version 3.60.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -126,7 +126,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.20.0. Workflow tools used around the stations; most work without
+Version 5.21.0. Workflow tools used around the stations; most work without
 `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -138,6 +138,7 @@ attach to the flow.
 | [`git-memory`](loom-workflow/skills/git-memory/README.md) | Classify commit and PR memory before committing; recall why a past decision was made. |
 | [`critique`](loom-workflow/skills/critique/README.md) | Judge a proposal or look for a simpler version of a change. |
 | [`decision-map`](loom-workflow/skills/decision-map/README.md) | Chart or advance a persistent Outcome Map across sessions. |
+| [`engineering-research`](loom-workflow/skills/engineering-research/README.md) | Resolve consequential evidence gaps and retain question-scoped research records; offer authorized long-term preservation after merge. |
 | [`independent-advisor`](loom-workflow/skills/independent-advisor/README.md) | Get a second opinion from another model, effort level or vendor. |
 | [`recap-state`](loom-workflow/skills/recap-state/README.md) | In-session recap of where the work stands. |
 | [`handoff`](loom-workflow/skills/handoff/README.md) | Save or resume state across sessions. |

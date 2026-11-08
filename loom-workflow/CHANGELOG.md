@@ -4,6 +4,15 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.21.0] — 2026-11-08 — question-scoped engineering research
+
+- Add optional `engineering-research` for consequential evidence gaps during Loom tasks and standalone engineering discussions, with question-scoped Markdown records, applicable source checks and proportionate evaluation methods.
+- Offer concrete long-term preservation candidates after verified merge; release-dependent claims need release evidence and each Vault write needs its own destination and scope authorization. Preserve project originals and report unavailable writes honestly.
+- Ship fifteen skills: ten counted workflow tools, three standalone tools, repository memory and one optional router. Admit the new leaf's 238 description characters separately while preserving the frozen catalog and its existing 60% budget.
+- Mechanism population increases by two; the counted-skill ceiling rises from 24 to 25, with no new runtime gate, rule or artifact schema.
+- budget-exception: engineering-research — adds one counted research skill; regression eval `loom-workflow/tests/engineering-research/test_package.py`.
+- budget-exception: tool:engineering-research — adds its counted contract registration; regression eval `loom-workflow/tests/scripts/test_skill_count.py::test_manifest_agrees_on_the_three_standalone_skills`.
+
 ## [5.20.0] — 2026-11-06 — keep local document delivery concise
 
 - Route local document delivery from both visualization cards to shared guidance: provide the document's actual absolute location in the current project, worktree or external directory, without extending the rule to ordinary filename mentions or quoted examples.

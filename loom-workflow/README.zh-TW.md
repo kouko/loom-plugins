@@ -8,7 +8,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.20.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.21.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名稱遷移
 
@@ -81,10 +81,11 @@ flowchart TD
 
 ## Skills
 
-共 14 個 skills：13 個工具與 1 個可選入口。
+共 15 個 skills：14 個工具與 1 個可選入口。
 
 | Skill | 角色 |
 |---|---|
+| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後的 Vault 保存逐次確認目的地與範圍。 |
 | [`using-loom-workflow`](skills/using-loom-workflow/README.md) | 可選入口：為廣泛或不明確的請求挑出對應工具，並讀入該工具的指示。每個工具仍可直接呼叫。 |
 | [`decision-map`](skills/decision-map/README.md) | 在 `docs/loom/maps/<map-id>/` 開一張持久化的 Outcome Map 並持續推進：Destination、fog、分型的 ticket 與 Decisions-so-far 紀錄；delivery 步驟會寫出 intent。 |
 | [`critique`](skills/critique/README.zh-TW.md) | 在動手做之前裁決提案：`mode: proposal` 把清單或計畫分成 KEEP / DEFER / DROP；`mode: complexity` 用 deletion-first 量一個具體改動。 |
@@ -100,7 +101,7 @@ flowchart TD
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | 在 Loom 變更或獨立討論中建立、驗證可編輯的 draw.io 圖表；每次編輯既有外部圖表前，先確認是否複製進專案。 |
 | [`goal-create`](skills/goal-create/README.zh-TW.md) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
-Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
+Loom 的契約計入其中十個工具。`goal-create` 與 `dbt-model-style` 是 Loom
 流程之外的 standalone skill；`project-retro` 也是獨立工具，`loom-memory` 與入口路由則維持在契約之外。
 
 ## Repository 結構

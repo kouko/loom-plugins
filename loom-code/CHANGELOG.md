@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.60.0] — 2026-11-08 — optional engineering research and preservation handoff
+
+- Plan and Build may delegate consequential evidence gaps to `loom-workflow:engineering-research`; Ship may offer post-merge preservation through that skill without making research or Vault writes a completion gate.
+- Admit research as a counted contract tool. The compatible tool addition keeps the contract version at 2.3.1; no new runtime gate, checker rule or artifact schema is introduced.
+- Raise the counted-skill measurement ceiling from 24 to 25. The mechanism population increases by two: one shared skill and one contract tool.
+- budget-exception: engineering-research — adds one counted research skill; regression eval `loom-workflow/tests/engineering-research/test_package.py`.
+- budget-exception: tool:engineering-research — adds its counted contract registration; regression eval `loom-workflow/tests/scripts/test_skill_count.py::test_manifest_agrees_on_the_three_standalone_skills`.
+
 ## [3.59.0] — 2026-11-06 — keep local document delivery concise
 
 - When delivering a local document, provide its actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
