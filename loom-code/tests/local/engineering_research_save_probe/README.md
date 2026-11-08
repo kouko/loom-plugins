@@ -13,7 +13,7 @@ Markdown files), and `result_mode` (`full` or `confirmation`). With no write
 paths all writes are denied. Preexisting collisions are never silently replaced.
 Authorized updates and session-created files must still match the server's last
 observed hash. Relative and absolute in-root targets are supported; traversal,
-symlinks, source/config/instruction paths, and outputs over 32 KiB are rejected.
+symlinks, source/config/instruction paths, and note bodies over 32 KiB are rejected.
 
 The stdlib newline JSON-RPC adapter exposes only this save operation. Launch
 `python3 server.py --policy <trusted-policy.json>` through an explicit local MCP
@@ -31,7 +31,9 @@ Atomic file replacement/create-if-absent is followed by a point-in-time readback
 this is not a hardened concurrent-process sandbox or a guarantee that a later
 writer cannot change the file. Server policy and native read-tool confinement
 must both be validated before an actual agent experiment. Returning content does
-not establish that an agent inspected or understood it.
+not establish that an agent inspected or understood it. The body cap does not
+cap total JSON response size or guarantee that a caller never truncates a
+response; inspect the actual received tool output.
 
 Offline tests: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/local/engineering_research_save_probe/test_save_tool.py -q`.
 Public synthetic control preparation and its scoped configurations live under

@@ -1,0 +1,20 @@
+{
+  "complete_package_runner": {
+    "exit_code": 0,
+    "pytest_passed": 4139,
+    "pytest_skipped": 6,
+    "pytest_groups": 15,
+    "shell_mermaid": "passed"
+  },
+  "tracked_source_commit": "14380628dfe8c5c33347a5dcb3ee772740483d10",
+  "original_failures_preserved": "package-tests-first-failure.txt",
+  "local_tests": 29,
+  "legacy_repair_focused": 10,
+  "census_existing_adversarial_tests": 3,
+  "private_actors_started": 0,
+  "private_approval": "pending explicit user answer; absent or preselected answer is not consent",
+  "existing_mechanism_adversarial_tests": {
+    "passed": 71,
+    "exit_code": 0
+  }
+}
