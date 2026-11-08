@@ -2,11 +2,14 @@
 
 ## [3.60.0] — 2026-11-08 — optional engineering research and preservation handoff
 
-- Plan and Build may delegate consequential evidence gaps to `loom-workflow:engineering-research`; Ship may offer post-merge preservation through that skill without making research or Vault writes a completion gate.
+- Add the optional code-owned `engineering-research` skill for consequential evidence gaps during Loom tasks and standalone engineering discussions, with question-scoped Markdown records, applicable source checks and proportionate evaluation methods.
+- Plan and Build may delegate consequential evidence gaps to `loom-code:engineering-research`; Ship may offer post-merge preservation through that skill without making research or Vault writes a completion gate. No workflow plugin is required for research, and design contains no direct research handoff.
+- Preservation requires verified merge, release evidence for release-dependent claims and per-instance destination and scope authorization. Preserve project originals and report unavailable writes honestly.
+- Ship eight skills, including the research leaf's separately admitted 238 description characters; preserve the frozen catalog and its existing 60% budget.
 - Admit research as a counted contract tool. The compatible tool addition keeps the contract version at 2.3.1; no new runtime gate, checker rule or artifact schema is introduced.
-- Raise the counted-skill measurement ceiling from 24 to 25. The mechanism population increases by two: one shared skill and one contract tool.
-- budget-exception: engineering-research — adds one counted research skill; regression eval `loom-workflow/tests/engineering-research/test_package.py`.
-- budget-exception: tool:engineering-research — adds its counted contract registration; regression eval `loom-workflow/tests/scripts/test_skill_count.py::test_manifest_agrees_on_the_three_standalone_skills`.
+- Raise the counted-skill measurement ceiling from 24 to 25. The mechanism population increases by two: one code-owned skill and one contract tool.
+- budget-exception: engineering-research — adds one counted research skill; regression eval `loom-code/tests/engineering-research/test_package.py`.
+- budget-exception: tool:engineering-research — adds its counted contract registration; regression eval `loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner`.
 
 ## [3.59.0] — 2026-11-06 — keep local document delivery concise
 

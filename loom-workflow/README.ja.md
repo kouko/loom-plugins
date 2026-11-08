@@ -8,7 +8,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.21.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.20.1 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -88,11 +88,10 @@ flowchart TD
 
 ## Skills
 
-15 skills：14 個のツールと任意のルーター 1 個。
+14 skills：13 個のツールと任意のルーター 1 個。
 
 | Skill | 役割 |
 |---|---|
-| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後の Vault 保存は、その都度、保存先と範囲の承認を得る。 |
 | [`using-loom-workflow`](skills/using-loom-workflow/README.md) | 任意のルーター：広い・曖昧な依頼に合うツールを選び、その手順を読み込む。各ツールは引き続き直接呼び出せる。 |
 | [`decision-map`](skills/decision-map/README.md) | `docs/loom/maps/<map-id>/` にある永続的な Outcome Map を作成・推進する：Destination、fog、種類付きの ticket、Decisions-so-far ログ。delivery ステップは intent を書く。 |
 | [`critique`](skills/critique/README.ja.md) | 作る前に提案を裁く：`mode: proposal` は list や plan を KEEP / DEFER / DROP に振り分け、`mode: complexity` は 1 つの具体的変更を deletion-first で量る。 |
@@ -108,7 +107,7 @@ flowchart TD
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Loom の変更や単独の議論で、外部エディタで編集できる draw.io 図を作成・検証する。既存の外部図を編集する前に、プロジェクトへコピーするか確認する。 |
 | [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
-Loom の契約で数えるツールはこのうち 10 個です。`goal-create` と `dbt-model-style`
+Loom の契約で数えるツールはこのうち 9 個です。`goal-create` と `dbt-model-style`
 と `project-retro` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
 
 ## Repository 構成

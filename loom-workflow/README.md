@@ -8,7 +8,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.21.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.20.1 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -87,11 +87,10 @@ acceptance criteria met, fog empty, and every ticket closed or withdrawn.
 
 ## Skills
 
-Fifteen skills: fourteen tools and one optional router.
+Fourteen skills: thirteen tools and one optional router.
 
 | Skill | Role |
 |---|---|
-| [`engineering-research`](skills/engineering-research/README.md) | Resolve consequential evidence gaps in Loom tasks or standalone engineering discussions, retain question-scoped research, and offer post-merge preservation with per-instance Vault authorization. |
 | [`using-loom-workflow`](skills/using-loom-workflow/README.md) | Optional router: picks the matching tool for a broad or unclear request and loads its instructions. Every tool stays directly invocable. |
 | [`decision-map`](skills/decision-map/README.md) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
 | [`critique`](skills/critique/README.md) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
@@ -107,7 +106,7 @@ Fifteen skills: fourteen tools and one optional router.
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
 | [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
-Loom's contract counts ten of these tools. `goal-create` and
+Loom's contract counts nine of these tools. `goal-create` and
 `dbt-model-style` and `project-retro` are standalone skills outside the Loom flow, and
 `loom-memory` and the router stay outside the contract.
 

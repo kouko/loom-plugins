@@ -57,10 +57,10 @@ def test_seven_stations_with_owner(manifest):
 
 
 def test_loom_code_station_names_match_skill_dirs(manifest):
-    """Lifecycle stations exclude the optional router and outside executor."""
+    """Lifecycle stations exclude optional routing, execution and research tools."""
     declared = {s["name"] for s in manifest["stations"] if s["owner"] == "loom-code"}
     on_disk = {p.name for p in (REPO / "loom-code" / "skills").iterdir() if p.is_dir()}
-    nonstations = {"using-loom-code", "external-review"}
+    nonstations = {"using-loom-code", "external-review", "engineering-research"}
     assert not declared.intersection(nonstations)
     assert nonstations <= on_disk
     assert declared == on_disk - nonstations
@@ -135,7 +135,15 @@ def test_tools_count_and_owner(manifest):
     counted = [t for t in tools if not t.get("standalone")]
     assert len(counted) == 13  # Research adds one contract tool; CHANGELOG declares the budget exception.
     assert {t["name"] for t in tools if t.get("standalone")} == {"goal-create", "dbt-model-style", "project-retro"}
-    assert {t["owner"] for t in tools} <= {"loom-design", "loom-workflow"}
+    owners = {t["name"]: t["owner"] for t in tools}
+    assert owners.pop("engineering-research") == "loom-code"
+    assert owners == {
+        **dict.fromkeys({"product-principles", "design-system", "architecture-design"}, "loom-design"),
+        **dict.fromkeys({"decision-map", "handoff", "recap-state", "loom-visualization",
+                         "loom-interactive-diagram", "skill-retro", "git-memory",
+                         "independent-advisor", "critique", "goal-create",
+                         "dbt-model-style", "project-retro"}, "loom-workflow"),
+    }
 
 
 def test_kickoff_defaults_keys_declared(manifest):

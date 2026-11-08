@@ -49,7 +49,7 @@ ADDED_LEAVES = {
     "loom-design/skills/architecture-design/SKILL.md",
     "loom-workflow/skills/project-retro/SKILL.md",
     "loom-workflow/skills/loom-interactive-diagram/SKILL.md",
-    "loom-workflow/skills/engineering-research/SKILL.md",
+    "loom-code/skills/engineering-research/SKILL.md",
 }
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
@@ -170,7 +170,7 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
     assert len(project_retro) == PROJECT_RETRO_DESCRIPTION_CHARS
     assert len(skill_retro) == SKILL_RETRO_DESCRIPTION_CHARS
     assert len(interactive_diagram) == INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS
-    research = _description(_skills()["loom-workflow"]["engineering-research"])
+    research = _description(_skills()["loom-code"]["engineering-research"])
     assert len(research) == ENGINEERING_RESEARCH_DESCRIPTION_CHARS
     exception = (PROJECT_RETRO_DESCRIPTION_CHARS + SKILL_RETRO_DESCRIPTION_DELTA
                  + INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS + ENGINEERING_RESEARCH_DESCRIPTION_CHARS)
