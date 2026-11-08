@@ -1,6 +1,8 @@
 # Engineering research — acceptance test evidence
 
-Tried on 2026-11-08, in a clean copy of the project at b29db7155edf059c93bd5869b98a8f34f85284bb.
+Tried on 2026-11-09, in a clean copy of the project at 26fc7d32650d66d455c4ae059a07b5808c4f4f46.
+
+Original behavioral run: 2026-11-08, clean source b29db7155edf059c93bd5869b98a8f34f85284bb; its procedure/results below and continuous A8 continuation remain historical evidence, not newly repeated behavior on the current metadata-only snapshot. See the final dated section for independently verified carry-over reasons.
 
 ## Environment and procedure
 
@@ -323,4 +325,59 @@ Actor response: existing consent permits creation only; existing note remains un
 A8 is now **works for the single continuous local synthetic cleanup+preservation exercise**: actual merge from the original run → two honestly blocked cleanup attempts → real user's manually granted exact ordinary deletion → verified local cleanup state → concrete candidate and provenance → no-consent no-write → exact synthetic instance consent → actual save/full readback/links → unchanged originals and no unauthorized overwrite.
 
 The important A8 validation finding from both reviewers was addressed by this observed continuation within its authorized synthetic scope, not dismissed or closed by reading their verdicts. It does NOT prove production land/hosted PR verification, installed-host behavior, real Obsidian CLI or Vault operation, renderer behavior, release eligibility of an actual product, general consent adherence or automatic routing improvement. No new external model calls, full-suite run, source/test repair, global settings change or main-repository commit occurred. A2 remains partly, and earlier historical partial/disagreement results remain unchanged.
+
+## Re-run on 2026-11-09, at 26fc7d32650d66d455c4ae059a07b5808c4f4f46 — W7 confirmation-record repair
+
+This is an evidence retarget with all nine outcomes carried over, not a new behavioral run. I inspected the actual fix before accepting carry-over; did not implement it.
+
+### Clean current snapshot
+
+Executed:
+```sh
+git clone --no-hardlinks --no-checkout /private/tmp/loom-engineering-research-delivery /private/tmp/engineering-research-acceptance-w7-20261109
+git -C /private/tmp/engineering-research-acceptance-w7-20261109 checkout --detach 26fc7d32650d66d455c4ae059a07b5808c4f4f46
+git -C /private/tmp/engineering-research-acceptance-w7-20261109 status --porcelain
+git -C /private/tmp/engineering-research-acceptance-w7-20261109 rev-parse HEAD
+```
+Observed: checkout succeeded; status was empty; HEAD returned exactly 26fc7d32650d66d455c4ae059a07b5808c4f4f46. A final clean-copy status check was also empty. Canonical Tried-on identity now names this actually observed clean snapshot. Original b29db715 behavioral evidence and all earlier A8 attempts/continuation remain intact above.
+
+### Independently inspected delta and content equality
+
+Actual `git diff --stat 514a8880 HEAD` returned three files, ten insertions and two deletions:
+- Intent descriptive title: “將軟體工程研究能力納入 Loom” → “將軟體工程研究能力納入 loom-code”.
+- Its normalized existing confirmation pin: 75b8b06... → 9f188f839c203a32bcc39b13c135b7cf97d05bc1.
+- Plan: W7 task documents canonical confirmation-history repair and continuation.
+- Evidence: finalize-first-failure.txt preserves the original BLOCK.
+
+The four bullets describe three files: title and pin share the intent file. Read the full actual intent/plan diff and canonical commit 3306660a95421d269d4fdaa1483f398cb5b072da, including its body. It records existing code-ownership approval, not a new user decision. Original status remains confirmed 2026-11-08, publication authorization remains 2026-11-08; Python exact comparisons proved the full Acceptance-and-following text unchanged and all intent lines after the pin unchanged.
+
+Read the retained actual failure:
+`BLOCK intake.intent-version: the intent no longer matches confirmation commit da402f1 (confirmed bd80f2c, current 75b8b06); every Acceptance line may be affected...`
+The failure is not reclassified as a passing run. The earlier noncanonical ownership commit and stale selected ancestry explain this metadata correction; the current evidence does not invent renewed user consent.
+
+Direct Git diff against original tested b29db715 over the research package, its four caller/router skill directories and relevant package/loader tests returned empty (exit 0). Independently compared all eight tracked research package files, including human README, byte-for-byte with b29db715. Output:
+`research package byte equality: 8 files; SHA256(path,NUL,bytes): 45db3cc9dbc476f90c2e609555138ae8b6fe4c9cb090d9140a669231f3d46539`.
+This digest is calculated by iterating `git ls-tree -r --name-only HEAD loom-code/skills/engineering-research`, checking each current file equals its `git show b29db715:<path>` bytes, and hashing path bytes, NUL then content in that order. It is a package equality observation, not a substitute for earlier actual behavior tests.
+
+Independently recomputed the normalized intent pin by excluding only lines beginning `status:` and `intent_confirmed_sha:`, preserving remaining bytes, then passing them to `git hash-object --stdin` (no object write). Compared against the current field. Actual output:
+```text
+normalized confirmation pin matches: 9f188f839c203a32bcc39b13c135b7cf97d05bc1
+canonical confirmation subject: docs(loom): intent 2026-11-08-engineering-research-skill confirmed
+```
+
+No change to Acceptance, constraints, authorization, runtime or tests was found in the fix. No new source setup/install, network model, full suite, Vault operation, branch deletion or production land was needed/performed for this unchanged-behavior retarget. Prior actual isolated loader setup and behavioral results remain the basis, not a claim that they just reran.
+
+### Carry-over decisions checked against this delta
+
+- 1: carried over — confirmation title/pin/history metadata changed; source discovery, sole code ownership, design exclusion, router/caller contents and actual prior local-loader result are unchanged.
+- 2: carried over — selection description/rules and case inputs are unchanged. Prior explicit-load behavior remains distinct from historical routing; current automatic-selection probability remains unmeasured.
+- 3: carried over — premise/applicability/evidence/readback rules and original actual retained artifacts are unchanged.
+- 4: carried over — methods/source/evaluation-selection instructions and prior direct/mixed assessment are unchanged.
+- 5: carried over — question-scoped paths/template/frontmatter and prior continuation/revalidation records are unchanged.
+- 6: carried over — prohibited-write/unsaved rule and observed original no-write case are unchanged.
+- 7: carried over — source/connected-condition/relationship guidance and previously executed loader exclusion case are unchanged.
+- 8: carried over — preservation reference, Ship caller and fulfilled continuous synthetic fixture conditions/result are unchanged. Both original blocked attempts, manual user approval, successful local cleanup, synthetic case consent, actual copy/full readback/source preservation and no-overwrite boundary remain above, without claiming live hosting/real Vault coverage.
+- 9: carried over — formal-source usage/handoff evidence and historical/prototype/installed-host distinctions are unchanged; this clean current snapshot and metadata-only delta are now recorded explicitly.
+
+Outcome remains eight works and A2 partly. The earlier A8 important validation gap stays resolved only within the demonstrated synthetic local scope. No source repair, additional model request, skipped step, main-repository commit or verdict modification was performed by this witness.
 
