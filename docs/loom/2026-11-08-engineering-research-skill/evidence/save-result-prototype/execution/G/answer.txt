@@ -1,0 +1,40 @@
+**結論:** `TEST_ROOTS` 精確列出四個目錄,依序是:
+
+1. `tests`
+2. `loom-code/tests`
+3. `loom-design/tests`
+4. `loom-workflow/tests`
+
+這是我直接讀 `src/scripts/run_package_tests.py:53` 確認的。內容是 `TEST_ROOTS = ("tests", "loom-code/tests", "loom-design/tests", "loom-workflow/tests")`。
+
+`src/tests/test_run_package_tests.py:302` 的斷言列出同一組四個值,我只讀了,沒有執行。
+
+以下是未儲存的研究草稿,依你的要求沒有寫入任何檔案,也沒有建 active change。
+
+---
+title: Package test roots in run_package_tests.py (UNSAVED DRAFT)
+type: loom-research
+status: concluded
+created: 2026-11-08
+updated: 2026-11-08
+tags: [loom/research]
+
+**Question:** Which directories does `TEST_ROOTS` list exactly?
+
+**Method:** I read the source statically and reused the existing record `docs/loom/research/2026-11-08-package-test-roots.md`. The question is a single-source fact, so no new method was needed.
+
+**Findings:**
+- `src/scripts/run_package_tests.py:53` lists exactly the four roots above.
+- The runner's docstring and the `code_roots` filter at line 125 are consistent with that list. The `code` group is every root except `loom-design/tests` and `loom-workflow/tests`.
+- A test outside these roots does not run. A new plugin's tests run only after its root is added to `TEST_ROOTS`.
+
+**Limitations:**
+- This is a static read of the minimal snapshot. I ran nothing.
+- I did not recompute hashes. `fixture-observations.json` records the hash observations, but I did not open it, so I am not citing it.
+- The existing record cites "lines 51–55". The assignment is on line 53, which falls inside that range.
+- I did not re-verify the existing record's claims about `tests/local/` exclusion or the explicit-argument mode (lines 168–175). They are outside this question.
+- CI configuration and deployed versions are outside the evidence.
+
+---
+
+**未保存:** 草稿沒有儲存,所以沒有儲存後的讀回驗證,也沒有實際的紀錄路徑。如果之後要保留,可以再要求我寫入 `docs/loom/research/`。

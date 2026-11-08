@@ -1,0 +1,618 @@
+[
+  {
+    "actor": "A",
+    "case": "F04",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 47.949,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 33808,
+        "cache_read_input_tokens": 101209,
+        "output_tokens": 5951,
+        "output_tokens_details": {
+          "thinking_tokens": 831
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 33808,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1244,
+            "cache_read_input_tokens": 30988,
+            "cache_creation_input_tokens": 2820,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2820
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 5951,
+          "cacheReadInputTokens": 101209,
+          "cacheCreationInputTokens": 33808,
+          "webSearchRequests": 0,
+          "costUSD": 0.20488689999999998,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 831,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 33808,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.20488689999999998,
+      "permission_denials": [],
+      "num_turns": 15
+    },
+    "changed_files": [],
+    "added_files": [
+      "docs/loom/research/2026-11-08-package-test-claim-boundary.md"
+    ],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": []
+  },
+  {
+    "actor": "B",
+    "case": "F04",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 45.735,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 32678,
+        "cache_read_input_tokens": 68859,
+        "output_tokens": 5614,
+        "output_tokens_details": {
+          "thinking_tokens": 753
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 32678,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1096,
+            "cache_read_input_tokens": 26744,
+            "cache_creation_input_tokens": 5934,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 5934
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 5614,
+          "cacheReadInputTokens": 68859,
+          "cacheCreationInputTokens": 32678,
+          "webSearchRequests": 0,
+          "costUSD": 0.1937579,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 753,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 32678,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.1937579,
+      "permission_denials": [],
+      "num_turns": 14
+    },
+    "changed_files": [],
+    "added_files": [
+      "docs/loom/research/2026-11-08-package-test-claim-scope.md"
+    ],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": []
+  },
+  {
+    "actor": "C",
+    "case": "F01",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 39.213,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 24616,
+        "cache_read_input_tokens": 66977,
+        "output_tokens": 4283,
+        "output_tokens_details": {
+          "thinking_tokens": 775
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 24616,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 843,
+            "cache_read_input_tokens": 24066,
+            "cache_creation_input_tokens": 4760,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 4760
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 4283,
+          "cacheReadInputTokens": 66977,
+          "cacheCreationInputTokens": 24616,
+          "webSearchRequests": 0,
+          "costUSD": 0.1480117,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 775,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 24616,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.1480117,
+      "permission_denials": [],
+      "num_turns": 11
+    },
+    "changed_files": [
+      "docs/loom/research/2026-11-08-package-test-roots.md"
+    ],
+    "added_files": [],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": []
+  },
+  {
+    "actor": "D",
+    "case": "F01",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 42.021,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 24472,
+        "cache_read_input_tokens": 94254,
+        "output_tokens": 4326,
+        "output_tokens_details": {
+          "thinking_tokens": 393
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 24472,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 892,
+            "cache_read_input_tokens": 26279,
+            "cache_creation_input_tokens": 2403,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2403
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 4326,
+          "cacheReadInputTokens": 94254,
+          "cacheCreationInputTokens": 24472,
+          "webSearchRequests": 0,
+          "costUSD": 0.15059740000000002,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 393,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 24472,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.15059740000000002,
+      "permission_denials": [],
+      "num_turns": 13
+    },
+    "changed_files": [
+      "docs/loom/research/2026-11-08-package-test-roots.md"
+    ],
+    "added_files": [],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": []
+  },
+  {
+    "actor": "E",
+    "case": "F06",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 34.897,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 21538,
+        "cache_read_input_tokens": 89079,
+        "output_tokens": 4396,
+        "output_tokens_details": {
+          "thinking_tokens": 557
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 21538,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1112,
+            "cache_read_input_tokens": 23770,
+            "cache_creation_input_tokens": 1978,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 1978
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 4396,
+          "cacheReadInputTokens": 89079,
+          "cacheCreationInputTokens": 21538,
+          "webSearchRequests": 0,
+          "costUSD": 0.1390439,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 557,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 21538,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.1390439,
+      "permission_denials": [],
+      "num_turns": 13
+    },
+    "changed_files": [],
+    "added_files": [
+      "fixtureVault/research/2026-11-08-package-test-roots.md"
+    ],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": [
+      "fixtureVault/research/2026-11-08-package-test-roots.md"
+    ]
+  },
+  {
+    "actor": "F",
+    "case": "F06",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 40.498,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 26024,
+        "cache_read_input_tokens": 97290,
+        "output_tokens": 4438,
+        "output_tokens_details": {
+          "thinking_tokens": 608
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 26024,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1275,
+            "cache_read_input_tokens": 29943,
+            "cache_creation_input_tokens": 291,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 291
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 4438,
+          "cacheReadInputTokens": 97290,
+          "cacheCreationInputTokens": 26024,
+          "webSearchRequests": 0,
+          "costUSD": 0.15822899999999998,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 608,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 26024,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.15822899999999998,
+      "permission_denials": [],
+      "num_turns": 13
+    },
+    "changed_files": [],
+    "added_files": [
+      "fixtureVault/research/2026-11-08-package-test-roots.md"
+    ],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": [
+      "fixtureVault/research/2026-11-08-package-test-roots.md"
+    ]
+  },
+  {
+    "actor": "G",
+    "case": "F03",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 12.027,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 11435,
+        "cache_read_input_tokens": 10080,
+        "output_tokens": 1221,
+        "output_tokens_details": {
+          "thinking_tokens": 135
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 11435,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 956,
+            "cache_read_input_tokens": 5870,
+            "cache_creation_input_tokens": 9775,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 9775
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 1221,
+          "cacheReadInputTokens": 10080,
+          "cacheCreationInputTokens": 11435,
+          "webSearchRequests": 0,
+          "costUSD": 0.058966000000000005,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 135,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 11435,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.058966000000000005,
+      "permission_denials": [],
+      "num_turns": 3
+    },
+    "changed_files": [],
+    "added_files": [],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": []
+  },
+  {
+    "actor": "H",
+    "case": "F03",
+    "exit_code": 0,
+    "timeout": false,
+    "elapsed_seconds": 13.831,
+    "requested_provider": "first-party Anthropic native account; no provider env inherited",
+    "requested_model": "claude-sonnet-5-5",
+    "requested_effort": "medium",
+    "result": {
+      "is_error": false,
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 12218,
+        "cache_read_input_tokens": 24517,
+        "output_tokens": 1325,
+        "output_tokens_details": {
+          "thinking_tokens": 63
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 12218,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 775,
+            "cache_read_input_tokens": 14437,
+            "cache_creation_input_tokens": 1991,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 1991
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 1325,
+          "cacheReadInputTokens": 24517,
+          "cacheCreationInputTokens": 12218,
+          "webSearchRequests": 0,
+          "costUSD": 0.0645857,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 63,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 12218,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "total_cost_usd": 0.0645857,
+      "permission_denials": [],
+      "num_turns": 6
+    },
+    "changed_files": [],
+    "added_files": [],
+    "deleted_files": [],
+    "cost_scope": "CLI list-price equivalent, not subscription bill",
+    "protected_unchanged": true,
+    "fixtureVault_changes": []
+  }
+]

@@ -1,0 +1,53 @@
+{
+  "actor": "A02",
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "server_confirmed_model": null,
+  "command": [
+    "/Users/kouko/.local/bin/codex",
+    "exec",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--json",
+    "--sandbox",
+    "read-only",
+    "-C",
+    "/private/tmp/engineering-research-save-result-20261108/audits/A02/packet",
+    "-m",
+    "gpt-6.1-sol",
+    "-c",
+    "model_provider=\"openai\"",
+    "-c",
+    "model_reasoning_effort=\"medium\"",
+    "-o",
+    "/private/tmp/engineering-research-save-result-20261108/audits/A02/answer.txt",
+    "-"
+  ],
+  "environment_keys": [
+    "CODEX_HOME",
+    "HOME",
+    "LANG",
+    "LOGNAME",
+    "PATH",
+    "PYTHONDONTWRITEBYTECODE",
+    "SHELL",
+    "TMPDIR",
+    "USER"
+  ],
+  "config_sha256": "5a0f487807aa4e75bebe84c91deaa714c2d09053a788ef6a7ae45809703bcabf",
+  "input_matches_frozen": true,
+  "timed_out": false,
+  "excluded_reasoning_events": 0,
+  "exit_code": 0,
+  "elapsed_seconds": 328.058,
+  "usage": {
+    "input_tokens": 1115345,
+    "cached_input_tokens": 1010176,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 9865,
+    "reasoning_output_tokens": 4100
+  },
+  "packet_unchanged": true,
+  "auth_symlink_removed": true
+}

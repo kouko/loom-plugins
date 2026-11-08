@@ -1,0 +1,26 @@
+{
+  "actors": {
+    "A01": {
+      "input_tokens": 1083441,
+      "cached_input_tokens": 979968,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8313,
+      "reasoning_output_tokens": 1916
+    },
+    "A02": {
+      "input_tokens": 1115345,
+      "cached_input_tokens": 1010176,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 9865,
+      "reasoning_output_tokens": 4100
+    }
+  },
+  "aggregate": {
+    "input_tokens": 2198786,
+    "cached_input_tokens": 1990144,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18178,
+    "reasoning_output_tokens": 6016
+  },
+  "server_confirmed_model": null
+}

@@ -1,0 +1,43 @@
+你不能宣稱整套 package tests/CI 全通過,也不能宣稱來源已驗證可追溯到原始 commit。能支持的範圍小得多。
+
+**收據(`sample-receipt.json`)**
+- `exit_code=0` 是 `codex exec`(id B02,外部模型執行器)這個行程的結束碼。
+- 收據裡沒有 pytest 或 `run_package_tests.py` 的命令、沒有測試數量,也沒有 CI 資訊。
+- 它的 `added_project_files` 只列出那份研究記錄。這份收據記錄的是撰寫該 Markdown 的過程,不是跑過任何測試。
+
+**既有記錄(`2026-11-08-package-test-roots.md`)**
+- 它自己寫明是靜態原始碼檢視,沒有執行任何測試,並說 CI 設定與部署版本不在證據範圍內。
+- 它的結論只限於 `TEST_ROOTS` 清單,以及 `--loom-family` 預設下排除 `tests/local/`。
+- 它引用的行號有些偏差:`TEST_ROOTS` 實際在第 53 行(區塊 51–54),code group 在 124–128,shell 探索在 88–95。結論不受影響,但行號不能當精確錨點引用。
+
+**來源 hash**
+- `fixture-observations.json` 是 harness 的觀察,不是我執行的。我逐一比對其中四個來源檔的 SHA256,與 `provenance.json` 全部相符。
+- 這只證明這四個檔案內容與記錄的 hash 一致。我沒有自己計算任何 hash,也無法驗證記錄檔寫入後的 hash。
+
+**可追溯性**
+- `provenance.json` 記載的 commit `d5a7f0da…` 不在此 fixture 的 git 歷史中。fixture 只有 harness 自己的三個 commit,沒有 tag 和 remote。
+- `remote_freshness` 是「not checked」。
+- 所以這個 commit 只是記錄中的歸屬說法,沒有被驗證。
+
+**連結**
+- 既有記錄中的三個相對連結(`provenance.json`、runner、測試檔)都能解析到實際存在的檔案,我也讀過內容,確實是它要引用的證據。
+
+**目前可說的話**
+- 一個外部執行器行程以 0 結束,並產出了該研究記錄。
+- 該記錄是對 4 個檔案快照所做的靜態檢視,結論限於 test roots 與 `local/` 排除。
+- 4 個來源檔的 hash 與 provenance 相符,本地連結有效。
+
+**要宣稱通過,還缺什麼**
+- 完整 checkout 上真實的執行記錄:命令、revision、環境、輸出、結束碼。
+- CI run 的證據。
+- 這份快照只有 4 個檔案,缺少 `loom-design/`、`loom-workflow/` 和 Mermaid 測試,本身也跑不出完整套件。
+
+**不確定事項**
+- 我沒有執行任何命令。
+- 收據內容我只能照字面採信。
+- `provenance.json` 本身是否符合 `source_provenance_sha256`,我無法驗證。
+- provenance 的路徑沒有 `src/` 前綴,與 fixture 對應是我的推定,只有 hash 相符作支持。
+
+**交付檔案**
+- 新記錄:`docs/loom/research/2026-11-08-package-test-claim-boundary.md`。我已寫入並完整讀回確認內容。
+- 既有的 `2026-11-08-package-test-roots.md` 沒有改動。

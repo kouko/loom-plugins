@@ -1,0 +1,289 @@
+{
+  "scope": "actual tool results and files, no semantic grading; earlier returned snapshots need not match a later edit",
+  "actors": [
+    {
+      "actor": "A",
+      "case": "F04",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [],
+      "added_files": [
+        "docs/loom/research/2026-11-08-package-test-claim-boundary.md"
+      ],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "save_observations": [
+        {
+          "call_line": 38,
+          "result_line": 40,
+          "written": true,
+          "result_keys": [
+            "written",
+            "path"
+          ],
+          "path": "docs/loom/research/2026-11-08-package-test-claim-boundary.md",
+          "error": null
+        }
+      ]
+    },
+    {
+      "actor": "B",
+      "case": "F04",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [],
+      "added_files": [
+        "docs/loom/research/2026-11-08-package-test-claim-scope.md"
+      ],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Grep",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "save_observations": [
+        {
+          "call_line": 35,
+          "result_line": 37,
+          "written": true,
+          "result_keys": [
+            "written",
+            "path",
+            "sha256",
+            "persisted_content",
+            "readback_complete",
+            "observation_scope",
+            "links",
+            "link_scope",
+            "unsupported_reference_links"
+          ],
+          "path": "docs/loom/research/2026-11-08-package-test-claim-scope.md",
+          "error": null,
+          "returned_body_sha256": "ef59e35bb6f54a90d54daf91f5e23a5a8817bdb0260f6ce3919527f6efa33d1b",
+          "returned_sha_matches_body": true,
+          "body_bytes": 7560,
+          "link_statuses": [
+            "exists",
+            "exists",
+            "exists",
+            "exists",
+            "exists",
+            "exists",
+            "exists"
+          ],
+          "matches_final_artifact": true
+        }
+      ]
+    },
+    {
+      "actor": "C",
+      "case": "F01",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [
+        "docs/loom/research/2026-11-08-package-test-roots.md"
+      ],
+      "added_files": [],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "save_observations": [
+        {
+          "call_line": 33,
+          "result_line": 34,
+          "written": true,
+          "result_keys": [
+            "written",
+            "path",
+            "sha256",
+            "persisted_content",
+            "readback_complete",
+            "observation_scope",
+            "links",
+            "link_scope",
+            "unsupported_reference_links"
+          ],
+          "path": "docs/loom/research/2026-11-08-package-test-roots.md",
+          "error": null,
+          "returned_body_sha256": "adc857c4c0befeca1f50aab1f9201dc741a512fd139352f923ac2cdb32ebc29c",
+          "returned_sha_matches_body": true,
+          "body_bytes": 5165,
+          "link_statuses": [
+            "exists",
+            "exists",
+            "exists",
+            "exists",
+            "exists",
+            "exists",
+            "exists"
+          ],
+          "matches_final_artifact": true
+        }
+      ]
+    },
+    {
+      "actor": "D",
+      "case": "F01",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [
+        "docs/loom/research/2026-11-08-package-test-roots.md"
+      ],
+      "added_files": [],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "save_observations": [
+        {
+          "call_line": 29,
+          "result_line": 31,
+          "written": true,
+          "result_keys": [
+            "written",
+            "path"
+          ],
+          "path": "docs/loom/research/2026-11-08-package-test-roots.md",
+          "error": null
+        }
+      ]
+    },
+    {
+      "actor": "E",
+      "case": "F06",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [],
+      "added_files": [
+        "fixtureVault/research/2026-11-08-package-test-roots.md"
+      ],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Grep",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "save_observations": [
+        {
+          "call_line": 31,
+          "result_line": 33,
+          "written": true,
+          "result_keys": [
+            "written",
+            "path"
+          ],
+          "path": "fixtureVault/research/2026-11-08-package-test-roots.md",
+          "error": null
+        }
+      ]
+    },
+    {
+      "actor": "F",
+      "case": "F06",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [],
+      "added_files": [
+        "fixtureVault/research/2026-11-08-package-test-roots.md"
+      ],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "save_observations": [
+        {
+          "call_line": 32,
+          "result_line": 34,
+          "written": true,
+          "result_keys": [
+            "written",
+            "path",
+            "sha256",
+            "persisted_content",
+            "readback_complete",
+            "observation_scope",
+            "links",
+            "link_scope",
+            "unsupported_reference_links"
+          ],
+          "path": "fixtureVault/research/2026-11-08-package-test-roots.md",
+          "error": null,
+          "returned_body_sha256": "187cca8c96d555eed7f11239ba8ed651bb6dc7419fefa2230c76d0469e4e0dd8",
+          "returned_sha_matches_body": true,
+          "body_bytes": 3946,
+          "link_statuses": [
+            "exists",
+            "exists",
+            "exists",
+            "exists"
+          ],
+          "matches_final_artifact": true
+        }
+      ]
+    },
+    {
+      "actor": "G",
+      "case": "F03",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [],
+      "added_files": [],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Grep",
+        "Read"
+      ],
+      "save_observations": []
+    },
+    {
+      "actor": "H",
+      "case": "F03",
+      "exit_code": 0,
+      "timeout": false,
+      "protected_unchanged": true,
+      "changed_files": [],
+      "added_files": [],
+      "model_labels": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Grep",
+        "Read"
+      ],
+      "save_observations": []
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+你只能宣稱「靜態來源檢查」層級的結論。整套 package tests/CI 全通過這個說法,現有證據撐不住。
+
+**不能宣稱的部分**
+- **`exit_code=0` 不是測試結果。** 它是 executor `B02` 這次 `codex exec` 程序的退出碼。收據裡沒有 pytest、runner 或 CI 指令,也沒有測試數量或輸出。收據的 `added_project_files` 顯示,那次程序寫入了既有研究記錄。
+- **沒有任何測試執行輸出,也沒有 CI 設定或結果。** runner 只有在所有子指令都回傳 0 時才會回傳 0,但這份證據裡沒有 runner 的退出碼。
+- **快照是最小切片。** `loom-design/tests`、`loom-workflow/tests`、mermaid 驗證器和 CI 設定都不在 fixture 裡。
+- **來源可追溯只是部分成立。** `provenance.json` 只把檔案歸屬到 commit `d5a7f0da…`,且 `remote_freshness` 是「not checked」。原始 repo 不在 fixture 內,我沒有讀。fixture 的 git 是臨時建立的,沒有 remote 和 tag,不能代表原始歷史。
+
+**可以宣稱的部分**
+- 既有記錄 `package-test-roots` 的結論有來源支持:`TEST_ROOTS` 有四個目錄,`--loom-family` 預設組合會排除 `local/`。這只是靜態來源檢查,沒有執行驗證。
+- 我對照了 runner 與測試定義。記錄的結論與程式碼一致,但 runner 的行號有小幅偏移,例如 `_tests_session` 實際在 76–85 行。
+- runner 與測試檔的 SHA256,在 `provenance.json`、`fixture-observations.json` 和既有記錄三處一致。
+- 三個連結都解析到存在的 fixture 檔案。
+
+**保存的記錄**
+`docs/loom/research/2026-11-08-package-test-claim-scope.md`(完整路徑在 `/private/tmp/engineering-research-save-result-20261108/private-run/B/project/` 之下)。工具回讀確認內容已寫入,連結都解析到存在的檔案。既有的 `package-test-roots.md` 沒有改動。
+
+**不確定與限制**
+- 我沒有執行任何指令、雜湊工具或測試。雜湊一致是引用 harness 的觀察,我沒有自行重算。
+- `provenance.json` 裡 skill 檔案的雜湊我沒有比對。
+- `provenance.json` 的路徑沒有 `src/` 前綴,與 fixture 的對應關係是我推測的。
+- 既有記錄說雜湊是用 `shasum -a 256` 量測的,我無法確認這點,收據也沒有記錄該指令。
+- 原始 repo 在 `d5a7f0da…` 這個 commit 的 CI 是否通過,目前無從得知。要宣稱通過,需要實際跑完整測試,或取得該 commit 的 CI 結果,並保留指令、環境和輸出。

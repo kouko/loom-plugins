@@ -11,10 +11,13 @@
   "local_tests": 29,
   "legacy_repair_focused": 10,
   "census_existing_adversarial_tests": 3,
-  "private_actors_started": 0,
-  "private_approval": "pending explicit user answer; absent or preselected answer is not consent",
+  "private_actors_started": 8,
+  "private_approval": "specific direct user approval; execution/authorization.json and audits/authorization.json",
   "existing_mechanism_adversarial_tests": {
     "passed": 71,
     "exit_code": 0
-  }
+  },
+  "private_execution_completed": 8,
+  "independent_audits_completed": 2,
+  "semantics": "See actual paired judgments; no overall dogfood pass or production promotion"
 }
