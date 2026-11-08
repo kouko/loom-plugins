@@ -1,0 +1,11 @@
+兩者可以同時成立：**固定探索範圍，範圍內自動探索測試**。
+
+依目前腳本靜態查核：
+
+- **固定 roots**：[第 53 行](/private/tmp/engineering-research-dogfood-A-20261108/P07-r1/project/scripts/run_package_tests.py:53) 明列 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。新增其他 plugin 的 root，仍須修改清單。
+- **自動探索**：[第 68 行起](/private/tmp/engineering-research-dogfood-A-20261108/P07-r1/project/scripts/run_package_tests.py:68) 遞迴判斷 Python 測試並交由 pytest 收集；shell 測試則在 roots 下遞迴搜尋 `test-*.sh`。因此，既有 roots 內新增符合規則的測試，不必逐檔登錄。
+- **適用邊界**：上述結論適用於 `--loom-family`；一般模式接受呼叫者傳入的 pytest 參數。另外，Mermaid 群組使用固定命令，不能概括成所有測試皆自動探索。
+
+所以，若 spec 的「自動探索」指 roots 內的測試清單，兩份說法相容；若指自動找到任意新 plugin/root，就與目前實作衝突。
+
+限制：未提供兩份 spec 原文，無法確認其實際語意；未執行測試，也未驗證缺少的 `repo_files` 依賴。以上為唯讀研究紀錄草稿，未儲存檔案。

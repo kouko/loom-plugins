@@ -1,0 +1,5 @@
+不必重寫 runner。最小方案是直接呼叫 `loom_family_commands()`，取得 argv 清單供預覽，沿用現有 discovery；若需要 CLI，再新增輸出清單後立即返回的分支。
+
+已完成一次允許的實驗，成功取得三組 Mermaid 命令，未啟動任何測試。限制是 builder 仍會執行唯讀 Git 查詢；完整 suite、依賴與實際執行結果尚未驗證。
+
+英文研究文件已寫入並讀回核對：[研究紀錄](/private/tmp/framework-probe-b-20261108/X004/project/docs/loom/research/2026-11-08-package-suite-command-preview.md)。

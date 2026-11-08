@@ -1,0 +1,9 @@
+Unsaved research draft (read-only; no artifact saved):
+
+- **Question:** Does the plugin loader support ESM on the supported host?
+- **Method:** Compare both tests’ execution paths and environments, then use a minimal reproduction if needed.
+- **Evidence:** Only the two conflicting claims are available. No tests, loader source, host versions, or execution results were supplied.
+- **Finding:** Unresolved. Different versions, transpilation, wrappers, or loading paths could explain the discrepancy; these remain hypotheses.
+- **Decision:** Keep the build blocked pending evidence tied to the supported host.
+
+What host/runtime and loader versions are supported, and can you provide both tests, their results, and the loader entry point?

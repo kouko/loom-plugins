@@ -1,0 +1,9 @@
+**有，原始碼支援 shell 測試，但必須使用 `--loom-family` 模式。**
+
+唯讀研究紀錄草稿（未存檔）：
+- **方法與證據**：靜態追查入口、測試探索及執行流程；[shell 執行分支](/private/tmp/engineering-research-dogfood-A-20261108/P10-r1/project/scripts/run_package_tests.py:134) 會產生 `bash <測試路徑>` 指令，入口逐一執行，遇非零退出碼即停止並回傳。
+- **使用方式**：從專案根目錄執行 `python3 scripts/run_package_tests.py --loom-family --only workflow-shell`。
+- **涵蓋範圍**：遞迴搜尋 `tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/` 下的 `test-*.sh`；排除各根目錄的 `local/`、`node_modules`，以及被識別為巢狀 repository／worktree 的子樹。
+- **限制**：一般參數與 `--then` 模式只呼叫 pytest，沒有直接執行 shell 的分支。未找到 shell 測試時也會回傳成功。
+
+**採用判斷**：既有測試若符合上述命名、位置及 Bash 執行方式，入口具備沿用能力。但目前只有此來源檔，缺少實際測試、`repo_files` 相依實作與執行紀錄，尚不能確認完整相容或驗證已通過。本次未執行測試；依唯讀限制，未建立研究檔案。

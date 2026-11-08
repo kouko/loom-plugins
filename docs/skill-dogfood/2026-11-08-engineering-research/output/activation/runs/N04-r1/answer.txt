@@ -1,0 +1,12 @@
+Implementation tasks:
+
+1. Add one `test-<behavior>.sh` beneath the appropriate existing test root: `tests/`, `loom-code/tests/`, `loom-design/tests/`, or `loom-workflow/tests/`. Keep it outside the root’s `local/` directory, `node_modules`, and nested repositories.
+2. Implement the confirmed scenario: arrange inputs, invoke the behavior, assert the expected result, and clean up temporary resources. Failed assertions must return a nonzero exit status.
+3. In the implementation environment, run the script directly with `bash <test-path>`.
+4. Run `python scripts/run_package_tests.py --loom-family --only workflow-shell` to verify suite integration.
+
+The [runner](scripts/run_package_tests.py) automatically discovers `test-*.sh` files, so adding this test requires no runner registration change.
+
+Missing evidence: the confirmed scenario, expected assertions, and owning component were not supplied, so the exact filename, location, and test body remain unspecified. Suite execution also depends on repository files absent from this isolated fixture.
+
+No files changed or tests run.

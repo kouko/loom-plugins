@@ -1,0 +1,13 @@
+**有支援，但須使用 `--loom-family` 模式。**依目前原始碼，可從專案根目錄執行：
+
+```sh
+python3 scripts/run_package_tests.py --loom-family --only workflow-shell
+```
+
+- [探索規則](scripts/run_package_tests.py:88)：遞迴收集 `tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/` 下的 `test-*.sh`，排除各根目錄的 `local/` 與 `node_modules`。
+- [執行方式](scripts/run_package_tests.py:134)：排除巢狀 repository/worktree 後，逐一以 `bash` 執行；[任一失敗即停止並回傳退出碼](scripts/run_package_tests.py:163)。
+- [一般模式](scripts/run_package_tests.py:168)只呼叫 pytest，沒有直接執行 shell 測試的分支。
+
+因此，既有驗證若符合上述路徑、命名及 Bash 執行方式，入口已有承接機制；不能據此保證完全相容。
+
+本次 engineering-research 採原始碼追蹤。僅有此 fixture，缺少 `repo_files`、既有 shell 測試與執行結果，尚未驗證實際可用性；也未確認版本。依唯讀限制，以上為未儲存研究摘要，未建立研究檔案。

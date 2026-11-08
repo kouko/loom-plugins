@@ -1,0 +1,8 @@
+Intent and feasibility are approved. The agreed shortcut, action, and target context aren’t provided, so this plan leaves those details unspecified.
+
+1. Identify the action handler, keyboard-event conventions, and existing shortcut conflicts. **Check:** document the agreed key combination and activation context.
+2. Connect the shortcut to the existing action. **Check:** it performs the same action once per intended activation.
+3. Apply focus and event-handling rules. **Check:** behavior matches the agreement in text inputs, dialogs, and unsupported contexts; unrelated shortcuts remain unaffected.
+4. Update shortcut help and add regression coverage. **Check:** documentation matches behavior, and supported platforms pass keyboard, focus, and conflict tests.
+
+No files changed.

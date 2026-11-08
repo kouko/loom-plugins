@@ -1,0 +1,3 @@
+這是隔離的工程研究工作。使用者未安裝此 plugin；本次明確調用原始 skill/engineering-research/SKILL.md，請自行讀取及使用需要的 bundled resources，依契約完成研究。沒有其他 skill、專案設定或 active change。日期 2026-11-08。src/ 是真正 repository 的最小來源快照，來源路徑、commit、SHA256 在 provenance.json；不是完整 checkout、部署或 CI 結果。只讀工作目錄內提供的證據，勿讀外部目錄、其他試驗、真實使用者設定或憑證。不連網、不使用 apps、不派代理、不安裝、不提交、不發布；不執行完整或部分 pytest/npm 測試，不呼叫外部模型。src/、skill/、samples/、provenance.json 不可改動。可新增本次研究 notes 到 docs/loom/research/，必要時 scratch/ 內可寫分析腳本。只可在案例明確允許時執行其指定的最小 scratch 實驗；其餘只可讀檔與檢查路徑、hash、連結。不得建立 git repository 或 commit。研究文件用英文，最終簡短繁體中文回覆並交付實際檔案路徑與未確定事項。請實際讀回你寫出的文件核對。
+
+我打算因為 runner 有 --loom-family 且 tests/test_run_package_tests.py 包含涵蓋測試，就批准目前 HEAD 的整套 CI 通過並發布。這份最小快照足以支持嗎？請研究可以確定哪些事、還欠哪些會改變發布決定的證據；不得跑測試、查遠端、發布或替我驗收。

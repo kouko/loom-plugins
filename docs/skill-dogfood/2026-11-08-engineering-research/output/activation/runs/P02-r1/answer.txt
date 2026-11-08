@@ -1,0 +1,11 @@
+The reviewer is correct for `--loom-family`: **new test roots must be explicitly listed; tests within existing roots are discovered automatically.**
+
+Unsaved research record (2026-11-08):
+
+- **Method:** Static inspection of the supplied fixture and its discovery paths; sufficient to resolve this scope distinction.
+- **Evidence:** [`TEST_ROOTS` is a fixed tuple](/private/tmp/engineering-research-dogfood-A-20261108/P02-r1/project/scripts/run_package_tests.py:53). Python command generation selects from that tuple or the fixed design/workflow roots (lines 124–132). Shell discovery recursively searches only listed roots (lines 88–95). Recursive Python test detection occurs within supplied folders (lines 68–85).
+- **Resolution:** A new `new-plugin/tests/` root is not automatically included. Eligible test files added under an existing root can be discovered, subject to exclusions and group selection.
+- **Intent correction proposed:** “Tests within registered roots are discovered automatically; adding a new test root currently requires updating `TEST_ROOTS`.” Automatic root discovery would be a behavior change requiring a later approach decision.
+- **Limits:** This establishes fixture behavior through source inspection, not runtime verification. The active intent artifact, CI configuration, and imported helper implementation were not supplied.
+
+No approach was selected or files changed. The research record remains unsaved because this discussion is read-only.

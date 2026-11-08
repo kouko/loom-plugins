@@ -1,0 +1,15 @@
+**Pytest and shell tests share root configuration, but not a single discovered inventory.**
+
+Source inspection of [scripts/run_package_tests.py](/private/tmp/engineering-research-dogfood-A-20261108/P03-r2/project/scripts/run_package_tests.py:53) shows:
+
+- In `--loom-family` mode, both derive their scope from `TEST_ROOTS`.
+- Pytest checks for `test_*.py` or `*_test.py`, then passes **directories** to pytest for collection. Python tests are divided into code, design, and workflow sessions (lines 68–85, 98–133).
+- Shell discovery independently enumerates `test-*.sh` beneath every configured root and runs each with `bash` (lines 88–95, 134–138).
+- Both receive nested-repository/worktree exclusions, applied differently: pytest command ignores versus shell-path filtering (lines 123–149).
+- Mermaid commands are explicitly listed separately (lines 139–145). Outside `--loom-family`, the runner invokes only pytest with supplied arguments.
+
+**Spec implication:** describe shared roots with separate discovery and execution paths. Assuming a shared file inventory would misrepresent the current implementation.
+
+This is source-level verification only. The fixture lacks pytest configuration, test trees, and `repo_files` implementation, so actual collected membership and exclusion correctness remain unverified.
+
+Research record: this response is the unsaved draft; no artifact was written under the read-only constraint.

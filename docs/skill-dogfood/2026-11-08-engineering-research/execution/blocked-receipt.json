@@ -1,0 +1,13 @@
+{
+  "utc": "2026-11-08T05:40:30.056537+00:00",
+  "external_execution": "blocked_by_automatic_approval_before_process_creation",
+  "actor_count": 0,
+  "actor_outputs": 0,
+  "frozen_inputs_unchanged": true,
+  "original_source_unchanged": true,
+  "skill_snapshot_unchanged": true,
+  "temporary_root_exists": false,
+  "auth_symlinks_created": false,
+  "cleanup_required": false,
+  "rejection": "The run sends private skill and repository source contents to an external OpenAI service; the user authorized dogfood testing but did not explicitly authorize this specific sensitive payload and destination. Do not bypass this rejection through a workaround or indirect execution."
+}

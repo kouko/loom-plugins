@@ -1,0 +1,13 @@
+Your suspicion is supported: **`tests/local` is explicitly excluded from the `--loom-family` package suite.** Treating it as ordinary CI coverage contradicts the runner.
+
+Source inspection shows:
+
+- `_tests_session()` excludes each test root’s `local/` directory when discovering tests and adds `--ignore=<absolute local path>` to pytest commands ([lines 76–85](scripts/run_package_tests.py#L76)).
+- `_shell_tests()` filters out shell tests beneath those directories ([lines 88–95](scripts/run_package_tests.py#L88)).
+- `_workflow_sessions()` excludes its root’s `local/` directory from both subfolder sessions and top-level collection ([lines 98–113](scripts/run_package_tests.py#L98)).
+
+The docstring identifies these as tests that only make sense on a developer’s machine. There is one important boundary: **without `--loom-family`, arguments pass directly to pytest**, so that route adds no local exclusions ([lines 168–175](scripts/run_package_tests.py#L168)).
+
+The planning assumption is therefore refuted for family mode. Actual CI validity remains unverified: the fixture provides neither CI configuration nor local-test contents, so it cannot establish the invocation CI uses or specific failures inclusion would cause.
+
+Research record: this response is the unsaved draft, based on source inspection only. No Markdown artifact was saved under the read-only constraint; no tests ran or planning continued.

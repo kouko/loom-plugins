@@ -1,0 +1,5 @@
+已完成並讀回核對[英文研究文件](/private/tmp/framework-probe-b-20261108/X006/project/docs/loom/research/2026-11-08-research-note-migration-traceability.md)。
+
+結論：不能原樣直接搬移；7 個來源連結都會失效。在提供的目錄結構中，各補一層 `../` 可維持原目標。來源 SHA256 均吻合，文件已列出最小搬移、驗收與回復界線。
+
+未確定事項：完整原筆記與反向連結、未來 checkout 路徑，以及編輯器的行號跳轉。未搬改原筆記、建立 active change 或執行測試。

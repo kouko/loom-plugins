@@ -1,0 +1,12 @@
+Unsaved research draft; intent stage preserved.
+
+Evidence: You report no deployment latency measurements; no project fixtures or browsing are provided. Neither choice is justified yet.
+
+Method: A matched benchmark would resolve the performance gap; a lightweight trade study would compare constraints.
+
+- Define latency targets, workload, concurrency, correctness, resource limits, cost ceiling and data-handling requirements.
+- Compare identical representative inputs under deployment constraints. Measure end-to-end p50/p95/p99, cold starts, throughput, failures and resource use across repeated runs; include hosted network, queue and retry delays.
+- Favor local if it meets targets within resource limits and its operational tradeoffs are acceptable.
+- Favor hosted if it meets targets, cost and data requirements with acceptable dependency risk.
+
+No research artifact saved: read-only scope.

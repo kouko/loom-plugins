@@ -1,0 +1,984 @@
+{
+  "requested_model": "gpt-6.1-sol",
+  "requested_effort": "medium",
+  "coverage": {
+    "status": "complete-for-frozen-actors",
+    "covered_ids": [
+      "X001",
+      "X002",
+      "X003",
+      "X004",
+      "X005",
+      "X006",
+      "X007",
+      "X008",
+      "X009",
+      "X010",
+      "X011",
+      "X012"
+    ],
+    "covered_count": 12,
+    "total_planned": 12,
+    "cases": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05",
+      "C06"
+    ],
+    "criterion_vote_counts": {
+      "supported": 104,
+      "not-applicable": 4
+    }
+  },
+  "actors": [
+    {
+      "id": "X001",
+      "case": "C02",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:13-23 preserves no-tests/no-duplicate-discovery and partial snapshot."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:25-33/26-40 chooses source inspection plus one permitted bounded experiment."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:35-93/42-95 traces builder, main, sys.path and Git helpers; fixture runner:47-49,116-150,153-180 supports claims."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:104-123 (X001) or 97-121 (X004): no-change direct reuse, small CLI branch, rejects separate discovery/rewrite with concrete reason."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:49-60 (X001) or 57-60,123-144 (X004) limits empty fixture result; no claimed full-suite correctness or speed."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/events.jsonl:26 (X001) or :20 (X004) executes python3 -I -B scratch/preview_package_commands.py once; script imports real runner, one builder call, prints only."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:1-9 required flat metadata; all local file targets exist; execution/X001/events.jsonl:30 (X001), :25 and :29 (X004) actual readback."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:125-147 (X001) or 123-152 (X004) distinguishes environment-dependent plan, missing dependencies, later state and unverified runtime."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/events.jsonl:13 (X001) or :9 (X004) loads required resources; no diagram used. X001 test read (:12) precedes resource completed event (:13), an ordering deviation without demonstrated functional impact."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X002",
+      "case": "C06",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:13-19 correctly rejects source definitions as approval for current HEAD release."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:21-25 direct connected evidence assessment fits completion claim, not unnecessary experiment."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:31-64 traces commands, failure, inventory, definition weaknesses and missing workflow files; fixture sources and tests support it."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:81-92 common evidence targets for withholding approval; no numerical scores or false mandatory service targets."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:39-49 explicitly distinguishes defined assertions/hash consistency/research process exits from executed successful CI."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/events.jsonl:5-21 reads/hash/path checks and record creation/readback only; no tests, remote query or release."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:1-9 metadata; all linked files exist; execution/X002/events.jsonl:21 actual readback. #L source anchors are hosting-specific, textual spans retain navigation."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:83-98 exact candidate, full workflows/inventory/env and revision-linked runs/artifacts required; approval remains human decision."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/events.jsonl:9 actual methods/source/evaluation/template reads, :11/:14/:16 source connected path and applicability checks. No diagram."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X003",
+      "case": "C03",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:13-21; execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:13-21 frames both accidental foreign execution and Git failure under read-only constraints."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:19-21; execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:19-21 separately traces trust boundary and failure propagation; framework names not required."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:25-54; execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:25-53/58 matches fixture runner:123-149, repo_files:73-146, git_exec:50-88, tests:128-184,260-331."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:56-66 or 58-66; execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:55-65 or 60-68 compares conditional retention, outside-root placement, discovery/pruning and fail-stop proposals without unsupported scores."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:25-42; execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:25-43 explicitly static source conclusions and plausible/runtime boundaries, no exploit reproduction or inferred measured outcome."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/events.jsonl command trajectory only reads/search/hash/path checks, mkdir and note creation; no runner/Git/test invocation."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:1-9 and execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:1-9 required metadata, question split, relative cross-links exist; execution/X003/events.jsonl:22 (X003) or :18 (X005) actual full readback and link ls."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:56-66; execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:55-65/60-68 preserves ignored clone, unrelated worktree, explicit target and external-policy unknowns; recommendations remain unimplemented."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/events.jsonl:9 (X003) or :7 (X005) actual required method/source/template reads; X003 also loads conditional evaluation selection. No diagram."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X004",
+      "case": "C02",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:13-23 preserves no-tests/no-duplicate-discovery and partial snapshot."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:25-33/26-40 chooses source inspection plus one permitted bounded experiment."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:35-93/42-95 traces builder, main, sys.path and Git helpers; fixture runner:47-49,116-150,153-180 supports claims."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:104-123 (X001) or 97-121 (X004): no-change direct reuse, small CLI branch, rejects separate discovery/rewrite with concrete reason."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:49-60 (X001) or 57-60,123-144 (X004) limits empty fixture result; no claimed full-suite correctness or speed."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/events.jsonl:26 (X001) or :20 (X004) executes python3 -I -B scratch/preview_package_commands.py once; script imports real runner, one builder call, prints only."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:1-9 required flat metadata; all local file targets exist; execution/X004/events.jsonl:30 (X001), :25 and :29 (X004) actual readback."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md:125-147 (X001) or 123-152 (X004) distinguishes environment-dependent plan, missing dependencies, later state and unverified runtime."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/events.jsonl:13 (X001) or :9 (X004) loads required resources; no diagram used. X001 test read (:12) precedes resource completed event (:13), an ordering deviation without demonstrated functional impact."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X005",
+      "case": "C03",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:13-21; execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:13-21 frames both accidental foreign execution and Git failure under read-only constraints."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:19-21; execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:19-21 separately traces trust boundary and failure propagation; framework names not required."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:25-54; execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:25-53/58 matches fixture runner:123-149, repo_files:73-146, git_exec:50-88, tests:128-184,260-331."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:56-66 or 58-66; execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:55-65 or 60-68 compares conditional retention, outside-root placement, discovery/pruning and fail-stop proposals without unsupported scores."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:25-42; execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:25-43 explicitly static source conclusions and plausible/runtime boundaries, no exploit reproduction or inferred measured outcome."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/events.jsonl command trajectory only reads/search/hash/path checks, mkdir and note creation; no runner/Git/test invocation."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:1-9 and execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:1-9 required metadata, question split, relative cross-links exist; execution/X005/events.jsonl:22 (X003) or :18 (X005) actual full readback and link ls."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md:56-66; execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md:55-65/60-68 preserves ignored clone, unrelated worktree, explicit target and external-policy unknowns; recommendations remain unimplemented."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/events.jsonl:9 (X003) or :7 (X005) actual required method/source/template reads; X003 also loads conditional evaluation selection. No diagram."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X006",
+      "case": "C05",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:13-17 hypothetical relocation only, no active change or original edits."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:19-21 document/path/hash analysis fits Markdown move; no copied database procedure."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:25-63 seven exact URLs, anchor lines, both manifests and differing extraction/full-note hashes."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:65-73 retains current general location as smallest option and offers staged relocation only if needed."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:39-52 and :81-83 distinguishes path/line/hash observations from rendering, authenticity and full-note/runtime claims."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/events.jsonl:14 read-only Python path/hash operations, :16 bounded grep; receipt added files contains only new report."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:1-9 metadata, :69-79 preserve dates/provenance with planned update and rollback; execution/X006/events.jsonl:21 actual full readback/path verification."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md:75-83 stop on mismatch/collision, rollback before acceptance; after dependents account for concurrent edits and consumers."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/events.jsonl:9 reads methods/source/template before evidence; no diagram; path calculations 7 old exist, 0 unchanged new exist, 7 repairs preserve identities."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X007",
+      "case": "C05",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:13-17 preserves hypothetical move/no original edits/no active change."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:19-21 fits document migration with direct path/hash inspection, not database rollout."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:25-56 all seven path calculations, exact anchors, eight hashes and extraction provenance distinguish what was actually checked."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:58-65 retaining general record is smallest option; future migration has common preservation criteria."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:37-41,75 separates path/line/hash observation from renderer/historical authentication or runtime."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/events.jsonl events :12 read-only Python/nl/rg, :17 readback/hash/path only; receipt adds only new report."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:1-9 flat metadata; 62-71 preserve history/dates, inbound/outbound links; events :17 actual readback."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md:67-75 stop/recovery bounds include intervening changes/consumers and full-note limitations."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/events.jsonl events :9 loads all conditional resources, :12 connected evidence, :17 full record and preserved source checks; no diagram."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X008",
+      "case": "C01",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:15,23-28 exact four roots in source order."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:17-19 direct fact check, no forced matrix/framework."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:30-34 tuple line 53 and consumers; actual source hash in execution/X008/events.jsonl:10."
+          ]
+        },
+        "R4": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "No alternative-selection question."
+          ]
+        },
+        "R5": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "No causal, performance, quality or cost claim."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/events.jsonl:7,:10 only source/read/hash; no experiment, tests or diagram. Note is 42 lines including required template headings."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:1-9 flat metadata; local targets resolve; execution/X008/events.jsonl:14 full readback plus target checks."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:38-42 source tuple settled, directory existence/CI/deployment/later revisions unverified."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/events.jsonl:7 skill/source, :10 methods/source/template. Source preceded method-read ordering but no functional consequence; direct fact conditional evaluation resource reasonably not triggered."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X009",
+      "case": "C01",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:15,23-28 exact four roots in source order."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:17-19 direct fact check, no forced matrix/framework."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:30-34 tuple line 53 and consumers; actual source hash in execution/X009/events.jsonl:9."
+          ]
+        },
+        "R4": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "No alternative-selection question."
+          ]
+        },
+        "R5": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "No causal, performance, quality or cost claim."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/events.jsonl:7,:9 only source/read/hash; no experiment, tests or diagram. Note is 42 lines including required template headings."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:1-9 flat metadata; local targets resolve; execution/X009/events.jsonl:13 full readback plus target checks."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md:38-42 source tuple settled, directory existence/CI/deployment/later revisions unverified."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/events.jsonl:7 skill/source, :9 methods/source/template. Source preceded method-read ordering but no functional consequence; direct fact conditional evaluation resource reasonably not triggered."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X010",
+      "case": "C06",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:13-19 refuses CI/release inference, scope is four-file snapshot, no acceptance authorization."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:21-25 direct source tracing answers completion claim, no required experiment."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:31-56 exact entry path, inventory, union, silent Git failure, subprocess boundary and test-definition limits."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:77-89 missing evidence relates to actual same-revision workflow/run/inventory/artifact criteria; no invented scores."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:44-52 and 73-75 source/hash/research-exit observations do not establish tests/CI passed."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/events.jsonl events :5-27 only reads/search/hash/path and record creation/readback; no remote/testing/publish."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:1-9 metadata, link targets resolve; events :27 reads actual saved record and checks 23 links."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md:79-95 same candidate/results/env/packaging links missing; no false green or release approval."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/events.jsonl events :9 loads required resources, :14,:16,:20,:22 connected source/tests and hashes; no diagram."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X011",
+      "case": "C04",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:13-17 preserves causal/universal/quality/cost question and no new measurements."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:19-23 controlled-comparison adequacy fits historical unmatched tasks, no runtime source-code investigation needed."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:29-61 exact receipt values and actual task-scope summary inspected, extraction provenance limits retained."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:69-80 common task-specific quality/cost/time criteria and matched work; quality guardrails cannot be compensated by speed."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:27-51 confounded task scopes, no quality ratings or currency cost, different cache categories; arithmetic 103.188 - 42.637 = 60.551, approximately 58.7% correct."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/events.jsonl events :7,:9,:11,:16,:18 only reads/inventory/path checks and note creation; no model/test rerun or invented observations."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:1-9 metadata, all local links resolve; events :16 full saved-record readback, :18 source link targets ls."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:67-84 bounded repeated matched-task observations/config/cache/order/variation/rework with representative tasks; universal change remains unsupported."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/events.jsonl events :9 all conditional resources loaded; no diagram and no unrelated source-code investigation forced."
+          ]
+        }
+      }
+    },
+    {
+      "id": "X012",
+      "case": "C04",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:13-17 exact question/constraints, timing-only inference, no new measurement."
+          ]
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:19-21 descriptive comparison/competing explanations directly fits causal claim without forced framework."
+          ]
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:27-65 exact historical receipt fields, actual scope and extraction provenance; full-output/history limits explicit."
+          ]
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:71-78 same required work, quality, total cost and representative tasks; no scores or preferred gold standard."
+          ]
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:38-54 actual requested settings differ from backend proof; 60.551 seconds, ~59%, ~34% input, ~68% output arithmetic correct; cache/reasoning not double counted, no currency savings inferred."
+          ]
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/events.jsonl events :7,:9,:14 read/list only and note creation/readback; no model/test rerun."
+          ]
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:1-9 flat metadata; events :14 actual full readback plus existing link targets."
+          ]
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md:69-82 cause/quality/cost/generalization remain unknown; future bounded matched/repeated tasks, order/config/cache/variation/guardrails specified."
+          ]
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/events.jsonl events :9 required raw contract resources loaded, no optional diagram; timing evidence before resource-read ordering has no demonstrated functional consequence."
+          ]
+        }
+      }
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "All twelve frozen actors reviewed across six case types; this is per-actor advisory review, not a global dogfood pass, causal A/B result or arm preference.",
+    "Requested gpt-6.1-sol medium is recorded; receipt server_confirmed_model is null, immutable backend identity unknown.",
+    "Masking hides arm assignment but contract text differences may permit inference; no private arm map consulted.",
+    "One auditor advisory source/trajectory review, no execution replay, external query, install, CI or production validation.",
+    "Readback/file-link checks establish retained artifact integrity, not semantic correctness by themselves. Source #L fragments in X002 are host-dependent; no cross-editor renderer check.",
+    "Minor resource-loading order variance occurs in several trajectories (e.g. X001 tests :12 before resources :13; X008 source :7 before resources :10; X012 timing :7 before resources :9). No demonstrated functional consequence; not counted as a functional defect or as evidence that the order requirement was literally met."
+  ],
+  "files_read": [
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/audit-rubric.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/scratch/preview_package_commands.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X001/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X002/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X003/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/scratch/preview_package_commands.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X004/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X005/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X006/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X008/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X009/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/migration/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/migration/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/migration/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/migration/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/migration/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/timing/B01.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/timing/B02.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/samples/timing/task-summary.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X010/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/migration/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/migration/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/migration/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/migration/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/migration/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/timing/B01.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/timing/B02.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/samples/timing/task-summary.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X011/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/migration/docs/loom/research/2026-11-08-package-runner-exclusions.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/migration/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/migration/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/migration/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/migration/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/migration/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/timing/B01.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/timing/B02.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/samples/timing/task-summary.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X012/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/cases.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/samples/migration/docs/loom/research/2026-11-08-package-runner-exclusions.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/samples/migration/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/samples/timing/B01.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/samples/timing/B02.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/samples/timing/task-summary.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/fixtures/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/freeze.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/rubric.md"
+  ]
+}

@@ -1,0 +1,9 @@
+The benchmark alone does **not justify changing the migration plan**.
+
+Unsaved research draft (read-only):
+- **Question/method:** Assess whether the comparison isolates the dependency’s performance effect; controlled comparison fits this causal question.
+- **Evidence:** Your report says hardware differed. No benchmark report, versions, workloads, configurations, or raw results are available.
+- **Finding:** Hardware is a confounder: the reported speedup cannot reliably be attributed to the dependency. This does not establish that the dependency offers no benefit.
+- **Decision impact:** Keep the current plan pending matched-hardware, representative-workload comparisons with equivalent settings, correctness checks, repeated measurements, and variability reported. Define a meaningful improvement threshold against migration costs before testing.
+
+No research artifact was saved under the read-only constraint.

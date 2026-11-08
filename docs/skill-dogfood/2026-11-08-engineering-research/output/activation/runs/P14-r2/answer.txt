@@ -1,0 +1,13 @@
+探索対象は起動モードで変わります。[確認したソース](scripts/run_package_tests.py)に基づく結果です。
+
+- 通常起動：`--then` で区切った引数群を、そのまま別々の pytest セッションへ渡します。以下のルート制限・除外処理は適用されません。
+- `--loom-family`：`tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/` が対象です。`--only` でグループを限定します。
+- Python：`test_*.py`／`*_test.py` の存在を再帰的に調べ、該当ディレクトリを pytest に渡します。実際の収集結果は pytest の設定にも依存します。
+- Shell：各ルート配下の `test-*.sh`。各ルート直下の `local/` と `node_modules` 配下は対象外です。
+- 分離：code は合同、design は独立、workflow-python は親と対象サブフォルダごとのセッションです。
+- 入れ子リポジトリ／worktree：検出結果を pytest の `--ignore` と Shell の除外に使います。
+- Mermaid：固定の検証コマンドも実行対象です。
+
+**未確認**：失敗時の起動引数・ログ、pytest 設定、実在テスト一覧、`repo_files` の検出実装は提示されていません。したがって、実際の収集対象と失敗原因は確定できません。
+
+調査方法は静的なソース確認です。再試行・変更はしていません。読み取り専用のため、この回答を未保存の調査記録とし、記録ファイルは作成していません。

@@ -1,0 +1,12 @@
+兩者可以同時成立：**固定探索範圍，範圍內自動探索測試**。但目前只能確認程式支援此解讀，尚不能確認兩份 spec 的原意。
+
+依 `engineering-research` 技能完成的唯讀研究草稿（未存檔）：
+
+- **方法與證據**：靜態追蹤 [run_package_tests.py](/private/tmp/engineering-research-dogfood-A-20261108/P07-r2/project/scripts/run_package_tests.py:53) 的入口與探索函式。
+- **固定 roots**：`--loom-family` 使用 `TEST_ROOTS` 的四個目錄；新增 plugin root 必須修改清單。
+- **自動探索**：既有 roots 內以檔名模式尋找測試，Python 交由 pytest 收集，shell 遞迴尋找 `test-*.sh`。因此新增測試檔通常不必修改清單，但仍受排除規則限制。
+- **適用邊界**：一般參數模式直接傳給 pytest，不受這份 roots 清單限制；Mermaid 群組則使用固定命令。
+
+可供核對的統一表述：「`--loom-family` 在明列 roots 內自動探索測試；新增 root 需更新清單，並保留特定群組的固定命令。」
+
+**缺少證據**：兩份 spec 原文、`repo_files` 實作及執行結果。故尚未證實文件衝突已消解，也未驗證實際收集結果；未修改任何檔案。

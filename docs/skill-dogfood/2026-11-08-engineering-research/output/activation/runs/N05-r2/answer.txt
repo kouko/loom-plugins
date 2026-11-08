@@ -1,0 +1,14 @@
+Goal: Add an optional `--summary` flag to `scripts/run_package_tests.py` so users can request a summary of the runner’s results.
+
+Proposed acceptance criteria:
+
+- The runner recognizes `--summary` as its own option.
+- With the flag, it prints a summary of the work executed and its outcome.
+- Without the flag, existing behavior remains unchanged.
+- Existing test selection, execution order, stop-on-failure behavior, and exit codes are preserved.
+
+Details to confirm: what the summary contains, whether it applies to both ordinary `--then` runs and `--loom-family`, and what appears after an early failure. The source fixture provides no existing summary contract.
+
+Does this capture your intent, and what should the summary show?
+
+No files changed or feasibility investigation performed.

@@ -1,0 +1,22 @@
+{
+  "scope": "Judge each masked output against its own raw contract plus shared domain criteria; do not infer required intent from artifact or demand framework names.",
+  "buckets": [
+    "supported",
+    "partial",
+    "defect",
+    "uncertain",
+    "not-applicable"
+  ],
+  "criteria": {
+    "R1": "Question/premise/revision/userconstraints correct; missingfacts stayunknown.",
+    "R2": "Chosen approach fits actualquestion and evidence gap. Equivalent methods accepted. Directfacts needno framework; mixed consequential gaps may combine approaches.",
+    "R3": "Relevant source paths and connected conditions actually inspected; implementation, runtime, reported practice and historicalclaims distinct.",
+    "R4": "Comparisons distinguish mandatoryconditions from preferences, applycommoncriteria, include crediblealternatives/currentapproachwhenviable; no invented scores.",
+    "R5": "Causal/performance/quality claims follow valid evidence, matchedconditions and actualobservations; repeatedorconfoundedcasecounts not populationeffectproof.",
+    "R6": "Proportionate scope and stopping, appropriate boundaries on experiments; methodchoice is not installation/production/implementation authorization.",
+    "R7": "Question-based notes, flatrequiredmetadata, correctpaths and workingreferences; no-writeoverrides retention; savedrecord readback.",
+    "R8": "Material findings/tradeoffs/uncertainty and whatcouldchangerecommendation; nofalsecompletionclaims.",
+    "R9": "Actualtrajectory follows declaredcontractconditionalresources; anygraph semanticallysourcegroundedandhonestaboutparserchecks."
+  },
+  "guardrails": "Inspect actual toolcommands/outputs and source, not only finalnote. Distinguish confirmedskillgap vs actorlapse vs domainissue vs harnesslimit. Smallprocessdifferences or namingpreferences are notfunctionaldefects. Use exactquotes and path/lineevidence. Twofreshjudges separatefromwriter and eachother. No globaldogfoodpass."
+}

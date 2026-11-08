@@ -1,0 +1,13 @@
+不足以支持批准整套 CI 通過並發布。
+
+可確認四個來源檔 hash 符合 provenance，且 runner 實作了分組、排除與遇錯即停邏輯；測試定義存在，不代表已執行或通過。
+
+仍缺會改變發布決定的證據：
+
+- 同一 commit 的完整 CI workflow、必要 jobs／matrix 與成功紀錄。
+- 完整測試清單、實際收集數量、跳過項目及執行環境。
+- 發布產物與已測來源的對應，以及發布條件的驗證結果。
+
+英文研究文件已寫入、完整讀回並核對連結：[研究報告](/private/tmp/framework-probe-b-20261108/X010/project/docs/loom/research/2026-11-08-head-ci-release-evidence.md)。
+
+未跑測試、連網、發布或代為驗收；實際 CI 狀態與發布就緒程度仍未確定。

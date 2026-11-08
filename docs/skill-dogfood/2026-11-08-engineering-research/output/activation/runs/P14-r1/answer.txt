@@ -1,0 +1,8 @@
+探索対象は、起動モードによって異なります。以下はソースの静的確認による調査メモ（2026-11-08、未保存）です。再試行・変更はしていません。
+
+- **通常モード**：`--then` で分けた引数を、そのまま各 pytest セッションへ渡します。固定の探索ルートや追加の除外指定は適用しません。[根拠](/private/tmp/engineering-research-dogfood-A-20261108/P14-r1/project/scripts/run_package_tests.py:168)
+- **`--loom-family`**：実行時のカレントディレクトリを基準に、`tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/` を対象にします。`--only` でグループを限定できます。[根拠](/private/tmp/engineering-research-dogfood-A-20261108/P14-r1/project/scripts/run_package_tests.py:116)
+- Python は `test_*.py`／`*_test.py` の存在で対象ディレクトリを選び、**ディレクトリ全体を pytest に渡します**。このパターンだけが最終収集対象になるとは断定できません。shell は各ルート配下の `test-*.sh`、Mermaid は固定コマンドです。
+- family モードでは入れ子のリポジトリ／worktree を除外する設計です。ただし、その検出関数の実装は提供されていません。
+
+失敗時のコマンド・ログ、pytest 設定、実際のファイル一覧がないため、**失敗した探索対象と原因は未確定**です。今回確認できたのはランナーの対象選定規則までです。

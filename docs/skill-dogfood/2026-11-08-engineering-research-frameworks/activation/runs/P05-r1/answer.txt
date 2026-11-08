@@ -1,0 +1,10 @@
+**The conflict remains unresolved:** neither source, the driver/version, nor retry configuration was provided, and no implementation or browsing evidence is available.
+
+Unsaved research draft (read-only constraint):
+
+- **Question:** Does the deployed driver retry this non-idempotent write under the relevant failure conditions?
+- **Method:** Compare both claims against version-matched documentation and the implementation’s retry path.
+- **Evidence needed:** Both source excerpts, driver/version, retry settings, write operation, transaction context, and failure timing.
+- **Decision impact:** Keep the design’s safety assumption unverified. A retry after a committed write whose acknowledgment was lost could duplicate effects; absence of retries alone does not establish data-loss safety.
+
+Please provide those details so the claims can be reconciled. No research file was saved.

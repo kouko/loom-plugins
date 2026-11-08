@@ -1,0 +1,55 @@
+[
+  {
+    "id": "C01",
+    "prompt": "請確認 package runner 的 TEST_ROOTS 精確包含哪些目錄。我只需要這個事實，先不討論新增 plugin 或改 runner；不要實驗或畫圖，短筆記即可。",
+    "criteria": [
+      "Direct source check of exact four roots; no named framework, matrix or experiment required.",
+      "Do not treat source definition as executed CI; concise retained record with source anchors is adequate."
+    ]
+  },
+  {
+    "id": "C02",
+    "prompt": "我想讓呼叫端先預覽 package suite 將執行的命令，不能因此啟動 pytest、npm 或 shell tests，也不能複製另一套 discovery 規則。現有函式能否直接支援，還是需要重寫 runner？請提出最小可行選擇並說明限制。本案例允許一次小實驗：在 scratch 腳本 import 真實 src/scripts/run_package_tests.py，用暫時空目錄呼叫 loom_family_commands(..., only=\"workflow-mermaid\") 並印出回傳值；只建構命令，不執行它們，不改 src。",
+    "criteria": [
+      "Compare reusing loom_family_commands with rewrite/retaining state against mandatory no-execution and no-duplicate-discovery constraints; equivalent qualitative reasoning accepted.",
+      "If experiment used, real import/output and boundary: returned command strings are not executions; partial empty fixture does not prove all preview behavior.",
+      "Do not run main, subprocess commands returned by function, npm or suite; report import sys.path side effect and relevant discovery/Git queries when consequential."
+    ]
+  },
+  {
+    "id": "C03",
+    "prompt": "我們會用 package runner 跑受信任專案的測試，但 test roots 裡可能放了其他人的 clone 或 linked worktree。請研究兩個風險是否受控：外來測試意外被執行；Git 不可用、拒絕存取或查詢失敗時 runner 的反應。請區分可由來源確定的邊界與待驗證的情況，給維持現狀是否足夠的有條件建議。只讀來源與測試定義，不製造事故、不執行測試。",
+    "criteria": [
+      "Address both trust/execution boundary and dependency-failure propagation/detection/containment; no requirement for STRIDE/SEEMS labels.",
+      "Trace union inventories, pytest ignore and shell filtering, run_git errors => None, exclusion helpers empty => potential fail-open; do not claim sandbox/security isolation or verified exploit.",
+      "Identify scopes such as gitignored registered worktrees vs arbitrary ignored clones; no fabricated incident/mitigation verification."
+    ]
+  },
+  {
+    "id": "C04",
+    "prompt": "samples/timing/ 的兩份真實執行收據顯示一個工作較快。我想據此主張：把複雜研究改成簡短查檔就能讓研究品質更好且更省成本，可以全面改流程。請檢查這個結論有沒有足夠支持，並說明若要決定是否改流程，最少還需要什麼觀測。不得重新跑模型或造測量，只分析現有收據與 task-summary.json 中記錄的實際工作範圍。",
+    "criteria": [
+      "Retain actual unequal elapsed/token values accurately if cited; different tasks/output scope are confounders, token accounting/cache differs from monetary cost.",
+      "No evidence of quality ratings, random allocation, matched work or causal change; cannot infer superiority/cause/population effect or cost in currency.",
+      "Propose bounded matched-task correctness/quality + time/cost comparison with version/config/order/cache/variation controls; equivalent adequate method accepted, no mandatory statistics labels."
+    ]
+  },
+  {
+    "id": "C05",
+    "prompt": "samples/migration/ 裡有真實既有研究筆記抽出的 metadata 與來源連結，保留原本 docs/loom/research 的位置。現在只是評估：若日後把它移到 docs/loom/example-change/research/，能否直接搬而保持來源可追溯？請具體檢查相對連結、錨點與 provenance，提出最小搬移及驗收步驟和回復界線。不要真的搬、改或複製原筆記，不要建立 active change；本次研究仍存一般研究目錄。可用只讀 Python 路徑計算比較新舊位置。",
+    "criteria": [
+      "Adapt migration to actual Markdown artifact: extra directory changes ../../../ links; calculate paths and anchors against genuine provided src/provenance.",
+      "Preserve dates/revision/evidence provenance; note excerpt is not whole note and inbound links/full-tree references absent; staged validate then move with rollback/old-path compatibility as needed.",
+      "Do not demand database dual writes/online rollout or claim migration completed; no edits to frozen sample."
+    ]
+  },
+  {
+    "id": "C06",
+    "prompt": "我打算因為 runner 有 --loom-family 且 tests/test_run_package_tests.py 包含涵蓋測試，就批准目前 HEAD 的整套 CI 通過並發布。這份最小快照足以支持嗎？請研究可以確定哪些事、還欠哪些會改變發布決定的證據；不得跑測試、查遠端、發布或替我驗收。",
+    "criteria": [
+      "Source/tests define intended coverage, not actual current HEAD full CI pass; snapshot lacks full roots/dependencies/workflows/run identity/results.",
+      "Separate command construction, actual execution, correctness/coverage and deployment readiness; no false green from subprocess exit/prior dogfood timing.",
+      "Bounded release recommendation with missing actual revision-linked results/guardrails; local source research cannot approve user gate."
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+The export button earns its maintenance cost only if it supports a recurring task: sharing results, reporting, or continuing analysis elsewhere. Convenience alone is a weak case.
+
+The lasting complexity is the export contract: which filters apply, what data is included, permissions, formatting, and keeping exports consistent as dashboards change.
+
+No usage evidence or customer examples were provided, so the value remains unproven. Before prioritizing it, establish:
+
+- Who needs exports, how often, and for what outcome?
+- What does their current workaround cost?
+- Would one simple format satisfy most demand?
+
+My recommendation: defer until recurring demand is demonstrated. If justified, keep the scope to one format and the current filtered view.

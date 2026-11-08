@@ -1,0 +1,5 @@
+I used the [independent-advisor skill](/private/tmp/engineering-research-frameworks-A-20261108/N02-r1/home/skills/independent-advisor/SKILL.md). It contains only a description stub; no reviewer workflow is available.
+
+An independent coding-agent opinion requires a separate reviewer, which your restrictions prohibit through both subagents and external model calls. I haven’t invoked one or started another investigation.
+
+The architecture trade-off and collected evidence also aren’t provided here. If you share them, I can prepare a review brief scoped to that evidence, covering assumptions, trade-offs, and a recommendation. My own assessment would not constitute an independent second review.

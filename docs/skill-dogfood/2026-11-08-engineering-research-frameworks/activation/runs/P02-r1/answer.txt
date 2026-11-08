@@ -1,0 +1,18 @@
+Compatibility remains **unverified**; hold runtime approval.
+
+Unsaved research draft (read-only; no artifact saved):
+
+```yaml
+title: Python 3.13 native-extension compatibility
+type: loom-research
+status: concluded
+created: 2026-11-08
+updated: 2026-11-08
+tags: [loom/research]
+```
+
+Method: assess available evidence against the spec assumption.
+
+Evidence: only your reported assumption and missing vendor table are available. No extension name/version, target OS/architecture, Python build variant, source, binaries, or runtime results were provided. Compatibility cannot be established.
+
+Before approval, obtain applicable vendor support evidence and verify installation, import, and a representative native operation in the intended environment. A successful import alone would not establish full compatibility.

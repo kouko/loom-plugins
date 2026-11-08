@@ -1,0 +1,12 @@
+No independent review or test execution has started.
+
+The [independent-advisor skill](/private/tmp/engineering-research-dogfood-A-20261108/N02-r2/home/skills/independent-advisor/SKILL.md) is available only as a description stub; it provides no review workflow.
+
+The missing review inputs are:
+
+- **The decision itself:** the proposed test plan, alternatives, rationale, and specific questions for the reviewer.
+- **Success criteria:** required coverage, acceptable runtime, environment constraints, and failure conditions.
+- **Supporting evidence:** actual tests, pytest configurations, CI configuration, and the imported `repo_files` helpers. Only [scripts/run_package_tests.py](/private/tmp/engineering-research-dogfood-A-20261108/N02-r2/project/scripts/run_package_tests.py) is supplied, so its documented isolation and exclusion behavior cannot be fully verified.
+- **Review routing:** the intended independent coding agent and an allowed means of contacting it. Your current constraints prohibit subagents and external CLI model calls.
+
+The fixture can support a future review of test grouping, discovery, and nested-repository exclusions, but it does not establish which test-plan decision you want assessed.

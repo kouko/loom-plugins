@@ -1,0 +1,13 @@
+**Yes—the source implements recursive shell-test discovery**, subject to scope and invocation.
+
+Unsaved research record (2026-11-08; source inspection):
+
+- [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P16-r1/project/scripts/run_package_tests.py:88) uses `folder.rglob("test-*.sh")` across `tests`, `loom-code/tests`, `loom-design/tests`, and `loom-workflow/tests`. It excludes `node_modules` and each root’s `local/` subtree.
+- [`loom_family_commands()`](/private/tmp/engineering-research-dogfood-A-20261108/P16-r1/project/scripts/run_package_tests.py:134) turns discovered paths into `bash` commands, excluding paths beneath detected nested repositories/worktrees.
+- [`main()`](/private/tmp/engineering-research-dogfood-A-20261108/P16-r1/project/scripts/run_package_tests.py:153) reaches this behavior through `--loom-family`, including `--only workflow-shell`. Ordinary argument groups invoke pytest directly.
+
+The proposed strategy’s discovery premise is therefore supported **if it uses that invocation and places matching files within those roots**.
+
+Limits: this establishes implementation behavior from the supplied fixture, not successful execution. The imported `repo_files` dependency, CI invocation, and runtime results were unavailable, so end-to-end operation remains unverified.
+
+No research artifact was saved because this discussion is read-only; this response is the unsaved record.

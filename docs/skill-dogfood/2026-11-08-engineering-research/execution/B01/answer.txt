@@ -1,0 +1,7 @@
+已依指定 skill 完成純來源調查，英文紀錄含一張關係圖：[研究紀錄](docs/loom/research/2026-11-08-package-runner-exclusions.md)。
+
+- 排除集合取兩者聯集：Git opaque directory entries 涵蓋 clone／submodule，worktree list 補上被 gitignore 隱藏的同庫 linked worktree。
+- 第一個命令失敗即返回，後續組不會執行。
+- 建議保留互補查詢，但不能視為完整隔離保證：Git 查詢失敗、ignored clone，以及 workflow 明確指定外部目錄為 pytest target，仍有缺口或未驗證行為。
+
+未執行 pytest、Git 初始化或安裝；提供的來源與 skill 雜湊均維持一致。

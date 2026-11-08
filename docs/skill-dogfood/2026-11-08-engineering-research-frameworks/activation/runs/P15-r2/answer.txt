@@ -1,0 +1,10 @@
+Unsaved research draft (read-only), at intent stage: neither choice is justified yet. No deployment measurements or project fixtures are available.
+
+Use a lightweight trade study supported by a representative controlled benchmark:
+
+- Define mandatory constraints and acceptance thresholds: correctness, latency, resource budget, cost, data handling and availability.
+- Compare identical representative inputs under actual deployment limits and expected concurrency. Measure end-to-end p50/p95/p99 latency, including cold starts, network transfer, retries and failures; retain versions, configuration and variability.
+- Local is justified if it meets correctness and latency targets within resource and operating budgets.
+- Hosted is justified if it meets those targets including network overhead, and satisfies cost, data-handling and dependency requirements.
+
+Keep the choice open until comparable evidence distinguishes them.

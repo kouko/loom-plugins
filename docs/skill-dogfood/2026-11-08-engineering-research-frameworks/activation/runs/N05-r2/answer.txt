@@ -1,0 +1,15 @@
+**User problem:** Deleting a draft by mistake can lose work. Users need a clear way to recover it.
+
+**Intended outcome:** Users can undo a recent draft deletion and continue editing with their content intact.
+
+**Proposed acceptance criteria:**
+
+- Deleting a draft displays a clearly labeled Undo button.
+- Selecting Undo restores that draft’s saved content and makes it accessible again.
+- Undo does not alter other drafts.
+- The recovery window is clear to users.
+- If recovery fails, the interface explains the failure without claiming success.
+
+**Open product decision:** How long should Undo remain available?
+
+No project evidence was provided; these criteria are proposals. No engineering research is needed yet.

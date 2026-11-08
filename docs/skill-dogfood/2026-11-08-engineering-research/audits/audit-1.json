@@ -1,0 +1,232 @@
+{
+  "auditor": "audit-1",
+  "requested_model": "gpt-6.1-sol",
+  "requested_effort": "medium",
+  "immutable_server_revision": "unconfirmed",
+  "scope": "Independent advisory audit; no global PASS; source and trajectory review only.",
+  "cases": [
+    {
+      "case_id": "B01",
+      "R1": {
+        "verdict": "supported",
+        "evidence": "Prompt and note lines 13–31 retain exclusion/failure-order question and snapshot-only conditions."
+      },
+      "R2": {
+        "verdict": "supported",
+        "evidence": "runner lines 123–149; repo_files lines 73–146; git_exec lines 50–88 support the union, ignore/filter paths and empty failure contributions. Note lines 48–84 follows these implementations."
+      },
+      "R3": {
+        "verdict": "supported",
+        "evidence": "events.jsonl lines 13,15,18 show implementation/helper/test reads; line 20 reports nine MATCH results. Note lines 88–105 separates test definitions from execution."
+      },
+      "R4": {
+        "verdict": "supported",
+        "evidence": "Note lines 140–173 gives conditional retention advice and explicit fail-open/ignored clone/explicit target limits rather than isolation certification."
+      },
+      "R5": {
+        "verdict": "supported",
+        "evidence": "Note lines 1–9 flat metadata, lines 19–23 revision/conditions, relative links resolve inside artifacts. events lines 22,25 show add/read-back; line 27 reports all eight LINK OK."
+      },
+      "R6": {
+        "verdict": "supported",
+        "evidence": "Note lines 109–136 defines arrow semantics/status and E1–E5 mappings. Union/failure/filter/queue branches agree with runner 123–167 and repo_files 73–146; fixed Mermaid bypass explained at note 132–133."
+      },
+      "R7": {
+        "verdict": "supported",
+        "evidence": "Note lines 38–105 and 138–181 remain readable without Mermaid; diagram is explicitly requested by prompt."
+      },
+      "R8": {
+        "verdict": "supported",
+        "evidence": "events line 25 is actual full saved-record cat; line 27 checks links and unchanged inputs. Note 135–136: no parser or renderer ran, rendering unverified; no successful rendering claim."
+      },
+      "R9": {
+        "verdict": "supported",
+        "evidence": "Observed commands are reads/hash/link checks plus one authorized note add. receipt source_unchanged=true and exactly one added_project_file; no pytest, Git initialization, installation or external command observed."
+      }
+    },
+    {
+      "case_id": "B02",
+      "R1": {
+        "verdict": "supported",
+        "evidence": "Prompt and note lines 11–17 match single-source root/local placement question; no invented active change."
+      },
+      "R2": {
+        "verdict": "supported",
+        "evidence": "runner 53 supplies exact four roots; 76–113 and 124–138 implement local exclusions. Note 21–24 scopes them to family preset/direct root local subtrees and distinguishes explicit argument mode."
+      },
+      "R3": {
+        "verdict": "supported",
+        "evidence": "events line 11 actually outputs runner and test definitions despite final rg docs failure; line 13 rereads helpers and hashes. Note 17,23 distinguishes reading from execution."
+      },
+      "R4": {
+        "verdict": "supported",
+        "evidence": "Note lines 28–34 derives test placement guidance and bounds conclusion to supplied runner; no test-pass claim."
+      },
+      "R5": {
+        "verdict": "supported",
+        "evidence": "Note 1–9 has required flat metadata; path is date/question based with no active change. All three relative links resolve. events 15 and 17 show add and full read-back."
+      },
+      "R6": {
+        "verdict": "not-applicable",
+        "evidence": "No diagram requested or helpful for this short root-list question; none produced."
+      },
+      "R7": {
+        "verdict": "supported",
+        "evidence": "Note has concise text/evidence and no structural placeholder; raw answer lists four roots and local exclusion plainly."
+      },
+      "R8": {
+        "verdict": "supported",
+        "evidence": "events 17 cat output matches saved note. Hash claim in note 26 matches events 13 output. No syntax/render assertion."
+      },
+      "R9": {
+        "verdict": "supported",
+        "evidence": "Only source/skill/provenance reads, hashing and authorized note add observed. receipt unchanged=true; one added note; no tests/install/network/publication observed."
+      }
+    },
+    {
+      "case_id": "B03",
+      "R1": {
+        "verdict": "supported",
+        "evidence": "Prompt requests unsaved evidence sufficiency draft; answer begins evidence insufficient and keeps exact HEAD/snapshot scope."
+      },
+      "R2": {
+        "verdict": "supported",
+        "evidence": "Answer implementation claims map to runner 51–167, repo_files 73–146 and git_exec 50–88. Test references 49–101,187–197 are described as definitions, not observed results."
+      },
+      "R3": {
+        "verdict": "supported",
+        "evidence": "events 11 inventory/provenance, 13 source reads, 16 focused test reads,18 hashes establish inspection. Answer explicitly distinguishes hash consistency, source semantics, independent commit membership and CI results."
+      },
+      "R4": {
+        "verdict": "supported",
+        "evidence": "Answer states Source review completed; full CI status for the recorded HEAD remains unverified. Missing workflows/logs/results do not become failure evidence; required revision/coverage/conditions are identified."
+      },
+      "R5": {
+        "verdict": "supported",
+        "evidence": "Explicit no-write honored: unsaved draft with metadata and stated missing saved artifact. receipt added_project_files=[]; no file_change events."
+      },
+      "R6": {
+        "verdict": "not-applicable",
+        "evidence": "No diagram needed for evidence insufficiency decision and none included."
+      },
+      "R7": {
+        "verdict": "supported",
+        "evidence": "Findings/evidence table and missing-evidence list are understandable without a diagram or empty placeholder."
+      },
+      "R8": {
+        "verdict": "supported",
+        "evidence": "No saved artifact exists to read back; source reads/hash outputs actually observed. Answer does not claim a saved record, runtime pass or rendered diagram."
+      },
+      "R9": {
+        "verdict": "supported",
+        "evidence": "All observed commands are local listing/cat/nl/sed/shasum reads; no file mutation/tests/network/install/delegation commands. Harness answer/event persistence is distinct from actor project writes."
+      }
+    }
+  ],
+  "findings": [
+    {
+      "severity": "informational",
+      "category": "supported-source-semantics",
+      "pass": "B01",
+      "prompt": "Investigate foreign-tree exclusions and earlier-group failure with a bounded diagram.",
+      "expected": "Follow connected implementations; preserve failure branches; distinguish source from runtime.",
+      "actual": "Union, symlink guard, no-Git empty contributions, pytest ignores, shell filter, fixed Mermaid exception and fail-fast execution are represented accurately in text; diagram maps critical relations to E1–E5.",
+      "exactquote": "X -->|\"nonzero\"| R[\"Return immediately; later commands do not run E1\"]",
+      "pathlocation": "execution/B01/artifacts/docs/loom/research/2026-11-08-package-runner-exclusions.md:127; execution/B01/artifacts/src/scripts/run_package_tests.py:163–167; execution/B01/events.jsonl:13,25",
+      "suggestedfix": "No corrective action established by this bounded review.",
+      "confidence": "high"
+    },
+    {
+      "severity": "informational",
+      "category": "supported-verification-boundary",
+      "pass": "B01",
+      "prompt": "Use one compact relationship diagram for a source-only investigation.",
+      "expected": "Truthfully report parser/render scope separately from factual validity.",
+      "actual": "Saved diagram was read back; actor discloses untested rendering. No evidence a compatible local parser was available; no availability claim or successful render is made.",
+      "exactquote": "No Mermaid parser or renderer was run; rendering remains\nunverified.",
+      "pathlocation": "execution/B01/artifacts/docs/loom/research/2026-11-08-package-runner-exclusions.md:135–136; execution/B01/events.jsonl:25",
+      "suggestedfix": "Treat display validation as unresolved, not a factual defect or successful render.",
+      "confidence": "high"
+    },
+    {
+      "severity": "informational",
+      "category": "supported-scope",
+      "pass": "B02",
+      "prompt": "Confirm TEST_ROOTS and whether tests/local enters ordinary package suite; no diagram or tests.",
+      "expected": "Exact roots and accurately bounded local exclusion.",
+      "actual": "Four roots match source; family preset exclusion is distinguished from explicit argument forwarding. No diagram or test execution.",
+      "exactquote": "The exclusion is preset-specific: the alternate explicit-argument mode forwards each group directly to pytest without adding these ignores",
+      "pathlocation": "execution/B02/artifacts/docs/loom/research/2026-11-08-package-test-roots.md:24; execution/B02/artifacts/src/scripts/run_package_tests.py:53,76–113,168–175; execution/B02/events.jsonl:11,13,17",
+      "suggestedfix": "No corrective action established.",
+      "confidence": "high"
+    },
+    {
+      "severity": "informational",
+      "category": "supported-no-write-and-provenance",
+      "pass": "B03",
+      "prompt": "Assess full CI pass evidence; explicit no-write, no tests or network.",
+      "expected": "Reject unsupported historical CI conclusion; unsaved bounded draft only.",
+      "actual": "No actor file-change events or added project files; draft separates hash agreement from commit membership or CI outcome.",
+      "exactquote": "This verifies snapshot consistency, not independent commit membership or CI success.",
+      "pathlocation": "execution/B03/answer.txt: findings/evidence table; execution/B03/events.jsonl:18–19; execution/B03/receipt.json:added_project_files; execution/B03/artifacts/src/tests/test_run_package_tests.py:187–197",
+      "suggestedfix": "No corrective action established; retain unverified CI status until real revision-bound results are available.",
+      "confidence": "high"
+    }
+  ],
+  "files_read": [
+    "docs/skill-dogfood/2026-11-08-engineering-research/audit-rubric.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/rubric.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/cases.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/docs/loom/research/2026-11-08-package-runner-exclusions.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/docs/loom/research/2026-11-08-package-test-roots.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/artifacts/src/tests/test_run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/prompt.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/answer.txt",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/events.jsonl",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/receipt.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/provenance.json",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/skill/engineering-research/SKILL.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/skill/engineering-research/references/research-methods.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/skill/engineering-research/references/source-policy.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/skill/engineering-research/references/structured-relations.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/skill/engineering-research/templates/research.md",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/src/loom-code/scripts/git_exec.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/src/loom-code/scripts/repo_files.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/src/scripts/run_package_tests.py",
+    "docs/skill-dogfood/2026-11-08-engineering-research/execution/B03/artifacts/src/tests/test_run_package_tests.py"
+  ],
+  "limitations": [
+    "No runtime tests, source changes, tools installation, external services or delegation.",
+    "Duplicate source/skill/provenance copies were byte-compared; B01 content provided the semantic reference for identical copies.",
+    "Mermaid parser/render validation untested; availability not established.",
+    "Evidence limited to recorded actor operations and preserved artifacts; receipt integrity is supplied harness evidence."
+  ]
+}

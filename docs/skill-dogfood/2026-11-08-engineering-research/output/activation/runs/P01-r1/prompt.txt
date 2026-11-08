@@ -1,0 +1,4 @@
+Handle the user request below using the available skills when relevant. This is a read-only engineering discussion, not authorization to implement or publish anything. Work only inside this isolated project and the skills listed in your initial catalog. Do not read other files, private sessions, or credentials. No subagents, installation, commits, external CLI model calls or configuration changes. The only project source fixture is scripts/run_package_tests.py; report missing evidence instead of inventing it. Keep your answer concise (maximum 200 words), and do not continue beyond the user's requested stage.
+
+User request:
+Before we commit our Loom intent, determine whether the current package test runner really discovers shell tests. That capability decides whether our proposed guard can ship. Read the provided runner and identify the evidence gap.

@@ -1,0 +1,7 @@
+可直接重用 `loom_family_commands()`，不必重寫 runner，也不需複製 discovery 規則。Python 呼叫端可顯示回傳的 argv 清單；CLI 若需要預覽，只需在執行迴圈前新增輸出後返回的分支。
+
+已完成唯一允許的實驗：回傳 Mermaid 群組三個命令，未啟動 pytest、npm 或 shell tests。
+
+限制：建構時仍會執行 Git 查詢；預覽不驗證工具或目標是否存在，完整 checkout 的命令清單與實際執行結果仍未確認。
+
+英文文件已寫入並實際讀回核對：[研究紀錄](/private/tmp/framework-probe-b-20261108/X001/project/docs/loom/research/2026-11-08-package-suite-command-preview.md)。

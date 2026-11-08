@@ -1,0 +1,13 @@
+**The runner implements shell-test discovery, but the fixture cannot establish that the proposed guard will run in CI.**
+
+Unsaved research draft — source inspection, 2026-11-08:
+
+- `_shell_tests()` recursively discovers `test-*.sh` beneath the four `TEST_ROOTS`, excluding `node_modules` and each root’s `local/` subtree (lines 53, 88–95).
+- `loom_family_commands()` builds `bash <test>` commands when no group is selected or `--only workflow-shell` is selected, excluding nested repositories/worktrees (lines 123–138).
+- `main()` executes those commands with `--loom-family`, using the current working directory as the repository root, and propagates failures. Its ordinary argument mode invokes only pytest (lines 153–175).
+
+**Evidence gap:** the supplied fixture contains neither the proposed guard’s filename/location nor the CI invocation. The imported `repo_files` implementation is also unavailable. No runtime discovery or execution was verified; an empty shell inventory can return success.
+
+Before treating the guard as shippable, establish that its path matches discovery, CI selects the shell-capable mode from the correct directory, and a failing guard actually fails that invocation.
+
+No research artifact was saved because this discussion is read-only.

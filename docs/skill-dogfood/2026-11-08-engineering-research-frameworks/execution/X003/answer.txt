@@ -1,0 +1,10 @@
+已完成並實際讀回核對兩份英文文件：
+
+- [外來測試排除邊界](docs/loom/research/2026-11-08-package-runner-foreign-tests.md)
+- [Git 失敗行為](docs/loom/research/2026-11-08-package-runner-git-failures.md)
+
+來源可確認：只有 family 模式自動加入外來路徑排除；Git 查詢失敗會靜默減少排除資料，不會因此停止，亦未設定查詢逾時。
+
+若允許外來 checkout 留在 test roots，現況不足以支持安全保證。維持現狀須另有目錄限制、完整成功的 Git 偵測及已驗證的 pytest 排除行為。
+
+未確定事項包括：workflow 明確 target 與 ignore 的實際互動、被忽略之外來 repository 覆蓋率，以及部署環境行為。本次未執行任何測試。
