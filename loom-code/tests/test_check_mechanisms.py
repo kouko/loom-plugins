@@ -1,3 +1,4 @@
+# concern: Research admission must retain the counted-skill ceiling and fail-closed budget evidence.
 """W0-06 — check_mechanisms.py recomputes the five admission-rule classes
 (concept-model §11, spec REQ-7) against docs/loom/evidence/mechanisms.yaml
 and diffs: R0 unknown class, R1 unregistered, R2 stale (class-scoped), R3
