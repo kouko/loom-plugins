@@ -1,0 +1,37 @@
+{
+  "task": "W4-02 harness preparation only",
+  "model_calls_by_this_agent": 0,
+  "commits_by_this_agent": 0,
+  "paths": {
+    "harness.py": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_retest/harness.py",
+    "test_harness.py": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_retest/test_harness.py",
+    "prepare_audits.py": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_retest/prepare_audits.py"
+  },
+  "tests": {
+    "infra_first_attempt": "host python had no pytest; no tests ran",
+    "red": "locked uv pytest collection FileNotFoundError for absent harness.py before implementation, exit2",
+    "green": "9 passed in 0.03s; includes revision-body blinding and non-skill payload preservation",
+    "additional_red": "redaction test failed AttributeError before blind_runtime_reads implementation"
+  },
+  "frozen_executor_harness_unchanged": true,
+  "freeze_sha256": "849fd5a3f368cbb3d5bbec6acf1f1176da6896cf0279429405bf12952294e0f1",
+  "equivalence_verified": "/private/tmp/engineering-research-small-fix-20261108/paired-run/prepare-verification.json",
+  "limits": [
+    "One pair per original case, directional only",
+    "Tool-only boundary control is distinct from skill behavior",
+    "No command tools; actor cannot independently compute post-write copy hash; must report unavailable honestly",
+    "F03 mutators absent in both arms; no causal credit to source instructions",
+    "Native activation/installed parity/app render not tested",
+    "Audit packager requires all12 successful process receipts before preparing, process success is not semantic pass"
+  ],
+  "run_command": "python3 /private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_retest/harness.py run",
+  "audit_prepare_command": "python3 /private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_retest/prepare_audits.py",
+  "audit_packet": {
+    "root": "/private/tmp/engineering-research-small-fix-20261108/paired-audits",
+    "freeze_sha256": "62c933b4566413de3e4c95dbef374bcac3a08c1cda20c2d24748b39be67d9831",
+    "harness_sha256": "45fc3f7972b2735c73cfeb7f7604c54e8bd83c60fd245a8ff459547bbc924019",
+    "packet_files": 852,
+    "verification": "/private/tmp/engineering-research-small-fix-20261108/paired-audits/packaging-verification.json",
+    "model_calls": 0
+  }
+}

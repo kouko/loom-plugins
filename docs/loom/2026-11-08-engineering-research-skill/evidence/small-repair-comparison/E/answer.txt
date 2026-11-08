@@ -1,0 +1,31 @@
+TEST_ROOTS 精確列了四個目錄。以下是未儲存的簡短草稿。
+
+## 研究草稿(未儲存)
+
+**問題:** `src/scripts/run_package_tests.py` 的 `TEST_ROOTS` 精確列了哪些目錄?
+
+**發現:** 第 53 行是 `TEST_ROOTS = ("tests", "loom-code/tests", "loom-design/tests", "loom-workflow/tests")`,即下列四項:
+1. `tests`
+2. `loom-code/tests`
+3. `loom-design/tests`
+4. `loom-workflow/tests`
+
+**相關行為**(來自同一檔案):
+- 第 52 行的註解寫著這些是套件測試會執行的資料夾,含子資料夾,其他地方的測試不會執行。
+- `code` 群組(第 125 行)排除 `DESIGN_ROOT`(`loom-design/tests`)和 `WORKFLOW_ROOT`(`loom-workflow/tests`)。因此它只涵蓋 `tests` 和 `loom-code/tests`。
+- `design` 群組只用 `loom-design/tests`,`workflow-python` 只用 `loom-workflow/tests`。
+- `_shell_tests`(第 88 到 95 行)遍歷全部四個根目錄,尋找 `test-*.sh`,並略過各根目錄下的 `local/`。
+- 第 142 到 144 行的 mermaid 群組直接寫死 `loom-workflow/tests/mermaid` 和 `loom-workflow/tests/mermaid-validator-negative.sh`,沒有經過 `TEST_ROOTS`。這些路徑仍在 `loom-workflow/tests` 之下。
+
+**證據:**
+- 我讀了 `src/scripts/run_package_tests.py` 的原始碼。
+- `fixture-observations.json` 記錄了這個檔案的 sha256 為 `6730a53e…0d54`。這是準備階段的 harness 觀察,不是我執行的。我沒有重新計算雜湊,所以無法確認我讀到的內容與該雜湊一致。
+
+**對決策的影響:** 要讓新 plugin 的測試被執行,需要把它的根目錄加進這個 tuple。
+
+**限制:**
+- 我沒有執行腳本或測試,也沒有驗證 CI 實際呼叫它的方式。
+- `src/` 只是最小來源快照,不代表完整部署。
+- 我沒有讀 `docs/loom/research/2026-11-08-package-test-roots.md` 或 `src/tests/test_run_package_tests.py`。第二個檔案的測試是否與 `TEST_ROOTS` 一致,未確認。
+
+**記錄:** 依你的要求,我沒有寫入任何檔案,所以沒有儲存的研究記錄路徑。已有的 `docs/loom/research/2026-11-08-package-test-roots.md` 我沒有改動。

@@ -1,0 +1,24 @@
+研究副本已存到 `fixtureVault/research/2026-11-08-package-test-roots.md`。我讀回確認過 frontmatter 和三個相對連結,連結指向 `../../provenance.json`、`../../src/scripts/run_package_tests.py` 和 `../../src/tests/test_run_package_tests.py`。從該路徑往上兩層是專案根目錄,所以三個連結都能解析到實際檔案。
+
+## 結論
+- `TEST_ROOTS` 就是 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`,見 runner 第 51–55 行。
+- 使用 `--loom-family` 預設套件時,Python 收集和 shell 發現都會排除各 root 底下的 `local/`。所以 `tests/local/` 不屬於一般套件。
+- 這項排除只限於 `--loom-family` 預設套件。明確參數模式(第 168–175 行)沒有加這些 ignore。
+- 新外掛的測試 root 不會被自動發現。它必須加進 `TEST_ROOTS`,或放在現有 root 裡 `local/` 以外的位置。
+
+## 我核實的內容
+- 我重新讀了 runner 和測試檔,原研究引用的行號與描述都對得上,沒有需要修正的地方。
+- 副本與原研究只有兩處不同:三個連結改指向此 fixture 的實際來源,另外在文末新增一節「Preservation provenance」。原研究 `docs/loom/research/` 底下的檔案沒有動。
+
+## 來源版本與 hash
+- 來源快照:`provenance.json` 記錄為 commit `d5a7f0da…`。
+- Runner 和測試檔的 SHA256 與 provenance 一致:`6730a53e…0d54`、`b7ed3d4e…da28`。這是 `fixture-observations.json` 記錄的 harness 觀察,不是我自己算的。
+- git 狀態同樣來自該檔:`main` 是 `4959e62`,`research-fixture` 是 `00fa764`,`merge-base --is-ancestor` 的結果是已被合併。我另外讀了 `.git/refs/heads/main`,內容與 `4959e62…` 相符。
+- 原研究的 SHA256 記錄為 `c54f2872…1283`。
+
+## 限制與不確定事項
+- 我沒有命令工具,所以沒有重新計算任何 hash,也沒有算副本本身的 hash。`fixture-observations.json` 說明沒有提供寫入後副本的 hash。
+- 沒有執行測試或 runner。結論只來自原始碼和測試定義,沒有運行時驗證。
+- CI 設定、已安裝或已部署的版本不在證據範圍內。遠端是否最新沒有檢查(`provenance.json` 寫的是 "not checked")。
+- 這次 merge 只是本地暫存 fixture 的合併,不代表發布或安裝。Vault 是暫存假 Vault,不是真實使用者 Vault。
+- Obsidian CLI 不可用,所以寫入走的是檔案工具。沒有檢查它在 Obsidian 裡的顯示效果。

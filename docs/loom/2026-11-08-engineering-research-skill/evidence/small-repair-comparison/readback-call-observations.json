@@ -1,0 +1,177 @@
+{
+  "scope": "Observable Read calls after last Write/Edit; not content sufficiency or semantic verdict",
+  "actors": [
+    {
+      "actor": "A",
+      "case": "F01",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/research/2026-11-08-package-test-roots.md",
+          "last_write_event_line": 38,
+          "subsequent_Read_calls": []
+        }
+      ]
+    },
+    {
+      "actor": "B",
+      "case": "F01",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/research/2026-11-08-package-test-roots.md",
+          "last_write_event_line": 38,
+          "subsequent_Read_calls": [
+            {
+              "path": "/private/tmp/engineering-research-small-fix-20261108/paired-run/B/project/docs/loom/research/2026-11-08-package-test-roots.md",
+              "line": 44,
+              "offset": 18,
+              "limit": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "actor": "C",
+      "case": "F02",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/fixture-explicit-args/research/001-explicit-args-local-test-inclusion.md",
+          "last_write_event_line": 46,
+          "subsequent_Read_calls": []
+        }
+      ]
+    },
+    {
+      "actor": "D",
+      "case": "F02",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md",
+          "last_write_event_line": 29,
+          "subsequent_Read_calls": [
+            {
+              "path": "/private/tmp/engineering-research-small-fix-20261108/paired-run/D/project/docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md",
+              "line": 31,
+              "offset": null,
+              "limit": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "actor": "E",
+      "case": "F03",
+      "write_and_read_calls": []
+    },
+    {
+      "actor": "F",
+      "case": "F03",
+      "write_and_read_calls": []
+    },
+    {
+      "actor": "G",
+      "case": "F04",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/research/2026-11-08-package-test-claim-boundary.md",
+          "last_write_event_line": 40,
+          "subsequent_Read_calls": [
+            {
+              "path": "/private/tmp/engineering-research-small-fix-20261108/paired-run/G/project/docs/loom/research/2026-11-08-package-test-claim-boundary.md",
+              "line": 44,
+              "offset": null,
+              "limit": 30
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "actor": "H",
+      "case": "F04",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/research/2026-11-08-package-test-claim-support.md",
+          "last_write_event_line": 45,
+          "subsequent_Read_calls": []
+        }
+      ]
+    },
+    {
+      "actor": "I",
+      "case": "F05",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/research/2026-11-08-merge-release-status.md",
+          "last_write_event_line": 50,
+          "subsequent_Read_calls": []
+        },
+        {
+          "file": "scratch/obsidian-preservation-proposal.md",
+          "last_write_event_line": 52,
+          "subsequent_Read_calls": []
+        }
+      ]
+    },
+    {
+      "actor": "J",
+      "case": "F05",
+      "write_and_read_calls": [
+        {
+          "file": "docs/loom/research/2026-11-08-merge-release-status.md",
+          "last_write_event_line": 38,
+          "subsequent_Read_calls": [
+            {
+              "path": "/private/tmp/engineering-research-small-fix-20261108/paired-run/J/project/docs/loom/research/2026-11-08-merge-release-status.md",
+              "line": 47,
+              "offset": null,
+              "limit": null
+            }
+          ]
+        },
+        {
+          "file": "scratch/vault-preservation-proposal.md",
+          "last_write_event_line": 40,
+          "subsequent_Read_calls": [
+            {
+              "path": "/private/tmp/engineering-research-small-fix-20261108/paired-run/J/project/scratch/vault-preservation-proposal.md",
+              "line": 49,
+              "offset": null,
+              "limit": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "actor": "K",
+      "case": "F06",
+      "write_and_read_calls": [
+        {
+          "file": "fixtureVault/research/2026-11-08-package-test-roots.md",
+          "last_write_event_line": 38,
+          "subsequent_Read_calls": [
+            {
+              "path": "/private/tmp/engineering-research-small-fix-20261108/paired-run/K/project/fixtureVault/research/2026-11-08-package-test-roots.md",
+              "line": 41,
+              "offset": null,
+              "limit": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "actor": "L",
+      "case": "F06",
+      "write_and_read_calls": [
+        {
+          "file": "fixtureVault/research/2026-11-08-package-test-roots.md",
+          "last_write_event_line": 41,
+          "subsequent_Read_calls": []
+        }
+      ]
+    }
+  ]
+}

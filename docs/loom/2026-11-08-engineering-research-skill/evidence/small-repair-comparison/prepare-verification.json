@@ -1,0 +1,84 @@
+{
+  "pair_equivalence": [
+    {
+      "case": "F01",
+      "actors": [
+        "A",
+        "B"
+      ],
+      "prompt_identical": true,
+      "different_input_files": [
+        "skill/engineering-research/references/preservation.md",
+        "skill/engineering-research/SKILL.md"
+      ],
+      "valid": true
+    },
+    {
+      "case": "F02",
+      "actors": [
+        "C",
+        "D"
+      ],
+      "prompt_identical": true,
+      "different_input_files": [
+        "skill/engineering-research/references/preservation.md",
+        "skill/engineering-research/SKILL.md"
+      ],
+      "valid": true
+    },
+    {
+      "case": "F03",
+      "actors": [
+        "E",
+        "F"
+      ],
+      "prompt_identical": true,
+      "different_input_files": [
+        "skill/engineering-research/references/preservation.md",
+        "skill/engineering-research/SKILL.md"
+      ],
+      "valid": true
+    },
+    {
+      "case": "F04",
+      "actors": [
+        "G",
+        "H"
+      ],
+      "prompt_identical": true,
+      "different_input_files": [
+        "skill/engineering-research/references/preservation.md",
+        "skill/engineering-research/SKILL.md"
+      ],
+      "valid": true
+    },
+    {
+      "case": "F05",
+      "actors": [
+        "I",
+        "J"
+      ],
+      "prompt_identical": true,
+      "different_input_files": [
+        "skill/engineering-research/references/preservation.md",
+        "skill/engineering-research/SKILL.md"
+      ],
+      "valid": true
+    },
+    {
+      "case": "F06",
+      "actors": [
+        "K",
+        "L"
+      ],
+      "prompt_identical": true,
+      "different_input_files": [
+        "skill/engineering-research/references/preservation.md",
+        "skill/engineering-research/SKILL.md"
+      ],
+      "valid": true
+    }
+  ],
+  "no_model_calls": true,
+  "freeze_sha256": "849fd5a3f368cbb3d5bbec6acf1f1176da6896cf0279429405bf12952294e0f1"
+}

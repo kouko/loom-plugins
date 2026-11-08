@@ -1,0 +1,18 @@
+先前的排除結論不能套用到這次呼叫。它只適用於 `--loom-family`。我只讀了原始碼,沒有執行任何測試或命令。
+
+**理由**
+- `main` 只有在第一個參數是 `--loom-family` 時才進入 preset 分支(`src/scripts/run_package_tests.py` 第 153–167 行)。
+- 其他 argv 會經 `split_groups`,每組直接執行 `python -m pytest <group>`(第 168–176 行)。
+- `local/` 的排除只寫在 `_tests_session`、`_shell_tests` 和 `_workflow_sessions`(第 76–113 行)。它們只能從 preset 分支走到,所以顯式參數模式不會加 `--ignore`,也不會查 `TEST_ROOTS`。
+- 因此 `tests/local/test_example.py` 會原樣交給 pytest。只要該檔存在,pytest 通常就會收集它。這是由 runner 轉交參數推論出來的,我沒有驗證 pytest 實際行為。
+
+**交付**
+- 新記錄在 `docs/loom/fixture-explicit-args/research/001-explicit-args-local-test-inclusion.md`,屬於 active change `fixture-explicit-args`。我寫完後讀回檢查過內容與連結,並修正了一處對測試檔檢查範圍的不實描述。
+- 舊記錄 `docs/loom/research/2026-11-08-package-test-roots.md` 原封不動,它對 `--loom-family` 的決策依據仍保留。
+- 新記錄引用了 `fixture-observations.json` 的 harness 觀察:原始碼 SHA256 與 provenance 相符,所以分析的是同一份原始碼。這些不是我執行的。
+
+**不確定事項**
+- 這個 fixture 裡沒有 `tests/local/test_example.py`,所以無法說明實際收集結果。`pytest.ini`、`conftest.py`、markers 的影響也沒驗證。
+- 測試檔我只看了關鍵字比對到的行,沒有通讀。「沒有測試涵蓋顯式指定 `tests/local`」這個說法只限於那些比對結果。
+- 只有最小原始碼快照,CI、包裝腳本或實際部署的 runner 版本可能不同。
+- `--loom-family` 與顯式路徑混用的情況沒有另外研究。

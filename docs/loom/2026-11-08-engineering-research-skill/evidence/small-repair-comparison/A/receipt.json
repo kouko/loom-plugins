@@ -1,0 +1,78 @@
+{
+  "actor": "A",
+  "case": "F01",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_provider": "firstParty Anthropic",
+  "requested_effort": "medium",
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 36.725,
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 12,
+      "cache_creation_input_tokens": 22264,
+      "cache_read_input_tokens": 95901,
+      "output_tokens": 4149,
+      "output_tokens_details": {
+        "thinking_tokens": 903
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 22264,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 857,
+          "cache_read_input_tokens": 26666,
+          "cache_creation_input_tokens": 272,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 272
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 12,
+        "outputTokens": 4149,
+        "cacheReadInputTokens": 95901,
+        "cacheCreationInputTokens": 22264,
+        "webSearchRequests": 0,
+        "costUSD": 0.1401601,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 903,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 22264,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.1401601,
+    "permission_denials": [],
+    "duration_api_ms": 35526,
+    "num_turns": 13
+  },
+  "changed_files": [
+    "docs/loom/research/2026-11-08-package-test-roots.md"
+  ],
+  "added_files": [],
+  "deleted_files": [],
+  "protected_unchanged": true,
+  "case_boundary_satisfied": true,
+  "fixtureVault_files": {}
+}
