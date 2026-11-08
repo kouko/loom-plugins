@@ -1,0 +1,43 @@
+確認 `TEST_ROOTS` 精確列出四個目錄，順序如下：
+
+```python
+("tests", "loom-code/tests", "loom-design/tests", "loom-workflow/tests")
+```
+
+以下為未儲存的英文研究草稿：
+
+```markdown
+---
+title: "Exact package test roots"
+type: loom-research
+status: concluded
+created: 2026-11-08
+updated: 2026-11-08
+tags:
+  - loom/research
+---
+
+Question and scope: Which directories are explicitly listed in TEST_ROOTS
+in the supplied source snapshot?
+
+Method: Reuse the existing research and directly inspect the defining
+assignment. Static inspection sufficiently answers this factual question.
+
+Finding: src/scripts/run_package_tests.py:53 lists exactly, in order:
+tests, loom-code/tests, loom-design/tests, loom-workflow/tests.
+
+Evidence: The assignment agrees with the existing research at
+docs/loom/research/2026-11-08-package-test-roots.md.
+provenance.json attributes the source snapshot to commit
+d5a7f0da247214bdb9c61fe90c550256432e5f76.
+
+Decision impact: These four directories are the explicit TEST_ROOTS list.
+
+Limitations: No uncertainty remains about the inspected assignment.
+Runtime behavior, complete CI coverage, and deployed versions were not
+verified. No tests or experiments were executed.
+```
+
+實際來源：[run_package_tests.py:53](/private/tmp/code-owned-engineering-research-execution-20261108/F03/project/src/scripts/run_package_tests.py:53)。
+
+本次未寫入任何檔案；草稿僅存在於回覆，未建立筆記或 active change。`fixture-cleanup.json` 僅作為臨時 fixture 的本地生命週期證據，不代表真實部署清理。

@@ -1,0 +1,11 @@
+Passkey support at your deployable versions is **unverified**. No providers, versions, required flow, or supporting sources were supplied; browsing is unavailable.
+
+Unsaved research draft:
+- **Question:** Does the required passkey flow exist in the deployable releases?
+- **Method:** Inspect version-specific official documentation, release notes, and relevant implementation paths.
+- **Finding:** Insufficient evidence to establish support or absence.
+- **Decision impact:** Passkey feasibility remains unresolved for the migration decision.
+
+Please provide the candidate providers, deployable server/SDK versions and editions, required registration/sign-in/recovery behavior, target platforms, and available source excerpts.
+
+No files were saved because this is read-only discussion; no migration was implemented.

@@ -1,0 +1,14 @@
+**Pytest and shell tests share root configuration, but not a single discovered inventory.** The spec should preserve that distinction.
+
+Source inspection of `scripts/run_package_tests.py` shows:
+
+- In `--loom-family` mode, both use `TEST_ROOTS`: `tests`, `loom-code/tests`, `loom-design/tests`, and `loom-workflow/tests` (line 53).
+- Python discovery checks `test_*.py` and `*_test.py` to select directories, then delegates collection to pytest. Sessions are split into code, design, and workflow groups (lines 68–85, 98–133).
+- Shell discovery independently enumerates `test-*.sh` across every root and invokes each through Bash—even under code or design roots (lines 88–95, 134–138).
+- Both apply nested-repository exclusions, but through different mechanisms: pytest `--ignore` arguments versus shell-path filtering (lines 123, 137, 146–149).
+- Mermaid commands are explicitly listed separately, including a shell negative check (lines 139–145).
+- Outside `--loom-family`, arguments go directly to pytest; shell discovery does not run (lines 168–173).
+
+**Spec implication:** describe shared roots with separate discovery and execution paths, plus explicit Mermaid commands.
+
+Unsaved research record: source inspection only; no execution. Pytest configuration, `repo_files` implementation, actual test inventory, and revision evidence are unavailable. No research file was saved under the read-only constraint.

@@ -1,0 +1,9 @@
+Intent and feasibility are approved, but the agreed key combination, action, scope, and project source aren’t provided. These tasks therefore need those details attached before implementation:
+
+1. Locate the target action and existing keyboard handling. Check: identify the integration point and shortcut conventions.
+2. Add the agreed shortcut. Check: it triggers the intended action once within the approved scope.
+3. Apply focus and conflict rules. Check: typing, modifier keys, and existing shortcuts behave as agreed.
+4. Add appropriate automated coverage. Check: activation, out-of-scope behavior, and relevant focus cases pass.
+5. Update shortcut help if applicable. Check: displayed keys match behavior.
+
+No implementation or publication performed.

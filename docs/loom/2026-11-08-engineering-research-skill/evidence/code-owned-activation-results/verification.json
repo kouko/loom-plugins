@@ -1,0 +1,596 @@
+{
+  "receipts": [
+    {
+      "id": "N01-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N01-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N02-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N02-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N03-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N03-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N04-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N04-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N05-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N05-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N06-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N06-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N07-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N07-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N08-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "N08-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P01-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P01-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P02-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P02-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P03-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P03-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P04-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P04-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P05-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P05-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P06-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P06-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P07-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P07-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P08-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P08-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P09-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P09-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P10-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P10-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P11-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P11-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P12-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P12-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P13-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P13-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P14-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P14-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P15-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P15-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P16-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P16-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P17-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P17-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P18-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P18-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P19-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P19-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P20-r1",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    },
+    {
+      "id": "P20-r2",
+      "hashes": {
+        "prompt.txt": true,
+        "catalog.json": true,
+        "events.jsonl": true,
+        "answer.txt": true
+      },
+      "auth_symlink_absent": true
+    }
+  ],
+  "frozen_hashes": {
+    "corpus.json": true,
+    "harness.py": true,
+    "design.md": true,
+    "adjacent/independent-advisor/SKILL.md": true,
+    "adjacent/project-retro/SKILL.md": true,
+    "adjacent/build/SKILL.md": true,
+    "adjacent/critique/SKILL.md": true,
+    "adjacent/write-plan/SKILL.md": true
+  },
+  "snapshot_matches_live": true,
+  "remaining_auth_symlinks": 0,
+  "actual_usage_total": {
+    "input_tokens": 1946052,
+    "cached_input_tokens": 1632896,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18105,
+    "reasoning_output_tokens": 1019
+  },
+  "checked_at": "2026-11-08T11:01:55.324060+00:00",
+  "cli_resolution": {
+    "entry": "/Users/kouko/.local/bin/codex",
+    "resolved": "/Users/kouko/.codex/packages/standalone/releases/0.167.0-aarch64-apple-darwin/bin/codex",
+    "binary_sha256": "030316ecfbb41f4e7946e584b0063ef333b7a36cd312ba349f2f6869e39b62cc",
+    "kind": "native arm64 Mach-O executable",
+    "version": [
+      "codex-cli 0.167.0"
+    ]
+  },
+  "checks_all_pass": true,
+  "catalog_initial_body_absent_count": 56,
+  "target_successful_body_read_count": 40
+}

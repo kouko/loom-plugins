@@ -1,0 +1,134 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-08-engineering-research-skill",
+  "content_digest": "27d5d72ec06b89448465d25324f6746b802cd1af",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_check_mechanisms.py -q",
+      "artifact": "loom-code/tests/test_check_mechanisms.py",
+      "result": "pass",
+      "command_digest": "3d696d7bfacac52ee193b9abf44b727b9122865b9f430126f8d1fa1ce9a76c3b"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_census_gaming.py -q",
+      "artifact": "loom-code/tests/test_adversarial_census_gaming.py",
+      "result": "pass",
+      "command_digest": "d10dc96aee061848ed55d17962f9332fb38a94fb19e96f91c2f3fd432ff44977"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "d5a7f0da247214bdb9c61fe90c550256432e5f76",
+      "review_target_sha": "1f20ee9d7cb5f252367c8d2b38d90678a22d3b94",
+      "dimension_scores": {
+        "security": "PASS — Source policy treats repository commands as data and prohibits private search payloads; preservation confines discovery to authorized roots and requires per-instance destination/scope and separate overwrite consent. The retired helper is archived evidence, not a maintained enforcement boundary.",
+        "architecture": "PASS — One code-owned skill, six directly linked single-level resources and optional code-station calls preserve the three-plugin boundary; design and workflow contain no runtime research copy or forwarding wrapper.",
+        "correctness": "PASS — Round 2 fixes canonical confirmation ancestry without changing approved outcomes: latest exact-subject confirmation is 3306660a, its intent equals current intent, and normalized pin is 9f188f839c203a32bcc39b13c135b7cf97d05bc1. Original source review, focused tests and scoped A8 completion carry forward; production hosting, real Vault and installed-host claims remain excluded.",
+        "naming": "PASS — Engineering-research and its method/source/evaluation/preservation references describe their actual responsibilities; record status is explicitly distinct from confidence and acceptance.",
+        "tests": "PASS — Original runs of all six changed ordinary pytest files carry forward: 139 code tests, 14 workflow release tests and nine catalog tests passed without skips. The independent continuation closes the specifically missing positive A8 local lifecycle without rerunning unrelated tests or treating separate historical copy runs as one trajectory.",
+        "refactoring": "PASS — Ownership moves without compatibility duplication; code-station integrations delegate by skill name and shared preservation policy resides in its owning reference. No additional reusable runtime helper was retained after the unsuccessful general save-result intervention.",
+        "cross-task-coherence": "PASS — Original registry, ownership, caller and release conclusions carry forward. W7 documents the metadata defect class and retained finalization failure; actual fix changes only descriptive intent title/pin and its plan. Acceptance retarget names an actual clean clone and gives all nine carry-over reasons without inventing repeated behavior; the stale provenance comment remains a nonfunctional nit.",
+        "external-surface-grounding": "PASS — No new executable external API, SDK, MCP or CLI call ships. Method guidance links primary references; Obsidian guidance delegates by available skill name and requires reading local help/version instead of prescribing ungrounded flags.",
+        "principles-conformance": "PASS — The three-plugin boundary, optional research, executable budget admission and regression coverage remain intact; no new prose-only gate or automatic external write is added. Partial acceptance is disclosed rather than represented as universal quality or host parity.",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists; there is no ratified architecture document to conform to.",
+        "deliberate-simplification": "PASS — The capability remains on-demand prose with conditional reference loading; no-write and unavailable-tool outcomes are explicit, installed-host and general reliability claims remain bounded, and later release checking requires an explicit invocation rather than a watcher.",
+        "deletion-first": "PASS — The requested capability has visible ownership and per-question persistence requirements; obsolete experimental runners and their exact census exception are removed, and neither a production save tool nor a compatibility skill is introduced."
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "cross-task-coherence",
+          "anchor": "loom-code/scripts/check_mechanisms.py:709",
+          "text": "nitpick: The ceiling comment points to matching research budget exceptions in loom-workflow 5.21.0, but the delivered exceptions are in loom-code 3.60.0 and workflow ships only the 5.20.1 documentation correction. Execution uses the correct default code changelog, so this does not alter admission behavior.",
+          "fix": "Change this comment to identify loom-code 3.60.0 as the location of the skill/tool budget exceptions."
+        }
+      ],
+      "notes": [
+        "Round 2, same bounded episode, fix-only review: read the complete 514a8880..1f20ee9d delta, W7, preserved finalization BLOCK, original ownership commit 7c1b6042, canonical repair commit 3306660a and actual intent_version.py rule. Independently verified exact-subject ancestry selects 3306660a, current intent equals its confirmed tree, normalized Git blob pin matches, and the actual clean-clone intent at 26fc7d32 matches. Full diff confirms all nine Acceptance lines, constraints, original status/date and publication authorization unchanged; no new user approval or weakened checker is introduced.",
+        "Original important A8 finding remains fixed within the independently inspected continuous local synthetic fixture; prior nit remains unchanged. Actual Git diff against original b29 source is empty for the research package, callers/router and package tests. Original 162 focused test passes and manifest-sync check carry forward; no old tests, full suite, probes or external models were rerun. Round 1 PASS preserved as code-verdict-round1.yaml; original PASS_WITH_NOTES remains code-verdict-original.yaml.",
+        "Read handed repair Build log (4139 passes, six skips across groups) and adversarial outputs (71 and three passes); no artifact filename appears in the adversarial lines, so no probe_confirmation is emitted. Acceptance retarget to actual clean 26fc7d32 retains eight works and A2 partly with individual carry-over reasons. Production land/hosting, actual Obsidian CLI/Vault, installed hosts and general quality/causal improvement remain unverified."
+      ],
+      "reviewer": "/root/final_code_review",
+      "vendor": "openai",
+      "model": null
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "d5a7f0da247214bdb9c61fe90c550256432e5f76",
+      "review_target_sha": "1f20ee9d7cb5f252367c8d2b38d90678a22d3b94",
+      "dimension_scores": {
+        "omission": "PASS — The prior A8 evidence gap is fixed by the independent witness's continuation of the same merged synthetic fixture through authorized successful local cleanup, concrete candidate/provenance, no-consent no-write, exact synthetic instance consent, actual save/full substantive readback/link verification, original preservation and no-overwrite. This establishes the required bounded local behavior without claiming production land, hosting or real Vault validation.",
+        "ambiguity": "PASS — Proportionate research, direct checks, conditional reference loading, unsaved outcomes, revalidation and preservation authorization have actionable boundaries. Unknown destinations remain unresolved rather than guessed.",
+        "inconsistency": "PASS — Round 2's actual fix delta changes only the descriptive intent title/pin, W7 plan and failure/acceptance evidence. All intent lines except title/pin are byte-identical to the previous target; the canonical confirmation records the already approved code ownership. The current report separates its fresh clean metadata snapshot from carried-over behavioral evidence. Prior runtime and polarity judgments carry over.",
+        "incorrect-fact": "PASS — Read W7, the retained finalization BLOCK, exact old/new confirmation commits, unchanged intent-version rule and updated acceptance evidence. Independently recomputed pin 9f188f839c203a32bcc39b13c135b7cf97d05bc1, confirmed the latest canonical subject and verbatim needs-design body, inspected the clean 26fc7d3 witness clone, and verified all eight package files equal b29db715. No checker/runtime/test changes or new behavioral completion claim found.",
+        "missing-population": "PASS — Routing counts identify the 20 positive and eight negative queries with two repetitions; six explicit cases, six matched repair pairs and four save-result pairs remain separate bounded populations. Reports disclose disagreements and do not infer general rates or causal quality improvement.",
+        "user-judgment-leak": "PASS — The canonical confirmation fixes discoverability of the existing explicit user-approved ownership; it does not supply a new preference, expand authorization or request repeated consent. All substantive intent text and original status/publication dates remain unchanged. Prior runtime consent and technical-decision judgments carry over.",
+        "deletion-first": "PASS — The expressly requested single code-owned package reuses the prototype and existing station handoffs. Conditional references avoid forcing every method; the experimental writer/runners were archived rather than promoted into a maintained dependency. No smaller shape preserving the accepted behavior was identified."
+      },
+      "findings": [],
+      "notes": [
+        "Round 2, same reviewer and bounded episode, second functional digest: reviewed only 514a8880..1f20ee9d and prior finding continuity. The unchanged rule searches exact canonical subjects, explaining why noncanonical 7c1b6042 left da402f1 selected. Commit 3306660a now records the same established approval under the correct subject/body, with a matching normalized pin; the original failure remains evidence. No new issue or reopened unrelated finding. Round 1 PASS is preserved in skill-verdict-round1.yaml.",
+        "The prior important A8 omission remains FIXED within the already checked continuous synthetic local lifecycle. The fresh clean witness clone is at 26fc7d32650d66d455c4ae059a07b5808c4f4f46; all nine carry-over reasons preserve eight works and A2 partly. Source, callers and tests have no delta in this fix; actual package bytes remain equal to the original behavioral tree. No historical trial was relabeled as a newly rerun behavior test.",
+        "Prior direct focused-test evidence carries over. Read supplied Build repair and 71/3 adversarial output logs without rerunning tests, full suite or probes, and without claiming program confirmations from stemless summaries. No external model calls, repository edits or unrelated review occurred. Installed hosts, real Vault/CLI, production land/hosting and generalized automatic selection remain unverified; W4/W5 residual outcomes and historical failures remain visible."
+      ],
+      "reviewer": "/root/final_skill_review",
+      "vendor": "openai",
+      "model": null
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "9f188f839c203a32bcc39b13c135b7cf97d05bc1",
+  "tested_commit": "26fc7d32650d66d455c4ae059a07b5808c4f4f46",
+  "reviewed_commit": "1f20ee9d7cb5f252367c8d2b38d90678a22d3b94",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "partly"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    },
+    {
+      "acceptance": 8,
+      "status": "works"
+    },
+    {
+      "acceptance": 9,
+      "status": "works"
+    }
+  ]
+}

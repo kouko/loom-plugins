@@ -1,0 +1,1210 @@
+{
+  "requested_model": "gpt-6.1-sol",
+  "requested_effort": "medium",
+  "coverage": {
+    "completed_audited": [
+      "X001",
+      "X002",
+      "X003",
+      "X004",
+      "X005",
+      "X006",
+      "X007",
+      "X008",
+      "X009",
+      "X010",
+      "X011",
+      "X012"
+    ],
+    "expected": 12,
+    "status": "complete: all 12 receipt-bearing actors audited"
+  },
+  "actors": [
+    {
+      "id": "X001",
+      "case": "C02",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Builder reuse, single real import/empty-directory Mermaid call, exact three argv arrays, Git subprocess and sys.path qualifications; narrow experimental limit."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Builder reuse, single real import/empty-directory Mermaid call, exact three argv arrays, Git subprocess and sys.path qualifications; narrow experimental limit."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Qualitative common criteria/credible smaller alternative when comparison is relevant; no invented scores."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Builder reuse, single real import/empty-directory Mermaid call, exact three argv arrays, Git subprocess and sys.path qualifications; narrow experimental limit."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X001/events.jsonl:12-30"
+          ],
+          "rationale": "Builder reuse, single real import/empty-directory Mermaid call, exact three argv arrays, Git subprocess and sys.path qualifications; narrow experimental limit."
+        },
+        "R9": {
+          "verdict": "partial",
+          "evidence": [
+            {
+              "path": "execution/X001/events.jsonl:5",
+              "command": "/bin/zsh -lc \"pwd && rg --files -g '\"'!src/**'\"' -g '\"'!samples/**'\"' -g '\"'!skill/**'\"' -g '\"'!provenance.json'\"' -g '\"'!**/.git/**'\"' && cat skill/engineering-research/SKILL.md\""
+            },
+            {
+              "path": "execution/X001/events.jsonl:12",
+              "command": "/bin/zsh -lc 'nl -ba src/tests/test_run_package_tests.py'"
+            },
+            {
+              "path": "execution/X001/events.jsonl:13",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md'"
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X001/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X001/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "Substantive source (or migration evidence excerpt) was read before required methods/source policy. Literal ordering partial; later resources were read and analysis is adequate, with no demonstrated functional harm. Initial file inventory alone is not counted as evidence gathering."
+        }
+      }
+    },
+    {
+      "id": "X002",
+      "case": "C06",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Rejects current-HEAD CI/release approval from source and test definitions; identifies revision-linked full-run/inventory/environment/artifact evidence."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Rejects current-HEAD CI/release approval from source and test definitions; identifies revision-linked full-run/inventory/environment/artifact evidence."
+        },
+        "R4": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md"
+          ],
+          "rationale": "Factual/evidence-sufficiency question; no alternative ranking required."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Rejects current-HEAD CI/release approval from source and test definitions; identifies revision-linked full-run/inventory/environment/artifact evidence."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X002/events.jsonl:7-21"
+          ],
+          "rationale": "Rejects current-HEAD CI/release approval from source and test definitions; identifies revision-linked full-run/inventory/environment/artifact evidence."
+        },
+        "R9": {
+          "verdict": "uncertain",
+          "evidence": [
+            {
+              "path": "execution/X002/events.jsonl:7",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md; cat provenance.json; rg --files src samples'"
+            },
+            {
+              "path": "execution/X002/events.jsonl:9",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/references/evaluation-selection.md skill/engineering-research/templates/research.md'"
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X002/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X002/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "The initial pre-reference read is provenance/revision orientation only, plausibly permitted by step 1 premise/context checking. The before-evidence clause boundary is ambiguous; no confirmed substantive source analysis preceded resources, and no functional defect is inferred."
+        }
+      }
+    },
+    {
+      "id": "X003",
+      "case": "C03",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Separate trust-boundary and Git-failure records; traces union, ignores, shell filtering, silent None-to-empty failure, timeout omission, partial discovery; actual pytest remains untested."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Separate trust-boundary and Git-failure records; traces union, ignores, shell filtering, silent None-to-empty failure, timeout omission, partial discovery; actual pytest remains untested."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Qualitative common criteria/credible smaller alternative when comparison is relevant; no invented scores."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Separate trust-boundary and Git-failure records; traces union, ignores, shell filtering, silent None-to-empty failure, timeout omission, partial discovery; actual pytest remains untested."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X003/events.jsonl:7-22"
+          ],
+          "rationale": "Separate trust-boundary and Git-failure records; traces union, ignores, shell filtering, silent None-to-empty failure, timeout omission, partial discovery; actual pytest remains untested."
+        },
+        "R9": {
+          "verdict": "uncertain",
+          "evidence": [
+            {
+              "path": "execution/X003/events.jsonl:7",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md; cat provenance.json'"
+            },
+            {
+              "path": "execution/X003/events.jsonl:9",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/references/evaluation-selection.md skill/engineering-research/templates/research.md; nl -ba src/scripts/run_package_tests.py; nl -ba src/loom-code/scripts/repo_files.py; nl -ba src/loom-code/scripts/git_exec.py'"
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X003/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X003/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "The initial pre-reference read is provenance/revision orientation only, plausibly permitted by step 1 premise/context checking. The before-evidence clause boundary is ambiguous; no confirmed substantive source analysis preceded resources, and no functional defect is inferred."
+        }
+      }
+    },
+    {
+      "id": "X004",
+      "case": "C02",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Mandatory no-execution/shared-discovery criteria; direct reuse vs CLI extension/rewrite; actual permitted probe only; Git and sys.path side effects, environment/dependency limits."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Mandatory no-execution/shared-discovery criteria; direct reuse vs CLI extension/rewrite; actual permitted probe only; Git and sys.path side effects, environment/dependency limits."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Qualitative common criteria/credible smaller alternative when comparison is relevant; no invented scores."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Mandatory no-execution/shared-discovery criteria; direct reuse vs CLI extension/rewrite; actual permitted probe only; Git and sys.path side effects, environment/dependency limits."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Mandatory no-execution/shared-discovery criteria; direct reuse vs CLI extension/rewrite; actual permitted probe only; Git and sys.path side effects, environment/dependency limits."
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+            "execution/X004/events.jsonl:7-29"
+          ],
+          "rationale": "Own raw skill and applicable resources inspected; no graph required or produced."
+        }
+      }
+    },
+    {
+      "id": "X005",
+      "case": "C03",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Both foreign-tree trust and Git failure paths addressed; no filesystem inventory fallback confused with exclusions; ignored/unrelated-tree and explicit-target limits retained."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Both foreign-tree trust and Git failure paths addressed; no filesystem inventory fallback confused with exclusions; ignored/unrelated-tree and explicit-target limits retained."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Qualitative common criteria/credible smaller alternative when comparison is relevant; no invented scores."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Both foreign-tree trust and Git failure paths addressed; no filesystem inventory fallback confused with exclusions; ignored/unrelated-tree and explicit-target limits retained."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Both foreign-tree trust and Git failure paths addressed; no filesystem inventory fallback confused with exclusions; ignored/unrelated-tree and explicit-target limits retained."
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+            "execution/X005/events.jsonl:5-18"
+          ],
+          "rationale": "Own raw skill and applicable resources inspected; no graph required or produced."
+        }
+      }
+    },
+    {
+      "id": "X006",
+      "case": "C05",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Computes all seven old/new links; unchanged move resolves under docs/src and fails, added parent repairs paths; checks actual source lines/hashes, excerpt/full provenance, staged acceptance and rollback."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Computes all seven old/new links; unchanged move resolves under docs/src and fails, added parent repairs paths; checks actual source lines/hashes, excerpt/full provenance, staged acceptance and rollback."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Qualitative common criteria/credible smaller alternative when comparison is relevant; no invented scores."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Computes all seven old/new links; unchanged move resolves under docs/src and fails, added parent repairs paths; checks actual source lines/hashes, excerpt/full provenance, staged acceptance and rollback."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Computes all seven old/new links; unchanged move resolves under docs/src and fails, added parent repairs paths; checks actual source lines/hashes, excerpt/full provenance, staged acceptance and rollback."
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+            "execution/X006/events.jsonl:9-21"
+          ],
+          "rationale": "Own raw skill and applicable resources inspected; no graph required or produced."
+        }
+      }
+    },
+    {
+      "id": "X007",
+      "case": "C05",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "All seven rebased paths, actual anchor contents/source hashes, extraction-versus-full-note provenance, preserved metadata, consumer inventory, bounded move/acceptance/rollback; sample unchanged."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "All seven rebased paths, actual anchor contents/source hashes, extraction-versus-full-note provenance, preserved metadata, consumer inventory, bounded move/acceptance/rollback; sample unchanged."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "Qualitative common criteria/credible smaller alternative when comparison is relevant; no invented scores."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "All seven rebased paths, actual anchor contents/source hashes, extraction-versus-full-note provenance, preserved metadata, consumer inventory, bounded move/acceptance/rollback; sample unchanged."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+            "execution/X007/events.jsonl:7-17"
+          ],
+          "rationale": "All seven rebased paths, actual anchor contents/source hashes, extraction-versus-full-note provenance, preserved metadata, consumer inventory, bounded move/acceptance/rollback; sample unchanged."
+        },
+        "R9": {
+          "verdict": "partial",
+          "evidence": [
+            {
+              "path": "execution/X007/events.jsonl:7",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md; cat provenance.json; cat samples/migration/provenance.json; cat samples/migration/docs/loom/research/2026-11-08-package-runner-exclusions.md'"
+            },
+            {
+              "path": "execution/X007/events.jsonl:9",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md; cat skill/engineering-research/references/source-policy.md; cat skill/engineering-research/references/evaluation-selection.md; cat skill/engineering-research/templates/research.md; rg --files src samples docs'"
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X007/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X007/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "Substantive source (or migration evidence excerpt) was read before required methods/source policy. Literal ordering partial; later resources were read and analysis is adequate, with no demonstrated functional harm. Initial file inventory alone is not counted as evidence gathering."
+        }
+      }
+    },
+    {
+      "id": "X008",
+      "case": "C01",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Exact four TEST_ROOTS in source order, direct inspection/hash, concise 42-line templated record and short final; no framework/matrix/diagram/experiment or CI inference."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Exact four TEST_ROOTS in source order, direct inspection/hash, concise 42-line templated record and short final; no framework/matrix/diagram/experiment or CI inference."
+        },
+        "R4": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md"
+          ],
+          "rationale": "Factual/evidence-sufficiency question; no alternative ranking required."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Exact four TEST_ROOTS in source order, direct inspection/hash, concise 42-line templated record and short final; no framework/matrix/diagram/experiment or CI inference."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X008/events.jsonl:7-14"
+          ],
+          "rationale": "Exact four TEST_ROOTS in source order, direct inspection/hash, concise 42-line templated record and short final; no framework/matrix/diagram/experiment or CI inference."
+        },
+        "R9": {
+          "verdict": "partial",
+          "evidence": [
+            {
+              "path": "execution/X008/events.jsonl:7",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md && cat provenance.json && cat src/scripts/run_package_tests.py'"
+            },
+            {
+              "path": "execution/X008/events.jsonl:10",
+              "command": "/bin/zsh -lc \"cat skill/engineering-research/references/research-methods.md && cat skill/engineering-research/references/source-policy.md && cat skill/engineering-research/templates/research.md && rg -n 'TEST_ROOTS|code_roots|def _shell_tests|def main|--loom-family' src/scripts/run_package_tests.py && shasum -a 256 src/scripts/run_package_tests.py && rg --files docs\""
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X008/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X008/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "Substantive source (or migration evidence excerpt) was read before required methods/source policy. Literal ordering partial; later resources were read and analysis is adequate, with no demonstrated functional harm. Initial file inventory alone is not counted as evidence gathering."
+        }
+      }
+    },
+    {
+      "id": "X009",
+      "case": "C01",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Question and authorized scope preserved; unknown runtime/deployment evidence not invented."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Exact four roots in declaration order; direct source/hash, concise 42-line note, no method framework or experiment."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Exact four roots in declaration order; direct source/hash, concise 42-line note, no method framework or experiment."
+        },
+        "R4": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Factual/evidence-sufficiency question; no alternative ranking required."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Source, observation and inference kept separate; no causal or population claim."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Exact four roots in declaration order; direct source/hash, concise 42-line note, no method framework or experiment."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Flat required metadata, general research directory, resolvable supplied file links, actual full record readback."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+            "execution/X009/events.jsonl:7-13"
+          ],
+          "rationale": "Exact four roots in declaration order; direct source/hash, concise 42-line note, no method framework or experiment."
+        },
+        "R9": {
+          "verdict": "partial",
+          "evidence": [
+            {
+              "path": "execution/X009/events.jsonl:7",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md provenance.json; cat src/scripts/run_package_tests.py'"
+            },
+            {
+              "path": "execution/X009/events.jsonl:9",
+              "command": "/bin/zsh -lc \"cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md; rg --files docs; rg -n 'TEST_ROOTS|code_roots|repo / root' src/scripts/run_package_tests.py; shasum -a 256 src/scripts/run_package_tests.py\""
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X009/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X009/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "Substantive source (or migration evidence excerpt) was read before required methods/source policy. Literal ordering partial; later resources were read and analysis is adequate, with no demonstrated functional harm. Initial file inventory alone is not counted as evidence gathering."
+        }
+      }
+    },
+    {
+      "id": "X010",
+      "case": "C06",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Preserves asked scope, source limits and no-experiment authorization."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Rejects CI/release approval from four source files and test definitions; traces actual fail-fast and empty inventory limits; missing workflows, exact revision-bound jobs/results/dependencies and artifact identity."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Rejects CI/release approval from four source files and test definitions; traces actual fail-fast and empty inventory limits; missing workflows, exact revision-bound jobs/results/dependencies and artifact identity."
+        },
+        "R4": {
+          "verdict": "not-applicable",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Rejects CI/release approval from four source files and test definitions; traces actual fail-fast and empty inventory limits; missing workflows, exact revision-bound jobs/results/dependencies and artifact identity."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Rejects CI/release approval from four source files and test definitions; traces actual fail-fast and empty inventory limits; missing workflows, exact revision-bound jobs/results/dependencies and artifact identity."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Rejects CI/release approval from four source files and test definitions; traces actual fail-fast and empty inventory limits; missing workflows, exact revision-bound jobs/results/dependencies and artifact identity."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Correct flat metadata/general research path; actual full saved-note readback; source links target supplied evidence."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "rationale": "Rejects CI/release approval from four source files and test definitions; traces actual fail-fast and empty inventory limits; missing workflows, exact revision-bound jobs/results/dependencies and artifact identity."
+        },
+        "R9": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+            "execution/X010/events.jsonl:7-23"
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X002/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "premise_orientation_clause": "execution/X002/artifacts/skill/engineering-research/SKILL.md:10-15",
+          "rationale": "Required resources read before substantive source inspection; no graph added."
+        }
+      }
+    },
+    {
+      "id": "X011",
+      "case": "C04",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Preserves asked scope, source limits and no-experiment authorization."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Exact 103.188/42.637 seconds and token categories; 60.551 seconds / approximately 58.7% correctly descriptive only; unequal workloads, no quality scores, billing/cache limits; matched-task/repeatable independent quality and total-cost observations proposed, none run."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Exact 103.188/42.637 seconds and token categories; 60.551 seconds / approximately 58.7% correctly descriptive only; unequal workloads, no quality scores, billing/cache limits; matched-task/repeatable independent quality and total-cost observations proposed, none run."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Exact 103.188/42.637 seconds and token categories; 60.551 seconds / approximately 58.7% correctly descriptive only; unequal workloads, no quality scores, billing/cache limits; matched-task/repeatable independent quality and total-cost observations proposed, none run."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Exact 103.188/42.637 seconds and token categories; 60.551 seconds / approximately 58.7% correctly descriptive only; unequal workloads, no quality scores, billing/cache limits; matched-task/repeatable independent quality and total-cost observations proposed, none run."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Exact 103.188/42.637 seconds and token categories; 60.551 seconds / approximately 58.7% correctly descriptive only; unequal workloads, no quality scores, billing/cache limits; matched-task/repeatable independent quality and total-cost observations proposed, none run."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Correct flat metadata/general research path; actual full saved-note readback; source links target supplied evidence."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X011/events.jsonl:7-18"
+          ],
+          "rationale": "Exact 103.188/42.637 seconds and token categories; 60.551 seconds / approximately 58.7% correctly descriptive only; unequal workloads, no quality scores, billing/cache limits; matched-task/repeatable independent quality and total-cost observations proposed, none run."
+        },
+        "R9": {
+          "verdict": "partial",
+          "evidence": [
+            {
+              "path": "execution/X011/events.jsonl:7",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md samples/timing/B01.json samples/timing/B02.json samples/timing/task-summary.json provenance.json'"
+            },
+            {
+              "path": "execution/X011/events.jsonl:9",
+              "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/references/evaluation-selection.md skill/engineering-research/templates/research.md'"
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X011/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "rationale": "Read complete timing receipts and task summary before references; substantive evidence-read ordering partial only, with adequate later method/resource use and no functional harm established."
+        }
+      }
+    },
+    {
+      "id": "X012",
+      "case": "C04",
+      "criteria": {
+        "R1": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Preserves asked scope, source limits and no-experiment authorization."
+        },
+        "R2": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Accurate timing/token observations and arithmetic, unequal actual scopes and missing quality/billing/configuration; no causal inference or universal rollout approval; proposes common required work, independent quality, actual charges/rework, order/cache controls and representative repetition; no new model or tests."
+        },
+        "R3": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Accurate timing/token observations and arithmetic, unequal actual scopes and missing quality/billing/configuration; no causal inference or universal rollout approval; proposes common required work, independent quality, actual charges/rework, order/cache controls and representative repetition; no new model or tests."
+        },
+        "R4": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Accurate timing/token observations and arithmetic, unequal actual scopes and missing quality/billing/configuration; no causal inference or universal rollout approval; proposes common required work, independent quality, actual charges/rework, order/cache controls and representative repetition; no new model or tests."
+        },
+        "R5": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Accurate timing/token observations and arithmetic, unequal actual scopes and missing quality/billing/configuration; no causal inference or universal rollout approval; proposes common required work, independent quality, actual charges/rework, order/cache controls and representative repetition; no new model or tests."
+        },
+        "R6": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Accurate timing/token observations and arithmetic, unequal actual scopes and missing quality/billing/configuration; no causal inference or universal rollout approval; proposes common required work, independent quality, actual charges/rework, order/cache controls and representative repetition; no new model or tests."
+        },
+        "R7": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Correct flat metadata/general research path; actual full saved-note readback; source links target supplied evidence."
+        },
+        "R8": {
+          "verdict": "supported",
+          "evidence": [
+            "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+            "execution/X012/events.jsonl:7-14"
+          ],
+          "rationale": "Accurate timing/token observations and arithmetic, unequal actual scopes and missing quality/billing/configuration; no causal inference or universal rollout approval; proposes common required work, independent quality, actual charges/rework, order/cache controls and representative repetition; no new model or tests."
+        },
+        "R9": {
+          "verdict": "partial",
+          "evidence": [
+            {
+              "path": "execution/X012/events.jsonl:7",
+              "command": "/bin/zsh -lc \"cat skill/engineering-research/SKILL.md samples/timing/B01.json samples/timing/B02.json samples/timing/task-summary.json; rg --files -g 'AGENTS.md' -g 'provenance.json' -g '*' docs src\""
+            },
+            {
+              "path": "execution/X012/events.jsonl:9",
+              "command": "/bin/zsh -lc \"cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md; rg --files -g 'provenance.json' -g 'AGENTS.md'; cat provenance.json\""
+            }
+          ],
+          "literal_clause": "Before gathering evidence, read [research methods](references/research-methods.md) and [source policy](references/source-policy.md).",
+          "contract_path": "execution/X012/artifacts/skill/engineering-research/SKILL.md:53-56",
+          "rationale": "Read complete timing receipts and task summary before references; substantive evidence-read ordering partial only, with adequate later method/resource use and no functional harm established."
+        }
+      }
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "Requested provider/model/effort are receipt/config claims; server_confirmed_model is null.",
+    "Masked actor identifiers only; raw skill contract differences necessarily reveal additional guidance and limit masking. No arm map or labeled inputs were read.",
+    "No runtime tests/external queries were performed by auditor; domain conclusions are grounded in supplied genuine source and actor trajectory.",
+    "No global pass or causal comparison between contracts is inferred from these cases."
+  ],
+  "files_read": [
+    "audit-rubric.json",
+    "execution/cases.json",
+    "execution/rubric.md",
+    "execution/freeze.json",
+    "execution/fixtures/provenance.json",
+    "execution/fixtures/samples/timing/task-summary.json",
+    "execution/fixtures/samples/timing/B01.json",
+    "execution/fixtures/samples/timing/B02.json",
+    "execution/fixtures/samples/migration/provenance.json",
+    "execution/fixtures/samples/migration/docs/loom/research/2026-11-08-package-runner-exclusions.md",
+    "execution/fixtures/src/tests/test_run_package_tests.py",
+    "execution/fixtures/src/scripts/run_package_tests.py",
+    "execution/fixtures/src/loom-code/scripts/git_exec.py",
+    "execution/fixtures/src/loom-code/scripts/repo_files.py",
+    "execution/X001/receipt.json",
+    "execution/X001/prompt.txt",
+    "execution/X001/answer.txt",
+    "execution/X001/events.jsonl",
+    "execution/X001/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X001/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X001/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X001/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X001/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X001/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+    "execution/X002/receipt.json",
+    "execution/X002/prompt.txt",
+    "execution/X002/answer.txt",
+    "execution/X002/events.jsonl",
+    "execution/X002/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X002/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X002/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X002/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X002/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "execution/X002/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X002/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+    "execution/X003/receipt.json",
+    "execution/X003/prompt.txt",
+    "execution/X003/answer.txt",
+    "execution/X003/events.jsonl",
+    "execution/X003/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X003/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X003/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X003/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X003/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "execution/X003/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md",
+    "execution/X003/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+    "execution/X004/receipt.json",
+    "execution/X004/prompt.txt",
+    "execution/X004/answer.txt",
+    "execution/X004/events.jsonl",
+    "execution/X004/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X004/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X004/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X004/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X004/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "execution/X004/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X004/artifacts/docs/loom/research/2026-11-08-package-suite-command-preview.md",
+    "execution/X005/receipt.json",
+    "execution/X005/prompt.txt",
+    "execution/X005/answer.txt",
+    "execution/X005/events.jsonl",
+    "execution/X005/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X005/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X005/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X005/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X005/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-git-failures.md",
+    "execution/X005/artifacts/docs/loom/research/2026-11-08-package-runner-foreign-tests.md",
+    "execution/X006/receipt.json",
+    "execution/X006/prompt.txt",
+    "execution/X006/answer.txt",
+    "execution/X006/events.jsonl",
+    "execution/X006/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X006/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X006/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X006/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X006/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X006/artifacts/docs/loom/research/2026-11-08-research-note-migration-traceability.md",
+    "execution/X007/receipt.json",
+    "execution/X007/prompt.txt",
+    "execution/X007/answer.txt",
+    "execution/X007/events.jsonl",
+    "execution/X007/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X007/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X007/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X007/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X007/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "execution/X007/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X007/artifacts/docs/loom/research/2026-11-08-research-note-migration.md",
+    "execution/X008/receipt.json",
+    "execution/X008/prompt.txt",
+    "execution/X008/answer.txt",
+    "execution/X008/events.jsonl",
+    "execution/X008/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X008/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X008/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X008/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X008/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "execution/X008/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X008/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+    "execution/X009/receipt.json",
+    "execution/X009/prompt.txt",
+    "execution/X009/answer.txt",
+    "execution/X009/events.jsonl",
+    "execution/X009/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X009/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X009/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X009/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X009/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X009/artifacts/docs/loom/research/2026-11-08-package-runner-test-roots.md",
+    "execution/X010/receipt.json",
+    "execution/X010/prompt.txt",
+    "execution/X010/answer.txt",
+    "execution/X010/events.jsonl",
+    "execution/X010/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X010/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X010/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X010/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X010/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X010/artifacts/docs/loom/research/2026-11-08-head-ci-release-evidence.md",
+    "execution/X011/receipt.json",
+    "execution/X011/prompt.txt",
+    "execution/X011/answer.txt",
+    "execution/X011/events.jsonl",
+    "execution/X011/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X011/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X011/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X011/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X011/artifacts/skill/engineering-research/references/evaluation-selection.md",
+    "execution/X011/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X011/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+    "execution/X012/receipt.json",
+    "execution/X012/prompt.txt",
+    "execution/X012/answer.txt",
+    "execution/X012/events.jsonl",
+    "execution/X012/artifacts/skill/engineering-research/SKILL.md",
+    "execution/X012/artifacts/skill/engineering-research/references/source-policy.md",
+    "execution/X012/artifacts/skill/engineering-research/references/structured-relations.md",
+    "execution/X012/artifacts/skill/engineering-research/references/research-methods.md",
+    "execution/X012/artifacts/skill/engineering-research/templates/research.md",
+    "execution/X012/artifacts/docs/loom/research/2026-11-08-research-workflow-timing-evidence.md",
+    "execution/X001/artifacts/scratch/preview_package_commands.py",
+    "execution/X004/artifacts/scratch/preview_package_commands.py"
+  ],
+  "observations": [
+    {
+      "category": "actor-lapse / contract-ordering",
+      "severity": "informational",
+      "functional_defect_established": false,
+      "actors_partial": [
+        "X001",
+        "X007",
+        "X008",
+        "X009",
+        "X011",
+        "X012"
+      ],
+      "actors_boundary_uncertain": [
+        "X002",
+        "X003"
+      ],
+      "expected": "Read bundled methods/source-policy before gathering substantive evidence; initial premise/revision orientation may precede this.",
+      "actual": "Complete source/test/excerpt/receipt reads precede references in partial actors; provenance-only orientation precedes references in uncertain actors. All later read required resources. Exact commands and line locations are in each R9 entry.",
+      "suggestedfix": "If strict ordering matters, read required resources immediately after SKILL; alternatively clarify whether initial orientation includes reading source. Do not infer a functional improvement from this observation."
+    }
+  ]
+}

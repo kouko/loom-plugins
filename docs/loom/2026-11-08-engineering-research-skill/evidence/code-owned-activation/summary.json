@@ -1,0 +1,14 @@
+{
+  "status": "blocked-by-auto-review-before-launch",
+  "planned_runs": 56,
+  "launched": 0,
+  "completed": 0,
+  "valid": 0,
+  "true_positive_rate": null,
+  "true_negative_rate": null,
+  "rejection_reason": "This batch would export private skill files, adjacent descriptions, and prompts to OpenAI; although the user authorized network dogfood testing, the trusted user message does not specifically authorize this exact sensitive payload and destination.",
+  "prior_infrastructure_failures": 9,
+  "prior_failures_excluded": true,
+  "effective_inherited_overrides": null,
+  "inherited_override_status": "complex/unobservable-main-profile"
+}

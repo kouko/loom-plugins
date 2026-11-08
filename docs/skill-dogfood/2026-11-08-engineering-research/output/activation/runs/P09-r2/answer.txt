@@ -1,0 +1,24 @@
+目前無法判定兩次漏測的真正原因；現有證據不足以支持調整 discovery 設計。
+
+研究紀錄草稿（唯讀，未存檔）：
+
+```yaml
+title: 新增測試漏收原因
+type: loom-research
+status: concluded
+created: 2026-11-08
+updated: 2026-11-08
+tags: [loom/research]
+```
+
+方法：檢視唯一來源檔的入口與篩選流程，區分程式事實及待驗證假說；未執行 build。
+
+已確認：
+
+- [根目錄與檔名篩選](/private/tmp/engineering-research-dogfood-A-20261108/P09-r2/project/scripts/run_package_tests.py:53)：Loom 模式只涵蓋四個指定根目錄；Python session 的前置判斷只認 `test_*.py`、`*_test.py`，並排除根目錄下的 `local/`。
+- [群組與排除條件](/private/tmp/engineering-research-dogfood-A-20261108/P09-r2/project/scripts/run_package_tests.py:123)：`--only` 限制執行群組；巢狀 repository/worktree 會被忽略。
+- [執行入口](/private/tmp/engineering-research-dogfood-A-20261108/P09-r2/project/scripts/run_package_tests.py:153)：使用 `Path.cwd()`；前一命令失敗即停止，無命令時也可能回傳成功。
+
+以上只是候選機制，尚未證明哪個造成此次漏測。缺少兩次 build 的完整命令、工作目錄、revision、新增測試路徑、collection 輸出，以及 pytest 設定與 `repo_files` 實作。
+
+決策：暫緩 discovery 設計變更；先以這些缺失證據定位首次排除或停止的位置。

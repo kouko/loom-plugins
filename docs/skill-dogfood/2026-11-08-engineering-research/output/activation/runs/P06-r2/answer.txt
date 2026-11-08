@@ -1,0 +1,11 @@
+查證結果：**「新增 plugin 不用改測試入口」不能作為已成立的 intent 前提。**
+
+研究紀錄草稿（唯讀，未存檔；方法：追讀 runner 的收集與執行路徑）：
+
+- **既有 roots 內新增測試**：runner 會遞迴搜尋 Python 與 shell 測試，支持不修改 runner，但仍受排除規則限制。
+- **新增獨立 plugin 測試根目錄**：`TEST_ROOTS` 是固定清單，見 [runner:53](/private/tmp/engineering-research-dogfood-A-20261108/P06-r2/project/scripts/run_package_tests.py:53)。`--loom-family` 的 Python、shell 收集都依賴它，因此新 root 需要修改入口清單。
+- **手動指定路徑**：一般模式可將路徑直接傳給 pytest（同檔第 168–173 行），但這不能證明 family 模式或 CI 會自動納入新 plugin。
+
+限制：以上是原始碼查證，未執行測試；唯一 fixture 不包含 `repo_files`、實際 plugin、pytest 設定或 CI，無法確認完整執行與相容性。
+
+對 intent 的影響：應將假設收斂為「既有測試 roots 內可自動發現新增測試」；獨立 plugin 能否免改入口，目前不成立。停留在 intent 查證階段。

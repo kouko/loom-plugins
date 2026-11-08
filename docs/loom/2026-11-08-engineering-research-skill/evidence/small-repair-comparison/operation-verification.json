@@ -1,0 +1,199 @@
+{
+  "observations": [
+    {
+      "actor": "A",
+      "case": "F01",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Edit",
+        "Grep",
+        "Read"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "B",
+      "case": "F01",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Edit",
+        "Grep",
+        "Read"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "C",
+      "case": "F02",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Edit",
+        "Glob",
+        "Grep",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "D",
+      "case": "F02",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "E",
+      "case": "F03",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Read"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "F",
+      "case": "F03",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Read"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "G",
+      "case": "F04",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "H",
+      "case": "F04",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Edit",
+        "Glob",
+        "Grep",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "I",
+      "case": "F05",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "J",
+      "case": "F05",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "K",
+      "case": "F06",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    },
+    {
+      "actor": "L",
+      "case": "F06",
+      "exit_code": 0,
+      "timeout": false,
+      "model_fields": [
+        "claude-sonnet-5-5"
+      ],
+      "tool_names": [
+        "Glob",
+        "Grep",
+        "Read",
+        "Write"
+      ],
+      "protected_unchanged": true,
+      "case_boundary_satisfied": true
+    }
+  ],
+  "semantics": "not self-graded",
+  "frozen_harness_unchanged": true
+}

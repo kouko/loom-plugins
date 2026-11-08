@@ -1,0 +1,48 @@
+{
+  "task": "W5-02 public runner and private preparation only",
+  "model_calls_by_implementer": 0,
+  "network_calls_by_implementer": 0,
+  "commits_by_implementer": 0,
+  "public_runner_delivered": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/experiment.py public-run",
+  "private_prepare_completed": true,
+  "private_run_command": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/experiment.py run",
+  "private_actor_count": 8,
+  "cases": [
+    "F04",
+    "F01",
+    "F06",
+    "F03"
+  ],
+  "freeze_sha256": "e1ebae3a122cfebd54a13f24c0c73c372048fc20398691e49f7c9f320a4446e7",
+  "frozen_dependencies_unchanged": true,
+  "pair_verification": "/private/tmp/engineering-research-save-result-20261108/private-run/prepare-verification.json",
+  "requires_parent_records": {
+    "private-run/authorization.json": {
+      "approved_private_execution": true,
+      "actor_count": 8,
+      "provider": "first-party Anthropic"
+    },
+    "public-control/verified.json": {
+      "customization_isolation_confirmed": true,
+      "mcp_tool_connected": true
+    }
+  },
+  "test_logs": {
+    "public_red": "W5-02-red.log: public_runner.py absent beforeimplementation",
+    "public_green": "W5-02-public-green.log:3passed",
+    "paired_red": "W5-02-paired-red.log: paired_experiment.py absent beforeimplementation",
+    "paired_green": "W5-02-paired-green.log:6passed",
+    "final_green": "W5-02-final-green.log:29passed"
+  },
+  "files": {
+    "save_tool.py": "d929b2dedd1290475cd7a63d43413b221a4130d112dd132eeb04101fbd16acc1",
+    "server.py": "5b5f01675cafc0b0611fbee96121236e93858773e8aa66ad6bbeeaedc53fceca",
+    "test_experiment.py": "9996f0706cd3c27ddccb480367b0e4c6798bfdca2502741b7515f02e8f82294d",
+    "public_runner.py": "98a6631f5f73ed58378a8b5284db1692457b09670041c16efec36295faadfeef",
+    "README.md": "cb5af3359d5eb9957b3a7cdcf9fcf025a9d768fa8f5fa3e9c4cd61e48fa4de3e",
+    "experiment.py": "b9105e2c6c59bb2771c8f97542b4305a28a46c9d1a994c5a024f222603fad4e7",
+    "paired_experiment.py": "3e6708871b0b67601e8e6bd5656cd274d105b32accec1affac9f0af33a994f98",
+    "test_save_tool.py": "6feca905a5e6897363aa96d74948b8f8262e460ad3d88aae7e7dbac586585cdc"
+  },
+  "scope": "No production skill or schema changes. One pair/case is directional. Returning persisted content does not prove agent comprehension or research correctness. No independent model audits prepared by this implementation task."
+}

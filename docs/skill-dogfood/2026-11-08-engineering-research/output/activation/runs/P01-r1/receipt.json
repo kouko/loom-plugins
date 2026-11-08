@@ -1,0 +1,50 @@
+{
+  "id": "P01-r1",
+  "case_id": "P01",
+  "repetition": 1,
+  "expected": true,
+  "model_requested": "gpt-6.1-sol",
+  "provider_requested": "openai",
+  "effort_requested": "medium",
+  "excluded_reasoning_events": 0,
+  "started": "2026-11-08T05:40:11.564672+00:00",
+  "catalog_verified": true,
+  "command": [
+    "codex",
+    "exec",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--json",
+    "--sandbox",
+    "read-only",
+    "-C",
+    "/private/tmp/engineering-research-dogfood-A-20261108/P01-r1/project",
+    "-o",
+    "/Users/kouko/.herdr/worktrees/loom-plugins/loom-research-skill-discut/docs/skill-dogfood/2026-11-08-engineering-research/output/activation/runs/P01-r1/answer.txt",
+    "-"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "target_body_read": true,
+  "target_read_commands": [
+    "/bin/zsh -lc 'cat /private/tmp/engineering-research-dogfood-A-20261108/P01-r1/home/skills/engineering-research/SKILL.md'"
+  ],
+  "skill_read_commands": [
+    "/bin/zsh -lc 'cat /private/tmp/engineering-research-dogfood-A-20261108/P01-r1/home/skills/engineering-research/SKILL.md'"
+  ],
+  "thread_id": "01a1b9ab-ecda-7db2-871e-4af035b62e0f",
+  "usage": {
+    "input_tokens": 60083,
+    "cached_input_tokens": 47104,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 677,
+    "reasoning_output_tokens": 0
+  },
+  "classification": "true-positive",
+  "auth_symlink_removed": true,
+  "elapsed_seconds": 25.416,
+  "prompt.txt_sha256": "6f30362ed3b55a54b120f9d4abd32722ba932ceb0761b9cdbe5f1040e728c718",
+  "catalog.json_sha256": "3884a8f06cf2abf6f9876ab4673bece972da6f23b1073bf6661b526eb312e7a4",
+  "events.jsonl_sha256": "1de0b68af2b3bed85f7ff14c592644bf2fd295a3236c1713a9a407cb221bec31",
+  "answer.txt_sha256": "775908189d2361d3b430734d06006b33852d2de4b17fdae086478801c7482ec5"
+}

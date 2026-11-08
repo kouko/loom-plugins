@@ -1,0 +1,12 @@
+**`--loom-family` では、各テストルート直下の `local/` は除外されます。ただし、CLI 専用テストを内容で識別する仕組みはありません。**
+
+コード上の根拠：
+
+- Python：`_tests_session()` が `<root>/local` を `--ignore` に追加します（[76行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r2/project/scripts/run_package_tests.py:76)）。
+- Shell：`_shell_tests()` が同じ場所の子孫を探索結果から除外します（[88行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r2/project/scripts/run_package_tests.py:88)）。
+- Workflow Python：ルート直下の `local/` を除外します。ただし、`tests/<skill>/local/` など、さらに深い配置への一律除外はありません（[98行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r2/project/scripts/run_package_tests.py:98)）。
+- **`--loom-family` 以外の経路では、自動除外せず引数を pytest に渡します**（[168行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r2/project/scripts/run_package_tests.py:168)）。
+
+採用判断として、「所定の `local/` 配下なら分離される」は確認できました。「実際の CLI 専用テストが通常 suite に混ざらない」は、テスト配置と CI の呼び出し方が提示されていないため未確定です。
+
+未保存の調査メモ（2026-11-08）：提示ソースの静的確認のみ。実行検証・ファイル保存・変更は行っていません。

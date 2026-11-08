@@ -1,0 +1,78 @@
+{
+  "actor": "H",
+  "case": "F04",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_provider": "firstParty Anthropic",
+  "requested_effort": "medium",
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 45.431,
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 14,
+      "cache_creation_input_tokens": 22770,
+      "cache_read_input_tokens": 121895,
+      "output_tokens": 5706,
+      "output_tokens_details": {
+        "thinking_tokens": 494
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 22770,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1368,
+          "cache_read_input_tokens": 26727,
+          "cache_creation_input_tokens": 717,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 717
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 14,
+        "outputTokens": 5706,
+        "cacheReadInputTokens": 121895,
+        "cacheCreationInputTokens": 22770,
+        "webSearchRequests": 0,
+        "costUSD": 0.16035750000000001,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 494,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 22770,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.16035750000000001,
+    "permission_denials": [],
+    "duration_api_ms": 44177,
+    "num_turns": 16
+  },
+  "changed_files": [],
+  "added_files": [
+    "docs/loom/research/2026-11-08-package-test-claim-support.md"
+  ],
+  "deleted_files": [],
+  "protected_unchanged": true,
+  "case_boundary_satisfied": true,
+  "fixtureVault_files": {}
+}

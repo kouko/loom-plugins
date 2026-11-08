@@ -1,0 +1,46 @@
+{
+  "pairs": [
+    {
+      "case": "F04",
+      "actors": [
+        "A",
+        "B"
+      ],
+      "prompt_identical": true,
+      "all_project_files_identical": true,
+      "authorization_policy_identical": true
+    },
+    {
+      "case": "F01",
+      "actors": [
+        "C",
+        "D"
+      ],
+      "prompt_identical": true,
+      "all_project_files_identical": true,
+      "authorization_policy_identical": true
+    },
+    {
+      "case": "F06",
+      "actors": [
+        "E",
+        "F"
+      ],
+      "prompt_identical": true,
+      "all_project_files_identical": true,
+      "authorization_policy_identical": true
+    },
+    {
+      "case": "F03",
+      "actors": [
+        "G",
+        "H"
+      ],
+      "prompt_identical": true,
+      "all_project_files_identical": true,
+      "authorization_policy_identical": true
+    }
+  ],
+  "freeze_sha256": "e1ebae3a122cfebd54a13f24c0c73c372048fc20398691e49f7c9f320a4446e7",
+  "model_calls": 0
+}

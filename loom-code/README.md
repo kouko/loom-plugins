@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.59.0 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.60.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -75,6 +75,7 @@ from this change flow; see their descriptions below.
 | [`maintain`](skills/maintain/README.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
 | [`using-loom-code`](skills/using-loom-code/README.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
 | [`external-review`](skills/external-review/README.md) | Run a consented outside review with an explicit model and effort; the calling review skill keeps its criteria and verdict checks. |
+| [`engineering-research`](skills/engineering-research/README.md) | Resolve consequential evidence gaps during Loom tasks or standalone engineering discussions, retain question-scoped research records, and offer post-merge preservation with per-instance Vault authorization. |
 
 ## Agents
 

@@ -1,0 +1,31 @@
+{
+  "model_calls": 0,
+  "network_calls": 0,
+  "canaries": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    ".claude/rules/public-canary.md"
+  ],
+  "public_data_only": true,
+  "modes": [
+    "confirmation",
+    "full"
+  ],
+  "server_sha256": "5b5f01675cafc0b0611fbee96121236e93858773e8aa66ad6bbeeaedc53fceca",
+  "suggested_cli_flags": [
+    "--restricted",
+    "--setting-sources",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "<actor/mcp.json>",
+    "--disable-slash-commands",
+    "--settings",
+    "/private/tmp/engineering-research-save-result-20261108/public-control/isolated-settings.json",
+    "--tools",
+    "Read,Grep,Glob",
+    "--allowedTools",
+    "Read,Grep,Glob,mcp__save_probe__save_record"
+  ],
+  "native_integration": "not yet executed; root must verify isolation and MCP availability"
+}

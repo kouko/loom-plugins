@@ -1,0 +1,84 @@
+{
+  "observed_utc": "2026-11-08T09:37:18.877215+00:00",
+  "status": "infrastructure-blocked; no actor behavior executed; independent semantic audits unavailable",
+  "raw_root": "/private/tmp/formal-engineering-research-execution",
+  "actor_count_attempted": 6,
+  "actual_model_behavior_observed": false,
+  "native_configuration": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_provider": "openai",
+    "requested_effort": "medium",
+    "server_confirmed_model": null,
+    "max_concurrency": 2,
+    "isolated_home": true,
+    "proxies": "not inherited"
+  },
+  "receipts": [
+    {
+      "id": "F01",
+      "timed_out": false,
+      "exit_code": 1,
+      "elapsed_seconds": 18.114,
+      "changed_files": [],
+      "added_files": [],
+      "fixtureVault_files": {},
+      "auth_symlink_removed": true
+    },
+    {
+      "id": "F02",
+      "timed_out": false,
+      "exit_code": 1,
+      "elapsed_seconds": 18.859,
+      "changed_files": [],
+      "added_files": [],
+      "fixtureVault_files": {},
+      "auth_symlink_removed": true
+    },
+    {
+      "id": "F03",
+      "timed_out": false,
+      "exit_code": 1,
+      "elapsed_seconds": 18.372,
+      "changed_files": [],
+      "added_files": [],
+      "fixtureVault_files": {},
+      "auth_symlink_removed": true
+    },
+    {
+      "id": "F04",
+      "timed_out": false,
+      "exit_code": 1,
+      "elapsed_seconds": 19.106,
+      "changed_files": [],
+      "added_files": [],
+      "fixtureVault_files": {},
+      "auth_symlink_removed": true
+    },
+    {
+      "id": "F05",
+      "timed_out": false,
+      "exit_code": 1,
+      "elapsed_seconds": 18.455,
+      "changed_files": [],
+      "added_files": [],
+      "fixtureVault_files": {},
+      "auth_symlink_removed": true
+    },
+    {
+      "id": "F06",
+      "timed_out": false,
+      "exit_code": 1,
+      "elapsed_seconds": 18.911,
+      "changed_files": [],
+      "added_files": [],
+      "fixtureVault_files": {},
+      "auth_symlink_removed": true
+    }
+  ],
+  "transport_error": "workspace routing discovery failed",
+  "usage": "No turn.completed usage reported; no token or cost estimate invented.",
+  "retry": "Network-enabled retry rejected by automatic approval review before execution; no retry or bypass performed.",
+  "raw_reasoning": "No reasoning events present; harness excludes reasoning/reasoning_summary event types.",
+  "auth_symlinks_remaining": [],
+  "audits": "No self grading, no semantic pass, and no dogfood-pass claim."
+}

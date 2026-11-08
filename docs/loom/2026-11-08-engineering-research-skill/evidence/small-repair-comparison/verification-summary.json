@@ -1,0 +1,26 @@
+{
+  "runtime_commit": "3b287e7b9",
+  "complete_package_suite": {
+    "exit_code": 0,
+    "pytest_passed": 4139,
+    "pytest_skipped": 6,
+    "pytest_groups": 15,
+    "shell_and_mermaid": "passed"
+  },
+  "reused_adversarial_program": {
+    "path": "loom-code/tests/test_check_mechanisms.py",
+    "exit_code": 0,
+    "passed": 71
+  },
+  "local_harness_tests": {
+    "passed": 9,
+    "exit_code": 0,
+    "model_calls": 0
+  },
+  "source_package_invariants": {
+    "passed": 5,
+    "exit_code": 0
+  },
+  "semantics": "awaiting two independent blind audits; no overall pass",
+  "sync_trunk": "blocked by uncommitted evidence; commit before dependent formal review"
+}

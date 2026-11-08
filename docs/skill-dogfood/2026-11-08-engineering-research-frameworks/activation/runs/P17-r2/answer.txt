@@ -1,0 +1,11 @@
+Unsaved research draft (read-only):
+
+**Finding:** Thirty-day retention is **unverified**. The API/provider, version, and record type are unspecified; no documentation, source fixtures, or browsing are available.
+
+**Method:** Review the applicable official API contract; this fits a capability guarantee. That review cannot proceed with the supplied evidence.
+
+**Unknowns:** Does deletion preserve retrievable/restorable records or only inaccessible backups? Is thirty days guaranteed, configurable, or merely a maximum? When does the clock start? Do hard deletion, account closure, plan, or region create exceptions?
+
+**Spec impact:** Keep this dependency unresolved before locking the spec. Supply the API/version and applicable retention documentation; runtime behavior would remain untested.
+
+No research file was saved under the read-only constraint.

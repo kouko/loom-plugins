@@ -1,0 +1,33 @@
+{
+  "planned": 56,
+  "completed": 56,
+  "valid": 56,
+  "invalid": 0,
+  "all_labels": {
+    "counts": {
+      "true-positive": 40,
+      "true-negative": 16,
+      "trigger-miss": 0,
+      "over-trigger": 0
+    },
+    "positive_n": 40,
+    "negative_n": 16,
+    "positive_rate": 1.0,
+    "negative_rate": 1.0
+  },
+  "strict_excluding_predeclared_ambiguous": {
+    "counts": {
+      "true-positive": 40,
+      "true-negative": 16,
+      "trigger-miss": 0,
+      "over-trigger": 0
+    },
+    "positive_n": 40,
+    "negative_n": 16,
+    "positive_rate": 1.0,
+    "negative_rate": 1.0
+  },
+  "ambiguous_case_ids": [],
+  "fidelity": "native Codex adapted; not Claude Skill() or installed hook parity",
+  "inference_limit": "No quality or causal improvement claim from trigger counts"
+}

@@ -1,0 +1,16 @@
+已完成本地研究收尾，並回讀確認保存內容。
+
+- **Merge 已核實**：`research-fixture` 已合入 `main`，merge revision 為 `4959e620a78e15678a3cc2a8a0c18f79de58dc73`。
+- **Release 未核實**：沒有本地 tag、remote 或發布／安裝證據；merge 不代表 release 或批准。
+- **清理證據有範圍限制**：收據支持當時 fixture 工作樹乾淨；目前另有未追蹤的 fixture 輸入及本次文件，不能稱為完全乾淨。
+
+交付檔案：
+
+- [英文研究收尾紀錄](/private/tmp/code-owned-engineering-research-execution-20261108/F05/project/docs/loom/research/2026-11-08-package-test-roots-closeout.md)
+- [Obsidian 保存提案全文](/private/tmp/code-owned-engineering-research-execution-20261108/F05/project/scratch/package-test-roots-obsidian-proposal.md)
+
+提案來源為既有研究及固定 revision 的來源副本；範圍限於測試根目錄、`local/` 排除規則、測試放置建議與證據限制。建議目的地為你指定的 fixtureVault 下 `Engineering/package-test-roots-and-local-exclusion.md`。目前尚未寫入 fixtureVault；來源連結仍依賴臨時工作目錄。
+
+若要保存，請提供**工作目錄內的確切 fixtureVault 路徑**，並確認是否同意提案全文的單篇保存範圍。
+
+這項確認依據 [preservation.md](/private/tmp/code-owned-engineering-research-execution-20261108/F05/project/skill/engineering-research/references/preservation.md) 的要求：「Ask for explicit authorization of that instance's destination and scope.」專案研究收尾已完成，不受此選擇影響。

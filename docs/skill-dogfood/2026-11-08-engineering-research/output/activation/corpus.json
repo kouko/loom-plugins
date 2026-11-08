@@ -1,0 +1,152 @@
+[
+  {
+    "id": "P01",
+    "query": "Before we commit our Loom intent, determine whether the current package test runner really discovers shell tests. That capability decides whether our proposed guard can ship. Read the provided runner and identify the evidence gap.",
+    "should_trigger": true,
+    "rationale": "intent capability"
+  },
+  {
+    "id": "P02",
+    "query": "The active intent assumes new test roots are discovered automatically, while a reviewer says they must be listed. Resolve this contradiction before we choose an approach.",
+    "should_trigger": true,
+    "rationale": "contradiction"
+  },
+  {
+    "id": "P03",
+    "query": "We are writing a spec, and whether pytest and shell tests share inventory determines the design. Check the actual runner rather than accepting the assumption.",
+    "should_trigger": true,
+    "rationale": "spec capability"
+  },
+  {
+    "id": "P04",
+    "query": "During planning, we need evidence on whether tests/local runs in CI. An incorrect assumption changes our validation plan. Investigate the runner slice.",
+    "should_trigger": true,
+    "rationale": "planning compatibility"
+  },
+  {
+    "id": "P05",
+    "query": "Build has failed repeatedly because a shell test seems absent from package execution. Stop retrying and establish what the runner actually discovers.",
+    "should_trigger": true,
+    "rationale": "repeated build failure"
+  },
+  {
+    "id": "P06",
+    "query": "我們正在確認 intent；「新增 plugin 不用改測試入口」只是猜測，會影響方案可行性。請先用現有 runner 查證。",
+    "should_trigger": true,
+    "rationale": "intent feasibility zh"
+  },
+  {
+    "id": "P07",
+    "query": "spec 的兩份說法互相衝突：一份說自動探索測試，一份說固定 roots。先查清楚它們如何同時成立。",
+    "should_trigger": true,
+    "rationale": "spec contradiction zh"
+  },
+  {
+    "id": "P08",
+    "query": "規劃尚未定案：若本機 CLI 測試會在一般 suite 跑，CI 方案就要改。請以實際程式判斷，不要直接排工作。",
+    "should_trigger": true,
+    "rationale": "planning evidence zh"
+  },
+  {
+    "id": "P09",
+    "query": "build 已連續兩次找不到新增測試；先找出真正原因與證據，再決定要不要調整 discovery 設計。",
+    "should_trigger": true,
+    "rationale": "build repeated zh"
+  },
+  {
+    "id": "P10",
+    "query": "採用這個測試入口之前，請確認它有沒有支援 shell 測試。這會決定我們能不能沿用既有驗證方式。",
+    "should_trigger": true,
+    "rationale": "generic capability zh"
+  },
+  {
+    "id": "P11",
+    "query": "実装方針を決める前に、テスト実行器が新しい plugin の tests を自動発見するという前提を確認してください。前提が違えば設計が変わります。",
+    "should_trigger": true,
+    "rationale": "generic feasibility ja"
+  },
+  {
+    "id": "P12",
+    "query": "Loom の intent を確認中です。ローカル CLI 専用テストが通常 suite に混ざるかで採用判断が変わります。コードで確かめてください。",
+    "should_trigger": true,
+    "rationale": "intent compatibility ja"
+  },
+  {
+    "id": "P13",
+    "query": "spec 作成中です。pytest と shell が別々の一覧を使うという説明と、共通 inventory という説明の矛盾を解消してください。",
+    "should_trigger": true,
+    "rationale": "spec contradiction ja"
+  },
+  {
+    "id": "P14",
+    "query": "ビルドで同じ test discovery の失敗を繰り返しました。再試行より先に、何が探索対象かを確認してください。",
+    "should_trigger": true,
+    "rationale": "build repeated ja"
+  },
+  {
+    "id": "P15",
+    "query": "We need an engineering decision, not implementation yet: can this runner support a fifth plugin without changing production code? Verify the relevant constraint first.",
+    "should_trigger": true,
+    "rationale": "generic decision"
+  },
+  {
+    "id": "P16",
+    "query": "A proposed acceptance strategy depends on shell tests being discovered recursively. Establish whether the current implementation supports that before recommending the strategy.",
+    "should_trigger": true,
+    "rationale": "acceptance assumption"
+  },
+  {
+    "id": "P17",
+    "query": "The plan treats tests/local as ordinary package tests. I suspect that assumption is wrong and would invalidate CI. Resolve it from source before planning further.",
+    "should_trigger": true,
+    "rationale": "plan invalid premise"
+  },
+  {
+    "id": "P18",
+    "query": "Before approving the spec, check whether the runner requires node or only Python. That environment requirement could make the design infeasible.",
+    "should_trigger": true,
+    "rationale": "environment feasibility"
+  },
+  {
+    "id": "P19",
+    "query": "目前沒有要修 code；先調查 runner 對 test roots 的限制，因為它會改變我們要不要新增 plugin 的決定。",
+    "should_trigger": true,
+    "rationale": "decision boundary zh"
+  },
+  {
+    "id": "P20",
+    "query": "Compatibility is the open decision: will a test named example_test.py and one named test-example.sh both be collected by the supplied runner? Verify rather than assume.",
+    "should_trigger": true,
+    "rationale": "compatibility concrete"
+  },
+  {
+    "id": "N01",
+    "query": "Critique this proposal on value and complexity only: add an optional summary flag to our runner. Assume technical feasibility is established; do not investigate capabilities.",
+    "should_trigger": false,
+    "rationale": "critique"
+  },
+  {
+    "id": "N02",
+    "query": "Please obtain an independent second opinion from another coding agent on this test-plan decision. Do not execute it yet; explain what review input is missing.",
+    "should_trigger": false,
+    "rationale": "independent-advisor"
+  },
+  {
+    "id": "N03",
+    "query": "Do a retrospective of this session: we agreed scope, made one small test update, and forgot to record the command. No unresolved technical question; what process should improve?",
+    "should_trigger": false,
+    "rationale": "project-retro"
+  },
+  {
+    "id": "N04",
+    "query": "The intent is confirmed and feasibility is established. Break adding one shell test into implementation tasks, without investigating technical assumptions.",
+    "should_trigger": false,
+    "rationale": "write-plan"
+  },
+  {
+    "id": "N05",
+    "query": "I want to add a new optional --summary flag to the runner. Capture my goal and acceptance criteria first; there are no feasibility questions to investigate yet.",
+    "should_trigger": false,
+    "rationale": "capture-intent"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "freeze_matches_packaging_checksum": true,
+  "harness_matches_frozen": true,
+  "harness_matches_packaging_checksum": true,
+  "prompt_matches_frozen": true,
+  "config_matches_frozen": true,
+  "master_packet_unchanged": true,
+  "packet_file_count": 852,
+  "auth_paths_remaining": [],
+  "runtime_source_still_matches": true,
+  "criteria_still_match_prior_frozen_bytes": true,
+  "opaque_judgments_extracted_before_decode": true,
+  "opaque_extraction_sha256": "854947edde21ad13343b92a869bf2b1c5e6e0b9ccdf888e759c23563d4142060",
+  "arm_map_sha256": "6bd1bf0ba6a69d04871848b2a565f63b23c8d322e144cea1ca70c879cfbda825",
+  "actors": {
+    "A01": {
+      "packet_unchanged": true,
+      "actor_config_matches_frozen": true,
+      "receipt_equals_aggregate_entry": true,
+      "receipt_usage_matches_observed_turn": true,
+      "final_answer_matches_observed_last_message": true,
+      "answer_matches_predecode_extraction": true,
+      "raw_reasoning_blocks_remaining": 0,
+      "event_lines": 41,
+      "completed_commands": 18,
+      "evidence_copy_identical": true
+    },
+    "A02": {
+      "packet_unchanged": true,
+      "actor_config_matches_frozen": true,
+      "receipt_equals_aggregate_entry": true,
+      "receipt_usage_matches_observed_turn": true,
+      "final_answer_matches_observed_last_message": true,
+      "answer_matches_predecode_extraction": true,
+      "raw_reasoning_blocks_remaining": 0,
+      "event_lines": 33,
+      "completed_commands": 14,
+      "evidence_copy_identical": true
+    }
+  }
+}

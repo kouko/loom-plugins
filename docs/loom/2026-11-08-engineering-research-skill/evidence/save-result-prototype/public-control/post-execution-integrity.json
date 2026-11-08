@@ -1,0 +1,6 @@
+{
+  "sources_unchanged": true,
+  "settings_unchanged": true,
+  "outside_public_sentinel": "PUBLIC_SYNTHETIC_OUTSIDE_SENTINEL\n",
+  "semantic_verdict": "not graded; root must inspect actual tools/canaries/results"
+}

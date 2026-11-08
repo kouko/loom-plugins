@@ -1,0 +1,21 @@
+{
+  "frozen_inputs_unchanged": {
+    "corpus.json": true,
+    "design.md": true,
+    "harness.py": true
+  },
+  "receipts": 50,
+  "unique_thread_ids": 50,
+  "all_catalogs_verified": true,
+  "all_auth_symlinks_removed": true,
+  "live_auth_symlinks_remaining": 0,
+  "excluded_reasoning_events": 0,
+  "retained_reasoning_events": 0,
+  "usage": {
+    "input_tokens": 1917132,
+    "cached_input_tokens": 1548928,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18482,
+    "reasoning_output_tokens": 953
+  }
+}

@@ -1,0 +1,63 @@
+證據不足，不能將目前 HEAD 的完整 CI 標成已通過；適合標為「未驗證」。以下為未儲存的英文研究草稿。
+
+---
+
+```yaml
+title: "Does the supplied HEAD snapshot establish a full CI pass?"
+type: loom-research
+status: concluded
+created: 2026-11-08
+updated: 2026-11-08
+tags:
+  - loom/research
+```
+
+**Question and scope**
+
+Does the supplied snapshot justify marking full CI as passed for HEAD `d5a7f0da247214bdb9c61fe90c550256432e5f76`?
+
+This assessment uses only supplied local files. The snapshot is incomplete and does not establish deployment state. No tests, repository scripts, installations, network requests, or writes were performed.
+
+**Method and rationale**
+
+Bounded source inspection: read the runner, its connected Git helpers, relevant test definitions, and provenance. This establishes intended execution paths and evidence gaps without executing them. Stop once the available evidence supports the labeling decision.
+
+**Findings and evidence**
+
+| Finding | Evidence and verification status |
+|---|---|
+| The supplied files match their recorded hashes. | Read-only `shasum -a 256` checks on all four source files matched [provenance.json](provenance.json). This verifies snapshot consistency, not independent commit membership or CI success. |
+| The runner defines five groups: `code`, `design`, `workflow-python`, `workflow-shell`, and `workflow-mermaid`. | Source inspection of [run_package_tests.py](src/scripts/run_package_tests.py), lines 51–150. Python and shell commands depend on discovered files; Mermaid commands include installation, validation, and a negative check. None were executed. |
+| Runner success alone would require coverage context. | Lines 153–167 stop at the first nonzero command and otherwise return zero. Some groups can produce no commands when their test roots are absent. Thus a zero return cannot alone demonstrate complete coverage. No such return was observed here. |
+| Discovery depends on repository context. | The runner calls `nested_repositories` and `nested_worktrees`; [repo_files.py](src/loom-code/scripts/repo_files.py), lines 73–146, obtains their inputs through [git_exec.py](src/loom-code/scripts/git_exec.py), lines 50–88. Git failures can yield no exclusions. Runtime behavior was not verified. |
+| Tests define expectations, not observed passes. | [test_run_package_tests.py](src/tests/test_run_package_tests.py), lines 49–101 and 187–197, expects broader test trees and references three CI workflows plus kickoff documentation. Those artifacts are absent from this minimal snapshot. Their absence here does not establish absence in the real repository. |
+| The actual full CI contract and outcomes remain unknown. | No workflow definitions, historical logs, or execution results were supplied. Provenance records matching local HEAD/origin-main values but explicitly says remote freshness was not checked. |
+
+All source findings apply to the supplied bytes attributed by provenance to the stated commit. No runtime success is claimed.
+
+**Decision impact**
+
+Do not mark full CI as passed. The supported conclusion is:
+
+> Source review completed; full CI status for the recorded HEAD remains unverified.
+
+This is an evidence limitation, not evidence that CI failed.
+
+**Missing evidence**
+
+1. **Complete CI scope at the target revision:** workflow definitions, referenced scripts/configuration, dependency manifests and lockfiles, test inventory, required checks, matrices, triggers, and conditional execution rules.
+2. **Results tied to the exact tested revision:** identifiable CI runs/checks showing the tested SHA, including whether a merge revision was tested instead of HEAD.
+3. **Complete execution evidence:** job and step conclusions, logs and relevant reports showing required coverage actually ran and succeeded; skipped, cancelled, or allowed-to-fail work must be accounted for.
+4. **Execution conditions:** runner/platform, tool and dependency versions, setup, and relevant configuration sufficient to assess applicability.
+
+A later authorized run could establish a new result under its recorded conditions; it would not recover missing historical outcomes.
+
+**Limitations and record status**
+
+The investigation is concluded because the labeling decision is supported: existing evidence is insufficient. Actual CI success remains unresolved.
+
+No active change exists. No research record or intent was created. The saved artifact is intentionally missing under the explicit no-write constraint and the skill’s no-write exception.
+
+---
+
+全程僅讀取工作目錄內資料；未寫檔、執行測試或連網。

@@ -1,0 +1,11 @@
+**`tests/local` is excluded in Loom-family mode; actual CI coverage remains unverified.**
+
+Unsaved research draft — 2026-11-08. Method: inspect the runner’s command construction and execution branches; this supports conditional behavior, without executing tests.
+
+- **Family mode:** `_tests_session()` excludes each root’s `local/` directory from discovery and adds `--ignore` when targeting that root. The `code` group applies this to repository-level `tests/`, excluding `tests/local` ([source](/private/tmp/engineering-research-dogfood-A-20261108/P04-r2/project/scripts/run_package_tests.py:76)).
+- **Shell tests:** `_shell_tests()` explicitly filters out files beneath each root’s `local/` directory ([source](/private/tmp/engineering-research-dogfood-A-20261108/P04-r2/project/scripts/run_package_tests.py:88)).
+- **Alternate entry path:** without `--loom-family`, arguments pass directly to pytest. This branch adds no local-directory exclusion, so explicitly targeting `tests/local` can reach pytest ([source](/private/tmp/engineering-research-dogfood-A-20261108/P04-r2/project/scripts/run_package_tests.py:168)).
+
+**Planning implication:** do not count `tests/local` as CI validation based on this runner. Its comment says CI selects family groups, but no CI configuration or execution logs were supplied to verify the actual invocation. Pytest configuration, dependencies, and successful collection/execution also remain unverified.
+
+No commands executed tests. No research file was saved because this discussion is read-only.

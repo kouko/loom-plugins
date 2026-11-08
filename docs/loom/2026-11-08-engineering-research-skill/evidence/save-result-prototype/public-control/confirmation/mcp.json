@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "save_probe": {
+      "command": "/opt/homebrew/opt/python@3.15/bin/python3.15",
+      "args": [
+        "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/server.py",
+        "--policy",
+        "/private/tmp/engineering-research-save-result-20261108/public-control/confirmation/policy.json"
+      ],
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}

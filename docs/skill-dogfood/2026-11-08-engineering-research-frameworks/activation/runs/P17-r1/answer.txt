@@ -1,0 +1,8 @@
+**The thirty-day retention capability remains unverified.** The API/provider and version are unspecified; no documentation, project evidence, or browsing is available.
+
+Unsaved research draft:
+- **Method:** Assess the claim against the applicable official API contract; that evidence is currently missing.
+- **Unknowns:** Whether deletion preserves full records, tombstones, or backups; whether records remain readable or restorable; whether thirty days is guaranteed or merely a maximum; when the clock starts; and whether configuration, plan, region, or hard deletion changes retention.
+- **Spec impact:** Keep this dependency unresolved. Before locking the spec, obtain version-specific official documentation covering these conditions. Runtime checks could corroborate behavior but cannot alone establish a thirty-day guarantee.
+
+No research file was saved because this discussion is read-only.

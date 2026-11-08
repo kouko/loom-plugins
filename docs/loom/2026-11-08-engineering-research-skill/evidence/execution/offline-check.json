@@ -1,0 +1,17 @@
+{
+  "check": "offline mechanical evidence only; not behavioral judgment",
+  "frozen_files": 27,
+  "frozen_hash_mismatches": [],
+  "auth_symlinks_remaining": 0,
+  "retry_directory_exists": false,
+  "case_count": 6,
+  "actor_receipts": 6,
+  "actor_exit_codes": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

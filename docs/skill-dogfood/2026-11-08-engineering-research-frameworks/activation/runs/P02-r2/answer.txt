@@ -1,0 +1,7 @@
+**Python 3.13 compatibility remains unverified; I recommend holding runtime approval.**
+
+Unsaved research draft (read-only):
+- **Method:** Targeted documentation and artifact review would establish support for the exact extension release and deployment environment.
+- **Evidence:** The vendor support table is missing. No extension name/version, binary artifact, target OS/architecture, source fixtures, or runtime results were supplied; browsing is unavailable.
+- **Required evidence:** Vendor documentation covering the exact release and Python 3.13 build, compatible binary/ABI details, and a successful import plus representative native operation in the target environment. Confirm whether Python uses the standard or free-threaded build.
+- **Conclusion:** The spec’s assumption is unsupported, not disproven. No compatibility test ran, and no research file was saved.

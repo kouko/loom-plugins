@@ -1,0 +1,128 @@
+{
+  "purpose": "Paired before/after description routing regression queries; expectations are test inputs, not observed activation results.",
+  "description_before": "Resolve consequential evidence gaps during Loom intent, spec or planning, and contradictions or repeated failures during build. Use when capability, version, compatibility or feasibility assumptions could change an engineering decision.",
+  "description_after": "Resolve evidence gaps in Loom tasks or standalone engineering discussions when an unresolved premise could change a decision, including a small capability or version check. Routine lookups without a consequential gap remain ordinary work.",
+  "run_status": "not-run",
+  "cases": [
+    {
+      "id": "p01",
+      "query": "Loom 的方案還沒定：目前套件版本真的支援我們需要的 transaction hook 嗎？請先查證再建議。",
+      "expected_route": "engineering-research",
+      "rationale": "A capability premise changes the design."
+    },
+    {
+      "id": "p02",
+      "query": "我們還在一般工程討論，先確認這個 adapter 是否只支援 Node 22，免得選錯部署環境。",
+      "expected_route": "engineering-research",
+      "rationale": "Standalone consequential version gap."
+    },
+    {
+      "id": "p03",
+      "query": "只需要一個小查證：這版 parser 會保留空值嗎？這決定是否能直接替換現有程式。",
+      "expected_route": "engineering-research",
+      "rationale": "Small factual check with decision impact."
+    },
+    {
+      "id": "p04",
+      "query": "build 同樣的錯已經失敗三次，先確認我們對 cache invalidation 的假設。",
+      "expected_route": "engineering-research",
+      "rationale": "Repeated failure with unresolved premise."
+    },
+    {
+      "id": "p05",
+      "query": "這個 GitHub repo 說支援離線模式，請讀實作判斷是否符合我們的部署限制。",
+      "expected_route": "engineering-research",
+      "rationale": "Repository implementation assessment."
+    },
+    {
+      "id": "p06",
+      "query": "GitLab 上那個修正 merged 了，已安裝版本真的有嗎？這決定能否移除 workaround。",
+      "expected_route": "engineering-research",
+      "rationale": "Source and installed-release scope differ."
+    },
+    {
+      "id": "p07",
+      "query": "Compare the two queue libraries against our ordering and recovery requirements before we commit to one.",
+      "expected_route": "engineering-research",
+      "rationale": "Alternative assessment with consequential gaps."
+    },
+    {
+      "id": "p08",
+      "query": "設計審查說這個變更會降低 p95，但測量工作量不同，先確認證據是否能支持它。",
+      "expected_route": "engineering-research",
+      "rationale": "Validity of an effect claim."
+    },
+    {
+      "id": "p09",
+      "query": "この互換性の前提を確かめたい。現在のバージョンで失敗すると移行計画が変わる。",
+      "expected_route": "engineering-research",
+      "rationale": "Version compatibility affects migration."
+    },
+    {
+      "id": "p10",
+      "query": "先不要實作。請查清 API 權限邊界是否讓這個整合可行，留下研究紀錄。",
+      "expected_route": "engineering-research",
+      "rationale": "Bounded feasibility research without implementation consent."
+    },
+    {
+      "id": "n01",
+      "query": "What is 17 times 24?",
+      "expected_route": "ordinary-work",
+      "rationale": "Routine calculation."
+    },
+    {
+      "id": "n02",
+      "query": "請把這個段落翻成日文。",
+      "expected_route": "ordinary-work",
+      "rationale": "Translation."
+    },
+    {
+      "id": "n03",
+      "query": "幫我把 JSON 排版縮排成兩格。",
+      "expected_route": "ordinary-work",
+      "rationale": "Formatting."
+    },
+    {
+      "id": "n04",
+      "query": "Python list 的長度要怎麼寫？只要語法。",
+      "expected_route": "ordinary-work",
+      "rationale": "Routine syntax lookup."
+    },
+    {
+      "id": "n05",
+      "query": "告訴我 git status 的用途，一句話就好。",
+      "expected_route": "ordinary-work",
+      "rationale": "Routine factual explanation."
+    },
+    {
+      "id": "n06",
+      "query": "請把 README 這個錯字改正。",
+      "expected_route": "ordinary-work",
+      "rationale": "Typo correction without evidence gap."
+    },
+    {
+      "id": "n07",
+      "query": "剛剛確定的方案照 plan 繼續做，現在沒有新的疑問。",
+      "expected_route": "ordinary-work",
+      "rationale": "Implementation with no new gap."
+    },
+    {
+      "id": "n08",
+      "query": "列出這個目錄的檔名。",
+      "expected_route": "ordinary-work",
+      "rationale": "Direct inventory."
+    },
+    {
+      "id": "n09",
+      "query": "この英文の文法を直してください。",
+      "expected_route": "ordinary-work",
+      "rationale": "Copy editing."
+    },
+    {
+      "id": "n10",
+      "query": "現在幾點？",
+      "expected_route": "ordinary-work",
+      "rationale": "Routine time query."
+    }
+  ]
+}

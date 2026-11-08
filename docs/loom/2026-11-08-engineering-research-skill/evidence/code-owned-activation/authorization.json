@@ -1,0 +1,28 @@
+{
+  "authorized_by": "kouko",
+  "date": "2026-11-08",
+  "user_quote": "授權做聯網 dogfood testing",
+  "prior_context": "Explicitly pending permission to send the formal seven runtime Markdown files, adjacent skill descriptions, bounded test prompts and minimal repository/research fixtures to first-party OpenAI for dogfood.",
+  "target_root": "/private/tmp/loom-engineering-research-delivery/loom-code/skills/engineering-research",
+  "target_commit": "fe2a78328",
+  "provider": "openai",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "allowed_payload": [
+    "seven runtime Markdown files",
+    "five adjacent skill descriptions",
+    "56 activation prompts",
+    "six executor prompts and minimal source/research fixtures",
+    "derived scoped executor output and tool trajectories for two blind audits",
+    "same skill package for one cold-reader"
+  ],
+  "excluded_payload": [
+    "historical user sessions",
+    "real Obsidian Vault contents",
+    "credential contents",
+    "unrelated project files"
+  ],
+  "cost": "existing account quota; explicitly pinned first-party native Codex model",
+  "effects": "temporary fixture operations only; no live Vault writes or installed plugin changes",
+  "prior_rejections": "Preserve and do not overwrite; this is fresh explicit authorization, not a workaround."
+}

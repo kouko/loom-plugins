@@ -1,0 +1,10 @@
+Safari compatibility remains unresolved; keep API-dependent implementation work unscheduled.
+
+Unsaved research draft (read-only constraint):
+- **Question:** Does the required API behavior work on the target Safari versions and platforms?
+- **Evidence:** You report Chrome behavior only. The API, required behavior, Safari targets, sources, and reproduction are unspecified.
+- **Method:** Check applicable official support documentation, then reproduce the exact required behavior in target Safari environments if documentation leaves consequential uncertainty.
+- **Decision gate:** Schedule once evidence establishes the required behavior or supports a viable fallback.
+- **Limitation:** No browsing or project fixtures are available; no Safari verification occurred. No research file was saved.
+
+Which API and behavior does the plan require, and which Safari versions/platforms must it support?

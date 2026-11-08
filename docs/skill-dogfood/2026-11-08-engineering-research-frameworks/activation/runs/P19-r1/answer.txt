@@ -1,0 +1,9 @@
+Unsaved research draft: **ESM support remains unresolved; the build blocker is not cleared.**
+
+- **Question:** Does the plugin loader accept ESM on the supported host?
+- **Method:** Compare both tests’ conditions and trace the loader’s actual execution path.
+- **Evidence:** Only the two conflicting claims were supplied. Host/runtime versions, loader revision, test bodies and results are missing. Neither claim establishes supported-host behavior.
+- **Possible explanation:** Different versions, configuration or transpilation could reconcile them; these are unverified hypotheses.
+- **Next evidence needed:** Supported host/runtime and loader versions, both tests and their outputs, and the loader entry point. Compare native ESM loading under identical conditions.
+
+No experiment was run or record saved under the read-only constraint.

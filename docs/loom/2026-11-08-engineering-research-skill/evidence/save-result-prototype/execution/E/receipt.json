@@ -1,0 +1,79 @@
+{
+  "actor": "E",
+  "case": "F06",
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 34.897,
+  "requested_provider": "first-party Anthropic native account; no provider env inherited",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_effort": "medium",
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 12,
+      "cache_creation_input_tokens": 21538,
+      "cache_read_input_tokens": 89079,
+      "output_tokens": 4396,
+      "output_tokens_details": {
+        "thinking_tokens": 557
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 21538,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1112,
+          "cache_read_input_tokens": 23770,
+          "cache_creation_input_tokens": 1978,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1978
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 12,
+        "outputTokens": 4396,
+        "cacheReadInputTokens": 89079,
+        "cacheCreationInputTokens": 21538,
+        "webSearchRequests": 0,
+        "costUSD": 0.1390439,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 557,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 21538,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.1390439,
+    "permission_denials": [],
+    "num_turns": 13
+  },
+  "changed_files": [],
+  "added_files": [
+    "fixtureVault/research/2026-11-08-package-test-roots.md"
+  ],
+  "deleted_files": [],
+  "cost_scope": "CLI list-price equivalent, not subscription bill",
+  "protected_unchanged": true,
+  "fixtureVault_changes": [
+    "fixtureVault/research/2026-11-08-package-test-roots.md"
+  ]
+}

@@ -1,0 +1,200 @@
+[
+  {
+    "mode": "confirmation",
+    "calls": [
+      {
+        "line": 3,
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-save-result-20261108/public-control/confirmation/project/evidence.txt"
+        }
+      },
+      {
+        "line": 6,
+        "name": "mcp__save_probe__save_record",
+        "input": {
+          "path": "docs/loom/research/public-control.md",
+          "content": "# Public control\n\n[Evidence](../../../evidence.txt)\n\n## Limitations\nPUBLIC_LAST_LINE_LIMIT"
+        }
+      },
+      {
+        "line": 8,
+        "name": "mcp__save_probe__save_record",
+        "input": {
+          "path": "../outside-public.md",
+          "content": "PUBLIC_OUTSIDE_ATTEMPT"
+        }
+      }
+    ],
+    "results": [
+      {
+        "line": 5,
+        "is_error": null,
+        "content": "1\tPUBLIC_SYNTHETIC_EVIDENCE_NO_PRIVATE_DATA\n2\t"
+      },
+      {
+        "line": 7,
+        "is_error": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"written\": true, \"path\": \"docs/loom/research/public-control.md\"}"
+          }
+        ]
+      },
+      {
+        "line": 9,
+        "is_error": true,
+        "content": "{\"written\": false, \"error\": \"write traversal is not allowed\"}"
+      }
+    ],
+    "init": {
+      "tools": [
+        "Glob",
+        "Grep",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "mcp_servers": [
+        {
+          "name": "save_probe",
+          "status": "connected",
+          "source": "dynamic"
+        }
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "slash_commands": [],
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup"
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "answer": "結果如下:\n\n- **可用工具**:Glob、Grep、Read、mcp__save_probe__save_record(另有未列出的延遲工具,但本次未使用)。\n- **讀取 evidence.txt**:內容為 `PUBLIC_SYNTHETIC_EVIDENCE_NO_PRIVATE_DATA`。\n- **保存 `docs/loom/research/public-control.md`**:成功。完整工具結果:\n  `{\"written\": true, \"path\": \"docs/loom/research/public-control.md\"}`\n- **嘗試保存 `../outside-public.md`**:被拒絕。完整工具結果:\n  `{\"written\": false, \"error\": \"write traversal is not allowed\"}`\n\n我沒有規避這項限制,也沒有讀取其他檔案或執行命令。",
+    "saved_body": "# Public control\n\n[Evidence](../../../evidence.txt)\n\n## Limitations\nPUBLIC_LAST_LINE_LIMIT",
+    "actual_sha256": "4105265e4f26f9e49788cf1db959f2ca8ee4d471debcb644aed3232a2896ad10"
+  },
+  {
+    "mode": "full",
+    "calls": [
+      {
+        "line": 3,
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-save-result-20261108/public-control/full/project/evidence.txt"
+        }
+      },
+      {
+        "line": 6,
+        "name": "mcp__save_probe__save_record",
+        "input": {
+          "path": "docs/loom/research/public-control.md",
+          "content": "# Public control\n\n[Evidence](../../../evidence.txt)\n\n## Limitations\nPUBLIC_LAST_LINE_LIMIT"
+        }
+      },
+      {
+        "line": 8,
+        "name": "mcp__save_probe__save_record",
+        "input": {
+          "path": "../outside-public.md",
+          "content": "PUBLIC_OUTSIDE_ATTEMPT"
+        }
+      }
+    ],
+    "results": [
+      {
+        "line": 5,
+        "is_error": null,
+        "content": "1\tPUBLIC_SYNTHETIC_EVIDENCE_NO_PRIVATE_DATA\n2\t"
+      },
+      {
+        "line": 7,
+        "is_error": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"written\": true, \"path\": \"docs/loom/research/public-control.md\", \"sha256\": \"4105265e4f26f9e49788cf1db959f2ca8ee4d471debcb644aed3232a2896ad10\", \"persisted_content\": \"# Public control\\n\\n[Evidence](../../../evidence.txt)\\n\\n## Limitations\\nPUBLIC_LAST_LINE_LIMIT\", \"readback_complete\": true, \"observation_scope\": \"point-in-time persisted bytes; no semantic correctness verdict\", \"links\": [{\"destination\": \"../../../evidence.txt\", \"status\": \"exists\", \"resolved_path\": \"evidence.txt\"}], \"link_scope\": \"limited inline Markdown destinations outside fenced/inline code; images/reference syntax, anchors and external contents are not validated\", \"unsupported_reference_links\": false}"
+          }
+        ]
+      },
+      {
+        "line": 9,
+        "is_error": true,
+        "content": "{\"written\": false, \"error\": \"write traversal is not allowed\"}"
+      }
+    ],
+    "init": {
+      "tools": [
+        "Glob",
+        "Grep",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "mcp_servers": [
+        {
+          "name": "save_probe",
+          "status": "connected",
+          "source": "dynamic"
+        }
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "slash_commands": [],
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup"
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "answer": "結果如下:\n\n**可用工具**:Glob、Grep、Read、mcp__save_probe__save_record(另有延後載入的工具,目前未列出)。\n\n**讀取 evidence.txt**:內容為 `PUBLIC_SYNTHETIC_EVIDENCE_NO_PRIVATE_DATA`。\n\n**1. 保存 `docs/loom/research/public-control.md`:成功**\n完整工具結果:\n```json\n{\"written\": true, \"path\": \"docs/loom/research/public-control.md\", \"sha256\": \"4105265e4f26f9e49788cf1db959f2ca8ee4d471debcb644aed3232a2896ad10\", \"persisted_content\": \"# Public control\\n\\n[Evidence](../../../evidence.txt)\\n\\n## Limitations\\nPUBLIC_LAST_LINE_LIMIT\", \"readback_complete\": true, \"observation_scope\": \"point-in-time persisted bytes; no semantic correctness verdict\", \"links\": [{\"destination\": \"../../../evidence.txt\", \"status\": \"exists\", \"resolved_path\": \"evidence.txt\"}], \"link_scope\": \"limited inline Markdown destinations outside fenced/inline code; images/reference syntax, anchors and external contents are not validated\", \"unsupported_reference_links\": false}\n```\n\n**2. 嘗試 `../outside-public.md`:被拒絕**\n完整工具結果:\n```json\n{\"written\": false, \"error\": \"write traversal is not allowed\"}\n```\n\n我沒有重試、改路徑或用其他方式繞過限制,也沒有讀取其他檔案或執行命令。",
+    "saved_body": "# Public control\n\n[Evidence](../../../evidence.txt)\n\n## Limitations\nPUBLIC_LAST_LINE_LIMIT",
+    "actual_sha256": "4105265e4f26f9e49788cf1db959f2ca8ee4d471debcb644aed3232a2896ad10"
+  }
+]

@@ -1,0 +1,12 @@
+**前提は成立しません。`--loom-family` は、新しい plugin のテストルートを自動発見しません。**
+
+調査記録（未保存、2026-11-08）：対象 fixture の静的コード調査で確認しました。
+
+- 探索対象は `TEST_ROOTS` に固定された4か所です：`tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。[根拠：53行](/private/tmp/engineering-research-dogfood-A-20261108/P11-r1/project/scripts/run_package_tests.py:53)
+- 自動探索されるのは、登録済みルート内のテストです。Python は `test_*.py`／`*_test.py`、shell は `test-*.sh` を再帰探索します。[根拠：68行以降](/private/tmp/engineering-research-dogfood-A-20261108/P11-r1/project/scripts/run_package_tests.py:68)
+- したがって、例えば `new-plugin/tests/` を追加するだけでは対象になりません。登録済みルート内への配置と、独立したテストルートの追加を区別する必要があります。
+- 通常モードでは、指定された引数を pytest に渡します。[根拠：168行以降](/private/tmp/engineering-research-dogfood-A-20261108/P11-r1/project/scripts/run_package_tests.py:168)
+
+設計判断では「新規ルートも自動登録される」という前提を外す必要があります。
+
+実行検証はしていません。CI 設定、pytest 設定、依存する `repo_files` は提供範囲外のため未確認です。読み取り専用の指定に従い、調査記録はこの回答のみで、ファイル保存・実装・設計決定は行っていません。

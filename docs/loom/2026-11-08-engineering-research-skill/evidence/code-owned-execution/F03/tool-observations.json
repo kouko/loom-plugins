@@ -1,0 +1,47 @@
+[
+  {
+    "id": "item_1",
+    "command": "/bin/zsh -lc \"pwd; rg --files -g 'SKILL.md' -g 'AGENTS.md' -g '*receipt*' -g '*provenance*' -g '*cleanup*' -g '*run_package_tests*' -g '*bundle*'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 238,
+    "output_sha256": "0e51891610a85285a14f73e55dd3369f3810fa4e58179840db764f829c0502c8"
+  },
+  {
+    "id": "item_2",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9333,
+    "output_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+  },
+  {
+    "id": "item_3",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 13482,
+    "output_sha256": "9b655741d13ab38f8e53a169bf46db46b9c1bab44c5c7a2ba8505841fb9342ff"
+  },
+  {
+    "id": "item_4",
+    "command": "/bin/zsh -lc 'rg --files snapshots docs; cat provenance.json sample-receipt.json fixture-cleanup.json'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 3518,
+    "output_sha256": "e855e0b6e6608ddd7cedceb6e7ebce285cb8eaa3b0c4bfdb04c5a403870c459b"
+  },
+  {
+    "id": "item_5",
+    "command": "/bin/zsh -lc 'nl -ba src/scripts/run_package_tests.py; cat docs/loom/research/2026-11-08-package-test-roots.md snapshots/original-research.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 15239,
+    "output_sha256": "a9c74200103e6bf0a7dfbc22f4461ce4f6dae7f2606c02ead0d9df2c07587cd0"
+  }
+]

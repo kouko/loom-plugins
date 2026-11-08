@@ -1,0 +1,18 @@
+不能直接套用。先前「`--loom-family` 不跑 `tests/local/`」的結論只適用於 preset 模式。呼叫端改用 explicit arguments 後，runner 原始碼裡沒有任何路徑會排除 `tests/local/test_example.py`。
+
+**依據**(來自靜態閱讀原始碼,沒有執行任何東西)
+- `main()` 只有在 `argv[0] == "--loom-family"` 時才進入 preset。否則走 `split_groups`,再對每組執行 `python -m pytest <原樣參數>`(`src/scripts/run_package_tests.py` 第 153–175 行)。
+- 排除 `local/` 的邏輯只在 `_tests_session`、`_shell_tests`、`_workflow_sessions` 這幾個函式裡,而且只有 `loom_family_commands` 會呼叫它們。explicit 模式完全不經過。巢狀 repo 的 `--ignore` 同樣只存在於 preset 路徑。
+- 現有測試中,涵蓋 `local` 排除的(第 222–298 行)都只針對 preset。explicit 路徑的測試(第 16–36 行)沒有涉及 `local/`。這些測試我只讀過,沒有跑。
+- 先前的記錄本來就寫明排除是 preset 專屬。我沒有動它,新結論另存為獨立的重新驗證。
+
+**交付路徑**
+- 新記錄:`docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md`。我寫完後只讀回了前 25 行(frontmatter 與開頭),全文沒有讀回確認。
+- 先前記錄 `docs/loom/research/2026-11-08-package-test-roots.md` 保持原樣,新記錄以相對連結引用它。
+
+**不確定事項**
+- pytest 是否真的會收集並執行該檔案,我沒有驗證。我既沒有執行,也沒有查閱 pytest 文件。依我對 pytest 的一般認知(推論),明確指定的檔案路徑會被收集,pytest 也不認得 `local` 這個名稱。
+- fixture 裡沒有 `tests/local/test_example.py`,所以它的內容、skip 標記和 fixture 都不明。真實 repo 的 pytest.ini、conftest、CI 設定與部署版本也不在這份快照內。
+- 新記錄引用的 hash 與 git 狀態,是 `fixture-observations.json` 的 harness 觀察。我沒有重新計算 hash,也沒有執行 git 指令。
+
+**決策影響:** 不要指望 runner 在 explicit 呼叫下擋掉 local 測試。若要避免它被執行,呼叫端就不要指定該檔案,或自行加上 `--ignore`。若是想刻意執行它,explicit arguments 看來就是可行的做法。

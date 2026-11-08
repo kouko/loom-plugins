@@ -1,0 +1,10 @@
+{
+  "path": "/private/tmp/claude-code-engineering-research-dogfood-20261108/blind-auditor-packet",
+  "file_count": 486,
+  "manifest_sha256": "f04efb21a0dd1fefdc71c87c59ebbf66fc8d7f600f81ef9a47b10fb47b0d68c2",
+  "ready": true,
+  "native_activation": "not tested",
+  "contains_codex_answers": false,
+  "contains_prior_auditor_findings": false,
+  "raw_thinking_blocks": 0
+}

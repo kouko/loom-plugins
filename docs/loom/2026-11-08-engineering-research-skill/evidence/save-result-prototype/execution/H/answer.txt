@@ -1,0 +1,25 @@
+**未儲存的研究草稿**(依你的要求,沒有寫入任何檔案,也沒有呼叫保存工具)
+
+**問題:** `src/scripts/run_package_tests.py` 的 `TEST_ROOTS` 精確列了哪些目錄?
+
+**結論:** `TEST_ROOTS` 剛好有四個目錄(`src/scripts/run_package_tests.py:53`):
+1. `tests`
+2. `loom-code/tests`
+3. `loom-design/tests`
+4. `loom-workflow/tests`
+
+**證據:**
+- 原始碼第 53 行直接定義這個 tuple。同檔案的 docstring(第 4–10 行)也說明,只有這些根目錄會被執行,新 plugin 的測試要先把它的根目錄加進 `TEST_ROOTS` 才會跑。
+- `src/tests/test_run_package_tests.py:302` 斷言 `TEST_ROOTS` 等於同樣的四元組。這是我讀到的測試定義,我沒有執行它。
+- 既有研究記錄 `docs/loom/research/2026-11-08-package-test-roots.md` 得到相同結論。它的範圍是同一份最小來源快照,所以可以沿用,不需要新增調查。
+- `fixture-observations.json` 記錄的 `run_package_tests.py` SHA256 是 `6730a53e…`,和既有記錄引用的值一致。這是準備階段的 harness 觀察,不是我執行的命令。
+
+**用法補充:**
+- `code` 群組是 `TEST_ROOTS` 去掉 design 與 workflow 後剩下的兩個根目錄(第 125 行)。
+- 每個根目錄下的 `local/` 子目錄在 `--loom-family` 模式會被排除。
+
+**限制:**
+- 這只是靜態讀取原始碼的結論,沒有執行任何測試或 runner。
+- 來源只是最小快照,不是完整部署,也不是 CI 設定的證明。
+- 我沒有重算雜湊,只比對了 harness 提供的值。
+- 本次沒有儲存研究記錄。你要求不儲存,所以沒有新的已保存檔案。上面的既有記錄是先前就存在的,我沒有修改它。

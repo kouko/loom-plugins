@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-08T11:59:41.979581+00:00",
+  "user_verbatim": "允許這 12 份資料送往第一方 OpenAI 做兩次盲審",
+  "provider": "first-party OpenAI",
+  "payload": "same frozen twelve actor outputs/observable trajectories,852filepacket; source bodies/armmap withheld; no credentials/unrelated data",
+  "calls": 2,
+  "model_requested": "gpt-6.1-sol",
+  "effort": "medium",
+  "freeze_sha256": "62c933b4566413de3e4c95dbef374bcac3a08c1cda20c2d24748b39be67d9831",
+  "prior_rejection": {
+    "action": "send new twelve case artifacts and trajectories to OpenAI",
+    "reason": "Prior specific authorization covered original six, not new twelve",
+    "model_calls_launched": 0,
+    "bypass": false
+  }
+}

@@ -1,0 +1,10 @@
+Streaming support is **unverified**. Repeated failures alone do not establish a tier or API-version restriction.
+
+Unsaved research draft (read-only; no artifact saved):
+
+- **Question:** Does your account tier and API version support streaming?
+- **Method:** Compare account entitlements with official documentation for the exact API version and endpoint.
+- **Evidence:** Only the reported failures are available. Provider, tier, API version, endpoint, documentation and errors are missing; browsing is unavailable.
+- **Decision:** There is insufficient evidence to justify another retry or conclude streaming is unsupported.
+
+Please provide the provider, account tier, exact API version and endpoint, relevant official documentation excerpts, and a redacted error response. Do not include credentials.

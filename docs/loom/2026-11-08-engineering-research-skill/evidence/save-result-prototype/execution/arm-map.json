@@ -1,0 +1,42 @@
+[
+  {
+    "actor": "A",
+    "case": "F04",
+    "mode": "confirmation"
+  },
+  {
+    "actor": "B",
+    "case": "F04",
+    "mode": "full"
+  },
+  {
+    "actor": "C",
+    "case": "F01",
+    "mode": "full"
+  },
+  {
+    "actor": "D",
+    "case": "F01",
+    "mode": "confirmation"
+  },
+  {
+    "actor": "E",
+    "case": "F06",
+    "mode": "confirmation"
+  },
+  {
+    "actor": "F",
+    "case": "F06",
+    "mode": "full"
+  },
+  {
+    "actor": "G",
+    "case": "F03",
+    "mode": "full"
+  },
+  {
+    "actor": "H",
+    "case": "F03",
+    "mode": "confirmation"
+  }
+]

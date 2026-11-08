@@ -1,0 +1,78 @@
+{
+  "no_model_calls": true,
+  "no_repo_source_or_frozen_input_changes": true,
+  "packager": "/private/tmp/engineering-research-save-result-20261108/prepare_audits.py",
+  "packager_sha256": "ef24cdffca73a70c505f5c6ee92cf0b5ab45cd57e78247752e937eac39a9eef4",
+  "freeze_sha256": "674d3041664bf93f0d7f6d9e67a618710cb9faeb4a8e963105e3d1a493a1d259",
+  "harness_sha256": "b7e57f2c42ae63ac40f58551166b65c230f43a41da6298e51b8768e403e83bd1",
+  "authorization_copy_outside_auditor_packet": true,
+  "checks": [
+    {
+      "actor": "A",
+      "save_record_call_count": 1,
+      "save_call_and_result_event_lines": [
+        38,
+        40
+      ],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "B",
+      "save_record_call_count": 1,
+      "save_call_and_result_event_lines": [
+        35,
+        37
+      ],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "C",
+      "save_record_call_count": 1,
+      "save_call_and_result_event_lines": [
+        33,
+        34
+      ],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "D",
+      "save_record_call_count": 1,
+      "save_call_and_result_event_lines": [
+        29,
+        31
+      ],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "E",
+      "save_record_call_count": 1,
+      "save_call_and_result_event_lines": [
+        31,
+        33
+      ],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "F",
+      "save_record_call_count": 1,
+      "save_call_and_result_event_lines": [
+        32,
+        34
+      ],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "G",
+      "save_record_call_count": 0,
+      "save_call_and_result_event_lines": [],
+      "all_save_events_byte_identical": true
+    },
+    {
+      "actor": "H",
+      "save_record_call_count": 0,
+      "save_call_and_result_event_lines": [],
+      "all_save_events_byte_identical": true
+    }
+  ],
+  "run_command": "python3 /private/tmp/engineering-research-save-result-20261108/audits/harness.py run"
+}

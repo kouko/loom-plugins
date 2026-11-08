@@ -1,0 +1,11 @@
+{
+  "completed": 50,
+  "valid": 50,
+  "all_catalogs_same_ten_skill_names": true,
+  "all_target_bodies_hidden_in_catalog": true,
+  "all_auth_symlinks_removed": true,
+  "web_tool_calls": 0,
+  "target_bundle_hashes_identical_for_resumed_actors": true,
+  "source_manifest_still_matches": true,
+  "preflight_receipt_preserved": true
+}

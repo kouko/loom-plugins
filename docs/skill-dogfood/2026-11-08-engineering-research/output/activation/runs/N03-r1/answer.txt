@@ -1,0 +1,11 @@
+Improve the verification handoff: record the exact test command and its result immediately after running it, before calling the change complete.
+
+Based on your account, scope agreement worked and the update stayed small. The gap was preserving verification evidence; there’s no unresolved technical question requiring research or more planning.
+
+[scripts/run_package_tests.py](/private/tmp/engineering-research-dogfood-A-20261108/N03-r1/project/scripts/run_package_tests.py) supports multiple test groups and invocation modes, so “tests passed” alone would not identify what was checked. The available evidence does not establish the actual command, changed test, or outcome.
+
+For future small changes, add one completion line:
+
+`Validation: <exact command> — <result; relevant failures or skips>`
+
+For this session, mark the command as unrecorded rather than reconstructing it as fact. A lightweight completion habit is sufficient; no new tooling or broader workflow is needed.

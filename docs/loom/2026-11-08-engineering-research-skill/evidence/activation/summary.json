@@ -1,0 +1,13 @@
+{
+  "status": "blocked-by-auto-review",
+  "planned_runs": 56,
+  "completed_sandbox_failures": 9,
+  "valid_runs": 0,
+  "true_positive_rate": null,
+  "true_negative_rate": null,
+  "network_rerun_started": false,
+  "auto_review_rejection": "The batch would transmit the private skill package and scoped prompts to OpenAI; testing was authorized, but not this specific sensitive payload-to-destination egress.",
+  "effective_inherited_overrides": null,
+  "inherited_override_status": "complex/unobservable-main-profile",
+  "quality_or_causal_claim": false
+}

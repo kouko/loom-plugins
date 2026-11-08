@@ -1,0 +1,8 @@
+{
+  "utc": "2026-11-08T12:36:13.881530+00:00",
+  "customization_isolation_confirmed": true,
+  "mcp_tool_connected": true,
+  "scope": "Bounded native-host control: explicit settings exclusions, no managed instructions/settings present, actual only4tools and no custom plugins/slashcommands, no canary responses, sole scoped MCP connected, saved-body/hash matches disk, traversal denied. This is not proof of process-wide filesystem or all possible hidden-context isolation.",
+  "evidence": "verification.json + observations.json + raw public trajectories",
+  "private_execution": "still requires separate actual user approval; no approval inferred here"
+}

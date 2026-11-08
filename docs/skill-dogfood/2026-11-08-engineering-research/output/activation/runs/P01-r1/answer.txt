@@ -1,0 +1,11 @@
+**The runner implements shell-test discovery, but the proposed guard’s actual coverage remains unverified.**
+
+Unsaved research draft (read-only; 2026-11-08). Method: source inspection of the supplied fixture; no tests executed.
+
+- [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P01-r1/project/scripts/run_package_tests.py:88) recursively discovers `test-*.sh` in four roots: `tests`, `loom-code/tests`, `loom-design/tests`, and `loom-workflow/tests`. It excludes `node_modules` and each root’s `local/` subtree.
+- [`loom_family_commands()`](/private/tmp/engineering-research-dogfood-A-20261108/P01-r1/project/scripts/run_package_tests.py:134) converts those discoveries into `bash <path>` commands, excluding detected nested repositories/worktrees. This applies to `--loom-family` with no group restriction or `--only workflow-shell`.
+- [`main()`](/private/tmp/engineering-research-dogfood-A-20261108/P01-r1/project/scripts/run_package_tests.py:153) executes those commands and propagates failures. Its ordinary argument mode invokes pytest without this shell-discovery path.
+
+**Evidence gap:** the fixture provides no CI invocation, proposed guard filename/location, imported `repo_files` implementation, or execution results. Therefore, it establishes discovery logic—not that the shipping test command discovers and executes this guard.
+
+Before committing the intent’s shipping assumption, obtain the actual invocation and evidence that the guard is discovered, runs, and causes failure when its check fails. No research artifact was saved because this discussion is read-only.

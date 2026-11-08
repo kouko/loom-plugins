@@ -1,0 +1,28 @@
+{
+  "actors": 12,
+  "exits": {
+    "X001": 0,
+    "X002": 0,
+    "X003": 0,
+    "X004": 0,
+    "X005": 0,
+    "X006": 0,
+    "X007": 0,
+    "X008": 0,
+    "X009": 0,
+    "X010": 0,
+    "X011": 0,
+    "X012": 0
+  },
+  "all_sources_unchanged": true,
+  "total_elapsed_actor_seconds": 1203.7849999999999,
+  "usage_totals": {
+    "input_tokens": 1949021,
+    "cached_input_tokens": 1608192,
+    "output_tokens": 44706,
+    "reasoning_output_tokens": 2040
+  },
+  "money_cost": "not supplied by native receipts; no estimate invented",
+  "audit_packet": "/Users/kouko/.herdr/worktrees/loom-plugins/loom-research-skill-discut/docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/auditor-input",
+  "self_grade": "not performed"
+}

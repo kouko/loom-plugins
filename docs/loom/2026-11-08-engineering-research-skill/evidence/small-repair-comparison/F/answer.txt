@@ -1,0 +1,33 @@
+**未儲存草稿**（依「不寫入任何檔案」的要求。我沒有建立或修改任何檔案，也沒有執行命令或測試。）
+
+## 問題
+`src/scripts/run_package_tests.py` 的 `TEST_ROOTS` 精確列了哪些目錄？
+
+## 結論
+`TEST_ROOTS` 有四個目錄，不多也不少（`src/scripts/run_package_tests.py:53`）：
+
+1. `tests`
+2. `loom-code/tests`
+3. `loom-design/tests`
+4. `loom-workflow/tests`
+
+第 52 行的註解寫著「nothing else runs」。新外掛的測試根目錄要加進 `TEST_ROOTS` 才會被跑。
+
+## 證據與方法
+- **方法**：靜態閱讀原始碼。這個問題只有單一來源，所以不需要其他方法，也沒有新增外部證據。
+- **程式碼讀取**：`TEST_ROOTS` 的定義在第 53 行。第 54 行另外定義 `DESIGN_ROOT` 和 `WORKFLOW_ROOT`，值與其中兩個根目錄相同。`code` 群組是 `TEST_ROOTS` 去掉這兩個之後的結果，也就是 `tests` 和 `loom-code/tests`（第 125 行）。
+- **既有記錄**：我沿用了 `docs/loom/research/2026-11-08-package-test-roots.md`，它的結論與我讀到的原始碼一致。
+- **harness 觀察**：`fixture-observations.json` 記錄了 `run_package_tests.py` 的 SHA256 是 `6730a53e…0d54`，與既有記錄引用的值相同。這是準備階段的觀察，不是我執行的。我也沒有自行重算雜湊。
+
+## 對決策的影響
+- 放進這四個根目錄的測試，在 `--loom-family` 預設模式下會被探索到。
+- 每個根目錄下的 `local/` 子目錄在這個模式下會被排除。
+- 明確指定路徑的模式（沒有 `--loom-family`）直接把參數交給 pytest，不加這些排除（第 168–175 行）。
+
+## 限制與不確定事項
+- 這是原始碼層級的結論，沒有跑過 runner，也沒有跑過測試。
+- `src/` 只是最小來源快照。CI 設定和實際部署版本不在證據範圍內，我不對它們下結論。
+- 我沒有讀 `provenance.json`，也沒有重新核對測試檔 `test_run_package_tests.py` 的內容。測試檔的說法只來自既有記錄。
+- 就「`TEST_ROOTS` 列了哪些目錄」這個問題，我沒有發現剩餘的實質不確定性。
+
+**已儲存路徑**：無（沒有儲存新記錄）。既有記錄未改動，路徑是 `docs/loom/research/2026-11-08-package-test-roots.md`。

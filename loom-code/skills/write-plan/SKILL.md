@@ -357,6 +357,13 @@ is asked when needed; continue independent work while awaiting the answer.
 List agent decisions so the acceptance test report can show them at decision
 point ③.
 
+When an unresolved factual premise could change that choice, consider
+`loom-code:engineering-research`, including for a small
+capability/version check. Reference the retained record and return its evidence
+or uncertainty to this plan. Research is optional, preserves this station and
+its authorization, and does not turn routine lookups into a prerequisite or
+advance a user decision point.
+
 <!-- gate: write-plan.post-decision-conservative-default -->
 **After the decision point, classes (b), (c) and (e) have no free
 default.** For those three classes in `references/one-way-door.md` — money

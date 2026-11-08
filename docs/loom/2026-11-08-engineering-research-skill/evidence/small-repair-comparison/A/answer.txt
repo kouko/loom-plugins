@@ -1,0 +1,22 @@
+我已把新增段落寫入既有紀錄,並用 Grep 檢查過各章節標題的順序。下面是最終回報。
+
+## 結論
+**不會。** 在同一份 source snapshot(provenance `HEAD` `d5a7f0da…`)中,一般的 `--loom-family`(不帶 `--only`)不會執行 `tests/local/` 下的 Python 或 shell tests。`loom-code/tests/local/` 和 design、workflow 各 root 的 `local/` 也一樣不會跑。
+
+- **Python:** `code` group 透過 `_tests_session` 加上 `--ignore=<tests/local 絕對路徑>`(`src/scripts/run_package_tests.py` 第 76–85、124–128 行)。
+- **Shell:** `_shell_tests` 會排除 `<root>/local` 底下的 `test-*.sh`(第 88–95 行,排除條件在第 94 行)。
+- **測試定義:** `src/tests/test_run_package_tests.py` 第 222–235、285–298 行的測試也斷言 local 被排除。我只讀了這些測試,沒有執行。
+- 既有證據足夠,所以我沒有做新的調查或實驗。我重新讀了 runner 與測試檔來確認它們仍然適用。
+
+## 交付路徑
+`docs/loom/research/2026-11-08-package-test-roots.md`
+
+我沒有另建檔案。新增段落是「Continuation check」,並補了一句 Limitations。這次沒有改任何其他 code,也沒有 commit。
+
+## 不確定事項
+- 這只是靜態讀碼的結論。我沒有執行 runner 或 pytest,所以實際會收集到哪些 tests 沒有觀察到。
+- 只有 root 底下直接的 `local/` 被排除。更深層、同名的 `local` 資料夾(例如 `tests/hooks/local/`)依原始碼看仍會被收集或執行。既有測試沒有涵蓋這點,我也沒有實測。
+- `fixture-observations.json` 的 hash 與 git 觀察是 harness 在準備階段取得的,不是我執行的。裡面也沒有 actor 副本寫入後的 hash。
+- CI 設定與實際部署版本不在證據範圍內。
+
+我沒有分析 `local/` 檔案與非 local tests 之間的 import 關係。

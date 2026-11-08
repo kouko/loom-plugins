@@ -1,0 +1,11 @@
+Unsaved research draft — dependency architecture support
+
+**Finding:** Unresolved. The dependency name/version, target triple, toolchain, build configuration and failure log are missing. No project sources or upstream evidence were provided; repeated failure alone does not establish unsupported architecture.
+
+**Method:** Inspect version-matched upstream platform documentation, then relevant architecture checks, build scripts and CI coverage to distinguish target support from cross-compilation support.
+
+**Decision:** There is insufficient evidence to justify another fix or declare the target unsupported.
+
+Please provide the dependency name/version, host and target triples, build command and first failing error with surrounding output.
+
+No research file was saved because this discussion is read-only.

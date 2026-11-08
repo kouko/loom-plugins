@@ -1,0 +1,32 @@
+我已把研究副本寫進 fixtureVault,並讀回內容、核對連結。剩下的是整理最終報告。
+
+## 結果
+
+**已保存副本:** `/private/tmp/engineering-research-small-fix-20261108/paired-run/K/project/fixtureVault/research/2026-11-08-package-test-roots.md`
+
+**結論(來源靜態檢視):**
+- `TEST_ROOTS` 共四個:`tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。
+- 使用 `--loom-family` 預設套件時,`tests/local/` 不會被收集。Python 與 shell 測試都會排除各 root 底下的 `local/`。
+- 這個排除只適用於 `--loom-family` 預設套件。明確傳路徑的模式(原始碼第 168–175 行)不會加 `--ignore`。
+- 新 plugin 的測試 root 不會自動被發現,要加進 `TEST_ROOTS`,或放在既有 root 的 `local/` 之外。
+
+**我實際做的檢查:**
+- 重讀了 `run_package_tests.py` 與測試檔的相關行段,確認研究記錄的主要論點成立。
+- 副本只改了相對連結(`../../../` 改成 `../../`),並在文末加了「Copy provenance」段落。
+- 從 fixtureVault 解析副本的四個連結,指向的檔案都存在:`provenance.json`、runner、測試檔、原始研究記錄。
+- 未改原研究、`skill/` 與 `src/`,也沒有 commit。
+
+**來源版本:**
+- 本地 `main` 是 `4959e62…`,為 `research-fixture`(`00fa764…`)的合併。
+- `fixture-observations.json` 記錄 `research-fixture` 是 `main` 的祖先,也沒有 tag 或 remote。
+- 上游快照 commit 是 `d5a7f0da…`,remote 新鮮度未檢查。
+- 這次 merge 不是發布、安裝或部署。
+
+## 限制與不確定事項
+- **雜湊都不是我算的。** 我沒有命令工具,無法自算 hash。原研究的 `c54f2872…`,以及 runner `6730a53e…` 和測試檔 `b7ed3d4e…` 的雜湊,都引用自 `fixture-observations.json` 與 `provenance.json`。這些是準備階段的 harness 觀察。
+- **副本的 hash 未知。** 副本寫入後沒有任何 hash 可供比對,它本身的 hash 與原檔不同是預期的。
+- **原文的 `shasum` 說法未重驗。** 原研究寫「measured with `shasum -a 256`」,這句我沒有重新驗證。
+- **行號有小偏差。** shell 探索實際在第 88–95 行,原文寫 89–96。我只改連結,沒改內文。
+- **路徑前綴不同。** `provenance.json` 記錄的是原專案路徑(如 `scripts/…`),fixture 內對應 `src/…`。
+- **測試與 CI 未涉及。** 沒有執行任何測試或 runner。測試檔只讀了定義,沒有跑。CI 設定與已安裝版本都不在證據範圍內。
+- **Obsidian CLI 不可用。** 副本是用檔案工具直接寫入臨時假 Vault,沒有經過 Obsidian。

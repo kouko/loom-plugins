@@ -1,0 +1,32 @@
+我已把研究副本存到 `fixtureVault/research/2026-11-08-package-test-roots.md`。它的完整絕對路徑是 `/private/tmp/engineering-research-save-result-20261108/private-run/E/project/fixtureVault/research/2026-11-08-package-test-roots.md`。
+
+**核實結果**
+- 我讀了 `src/scripts/run_package_tests.py` 和測試檔,內容支持原研究的主要結論。
+  - `TEST_ROOTS` 就是 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`(第 53 行)。
+  - 在 `--loom-family` 預設模式下,`tests/local/` 不會被收進 Python 和 shell 測試(第 76–86、89–96 行)。
+  - 明確傳參的模式沒有加這些排除(第 168–175 行)。
+- 原研究引用的行號範圍都對得上。
+- 我用 Grep 看了測試檔,第 222–235、285–310 行確實有斷言這些行為。我沒有讀完整個檔案。
+- 結論是「讀原始碼得到的」,沒有實際執行。
+
+**保存內容**
+- 副本內容就是原研究。
+  - 我只把三處相對連結從 `../../../` 改成 `../../`,讓它們從 `fixtureVault/research/` 指回 `provenance.json`、`src/scripts/run_package_tests.py` 和 `src/tests/test_run_package_tests.py`。
+  - 另外在開頭加了一段說明這是副本,結尾加了「Copy provenance」小節。
+- 存檔後我讀回全文。4 個連結目標(`provenance.json`、runner、測試檔、原研究)我用 Glob 確認都存在。
+- 原研究和其他檔案都沒改。
+
+**Hash、版本與限制**
+- 以下 hash 和 git 版本都是 `fixture-observations.json` 裡的準備階段觀察,不是我執行指令得到的。
+  - 原研究 SHA256 是 `c54f2872…1283`。
+  - runner 和測試檔的 hash 與 `provenance.json` 一致。
+  - 本地 git 的 `main` 是 `4959e62`,它包含 `research-fixture`(`00fa764`)。fixture 沒有 remote 和 tag。
+- 上游快照 commit 是 `d5a7f0da…`,remote 新鮮度沒檢查。
+- 副本存檔後的 hash 我沒算,因為沒有指令工具,也沒有觀察檔可以引用。
+- 這次沒有跑測試或 runner,也沒有檢查 CI 或實際部署版本。
+- Obsidian CLI 不可用,所以這只是 temp 假 Vault 裡的純 Markdown 檔。
+- 這次 merge 只是本地 fixture 的 merge,不是發布或安裝。
+
+**不確定事項**
+- 範圍只限於這份最小原始碼快照,它不是完整 checkout。
+- 預設模式下 `local/` 只在每個 root 的最上層被排除。我只在第 76–86、89–96 行確認了這一點,沒有針對更深層的 `local/` 目錄做專門驗證。

@@ -1,0 +1,10 @@
+**Passkey support at deployable versions remains unverified.**
+
+Unsaved research draft:
+- **Question:** Does the required passkey flow exist in the authentication providers at deployable versions?
+- **Method:** Version-specific official documentation and release/source inspection; appropriate because support can differ by release, edition and configuration.
+- **Evidence:** No provider names, deployable versions, flow requirements, project fixtures or browsing evidence were supplied. No capability claim can be established.
+- **Decision impact:** Evidence does not yet support a migration decision.
+- **Needed:** Current and candidate providers; allowed server/SDK versions and editions; required registration, sign-in, discovery, recovery and platform behavior.
+
+No implementation occurred. The research record remains unsaved under the read-only constraint.

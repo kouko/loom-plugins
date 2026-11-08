@@ -1,0 +1,13 @@
+Improve the completion handoff: record the exact validation command and its result immediately after running it, even for a small test update.
+
+Based on your account, agreeing scope worked; the gap was preserving verification evidence. A lightweight completion note is enough:
+
+- Change: what test was updated and why.
+- Validation: exact command, working directory, and outcome.
+- Limitations: anything skipped or unverified.
+
+The available [test runner](/private/tmp/engineering-research-dogfood-A-20261108/N03-r2/project/scripts/run_package_tests.py) supports several test groups, so saying “tests passed” would leave the tested scope unclear.
+
+The original command, output, and test diff are unavailable here. Record that evidence as missing rather than reconstructing a successful run.
+
+No additional research or planning stage is warranted: there is no unresolved technical question. The improvement is one small completion habit, not a broader workflow.

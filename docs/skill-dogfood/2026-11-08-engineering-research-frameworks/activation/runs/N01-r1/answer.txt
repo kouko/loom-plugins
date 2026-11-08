@@ -1,0 +1,7 @@
+The export button earns its maintenance cost only if it supports a recurring, valuable workflow. Without usage evidence, its value is unproven.
+
+- **Value:** Strong if users regularly need dashboard data for reporting, analysis, or sharing and current workarounds are costly. Weak if demand is occasional or already served elsewhere.
+- **Complexity:** The button is small; the lasting contract includes export accuracy, filter consistency, permissions, format compatibility, and support as dashboards evolve.
+- **Recommendation:** Validate frequency, affected users, and time saved before committing. If justified, constrain the first version to one format and explicit export semantics.
+
+Technical feasibility being settled does not establish product value. There is no supplied evidence yet to recommend building it.

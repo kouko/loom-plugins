@@ -1,0 +1,19 @@
+我已把這次核對寫回同一份研究記錄。結論是：以原始碼來看，一般的 `--loom-family` preset 不會跑 `tests/local/` 的 Python 和 shell tests。
+
+**記錄路徑：** `docs/loom/research/2026-11-08-package-test-roots.md`。這是同一問題、同一 source snapshot，我只更新了這一份，沒有另開新檔。
+
+**依據（皆為原始碼讀取）：**
+- **Python：** `code` group 由 `_tests_session` 組出 pytest 指令。它會跳過 `<root>/local`，並加上 `--ignore=<絕對路徑>`（`run_package_tests.py` 76–85、124–128 行）。
+- **Shell：** `_shell_tests` 會排除路徑上有 `<root>/local` 的 `test-*.sh`（88–95 行，使用處在 134–138 行）。
+- **既有測試定義：** `test_run_package_tests.py` 的 222–235 與 285–298 行斷言了同樣的排除行為。這些我只讀過，沒有執行。
+- **來源雜湊：** runner 與測試檔的雜湊與 `provenance.json` 及 `fixture-observations.json` 相符。這是 harness 的觀察，不是我執行指令得到的。
+
+**這次的修正：** 上一版的部分行號差了 1 到 2 行，已更正，結論不變。
+
+**驗證：** 儲存工具回傳了完整內容，我已逐段核對 question、findings、evidence 和 limitations。工具也回報記錄中的 7 個相對連結都存在，但這只表示路徑存在，不代表連結內容正確。
+
+**不確定事項：**
+- 我沒有執行 runner 或測試，結論只來自靜態來源。
+- CI 設定、實際部署版本，以及 source commit 在遠端是否最新，都不在證據範圍內。
+- 排除只針對 root 底下直接的 `local/`。像 `tests/sub/local/` 這種更深層的資料夾，從程式碼推論不會被排除，但這點沒有測試過。
+- 明確引數模式（不走 `--loom-family`）不會加 ignore，所以這個結論不適用於裸跑 pytest 或直接指定 local 測試。

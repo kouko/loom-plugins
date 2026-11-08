@@ -1,0 +1,31 @@
+**結論:** `research-fixture` 已 merge 進本地 `main`,但沒有任何 release、tag、remote 或安裝證據。merge 不等於 release,也不等於批准。
+
+**已核實的 merge 狀態**(以下都是準備階段的 harness 觀察,我沒有自己執行 git):
+- `main` 是 `4959e62…`,`research-fixture` 是 `00fa764…`。我另外直接讀了 `.git/refs/heads/*`,內容與 harness 輸出一致。
+- `git merge-base --is-ancestor research-fixture main` 的結果是 exit 0,所以分支尖端確實在 `main` 之內。
+- `git tag --list` 與 `git remote -v` 輸出都是空的。
+- 清理紀錄顯示 merge 後工作樹是乾淨的,沒有建立 worktree。topic 分支保留作為稽核證據。
+
+**交付的檔案**:
+- 研究紀錄(英文):`docs/loom/research/2026-11-08-merge-release-status.md`
+- Obsidian 保存提案草稿(未保存):`scratch/obsidian-preservation-proposal.md`
+- 既有的 `docs/loom/research/2026-11-08-package-test-roots.md` 沒有改動。
+
+**保存提案內容**:
+- **來源**:`2026-11-08-package-test-roots.md`,它是對 snapshot 的原始碼檢視結論,不依賴 release。
+- **內容範圍**:只含這一項 package test roots 發現,附上 `main` 與上游 `d5a7f0da…` 的出處。release 相關主張、merge 狀態紀錄與 fixture JSON 都不納入。
+- **目的地**:未決定。沒有 Obsidian CLI,我不會猜 Vault 路徑。
+
+**請你決定**:
+1. fixtureVault 內的確切目的地路徑。
+2. 是否同意上述內容範圍。
+3. 若該路徑已有同名檔案,是否允許覆寫。
+
+你回覆之前,我不會寫 fixtureVault。
+
+**不確定事項與限制**:
+- 以上 git 觀察是 session 之前的快照,我沒有重跑。當前工作樹是否仍乾淨,我無法確認。
+- 我沒有重新計算 SHA256。harness 提供的 `src/` 雜湊與 `provenance.json` 一致,但 `docs/loom/research/2026-11-08-package-test-roots.md` 的雜湊(`c54f2872…`)沒有可比對的對照值。
+- 沒有 remote,所以遠端新鮮度與託管端 merge 狀態都無法知道。上游 `d5a7f0da…` 是否已 release 也不在證據內。
+- 兩份新檔案寫入後,我沒有另外讀回驗證。寫入工具只回報成功。
+- 我沒有執行任何測試。

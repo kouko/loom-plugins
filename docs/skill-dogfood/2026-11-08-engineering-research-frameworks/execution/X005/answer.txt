@@ -1,0 +1,8 @@
+已完成英文研究文件，並實際讀回核對及確認來源 hash：
+
+- [外來測試排除邊界](docs/loom/research/2026-11-08-package-runner-foreign-tests.md)
+- [Git 失敗時的反應](docs/loom/research/2026-11-08-package-runner-git-failures.md)
+
+結論：排除機制有條件有效；Git 查詢失敗可能使排除清單變空，runner 仍繼續執行。若允許任意外來 clone／worktree 留在 test roots，單靠現狀不足以保證安全排除。
+
+未確定事項包括 ignored clone、其他 repository 的 worktree、明確 pytest target 與 ignore 的互動，以及實際 CI／版本行為。全程未執行測試、連網或修改來源。

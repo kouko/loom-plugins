@@ -1,0 +1,68 @@
+{
+  "native_file_tool_boundary_only": true,
+  "Bash_enabled": false,
+  "observations": [
+    {
+      "call": {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/project/inside.txt"
+        }
+      },
+      "is_error": null,
+      "result": "1\tPUBLIC_INSIDE_OK\n2\t"
+    },
+    {
+      "call": {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/public-sentinel.txt"
+        }
+      },
+      "is_error": true,
+      "result": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/public-sentinel.txt is outside /private/tmp/engineering-research-small-fix-20261108/boundary-control/project; --restricted confines the file tools to the working directory."
+    },
+    {
+      "call": {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/public-sentinel.txt"
+        }
+      },
+      "is_error": true,
+      "result": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/public-sentinel.txt is outside /private/tmp/engineering-research-small-fix-20261108/boundary-control/project; --restricted confines the file tools to the working directory."
+    },
+    {
+      "call": {
+        "name": "Read",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/project/escape/public-sentinel.txt"
+        }
+      },
+      "is_error": true,
+      "result": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/project/escape/public-sentinel.txt resolves through a symlink to /private/tmp/engineering-research-small-fix-20261108/boundary-control/public-sentinel.txt, which is outside /private/tmp/engineering-research-small-fix-20261108/boundary-control/project; --restricted confines the file tools to the working directory."
+    },
+    {
+      "call": {
+        "name": "Glob",
+        "input": {
+          "pattern": "../public-sentinel.txt"
+        }
+      },
+      "is_error": null,
+      "result": "No files found"
+    },
+    {
+      "call": {
+        "name": "Write",
+        "input": {
+          "file_path": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/outside-write.txt",
+          "content": "CONTROL"
+        }
+      },
+      "is_error": true,
+      "result": "/private/tmp/engineering-research-small-fix-20261108/boundary-control/outside-write.txt is outside /private/tmp/engineering-research-small-fix-20261108/boundary-control/project; --restricted confines the file tools to the working directory."
+    }
+  ],
+  "outside_write_exists": false
+}

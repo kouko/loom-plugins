@@ -1,0 +1,11 @@
+**The runner excludes `tests/local` in `--loom-family` mode; whether CI uses that mode remains unverified.**
+
+Unsaved research draft — 2026-11-08, concluded within the available evidence. Method: source inspection of the supplied runner and its argument branches.
+
+- **Family mode:** `_tests_session()` checks for tests outside each root’s `local/` directory and adds an explicit pytest ignore when that directory exists ([source](/private/tmp/engineering-research-dogfood-A-20261108/P04-r1/project/scripts/run_package_tests.py:76)). Shell discovery also excludes each root’s `local/` subtree; workflow Python sessions separately exclude their root’s `local/`.
+- **Alternate path:** Without `--loom-family`, the runner forwards supplied arguments directly to pytest, adding no local-directory exclusion. Explicitly targeting `tests/local` therefore reaches pytest; actual collection depends on unavailable pytest configuration ([source](/private/tmp/engineering-research-dogfood-A-20261108/P04-r1/project/scripts/run_package_tests.py:168)).
+- **Missing evidence:** CI invocation/configuration, execution logs, pytest configuration, imported `repo_files` implementation, and revision identity were not supplied. The docstring’s statement that CI selects groups with `--only` does not prove deployed CI behavior.
+
+**Planning implication:** Do not count `tests/local` as CI validation coverage. Confirm the actual CI command before finalizing that assumption; plan separate local validation meanwhile.
+
+No tests executed or files changed. The research record remains unsaved under the read-only constraint.

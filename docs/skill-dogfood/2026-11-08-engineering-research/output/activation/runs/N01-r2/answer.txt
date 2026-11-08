@@ -1,0 +1,7 @@
+The proposal has plausible value, but needs a tighter definition before it merits building.
+
+- **Value:** The runner executes multiple commands and stops at the first failure. An optional recap could help users identify what completed, what failed, and what was left unrun without scanning the full log. The fixture provides no evidence of user demand or difficulty interpreting current output, so the benefit remains unproven.
+- **Complexity:** A command-level recap is a small, bounded addition. Aggregated test counts, parsed subprocess output, timing, or machine-readable formats would introduce substantially more scope across pytest, shell, and Mermaid commands.
+- **Design ambiguity:** Define whether “summary” means execution status or test results. Also specify which runner modes accept the flag: ordinary mode currently forwards arguments to pytest, while family mode handles runner options itself.
+
+My recommendation is to narrow the proposal to an opt-in command-status recap that preserves existing execution order and failure behavior. Proceed only if users need that overview; defer richer reporting until there is evidence it would help.

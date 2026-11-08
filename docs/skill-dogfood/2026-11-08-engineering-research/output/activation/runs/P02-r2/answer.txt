@@ -1,0 +1,26 @@
+The reviewer is correct for `--loom-family`: **new test roots must be listed; tests within listed roots are discovered automatically.** The intent conflates these two behaviors.
+
+Unsaved research draft, respecting your read-only constraint:
+
+```yaml
+title: Test-root discovery
+type: loom-research
+status: concluded
+created: 2026-11-08
+updated: 2026-11-08
+tags: [loom/research]
+```
+
+Method: inspect the supplied implementation and follow its command-building path.
+
+Evidence:
+
+- [`TEST_ROOTS`, line 53](/private/tmp/engineering-research-dogfood-A-20261108/P02-r2/project/scripts/run_package_tests.py:53) explicitly lists four roots.
+- [Python command construction, line 125](/private/tmp/engineering-research-dogfood-A-20261108/P02-r2/project/scripts/run_package_tests.py:125) selects roots from that list; design and workflow use fixed root constants.
+- [Shell discovery, line 88](/private/tmp/engineering-research-dogfood-A-20261108/P02-r2/project/scripts/run_package_tests.py:88) recursively searches only listed roots. Python helpers likewise inspect supplied folders.
+
+Therefore, a new `plugin-x/tests/` root requires registration. Eligible tests added beneath an existing root are discovered subject to exclusions and group selection.
+
+Decision impact: correct the intent’s current-behavior premise before choosing an approach. Automatic discovery of new roots would require changed behavior.
+
+Limitations: source inspection only; no runtime validation. The intent, reviewer artifact, dependency implementation, and revision identifier were not supplied. No research file was saved, and no approach was selected.

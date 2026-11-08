@@ -1,0 +1,18 @@
+{
+  "task": "W5-03 retired-name collision repair only",
+  "class": "Local helper identifier accidentally matches retired-step lexical guard",
+  "whole_branch_class_sweep": "/private/tmp/engineering-research-save-result-20261108/integration-class-sweep.json",
+  "changed_paths": [
+    "loom-code/tests/local/engineering_research_retest/prepare_audits.py",
+    "loom-code/tests/local/engineering_research_retest/test_harness.py"
+  ],
+  "change": "Three live references renamed to mask_skill_reads; no behavior or guard changes",
+  "red": "W5-03-legacy-red.log:1failed",
+  "green": "W5-03-legacy-green.log:10passed",
+  "W5_frozen_dependencies_unchanged": true,
+  "frozen_history_edited": false,
+  "census_or_adversarial_program_edited": false,
+  "commits": 0,
+  "model_calls": 0,
+  "network_calls": 0
+}

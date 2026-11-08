@@ -1,0 +1,41 @@
+我正在收尾:新的研究記錄已寫好,連結也已逐一確認可解析。以下是結論。
+
+## 結論:不能宣稱「整套 package tests/CI 全通過」
+
+**收據(`sample-receipt.json`)**
+- `exit_code=0` 是 `codex exec` 這個代理程序的結束碼,不是 pytest 的結果。
+- 收據裡沒有任何測試指令、測試輸出或 CI 識別碼。它只記錄新增了研究記錄,且 `source_unchanged: true`。
+
+**既有記錄(`package-test-roots.md`)**
+- 它自己寫明是靜態讀碼,「no tests or runner commands were executed」,也不涵蓋 CI 與部署。
+- 它只回答 `TEST_ROOTS` 與 `tests/local/` 的排除問題。我重讀 runner,它引用的行號大致成立:`TEST_ROOTS` 實際在第 53 行,記錄寫 51–55。
+- 它引用的測試檔行號(222–235、285–310)我沒有重新核對。
+
+**來源 hash 與連結**
+- `src/` 的 4 個檔案,hash 全部與 `provenance.json` 相符。既有記錄只提到其中 2 個。
+- 記錄內的相對連結都能解析。
+- 收據的 `-C` 與 `-o` 路徑指向本目錄以外,我沒有讀。
+- 快照只有 4 個檔案,不含 `tests/`、`loom-*/tests` 與 CI 設定,所以這份快照本身跑不出整套測試。
+
+## 可宣稱與不可宣稱
+
+- **可宣稱:** 4 個檔案與 provenance 記錄的 hash 一致。provenance 把它們歸於 commit `d5a7f0da`,但遠端新鮮度未檢查,原始 repo 我也沒讀。另外,靜態檢視發現 `--loom-family` preset 排除 `tests/local/`。
+- **不可宣稱:**
+  - 整套測試通過:沒有任何測試被執行。
+  - CI 通過:證據裡沒有 CI 設定、執行紀錄或 log。
+  - 完全可追溯:這裡的 git 歷史只是 harness 建立的臨時 repo,不是原專案歷史。
+- 建議措辭:「對 4 檔快照做靜態檢視,hash 與 provenance(commit d5a7f0da,未查遠端)相符,確認 `TEST_ROOTS` 與 `tests/local/` 排除行為;未執行測試或 CI。」
+
+## 不確定事項
+
+- 目前的 `SKILL.md` 與 `templates/research.md`,hash 和 provenance 記錄的不同,其餘 3 個 reference 相符。既有記錄可能是在另一版 skill 下產生的。
+- 收據的 `server_confirmed_model` 為 null,實際使用的模型未經確認。
+- 既有記錄的格式與範本略有出入:沒有 H1,「Findings」與「Evidence」合併成一節。
+
+是否採納以上宣稱範圍,由你決定。我沒有跑測試、查遠端或替你驗收。
+
+## 實際路徑
+
+新記錄:`docs/loom/research/2026-11-08-package-test-claim-scope.md`
+
+這是不同的問題,所以另開新檔並連結舊記錄,舊記錄沒有改動。

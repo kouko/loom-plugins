@@ -1,0 +1,9 @@
+The benchmark does not establish that the dependency would improve our workload enough to justify migration. Different hardware confounds the comparison: the reported speedup cannot be attributed to the dependency alone.
+
+Unsaved research draft (read-only):
+- **Evidence:** Your report of different hardware; benchmark methods, versions, raw results and project workload were unavailable.
+- **Method:** Assess comparability; a controlled benchmark fits because the decision depends on the dependency’s performance effect.
+- **Decision impact:** Keep the current plan pending stronger evidence.
+- **Evidence needed:** Compare both dependencies on identical hardware with representative inputs, matched configuration, correctness checks and repeated runs. Assess variability, resource use and whether gains justify migration costs.
+
+No benchmark was run or research artifact saved.

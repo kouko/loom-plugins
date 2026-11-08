@@ -1,0 +1,15 @@
+**User problem:** Accidentally deleting a draft can lose work, with no clear way to recover it.
+
+**Intended outcome:** Let users quickly reverse a draft deletion and continue editing without recreating their work.
+
+**Proposed acceptance criteria:**
+
+- After deletion, show a clearly labeled **Undo** action.
+- Selecting Undo restores the draft’s saved content and returns it to the draft list.
+- Confirm successful restoration.
+- If recovery fails, explain the failure without claiming the draft was restored.
+- Make Undo accessible by keyboard and assistive technology.
+
+**To confirm:** How long should Undo remain available?
+
+These criteria are provisional. No project evidence was provided, and no engineering uncertainty has been identified.

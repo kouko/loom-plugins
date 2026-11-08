@@ -1,0 +1,33 @@
+我已讀回副本的開頭,下面是最終結果。
+
+## 結論
+原研究的結論經核實成立。`src/scripts/run_package_tests.py` 的 `TEST_ROOTS` 只有 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。在 `--loom-family` 預設模式下,`tests/local/` 不會被收集。Python 部分由 `_tests_session` 加上 `--ignore`,shell 部分由 `_shell_tests` 排除。
+
+這個排除只適用於預設模式。明確引數模式(第 168–175 行)沒有加 ignore。
+
+新 plugin 的測試根目錄必須加進 `TEST_ROOTS`,否則不會被發現。一般套件覆蓋的測試也不該放在 `tests/local/`。
+
+## 我實際做的核對
+- 我讀了 `SKILL.md`、`research-methods.md`、`source-policy.md` 和 `preservation.md`。
+- 我讀了 `docs/loom/research/2026-11-08-package-test-roots.md`、`provenance.json` 和 `fixture-observations.json`。
+- 我對照 runner 原始碼和測試定義,核對了研究引用的行號:51–55、76–86、89–96、99–114、122–132、153–175,以及測試的 222–235 與 285–310。這些都與原文一致。
+
+## 保存結果
+- 副本路徑是 `fixtureVault/research/2026-11-08-package-test-roots.md`。
+- 工具回報的 SHA256 是 `187cca8c96d555eed7f11239ba8ed651bb6dc7419fefa2230c76d0469e4e0dd8`,並回報已完整讀回。
+- 我用 Read 只讀了檔案前 12 行,確認 frontmatter 正確。全文內容是靠寫入工具回傳的讀回內容核對的。
+- 相對連結改成指回此 fixture 的來源:`../../provenance.json`、`../../src/...` 和 `../../docs/loom/research/...`。工具回報這 4 個目標都存在。這只是機械性觀察,不是研究正確性的判斷。
+- 我在副本末尾加了「Copy provenance」段落,記錄來源版本、harness 觀察的 git 狀態和雜湊。正文其餘部分未改,原研究也沒動。
+
+## 來源版本
+- `provenance.json` 記錄的來源 commit 是 `d5a7f0da…`。這個 commit 不在 fixture 的 git 裡,遠端新鮮度也標示為未檢查。
+- fixture git 是 harness 觀察的結果:`main` 為 `4959e62`,`research-fixture` 為 `00fa764` 且是 `main` 的祖先,沒有 tag 和 remote。
+- 這些觀察來自 `fixture-observations.json`,不是我執行的命令。
+
+## 限制與不確定事項
+- 我沒有執行任何測試、runner 或命令,結論僅由靜態原始碼支持。
+- 來源雜湊是比對 `fixture-observations.json` 與 `provenance.json` 的數值,我沒有自己重算。
+- 副本寫入後的雜湊沒有獨立來源可比對,只有工具回報的那一個。
+- CI 設定、已部署或已安裝的版本都不在證據範圍內。
+- 這個 merge 只發生在臨時 fixture,不代表發布或安裝。
+- Obsidian CLI 不可用,所以沒有驗證 Obsidian 內的顯示。

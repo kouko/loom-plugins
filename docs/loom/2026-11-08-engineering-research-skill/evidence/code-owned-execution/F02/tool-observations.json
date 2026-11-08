@@ -1,0 +1,74 @@
+[
+  {
+    "id": "item_1",
+    "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'!*node_modules*'\"' -g '\"'!*.lock'\"'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 731,
+    "output_sha256": "3b22660185d6cbf551dbb2b8202429fa360676bdda3f03b76b8b56d18324c271"
+  },
+  {
+    "id": "item_2",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9333,
+    "output_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+  },
+  {
+    "id": "item_4",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/templates/research.md skill/engineering-research/references/preservation.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 17417,
+    "output_sha256": "575833c98b67ffcda75b5a735923d9e9a3098f9631d6ec914e1db28de1c91de4"
+  },
+  {
+    "id": "item_5",
+    "command": "/bin/zsh -lc 'cat docs/loom/research/2026-11-08-package-test-roots.md snapshots/original-research.md provenance.json sample-receipt.json fixture-cleanup.json'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9365,
+    "output_sha256": "ffed4af079cf838d08b6b3e0a3ad900d242eb17e721d1fc60bbd3d01934b6c82"
+  },
+  {
+    "id": "item_6",
+    "command": "/bin/zsh -lc 'nl -ba src/scripts/run_package_tests.py; nl -ba src/tests/test_run_package_tests.py'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 25459,
+    "output_sha256": "fb81c6311116b51e00225177a8a7cebd999a09f9bd43097f233aeb6f6b054325"
+  },
+  {
+    "id": "item_7",
+    "command": "/bin/zsh -lc 'git status --short; git log --all --decorate --oneline -8; rg --files --hidden docs; shasum -a 256 src/scripts/run_package_tests.py src/tests/test_run_package_tests.py'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 438,
+    "output_sha256": "73bb814b685e6f9f3ae6a6b1e6abdbaa73c55e4667dd963db90acc11cd36c867"
+  },
+  {
+    "id": "item_8",
+    "command": "/bin/zsh -lc \"sed -n '1,100p' src/loom-code/scripts/repo_files.py; sed -n '1,100p' src/loom-code/scripts/git_exec.py; git show --no-patch --format=fuller 4959e620a78e15678a3cc2a8a0c18f79de58dc73; git diff 00fa764 4959e620a78e15678a3cc2a8a0c18f79de58dc73 -- docs/loom/research/2026-11-08-package-test-roots.md\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 8908,
+    "output_sha256": "4576fd7769e01a3fb226dc25869003aa12f344b33e5247d141215f300915c04a"
+  },
+  {
+    "id": "item_11",
+    "command": "/bin/zsh -lc 'cat docs/loom/fixture-explicit-args/research/001-explicit-local-test-arguments.md; git diff --stat; git status --short'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 7359,
+    "output_sha256": "760bad0bfb93bf0b22de62ed943af11969f12c266c30dc1773e56a79fa8b232d"
+  }
+]

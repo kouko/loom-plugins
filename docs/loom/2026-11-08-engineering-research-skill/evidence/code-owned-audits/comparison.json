@@ -1,0 +1,66 @@
+{
+  "nature": "two independent blind advisory dogfood draft audits; not formal closing-review verdicts",
+  "case_buckets": {
+    "A01": {
+      "F01": "met",
+      "F02": "met",
+      "F03": "met",
+      "F04": "met",
+      "F05": "partial",
+      "F06": "partial"
+    },
+    "A02": {
+      "F01": "met",
+      "F02": "met",
+      "F03": "met",
+      "F04": "met",
+      "F05": "partial",
+      "F06": "met"
+    }
+  },
+  "disagreements": [
+    {
+      "case": "F05",
+      "scope": "destination concretization",
+      "A01": "unresolved destination permitted by no-CLI fallback",
+      "A02": "low severity: nominate complete project-relative destination",
+      "adjudicated": false
+    },
+    {
+      "case": "F06",
+      "scope": "effect of unresolved broader cleanup prerequisite",
+      "A01": "partial despite established authorized copy",
+      "A02": "met for explicit copy operation; broader cleanup remains unknown",
+      "adjudicated": false
+    }
+  ],
+  "agreement": [
+    "F01-F04 met",
+    "source conclusions accurate and original source unchanged",
+    "F03 no-write satisfied",
+    "F04 research actor success does not prove suite/CI",
+    "F05 no Vault write and consent controls satisfied",
+    "F06 exact authorized copy, readback/hash/links established",
+    "broader cleanup eligibility inconclusive; blocked deletion not successful cleanup",
+    "release/install/application behavior remains unverified"
+  ],
+  "requested_identity": {
+    "model": "gpt-6.1-sol",
+    "provider": "openai",
+    "effort": "medium"
+  },
+  "server_confirmed_identity": null,
+  "aggregate_usage": {
+    "input_tokens": 1190127,
+    "cached_input_tokens": 990336,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 12707,
+    "reasoning_output_tokens": 2225
+  },
+  "input_packet_unchanged": true,
+  "auth_symlinks_removed": true,
+  "raw_reasoning_excluded": true,
+  "runtime_source_files": 7,
+  "frozen_input_files": 444,
+  "harness_raw_root": "/private/tmp/code-owned-engineering-research-audits-20261108"
+}

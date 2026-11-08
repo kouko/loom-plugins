@@ -1,0 +1,11 @@
+結論：限制主要在 `--loom-family` 的自動收集範圍；目前證據不足以決定是否新增 plugin。
+
+**研究紀錄草稿（未儲存，遵守唯讀要求）**  
+日期：2026-11-08；狀態：concluded。方法：靜態追查唯一 fixture，未執行 runner。
+
+- **Roots 是固定白名單**：只有 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。新 plugin 自有的 tests root 不會自動加入。[來源](/private/tmp/engineering-research-dogfood-A-20261108/P19-r2/project/scripts/run_package_tests.py:53)
+- **新增 root 不代表隔離執行**：除 design、workflow 外，都歸入同一個 `code` pytest／xdist session；若 plugin 需要獨立設定，單加 root 未必足夠。[來源](/private/tmp/engineering-research-dogfood-A-20261108/P19-r2/project/scripts/run_package_tests.py:124)
+- **白名單不是所有模式的限制**：一般模式會直接把指定路徑／參數交給 pytest，支援 `--then` 分組，也沒有套用 family 的排除處理。[來源](/private/tmp/engineering-research-dogfood-A-20261108/P19-r2/project/scripts/run_package_tests.py:168)
+- **排除條件**：family 有 root 下的 `local/` 與巢狀 repository 排除邏輯；後者依賴缺少的 `repo_files`，尚未驗證實際行為。
+
+決策影響：若要求「新 plugin 自動納入 family」，目前 runner 需要調整；但缺少 plugin 的目錄、pytest 設定與隔離需求，不能據此判定應否新增 plugin。
