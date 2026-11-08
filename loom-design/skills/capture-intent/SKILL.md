@@ -76,12 +76,6 @@ Draft directly when already sufficient. No intake question quota applies.
 Problems/outcomes are valid before choosing features or implementation.
 Existing decision points remain unchanged.
 
-For factual gaps that could change the outcome, consider optional
-`loom-workflow:engineering-research` when available, including small capability
-checks. Return evidence or uncertainty here, preserving this station and
-authorization. Routine lookups remain ordinary work; research never replaces
-intent confirmation.
-
 Cover affected people, workaround, clean-environment observable outcomes,
 fixed constraints, and exclusions. For product also cover urgency, existing
 alternatives, and displaced work. End with GO or NO-GO plus one reason; write

@@ -358,7 +358,7 @@ List agent decisions so the acceptance test report can show them at decision
 point ③.
 
 When an unresolved factual premise could change that choice, consider
-`loom-workflow:engineering-research` when available, including for a small
+`loom-code:engineering-research`, including for a small
 capability/version check. Reference the retained record and return its evidence
 or uncertainty to this plan. Research is optional, preserves this station and
 its authorization, and does not turn routine lookups into a prerequisite or

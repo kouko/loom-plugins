@@ -16,7 +16,6 @@ The selected skill owns its procedure, permissions, and output contract.
 | Judge a proposal, choose what to keep, or assess a simpler implementation | [critique](../critique/SKILL.md) |
 | Write, edit, or review dbt + Redshift model style and structure | [dbt-model-style](../dbt-model-style/SKILL.md) |
 | Open, advance, resume, or assess a persistent Outcome Map across sessions | [decision-map](../decision-map/SKILL.md) |
-| Resolve a factual evidence gap that could change an engineering decision, including a small capability/version check, or consider preserving research from a merged change | [engineering-research](../engineering-research/SKILL.md) |
 | Review selected past or current session snapshots for recurring issues in a readable target skill or its related plugin integration | [skill-retro](../skill-retro/SKILL.md) |
 | Commit, create/merge a PR, or recall a decision bound to Git history | [git-memory](../git-memory/SKILL.md) |
 | Explicitly invoke `goal-create` by name for a session goal or repository purpose | [goal-create](../goal-create/SKILL.md) |
@@ -31,9 +30,7 @@ The selected skill owns its procedure, permissions, and output contract.
 Do not select `goal-create` from an inferred need or an unnamed goal request.
 Changing a critique lens selects `critique`; changing who answers selects
 `independent-advisor`. A built-in `/recap` away-summary is not `recap-state`.
-Routine factual or function-state questions without a consequential evidence gap
-need no workflow skill. Research preserves the owning task and its authorization;
-it is optional and does not add a lifecycle station or prerequisite. Diagrams in
+Simple factual or function-state questions need no workflow skill. Diagrams in
 coding chat select `loom-visualization`; Obsidian notes do not. A single
 implementation change belongs to an available Loom lifecycle station, not `decision-map`; this toolbox
 does not supply intent, spec, plan, build, review, or ship procedures.

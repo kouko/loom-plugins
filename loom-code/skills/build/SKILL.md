@@ -16,8 +16,8 @@ Read the confirmed intent, retained spec and plan when present, current branch,
 and branch base. Preserve unrelated and untracked work. Work only on scoped paths.
 
 If an unresolved factual premise or repeated failed attempt could change an
-implementation decision, consider `loom-workflow:engineering-research` when
-available. Bring its retained record and evidence or uncertainty back to the
+implementation decision, consider `loom-code:engineering-research`.
+Bring its retained record and evidence or uncertainty back to the
 owning task; preserve Build's scope and authorization. This optional handoff
 does not replace tests, advance user decisions or make routine lookups a new
 prerequisite.

@@ -51,3 +51,23 @@ def test_entry_routes_every_core_resource_directly():
     assert metadata["name"] == PACKAGE.name
     assert isinstance(metadata["description"], str)
     assert len(metadata["description"]) <= 250
+
+
+def test_code_owns_the_only_discoverable_package_without_design_routing():
+    root = Path(__file__).resolve().parents[3]
+    assert PACKAGE == root / "loom-code/skills/engineering-research"
+    assert not (root / "loom-workflow/skills/engineering-research").exists()
+    for path in (root / "loom-design/skills").rglob("*.md"):
+        assert "engineering-research" not in path.read_text(), path
+    code_router = (root / "loom-code/skills/using-loom-code/SKILL.md").read_text()
+    assert "[engineering-research](../engineering-research/SKILL.md)" in code_router
+    workflow_router = root / "loom-workflow/skills/using-loom-workflow/SKILL.md"
+    assert "engineering-research" not in workflow_router.read_text()
+
+
+def test_code_stations_delegate_research_to_their_bundled_skill():
+    root = Path(__file__).resolve().parents[3]
+    for station in ("write-plan", "build", "ship"):
+        text = (root / f"loom-code/skills/{station}/SKILL.md").read_text()
+        calls = set(re.findall(r"`(loom-[\w-]+:engineering-research)`", text))
+        assert calls == {"loom-code:engineering-research"}, station

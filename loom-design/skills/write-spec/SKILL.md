@@ -100,12 +100,6 @@ Write `docs/loom/<change-id>/spec.md` from `templates/spec-minimal.md`.
 Every section is required —
 `N/A — <reason>` is an answer, silence is not.
 
-If a consequential premise lacks evidence, consider
-`loom-workflow:engineering-research` when available. Reference its retained
-record and bring the result or uncertainty back to this spec. This optional
-handoff preserves the station, confirmed scope and authorization; it neither
-advances decision point ② nor makes routine lookups a research prerequisite.
-
 The spec is written in English, and each `REQ-<n>` line is one of the five
 EARS forms (`WHEN <trigger>, the <system> shall <response>`, `WHILE
 <state>`, `WHERE <feature>`, `IF <condition> THEN`, or the plain `The
