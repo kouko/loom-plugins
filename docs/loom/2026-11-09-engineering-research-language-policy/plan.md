@@ -24,6 +24,13 @@ charter: 1.1
 - Test: A6 positive: synchronized-release-metadata; boundary: unchanged-other-plugin-versions.
 - Risk: agent-decided — REQ-6: minor bump for station guidance, derived manifests via existing synchronizer; locate version pins before editing and preserve all unrelated release behavior. Include changelog entry and pin-test rewrite.
 
+### Wave 3 — Correct the validation invocation
+
+**W3-01 Correct the adversarial command declaration** after: W2-02 acceptance: 6
+- Files: docs/loom/2026-11-09-engineering-research-language-policy/evidence/finalize-command-repair.md
+- Test: A6 positive: supported-direct-pytest-wrapper; boundary: preserve-rejected-env-declaration.
+- Risk: agent-decided — REQ-6: preserve the rejected declaration and use the existing uv-wrapped Python command directly; pass cache environment through the launcher. No product, program or approved requirement changes; retain the same review episode.
+
 ## Simplicity check
 
 - none found
@@ -37,3 +44,4 @@ charter: 1.1
 1. agent-decided — Two supplemental observations cannot establish reliable triggering, causality or host compatibility. Report actual expansion separately from sufficient alternative evidence; retain unobserved paths.
 2. agent-decided — All archived fixtures and queries are public technical material. Native agents only; no outside-host CLI invocation, private-data export, global installation or real Vault writes.
 3. user-decided — Confirmed scope and automatic nonforce push/Ready PR on 2026-11-09. Merge requires separate acceptance. Engineering change skips product decision point ②.
+4. agent-decided — The installed Python probe recognizer rejects an env-prefixed wrapper. Declare uv directly and inherit cache environment; preserve the failed finalization and rerun Build checks before same-reviewer Round 2. No counters or requirements reset.
