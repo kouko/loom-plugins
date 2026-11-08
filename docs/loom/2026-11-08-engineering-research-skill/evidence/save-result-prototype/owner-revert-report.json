@@ -1,0 +1,20 @@
+{
+  "commit": "ea33e4ce5b8f1326ad39ecada59ac32f61acff0d",
+  "task": "W6-01 continuation: remove the single orphaned local-helper census entry after deterministic archival",
+  "program": "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py",
+  "change": "Remove only the exact save_tool.py MANUAL_OVERRIDES row introduced by1205fa661; all other inference, entries and guards unchanged",
+  "net_program_matches_origin_main": true,
+  "classifier": {"command": "uv run --isolated --with-requirements requirements-package-tests.lock python docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py --roots loom-code/tests", "exit_code": 0, "log": "census-owner-revert-classifier.txt"},
+  "reused_tests": {"artifact": "loom-code/tests/test_adversarial_census_gaming.py", "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_census_gaming.py -q", "passed": 3, "exit_code": 0, "modified": false, "log": "census-owner-revert-tests.txt"},
+  "mutations_and_boundaries": [
+    {"case": "same-filename-prose-pin", "observed": "Actual updated committed classifier reports sentence-pin without override", "log": "census-owner-revert-baseline-prose.txt"},
+    {"case": "stale-exact-row-restored", "observed": "Actual copied classifier masks the synthetic same-filename prose pin as not-prose; direct output assertion turns RED, exit1", "log": "census-owner-revert-mutation-red.txt", "reverted": true},
+    {"case": "neighbor-unknown", "observed": "Actual updated committed classifier still reports other without override and exits1; boundary assertion passes", "log": "census-owner-revert-unknown.txt", "removed": true}
+  ],
+  "method": "The actual updated committed program was copied byte-for-byte with git show; no copied classification logic. Mutations were applied and undone only in a throwaway tree with apply_patch; direct executable assertions inspect real CLI output.",
+  "setup_failure_preserved": "Initial minimal mutation copy omitted mechanisms.yaml and failed before classification. The real dependency was copied in; that setup failure is not counted as a mutation RED.",
+  "new_programs": 0,
+  "modified_programs": 1,
+  "other_product_or_frozen_inputs_modified": false,
+  "historical_1205_report_preserved": true
+}

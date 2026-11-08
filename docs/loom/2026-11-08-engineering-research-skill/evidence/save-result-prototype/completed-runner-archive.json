@@ -1,0 +1,86 @@
+{
+  "archive": "completed-runner-sources.tar.gz",
+  "archive_sha256": "7df7f3bcfb407eb76b1232ea6a0374e7da20acfaf793b7aa4788ca787437a42e",
+  "archive_bytes": 23948,
+  "member_count": 11,
+  "members": {
+    "loom-code/tests/local/engineering_research_retest/harness.py": {
+      "sha256": "94b8cb36da4b87c782d14bc72b72b130e580546eac1de51bb0aa540bfd9482ba",
+      "bytes": 13040,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_retest/prepare_audits.py": {
+      "sha256": "c7c9e38238afc9742d94bd9cca5cd52daf4b694407620b8088e086d75ca44ddb",
+      "bytes": 11990,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_retest/test_harness.py": {
+      "sha256": "a55498069041462fcf6e41fccf37ee03df94587dfb98faa1233261f2095e3d14",
+      "bytes": 6520,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/README.md": {
+      "sha256": "54ed42884f93336dac5869aadff41c0b3cefacd695a3e2c6dfc20089c6abc791",
+      "bytes": 3560,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/experiment.py": {
+      "sha256": "b9105e2c6c59bb2771c8f97542b4305a28a46c9d1a994c5a024f222603fad4e7",
+      "bytes": 336,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/paired_experiment.py": {
+      "sha256": "3e6708871b0b67601e8e6bd5656cd274d105b32accec1affac9f0af33a994f98",
+      "bytes": 10512,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/public_runner.py": {
+      "sha256": "98a6631f5f73ed58378a8b5284db1692457b09670041c16efec36295faadfeef",
+      "bytes": 6144,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/save_tool.py": {
+      "sha256": "d929b2dedd1290475cd7a63d43413b221a4130d112dd132eeb04101fbd16acc1",
+      "bytes": 7466,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/server.py": {
+      "sha256": "5b5f01675cafc0b0611fbee96121236e93858773e8aa66ad6bbeeaedc53fceca",
+      "bytes": 2789,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/test_experiment.py": {
+      "sha256": "9996f0706cd3c27ddccb480367b0e4c6798bfdca2502741b7515f02e8f82294d",
+      "bytes": 3054,
+      "readback_matches_original": true
+    },
+    "loom-code/tests/local/engineering_research_save_probe/test_save_tool.py": {
+      "sha256": "6feca905a5e6897363aa96d74948b8f8262e460ad3d88aae7e7dbac586585cdc",
+      "bytes": 10197,
+      "readback_matches_original": true
+    }
+  },
+  "cleanup_base_head": "2911e412d65c6ee05a9c8bfde0123a6921c12658",
+  "source_tree_commit": "2911e412d65c6ee05a9c8bfde0123a6921c12658",
+  "completed_prototype_commit": "31210c84aae65dd6146899faaadf3aa9a4048c8c",
+  "metadata_normalization": {
+    "gzip_filename": "",
+    "gzip_mtime": 0,
+    "tar_format": "GNU",
+    "member_mode": "0644",
+    "uid": 0,
+    "gid": 0,
+    "mtime": 0,
+    "uname": "",
+    "gname": "",
+    "ordering": "sorted original repository-relative file paths"
+  },
+  "verification": "Every archived regular member was read back and compared byte-for-byte with the tracked working file and source tree at cleanup_base_head before deletion. All 11 matched.",
+  "scope": "Only the completed W4 comparison runners and W5 unpromoted save-result prototype sources. Original workspace, raw trials, older archives, runtime skill, user/global settings, credentials and ignored pycache are untouched.",
+  "path_status": "These original repository-relative paths are historical after cleanup. Frozen source hashes remain historical evidence; read the matching bytes from this archive or the recorded Git commit. No claim that deleted runner paths remain live is made.",
+  "restoration": "Exact archived source bytes are retained for explicit restoration/replay by choice. No automatic extraction, installation or execution is authorized or performed.",
+  "behavior_scope": "Archival does not turn exploratory outputs into semantic acceptance, promote the helper, prove installed-host parity or reset prior failures.",
+  "models_requested": 0,
+  "tests_run_during_cleanup": 0,
+  "parent_plan_sha256_unchanged": "bcf324e2ff07d6b308ce01254138a34a3b75daa1902ac5639292be1752b4025b"
+}

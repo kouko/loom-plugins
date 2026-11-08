@@ -72,6 +72,13 @@ Requirement continuity section defines.
 - Test: Reproduce retired-name scan collision and census unclassified-helper failure. Rename the local masking function consistently; retain frozen history. Let the adversary update its census program for the added helper scope. Re-run focused guards and the complete package runner.
 - Risk: agent-decided — These integration failures appeared after earlier local harness files became tracked. Earlier package passes covered their prior tracked inventory only. Preserve failures, frozen W5 dependencies and all original rules; no task-attempt reset or private model retry is implied.
 
+### Wave 6 — Keep unpromoted experiments out of the maintained package
+
+**W6-01 Archive completed local runners and retain only delivery evidence** after: W5-02,W5-03 acceptance: 9
+- Files: loom-code/tests/local/engineering_research_retest/, loom-code/tests/local/engineering_research_save_probe/, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-11-08-engineering-research-skill/evidence/save-result-prototype/, docs/skill-dogfood/2026-11-08-code-owned-engineering-research/
+- Test: Verify every tracked runner/helper byte against a deterministic source archive before deleting only those files. Preserve all raw trials. Remove the now-unused exact census admission through its owner; rerun the package runner and existing adversarial tests.
+- Risk: agent-decided — Four paired cases did not establish a general research-quality advantage. The helper remains an archived prototype rather than maintained plugin code. Runtime research behavior and requirement/attempt history stay unchanged; archival links disclose historical execution paths.
+
 ## Simplicity check
 - none found
 
