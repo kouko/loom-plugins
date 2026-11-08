@@ -43,6 +43,18 @@ Requirement continuity section defines.
 - Test: A9 positive: owner-census-release-parity; negative: stale-workflow-registration. Retain prior cap and budget regressions; run complete declared package inventory after integration.
 - Risk: agent-decided — Follow revised spec REQ-1 and REQ-9; retain one counted skill/tool, restore design runtime/release surfaces to trunk baseline, and synchronize code/workflow manifests, documentation and tests.
 
+### Wave 4 — User-approved bounded dogfood repair
+
+**W4-01 Make saved-content completion and preservation navigation concrete** after: W3-02 acceptance: 2,3,8,9
+- Files: loom-code/skills/engineering-research/SKILL.md, loom-code/skills/engineering-research/references/preservation.md
+- Test: Frozen Claude F02/F04/F06 trajectories are behavioral RED for saved-content inspection; F05 for preservation links. Run package invariants and a fresh old/new six-case comparison with independent trajectory judgment. Prose-token assertions cannot establish behavioral GREEN.
+- Risk: agent-decided — User approved repair/retest on 2026-11-08. Existing obligations and attempts continue; keep description, methods, framework selection, ownership, schema and historical failed outputs unchanged.
+
+**W4-02 Bound test tools and rerun both versions under identical conditions** after: W4-01 acceptance: 2,3,8,9
+- Files: loom-code/tests/local/engineering_research_retest/, docs/loom/2026-11-08-engineering-research-skill/evidence/, docs/skill-dogfood/2026-11-08-code-owned-engineering-research/
+- Test: RED/GREEN boundary checks cover traversal, external paths, symlink escapes, writes and commands. Reuse six prompts/fixtures/rubric; run one fresh old/new pair each with identical confined tools. Two independent revision-blinded auditors inspect trajectories. Preserve earlier native-tool results separately.
+- Risk: agent-decided — Confinement is a fixed harness control, not production safety or skill improvement. Six pairs give directional evidence only. Retain first-party Anthropic/OpenAI identities and existing data boundaries; no real Vault, installation, publication, merge or trigger claims.
+
 ## Simplicity check
 - none found
 
@@ -56,3 +68,4 @@ Requirement continuity section defines.
 4. The new counted skill and contract tool increase the mechanism population; record budget-exception lines and executable admission updates, retaining every earlier population and budget regression case.
 5. The spec received independent spec+adversarial PASS against da402f1b; engineering exemption applies to decision point ②, and the plan is agent-decided. The next user decision is acceptance after publication checks.
 6. W3 changes the ownership and design-integration obligation by explicit user reconfirmation; it does not reopen completed word-cap, portability or archive fixes, reset their attempts, or authorize the still-blocked native-model payload transmission.
+7. W4 retains original findings/attempts. Specific provider permissions and explicit repair/retest approval govern this bounded rerun, without provider substitution or broader data collection. Report lack of improvement rather than iterate indefinitely.
