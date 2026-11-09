@@ -53,7 +53,8 @@ def delivery(tmp_path, monkeypatch):
 
 
 def test_matching_remote_pr(delivery):
-    _, _, calls, pr, observe = delivery
+    repo, _, calls, pr, observe = delivery
+    git(repo, "tag", "feature")
     code, result = observe()
     assert code == 0 and result["state"] == "published" and result["complete"]
     assert result["evidence"]["pr"] == pr["html_url"]

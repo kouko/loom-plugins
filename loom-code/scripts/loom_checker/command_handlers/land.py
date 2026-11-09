@@ -13,6 +13,7 @@ from loom_checker.command_handlers.publish import classify_checks
 from loom_checker.command_handlers.publish import resolve_publish_executable
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
@@ -671,7 +672,7 @@ def _sweep_list(
     )
     if prs is None:
         return 1
-    invoking = git_maybe(context.repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    invoking = current_branch(context.repo)
 
     lines: list[str] = []
     removable: list[tuple[LandTarget, CleanupPlan]] = []
@@ -962,7 +963,7 @@ def _merge_preconditions(
         return _block(ACCEPTANCE_NOT_RECORDED, err)
 
     head = git_maybe(repo, "rev-parse", "HEAD")
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(repo)
     if not head or not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
         return _block("land requires a safe current symbolic branch and HEAD", err)
     _origin_url, origin_error = _publish_origin_state(repo, branch)

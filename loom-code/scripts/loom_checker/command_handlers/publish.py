@@ -5,6 +5,7 @@ from typing import Literal
 from git_exec import run_git
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
@@ -98,7 +99,7 @@ def _publish_block(reason: str, err, next_action: str | None = None,
 
 def _publish_origin_state(repo: Path, expected_branch: str) -> tuple[str | None, str | None]:
     """Return the single literal origin URL or a publication identity error."""
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(repo)
     if branch != expected_branch:
         return None, "symbolic branch changed before publication"
     origin_urls = (git_maybe(repo, "config", "--get-all", "remote.origin.url") or "").splitlines()
@@ -317,7 +318,7 @@ def observe_delivery(
             return result("unconfirmed", "intent path does not match the identified change",
                           "Select the identified change's canonical committed intent.")
         head = git_text(repo, "rev-parse", "HEAD")
-        branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+        branch = current_branch(repo)
         evidence.update(change_id=change_id, head=head, branch=branch)
         if not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
             return result("unconfirmed", "a safe symbolic feature branch is required",
@@ -355,9 +356,7 @@ def observe_delivery(
             pending = pending_result()
             if pending:
                 return pending
-            if git_text(repo, "rev-parse", "HEAD") != head or git_maybe(
-                repo, "symbolic-ref", "--quiet", "--short", "HEAD"
-            ) != branch:
+            if git_text(repo, "rev-parse", "HEAD") != head or current_branch(repo) != branch:
                 return result("unconfirmed", "local HEAD or branch changed during observation",
                               "Stabilize the selected branch and rerun delivery.")
             return result("local", "attributable work is committed locally",
@@ -747,7 +746,7 @@ def _cmd_publish_trusted(
         )
 
     head = git_maybe(repo, "rev-parse", "HEAD")
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(repo)
     if not head or not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
         return _publish_block("publication requires a safe current symbolic branch and HEAD", err)
     origin_url, origin_error = _publish_origin_state(repo, branch)

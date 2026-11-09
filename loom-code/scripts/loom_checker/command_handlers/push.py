@@ -10,6 +10,7 @@ or non-object payload exits 2.
 from __future__ import annotations
 
 from loom_checker.helpers import UsageError
+from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import repo_root
 from loom_checker.rule_checks.push import publication_kind
@@ -56,7 +57,8 @@ pre-push)
     done
     ;;
 *)
-    branch=$(git symbolic-ref -q --short HEAD) || exit 0
+    branch=$(git symbolic-ref -q HEAD) || exit 0
+    case "$branch" in refs/heads/*) branch=${branch#refs/heads/} ;; *) exit 0 ;; esac
     protected "$branch" && deny "$branch"
     ;;
 esac
@@ -196,8 +198,7 @@ def _protect_main(command: str, cwd: Path) -> bool:
     """A literal Git verb at the start, including when later shell text follows."""
     if not DIRECT_GIT_CHANGE.match(command):
         return False
-    # https://git-scm.com/docs/git-symbolic-ref (--quiet for detached HEAD, --short for branch name)
-    branch = git_maybe(cwd, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(cwd)
     if branch not in {"main", "master"}:
         return False
     # https://git-scm.com/docs/git-config (--local limits scope; --bool normalizes false values)
