@@ -1,0 +1,20 @@
+verdict: PASS_WITH_NOTES
+lens: spec+adversarial
+reviewed_sha: 2592320b
+reviewer: /root/spec_review
+dimension_scores:
+  omission: PASS
+  ambiguity: PASS
+  inconsistency: PASS
+  incorrect-fact: PASS_WITH_NOTES — supplementary counts were not independently recomputed
+  missing-population: PASS
+  deletion-first: PASS
+  spec-conformance: PASS
+  design-conformance: N/A — standing waiver
+  principles-conformance: PASS
+  user-judgment-leak: PASS
+findings: []
+notes:
+  - Shared-hook enrollment fixed by repository-only location and identity verification.
+  - Publication revocation fixed by working-intent precedence without claiming local completion.
+  - Fix delta 2592320b..24b5bc0f only; reviewer performed no edits, tests or probes.
