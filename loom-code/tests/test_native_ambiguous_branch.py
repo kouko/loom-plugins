@@ -1,12 +1,7 @@
 # concern: A same-named tag must not let ordinary commits bypass trunk protection.
 """Exercise Git's disambiguated symbolic-ref output in an isolated repository."""
-import sys
-from pathlib import Path
-
 import pytest
 
-ROOT = Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(ROOT / "loom-code/tests"))
 from test_native_git_protection import git, manage, setup
 
 
