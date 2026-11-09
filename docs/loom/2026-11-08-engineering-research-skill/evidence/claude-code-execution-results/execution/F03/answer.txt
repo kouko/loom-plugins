@@ -1,0 +1,26 @@
+**研究草稿(未儲存。依你的要求,我沒有寫入任何檔案。)**
+
+**問題:** `src/scripts/run_package_tests.py` 的 `TEST_ROOTS` 精確列了哪些目錄?
+
+**結論:** `TEST_ROOTS` 剛好是四個目錄,見 `src/scripts/run_package_tests.py:53`:
+
+```python
+TEST_ROOTS = ("tests", "loom-code/tests", "loom-design/tests", "loom-workflow/tests")
+```
+
+**證據(靜態閱讀,未執行任何東西):**
+- 檔案內的註解寫著「Every folder the package suite runs, subfolders included; nothing else runs」(第 52 行)。
+- `_shell_tests` 在第 92 行對這四個根目錄遞迴找 `test-*.sh`,並排除各根目錄下的 `local/`。
+- `code` 群組在第 125 行取四者中除 `loom-design/tests`、`loom-workflow/tests` 以外的部分,也就是 `tests` 與 `loom-code/tests`。
+- `src/tests/test_run_package_tests.py:302` 的測試也斷言同一個 tuple。我只讀了這個測試,沒有執行。
+- 既有紀錄 `docs/loom/research/2026-11-08-package-test-roots.md` 的結論相同。它記錄的 SHA256 與 provenance 相符,但我這次沒有重新計算雜湊。
+- 該紀錄引用的行號是 51–55,tuple 實際在第 53 行,兩者不衝突。
+
+**決策影響:** 新 plugin 的測試目錄不會被自動發現,必須加進 `TEST_ROOTS`。否則請放在既有根目錄下、`local/` 以外的位置。
+
+**限制:**
+- 這只是對最小來源快照(provenance 標示 commit `d5a7f0da…`)的靜態閱讀。
+- CI 設定、實際部署版本和執行期行為都不在證據範圍內。
+- 既有紀錄指出,明確參數模式會把各群組直接轉給 pytest,不會加上 `local/` 的排除。
+
+**Skill 流程:** 既有證據已足夠回答,所以我沒有蒐集新證據,也就沒有另外載入 `references/` 文件。因為你要求不寫入,所以沒有儲存的研究紀錄。如果之後要保留這份草稿,現有的 `docs/loom/research/2026-11-08-package-test-roots.md` 已涵蓋同一問題,應該重開它而不是另建新檔。

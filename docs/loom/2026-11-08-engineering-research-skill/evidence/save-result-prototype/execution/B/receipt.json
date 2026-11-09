@@ -1,0 +1,77 @@
+{
+  "actor": "B",
+  "case": "F04",
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 45.735,
+  "requested_provider": "first-party Anthropic native account; no provider env inherited",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_effort": "medium",
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 10,
+      "cache_creation_input_tokens": 32678,
+      "cache_read_input_tokens": 68859,
+      "output_tokens": 5614,
+      "output_tokens_details": {
+        "thinking_tokens": 753
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 32678,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1096,
+          "cache_read_input_tokens": 26744,
+          "cache_creation_input_tokens": 5934,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 5934
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 10,
+        "outputTokens": 5614,
+        "cacheReadInputTokens": 68859,
+        "cacheCreationInputTokens": 32678,
+        "webSearchRequests": 0,
+        "costUSD": 0.1937579,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 753,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 32678,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.1937579,
+    "permission_denials": [],
+    "num_turns": 14
+  },
+  "changed_files": [],
+  "added_files": [
+    "docs/loom/research/2026-11-08-package-test-claim-scope.md"
+  ],
+  "deleted_files": [],
+  "cost_scope": "CLI list-price equivalent, not subscription bill",
+  "protected_unchanged": true,
+  "fixtureVault_changes": []
+}

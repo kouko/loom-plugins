@@ -1,0 +1,51 @@
+{
+  "id": "X007",
+  "case": "C05",
+  "command": [
+    "/Users/kouko/.local/bin/codex",
+    "exec",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--json",
+    "--sandbox",
+    "workspace-write",
+    "-C",
+    "/private/tmp/framework-probe-b-20261108/X007/project",
+    "-o",
+    "/Users/kouko/.herdr/worktrees/loom-plugins/loom-research-skill-discut/docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/X007/answer.txt",
+    "-"
+  ],
+  "env_keys": [
+    "CODEX_HOME",
+    "HOME",
+    "LANG",
+    "LOGNAME",
+    "PATH",
+    "PYTHONDONTWRITEBYTECODE",
+    "SHELL",
+    "TMPDIR",
+    "USER"
+  ],
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "config": "model = \"gpt-6.1-sol\"\nmodel_provider = \"openai\"\nmodel_reasoning_effort = \"medium\"\nweb_search = \"disabled\"\n[features]\napps = false\nmulti_agent = false\n",
+  "server_confirmed_model": null,
+  "timed_out": false,
+  "excluded_reasoning_events": 0,
+  "exit_code": 0,
+  "elapsed_seconds": 117.009,
+  "thread_id": "01a1b9fd-4484-7c80-ac0e-9d6b65011a83",
+  "usage": {
+    "input_tokens": 152146,
+    "cached_input_tokens": 119680,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 4830,
+    "reasoning_output_tokens": 84
+  },
+  "source_unchanged": true,
+  "added_project_files": [
+    "docs/loom/research/2026-11-08-research-note-migration.md"
+  ],
+  "auth_symlink_removed": true
+}

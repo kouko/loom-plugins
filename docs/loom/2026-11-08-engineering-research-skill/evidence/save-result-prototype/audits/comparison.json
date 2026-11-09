@@ -1,0 +1,371 @@
+{
+  "nature": "W5 persisted-save result intervention; two independent advisory blind audits; no formal closing-review verdict or overall pass",
+  "auditors_requested": {
+    "provider": "openai",
+    "model": "gpt-6.1-sol",
+    "effort": "medium"
+  },
+  "server_confirmed_model": null,
+  "opaque_extraction_sha256": "7fa7c48daeb1aa6cf7563771812a56b6bc15b5393f671311c51d2e72c8076e80",
+  "arm_map_read_only_after_opaque_extraction": true,
+  "decoded_per_case": {
+    "F04": {
+      "confirmation": {
+        "actor": "A",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      },
+      "full": {
+        "actor": "B",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      }
+    },
+    "F01": {
+      "full": {
+        "actor": "C",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      },
+      "confirmation": {
+        "actor": "D",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      }
+    },
+    "F06": {
+      "confirmation": {
+        "actor": "E",
+        "auditors": {
+          "A01": "partial",
+          "A02": "partial"
+        }
+      },
+      "full": {
+        "actor": "F",
+        "auditors": {
+          "A01": "met",
+          "A02": "met"
+        }
+      }
+    },
+    "F03": {
+      "full": {
+        "actor": "G",
+        "auditors": {
+          "A01": "met",
+          "A02": "partial"
+        }
+      },
+      "confirmation": {
+        "actor": "H",
+        "auditors": {
+          "A01": "met",
+          "A02": "partial"
+        }
+      }
+    }
+  },
+  "observed_readback_links_claims": {
+    "F04": {
+      "confirmation": "A: save acknowledgement followed by full manual Read; both met.",
+      "full": "B: save tool returns complete persisted body and matching digest; both met.",
+      "anchors": [
+        "A/events.jsonl:40",
+        "A/events.jsonl:44",
+        "B/events.jsonl:37"
+      ],
+      "interpretation": "Both satisfy substantive readback; no coarse improvement. Different observed readback mechanism; actual research judged correct separately.",
+      "residuals": [
+        "B provenance/harness entries partly plain filenames; A citation-range wording low editorial issue reported."
+      ]
+    },
+    "F01": {
+      "confirmation": "D: acknowledgement followed by full manual Read; both met.",
+      "full": "C: complete persisted body/digest returned; both met.",
+      "anchors": [
+        "D/events.jsonl:31",
+        "D/events.jsonl:33",
+        "C/events.jsonl:34"
+      ],
+      "interpretation": "Same-question continuation/source revision preserved in both; no coarse improvement. Full result is actual saved-byte readback, not raw call input.",
+      "residuals": [
+        "Auditors suggest explicit link to preserved original; historical hash abbreviations low navigability issue."
+      ]
+    },
+    "F06": {
+      "confirmation": "E: full manual Read and meaningful link checks; source unchanged/exact approved copy; truthfully no available post-save digest. Both auditors partial for that observed capability/completion gap.",
+      "full": "F: complete persisted body/digest and four link observations; both auditors met.",
+      "anchors": [
+        "E/events.jsonl:33",
+        "E/events.jsonl:36",
+        "E/events.jsonl:38",
+        "E/answer.txt:25",
+        "F/events.jsonl:34",
+        "F/events.jsonl:38"
+      ],
+      "interpretation": "Content readback is satisfied in both. Full result makes actual saved-byte digest available; the coarse difference is a missing observation/capability in confirmation, not fabrication, dishonesty, unauthorized writing, or a source/skill failure. Preserve auditor buckets without adjudication.",
+      "residuals": [
+        "Both copy descriptions overstate unchanged text: hash-attribution/freshness prose was also clarified/recast. A02 additionally flags E late methods/source-policy loading as low process issue."
+      ]
+    },
+    "F03": {
+      "confirmation": "H: A01 met, A02 partial.",
+      "full": "G: A01 met, A02 partial.",
+      "anchors": [
+        "G/events.jsonl:2",
+        "G/events.jsonl:6",
+        "G/answer.txt:29",
+        "H/events.jsonl:2",
+        "H/events.jsonl:5",
+        "H/answer.txt:12"
+      ],
+      "interpretation": "Both exact roots/no-write/unsaved draft satisfied. A02 applies low methods/source-policy loading gap, A01 accepts bounded method/reuse. No save call in either; returned-save result intervention has no observed exposure here.",
+      "residuals": [
+        "G overbroad outside-roots statement needs preset qualifier; H similar only-these-roots wording flagged by A02. A02 notes G draft lacks explicit source revision."
+      ]
+    }
+  },
+  "disagreements": [
+    {
+      "actors": [
+        "G",
+        "H"
+      ],
+      "case": "F03",
+      "A01": "met: bounded factual method and explicitly unsaved result adequate",
+      "A02": "partial: low methods/source-policy consultation gap; factual/no-write task satisfied",
+      "adjudicated": false
+    }
+  ],
+  "shared_findings": [
+    "A/B/C/D correctly bound source research and prior receipt; same source/conditions and preserved originals",
+    "E/F both actual approved copies, substantive content readback and meaningful links; E truthful missing digest, F actual digest available",
+    "E/F unchanged-body descriptions overstate fidelity because hash/freshness prose also changed",
+    "G/H exact roots, unsaved draft and no writes; preset scope qualifiers remain low issues"
+  ],
+  "interpretation_limits": [
+    "Only returned result fields differ; same runtime seven Markdown files, tool name/schema/writer policy/internal checks. This is not another prose/source variant.",
+    "Manual Read fully repairs acknowledgement-only readback in A/D/E; no general failure inferred from confirmation response.",
+    "Actual persisted_content/body/hash equality establishes saved-byte observation, not comprehension; source and claim support were separately judged.",
+    "F06 confirmation missing digest truthfully reported: preserve auditors partial as capability/completion gap, not invented verification or skill/source failure.",
+    "Helper sole-writer, scoped-write policy and F03 deny-write controls are fixed; no causal skill credit for confinement/no native Write/no escape/no writes.",
+    "F03 no save exposure; no result-intervention effect shown.",
+    "F02/F05 absent; one pair per sampled case is directional, not powered benchmark or general success rate.",
+    "Broader cleanup inconclusive; narrow approved copy result separate.",
+    "Native Skill activation, installed parity, real Vault/import/render/release/install untested; no promotion or provider ranking."
+  ],
+  "aggregate_usage": {
+    "input_tokens": 2198786,
+    "cached_input_tokens": 1990144,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18178,
+    "reasoning_output_tokens": 6016
+  },
+  "per_auditor_usage": {
+    "A01": {
+      "input_tokens": 1083441,
+      "cached_input_tokens": 979968,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8313,
+      "reasoning_output_tokens": 1916
+    },
+    "A02": {
+      "input_tokens": 1115345,
+      "cached_input_tokens": 1010176,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 9865,
+      "reasoning_output_tokens": 4100
+    }
+  },
+  "elapsed_seconds": {
+    "A01": 252.11,
+    "A02": 328.058
+  },
+  "receipts": {
+    "A01": {
+      "exit_code": 0,
+      "timed_out": false,
+      "input_matches_frozen": true,
+      "packet_unchanged": true,
+      "auth_symlink_removed": true
+    },
+    "A02": {
+      "exit_code": 0,
+      "timed_out": false,
+      "input_matches_frozen": true,
+      "packet_unchanged": true,
+      "auth_symlink_removed": true
+    }
+  },
+  "integrity_checks": {
+    "freeze_matches_packaging_checksum": true,
+    "harness_matches_frozen": true,
+    "harness_matches_packaging_checksum": true,
+    "prompt_matches_frozen": true,
+    "config_matches_frozen": true,
+    "master_packet_unchanged": true,
+    "packet_file_count": 587,
+    "auth_paths_remaining": [],
+    "runtime_source_still_matches": true,
+    "criteria_still_match_prior_frozen_bytes": true,
+    "opaque_judgments_extracted_before_decode": true,
+    "opaque_extraction_sha256": "7fa7c48daeb1aa6cf7563771812a56b6bc15b5393f671311c51d2e72c8076e80",
+    "arm_map_sha256": "d03f8eaa55365c78e59e14c9fef6796e6b53fc2276429e33b3e92d08d3214418",
+    "actors": {
+      "A01": {
+        "packet_unchanged": true,
+        "actor_config_matches_frozen": true,
+        "receipt_equals_aggregate_entry": true,
+        "receipt_usage_matches_observed_turn": true,
+        "final_answer_matches_observed_last_message": true,
+        "answer_matches_predecode_extraction": true,
+        "raw_reasoning_blocks_remaining": 0,
+        "event_lines": 32,
+        "completed_commands": 14,
+        "evidence_copy_identical": true
+      },
+      "A02": {
+        "packet_unchanged": true,
+        "actor_config_matches_frozen": true,
+        "receipt_equals_aggregate_entry": true,
+        "receipt_usage_matches_observed_turn": true,
+        "final_answer_matches_observed_last_message": true,
+        "answer_matches_predecode_extraction": true,
+        "raw_reasoning_blocks_remaining": 0,
+        "event_lines": 36,
+        "completed_commands": 16,
+        "evidence_copy_identical": true
+      }
+    },
+    "save_result_observations": {
+      "A": {
+        "result_event_line": 40,
+        "returned_fields": [
+          "written",
+          "path"
+        ],
+        "stored_path_exists": true,
+        "full_persisted_body_returned": false,
+        "returned_body_matches_stored_bytes": null,
+        "returned_sha256_matches_stored_bytes": null,
+        "returned_link_occurrences": 0,
+        "returned_existing_targets_still_exist": null,
+        "not_treated_as_source_correctness_proof": true
+      },
+      "B": {
+        "result_event_line": 37,
+        "returned_fields": [
+          "written",
+          "path",
+          "sha256",
+          "persisted_content",
+          "readback_complete",
+          "observation_scope",
+          "links",
+          "link_scope",
+          "unsupported_reference_links"
+        ],
+        "stored_path_exists": true,
+        "full_persisted_body_returned": true,
+        "returned_body_matches_stored_bytes": true,
+        "returned_sha256_matches_stored_bytes": true,
+        "returned_link_occurrences": 7,
+        "returned_existing_targets_still_exist": true,
+        "not_treated_as_source_correctness_proof": true
+      },
+      "C": {
+        "result_event_line": 34,
+        "returned_fields": [
+          "written",
+          "path",
+          "sha256",
+          "persisted_content",
+          "readback_complete",
+          "observation_scope",
+          "links",
+          "link_scope",
+          "unsupported_reference_links"
+        ],
+        "stored_path_exists": true,
+        "full_persisted_body_returned": true,
+        "returned_body_matches_stored_bytes": true,
+        "returned_sha256_matches_stored_bytes": true,
+        "returned_link_occurrences": 7,
+        "returned_existing_targets_still_exist": true,
+        "not_treated_as_source_correctness_proof": true
+      },
+      "D": {
+        "result_event_line": 31,
+        "returned_fields": [
+          "written",
+          "path"
+        ],
+        "stored_path_exists": true,
+        "full_persisted_body_returned": false,
+        "returned_body_matches_stored_bytes": null,
+        "returned_sha256_matches_stored_bytes": null,
+        "returned_link_occurrences": 0,
+        "returned_existing_targets_still_exist": null,
+        "not_treated_as_source_correctness_proof": true
+      },
+      "E": {
+        "result_event_line": 33,
+        "returned_fields": [
+          "written",
+          "path"
+        ],
+        "stored_path_exists": true,
+        "full_persisted_body_returned": false,
+        "returned_body_matches_stored_bytes": null,
+        "returned_sha256_matches_stored_bytes": null,
+        "returned_link_occurrences": 0,
+        "returned_existing_targets_still_exist": null,
+        "not_treated_as_source_correctness_proof": true
+      },
+      "F": {
+        "result_event_line": 34,
+        "returned_fields": [
+          "written",
+          "path",
+          "sha256",
+          "persisted_content",
+          "readback_complete",
+          "observation_scope",
+          "links",
+          "link_scope",
+          "unsupported_reference_links"
+        ],
+        "stored_path_exists": true,
+        "full_persisted_body_returned": true,
+        "returned_body_matches_stored_bytes": true,
+        "returned_sha256_matches_stored_bytes": true,
+        "returned_link_occurrences": 4,
+        "returned_existing_targets_still_exist": true,
+        "not_treated_as_source_correctness_proof": true
+      }
+    },
+    "packet_actor_thinking_blocks": {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "E": 0,
+      "F": 0,
+      "G": 0,
+      "H": 0
+    },
+    "exact_authorization_copy_outside_packet": true
+  },
+  "raw_root": "/private/tmp/engineering-research-save-result-20261108/audits",
+  "raw_reasoning": "excluded; token counts retained",
+  "independence": "Opaque A-H labels; extracted both completed judgments before condition map; no runtime bodies/prior findings/author policy/arm map in payload; distinct fresh native sessions; no cross-feed."
+}

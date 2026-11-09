@@ -1,0 +1,80 @@
+{
+  "task": "W4-01",
+  "behavioral_baseline": "Frozen Claude F02/F04/F06 saved-body readback and F05 links RED; semantic GREEN awaits actual old/new runs.",
+  "defect_class": "Incomplete saved-body verification, absent destination-aware evidence navigation, unauthorized discovery",
+  "search_scope": "All 522 branch-changed paths plus Acceptance surfaces in class-sweep.json; 411 lexical matches including historical evidence",
+  "live_instances": [
+    {
+      "path": "loom-code/skills/engineering-research/SKILL.md",
+      "sections": [
+        "Step 5",
+        "Return to owning task"
+      ],
+      "disposition": "Step 5 now concrete; return already delegates actual content verification, unchanged"
+    },
+    {
+      "path": "loom-code/skills/engineering-research/references/preservation.md",
+      "sections": [
+        "Prepare concrete candidate",
+        "Discover destinations",
+        "Save authorized copy"
+      ],
+      "disposition": "Concrete draft/final links, authorized discovery scope, substantive readback"
+    },
+    {
+      "path": "loom-code/skills/engineering-research/references/structured-relations.md",
+      "sections": [
+        "Check actual representation"
+      ],
+      "disposition": "Already concrete diagram readback with evidential meaning; unchanged"
+    },
+    {
+      "path": "loom-code/skills/engineering-research/references/source-policy.md",
+      "sections": [
+        "Critical-claim evidence rules"
+      ],
+      "disposition": "Already requires actual supporting content and respects boundaries; unchanged"
+    },
+    {
+      "path": "loom-code/skills/engineering-research/templates/research.md",
+      "sections": [
+        "Evidence"
+      ],
+      "disposition": "Already links decision-critical evidence; unchanged"
+    },
+    {
+      "path": "loom-code/skills/build/SKILL.md, loom-code/skills/write-plan/SKILL.md, loom-code/skills/ship/SKILL.md",
+      "disposition": "Callers preserve authorization and delegate research; no duplicate content procedure to fix; unchanged"
+    }
+  ],
+  "changed_files": {
+    "SKILL.md": {
+      "old_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716",
+      "new_sha256": "7ed0335f850a467d332e8cfb4da053018f9bd6e3bb3abe2bc7ca6c7e4a63cd43"
+    },
+    "references/preservation.md": {
+      "old_sha256": "10d2e7871282302e5aed14e8e9b8f18b4e4ec30c56748189051521bcbeb25e04",
+      "new_sha256": "3b4007c9c14905c43a3eaeb4a358de075ee4b26306ba3f2940f878cb9475953e"
+    }
+  },
+  "invariants": {
+    "frontmatter_identical": true,
+    "five_other_runtime_files_identical": true,
+    "README_identical": true,
+    "no_new_helpers_or_resources": true,
+    "frozen_evidence_untouched": true
+  },
+  "focused_test": {
+    "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/engineering-research/test_package.py -q",
+    "result": "5 passed in 0.03s",
+    "first_attempt": "uv cache sandbox write denied, no tests ran",
+    "second_attempt": "normal approved sandbox escalation; exit 0"
+  },
+  "claims_not_made": [
+    "behavioral GREEN",
+    "automatic triggering improvement",
+    "production sandbox enforcement",
+    "release readiness"
+  ],
+  "committed": false
+}

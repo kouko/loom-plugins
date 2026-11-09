@@ -1,0 +1,21 @@
+我已讀回更新後的紀錄,內容正確,這就是最終回報。
+
+**結論:不會。** 一般的 `--loom-family` preset 不會跑 `tests/local/` 裡的 Python 和 shell tests。這次我重用了先前的證據,並重讀 runner 原始碼來確認,沒有做新的實驗。
+
+- **Python:** `code` group 透過 `_tests_session` 組出 `tests` 和 `loom-code/tests` 的目標,只要該 root 底下的 `local/` 存在,就會加上 `--ignore=<local 絕對路徑>`(runner 第 76–85、124–128 行)。`design` 和 `workflow-python` 對各自的 `local/` 也是同樣處理。
+- **Shell:** `_shell_tests` 會排除每個 root 底下直接的 `local/`,`workflow-shell` group 用的就是它(第 88–95、134–138 行)。
+- **測試定義:** `src/tests/test_run_package_tests.py` 的 222–235、286–298 行斷言 `tests/local/` 下的 Python 和 shell 測試不會被收集或執行。我只讀了這些定義,沒有執行。
+
+我修正了舊紀錄中幾處差一行的行號。紀錄也補了一段 harness 觀察:引用 `fixture-observations.json`,並註明那是準備階段的觀察,不是我執行的。
+
+**不確定事項**
+- 我沒有執行 runner、pytest 或 shell 指令,所以真實 checkout 上的實際收集結果沒有驗證。
+- 排除只涵蓋直接位於 root 底下的 `local/`。更深層的 `tests/foo/local/` 不在排除範圍內。
+- 不帶 `--loom-family` 的明確參數模式、直接跑 pytest 或 `bash`,都不受這個排除影響。
+- 紀錄中 `fixture-observations.json` 的雜湊值是更新前量到的。我這次沒有重新計算,所以舊紀錄那筆雜湊已不對應更新後的檔案。
+- CI 設定和實際部署版本不在證據範圍內。
+
+**交付路徑**
+`/private/tmp/engineering-research-small-fix-20261108/paired-run/B/project/docs/loom/research/2026-11-08-package-test-roots.md`
+
+我沒有改動 `src/`、`skill/`、`provenance.json`,也沒有 commit。

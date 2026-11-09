@@ -1,0 +1,13 @@
+Yes—**the supplied implementation supports recursive shell-test discovery in Loom-family mode**.
+
+Source inspection shows:
+
+- [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P16-r2/project/scripts/run_package_tests.py:88) uses `folder.rglob("test-*.sh")` under `tests`, `loom-code/tests`, `loom-design/tests`, and `loom-workflow/tests`. It excludes `node_modules` and each root’s `local/` subtree.
+- [`loom_family_commands()`](/private/tmp/engineering-research-dogfood-A-20261108/P16-r2/project/scripts/run_package_tests.py:134) creates a `bash` command for each discovered test, excluding paths beneath detected foreign repositories/worktrees.
+- This applies to `--loom-family` and `--loom-family --only workflow-shell`. The ordinary argument path invokes pytest directly.
+
+The recursive-discovery premise is therefore supported, provided the acceptance strategy uses that mode, filename pattern, and root placement.
+
+This is a **source-level finding**, not a successful execution result. The fixture does not provide `repo_files`, CI configuration, or execution evidence, so helper behavior and actual CI invocation remain unverified.
+
+Research record: this response is the unsaved draft; no Markdown artifact was saved because the discussion is read-only.

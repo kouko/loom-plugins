@@ -1,0 +1,86 @@
+{
+  "id": "F04",
+  "model_requested": "claude-sonnet-5-5",
+  "effort_requested": "medium",
+  "mode": "explicit raw seven-MD execution",
+  "timeout": false,
+  "exit_code": 0,
+  "elapsed_seconds": 51.154,
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 12,
+      "cache_creation_input_tokens": 21599,
+      "cache_read_input_tokens": 97392,
+      "output_tokens": 5339,
+      "output_tokens_details": {
+        "thinking_tokens": 624
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 21599,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1166,
+          "cache_read_input_tokens": 26957,
+          "cache_creation_input_tokens": 657,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 657
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 12,
+        "outputTokens": 5339,
+        "cacheReadInputTokens": 97392,
+        "cacheCreationInputTokens": 21599,
+        "webSearchRequests": 0,
+        "costUSD": 0.1495492,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 624,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 21599,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.1495492,
+    "permission_denials": [],
+    "duration_api_ms": 49128,
+    "num_turns": 10
+  },
+  "changed_files": [],
+  "added_files": [
+    "docs/loom/research/2026-11-08-package-test-claim-scope.md"
+  ],
+  "deleted_files": [],
+  "fixtureVault_files": {},
+  "returned_model_metadata": {
+    "assistant_message_models": [
+      "claude-sonnet-5-5"
+    ],
+    "modelUsage_keys": [
+      "claude-sonnet-5-5"
+    ],
+    "providers": [
+      "firstParty"
+    ]
+  }
+}

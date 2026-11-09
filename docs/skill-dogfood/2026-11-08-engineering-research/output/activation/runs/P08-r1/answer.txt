@@ -1,0 +1,11 @@
+結論：**不能斷言本機 CLI 測試會進入一般 suite；關鍵是入口與測試位置。**
+
+依指定腳本的靜態呼叫路徑：
+
+- `--loom-family`：code／design 的 Python 測試會排除各測試根目錄直屬的 `local/`；workflow Python 也排除 `loom-workflow/tests/local/`。Shell 掃描同樣排除根目錄直屬的 `local/`。見 [排除邏輯](/private/tmp/engineering-research-dogfood-A-20261108/P08-r1/project/scripts/run_package_tests.py:76)。
+- 排除依據是**路徑**，沒有辨識「本機 CLI 測試」的語意。放在其他可收集位置的測試仍可能被納入；更深層的 `子目錄/local/` 沒有一致排除保證。
+- 非 `--loom-family` 模式直接把參數交給 pytest，**不會自動加入 local 排除**。見 [入口分支](/private/tmp/engineering-research-dogfood-A-20261108/P08-r1/project/scripts/run_package_tests.py:153)。
+
+因此，目前不足以判定 CI 方案必須修改或可直接定案：缺少實際 CI 呼叫參數、本機 CLI 測試位置及 pytest 設定。
+
+以上為 engineering-research 的唯讀研究摘要；未執行 suite、未寫入研究檔，也未排工作。

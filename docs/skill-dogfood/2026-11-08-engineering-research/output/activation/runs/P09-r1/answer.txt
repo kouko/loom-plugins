@@ -1,0 +1,13 @@
+目前無法確認兩次漏測的真正原因；現有證據不足以決定是否調整 discovery。
+
+研究紀錄草稿（唯讀，未存檔）：採用原始碼追查，僅檢視提供的 fixture，未執行 build。
+
+已確認：
+
+- discovery 僅涵蓋四個固定 `TEST_ROOTS`；Python 預篩只認 `test_*.py`、`*_test.py`，shell 只認 `test-*.sh`。見 [入口程式](/private/tmp/engineering-research-dogfood-A-20261108/P09-r1/project/scripts/run_package_tests.py:53)。
+- `local/`、群組選擇及巢狀 repository 排除都可能影響收集；尚無證據指出哪項造成此次漏測。
+- `--loom-family` 以目前工作目錄為根目錄；若所選群組產生零條命令，仍回傳成功。這是可確認的靜默漏跑風險，尚非此次根因。見 [main](/private/tmp/engineering-research-dogfood-A-20261108/P09-r1/project/scripts/run_package_tests.py:153)。
+
+缺少兩次 build 的完整命令、工作目錄、新測試路徑、collection 輸出，以及 pytest 設定與 `repo_files` 實作。
+
+**決策：暫緩 discovery 設計變更。** 先補齊上述證據，才能區分呼叫方式、收集規則與設計缺口；連續失敗兩次本身不能證明需要重設計。

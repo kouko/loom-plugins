@@ -1,0 +1,10 @@
+{
+  "root": "/private/tmp/engineering-research-save-result-20261108/public-control/full/project",
+  "create_roots": [
+    "docs/loom/research"
+  ],
+  "create_files": [
+    "fixtureVault/research/approved.md"
+  ],
+  "result_mode": "full"
+}

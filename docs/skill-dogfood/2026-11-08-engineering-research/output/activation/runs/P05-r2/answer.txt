@@ -1,0 +1,16 @@
+Shell discovery is limited to specific roots; it does not scan the whole package.
+
+**Unsaved research draft — 2026-11-08**  
+Method: source inspection of the supplied runner; no build or tests executed.
+
+- [`TEST_ROOTS`](/private/tmp/engineering-research-dogfood-A-20261108/P05-r2/project/scripts/run_package_tests.py:53) contains `tests`, `loom-code/tests`, `loom-design/tests`, and `loom-workflow/tests`.
+- [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P05-r2/project/scripts/run_package_tests.py:88) recursively matches `test-*.sh`, sorts results, and excludes paths containing `node_modules` and each root’s immediate `local/` subtree.
+- Shell commands are generated only for `--loom-family` with no `--only`, or with `--only workflow-shell`. Nested repositories/worktrees reported by imported helpers are excluded. Each remaining match runs through `bash`.
+- The Mermaid group separately names `mermaid-validator-negative.sh`; that filename does not match automatic shell discovery.
+- Ordinary invocation runs pytest only. Family execution stops at the first failed command, so a discovered shell test may never execute.
+
+**Decision impact:** establish whether the missing test matches those discovery rules and whether execution reaches its group before retrying.
+
+**Missing evidence:** the test’s path, actual invocation, failure logs, test tree, and imported helper implementation. The fixture establishes selection logic, not the actual discovered inventory or failure cause.
+
+No files changed; this research record remains unsaved under the read-only constraint.

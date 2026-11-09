@@ -1,0 +1,41 @@
+{
+  "original_repository": "/Users/kouko/.herdr/worktrees/loom-plugins/loom-research-skill-discut",
+  "HEAD": "d5a7f0da247214bdb9c61fe90c550256432e5f76",
+  "locally_recorded_origin_main": "d5a7f0da247214bdb9c61fe90c550256432e5f76",
+  "remote_freshness": "not checked",
+  "files": [
+    {
+      "path": "scripts/run_package_tests.py",
+      "sha256": "6730a53e11d862d5d3d93eadcdafb2011b81f2595332e4a57ae49a504f660d54"
+    },
+    {
+      "path": "loom-code/scripts/repo_files.py",
+      "sha256": "62333168fb9eacabb6877d0f185f08081175d8681444465173b18d712ca26399"
+    },
+    {
+      "path": "loom-code/scripts/git_exec.py",
+      "sha256": "9c721b8e2f8fae0e4c31da5d6ab41b42e0ae4eeb8cecbf164a36fce7dd61e7c7"
+    },
+    {
+      "path": "tests/test_run_package_tests.py",
+      "sha256": "b7ed3d4e19fd4d03c68df5d8ca796d03442a859874745564c20ddaeb7780da28"
+    }
+  ],
+  "samples": [
+    {
+      "original_path": "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/receipt.json",
+      "original_sha256": "554030ba8f99786896d7fa11d11cf2a091cf3d654dfa4939b4cb48fbb1ad3b8f",
+      "extraction": "only factual receipt fields; no conclusions or grader output"
+    },
+    {
+      "original_path": "docs/skill-dogfood/2026-11-08-engineering-research/execution/B02/receipt.json",
+      "original_sha256": "92edc1d9e4f5fbb1cc095f70752672b99ccde8018c1ff87960ae72b3df85ac06",
+      "extraction": "only factual receipt fields; no conclusions or grader output"
+    },
+    {
+      "original_path": "docs/skill-dogfood/2026-11-08-engineering-research/execution/B01/artifacts/docs/loom/research/2026-11-08-package-runner-exclusions.md",
+      "original_sha256": "dcbf5ea5573cd922f1f56b764d65ec10d481d54925f578cc195a575e10b9272b",
+      "extraction": "frontmatter/title lines 1-10 and verbatim evidence-link rows only, no original findings/conclusions"
+    }
+  ]
+}

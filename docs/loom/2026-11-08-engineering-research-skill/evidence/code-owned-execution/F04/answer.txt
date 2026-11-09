@@ -1,0 +1,11 @@
+**不能宣稱整套 package tests／CI 全通過。** 可支持的範圍是：
+
+- `exit_code=0` 表示既有 `codex exec` 程序成功結束；收據沒有測試結果或 CI 執行證據。
+- 原研究支持四個測試根目錄及 preset 排除 `local/` 的靜態來源結論，並明載未跑測試。
+- 四個來源檔 SHA-256 全數符合 provenance；原研究的三個相對連結有效。這支持與所附清單的對應，不能證明完整專案、部署或遠端最新狀態。
+- skill 的 `SKILL.md` 與研究模板雜湊不符，原因未明；`snapshots/` 副本的三個連結會越出 fixture，未存取。
+- cleanup 收據僅支持記錄時點的臨時 fixture 狀態。目前另有未追蹤檔案，不能宣稱現在工作樹乾淨。
+
+英文研究已儲存並讀回核對：[完整證據記錄](/private/tmp/code-owned-engineering-research-execution-20261108/F04/project/docs/loom/research/2026-11-08-package-test-evidence-boundaries.md)。
+
+尚缺實際測試／CI 日誌、完整 CI 設定及 skill 雜湊差異說明。本次未跑測試、連網、發布或代為驗收，原始材料保持不變。

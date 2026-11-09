@@ -1,0 +1,10 @@
+An independent second opinion has **not been obtained**. No tests or external agent calls were run. The independent-advisor skill is a description-only stub with no review workflow, and your constraints prohibit subagents and external CLI model calls.
+
+Missing review input:
+
+- **The decision itself:** the proposed test plan, alternatives, and rationale.
+- **Review scope:** the change or failure being tested, acceptance criteria, and constraints.
+- **Supporting evidence:** relevant test inventory, pytest configuration, CI setup, and prior results. Only [scripts/run_package_tests.py](scripts/run_package_tests.py) is available; its discovery helpers and referenced tests cannot be verified from this fixture.
+- **Reviewer contract:** which independent coding agent should review it, permitted access, and the expected output—such as a verdict, evidence-backed risks, and recommended changes.
+
+The fixture describes five test groups and exclusions for nested repositories, worktrees, and local tests. That provides runner context, but it does not establish which test-plan decision you want reviewed or whether coverage is adequate.

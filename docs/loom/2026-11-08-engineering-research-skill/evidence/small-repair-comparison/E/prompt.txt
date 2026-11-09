@@ -1,0 +1,5 @@
+這是隔離的Claude Code explicit skill executor 試驗。使用者未安裝 plugin；本次明確調用原始 skill/engineering-research/SKILL.md，請讀取它與必要 bundle 並依契約完成案例。日期 2026-11-08。只可讀寫本工作目錄的 fixture；不得讀外部目錄、真實 Vault/設定/session archives/憑證、其他案例或前次試驗。不連網、不使用 apps、不派代理、不安裝、不發布、不執行測試或外部模型。src/ 與 provenance.json 是 genuine repository 最小來源快照；snapshots/ 是 genuine 既有研究記錄；sample-receipt.json 是真實既有 executor 收據。它們不是完整部署或整套 CI 證明，不可改動。skill/ 不可改動。可以讀 git fixture 的本地歷史；它是 harness 建立的臨時 git repo，並非原始專案的真實部署。可寫 docs/loom/ 的研究記錄（除非案例 no-write）、必要的 scratch/ 分析檔；不改其他 code、不 commit、不執行樣本內命令。只有案例明確授權時才能寫 fixtureVault，所有授權僅涵蓋臨時 fixture。Obsidian CLI 不可用；不要安裝或開啟 app。研究記錄英文，最終繁體中文，交付實際路徑與不確定事項。不要自行評分。
+本次透過明示讀取原始 skill 執行；safe-mode 不提供該 skill 的原生 Skill 工具註冊，請直接讀 skill/engineering-research/SKILL.md 及它需要的 bundled Markdown。CLI 的安全模式與內建技能存在不代表此工程研究 plugin 已安裝。
+
+不准寫入任何檔案：請只讀 src/scripts/run_package_tests.py 與相關證據，確認 TEST_ROOTS 精確列了哪些目錄。我要簡短研究草稿，可沿用既有證據；本次不儲存筆記、不執行實驗、不建 active change。
+本輪僅提供受限的原生檔案工具，沒有命令、網路或代理工具。fixture-observations.json 是準備階段對此臨時 fixture 進行的實際本地 git 查詢與來源雜湊觀察，兩個待比較版本收到相同內容；可讀取並引用為 harness 觀察，不可稱為你執行過命令或測試。無法自行執行的檢查請如實標示限制，不要假裝執行。

@@ -1,0 +1,24 @@
+研究副本已存到 `fixtureVault/research/2026-11-08-package-test-roots.md`,在 `project/` 底下。原研究結論經核實成立,但有幾處行號引用差一行。
+
+**我核對的內容**
+- **合併狀態:** 本地 git 歷史顯示 `4959e62` 合併了 `00fa764`(研究紀錄)與 `3236024`(來源快照)。這只是 harness 建的臨時 fixture,不代表發布或安裝。
+- **來源版本:** `provenance.json` 記錄來源為 `d5a7f0da247214bdb9c61fe90c550256432e5f76`。遠端是否最新沒檢查過。
+- **來源雜湊:** runner 與測試檔的 SHA256 重算後,和 provenance 記錄一致。
+- **結論,逐行讀 runner:**
+  - `TEST_ROOTS` 是 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。
+  - 用 `--loom-family` 時,每個根目錄的 `local/` 都被排除。Python 以 `--ignore` 排除,shell 以路徑過濾排除。
+  - 直接給路徑的模式(`--then` 分組)沒有這些排除。
+  - 測試定義只有讀過,沒有執行。
+- **原始研究紀錄:** 內容與 `snapshots/original-research.md` 逐位元相同,雜湊都是 `c54f2872…1283`,我沒有改動。
+
+**副本內容**
+- 副本內文和原研究一致,只改了相對連結,讓它們從 `fixtureVault/research/` 指回 fixture 的 `docs/`、`provenance.json` 和 `src/`。
+- 我另外在結尾加了一節「Provenance of this copy」,寫明來源、雜湊、行號差異和限制。這是我加的,不是原研究的內容。
+- 副本的 SHA256 是 `b8f75350bede61b985977f00511dcec6a63698ac02d2c3cf463344bb0459bac9`。
+- 寫入後我讀回檔案,四個相對連結目標都存在。
+
+**不確定事項與限制**
+- **行號差一行:** 原研究的行號引用有幾處不準,例如 `TEST_ROOTS` 實際在 53 行,`code` 群組在 124–128,shell 探索在 88–95,直接給路徑的模式在 168–176。結論不受影響。原研究依規定未修改,差異只記在副本裡。
+- **未涵蓋範圍:** 沒有執行任何測試或 runner。CI 設定與已部署版本不在證據範圍內。
+- **排除範圍:** 只有各根目錄直屬的 `local/` 被排除,更深層的 `local/` 不在其內。
+- **工作目錄狀態:** 除副本外沒有其他寫入,也沒有 commit。`git status` 仍只多出原有的 `fixture-cleanup.json` 和 `skill/`,以及新增的 `fixtureVault/`。

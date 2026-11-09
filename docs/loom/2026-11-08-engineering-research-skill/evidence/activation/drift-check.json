@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-11-08T09:37:10.349545+00:00",
+  "snapshot_files_match_live": true,
+  "files": {
+    "SKILL.md": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716",
+    "references/source-policy.md": "c9424edd2191c7ead231a82da98ae3f35c504a00454c1338512313a1d7fd16c3",
+    "references/structured-relations.md": "dc0c65ab06534a369ee02fa76ed8d8b9d59769ee5578552c7da19a6888808d1d",
+    "references/research-methods.md": "bfada6dddb9ae104ddc3a7e48c3a701a1eb2ea3f0955cd1f3424a41e6a668ca5",
+    "references/preservation.md": "10d2e7871282302e5aed14e8e9b8f18b4e4ec30c56748189051521bcbeb25e04",
+    "references/evaluation-selection.md": "5a95eabd656e96b81f48b18d151826542daf0215e99e0e7a5242ec4db2bcf78b",
+    "templates/research.md": "62757b98a15cb64caadbba067803864e1297fbabbacd0162eba1d88e2cafa69e"
+  }
+}

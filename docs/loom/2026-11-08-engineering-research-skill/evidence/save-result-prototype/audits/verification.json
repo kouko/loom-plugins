@@ -1,0 +1,159 @@
+{
+  "freeze_matches_packaging_checksum": true,
+  "harness_matches_frozen": true,
+  "harness_matches_packaging_checksum": true,
+  "prompt_matches_frozen": true,
+  "config_matches_frozen": true,
+  "master_packet_unchanged": true,
+  "packet_file_count": 587,
+  "auth_paths_remaining": [],
+  "runtime_source_still_matches": true,
+  "criteria_still_match_prior_frozen_bytes": true,
+  "opaque_judgments_extracted_before_decode": true,
+  "opaque_extraction_sha256": "7fa7c48daeb1aa6cf7563771812a56b6bc15b5393f671311c51d2e72c8076e80",
+  "arm_map_sha256": "d03f8eaa55365c78e59e14c9fef6796e6b53fc2276429e33b3e92d08d3214418",
+  "actors": {
+    "A01": {
+      "packet_unchanged": true,
+      "actor_config_matches_frozen": true,
+      "receipt_equals_aggregate_entry": true,
+      "receipt_usage_matches_observed_turn": true,
+      "final_answer_matches_observed_last_message": true,
+      "answer_matches_predecode_extraction": true,
+      "raw_reasoning_blocks_remaining": 0,
+      "event_lines": 32,
+      "completed_commands": 14,
+      "evidence_copy_identical": true
+    },
+    "A02": {
+      "packet_unchanged": true,
+      "actor_config_matches_frozen": true,
+      "receipt_equals_aggregate_entry": true,
+      "receipt_usage_matches_observed_turn": true,
+      "final_answer_matches_observed_last_message": true,
+      "answer_matches_predecode_extraction": true,
+      "raw_reasoning_blocks_remaining": 0,
+      "event_lines": 36,
+      "completed_commands": 16,
+      "evidence_copy_identical": true
+    }
+  },
+  "save_result_observations": {
+    "A": {
+      "result_event_line": 40,
+      "returned_fields": [
+        "written",
+        "path"
+      ],
+      "stored_path_exists": true,
+      "full_persisted_body_returned": false,
+      "returned_body_matches_stored_bytes": null,
+      "returned_sha256_matches_stored_bytes": null,
+      "returned_link_occurrences": 0,
+      "returned_existing_targets_still_exist": null,
+      "not_treated_as_source_correctness_proof": true
+    },
+    "B": {
+      "result_event_line": 37,
+      "returned_fields": [
+        "written",
+        "path",
+        "sha256",
+        "persisted_content",
+        "readback_complete",
+        "observation_scope",
+        "links",
+        "link_scope",
+        "unsupported_reference_links"
+      ],
+      "stored_path_exists": true,
+      "full_persisted_body_returned": true,
+      "returned_body_matches_stored_bytes": true,
+      "returned_sha256_matches_stored_bytes": true,
+      "returned_link_occurrences": 7,
+      "returned_existing_targets_still_exist": true,
+      "not_treated_as_source_correctness_proof": true
+    },
+    "C": {
+      "result_event_line": 34,
+      "returned_fields": [
+        "written",
+        "path",
+        "sha256",
+        "persisted_content",
+        "readback_complete",
+        "observation_scope",
+        "links",
+        "link_scope",
+        "unsupported_reference_links"
+      ],
+      "stored_path_exists": true,
+      "full_persisted_body_returned": true,
+      "returned_body_matches_stored_bytes": true,
+      "returned_sha256_matches_stored_bytes": true,
+      "returned_link_occurrences": 7,
+      "returned_existing_targets_still_exist": true,
+      "not_treated_as_source_correctness_proof": true
+    },
+    "D": {
+      "result_event_line": 31,
+      "returned_fields": [
+        "written",
+        "path"
+      ],
+      "stored_path_exists": true,
+      "full_persisted_body_returned": false,
+      "returned_body_matches_stored_bytes": null,
+      "returned_sha256_matches_stored_bytes": null,
+      "returned_link_occurrences": 0,
+      "returned_existing_targets_still_exist": null,
+      "not_treated_as_source_correctness_proof": true
+    },
+    "E": {
+      "result_event_line": 33,
+      "returned_fields": [
+        "written",
+        "path"
+      ],
+      "stored_path_exists": true,
+      "full_persisted_body_returned": false,
+      "returned_body_matches_stored_bytes": null,
+      "returned_sha256_matches_stored_bytes": null,
+      "returned_link_occurrences": 0,
+      "returned_existing_targets_still_exist": null,
+      "not_treated_as_source_correctness_proof": true
+    },
+    "F": {
+      "result_event_line": 34,
+      "returned_fields": [
+        "written",
+        "path",
+        "sha256",
+        "persisted_content",
+        "readback_complete",
+        "observation_scope",
+        "links",
+        "link_scope",
+        "unsupported_reference_links"
+      ],
+      "stored_path_exists": true,
+      "full_persisted_body_returned": true,
+      "returned_body_matches_stored_bytes": true,
+      "returned_sha256_matches_stored_bytes": true,
+      "returned_link_occurrences": 4,
+      "returned_existing_targets_still_exist": true,
+      "not_treated_as_source_correctness_proof": true
+    }
+  },
+  "packet_actor_thinking_blocks": {
+    "A": 0,
+    "B": 0,
+    "C": 0,
+    "D": 0,
+    "E": 0,
+    "F": 0,
+    "G": 0,
+    "H": 0
+  },
+  "exact_authorization_copy_outside_packet": true
+}

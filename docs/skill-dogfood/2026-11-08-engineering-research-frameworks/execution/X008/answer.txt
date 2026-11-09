@@ -1,0 +1,10 @@
+`TEST_ROOTS` 精確包含四個目錄，依序為：
+
+- `tests`
+- `loom-code/tests`
+- `loom-design/tests`
+- `loom-workflow/tests`
+
+已核對來源雜湊，並讀回[英文短筆記](/private/tmp/framework-probe-b-20261108/X008/project/docs/loom/research/2026-11-08-package-runner-test-roots.md)。
+
+此快照中的清單無未確定事項；未執行測試或實驗，未驗證部署或 CI 狀態。

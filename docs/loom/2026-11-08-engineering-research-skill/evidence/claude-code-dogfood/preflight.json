@@ -1,0 +1,62 @@
+{
+  "recorded_at": "2026-11-08T11:01:28.705831+00:00",
+  "host": "Claude Code",
+  "cli_version": "2.1.317",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_effort": "medium",
+  "status": "explicit_executor_blocked_by_automatic_approval_review",
+  "isolated_home": "/private/tmp/claude-code-engineering-research-dogfood-20261108",
+  "isolated_native_auth_metadata": {
+    "loggedIn": false,
+    "authMethod": "none",
+    "apiProvider": "firstParty",
+    "subscriptionType": null
+  },
+  "preflight_exit_code": 0,
+  "sandbox_boundary": "Native auth metadata command ran outside sandbox; isolated HOME still has no usable native login. No credential contents were read, copied, or printed.",
+  "health_requests": 2,
+  "activation_attempts": 0,
+  "executor_attempts": 0,
+  "model_tokens": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 4132,
+    "cache_read_input_tokens": 7104,
+    "output_tokens": 270
+  },
+  "model_tokens_note": "First health API duration/tokens zero. Final public native probe succeeded; see final-public-probe.json for nonzero usage.",
+  "scope": "Temporary session-only plugin counterpart; no global install, settings or hook mutation; production files unchanged.",
+  "stopped_reason": "Automatic approval review rejected six private fixture/skill requests as unapproved sensitive egress to Anthropic. No executor request started. No workaround attempted.",
+  "classification": "Environment/auth isolation boundary; no evidence of skill activation or workflow behavior.",
+  "preflight_tool_wall_seconds": 5.9,
+  "preflight_command": "env -i HOME=<temporary HOME> PATH=<minimal native CLI PATH> claude auth status --json | <four-field metadata filter>",
+  "diagnostic_iterations": [
+    {
+      "attempt": 1,
+      "kind": "isolated_home_auth_status",
+      "wall_seconds": 5.9,
+      "loggedIn": false,
+      "authMethod": "none",
+      "apiProvider": "firstParty",
+      "subscriptionType": null
+    },
+    {
+      "attempt": 2,
+      "kind": "isolated_home_with_two_nonsecret_account_uuid_fields",
+      "wall_seconds": 4.6,
+      "loggedIn": false,
+      "authMethod": "none",
+      "apiProvider": "firstParty",
+      "subscriptionType": null
+    }
+  ],
+  "health_request_note": "One native CLI health invocation; failed before API processing: duration_api_ms=0, token usage=0, Not logged in.",
+  "identity_metadata_cleanup": "Temporary .claude.json containing only accountUuid/organizationUuid and onboarding flag deleted after bounded diagnosis.",
+  "public_probe_costUSD": 0.0199464,
+  "corrective_diagnosis": "HOME/PATH-only allowlist omitted normal OS identity/context and produced false-negative native auth. Normal nonsecret OS env allowlist restored first-party model access. No user login/config repair is required by current evidence.",
+  "native_activation_status": "unverified; safe-mode public inline plugin skill lookup Unknown skill",
+  "approval_rejection": {
+    "action": "Six explicit Claude Code executors sending frozen seven runtime MD, prompts and minimal fixtures to Anthropic",
+    "reason": "此動作會把內部 skill Markdown、測試提示與 fixture 資料送往 Anthropic；使用者只明確詢問能否用 Claude Code 測試，未明確授權這批具體資料送至 Anthropic，敏感外傳因此不得執行。",
+    "required_next_step": "Explicit user approval of specified data transfer; no indirect execution or workaround."
+  }
+}

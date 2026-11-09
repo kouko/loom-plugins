@@ -1,0 +1,20 @@
+**結論:不能套用。** 先前「`tests/local/` 被排除」的結論只適用於 `--loom-family` preset,不適用於「不帶 `--loom-family`、用 explicit arguments 指定 `tests/local/test_example.py`」的呼叫。
+
+**原始碼依據**(只讀 `src/scripts/run_package_tests.py`,未執行任何東西):
+- `main()` 只有在 `argv[0] == "--loom-family"` 時才進入 preset(第 153–167 行)。
+- 否則走 explicit 分支(第 168–176 行):依 `--then` 切組,每組直接執行 `python -m pytest <group>`。
+- 排除 `local/` 的邏輯(`_tests_session`、`_holds_tests`、`_shell_tests`、`_workflow_sessions`)只存在於 preset 路徑。explicit 分支不會呼叫它們,也不會加任何 `--ignore`。
+- 測試檔(`src/tests/test_run_package_tests.py`)對 `local/` 排除的斷言只針對 preset 指令。我只讀了這些定義,沒有執行。
+- 推論:這個 runner 本身不會擋掉你明確指定的 `tests/local/test_example.py`,它會被原樣交給 pytest。所以如果沒有其他設定阻擋,預期它會被執行。
+
+**處理方式:** 先前的記錄 `docs/loom/research/2026-11-08-package-test-roots.md` 完全沒動。這次是針對不同呼叫條件另做的研究,掛在 active change `fixture-explicit-args` 下,並連結回先前的記錄。
+
+**新記錄:** `docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md`。已讀回內容,相對連結都能解析。兩個來源檔的 SHA256 與 provenance 一致。
+
+**不確定事項:**
+- 這只有原始碼層級的證據,沒有執行,所以 pytest 是否真的收集到該檔未經測試。
+- snapshot 沒有 `pytest.ini`、`conftest.py` 或 `addopts`,真實 repo 的設定可能影響結果。
+- `tests/local/test_example.py` 在 fixture 中不存在,是假設的路徑。
+- CI 與實際部署版本不在證據範圍內。commit `d5a7f0d` 的遠端是否最新也沒檢查。
+
+**待決定:** 如果希望 `local/` 測試永遠不能經由這個 runner 執行,explicit 路徑需要加 guard。如果允許開發者明確指定來跑,現行行為就符合。這是變更負責人的設計決定,我沒有替你選。

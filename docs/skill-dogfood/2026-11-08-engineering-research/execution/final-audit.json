@@ -1,0 +1,18 @@
+{
+  "utc": "2026-11-08T06:02:15.476665+00:00",
+  "prior_blocked_receipt_preserved": true,
+  "frozen_inputs_unchanged": true,
+  "original_sources_unchanged": true,
+  "skill_snapshot_unchanged": true,
+  "all_actor_sources_unchanged": true,
+  "all_actor_auth_links_removed": true,
+  "remaining_auth_links": [],
+  "temporary_project_snapshots_retained": true,
+  "total_usage": {
+    "input_tokens": 412048,
+    "cached_input_tokens": 330624,
+    "output_tokens": 7182,
+    "reasoning_output_tokens": 190
+  },
+  "server_confirmed_model": null
+}

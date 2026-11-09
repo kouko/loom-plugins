@@ -1,0 +1,9 @@
+Unsaved research draft; no files changed.
+
+**Finding:** The conflict remains unresolved. Neither source, driver/version, nor configuration was provided; no implementation or runtime evidence is available.
+
+**Method:** Compare both claims against the exact release’s documentation and retry execution paths, checking write type, failure timing, retry settings, and deduplication guarantees.
+
+**Decision impact:** The design’s risk assessment remains unverified. Replaying an applied non-idempotent write could duplicate effects; withholding retries after an ambiguous failure could leave completion unknown. These are conditional risks, not observed behavior.
+
+Please provide both source excerpts, the driver/version, and relevant retry configuration so the claims can be reconciled.

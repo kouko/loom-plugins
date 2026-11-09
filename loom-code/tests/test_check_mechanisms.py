@@ -1,3 +1,4 @@
+# concern: Research admission must retain the counted-skill ceiling and fail-closed budget evidence.
 """W0-06 — check_mechanisms.py recomputes the five admission-rule classes
 (concept-model §11, spec REQ-7) against docs/loom/evidence/mechanisms.yaml
 and diffs: R0 unknown class, R1 unregistered, R2 stale (class-scoped), R3
@@ -984,14 +985,24 @@ class TestMeasureFailsClosed:
         assert cm.measure_skill_count(repo) == 24
         assert cm.run_measure(repo) == 0
 
-    def test_twenty_fifth_counted_skill_exceeds_budget(self, tmp_path, capsys):
+    def test_twenty_five_counted_skills_fit_declared_research_budget(self, tmp_path):
         repo = _measure_repo(tmp_path, words=10,
                              baseline_line="- session-start-baseline: <sha> 10 — measured")
-        # The fixture already contains two counted skills.
         for number in range(23):
             skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
             skill.parent.mkdir(parents=True, exist_ok=True)
             skill.write_text("# Skill\n")
         assert cm.measure_skill_count(repo) == 25
+        assert cm.run_measure(repo) == 0
+
+    def test_twenty_sixth_counted_skill_exceeds_budget(self, tmp_path, capsys):
+        repo = _measure_repo(tmp_path, words=10,
+                             baseline_line="- session-start-baseline: <sha> 10 — measured")
+        # The fixture already contains two counted skills.
+        for number in range(24):
+            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
+            skill.parent.mkdir(parents=True, exist_ok=True)
+            skill.write_text("# Skill\n")
+        assert cm.measure_skill_count(repo) == 26
         assert cm.run_measure(repo) == 1
-        assert "skill count 25 exceeds the loom budget of 24" in capsys.readouterr().out
+        assert "skill count 26 exceeds the loom budget of 25" in capsys.readouterr().out

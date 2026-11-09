@@ -1,0 +1,31 @@
+{
+  "date_utc": "2026-11-08T05:57:53.154860+00:00",
+  "user_reply": "同意",
+  "in_response_to": "是否同意將 skill、必要的 Loom 原始碼、測試提示與輸出傳送至 OpenAI（gpt-6.1-sol）？不含私人 session、Vault 或憑證內容。",
+  "authorized": true,
+  "destination": "OpenAI first-party model service",
+  "model": "gpt-6.1-sol",
+  "scope": [
+    "uninstalled research skill and bundle",
+    "five adjacent skill descriptions",
+    "necessary Loom source/test slices",
+    "dogfood prompts, generated artifacts and operational transcripts"
+  ],
+  "excluded": [
+    "private sessions",
+    "vault content",
+    "credential contents"
+  ],
+  "actions": [
+    "remaining activation trials",
+    "three execution cases",
+    "two fresh independent artifact audits"
+  ],
+  "not_authorized": [
+    "install skill",
+    "edit tested skill",
+    "commit",
+    "publish",
+    "merge"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "status": "complete",
+  "planned_runs": 50,
+  "completed_runs": 50,
+  "valid_runs": 50,
+  "invalid_runs": 0,
+  "overall": {
+    "n": 50,
+    "counts": {
+      "true-negative": 10,
+      "true-positive": 40
+    },
+    "positive_n": 40,
+    "negative_n": 10,
+    "true_positive_rate": 1.0,
+    "true_negative_rate": 1.0
+  },
+  "explicit_stage_positives": {
+    "n": 26,
+    "counts": {
+      "true-positive": 26
+    },
+    "positive_n": 26,
+    "negative_n": 0,
+    "true_positive_rate": 1.0,
+    "true_negative_rate": null
+  },
+  "boundary_sensitive_positives": {
+    "n": 14,
+    "counts": {
+      "true-positive": 14
+    },
+    "positive_n": 14,
+    "negative_n": 0,
+    "true_positive_rate": 1.0,
+    "true_negative_rate": null
+  },
+  "resumed_context_only": {
+    "n": 49,
+    "counts": {
+      "true-negative": 10,
+      "true-positive": 39
+    },
+    "positive_n": 39,
+    "negative_n": 10,
+    "true_positive_rate": 1.0,
+    "true_negative_rate": 1.0
+  },
+  "token_usage": {
+    "input_tokens": 2349328,
+    "cached_input_tokens": 1757824,
+    "output_tokens": 30690,
+    "reasoning_output_tokens": 1159
+  },
+  "elapsed_actor_seconds": 1214.205,
+  "note": "Same frozen labels; one full-sibling/default-capability preflight plus49 description-only-sibling restricted resumed contexts. Rates describe this corpus, not production reliability."
+}

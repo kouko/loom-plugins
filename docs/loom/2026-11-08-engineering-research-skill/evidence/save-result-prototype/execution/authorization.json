@@ -1,0 +1,18 @@
+{
+  "utc": "2026-11-08T13:44:22.073002+00:00",
+  "approved_private_execution": true,
+  "actor_count": 8,
+  "provider": "first-party Anthropic",
+  "model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "approved_output_audits": {
+    "provider": "first-party OpenAI",
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "calls": 2,
+    "payload": "only these eight outputs and observable trajectories with their frozen minimal fixture/criteria"
+  },
+  "user_verbatim": "允許",
+  "context": "Direct reply to exact request for this frozen four-case/eight-execution tool-result comparison plus two OpenAI audits; no credentials, unrelated projects or real Vault data.",
+  "freeze_sha256": "e1ebae3a122cfebd54a13f24c0c73c372048fc20398691e49f7c9f320a4446e7"
+}

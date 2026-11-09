@@ -1,0 +1,62 @@
+{
+  "observations": [
+    {
+      "mode": "confirmation",
+      "actual_tools": [
+        "Glob",
+        "Grep",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "custom_mcp_connected": [
+        {
+          "name": "save_probe",
+          "status": "connected",
+          "source": "dynamic"
+        }
+      ],
+      "custom_plugins": [],
+      "slash_commands": [],
+      "actual_tool_body_matches_disk": null,
+      "actual_tool_sha_matches_disk": null,
+      "traversal_write_denied": true,
+      "no_canary_observed": true,
+      "configuration_scope": "session-only explicit settings; no claim of process-wide filesystem sandbox",
+      "canary_response_markers_checked": [
+        "PROJECT_CANARY_LOADED",
+        "RULE_CANARY_LOADED",
+        "AGENTS_CANARY_LOADED"
+      ]
+    },
+    {
+      "mode": "full",
+      "actual_tools": [
+        "Glob",
+        "Grep",
+        "Read",
+        "mcp__save_probe__save_record"
+      ],
+      "custom_mcp_connected": [
+        {
+          "name": "save_probe",
+          "status": "connected",
+          "source": "dynamic"
+        }
+      ],
+      "custom_plugins": [],
+      "slash_commands": [],
+      "actual_tool_body_matches_disk": true,
+      "actual_tool_sha_matches_disk": true,
+      "traversal_write_denied": true,
+      "no_canary_observed": true,
+      "configuration_scope": "session-only explicit settings; no claim of process-wide filesystem sandbox",
+      "canary_response_markers_checked": [
+        "PROJECT_CANARY_LOADED",
+        "RULE_CANARY_LOADED",
+        "AGENTS_CANARY_LOADED"
+      ]
+    }
+  ],
+  "settings_sha256": "717ea799a86830ed6f99c11ca2051a5187195569f698b74e5f6644a3e66d49ba",
+  "limits": "Canary absence is supporting evidence, not proof of all possible hidden context. Native control with private fixtures not yet run."
+}

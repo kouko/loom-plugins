@@ -1,0 +1,11 @@
+Dependency support is **unverified**. Repeated cross-compilation failures alone do not establish that the architecture is unsupported.
+
+Unsaved research draft, using the engineering-research skill:
+
+- **Question:** Does the exact dependency release support the target?
+- **Method:** Compare version-specific upstream support documentation with architecture checks, build scripts and relevant CI coverage.
+- **Evidence:** No dependency identity, version, target triple, build logs or source fixtures were provided; browsing is unavailable.
+- **Decision:** No support conclusion or further fix is justified yet.
+- **Record:** Unsaved because this session is read-only.
+
+Please provide the dependency name/version, host and target triples (including OS/ABI), cross-compilation command and first failing error. Those details will scope the investigation.

@@ -1,0 +1,30 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_no_runtime_file_names_the_retired_step_name _______________
+
+    def test_no_runtime_file_names_the_retired_step_name() -> None:
+        listed = subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True,
+        ).stdout.decode("utf-8").split("\0")
+        paths = [
+            p for p in listed
+            if (p in RUNTIME_FILES or p.startswith(RUNTIME_TREES))
+            and Path(p).name != "CHANGELOG.md" and (ROOT / p).is_file()
+        ]
+        hits = []
+        for path in paths:
+            try:
+                text = (ROOT / path).read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            hits.extend(retired_step_names(path, text))
+>       assert hits == []
+E       AssertionError: assert ['loom-code/t...rness.py:101'] == []
+E         
+E         Left contains 3 more items, first extra item: 'loom-code/tests/local/engineering_research_retest/prepare_audits.py:35'
+E         Use -v to get more diff
+
+loom-code/tests/test_legacy_contract_removed.py:111: AssertionError
+=========================== short test summary info ============================
+FAILED loom-code/tests/test_legacy_contract_removed.py::test_no_runtime_file_names_the_retired_step_name
+1 failed in 0.13s

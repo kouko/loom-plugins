@@ -1,0 +1,26 @@
+{
+  "obsidianApiVersion": "1.14.5",
+  "mermaidVersion": "not introspected",
+  "checks": [
+    {
+      "id": "valid-control",
+      "svgCount": 1,
+      "error": null,
+      "rendered": true
+    },
+    {
+      "id": "invalid-control",
+      "svgCount": 1,
+      "error": "Error parsing Mermaid diagram!\n\nParse error on line 2:\nflowchart TDA -> B\n--------------^\nExpecting 'SEMI', 'NEWLINE', 'EOF', 'AMP', 'START_LINK', 'LINK', 'LINK_ID', got 'MINUS'",
+      "rendered": false
+    },
+    {
+      "id": "B01-saved-block",
+      "svgCount": 1,
+      "error": null,
+      "rendered": true
+    }
+  ],
+  "vaultFilesWritten": false,
+  "visualLayoutInspected": false
+}

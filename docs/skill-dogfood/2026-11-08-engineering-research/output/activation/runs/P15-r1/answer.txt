@@ -1,0 +1,10 @@
+**A fifth plugin’s separate test root will not be discovered automatically without changing the runner.** Explicit Python test invocation is already supported.
+
+Unsaved research record (read-only):
+- **Method:** inspected the supplied runner’s discovery and command paths.
+- **Verified constraint:** [`TEST_ROOTS`](scripts/run_package_tests.py#L53) hard-codes four test locations, including repository-level `tests/`. These are roots, not a four-plugin capacity limit. Family-mode Python collection and shell discovery use those locations; there is no argument for adding a root.
+- **Decision:** for automatic `--loom-family` inclusion of `<new-plugin>/tests`, the runner requires a source change. Tests placed under an existing eligible root can be discovered without that change.
+- **Existing alternative:** [ordinary mode](scripts/run_package_tests.py#L168) forwards supplied arguments to pytest, so `python scripts/run_package_tests.py <new-plugin>/tests` can target Python tests without editing the runner. This does not provide automatic family inclusion or shell-test discovery.
+- **Limitations:** only this fixture was inspected; no tests ran. The plugin’s layout, pytest compatibility, CI configuration, and imported `repo_files` implementation are unavailable, so end-to-end support remains unverified.
+
+No files changed; the research record was not saved under the read-only constraint.

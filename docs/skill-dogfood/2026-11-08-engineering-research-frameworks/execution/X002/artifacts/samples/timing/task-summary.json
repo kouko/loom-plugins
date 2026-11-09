@@ -1,0 +1,5 @@
+{
+  "B01": "Source-only investigation of nested repository/worktree exclusions and failure ordering, with a relationship diagram; produced package-runner-exclusions note.",
+  "B02": "Source-only check of TEST_ROOTS and tests/local exclusions, concise note without diagram; produced package-test-roots note.",
+  "quality_assessment": "No quality assessment supplied; summaries only describe actual requested scopes."
+}

@@ -1,0 +1,10 @@
+**Both filenames match the runner’s discovery rules in `--loom-family` mode**, subject to location, exclusions, and selected group.
+
+- `example_test.py` matches `*_test.py` in [`_holds_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P20-r1/project/scripts/run_package_tests.py:68). The runner passes its containing test directory to pytest; pytest performs actual collection.
+- `test-example.sh` matches `test-*.sh` in [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P20-r1/project/scripts/run_package_tests.py:88). The runner schedules it directly with `bash` in the `workflow-shell` group.
+
+Files must sit beneath a configured root: `tests/`, `loom-code/tests/`, `loom-design/tests/`, or `loom-workflow/tests/`. Relevant exclusions include `local/`, `node_modules`, and nested repositories/worktrees.
+
+**Verification limit:** This is source verification, not an executed collection result. The supplied fixture lacks pytest configuration, dependencies, and test contents, so successful Python collection remains unverified. Without `--loom-family`, the runner forwards arguments to pytest and does not perform shell discovery.
+
+Research record (unsaved, respecting read-only scope): method—implementation inspection; conclusion—both naming conventions supported by runner discovery; remaining evidence—actual pytest collection. No Markdown artifact was saved.

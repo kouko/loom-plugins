@@ -1,0 +1,16 @@
+{
+  "source_fixture": "/private/tmp/formal-engineering-research-execution/fixture",
+  "nature": "exact copy of prior real temporary git merge fixture; not production merge/release",
+  "current_target_commit": "fe2a78328bb5a7c77cab4917a6de846fcacb02a6",
+  "target_owner": "loom-code",
+  "cleanup_scope": "clean post-merge main observation as recorded; topic branch remains after preserved guard rejection; fuller branch/worktree cleanup not claimed",
+  "runtime_hash_match_to_prior": {
+    "SKILL.md": true,
+    "references/source-policy.md": true,
+    "references/structured-relations.md": true,
+    "references/research-methods.md": true,
+    "references/preservation.md": true,
+    "references/evaluation-selection.md": true,
+    "templates/research.md": true
+  }
+}

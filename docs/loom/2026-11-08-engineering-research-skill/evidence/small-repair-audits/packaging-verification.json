@@ -1,0 +1,84 @@
+{
+  "packet_files": 852,
+  "source_body_blinding": [
+    {
+      "actor": "A",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 45
+    },
+    {
+      "actor": "B",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 50
+    },
+    {
+      "actor": "C",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 50
+    },
+    {
+      "actor": "D",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 35
+    },
+    {
+      "actor": "E",
+      "redacted_lines": 1,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 13
+    },
+    {
+      "actor": "F",
+      "redacted_lines": 1,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 16
+    },
+    {
+      "actor": "G",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 51
+    },
+    {
+      "actor": "H",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 49
+    },
+    {
+      "actor": "I",
+      "redacted_lines": 5,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 59
+    },
+    {
+      "actor": "J",
+      "redacted_lines": 5,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 55
+    },
+    {
+      "actor": "K",
+      "redacted_lines": 4,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 48
+    },
+    {
+      "actor": "L",
+      "redacted_lines": 5,
+      "all_other_event_lines_unchanged": true,
+      "event_lines": 51
+    }
+  ],
+  "runtime_bodies_absent": true,
+  "armmap_absent": true,
+  "protocol_absent": true,
+  "hashes": {
+    "freeze": "62c933b4566413de3e4c95dbef374bcac3a08c1cda20c2d24748b39be67d9831",
+    "harness": "45fc3f7972b2735c73cfeb7f7604c54e8bd83c60fd245a8ff459547bbc924019"
+  }
+}

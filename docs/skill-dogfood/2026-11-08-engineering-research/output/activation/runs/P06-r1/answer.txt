@@ -1,0 +1,10 @@
+結論：**「新增 plugin 不用改測試入口」不能作為目前 intent 的已知前提。**
+
+依 engineering-research 技能完成原始碼查證，以下為未落盤研究摘要：
+
+- **方法與範圍**：檢查唯一 fixture 的入口、測試根目錄與命令生成流程；足以判斷自動探索的邊界。
+- **證據**：[TEST_ROOTS 第 53 行](/private/tmp/engineering-research-dogfood-A-20261108/P06-r1/project/scripts/run_package_tests.py:53) 固定列出四個根目錄。[Python 命令生成](/private/tmp/engineering-research-dogfood-A-20261108/P06-r1/project/scripts/run_package_tests.py:124) 與 [shell 探索](/private/tmp/engineering-research-dogfood-A-20261108/P06-r1/project/scripts/run_package_tests.py:88) 均以這些根目錄為界。
+- **判定**：既有根目錄內新增測試可自動探索；若新 plugin 使用獨立的 `<plugin>/tests`，目前須修改 `TEST_ROOTS` 才能納入 `--loom-family`。手動指定 pytest 路徑是另一條入口，不能證明自動納入。
+- **限制**：缺少 `repo_files`、實際測試及 CI 設定，未執行 runner，也未驗證 CI 行為；版本資訊未提供。
+
+intent 應保留此條件差異；若要求任意新 plugin 自動納入，那是待新增的能力。依唯讀限制，研究紀錄未儲存，未進入規劃或實作。

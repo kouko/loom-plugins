@@ -1,0 +1,8 @@
+依 engineering-research 做靜態程式檢查，結論是：**不能直接認定本機 CLI 測試會進一般 suite；取決於測試位置與呼叫方式。**
+
+- `--loom-family`：各測試根目錄直屬的 `local/` 會被排除，Python 與 shell 都有實作；判斷依據是路徑，沒有按「CLI 測試」類型排除。見 [Python 排除邏輯](/private/tmp/engineering-research-dogfood-A-20261108/P08-r2/project/scripts/run_package_tests.py:76)、[shell 排除邏輯](/private/tmp/engineering-research-dogfood-A-20261108/P08-r2/project/scripts/run_package_tests.py:88)。
+- 非 `--loom-family`：參數直接交給 pytest，runner **不自動加入 `local/` 排除**。見 [入口分支](/private/tmp/engineering-research-dogfood-A-20261108/P08-r2/project/scripts/run_package_tests.py:168)。
+
+因此，若 CI 使用 family 模式，且本機測試位於上述 `local/`，這項疑慮不足以要求改 CI；若在其他會被收集的位置，或使用直接 pytest 分支，就可能需要調整方案。
+
+目前缺少實際 CLI 測試路徑、CI 呼叫命令及 pytest 設定，尚不能定案。本次未執行測試、未排工作；以上為未存檔研究摘要，遵守唯讀限制。

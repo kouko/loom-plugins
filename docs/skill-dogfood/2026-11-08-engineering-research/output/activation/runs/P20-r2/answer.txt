@@ -1,0 +1,10 @@
+**Both filenames are supported by the runner’s `--loom-family` discovery logic**, subject to placement and group selection:
+
+- `example_test.py` matches `*_test.py` in [`_holds_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P20-r2/project/scripts/run_package_tests.py:68). The runner then passes its containing test directory to pytest.
+- `test-example.sh` matches `test-*.sh` in [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P20-r2/project/scripts/run_package_tests.py:88) and gets a `bash` command in the `workflow-shell` group.
+
+Files must be under a configured test root. Root-level `local/` subtrees, `node_modules`, and nested repositories are excluded. A restrictive `--only` can omit the relevant group. Ordinary mode delegates arguments directly to pytest; it does not perform shell discovery.
+
+**Evidence limit:** Source inspection verifies filename compatibility and command construction, not successful execution or final pytest collection. Pytest configuration, test contents, and the imported `repo_files` implementation are unavailable in the supplied fixture.
+
+Research record (2026-11-08): source inspection was sufficient for the filename decision; this response is the unsaved record because the task is read-only.

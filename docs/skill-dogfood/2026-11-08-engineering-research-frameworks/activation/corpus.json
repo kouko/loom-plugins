@@ -1,0 +1,177 @@
+[
+  {
+    "id": "P01",
+    "query": "We are drafting the intent for offline sign-in. Whether the chosen identity SDK supports token refresh without a network could overturn the design. Establish what evidence we need before committing.",
+    "should_trigger": true,
+    "rationale": "intent capability",
+    "ambiguous": false
+  },
+  {
+    "id": "P02",
+    "query": "Our spec assumes Python 3.13 can load this native extension. The vendor support table is missing. Investigate compatibility before we approve that runtime.",
+    "should_trigger": true,
+    "rationale": "spec version compatibility",
+    "ambiguous": false
+  },
+  {
+    "id": "P03",
+    "query": "The implementation plan relies on a browser API working in Safari. We have only seen Chrome behavior; resolve that uncertainty before scheduling work.",
+    "should_trigger": true,
+    "rationale": "planning platform compatibility",
+    "ambiguous": false
+  },
+  {
+    "id": "P04",
+    "query": "Build keeps failing at the same cross-compilation step. Before we attempt another fix, investigate whether our dependency even supports the target architecture.",
+    "should_trigger": true,
+    "rationale": "build repeated feasibility",
+    "ambiguous": false
+  },
+  {
+    "id": "P05",
+    "query": "Two sources disagree about whether the database driver retries non-idempotent writes. That changes the data-loss risk in our proposed design. Resolve the conflict.",
+    "should_trigger": true,
+    "rationale": "contradictory safety capability",
+    "ambiguous": false
+  },
+  {
+    "id": "P06",
+    "query": "Loom intent 還沒確認：我們假設套件可在沒有 Node 的使用者環境載入。請查證這個前提，因為不成立就得換方案。",
+    "should_trigger": true,
+    "rationale": "intent environment zh",
+    "ambiguous": false
+  },
+  {
+    "id": "P07",
+    "query": "正在寫 spec。舊文件說 webhook 保證順序，新文件只保證至少一次，這會改變去重設計，先解開矛盾。",
+    "should_trigger": true,
+    "rationale": "spec semantics contradiction zh",
+    "ambiguous": false
+  },
+  {
+    "id": "P08",
+    "query": "規劃資料庫升級前，請確認目前版號能不能直接升到目標版；不支援就要安排中繼升級。",
+    "should_trigger": true,
+    "rationale": "planning version zh",
+    "ambiguous": false
+  },
+  {
+    "id": "P09",
+    "query": "build 已在權限設定上失敗好幾輪；先研究 macOS sandbox 是否容許這項操作，再決定怎麼修。",
+    "should_trigger": true,
+    "rationale": "build platform repeated zh",
+    "ambiguous": false
+  },
+  {
+    "id": "P10",
+    "query": "這個儲存方案是否可行，取決於服務端能不能做原子條件寫入。現在沒有可靠證據，請先調查。",
+    "should_trigger": true,
+    "rationale": "generic feasibility zh",
+    "ambiguous": true
+  },
+  {
+    "id": "P11",
+    "query": "Loom の intent を詰めています。選定 SDK のライセンスが再配布を許すか不明で、採用可否が変わります。根拠を確認してください。",
+    "should_trigger": true,
+    "rationale": "intent license constraint ja",
+    "ambiguous": false
+  },
+  {
+    "id": "P12",
+    "query": "spec の前提である HTTP クライアントのプロキシ対応が現行版にもあるか、確かな資料で確認してから設計を進めたいです。",
+    "should_trigger": true,
+    "rationale": "spec version capability ja",
+    "ambiguous": false
+  },
+  {
+    "id": "P13",
+    "query": "計画に入る前に、このキャッシュが複数プロセスで安全に使えるか確認したいです。仕様の説明が食い違い、方式の選択に影響します。",
+    "should_trigger": true,
+    "rationale": "planning contradiction ja",
+    "ambiguous": false
+  },
+  {
+    "id": "P14",
+    "query": "ビルド中、同じ ABI エラーが続きます。対応バージョンの組合せそのものが間違っていないか調べてください。",
+    "should_trigger": true,
+    "rationale": "repeated build compatibility ja",
+    "ambiguous": false
+  },
+  {
+    "id": "P15",
+    "query": "The intent compares local versus hosted parsing. We have no measured latency under the deployment constraints; determine what evidence would justify either choice.",
+    "should_trigger": true,
+    "rationale": "intent comparison gap",
+    "ambiguous": false
+  },
+  {
+    "id": "P16",
+    "query": "A benchmark claims the new dependency is faster, but it used different hardware. Before changing our plan, assess whether that evidence supports the migration decision.",
+    "should_trigger": true,
+    "rationale": "planning causal gap",
+    "ambiguous": false
+  },
+  {
+    "id": "P17",
+    "query": "Our design depends on the current API retaining deleted records for thirty days. Verify that capability and identify what remains unknown before we lock the spec.",
+    "should_trigger": true,
+    "rationale": "spec retention capability",
+    "ambiguous": false
+  },
+  {
+    "id": "P18",
+    "query": "We are deciding whether to migrate authentication providers. Check whether the required passkey flow exists at the versions we can deploy; do not implement the migration.",
+    "should_trigger": true,
+    "rationale": "bounded migration feasibility",
+    "ambiguous": true
+  },
+  {
+    "id": "P19",
+    "query": "One test says the plugin loader handles ESM, another says it only accepts CommonJS. Build is blocked until we resolve which claim applies to our supported host.",
+    "should_trigger": true,
+    "rationale": "build conflicting compatibility",
+    "ambiguous": false
+  },
+  {
+    "id": "P20",
+    "query": "Repeated attempts to enable streaming have failed. Before another retry, establish whether our account tier and API version support it at all.",
+    "should_trigger": true,
+    "rationale": "repeated failure capability boundary",
+    "ambiguous": true
+  },
+  {
+    "id": "N01",
+    "query": "Critique the value and complexity of adding a dashboard export button. Technical feasibility is settled; focus on whether this product idea earns its maintenance cost.",
+    "should_trigger": false,
+    "rationale": "critique proposal",
+    "ambiguous": false
+  },
+  {
+    "id": "N02",
+    "query": "Get an independent coding-agent opinion on our architecture trade-off. The evidence is collected already; I want a second reviewer, not another investigation.",
+    "should_trigger": false,
+    "rationale": "independent-advisor",
+    "ambiguous": false
+  },
+  {
+    "id": "N03",
+    "query": "Review this development session for process improvements: we skipped the kickoff, implemented the agreed tiny change, and ran tests late. No technical issue remains open.",
+    "should_trigger": false,
+    "rationale": "project-retro",
+    "ambiguous": false
+  },
+  {
+    "id": "N04",
+    "query": "The intent and feasibility are approved. Turn the agreed addition of a keyboard shortcut into implementation tasks with acceptance checks.",
+    "should_trigger": false,
+    "rationale": "write-plan",
+    "ambiguous": false
+  },
+  {
+    "id": "N05",
+    "query": "I want an undo button for deleted drafts. Help capture the user problem, intended outcome and acceptance criteria; there is no known engineering uncertainty yet.",
+    "should_trigger": false,
+    "rationale": "capture-intent",
+    "ambiguous": false
+  }
+]

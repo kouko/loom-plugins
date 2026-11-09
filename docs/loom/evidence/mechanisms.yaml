@@ -59,7 +59,7 @@ mechanisms:
   - id: "Stop::loom-python@codex"
     class: hook
     eval: loom-code/tests/test_delivery_stop.py
-  # --- skill (24; 7 stations + 14 non-standalone tools + 3 optional routers;
+  # --- skill (25; 7 stations + 15 non-standalone tools + 3 optional routers;
   #     the 3 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
@@ -106,6 +106,9 @@ mechanisms:
   - id: decision-map
     class: skill
     eval: "loom-workflow/tests/decision-map/test_start_delivery.py::test_creates_intent_and_lists_it_under_the_criterion"
+  - id: engineering-research
+    class: skill
+    eval: loom-code/tests/engineering-research/test_package.py
   - id: handoff
     class: skill
     eval: "loom-workflow/tests/scripts/test_handoff_compaction.py"
@@ -291,6 +294,7 @@ mechanisms:
   - {id: "tool:design-system",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:architecture-design", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:decision-map",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:engineering-research", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:recap-state",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:loom-visualization",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}

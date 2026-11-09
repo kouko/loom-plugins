@@ -1,0 +1,727 @@
+[
+  {
+    "id": "P01",
+    "query": "Before we commit our Loom intent, determine whether the current package test runner really discovers shell tests. That capability decides whether our proposed guard can ship. Read the provided runner and identify the evidence gap.",
+    "should_trigger": true,
+    "rationale": "intent capability",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P01-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "1de0b68af2b3bed85f7ff14c592644bf2fd295a3236c1713a9a407cb221bec31",
+        "answer.txt_sha256": "775908189d2361d3b430734d06006b33852d2de4b17fdae086478801c7482ec5"
+      },
+      {
+        "id": "P01-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "1d78f1635f84648d8638cf6f2082d4cd6474c484cbd4f4ef79f07fdd1474a391",
+        "answer.txt_sha256": "6edb7679b69e65b9faf0556f1a57e835dd18790af73d9543514782fd1a2208fe"
+      }
+    ]
+  },
+  {
+    "id": "P02",
+    "query": "The active intent assumes new test roots are discovered automatically, while a reviewer says they must be listed. Resolve this contradiction before we choose an approach.",
+    "should_trigger": true,
+    "rationale": "contradiction",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P02-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "a4ab90c9758935632e79b1ddee97060263a34f7db9830d1fd5911c76b3a4b64c",
+        "answer.txt_sha256": "0e1e9f4dbecb71f4d0dda819f5405161caa0a52cde1d09737e13c4bd5719dffe"
+      },
+      {
+        "id": "P02-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "cb45bf0f48ee33f6d59d1b10ec1a2f39e4955063e6c46ecfbbc6f4e56ee92f2c",
+        "answer.txt_sha256": "2baf5283944d14c40085d61d4c9e424066f39de768ea37bd7eb947df30b68b80"
+      }
+    ]
+  },
+  {
+    "id": "P03",
+    "query": "We are writing a spec, and whether pytest and shell tests share inventory determines the design. Check the actual runner rather than accepting the assumption.",
+    "should_trigger": true,
+    "rationale": "spec capability",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P03-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "766259ee921c4f6b7166587a4aea7e1253b7dabf9a9ec1d411de43fe4c09ac59",
+        "answer.txt_sha256": "74346c70b1833f444bc8c34f4935db0872d826548e0c9ffb13eb577a9a10ea6d"
+      },
+      {
+        "id": "P03-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "01f923415e4fccd8cfd12a819af35cc5088f7db30a19b47bea17fb2042e467ae",
+        "answer.txt_sha256": "29647c74f0b8bbac8a26b4e616f33c25279aed798de4fec810cfa1b55ee8c27a"
+      }
+    ]
+  },
+  {
+    "id": "P04",
+    "query": "During planning, we need evidence on whether tests/local runs in CI. An incorrect assumption changes our validation plan. Investigate the runner slice.",
+    "should_trigger": true,
+    "rationale": "planning compatibility",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P04-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "07638f83cae854c6536b323f96baca516ad8e8b873cc3b50cdac63b00ce507e9",
+        "answer.txt_sha256": "2b496acfaa957f0ea81f4d5c7ce79fc20f6591c1d31f9fb8aee62d2478d38a88"
+      },
+      {
+        "id": "P04-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "12bc009025783a8034681a1ec535ba31e482897d91e4ba6c6033b0767f8816da",
+        "answer.txt_sha256": "9f640648bee133d19db33175648e8d512680e3c1133baf09273b3c531ae252d4"
+      }
+    ]
+  },
+  {
+    "id": "P05",
+    "query": "Build has failed repeatedly because a shell test seems absent from package execution. Stop retrying and establish what the runner actually discovers.",
+    "should_trigger": true,
+    "rationale": "repeated build failure",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P05-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "60fc2a9fb3ec7627c7c352b59e884fd0333abfe3d68a51fa9ac9554364c1d740",
+        "answer.txt_sha256": "d18a096acc13c44663fb2d912a834abe1b61e8970b3f8ed2ccf6b20e754d54e5"
+      },
+      {
+        "id": "P05-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "c4cb5157e71328f5061b1ed2352dec047e8e828d9cdc734e1b2edfbd2ae0c51f",
+        "answer.txt_sha256": "ce53fd3e4abea2a3bffe5b0810f19693143db9aedb9cf92febeddab879115839"
+      }
+    ]
+  },
+  {
+    "id": "P06",
+    "query": "我們正在確認 intent；「新增 plugin 不用改測試入口」只是猜測，會影響方案可行性。請先用現有 runner 查證。",
+    "should_trigger": true,
+    "rationale": "intent feasibility zh",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P06-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "db90f52ee8cc8753d135809d8d1b776ec68a2ded3060497bc98a02dafba1a32e",
+        "answer.txt_sha256": "d152d8399333e8030b7aa330ac74a9d4ea7fff856fef4536d94748b87ea443fc"
+      },
+      {
+        "id": "P06-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "19017fd9e10571ab48ecccd153a1bcfe71c2ac2b44080a1083cae8000c5cd1f3",
+        "answer.txt_sha256": "d31382fec01652bd3b495e3cdf25524e3eb00c8819e1c2aa3f8d4788dffc3d19"
+      }
+    ]
+  },
+  {
+    "id": "P07",
+    "query": "spec 的兩份說法互相衝突：一份說自動探索測試，一份說固定 roots。先查清楚它們如何同時成立。",
+    "should_trigger": true,
+    "rationale": "spec contradiction zh",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P07-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "d7d57f5177a997f3f0093ae8ad110e49bf976b815c38cc15ae2fd28ec6480a67",
+        "answer.txt_sha256": "5a2677d57d86a55ad74c5413b0324c7e95bfb956c9a625ea91b64ee49f7cd652"
+      },
+      {
+        "id": "P07-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "67207c2ad7ba8c8cbab511dfae06504651ebb0a915653a2d64586f1a1f1d0b9a",
+        "answer.txt_sha256": "b018e2794fe14e1721fb440f29080a1e23af791c719726ac96d9bf6dc0ff215a"
+      }
+    ]
+  },
+  {
+    "id": "P08",
+    "query": "規劃尚未定案：若本機 CLI 測試會在一般 suite 跑，CI 方案就要改。請以實際程式判斷，不要直接排工作。",
+    "should_trigger": true,
+    "rationale": "planning evidence zh",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P08-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "ed66033375bfdf6adc63295f385b798c30a6b8fa482712724c9c7703d205d513",
+        "answer.txt_sha256": "daf007e48e265cf5f90f4687affb1ecbf5dd4a984c06254cb7afec7f27ff164c"
+      },
+      {
+        "id": "P08-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "8bae78f0982837968ed74764008806a49efae4debccd559ed6bf249f13bdd0d0",
+        "answer.txt_sha256": "ae693cf042d7598d9a0ddea3ed59279d42cfe701436f5f2a450d9efb4a424ad3"
+      }
+    ]
+  },
+  {
+    "id": "P09",
+    "query": "build 已連續兩次找不到新增測試；先找出真正原因與證據，再決定要不要調整 discovery 設計。",
+    "should_trigger": true,
+    "rationale": "build repeated zh",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P09-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "9e543e4ce6e4f7f2a0d39839d4c426015d8c79639cf3cf10db0d134825da185c",
+        "answer.txt_sha256": "b16759318ed1133f1ae6ab9fd8f894cefb7a1e995b09a31a8300d00752160ac8"
+      },
+      {
+        "id": "P09-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "f59e84faaa80caeb90dee435077670645c7a42a34572a4b0c4607da6a5ca0a96",
+        "answer.txt_sha256": "0930fc4259139d9603e1d92e8fa2373ab9be6a1e2eb026a6d3383956ca4de9b9"
+      }
+    ]
+  },
+  {
+    "id": "P10",
+    "query": "採用這個測試入口之前，請確認它有沒有支援 shell 測試。這會決定我們能不能沿用既有驗證方式。",
+    "should_trigger": true,
+    "rationale": "generic capability zh",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P10-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "074c01761643a5342fd3404fe57a46491557d675403e6a62c1ba6ac107010b6c",
+        "answer.txt_sha256": "3f69d1b279aafa45a51f476a56ac92d79074da07251dbc7bf0fe6b92ae90820f"
+      },
+      {
+        "id": "P10-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "f4c0ba6f076bc413a487c83daf9579ae11717635e1d6d5e6d69c024dfdb5cc76",
+        "answer.txt_sha256": "281b44918c4170b14b16177e413f2bcb61e4a17550ed95cd11226708900148fd"
+      }
+    ]
+  },
+  {
+    "id": "P11",
+    "query": "実装方針を決める前に、テスト実行器が新しい plugin の tests を自動発見するという前提を確認してください。前提が違えば設計が変わります。",
+    "should_trigger": true,
+    "rationale": "generic feasibility ja",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P11-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "9e49e140757f8441c412b56cd6d810df5e01be1bbbd4c937d3f03b3f0e69db55",
+        "answer.txt_sha256": "bf3c3edbca9701a2a745f49d28150deb11cdcdb4be6e52f90e66deab6027a927"
+      },
+      {
+        "id": "P11-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "e310d8395dae14f16ccfcbeadb7bd982458d32dde09a624d2d0d8db4b440b1f8",
+        "answer.txt_sha256": "ee79197d3a7ea68061b3f21b9573906cc522e4e285298030b096256ebdcf00a1"
+      }
+    ]
+  },
+  {
+    "id": "P12",
+    "query": "Loom の intent を確認中です。ローカル CLI 専用テストが通常 suite に混ざるかで採用判断が変わります。コードで確かめてください。",
+    "should_trigger": true,
+    "rationale": "intent compatibility ja",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P12-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "19985eadee7d7b7327f707d20c8cefefc9f090a094eee3e37cf11d6425aa6ea9",
+        "answer.txt_sha256": "6bf6192aaaee7d6f01cb26423baa659dd04ae72c01a35d5d2b89a5b0cd62a5eb"
+      },
+      {
+        "id": "P12-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "bf6d760bd3ff4237b0a8e65da4e9fd99480dadf20767d3f03c5002ab717ac99c",
+        "answer.txt_sha256": "524b3fbaa76821056bdfd57e7fc4910409ba9eb4c4d708709b71d77733dce3fe"
+      }
+    ]
+  },
+  {
+    "id": "P13",
+    "query": "spec 作成中です。pytest と shell が別々の一覧を使うという説明と、共通 inventory という説明の矛盾を解消してください。",
+    "should_trigger": true,
+    "rationale": "spec contradiction ja",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P13-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "0cae4e8f3879b8e10697b27dca3de58192663670808f75ab1f0f029df84a2f12",
+        "answer.txt_sha256": "379a9b183f1b3be57786b668418adb3d7cf36d0e533d7731252b83c63ad458a6"
+      },
+      {
+        "id": "P13-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "45859ec6e8a4112b3dcaded64528003fb54839367853471bc075ca939482e62f",
+        "answer.txt_sha256": "6b67042e8d6318369203e0bef84fd9fb372101c985efdbbcfefeb9b9fda624ec"
+      }
+    ]
+  },
+  {
+    "id": "P14",
+    "query": "ビルドで同じ test discovery の失敗を繰り返しました。再試行より先に、何が探索対象かを確認してください。",
+    "should_trigger": true,
+    "rationale": "build repeated ja",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P14-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "d6e1743228fb02ad0aa80a515e1f47886f3c3e125f206d735c9ef70538c7036e",
+        "answer.txt_sha256": "de7d09aa8649b17efc97b313df3d16ddd715dc6235d0dcb837150da043f6650a"
+      },
+      {
+        "id": "P14-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "4fb4c0f23403d8b792b63e49b45c9a78d7700c1ceb65cd02932f93b8135217cb",
+        "answer.txt_sha256": "4ec27f7f4edb780c35a9b7086751eaf82cc3f1a41ed24ac9bce205913c8458aa"
+      }
+    ]
+  },
+  {
+    "id": "P15",
+    "query": "We need an engineering decision, not implementation yet: can this runner support a fifth plugin without changing production code? Verify the relevant constraint first.",
+    "should_trigger": true,
+    "rationale": "generic decision",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P15-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "a8e7da5b3d7d0db19572069dd3b0062466eded87c3e580b148f6c13434e40dc7",
+        "answer.txt_sha256": "27a07fe5e92cf5fc46e23f62881b7140472c192b3a85cf229b9a01b15c3c10bc"
+      },
+      {
+        "id": "P15-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "dbc7f4fc594ea7720029f78748a3142bfe9fdeced2f656b67ee5f335d3c72935",
+        "answer.txt_sha256": "31b74865fec3b549a66500819eb175c14a0544f4916d93c6dcab2cf0c229afe7"
+      }
+    ]
+  },
+  {
+    "id": "P16",
+    "query": "A proposed acceptance strategy depends on shell tests being discovered recursively. Establish whether the current implementation supports that before recommending the strategy.",
+    "should_trigger": true,
+    "rationale": "acceptance assumption",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P16-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "e59e6fd4cdea32f96f3495aea70ab2f947112fef73b09d87cab3655097748451",
+        "answer.txt_sha256": "54855819725f4eb8e3b85dca75b27eb2ed16064361ee00e69ff1d57a6b8fe487"
+      },
+      {
+        "id": "P16-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "5077c36ecca7975c26d052337745e196ee5dc2e7743892db8c2be0719bb0b75c",
+        "answer.txt_sha256": "d0c1a89b0de02e4a4209836ef22f86bfd427ab88b614c331a692714297bdab99"
+      }
+    ]
+  },
+  {
+    "id": "P17",
+    "query": "The plan treats tests/local as ordinary package tests. I suspect that assumption is wrong and would invalidate CI. Resolve it from source before planning further.",
+    "should_trigger": true,
+    "rationale": "plan invalid premise",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "P17-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "21f5fc1c9f43c353d39067dbfdc3ad0d756771db4f7c34e66159fbe9e58027f9",
+        "answer.txt_sha256": "67b3815e277af3e07be61425dfdfaf4a15323bfa0fcd665d26b9bb64b5351802"
+      },
+      {
+        "id": "P17-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "5cc82095faf2f3a5e72534e7cdfabece00028b6f8015ad47ec1f447e0f80c395",
+        "answer.txt_sha256": "37fc2d89b8f8fdeed2af35f8c2e2080bc92f4191893c1f613521c6f1a8d78351"
+      }
+    ]
+  },
+  {
+    "id": "P18",
+    "query": "Before approving the spec, check whether the runner requires node or only Python. That environment requirement could make the design infeasible.",
+    "should_trigger": true,
+    "rationale": "environment feasibility",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P18-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "fc80184c6ec7c1039243753cee25eb931033adc159d2202959a5e3ab9909347b",
+        "answer.txt_sha256": "49a3ce8613df751dc60d8db44b1a59b5dc756168969342ea66dd991f500d4a3c"
+      },
+      {
+        "id": "P18-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "2f1125991daa4b195e30a468bb851f9f504ed836948102f8706cba53b79c6231",
+        "answer.txt_sha256": "c1c51931c75dceea1d512d3d43258af9283ec0c3d1537a275c3185893de98abe"
+      }
+    ]
+  },
+  {
+    "id": "P19",
+    "query": "目前沒有要修 code；先調查 runner 對 test roots 的限制，因為它會改變我們要不要新增 plugin 的決定。",
+    "should_trigger": true,
+    "rationale": "decision boundary zh",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P19-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "739cdae3c44bd034583bff178399ff88c9281a4eb60c2306bc2ea9da2ce2104d",
+        "answer.txt_sha256": "c88cd84673dc374e1abc9b4c7bfd47644e858dd5d7e6521d62d8fbccb7fb1a1f"
+      },
+      {
+        "id": "P19-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "c1cb1ed65fe4b386151be5638fba80accd0618bd6f140ae241849cb2c16e20a9",
+        "answer.txt_sha256": "97ea57f2eacefaa8e920f597218ad5a4689b32e4208157866004ac87a4e17a00"
+      }
+    ]
+  },
+  {
+    "id": "P20",
+    "query": "Compatibility is the open decision: will a test named example_test.py and one named test-example.sh both be collected by the supplied runner? Verify rather than assume.",
+    "should_trigger": true,
+    "rationale": "compatibility concrete",
+    "boundary_sensitive": true,
+    "runs": [
+      {
+        "id": "P20-r1",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "d1dc19febe0f6e97a50963ca484bfcfd39fa9ad1fbfdec0f8f641b4bacca89e1",
+        "answer.txt_sha256": "667539c4680fedb441057d254a462896f651d76ad08d6328f671e73b584d6628"
+      },
+      {
+        "id": "P20-r2",
+        "classification": "true-positive",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": true,
+        "events.jsonl_sha256": "f9f46d027abaa95a4afb0eb19e181680898b39d068cad69d48f31e38541c1824",
+        "answer.txt_sha256": "2e8a78aec6b07831ebf623ba1f8bf1618a86d6bfbe80901cf5eb98cf21a84c26"
+      }
+    ]
+  },
+  {
+    "id": "N01",
+    "query": "Critique this proposal on value and complexity only: add an optional summary flag to our runner. Assume technical feasibility is established; do not investigate capabilities.",
+    "should_trigger": false,
+    "rationale": "critique",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "N01-r1",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "c161c5e335ac3aac1ead34c274f4dcb01a0e8d156a4b40381e70e92d00987a48",
+        "answer.txt_sha256": "29412e1d65ae72e8ef478a47abe353db98daf3ebad6119c08283ef973a9cd31e"
+      },
+      {
+        "id": "N01-r2",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "d3453a7e4a27fd0606742ceb604d6eb779d49ed93b1cef173fe9ca437f314489",
+        "answer.txt_sha256": "dddd5a0f01915e779fadd7ca92c5d2397b6d5b6c3e648b632972f78240dc1d41"
+      }
+    ]
+  },
+  {
+    "id": "N02",
+    "query": "Please obtain an independent second opinion from another coding agent on this test-plan decision. Do not execute it yet; explain what review input is missing.",
+    "should_trigger": false,
+    "rationale": "independent-advisor",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "N02-r1",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "8b3ca285680fc411a7d732f95a38d15f06e282dc16fe2b24594f84b05c1d11d4",
+        "answer.txt_sha256": "4b46987f3111941332c858b063f258a62fcfcb04e9a46ad56639bce85c791766"
+      },
+      {
+        "id": "N02-r2",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "f8ef87d5b9870ebc1f9f5e86f95fb98edc76d0fd6f64dd746f409f487616a468",
+        "answer.txt_sha256": "3bfab544239fc8fa72d2aba1b19228f8d8fe2a0abe8ae8c1f60b7e2877c9e18d"
+      }
+    ]
+  },
+  {
+    "id": "N03",
+    "query": "Do a retrospective of this session: we agreed scope, made one small test update, and forgot to record the command. No unresolved technical question; what process should improve?",
+    "should_trigger": false,
+    "rationale": "project-retro",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "N03-r1",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "9c51ecbc8f7edbd4c910364700254e32f307fb04807d0ed957ca4310ca8fb46e",
+        "answer.txt_sha256": "b9af8fbf0c99e5c5f0eae28b440f22702d128a94c8e2dc8028435fa946acb9d3"
+      },
+      {
+        "id": "N03-r2",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "d36ca73649c75a08e0f77a6b783062a5bd7022f59a2c34bd4b4637f6172ee41e",
+        "answer.txt_sha256": "18786e07e48d80f5ae912a14511bdf62332f551324fc86d86667c65a5926b446"
+      }
+    ]
+  },
+  {
+    "id": "N04",
+    "query": "The intent is confirmed and feasibility is established. Break adding one shell test into implementation tasks, without investigating technical assumptions.",
+    "should_trigger": false,
+    "rationale": "write-plan",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "N04-r1",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "cc116ff296666b6e717c4dbd6d14e86a19aea005499147f891004551a8c71e73",
+        "answer.txt_sha256": "096b3a2e0333fff8729af388d7f66aecfc47c746d0c9b1e27e31836890d4b953"
+      },
+      {
+        "id": "N04-r2",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "12352b5ed00e025365b9759ae7d1d3255f627df6d46f863a6f31ae9f1080236b",
+        "answer.txt_sha256": "abed51ec1e4feeba7d9ab3feba59d97e71ad5586c4e436dcc480c8e7b1c9e0f4"
+      }
+    ]
+  },
+  {
+    "id": "N05",
+    "query": "I want to add a new optional --summary flag to the runner. Capture my goal and acceptance criteria first; there are no feasibility questions to investigate yet.",
+    "should_trigger": false,
+    "rationale": "capture-intent",
+    "boundary_sensitive": false,
+    "runs": [
+      {
+        "id": "N05-r1",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "8490478b232e3f0d563a4b0266dc8c85437078517d7843612532f550973ca6b2",
+        "answer.txt_sha256": "8586c630546717d5d5aaf8fdc3dd00ad1cd33f904db69898777761f08ebce58a"
+      },
+      {
+        "id": "N05-r2",
+        "classification": "true-negative",
+        "timed_out": false,
+        "exit_code": 0,
+        "harness_error": null,
+        "target_body_read": false,
+        "events.jsonl_sha256": "535469469e6299b1de0d85bd7bbc8f6c817248e54dc68515a93d5e4446da3b34",
+        "answer.txt_sha256": "d3d07bafccbf6369a10dfd05e6c96d98c0bc87b03138f63c726423776d8a7a00"
+      }
+    ]
+  }
+]

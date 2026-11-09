@@ -1,0 +1,5 @@
+`TEST_ROOTS` 列出四個目錄：`tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。
+
+一般 `--loom-family` package suite 會排除 `tests/local/` 的 Python 與 shell 測試；明確傳入路徑的模式不會自動套用此排除。依據是 runner 的探索與 `--ignore` 邏輯。
+
+已儲存[英文研究紀錄](docs/loom/research/2026-11-08-package-test-roots.md)。僅檢查提供的來源，未執行測試。

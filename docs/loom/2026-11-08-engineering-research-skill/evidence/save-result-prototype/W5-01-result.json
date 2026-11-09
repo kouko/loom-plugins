@@ -1,0 +1,38 @@
+{
+  "task": "W5-01 test-local save-result prototype",
+  "model_calls": 0,
+  "network_calls": 0,
+  "commits": 0,
+  "source_paths": {
+    "save_tool.py": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/save_tool.py",
+    "server.py": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/server.py",
+    "README.md": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/README.md",
+    "test_save_tool.py": "/private/tmp/loom-engineering-research-delivery/loom-code/tests/local/engineering_research_save_probe/test_save_tool.py"
+  },
+  "sha256": {
+    "save_tool.py": "d929b2dedd1290475cd7a63d43413b221a4130d112dd132eeb04101fbd16acc1",
+    "server.py": "5b5f01675cafc0b0611fbee96121236e93858773e8aa66ad6bbeeaedc53fceca",
+    "README.md": "46d6dfbd54d152b046015baef11671c15dbe68e15fd974a82d6b24f5c7d55801",
+    "test_save_tool.py": "6feca905a5e6897363aa96d74948b8f8262e460ad3d88aae7e7dbac586585cdc"
+  },
+  "tests": {
+    "initial_uv_cache_permission_failure": "red.log; no tests executed",
+    "initial_red": "red-tests.log: missing save_tool.py collection error before implementation",
+    "initial_green": "green-tests.log:17 passed",
+    "additional_red": "extra-red-tests.log: unauthorized instruction writes and invalid MCP params fail;19 pass",
+    "malformed_url_red": "malformed-red-tests.log:4 failed/19passed including persisted-state loss through malformed URL",
+    "final_green": "final-green-tests.log:23 passed in0.15s"
+  },
+  "actual_result": "sameinternalwrite/readback/link checks bothmodes;fullresult contains actual persistedbody/hash/local-link observations;confirmation hides extra result fields",
+  "public_prepared": "/private/tmp/engineering-research-save-result-20261108/public-control",
+  "runtime_skill_unchanged": true,
+  "production_promoted": false,
+  "limits": [
+    "No nativeClaude or OpenAI modelcall executed",
+    "Complete returned content is availability, not agent understanding or research correctness",
+    "Local inlineMarkdown-only observations; reference/images/complexsyntax/anchors/externalcontent notvalidated",
+    "No network/outside-root link following; symlink destinations unchecked",
+    "Atomic create/replace then point-in-time hash/readback; not hardened against adversarial concurrentprocesses",
+    "Policy and native filetool confinement mustboth bevalidated beforeprivatecaseexecution"
+  ]
+}

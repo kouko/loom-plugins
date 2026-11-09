@@ -1,0 +1,20 @@
+{
+  "date_utc": "2026-11-08T06:59:13.073110+00:00",
+  "current_request": "可以用 dogfood testing 測試看看嗎",
+  "prior_explicit_consent": "同意",
+  "previous_authorization_record": "../2026-11-08-engineering-research/authorization-resume.json",
+  "authorized_destination": "OpenAI first-party gpt-6.1-sol",
+  "payload": [
+    "revision-4 and revision-5 research skill snapshots",
+    "five adjacent skill descriptions",
+    "necessary genuine Loom source/test slices",
+    "prior generated test receipts/notes when used as genuine observed fixture data",
+    "dogfood prompts, produced artifacts and filtered operational traces"
+  ],
+  "exclusions": [
+    "private sessions",
+    "Vault contents",
+    "credential contents"
+  ],
+  "scope": "Continue the user-authorized same research-skill dogfood on the newly requested framework-selection prototype; no installation, commits, publication or merge."
+}

@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.20.1] — 2026-11-08 — correct the workflow tool census
+
+- Correct all three README counts to nine counted workflow tools among fourteen shipped skills. Engineering research belongs to loom-code; this plugin adds no research capability.
+- Agent-decided: publish a patch for the directly related documentation correction rather than a feature release for a capability owned elsewhere.
+
 ## [5.20.0] — 2026-11-06 — keep local document delivery concise
 
 - Route local document delivery from both visualization cards to shared guidance: provide the document's actual absolute location in the current project, worktree or external directory, without extending the rule to ordinary filename mentions or quoted examples.

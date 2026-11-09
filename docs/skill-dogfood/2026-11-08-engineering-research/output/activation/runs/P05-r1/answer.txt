@@ -1,0 +1,10 @@
+**The runner discovers shell tests only in Loom-family mode.** Source inspection establishes these rules:
+
+- [`_shell_tests()`](/private/tmp/engineering-research-dogfood-A-20261108/P05-r1/project/scripts/run_package_tests.py:88) recursively finds `test-*.sh` under `tests`, `loom-code/tests`, `loom-design/tests`, and `loom-workflow/tests`. It excludes `node_modules` and each root’s direct `local/` subtree.
+- [`loom_family_commands()`](/private/tmp/engineering-research-dogfood-A-20261108/P05-r1/project/scripts/run_package_tests.py:134) schedules those matches with `bash` only for the full family or `--only workflow-shell`, filtering paths beneath nested repositories/worktrees reported by imported helpers.
+- The Mermaid group separately schedules `loom-workflow/tests/mermaid-validator-negative.sh`, despite its different filename.
+- [`main()`](/private/tmp/engineering-research-dogfood-A-20261108/P05-r1/project/scripts/run_package_tests.py:153) uses the current working directory as the discovery root. Ordinary argument mode invokes pytest only. Execution stops at the first failed command, so a discovered shell test can remain unexecuted.
+
+**Conclusion:** shell support exists; the fixture cannot establish why the specific test was absent. Missing evidence includes its path, invocation, working directory, helper implementation/results, and failure logs.
+
+Research record: unsaved draft, dated 2026-11-08; method: bounded source inspection; status: concluded with those limitations. No retries, execution, or changes were made; no research file was saved under your read-only constraint.

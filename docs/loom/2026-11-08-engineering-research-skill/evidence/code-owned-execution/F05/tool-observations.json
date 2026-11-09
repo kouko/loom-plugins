@@ -1,0 +1,83 @@
+[
+  {
+    "id": "item_1",
+    "command": "/bin/zsh -lc \"pwd; rg --files -g '\"'! .git'\"'\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 731,
+    "output_sha256": "742e374f44368986be39add6db7cdf4eb8b443849ca7edf0a32128c0c22029d1"
+  },
+  {
+    "id": "item_2",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/SKILL.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9333,
+    "output_sha256": "5f2880b87f395e70ab28f5852e2aade303964c92a345733a4c6c268b717bf716"
+  },
+  {
+    "id": "item_3",
+    "command": "/bin/zsh -lc 'cat skill/engineering-research/references/research-methods.md skill/engineering-research/references/source-policy.md skill/engineering-research/references/preservation.md skill/engineering-research/templates/research.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 17417,
+    "output_sha256": "cd458b5d6d5a033feea91c6c88fd0b834eeaca8f0df63ec80ca4c8ba403a5da9"
+  },
+  {
+    "id": "item_4",
+    "command": "/bin/zsh -lc 'cat docs/loom/research/2026-11-08-package-test-roots.md snapshots/original-research.md provenance.json sample-receipt.json fixture-cleanup.json'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 9365,
+    "output_sha256": "ffed4af079cf838d08b6b3e0a3ad900d242eb17e721d1fc60bbd3d01934b6c82"
+  },
+  {
+    "id": "item_6",
+    "command": "/bin/zsh -lc 'git status --short --branch; git log --all --decorate --oneline --graph -8; git show --no-patch --format=fuller HEAD; git branch --contains research-fixture; git tag --list; git remote -v; git ls-tree -r --name-only HEAD'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 800,
+    "output_sha256": "d0c1720944ecd4bcb16fad1c36e83ce6dc5994677493d1412048b1cf3f371553"
+  },
+  {
+    "id": "item_7",
+    "command": "/bin/zsh -lc \"nl -ba src/scripts/run_package_tests.py; sed -n '215,240p' src/tests/test_run_package_tests.py; sed -n '275,320p' src/tests/test_run_package_tests.py; shasum -a 256 src/scripts/run_package_tests.py src/tests/test_run_package_tests.py\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 12382,
+    "output_sha256": "f22e80fcdb7cb204a3ad76b776d3cb97133f185ca5406b08a1b80ae6c98bf7d8"
+  },
+  {
+    "id": "item_9",
+    "command": "/bin/zsh -lc \"git diff --exit-code HEAD -- docs/loom/research/2026-11-08-package-test-roots.md src provenance.json snapshots sample-receipt.json; git show --stat 00fa764; git worktree list --porcelain; git status --porcelain --untracked-files=no; sed -n '1,100p' src/loom-code/scripts/repo_files.py; rg -n 'def nested_repositories|def nested_worktrees' src/loom-code/scripts/repo_files.py\"",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 5451,
+    "output_sha256": "246073e955c5c45f428a27cca65e01f9ba2d5e7b91316d394fce1d8eac3d783b"
+  },
+  {
+    "id": "item_10",
+    "command": "/bin/zsh -lc 'mkdir -p scratch/preservation/4959e620a78e15678a3cc2a8a0c18f79de58dc73\n git show 4959e620a78e15678a3cc2a8a0c18f79de58dc73:docs/loom/research/2026-11-08-package-test-roots.md > scratch/preservation/4959e620a78e15678a3cc2a8a0c18f79de58dc73/research-original.md\n git show 4959e620a78e15678a3cc2a8a0c18f79de58dc73:src/scripts/run_package_tests.py > scratch/preservation/4959e620a78e15678a3cc2a8a0c18f79de58dc73/run_package_tests.py\n git show 4959e620a78e15678a3cc2a8a0c18f79de58dc73:src/tests/test_run_package_tests.py > scratch/preservation/4959e620a78e15678a3cc2a8a0c18f79de58dc73/test_run_package_tests.py'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 0,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "item_13",
+    "command": "/bin/zsh -lc 'cat docs/loom/research/2026-11-08-package-test-roots-closeout.md scratch/package-test-roots-obsidian-proposal.md; shasum -a 256 scratch/preservation/4959e620a78e15678a3cc2a8a0c18f79de58dc73/*; git status --short; git diff --exit-code HEAD -- src provenance.json sample-receipt.json snapshots docs/loom/research/2026-11-08-package-test-roots.md'",
+    "command_truncated": false,
+    "exit_code": 0,
+    "status": "completed",
+    "output_characters": 11060,
+    "output_sha256": "3665fe1e1703453814f9af848029b9de71367135bf23e5980a9d8e6171737337"
+  }
+]

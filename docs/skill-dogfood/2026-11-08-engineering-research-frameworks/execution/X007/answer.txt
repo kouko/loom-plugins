@@ -1,0 +1,5 @@
+已完成並讀回核對：[英文研究文件](/private/tmp/framework-probe-b-20261108/X007/project/docs/loom/research/2026-11-08-research-note-migration.md)。
+
+結論：**不能原樣直接搬移**。7 個來源連結都會失效，須將 `../../../src/` 改為 `../../../../src/`。行號錨點均在範圍內，來源雜湊均符合 provenance。文件已列出最小搬移、驗收步驟及回復界線。
+
+尚未確定：完整筆記的其他連結、所有反向連結，以及各閱讀器的錨點導航行為。本次未搬改原筆記、未建立 active change、未執行測試。

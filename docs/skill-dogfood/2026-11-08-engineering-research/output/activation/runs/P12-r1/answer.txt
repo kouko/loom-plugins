@@ -1,0 +1,9 @@
+結論：`--loom-family` 経由では、各テストルート直下の `local/` は通常 suite から除外されます。ただし、CLI 専用かどうかを判定する仕組みではなく、配置場所による除外です。
+
+- Python：`code`／`design` は `local/` を `--ignore` に追加します（[76行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r1/project/scripts/run_package_tests.py:76)）。`workflow-python` もルート直下の `local/` を除外します（[98行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r1/project/scripts/run_package_tests.py:98)）。
+- Shell：各ルート直下の `local/` 配下を探索結果から除外します（[88行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r1/project/scripts/run_package_tests.py:88)）。
+- `--loom-family` を使わない経路は、引数をそのまま pytest に渡し、この除外を追加しません（[168行目](/private/tmp/engineering-research-dogfood-A-20261108/P12-r1/project/scripts/run_package_tests.py:168)）。
+
+したがって、採用条件は「CLI 専用テストが各ルート直下の `local/` に置かれ、通常 suite が `--loom-family` を使うこと」です。実際のテスト配置・CI 呼び出しは提供されておらず、混入しないとの最終確認はできません。
+
+調査記録（未保存ドラフト）：2026-11-08、提供コードの静的追跡。実行検証なし、リビジョン不明。読み取り専用指定に従い、記録ファイルは保存していません。

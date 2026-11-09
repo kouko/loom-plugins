@@ -1,0 +1,7 @@
+不足以支持批准整套 CI 通過並發布。快照可確認 runner 的分組、探索與排除邏輯，以及相關測試定義存在；四份來源檔案的 SHA256 均符合 provenance，但沒有證明測試曾執行或通過。
+
+仍缺會改變發布決定的證據：同一 commit 的完整 CI 設定、必要檢查與實際執行紀錄、測試收集範圍及環境，以及發布產物與該版本的對應。
+
+英文研究文件已寫入並實際讀回核對：[研究紀錄](/private/tmp/framework-probe-b-20261108/X002/project/docs/loom/research/2026-11-08-head-ci-release-evidence.md)。
+
+未跑測試、查遠端、發布或代為驗收。

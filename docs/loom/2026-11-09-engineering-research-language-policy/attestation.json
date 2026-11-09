@@ -1,0 +1,107 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-09-engineering-research-language-policy",
+  "content_digest": "3e9c61e511dc7fe1804d26a38291ea1137728a93",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/engineering-research/test_package.py",
+      "artifact": "loom-code/tests/engineering-research/test_package.py",
+      "result": "pass",
+      "command_digest": "bdad07059b3da7e31fb1eb3ec2a2ddc76a7ffc7bb5722e6692e241c51afddee7"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "11b962b7f2c83f397c52d0753fd890ffec06e74b",
+      "review_target_sha": "3aebd2eb1d7ffa5e06a08741caf61691ce9c9232",
+      "dimension_scores": {
+        "security": "PASS — Runtime changes preserve the existing public-query, private-data, authorization and no-write boundaries; archived programs remain evidence rather than executable plugin dependencies.",
+        "architecture": "PASS — The existing source-policy reference owns this guidance; no station, dependency, metadata field or routing surface is added.",
+        "correctness": "PASS — The eight-line runtime delta matches the frozen first-trial policy and the intent's defaults, independent language expansion, early-original and sufficiency exceptions. Retained actual traces support the bounded observations; acceptance explicitly marks unobserved branches partly rather than claiming success.",
+        "naming": "PASS — Search languages describes the new policy directly; changed metadata and the existing test concern annotation accurately name their scope.",
+        "tests": "PASS — Independently ran both changed ordinary test modules in full: 48 passed, zero skipped. Existing package-entry and release synchronization checks remain appropriate for this prose-only integration; no implementation-mirroring language pins or new harness were added.",
+        "refactoring": "PASS — The change extends the existing policy at its established ownership point without extracting or duplicating executable logic.",
+        "cross-task-coherence": "PASS — Supplemental observations precede adoption, release versions consistently become 3.61.0, and the spec, observations, changelog and independent acceptance report retain the delayed-expansion and provenance limits.",
+        "external-surface-grounding": "PASS — No new runtime HTTP, SDK, MCP or CLI call is introduced. Public source identities and actual archived tool calls ground the experimental action claims; archived helpers are explicitly historical evidence.",
+        "principles-conformance": "PASS — The guidance introduces no gate or net new mechanism, retains evidence sufficiency and user-data boundaries, and the report exposes partial coverage and unresolved historical findings.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in this worktree.",
+        "deliberate-simplification": "PASS — Reusing source-policy and existing package coverage is supported by the bounded prose change; explicit loading, delayed-expansion, translation-duplication and host-validation ceilings remain visible.",
+        "deletion-first": "PASS — The user explicitly requested this bounded language guidance; adding it in the existing policy is the smallest runtime shape and avoids new fields, gates, dependencies or maintained experimental runners."
+      },
+      "findings": [],
+      "notes": [
+        "Same bounded episode, Round 2: prior findings were empty. Read the entire four-document fix delta from ceaab3c2fc04b0e7504a704ad73646271cbb626c to the current target; runtime, tests, release packet and archived evidence are unchanged, so original dimension conclusions and the independently run 48-test result carry over.",
+        "Inspected the actual installed command recognizer, corrected temporary input, original refusal and its matching SHA-256, and clean-copy revalidation record. Direct uv reaches the existing Python/pytest artifact recognition path; the historical env form does not. Acceptance distinguishes five carried-over rows from freshly re-tested row 6 and preserves row 3 partly. No finalization success is preclaimed.",
+        "Inspected handed Round 2 Build logs: 4139 passed and 6 skipped across pytest groups, plus the unchanged five-test adversarial program passed. Did not rerun either the complete suite or adversarial program. Delayed expansion, translated-duplicate rejection, S01/S02 limitations, original C06 disagreement and installed-host/routing limits remain unchanged."
+      ],
+      "reviewer": "/root/language_policy_code_review",
+      "vendor": "openai",
+      "model": null
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "11b962b7f2c83f397c52d0753fd890ffec06e74b",
+      "review_target_sha": "3aebd2eb1d7ffa5e06a08741caf61691ce9c9232",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Same bounded episode, Round 2: no prior findings. Inspected only ceaab3c2fc04b0e7504a704ad73646271cbb626c..3aebd2eb1d7ffa5e06a08741caf61691ce9c9232 and touched carry-over relations. Runtime/tests/archived cases remain unchanged; all Round 1 dimension conclusions carry forward.",
+        "The repair preserves the rejected declaration and refusal. Independently read installed command recognition source and verified the retained refusal log SHA-256. Direct uv declaration matches that source; handed Round 2 logs show the unchanged five-test program passed and shell/Mermaid completion. No full suite or adversarial program rerun by this reviewer.",
+        "Acceptance rows 1-5 individually identify carry-over, row 3 remains partly, and row 6 records fresh clean setup/loading plus 48 focused tests at 03b1aedf. No future finalizer success is asserted. Prior limits and factual disagreements remain unchanged. Reviewer model inherited without overrides; actual model is unknown (null)."
+      ],
+      "reviewer": "/root/language_policy_skill_review",
+      "vendor": "openai",
+      "model": null
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "a97fa80bdfd3dbcbcffa877db9547ff2cee75c01",
+  "tested_commit": "03b1aedf488852f8e3375cf6d6a80f449a180296",
+  "reviewed_commit": "3aebd2eb1d7ffa5e06a08741caf61691ce9c9232",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "partly"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}

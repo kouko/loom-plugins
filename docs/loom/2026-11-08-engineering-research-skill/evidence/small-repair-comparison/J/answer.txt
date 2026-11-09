@@ -1,0 +1,35 @@
+**結論:`research-fixture` 已 merge 進 `main`,但沒有任何 release 或安裝證據。Vault 還沒寫入任何東西,等你決定。**
+
+我沒有執行任何 git 指令或測試。下面的 git 事實都來自 `fixture-observations.json` 和 `fixture-cleanup.json`,這是 harness 在準備階段記錄的觀察。
+
+**Merge 狀態**
+- `main` 是 `4959e620a78e15678a3cc2a8a0c18f79de58dc73`,`research-fixture` 是 `00fa7642dd5ba69eb7b37fa19dfc0b15d4f3537a`。
+- 檢查 `research-fixture` 是否為 `main` 祖先的指令,結束碼是 0,表示分支頂端已包含在 `main` 裡。
+- cleanup 記錄顯示 merge 後 `main` 工作樹乾淨,而且沒有建立額外 worktree。topic 分支是刻意保留的。
+
+**Release 狀態**
+- `git tag --list` 沒有輸出,`git remote -v` 也沒有輸出。也就是沒有 tag、沒有 remote,也看不到發布或安裝的跡象。
+- 這個 merge 只是 fixture 裡的本地 merge,不等於 release,也不代表你批准了任何動作。
+
+**交付路徑**(位於 `/private/tmp/engineering-research-small-fix-20261108/paired-run/J/project/`)
+- 新研究紀錄:`docs/loom/research/2026-11-08-merge-release-status.md`。
+- Vault 保存提案(未保存的候選稿):`scratch/vault-preservation-proposal.md`。
+- 既有的 `docs/loom/research/2026-11-08-package-test-roots.md` 我沒有改動。
+- 兩個新檔案存檔後我都讀回檢查過,內容和相對連結都對得上目標檔案。
+
+**Vault 保存提案摘要**
+- **來源:** 只提議保存 test-roots 這份研究,也就是 `TEST_ROOTS` 的清單,以及 package preset 會排除 `local/`。依據是上游 commit `d5a7f0da247214bdb9c61fe90c550256432e5f76` 的原始碼閱讀。
+- **內容範圍:** 一則筆記,含問題與條件、發現、證據限制、決策影響,以及來源和 merge 版本。merge-status 紀錄只跟這個 fixture 有關,所以不納入。
+- **目的地:** 尚未決定。Obsidian CLI 不可用,你也沒提供 Vault 路徑,我沒有猜。
+
+**需要你決定的事**
+1. 目的地 Vault 和資料夾。
+2. 是否同意上述單篇筆記的範圍。
+3. 同名筆記已存在時怎麼處理(預設是停止,不覆蓋)。
+4. 連結怎麼處理:Vault 裡的筆記無法解析專案的相對連結,要改成純文字路徑加複製的證據段落,還是把來源副本放在筆記旁邊。
+
+**不確定事項**
+- test-roots 的結論只來自靜態閱讀原始碼,沒有跑過測試或 runner。
+- 上游 remote 是否為最新沒有檢查過,`provenance.json` 也標示 "not checked"。
+- 沒有檢查 CI、真實部署、已安裝版本或你的實際 Vault,也沒有 post-write 的 hash。
+- 沒有 tag 和 remote,只說明這個本地 fixture 沒有 release,不代表原始專案沒有。

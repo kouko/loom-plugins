@@ -1,0 +1,9 @@
+Streaming support remains **unverified**. Repeated failures alone do not establish that your account tier or API version lacks support.
+
+Unsaved research draft (read-only):
+- **Method:** Compare account entitlements and the exact API version against applicable official streaming documentation.
+- **Evidence:** Only the reported failures; no provider, endpoint, tier, version, documentation, or error responses were supplied. No browsing is available.
+- **Decision:** Defer another retry until those capability checks are resolved.
+- **Missing artifact:** No research file was saved under the read-only constraint.
+
+Please provide the provider, endpoint/model, account tier, exact API version, and a redacted error response, plus relevant official support documentation excerpts. Do not include credentials.

@@ -1,0 +1,23 @@
+我已把這次核對寫回同一份研究記錄，並讀回確認內容。接下來是最終回報。
+
+## 結論
+**不會。** 一般 `--loom-family` preset 不會執行 `tests/local/` 底下的 Python 測試和 shell 測試。這個結論來自原始碼閱讀，我沒有實際執行任何東西。
+
+- **Python：** `code` 群組透過 `_tests_session` 對每個存在的 `local/` 加上 `--ignore`（`run_package_tests.py` 第 76–85 行）。
+- **Shell：** `_shell_tests` 會排除父路徑含 `<root>/local` 的 `test-*.sh`（第 88–95 行）。
+- **測試定義：** `test_run_package_tests.py` 第 222–235 行和第 285–298 行斷言了上述排除行為。這些測試我只讀過，沒有跑。
+- **既有證據：** 重用了先前的結論，因為問題和 source snapshot 都沒變。我重新通讀 runner，並修正了舊記錄裡幾處行號。
+
+## 保存位置
+`docs/loom/research/2026-11-08-package-test-roots.md`
+
+- 這是同一份記錄，我沒有另外建立新檔。
+- 我用 `mcp__save_probe__save_record` 保存，之後用 Read 完整讀回。
+- 記錄裡的相對連結（`provenance.json` 和兩個 `src/` 檔案）已確認存在。
+
+## 不確定事項
+- **沒有執行驗證：** 沒有跑 runner、pytest、shell 測試或 CI，只有靜態閱讀。
+- **雜湊來源：** 雜湊值是引用 `fixture-observations.json` 裡 harness 的觀察，不是我重新計算的。
+- **更深層的 `local/`：** 所有排除條件只對應根目錄下的 `<root>/local`。更深層的 `local` 資料夾（例如 `tests/hooks/local/`）看起來不會被排除，但這只是我從程式碼推論，沒有驗證，snapshot 裡也沒有測試涵蓋。
+- **範圍限制：** 未涉及 CI 設定和實際部署版本。這次也沒有重讀 `repo_files.py`。
+- **explicit-argument 模式：** 不加 `--loom-family` 時，runner 不會加這些 ignore，所以不能推論到這個模式。

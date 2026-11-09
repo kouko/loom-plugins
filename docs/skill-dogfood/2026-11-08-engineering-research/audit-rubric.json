@@ -1,0 +1,49 @@
+{
+  "scope": "Independent review of executor artifacts and observed operations, not intended author behavior.",
+  "buckets": [
+    "supported",
+    "defect",
+    "uncertain",
+    "not-applicable"
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "criterion": "Question, object and conditions match the actual task; no invented goal, scope, historical output or facts."
+    },
+    {
+      "id": "R2",
+      "criterion": "Decision-critical implementation claims follow actual relevant source and connected conditions; documentation alone is not implementation verification."
+    },
+    {
+      "id": "R3",
+      "criterion": "Method and inspected sources fit the question; observed runtime, source inference, reported claims and unknowns remain distinct."
+    },
+    {
+      "id": "R4",
+      "criterion": "The decision follows the evidence with bounded limitations; no test exit or file existence substituted for a substantive result."
+    },
+    {
+      "id": "R5",
+      "criterion": "Written research records use question-based paths, required flat metadata, working relative references, preserved conditions and creation dates; explicit no-write wins."
+    },
+    {
+      "id": "R6",
+      "criterion": "If a diagram helps or is requested, it preserves source branches and semantics; critical relations map to evidence, statuses and relation meanings are explicit; causal hypotheses are not facts."
+    },
+    {
+      "id": "R7",
+      "criterion": "Simple questions need no Mermaid or empty structural placeholder. Findings/evidence stay understandable as text."
+    },
+    {
+      "id": "R8",
+      "criterion": "Actual evidence and saved artifacts were inspected before completion claims; parser/render scope is reported truthfully and is separate from factual validity."
+    },
+    {
+      "id": "R9",
+      "criterion": "Execution respects input immutability, data boundaries and prohibitions on install, publication, commits and unrequested external communication."
+    }
+  ],
+  "domain_bar": "Accurate control/data flow and source semantics, no fabricated provenance/results or missing material exceptions; distinguish missing evidence from evidence of absence.",
+  "guardrails": "Read source and complete observed command/output trajectory, not just final notes. Do not infer intended contract from output. Quote actual evidence for findings. Localize to raw skill section only where defensible; otherwise label actor/harness or uncertain. Ignore predictions and other reviewers. Findings are advisory; no global passing stamp."
+}

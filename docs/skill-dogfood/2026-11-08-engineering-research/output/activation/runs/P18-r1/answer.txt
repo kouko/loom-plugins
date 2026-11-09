@@ -1,0 +1,11 @@
+**The full runner requires Node.js and npm, alongside Python.** A Python-only environment cannot run the complete suite as written.
+
+Unsaved research record — source inspection, 2026-11-08:
+
+- `--loom-family` without `--only`, or with `--only workflow-mermaid`, schedules `npm ci`, `node …/validate_mermaid.mjs`, and a Bash negative check. There is no missing-tool skip ([source](/private/tmp/engineering-research-dogfood-A-20261108/P18-r1/project/scripts/run_package_tests.py:139)).
+- Ordinary argument groups invoke Python’s `pytest`; selecting `code`, `design`, or `workflow-python` avoids the runner’s explicit Node commands. The `code` group also uses pytest-xdist. Dependencies invoked inside tests remain unknown.
+- The runner executes commands sequentially and stops on failure ([source](/private/tmp/engineering-research-dogfood-A-20261108/P18-r1/project/scripts/run_package_tests.py:163)).
+
+**Spec implication:** if the design requires the full suite in a Python-only environment, that requirement is infeasible with this runner unchanged. Before approval, resolve whether Node/npm/Bash are permitted or reduced test coverage is acceptable.
+
+Limitations: only the supplied fixture was inspected; no execution occurred. Node versions, downstream dependencies, target environment, and spec contents are unavailable. This record remains unsaved under your read-only constraint.

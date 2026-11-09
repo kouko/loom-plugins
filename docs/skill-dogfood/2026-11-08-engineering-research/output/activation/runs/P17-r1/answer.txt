@@ -1,0 +1,13 @@
+The assumption is wrong for the `--loom-family` package suite: `tests/local` is deliberately excluded.
+
+Source inspection establishes:
+
+- `_tests_session()` checks for Python tests outside each root’s `local/` directory and adds `--ignore=<absolute-local-path>` when that directory exists ([source](/private/tmp/engineering-research-dogfood-A-20261108/P17-r1/project/scripts/run_package_tests.py:76)).
+- `_shell_tests()` excludes shell tests beneath each root’s `local/` directory ([source](/private/tmp/engineering-research-dogfood-A-20261108/P17-r1/project/scripts/run_package_tests.py:88)).
+- The module documentation describes these as tests that only make sense on a developer’s machine ([source](/private/tmp/engineering-research-dogfood-A-20261108/P17-r1/project/scripts/run_package_tests.py:8)).
+
+There is a consequential boundary: the ordinary argument mode forwards arguments directly to pytest without adding these exclusions ([source](/private/tmp/engineering-research-dogfood-A-20261108/P17-r1/project/scripts/run_package_tests.py:168)). Its behavior therefore depends on the supplied arguments and pytest configuration.
+
+**Decision:** reject the plan’s classification of `tests/local` as ordinary package coverage. Whether actual CI includes them or fails remains unverified: CI configuration, test contents, pytest configuration, and execution results were not supplied.
+
+This is the unsaved research record, based on static inspection of the supplied fixture; no revision identifier was available. No files were written, and planning has not advanced.

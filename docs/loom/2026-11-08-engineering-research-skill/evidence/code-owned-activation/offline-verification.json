@@ -1,0 +1,18 @@
+{
+  "freeze_hashes": {
+    "corpus.json": true,
+    "harness.py": true,
+    "design.md": true,
+    "adjacent/independent-advisor/SKILL.md": true,
+    "adjacent/project-retro/SKILL.md": true,
+    "adjacent/build/SKILL.md": true,
+    "adjacent/critique/SKILL.md": true,
+    "adjacent/write-plan/SKILL.md": true
+  },
+  "target_snapshot_matches": true,
+  "corpus_unchanged_from_prior": true,
+  "run_directory_absent": true,
+  "auth_symlinks_created": 0,
+  "cli_executable": "/Users/kouko/.local/bin/codex",
+  "cli_version": "codex-cli 0.167.0"
+}

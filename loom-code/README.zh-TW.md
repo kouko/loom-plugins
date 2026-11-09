@@ -10,7 +10,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.60.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.62.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -67,6 +67,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
 | [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
+| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後的 Vault 保存逐次確認目的地與範圍。 |
 
 ## Agents
 

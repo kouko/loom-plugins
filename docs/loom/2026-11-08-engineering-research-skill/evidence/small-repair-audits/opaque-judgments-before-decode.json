@@ -1,0 +1,135 @@
+{
+  "extracted_utc": "2026-11-08T12:05:57.095050+00:00",
+  "arm_map_not_yet_read": true,
+  "method": "extract exact case headings plus verbatim case sections from both completed raw answers before accessing private revision map",
+  "answer_sha256": {
+    "A01": "0da58e839b744db3788803d93f001c0e563037b5f2de0a300e900f71d8a18977",
+    "A02": "e08df21c98a1e37977ec989a0538b40bf3d2a598d33109253db9eb0b25ff1830"
+  },
+  "opaque_judgments": {
+    "A01": {
+      "A": {
+        "case": "F01",
+        "bucket": "partial",
+        "raw_section": "1. **A — F01 — partial.** The continuation correctly explains that ordinary `--loom-family` excludes root-level `local/` Python and shell tests, preserves the original created date and source revision, and updates the same question file. Its evidence links resolve; reuse and runtime limitations are explicit (`A/project/docs/loom/research/2026-11-08-package-test-roots.md:5`, `:13`, `:30`, `:32`, `:36`, `:46`). **Medium verification gap:** after both edits, the only check is `Grep \"^## \"`; its result returns headings rather than substantive content (`A/events.jsonl:36`, `:38`, `:40`, `:42`). The final answer accurately describes that limited check (`A/answer.txt:1`). **Correction:** read back the updated continuation, provenance attribution, and limitations. No redundant record or unauthorized write appears."
+      },
+      "B": {
+        "case": "F01",
+        "bucket": "met",
+        "raw_section": "2. **B — F01 — met.** B retains the same record, created date, and original revision, corrects loose source anchors, and adds a bounded continuation with resolving evidence links (`B/project/docs/loom/research/2026-11-08-package-test-roots.md:5`, `:13`, `:22`, `:28`). The saved continuation distinguishes preset behavior, deeper nested `local/` directories, explicit arguments, and unobserved runtime behavior. It correctly states that the earlier note hash predates the edit (`:36`, `:37`, `:38`). The post-edit `Read` from line 18 returns the findings, continuation, provenance discussion, decision impact, and limitations (`B/events.jsonl:44`, `:45`). The unchanged question and metadata had already been read (`B/events.jsonl:8`). No material correction is needed."
+      },
+      "C": {
+        "case": "F02",
+        "bucket": "partial",
+        "raw_section": "3. **C — F02 — partial.** C inspects the actual explicit-argument branch, correctly rejects transferring the preset exclusion, and creates a linked revalidation under the actual change’s research directory. The original note remains byte-for-byte unchanged. The new record treats the supplied path as absent from the fixture and makes collection conditional rather than claiming a successful test (`C/project/docs/loom/fixture-explicit-args/research/001-explicit-args-local-test-inclusion.md:16`, `:26`, `:27`, `:31`, `:50`). A full substantive readback occurs (`C/events.jsonl:41`, `:42`). **Low residual verification gap:** C subsequently corrects its description of the test-inspection scope, but does not read that final correction back (`C/events.jsonl:46`, `:48`; saved correction at record `:41`). **Correction:** read the final edited evidence statement and make the nearby test-coverage wording consistently qualified. This is substantially stronger verification than a header-only check."
+      },
+      "D": {
+        "case": "F02",
+        "bucket": "partial",
+        "raw_section": "4. **D — F02 — partial.** The saved revalidation correctly traces dispatch into pytest, separates source observation from pytest inference, links to the preserved prior decision, and disclaims execution and target-file existence (`D/project/docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md:16`, `:18`, `:26`, `:30`, `:31`, `:49`). Allocation was inspected before creation (`D/events.jsonl:3`, `:6`), and the old note is unchanged. **Medium verification gap:** the post-write `Read` stops at line 25, immediately before the findings; provenance results and limitations are consequently unread (`D/events.jsonl:31`, `:32`). D candidly admits this (`D/answer.txt:10`). **Correction:** read back the remaining substantive sections. Resolving links and a correct final artifact do not eliminate that omission."
+      },
+      "E": {
+        "case": "F03",
+        "bucket": "partial",
+        "raw_section": "5. **E — F03 — partial.** **The F03 factual and authorization controls are satisfied:** E reports the exact four roots, supplies an explicitly unsaved draft, identifies the missing saved record, and makes no project writes (`E/answer.txt:1`, `:7`, `:22`, `:27`, `:31`; unchanged `E/before.json` and `E/after.json`). The returned runner read supports the answer (`E/events.jsonl:4`, `:5`). E also honestly names evidence it did not inspect (`E/answer.txt:29`). **Low shared-contract process gap:** the observable trajectory loads the raw skill, runner, and harness observations, but no methods/source-policy references before substantive inspection (`E/events.jsonl:2`, `:4`, `:6`; `shared-declared-contract.md:6`). **Correction:** load those required references read-only; no retained artifact, experiment, or framework is warranted."
+      },
+      "F": {
+        "case": "F03",
+        "bucket": "partial",
+        "raw_section": "6. **F — F03 — partial.** **The F03 factual and no-write controls are satisfied:** the four roots are exact, the draft is expressly unsaved, the existing note remains unchanged, and missing current retention is disclosed (`F/answer.txt:1`, `:7`, `:19`, `:28`, `:33`; identical before/after inventories). F actually reads the existing note and truthfully distinguishes reused test claims from direct inspection (`F/events.jsonl:12`, `:13`; `F/answer.txt:30`). **Low shared-contract process gap:** as with E, no observable methods/source-policy reference loading precedes the runner inspection (`F/events.jsonl:2`, `:4`, `:6`; `shared-declared-contract.md:6`). **Correction:** perform that read-only prerequisite while retaining the concise, unsaved delivery."
+      },
+      "G": {
+        "case": "F04",
+        "bucket": "partial",
+        "raw_section": "7. **G — F04 — partial.** G correctly identifies `exit_code=0` as the prior research-authoring process result, rejects whole-suite/CI success, compares the four source hashes to provenance, and explains the bounded traceability and fixture-history limits (`G/project/docs/loom/research/2026-11-08-package-test-claim-boundary.md:25`, `:26`, `:32`, `:33`, `:55`). The separate question appropriately receives a separate record; its evidence links resolve and the original note stays unchanged. **Medium verification gap:** the saved readback covers only lines 1–30, stopping before the actual hash/provenance findings, claim boundaries, and limitations (`G/events.jsonl:44`, `:46`). G accurately calls this a read of the beginning (`G/answer.txt:1`). **Correction:** read the remaining substantive content. The comment about a missing template H1 is cosmetic, not a frozen-bar failure."
+      },
+      "H": {
+        "case": "F04",
+        "bucket": "partial",
+        "raw_section": "8. **H — F04 — partial.** H reaches the correct bounded conclusion and retains a substantive record distinguishing authoring success, static source support, declared hash correspondence, and unverified original-repository provenance (`H/project/docs/loom/research/2026-11-08-package-test-claim-support.md:23`, `:24`, `:26`, `:43`, `:45`). Actual receipt/source inspections and link targets support those conclusions. **Medium verification gap:** after creation, H performs two edits but no saved-content `Read` (`H/events.jsonl:37`, `:38`, `:43`, `:44`, `:45`, `:46`). Edit metadata and success messages do not replace readback. The final answer acknowledges that it did not reread the whole record (`H/answer.txt:29`). **Correction:** read the final question, findings, provenance, and limitations from the saved file."
+      },
+      "I": {
+        "case": "F05",
+        "bucket": "partial",
+        "raw_section": "9. **I — F05 — partial.** I truthfully reuses harness ancestry evidence and directly reads both local refs; it separates local merge from release, installation, and approval (`I/events.jsonl:41`, `:42`, `:43`, `:44`; `I/project/docs/loom/research/2026-11-08-merge-release-status.md:23`, `:28`). Both records are actually saved, existing sources remain unchanged, and fixtureVault is untouched. **Medium gaps:** neither new artifact receives substantive readback, which I explicitly admits (`I/events.jsonl:50`, `:51`, `:52`, `:53`; `I/answer.txt:30`). The proposal includes reviewable note content but leaves its destination as a folder placeholder rather than a concrete proposed path (`I/project/scratch/obsidian-preservation-proposal.md:12`, `:19`). Its “not written anywhere” label is inaccurate for a saved scratch draft (`:1`). **Correction:** read both artifacts, propose an exact temporary destination for review without writing it, and label the draft “saved locally; not copied to Vault.”"
+      },
+      "J": {
+        "case": "F05",
+        "bucket": "partial",
+        "raw_section": "10. **J — F05 — partial.** J correctly attributes merge evidence to the harness, bounds cleanup observations, and avoids release/install claims. It preserves the original research and stops before any Vault write (`J/project/docs/loom/research/2026-11-08-merge-release-status.md:19`, `:23`, `:24`, `:26`, `:40`). Both new artifacts receive full substantive readback, and the proposal’s saved-location links resolve (`J/events.jsonl:47`, `:48`, `:49`, `:50`; `J/project/scratch/vault-preservation-proposal.md:5`, `:6`, `:8`). **Medium proposal-completeness gap:** the destination remains unresolved and the destination link treatment is deferred to another decision, although a concrete proposal was requested (`J/project/scratch/vault-preservation-proposal.md:11`, `:22`; `J/prompt.txt:4`). **Correction:** propose an exact fixtureVault path and a specific link adaptation, explicitly subject to approval. No additional write consent should be inferred."
+      },
+      "K": {
+        "case": "F06",
+        "bucket": "met",
+        "raw_section": "11. **K — F06 — met.** K creates only the explicitly approved copy path, preserves the original source, adapts meaningful links, records both fixture and upstream revisions, and attributes the original-note hash to the harness (`K/prompt.txt:4`; `K/project/fixtureVault/research/2026-11-08-package-test-roots.md:13`, `:21`, `:23`, `:38`, `:39`, `:40`). Initial inventory inspection establishes no destination collision; the copy is then fully read back, followed by a target-file listing (`K/events.jsonl:4`, `:6`, `:38`, `:39`, `:41`, `:42`, `:43`, `:45`). K candidly reports that it computed no hashes, lacks a post-write copy hash, and performed no Obsidian validation (`K/answer.txt:26`, `:27`, `:32`). The final inventory independently records the actual copy hash (`K/after.json:52`). **Low improvement:** retain those copy-hash and application-validation limitations inside the copy itself. The inherited `shasum` sentence is historical text, not evidence that K ran an unavailable command."
+      },
+      "L": {
+        "case": "F06",
+        "bucket": "partial",
+        "raw_section": "12. **L — F06 — partial.** L makes the authorized copy at the exact path, preserves the original, fixes the three evidence links, and records bounded provenance (`L/project/fixtureVault/research/2026-11-08-package-test-roots.md:13`, `:21`, `:23`, `:38`, `:39`). The actual saved artifact and its inventory hash establish that the copy exists with substantive content (`L/receipt.json:71`, `:78`). **Medium verification gap:** the only post-write check uses `Grep` with `-o`; its result contains field names and truncated `](../` fragments—not values, full link targets, findings, provenance, or limitations (`L/events.jsonl:48`, `:49`). Thus the verification claimed in `L/answer.txt:1` exceeds that returned result. **Correction:** read the substantive saved copy and complete link targets. L honestly disclaims recomputed/copy hashes and Obsidian rendering (`L/answer.txt:20`, `:24`); those honest limits do not cure missing content readback."
+      }
+    },
+    "A02": {
+      "A": {
+        "case": "F01",
+        "bucket": "partial",
+        "raw_section": "1. **A — F01 — partial.**  \n   Correctly continued the original question, preserved `created` and the original upstream revision, and saved accurate preset-specific findings, reuse rationale, provenance and limitations. The new evidence links resolve from the retained location (`A/project/docs/loom/research/2026-11-08-package-test-roots.md:13`, `:30`, `:32`, `:36`, `:46`). Only that note changed (`A/before.json:49`; `A/after.json:49`).\n\n   **Moderate verification gap:** after editing, A inspected headings only. The Grep call/result at `A/events.jsonl:40` and `:42` returned no substantive findings, provenance or limitations. Its final account honestly describes that limited check. **Correction:** read back the saved continuation and limitations, including their evidence targets."
+      },
+      "B": {
+        "case": "F01",
+        "bucket": "met",
+        "raw_section": "2. **B — F01 — met.**  \n   Correctly reused the evidence in the same note, preserved its original date/revision, clarified direct-root versus deeper `local/`, and distinguished explicit mode and runtime unknowns. It also explains that the old note hash predates the update (`B/project/docs/loom/research/2026-11-08-package-test-roots.md:13`, `:30`, `:36`, `:37`, `:38`).\n\n   The post-edit Read returned lines 18 onward, covering the saved findings, continuation, provenance attribution and limitations (`B/events.jsonl:44`, `:45`). The unchanged question/frontmatter had already been read (`:8`). Relative evidence links resolve; inventory changes are confined to the original note (`B/after.json:49`). No material correction identified."
+      },
+      "C": {
+        "case": "F02",
+        "bucket": "met",
+        "raw_section": "3. **C — F02 — met.**  \n   Read the actual dispatch branch, correctly rejected transfer of the preset exclusion, and treated the named test as an absent hypothetical target rather than observed execution. It inspected allocation and created a separately scoped record under the actual change; the original note remained byte-for-byte intact (`C/events.jsonl:3`, `:6`, `:18`; `C/after.json:49`, `:50`).\n\n   The saved record contains the changed conditions, pinned revision, findings, inference boundaries and working links (`C/project/docs/loom/fixture-explicit-args/research/001-explicit-args-local-test-inclusion.md:16`, `:18`, `:26`, `:31`, `:50`). A full substantive Read occurred at `C/events.jsonl:41`, `:42`.\n\n   **Low residual gap:** C subsequently corrected one evidence-table cell to acknowledge that only grep matches were inspected (`:46`, `:48`; saved record `:41`). That correction is truthful, but no subsequent Read is recorded. **Correction:** read back the corrected cell; the principal substantive readback is already established."
+      },
+      "D": {
+        "case": "F02",
+        "bucket": "partial",
+        "raw_section": "4. **D — F02 — partial.**  \n   Correct branch analysis, preserved prior decision basis, correct active-change location, and accurate distinction between forwarding a hypothetical path and actual pytest behavior. Its saved links resolve and the old note hash is unchanged (`D/project/docs/loom/fixture-explicit-args/research/001-explicit-args-local-tests.md:16`, `:18`, `:26`, `:30`, `:31`; `D/after.json:50`).\n\n   **Moderate verification gap:** the post-write Read stopped at line 25, immediately before the findings. It therefore did not read back the saved findings, evidence/provenance discussion or limitations (`D/events.jsonl:31`, `:32`). D explicitly disclosed this limitation (`D/answer.txt:11`). **Correction:** read the remaining substantive body before presenting record verification as complete."
+      },
+      "E": {
+        "case": "F03",
+        "bucket": "partial",
+        "raw_section": "5. **E — F03 — partial.**  \n   The core no-write task is satisfied: accurately reports the four roots, identifies its answer as an unsaved draft, names the missing saved record, and honestly identifies evidence it did not inspect (`E/answer.txt:7`, `:20`, `:26`, `:31`). The trajectory contains only Reads and the inventories are identical; no project artifact or active change was created (`E/events.jsonl:2`, `:4`, `:6`; `E/before.json`; `E/after.json`).\n\n   **Low process gap:** E read the runner without loading the methods/source-policy references required before new substantive evidence (`E/events.jsonl:2`–`:8`; frozen requirement at `shared-declared-contract.md:6`). **Correction:** read those references first while retaining the short, unsaved response. No saved-content readback is required under the explicit no-write exception."
+      },
+      "F": {
+        "case": "F03",
+        "bucket": "partial",
+        "raw_section": "6. **F — F03 — partial.**  \n   Correctly gives the exact four roots, explains the smallest fitting static-reading method, reuses the existing note, separates harness hashes from personal measurement, and explicitly states that no new retained record exists (`F/answer.txt:7`, `:17`, `:19`, `:20`, `:33`). No writes occurred; before/after inventories are identical. The existing note was actually read (`F/events.jsonl:12`, `:13`).\n\n   **Low process gap:** as with E, no methods/source-policy reference read precedes the runner inspection (`F/events.jsonl:2`–`:13`; `shared-declared-contract.md:6`). **Correction:** load those references before source inspection. The missing saved artifact is authorized and accurately disclosed, not a retention failure."
+      },
+      "G": {
+        "case": "F04",
+        "bucket": "partial",
+        "raw_section": "7. **G — F04 — partial.**  \n   Correctly identifies the receipt as a successful research-authoring executor, rejects whole-suite/CI success, compares all four harness source hashes with provenance, and bounds original-repository traceability. The new, separately scoped record preserves the original note and has meaningful, resolving evidence links (`G/project/docs/loom/research/2026-11-08-package-test-claim-boundary.md:25`, `:32`, `:33`, `:36`, `:57`, `:65`).\n\n   **Moderate verification gap:** the saved Read returned only lines 1–30. The hash/provenance findings begin at line 32 and substantive limitations at line 65, so neither was read back (`G/events.jsonl:44`, `:46`). The final response acknowledges a front-section read. **Correction:** read back the remaining provenance, decision boundary and limitations."
+      },
+      "H": {
+        "case": "F04",
+        "bucket": "partial",
+        "raw_section": "8. **H — F04 — partial.**  \n   Correctly rejects the CI claim and distinguishes receipt exit status, source definitions, harness hash agreement and unverified upstream provenance. The saved record contains the required bounded analysis and working links; the old research remains unchanged (`H/project/docs/loom/research/2026-11-08-package-test-claim-support.md:23`, `:26`, `:34`, `:43`, `:49`; `H/after.json:50`).\n\n   **Moderate verification gap:** H wrote and then edited the new record but made no subsequent content Read/Grep. Completion messages and edit payloads do not establish saved-content readback (`H/events.jsonl:37`, `:38`, `:43`, `:44`, `:45`, `:46`). Its statement that it did not “reread the whole” should more clearly disclose that no substantive post-save read occurred (`H/answer.txt:29`). **Correction:** read back the completed record and qualify the verification claim accordingly."
+      },
+      "I": {
+        "case": "F05",
+        "bucket": "partial",
+        "raw_section": "9. **I — F05 — partial.**  \n   Correctly reuses harness ancestry evidence, additionally reads local refs, and keeps merge distinct from release, installation and authorization. Both project artifacts exist, and no Vault file was created (`I/events.jsonl:41`, `:42`, `:43`, `:44`, `:50`–`:53`; `I/after.json:49`, `:55`). The proposal contains a reviewable draft with source, content scope and limitations (`I/project/scratch/obsidian-preservation-proposal.md:6`, `:19`, `:33`, `:38`, `:46`).\n\n   **Moderate gaps:** neither new artifact was read back, which I honestly discloses (`I/answer.txt:30`). The destination remains a placeholder rather than a concrete proposed fixture path (`I/project/scratch/obsidian-preservation-proposal.md:11`). Its “not written anywhere” heading also conflicts with the saved scratch artifact (`:1`). **Correction:** read both artifacts, propose a specific optional destination within `fixtureVault`, and label the candidate “saved in scratch; not copied to Vault.” Cleanup eligibility remains bounded as discussed below."
+      },
+      "J": {
+        "case": "F05",
+        "bucket": "partial",
+        "raw_section": "10. **J — F05 — partial.**  \n    Correctly separates local merge, scoped cleanup observation, release unknowns and consent. Both new artifacts were substantively read back, and their existing project links resolve (`J/events.jsonl:47`, `:48`, `:49`, `:50`; `J/project/docs/loom/research/2026-11-08-merge-release-status.md:23`, `:24`, `:26`). The proposal names enduring findings, scope, provenance and collision behavior. No Vault write occurred.\n\n    **Moderate proposal gap:** the destination is explicitly unresolved, despite the request for a concrete proposal; future link adaptation is also deferred (`J/project/scratch/vault-preservation-proposal.md:10`, `:18`, `:22`, `:27`). CLI absence does not prevent proposing an exact temporary-fixture destination for review. **Correction:** supply that candidate path and the corresponding link plan while continuing to withhold the write pending consent. Cleanup eligibility remains bounded."
+      },
+      "K": {
+        "case": "F06",
+        "bucket": "met",
+        "raw_section": "11. **K — F06 — met.**  \n    Inspected the source, provenance, local merge observations, cleanup record and destination inventory; created only the exactly authorized copy. The original research stayed unchanged (`K/events.jsonl:4`, `:6`, `:9`, `:11`, `:13`, `:30`, `:32`, `:38`; `K/after.json:49`, `:52`).\n\n    Crucially, the post-write Read returned the complete copy, including question, findings, provenance and limitations (`K/events.jsonl:41`, `:42`). Rebased evidence links and the added original-record link resolve; target existence was additionally checked (`:43`, `:45`; `K/project/fixtureVault/research/2026-11-08-package-test-roots.md:13`, `:21`, `:23`, `:38`).\n\n    K honestly reports that source hashes are harness observations and the post-write copy hash was unavailable to it (`K/answer.txt:26`, `:27`). The independent inventory supplies that hash; it does not prove actor hashing. Copy success is appropriately separated from application, CI and release validation. No material correction for the bounded copy task."
+      },
+      "L": {
+        "case": "F06",
+        "bucket": "partial",
+        "raw_section": "12. **L — F06 — partial.**  \n    The actual copy is substantively accurate, uses the approved destination, preserves the original, and contains resolving relative evidence links plus scoped provenance (`L/after.json:49`, `:52`; `L/project/fixtureVault/research/2026-11-08-package-test-roots.md:13`, `:21`, `:23`, `:38`, `:39`). Hash limitations and untested Obsidian rendering are honestly disclosed (`L/answer.txt:20`, `:24`).\n\n    **Moderate verification gap:** the only post-write inspection was Grep with `-o`. Its result returned field names and `](../` fragments—not frontmatter values, complete link targets, findings, provenance or limitations (`L/events.jsonl:48`, `:49`). Thus the claim of reading back frontmatter and three links exceeds the returned evidence (`L/answer.txt:1`). Independent confirmation that the copy and links are correct cannot establish actor readback. **Correction:** read the complete saved copy and verify the actual returned targets before claiming completion."
+      }
+    }
+  }
+}

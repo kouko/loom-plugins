@@ -1,0 +1,62 @@
+[
+  {
+    "actor": "A",
+    "case": "F01",
+    "arm": "old"
+  },
+  {
+    "actor": "B",
+    "case": "F01",
+    "arm": "new"
+  },
+  {
+    "actor": "C",
+    "case": "F02",
+    "arm": "new"
+  },
+  {
+    "actor": "D",
+    "case": "F02",
+    "arm": "old"
+  },
+  {
+    "actor": "E",
+    "case": "F03",
+    "arm": "old"
+  },
+  {
+    "actor": "F",
+    "case": "F03",
+    "arm": "new"
+  },
+  {
+    "actor": "G",
+    "case": "F04",
+    "arm": "new"
+  },
+  {
+    "actor": "H",
+    "case": "F04",
+    "arm": "old"
+  },
+  {
+    "actor": "I",
+    "case": "F05",
+    "arm": "old"
+  },
+  {
+    "actor": "J",
+    "case": "F05",
+    "arm": "new"
+  },
+  {
+    "actor": "K",
+    "case": "F06",
+    "arm": "new"
+  },
+  {
+    "actor": "L",
+    "case": "F06",
+    "arm": "old"
+  }
+]

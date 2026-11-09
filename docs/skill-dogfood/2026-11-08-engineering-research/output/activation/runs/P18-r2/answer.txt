@@ -1,0 +1,10 @@
+**The full runner requires Node.js and npm as well as Python. A Python-only environment cannot run the complete Loom suite unchanged.**
+
+Unsaved research record (2026-11-08; source inspection):
+
+- **Evidence:** In [run_package_tests.py](/private/tmp/engineering-research-dogfood-A-20261108/P18-r2/project/scripts/run_package_tests.py:139), both unrestricted `--loom-family` and `--only workflow-mermaid` schedule `npm ci`, a `node` validator, and a Bash negative check. There is no fallback for missing Node/npm.
+- **Scope:** Ordinary argument groups invoke Python’s `pytest`. Selecting `code`, `design`, or `workflow-python` avoids the runner’s explicit Node commands; their tests could still introduce dependencies. The `code` group also uses pytest-xdist.
+- **Decision impact:** If the spec requires the entire suite in a Python-only environment, that requirement conflicts with the current implementation. A narrower test selection needs an explicit scope decision before approval.
+- **Missing evidence:** Only this fixture was inspected. The imported `repo_files` module, test bodies, npm manifest/lockfile, target environment, and spec were unavailable, so supported Node versions and end-to-end feasibility remain unverified. Nothing was executed.
+
+No research file was saved because this discussion is read-only.

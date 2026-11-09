@@ -1,0 +1,11 @@
+結論：**runner 限制的是 `--loom-family` 的自動收錄範圍，並未禁止新增 plugin。**
+
+以下為唯讀研究草稿；方法是檢查唯一 fixture 的實作，未執行測試、未儲存研究檔。
+
+- **固定 roots**：[第 53 行](scripts/run_package_tests.py#L53) 僅列出 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。新增 `my-plugin/tests` 不會自動納入，也沒有動態註冊 root 的介面。
+- **加入 root 後的限制**：[第 125 行](scripts/run_package_tests.py#L125) 會將新 root 的 Python 測試併入 `code` 的同一個 pytest／xdist session；不會自動取得獨立 session。Shell 測試則按 `test-*.sh` 遞迴收錄，排除 root 直下的 `local/` 與 `node_modules`。
+- **可手動指定其他路徑**：[第 168 行](scripts/run_package_tests.py#L168) 的一般模式直接轉交 pytest，支援 `--then` 分組，不受 `TEST_ROOTS` 清單限制。
+
+**決策影響**：若新 plugin 必須自動進入 family suite，現況需要調整 runner；若需要獨立 pytest 設定，僅加 root 未必足夠。這是整合成本，尚不足以否決新增 plugin。
+
+缺少 `repo_files` 實作、pytest 設定及 CI 證據，無法確認巢狀 repository 排除是否完整、收集相容性與實際 CI 覆蓋。

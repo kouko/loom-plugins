@@ -1,0 +1,14 @@
+Unsaved intent-stage research draft; no files written.
+
+The SDK’s offline-refresh capability remains unresolved: no SDK name/version, project artifacts, documentation, or runtime evidence was supplied.
+
+Before committing, require:
+
+- Exact SDK/version, identity provider, platform, configuration, and intended offline duration.
+- A precise distinction between issuing fresh tokens, reusing cached unexpired tokens, and unlocking local data.
+- Version-matched official documentation establishing network requirements; relevant implementation paths if documentation is ambiguous.
+- Subsequently authorized verification with networking blocked: expired access token, available refresh token, restart, and reconnect. Capture token expiry, network attempts, and outcomes without secrets.
+
+Method: targeted documentation/source inspection, then a minimal experiment if needed.
+
+Keep the intent conditional until evidence supports the required behavior; otherwise revise offline scope.

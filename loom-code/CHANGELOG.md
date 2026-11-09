@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.60.0] — 2026-11-09 — observe Git delivery and protect ordinary trunk operations
+## [3.62.0] — 2026-11-09 — observe Git delivery and protect ordinary trunk operations
 
 - Reuse publish/land evidence for read-only `delivery --goal local|published|merged`: distinguish pending, failed and unconfirmed results, with safe next actions. Observation never grants publication or merge authorization; working-copy withdrawal immediately revokes a committed grant.
 - Offer explicit repository-scoped static native Git hooks without launcher/cache dependencies; preserve foreign hooks, linked worktrees and safe trunk synchronization. Disclose history-operation limits and inspect effective server PR/check protection without changing it.
@@ -10,6 +10,23 @@
 - budget-exception: action:native-git-protection — register opt-in static native protection; regression eval `loom-code/tests/test_native_git_protection.py`.
 - budget-exception: Stop::loom-python — count Claude Code's actual Stop entry; regression eval `loom-code/tests/test_delivery_stop.py`.
 - budget-exception: Stop::loom-python@codex — count Codex's actual Stop entry; regression eval `loom-code/tests/test_delivery_stop.py`.
+
+## [3.61.0] — 2026-11-09 — evidence-led search languages for engineering research
+
+- Normally start external exploratory discovery with separate English and Japanese queries, preserving exact technical identifiers. Reuse sufficient local artifacts, existing evidence or applicable official sources and stop without a language-count quota.
+- Consider Chinese and Korean independently when original material, regional conditions or consequential unresolved gaps warrant them; use known relevant original languages early and allow other necessary languages. Translations and repeated summaries remain one source, with existing acceptance, authorization, recording and stopping rules preserved.
+- Adopt bounded guidance supported by eight observed tasks. Delayed language expansion remains unobserved, query-specific attribution is partial in one supplemental case, one supplemental query has a malformed site operator, and the original factual disagreement remains unresolved. These observations do not establish general quality gains, stable activation rates or host compatibility.
+
+## [3.60.0] — 2026-11-08 — optional engineering research and preservation handoff
+
+- Add the optional code-owned `engineering-research` skill for consequential evidence gaps during Loom tasks and standalone engineering discussions, with question-scoped Markdown records, applicable source checks and proportionate evaluation methods.
+- Plan and Build may delegate consequential evidence gaps to `loom-code:engineering-research`; Ship may offer post-merge preservation through that skill without making research or Vault writes a completion gate. No workflow plugin is required for research, and design contains no direct research handoff.
+- Preservation requires verified merge, release evidence for release-dependent claims and per-instance destination and scope authorization. Preserve project originals and report unavailable writes honestly.
+- Ship eight skills, including the research leaf's separately admitted 238 description characters; preserve the frozen catalog and its existing 60% budget.
+- Admit research as a counted contract tool. The compatible tool addition keeps the contract version at 2.3.1; no new runtime gate, checker rule or artifact schema is introduced.
+- Raise the counted-skill measurement ceiling from 24 to 25. The mechanism population increases by two: one code-owned skill and one contract tool.
+- budget-exception: engineering-research — adds one counted research skill; regression eval `loom-code/tests/engineering-research/test_package.py`.
+- budget-exception: tool:engineering-research — adds its counted contract registration; regression eval `loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner`.
 
 ## [3.59.0] — 2026-11-06 — keep local document delivery concise
 

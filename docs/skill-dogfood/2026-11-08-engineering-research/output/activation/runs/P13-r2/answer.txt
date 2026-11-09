@@ -1,0 +1,11 @@
+「共通 inventory」が何を指すかを限定すれば、矛盾を解消できます。共有しているのは探索ルートであり、実行ファイルの統一一覧ではありません。
+
+仕様の修正文案：
+
+> `--loom-family` は、共通の探索ルート定義 `TEST_ROOTS` を基準にテスト対象を決める。pytest はグループ別にディレクトリを渡し、ファイル収集を pytest に委ねる。shell は同じルート配下の `test-*.sh` を列挙する。したがって、探索ルートは共通だが、対象の収集方法と実行単位は異なる。Mermaid グループは明示的に定義したコマンドを実行する。
+
+「pytest と shell が別々の一覧を使う」は「別々の収集処理を使う」へ、「共通 inventory」は「共通の探索ルート定義」へ置き換えるのが適切です。
+
+根拠は [TEST_ROOTS と収集処理](/private/tmp/engineering-research-dogfood-A-20261108/P13-r2/project/scripts/run_package_tests.py:53)、[コマンド生成](/private/tmp/engineering-research-dogfood-A-20261108/P13-r2/project/scripts/run_package_tests.py:116) の静的確認です。
+
+調査記録はこの回答内の未保存ドラフトです。仕様原文・pytest 設定・依存モジュールは提示されていないため、実際の収集結果や除外の完全な一致までは未検証です。ファイル変更・実行はしていません。

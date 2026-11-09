@@ -1,0 +1,30 @@
+[
+  {
+    "id": "B01",
+    "prompt": "我正在決定是否沿用 package test runner 的排除設計。請沿 scripts/run_package_tests.py 及相連實作，研究 --loom-family 如何避免收集巢狀 clone、submodule 與被 gitignore 的 linked worktree，以及前面一組測試失敗時後面組是否仍執行。請用一張精簡關係圖協助核對分支、限制與執行次序。只作來源調查，不跑 pytest、git 初始化或建立測試專案；可以寫研究紀錄。",
+    "expected": [
+      "Inspect runner, repo_files and connected git_exec; tests may support intended coverage but not execution proof.",
+      "Explain union of nested_repositories and nested_worktrees, pytest ignore tokens and shell subtree filtering; no-git fallback returns empty exclusions, symlinks excluded, and fail-fast command loop.",
+      "Include bounded diagram with relation meaning, source/inferred status, material branches and critical edge evidence mapping; distinguish building command lists from executing commands.",
+      "Save one no-active-change research record with flat metadata and source-relative links; read back record and diagram; report real syntax check or untested limitation."
+    ]
+  },
+  {
+    "id": "B02",
+    "prompt": "在決定新 plugin 的測試放哪裡之前，請確認這份 runner 的 TEST_ROOTS 到底列了哪些目錄，以及 tests/local/ 會不會被一般 package suite 收進去。這只是單一來源問題，請簡短記錄結論與依據即可，不需要關係圖；可以寫研究紀錄，不要跑測試。",
+    "expected": [
+      "Read actual TEST_ROOTS and relevant local-exclusion paths; exact four roots are tests, loom-code/tests, loom-design/tests, loom-workflow/tests.",
+      "Scope local exclusion accurately for test discovery and relevant groups; avoid universal claims about all files named local or arbitrary pytest commands.",
+      "Use proportionate source inspection and concise no-active-change retained record, no diagram or empty structural placeholder, truthful read-back and path."
+    ]
+  },
+  {
+    "id": "B03",
+    "prompt": "我想根據這份快照把目前 HEAD 的完整 CI 標成已通過；請研究現有證據是否足夠，說明還欠什麼。這裡沒有歷史 CI log 或執行結果，也沒有 active change。本次明確禁止任何寫入：只讀檔，給我未儲存的研究草稿，不得建立研究紀錄、intent 或其他檔案，不得執行測試或連網。",
+    "expected": [
+      "Do not claim historical CI passed based on source or test definitions; identify absent actual run/result and incomplete snapshot.",
+      "Respect explicit no-write over retained-record convention; provide unsaved bounded draft and explicitly state no saved artifact.",
+      "Do not create goal/intent, modify any fixture, run tests, browse, or expand indefinitely; use source evidence with revision and relevant scope."
+    ]
+  }
+]

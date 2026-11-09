@@ -1,0 +1,36 @@
+**結論:你不能宣稱整套 package tests/CI 全通過。來源可追溯也只能說到一部分。**
+
+**為什麼不能宣稱測試全通過或 CI 通過**
+- **收據的 `exit_code=0`**:它是另一個 executor(`codex exec`,模型 `gpt-6.1-sol`)程序的結束碼。收據裡沒有 `run_package_tests.py` 或 pytest 的指令、輸出或測試數量。它只顯示 executor 結束碼為 0、來源未變動、新增了一個研究記錄檔。收據裡的路徑也指向另一個目錄,不是這個 fixture。
+- **既有研究記錄**:它是靜態讀原始碼的結果,內文自己寫明沒有執行任何測試。檔案存在不代表測試通過。
+- **快照不完整**:`src/` 只有 4 個檔案。runner 預期的四個測試根目錄,除了那一個測試檔,都不在快照裡。Mermaid 群組需要的目錄也不存在。CI 設定同樣不在快照裡。所以整套測試在這份快照上無法重現,「CI 通過」更沒有證據。
+
+**可以宣稱的範圍**
+- **runner 的行為(我讀過原始碼)**:`TEST_ROOTS` 列出 `tests`、`loom-code/tests`、`loom-design/tests`、`loom-workflow/tests`。`--loom-family` 預設模式會排除各根目錄下的 `local/`。
+- **測試定義**:測試檔裡有對應的斷言,但我只讀了,沒有執行。
+- **hash**:`fixture-observations.json` 記錄的 4 個 `src/` 檔案 SHA256 與 `provenance.json` 一致。這是準備階段的 harness 觀察,不是我執行的結果。
+- **既有記錄的準確度**:它的結論有原始碼支持,但行號範圍略寬。例如 code 群組實際從第 124 行開始,不是第 122 行。
+
+**來源可追溯的限制**
+- hash 一致只代表檔案與 provenance 的宣告相符。
+- 原始 repository 和 commit `d5a7f0da…` 我沒有讀到,遠端新舊程度也「未檢查」。
+- 這個 git 是 harness 臨時建立的,沒有 remote 也沒有 tag,不是原專案的歷史。
+
+**建議的措辭**
+> 在此 fixture 中,靜態閱讀 runner 原始碼可知它列出四個測試根目錄,且 `--loom-family` 預設模式排除 `local/`。快照的四個檔案與 provenance 宣告的 hash 相符;原始 repository 與遠端新舊程度未驗證,沒有測試或 CI 的執行證據。
+
+**要宣稱測試或 CI 結果,還需要**
+- 在完整的 checkout 執行 runner,並保留指令、輸出和 revision。
+- 若要宣稱 CI,另外提供 CI 的執行證據。
+
+**交付檔案**
+- 新增記錄:`/private/tmp/engineering-research-small-fix-20261108/paired-run/H/project/docs/loom/research/2026-11-08-package-test-claim-support.md`
+- 這是另一個問題,所以我另開新檔,沒有改動既有的 `2026-11-08-package-test-roots.md`。
+- 存檔後我只修了兩處筆誤,沒有再整份重讀。
+
+**不確定事項**
+- 我沒有執行任何指令。hash 和 git 結果都引用自 harness 的觀察檔。
+- 原 repository、commit `d5a7f0da…` 和 CI 設定都沒有檢查。
+- 收據裡沒有當時給 executor 的 prompt,所以不知道它被要求做什麼。
+- runner 的實際執行行為,包括 `nested_repositories`,沒有檢查也沒有執行。
+- 驗收由你決定,我沒有代為判定。

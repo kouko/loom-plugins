@@ -1,0 +1,5 @@
+已確認：同一 source snapshot 的 ordinary `--loom-family` preset **不會納入 `tests/local/` 的 Python 與 shell tests**。原始碼與雜湊核對支持既有結論。
+
+本次核對已補入並讀回[同一份研究紀錄](/private/tmp/code-owned-engineering-research-execution-20261108/F01/project/docs/loom/research/2026-11-08-package-test-roots.md)，未另建變更或實驗。
+
+未執行測試；結論限於提供的原始碼，不代表實際 CI、部署版本或 bare pytest 的行為。`fixture-cleanup.json` 僅作為臨時 fixture 的生命週期證據。

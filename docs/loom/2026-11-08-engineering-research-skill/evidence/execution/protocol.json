@@ -1,0 +1,27 @@
+{
+  "created_utc": "2026-11-08T09:34:47.835689+00:00",
+  "profile": "complex/unobservable",
+  "native_subagent_override": {
+    "model": null,
+    "effort": null
+  },
+  "actor_model": "gpt-6.1-sol",
+  "actor_provider": "openai",
+  "actor_effort": "medium",
+  "concurrency": 2,
+  "target_snapshot": "pending final-target-ready",
+  "scope": "fixture-only; no production code or true Vault writes",
+  "actor_timeout_seconds": 300,
+  "raw_reasoning": "excluded",
+  "audits": "not performed by executor; two independent pinned-model auditors arranged by parent",
+  "case_order": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06"
+  ],
+  "rubric_sha256": "8cdd4ab294ce540f90ec09aa4265891654b45d5beb1699150df0d0a081ac5572",
+  "cases_sha256": "e66825a1d8e5d6777b79fe083c8180ec372a56e3e7fe82adeb1671a3ced0bdbf"
+}

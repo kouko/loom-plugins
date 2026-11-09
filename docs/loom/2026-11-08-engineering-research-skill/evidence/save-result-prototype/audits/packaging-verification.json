@@ -1,0 +1,101 @@
+{
+  "no_model_calls": true,
+  "actor_count": 8,
+  "packet_files": 587,
+  "runtime_skill_bodies_omitted": true,
+  "private_map_and_policies_omitted": true,
+  "save_record_results_preserved": true,
+  "source_body_masking": [
+    {
+      "actor": "A",
+      "redacted_skill_result_lines": [
+        3,
+        8,
+        10,
+        12
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 46
+    },
+    {
+      "actor": "B",
+      "redacted_skill_result_lines": [
+        3,
+        8,
+        10,
+        12
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 40
+    },
+    {
+      "actor": "C",
+      "redacted_skill_result_lines": [
+        7,
+        14,
+        15,
+        27
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 40
+    },
+    {
+      "actor": "D",
+      "redacted_skill_result_lines": [
+        7,
+        12,
+        13,
+        15
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 40
+    },
+    {
+      "actor": "E",
+      "redacted_skill_result_lines": [
+        3,
+        17,
+        19
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 40
+    },
+    {
+      "actor": "F",
+      "redacted_skill_result_lines": [
+        3,
+        14,
+        16,
+        18
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 43
+    },
+    {
+      "actor": "G",
+      "redacted_skill_result_lines": [
+        3
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 11
+    },
+    {
+      "actor": "H",
+      "redacted_skill_result_lines": [
+        3
+      ],
+      "all_other_event_lines_identical": true,
+      "event_lines": 17
+    }
+  ],
+  "criteria_match_previous": {
+    "rubric.md": true,
+    "cases.json": true,
+    "shared-declared-contract.md": true
+  },
+  "freeze_sha256": "674d3041664bf93f0d7f6d9e67a618710cb9faeb4a8e963105e3d1a493a1d259",
+  "harness_sha256": "b7e57f2c42ae63ac40f58551166b65c230f43a41da6298e51b8768e403e83bd1",
+  "packager_sha256": "ef24cdffca73a70c505f5c6ee92cf0b5ab45cd57e78247752e937eac39a9eef4",
+  "mask_helper_sha256": "c7c9e38238afc9742d94bd9cca5cd52daf4b694407620b8088e086d75ca44ddb",
+  "actor_process_failures_preserved": []
+}

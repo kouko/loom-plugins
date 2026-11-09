@@ -1,0 +1,86 @@
+{
+  "id": "F01",
+  "model_requested": "claude-sonnet-5-5",
+  "effort_requested": "medium",
+  "mode": "explicit raw seven-MD execution",
+  "timeout": false,
+  "exit_code": 0,
+  "elapsed_seconds": 33.393,
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 12,
+      "cache_creation_input_tokens": 19774,
+      "cache_read_input_tokens": 92983,
+      "output_tokens": 3503,
+      "output_tokens_details": {
+        "thinking_tokens": 562
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 19774,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 841,
+          "cache_read_input_tokens": 24147,
+          "cache_creation_input_tokens": 775,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 775
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 12,
+        "outputTokens": 3503,
+        "cacheReadInputTokens": 92983,
+        "cacheCreationInputTokens": 19774,
+        "webSearchRequests": 0,
+        "costUSD": 0.1234483,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 562,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 19774,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.1234483,
+    "permission_denials": [],
+    "duration_api_ms": 31271,
+    "num_turns": 11
+  },
+  "changed_files": [
+    "docs/loom/research/2026-11-08-package-test-roots.md"
+  ],
+  "added_files": [],
+  "deleted_files": [],
+  "fixtureVault_files": {},
+  "returned_model_metadata": {
+    "assistant_message_models": [
+      "claude-sonnet-5-5"
+    ],
+    "modelUsage_keys": [
+      "claude-sonnet-5-5"
+    ],
+    "providers": [
+      "firstParty"
+    ]
+  }
+}

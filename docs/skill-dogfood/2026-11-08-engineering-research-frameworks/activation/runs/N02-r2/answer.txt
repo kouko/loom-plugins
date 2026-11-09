@@ -1,0 +1,3 @@
+The [independent-advisor skill](/private/tmp/engineering-research-frameworks-A-20261108/N02-r2/home/skills/independent-advisor/SKILL.md) is available, but contains no review workflow. Your constraints also prohibit subagents and external model calls, so I can’t obtain an independent coding-agent opinion here.
+
+Please provide the architecture trade-off, alternatives, collected evidence, and decision criteria. I can critically review that material within this conversation, without further investigation, but that would not constitute an independent agent review.

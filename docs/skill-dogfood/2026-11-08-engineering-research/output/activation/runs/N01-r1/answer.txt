@@ -1,0 +1,7 @@
+The proposal has plausible value, but the user need is not yet demonstrated.
+
+- **Value:** The runner launches multiple commands and stops at the first failure. A final summary could help users see what completed, what failed, and what remains unrun without scanning individual command output. An optional flag preserves the current experience.
+- **Complexity:** A command-level recap is a small, bounded addition. Aggregated test counts, output parsing, multiple formats, or continuing after failures would substantially broaden the proposal. Flag semantics also need care because ordinary-mode arguments currently pass through to pytest.
+- **Missing evidence:** The fixture provides no evidence of users struggling with output, how frequently that happens, or what “summary” should contain. The benefit therefore remains a hypothesis.
+
+**Recommendation:** Favor a minimal command-outcome summary if users regularly lose track of multi-command runs. Define the intended reader and summary contents before approving broader scope. On the available evidence, this is a modest convenience feature, not an established priority.

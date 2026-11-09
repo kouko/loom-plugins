@@ -1,0 +1,12 @@
+Unsaved research draft—intent stage. SDK capability remains unresolved: no SDK/version, project evidence, or documentation was provided.
+
+Before committing, require:
+
+- Exact SDK/version, platform, identity provider, and session configuration.
+- A definition of “offline sign-in”: cached-session access, local unlocking, or issuing fresh tokens.
+- Applicable official documentation establishing refresh network requirements, token expiry, and offline guarantees; inspect implementation paths if ambiguous.
+- A proposed, separately authorized feasibility check with networking blocked: compare valid versus expired access tokens, restart behavior, refresh attempts, and observed network requests.
+
+Method: targeted documentation/source inspection, followed by measurement only where needed.
+
+Decision gate: keep offline refresh an unverified assumption until evidence resolves it; otherwise narrow the intent to supported offline behavior. Nothing was executed or saved.

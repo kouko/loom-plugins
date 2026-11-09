@@ -1,0 +1,29 @@
+我已核實完 merge 狀態,並備好 Obsidian 保存提案草稿。下面是結果。
+
+## Merge 與收尾狀態(已核實)
+- `research-fixture`(00fa764)是 `main`(4959e62)的祖先,merge 屬實。
+- `main` 沒有未追蹤的專案檔,只有 `fixture-cleanup.json` 與 `skill/`。
+- `fixture-cleanup.json` 記錄 cleanup 範圍是 `.`,也沒有 linked worktree。
+- 本地沒有任何 tag 或 remote,所以**沒有 release 證據**。merge 不等於 release,也不等於批准。
+- `provenance.json` 註明遠端新鮮度「未檢查」。
+- `src/` 四個檔案的 SHA256 都與 provenance 相符。
+- `snapshots/original-research.md` 與專案紀錄逐字相同。
+
+## 專案研究紀錄
+我沒有修改既有的 `docs/loom/research/2026-11-08-package-test-roots.md`。它是同一問題、同樣條件下已 concluded 的紀錄,所以只重用。我只重新核對了 `TEST_ROOTS` 與 `--loom-family` 的忽略邏輯,以及明確參數模式不加 ignore 這幾點,都與紀錄相符。我沒有重新核對紀錄中全部的行號引用,也沒有執行任何測試。
+
+## Obsidian 保存提案(待你決定,尚未寫入)
+- **來源**:上述專案紀錄,以及 fixture merge commit `4959e62`。
+- **上游來源**:快照對應 `d5a7f0da…`。
+- **內容範圍**:問題與條件、三項發現、出處、限制。我改寫成可獨立閱讀的摘要,不含壞掉的相對連結,也不含 provenance 裡的本機絕對路徑。
+- **草稿**:`scratch/vault-candidate-package-test-roots.md`,請審閱。
+- **建議目的地**:`fixtureVault/research/package-test-roots.md`。這個資料夾目前存在但是空的,而且只是偵測到的,不代表你的偏好。目的地不存在同名檔案,所以沒有覆寫問題。
+- **Tags**:`loom/research` 與 `loom/research-export`,方便在 Obsidian 搜尋。
+
+請回覆是否同意以**這個目的地與這個範圍**寫入。你也可以指定別的目的地,或要求修改草稿。你沒回覆或拒絕,草稿就維持未保存。
+
+## 不確定事項
+- 沒有 release、安裝或 CI 證據。
+- 上游 `origin/main` 是否更新過,沒有檢查。
+- Obsidian CLI 不可用,所以沒有查詢任何真實 Vault。`fixtureVault/` 只是 fixture 內的暫存資料夾。
+- 研究結論只靠靜態原始碼閱讀,沒有執行測試。

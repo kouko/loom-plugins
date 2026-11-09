@@ -26,6 +26,9 @@ PROJECT_RETRO_DESCRIPTION_CHARS = 229
 SKILL_RETRO_DESCRIPTION_CHARS = 182
 SKILL_RETRO_DESCRIPTION_DELTA = 53
 INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS = 213
+# Explicit admission for the optional counted research tool; the frozen
+# catalog and its 60% limit remain unchanged.
+ENGINEERING_RESEARCH_DESCRIPTION_CHARS = 238
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",
@@ -46,6 +49,7 @@ ADDED_LEAVES = {
     "loom-design/skills/architecture-design/SKILL.md",
     "loom-workflow/skills/project-retro/SKILL.md",
     "loom-workflow/skills/loom-interactive-diagram/SKILL.md",
+    "loom-code/skills/engineering-research/SKILL.md",
 }
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
@@ -166,7 +170,10 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
     assert len(project_retro) == PROJECT_RETRO_DESCRIPTION_CHARS
     assert len(skill_retro) == SKILL_RETRO_DESCRIPTION_CHARS
     assert len(interactive_diagram) == INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS
-    exception = PROJECT_RETRO_DESCRIPTION_CHARS + SKILL_RETRO_DESCRIPTION_DELTA + INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS
+    research = _description(_skills()["loom-code"]["engineering-research"])
+    assert len(research) == ENGINEERING_RESEARCH_DESCRIPTION_CHARS
+    exception = (PROJECT_RETRO_DESCRIPTION_CHARS + SKILL_RETRO_DESCRIPTION_DELTA
+                 + INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS + ENGINEERING_RESEARCH_DESCRIPTION_CHARS)
     assert candidate <= DESCRIPTION_BUDGET + exception
     assert (candidate - exception) * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
 

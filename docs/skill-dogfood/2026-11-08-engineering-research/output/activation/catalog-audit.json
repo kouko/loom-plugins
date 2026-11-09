@@ -1,0 +1,52 @@
+{
+  "total_entries": 10,
+  "entries": [
+    {
+      "name": "imagegen",
+      "path": "r1/imagegen/SKILL.md"
+    },
+    {
+      "name": "openai-docs",
+      "path": "r1/openai-docs/SKILL.md"
+    },
+    {
+      "name": "skill-creator",
+      "path": "r1/skill-creator/SKILL.md"
+    },
+    {
+      "name": "skill-installer",
+      "path": "r1/skill-installer/SKILL.md"
+    },
+    {
+      "name": "capture-intent",
+      "path": "r0/capture-intent/SKILL.md"
+    },
+    {
+      "name": "critique",
+      "path": "r0/critique/SKILL.md"
+    },
+    {
+      "name": "engineering-research",
+      "path": "r0/engineering-research/SKILL.md"
+    },
+    {
+      "name": "independent-advisor",
+      "path": "r0/independent-advisor/SKILL.md"
+    },
+    {
+      "name": "project-retro",
+      "path": "r0/project-retro/SKILL.md"
+    },
+    {
+      "name": "write-plan",
+      "path": "r0/write-plan/SKILL.md"
+    }
+  ],
+  "catalog_bytes": 70420,
+  "privacy_marker_checks": {
+    "memory_summary_present": false,
+    "private_vault_path_present": false,
+    "private_session_path_present": false,
+    "target_body_sentinel_present": false
+  }
+}

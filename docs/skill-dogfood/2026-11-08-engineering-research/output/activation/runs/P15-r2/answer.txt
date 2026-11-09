@@ -1,0 +1,9 @@
+**A fifth plugin with its own test root cannot join `--loom-family` without changing the runner.** The verified constraint is a hardcoded root list, not a four-plugin capacity limit.
+
+- [`TEST_ROOTS`, line 53](/private/tmp/engineering-research-dogfood-A-20261108/P15-r2/project/scripts/run_package_tests.py:53) lists four directories—including repository-level `tests/`, so it does not establish four existing plugins.
+- Family Python collection derives its general roots from that list (line 125); shell discovery also iterates it (line 92). A new `<plugin>/tests` root is therefore excluded unless registered in code.
+- The generic mode forwards explicit arguments to pytest (lines 168–173), so `python scripts/run_package_tests.py fifth-plugin/tests` provides an existing route for Python tests without runner changes. Tests placed beneath an existing registered root are also discoverable, subject to exclusions.
+
+**Decision:** explicit Python invocation is supported by the source; automatic family integration of a separate plugin root requires a runner edit. Whether production plugin code needs changes remains unverified: plugin loading, CI configuration, dependencies, and fifth-plugin requirements are absent from the supplied fixture.
+
+Unsaved research record: source inspection only, dated 2026-11-08; no runtime validation. No research file was saved because this discussion is read-only.

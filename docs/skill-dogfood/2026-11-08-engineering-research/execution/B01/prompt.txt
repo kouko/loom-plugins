@@ -1,0 +1,3 @@
+這是隔離的工程研究工作。使用者尚未安裝這個 plugin；本次已明確調用原始 skill/engineering-research/SKILL.md，請讀取它與需要的 bundled resources，依契約執行。沒有其他 skill 或專案設定，也沒有 active change。日期 2026-11-08。此工作目錄 src/ 是真實目前 repository 的最小來源快照，原路徑、commit、SHA256 在 provenance.json；不代表完整 checkout 或已部署版本。請勿讀取工作目錄外資料或其他試驗結果。只用提供的本機證據，不上網、不安裝、不提交、不發布、不另派代理，不執行完整測試套件。不得改動 src/、skill/、provenance.json。專案研究文件用英文，最後以繁體中文簡短回覆。
+
+我正在決定是否沿用 package test runner 的排除設計。請沿 scripts/run_package_tests.py 及相連實作，研究 --loom-family 如何避免收集巢狀 clone、submodule 與被 gitignore 的 linked worktree，以及前面一組測試失敗時後面組是否仍執行。請用一張精簡關係圖協助核對分支、限制與執行次序。只作來源調查，不跑 pytest、git 初始化或建立測試專案；可以寫研究紀錄。

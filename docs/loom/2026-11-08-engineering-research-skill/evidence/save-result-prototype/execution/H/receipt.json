@@ -1,0 +1,75 @@
+{
+  "actor": "H",
+  "case": "F03",
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 13.831,
+  "requested_provider": "first-party Anthropic native account; no provider env inherited",
+  "requested_model": "claude-sonnet-5-5",
+  "requested_effort": "medium",
+  "result": {
+    "is_error": false,
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 12218,
+      "cache_read_input_tokens": 24517,
+      "output_tokens": 1325,
+      "output_tokens_details": {
+        "thinking_tokens": 63
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 12218,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 775,
+          "cache_read_input_tokens": 14437,
+          "cache_creation_input_tokens": 1991,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1991
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 6,
+        "outputTokens": 1325,
+        "cacheReadInputTokens": 24517,
+        "cacheCreationInputTokens": 12218,
+        "webSearchRequests": 0,
+        "costUSD": 0.0645857,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 63,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 12218,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.0645857,
+    "permission_denials": [],
+    "num_turns": 6
+  },
+  "changed_files": [],
+  "added_files": [],
+  "deleted_files": [],
+  "cost_scope": "CLI list-price equivalent, not subscription bill",
+  "protected_unchanged": true,
+  "fixtureVault_changes": []
+}

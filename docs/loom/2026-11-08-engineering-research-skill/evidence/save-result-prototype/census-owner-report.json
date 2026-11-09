@@ -1,0 +1,24 @@
+{
+  "commit": "1205fa661cf73d4759236882e49621424092776d",
+  "role": "fresh adversary owner maintenance for widened local-probe scope",
+  "attack_points": {"found": 4, "earned_a_new_program": 0, "modified_programs_committed": 1, "new_programs_committed": 0},
+  "program": "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py",
+  "change": "One exact visible MANUAL_OVERRIDES row classifies the persisted-save data helper as not-prose; generic inference, existing rows, rejection policy, product code and tests unchanged.",
+  "class": "A test-local Markdown data helper falls outside automatic prose-test inference",
+  "searched": "Classifier decision paths and CLI admission logic, complete save helper, widened local-probe surfaces, and retained 833-path whole-branch sweep",
+  "red": {"command": "uv run --isolated --with-requirements requirements-package-tests.lock python docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py --roots loom-code/tests", "exit_code": 1, "unknown_count": 1, "log": "census-owner-red.txt"},
+  "green": {"same_command_exit_code": 0, "log": "census-owner-green.txt"},
+  "reused_tests": {"artifact": "loom-code/tests/test_adversarial_census_gaming.py", "modified": false, "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_census_gaming.py -q", "exit_code": 0, "passed": 3, "log": "census-owner-focused.txt"},
+  "mutations_and_boundaries": [
+    {"kind": "restore-original-rejection", "change": "Remove only the new admission row in an archive of the committed classifier, with actual subject helper copied into its original relative path", "observed": "Actual classifier returned 1 with other=1", "log": "census-mutation-restore-original.txt", "reverted": true},
+    {"kind": "neighbor-unknown", "change": "Add a neighboring Markdown data helper without an admission", "observed": "Actual classifier still returned 1; exact override did not accept the neighbor", "log": "census-boundary-unknown.txt", "removed": true},
+    {"kind": "overbroad-acceptance", "change": "Mutate only the copied classifier to accept every other as not-prose", "observed": "Actual classifier incorrectly returned 0; direct executable rejection assertion failed with exit1", "log": "census-mutation-overbroad-assertion.txt", "reverted": true},
+    {"kind": "neighbor-prose-pin", "change": "Add a neighboring real sentence-pin source fixture", "observed": "Actual classifier reported sentence-pin, has_pins=yes, no override; CLI exit0", "log": "census-boundary-prose-pin.txt", "removed": true}
+  ],
+  "mutation_method": "The actual committed classifier was extracted with git archive and executed, not its logic copied into another checker. Only direct boundary assertions wrapped subprocess exit/output. These temporary assertions were not new committed probe programs.",
+  "restoration": "All copied program mutations and temporary neighbor fixtures restored with apply_patch; copied classifier compared byte-for-byte against commit1205fa661",
+  "scope_limits": "This maintenance does not independently establish save-tool correctness or private model behavior. The old-store classifier path is a maintained inventory dependency, not a newly placed current-change probe; existing census adversarial tests provide the suite-level executable guard.",
+  "model_calls": 0,
+  "network_calls": 0,
+  "product_or_frozen_inputs_modified": false
+}
