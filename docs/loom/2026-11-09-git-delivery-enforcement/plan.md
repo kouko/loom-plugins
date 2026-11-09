@@ -110,3 +110,4 @@ charter: 1.1
 5. Any net mechanism increase gets a named budget-exception in the release entry. Count final runtime/functions/tests against evidence/complexity-analysis.md rather than treating estimates as achieved reductions.
 6. Repository package command remains the locked isolated Loom-family runner. Use a writable temporary UV_CACHE_DIR when sandbox cache access is unavailable; no base-environment package installation.
 7. Round 3 reached NON_CONVERGENT. User A authorized one limited supplemental check by the same reviewer: PASS for 3e9b3007..8274b2a3. Preserve prior rounds; resume Build with validated default identity. This exception does not reset later budgets.
+8. user-decided — second-vendor selection-confirmed: claude
