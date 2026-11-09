@@ -1,0 +1,116 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-09-git-delivery-enforcement",
+  "content_digest": "684638784c7be286fdbb8d585620dde4ac5bc17c",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_native_ambiguous_branch.py -q",
+      "artifact": "loom-code/tests/test_native_ambiguous_branch.py",
+      "result": "pass",
+      "command_digest": "7f8e58e47b9369b7b560b522cd270a946f5b7b59364f34f7438750bc3fddd257"
+    }
+  ],
+  "verdicts": [
+    {
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "361ef5d200289c72b13744488b2ba0a91cbdf9c3",
+      "review_target_sha": "90fd90560cd11ee012402af51ca0cf235eaa17f6",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "reviewer": "/root/closing_reader_one",
+      "notes": [
+        "Previous mixed-terminal-remedy finding: fixed. Shared guidance now covers failure, cancellation and required approval; the existing entry-level land test verifies all three together and prohibits merging.",
+        "Previous capture prose-pin finding: fixed by deleting the redundant test. Independently ran delivery/land/publish tests: 107 passed; capture contract tests: 27 passed. No skips; no full suite or evidence-store probes run.",
+        "Reviewed only the fix delta and updated acceptance records. No new regression found in touched surfaces. Configured-server simulation and installed-host enforcement limitations remain explicitly disclosed."
+      ]
+    },
+    {
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "361ef5d200289c72b13744488b2ba0a91cbdf9c3",
+      "review_target_sha": "90fd90560cd11ee012402af51ca0cf235eaa17f6",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "reviewer": "/root/closing_reader_two",
+      "notes": [
+        "Round 2, same reviewer and episode; reviewed fix delta 53e54d48384fb8984f8620ec25d4cb5b640c24a9..90fd90560cd11ee012402af51ca0cf235eaa17f6. Previous fatal grounding finding: fixed by adjacent official githooks citation; emitted hook bytes remain unchanged.",
+        "Previous important mixed-remedy finding: fixed. Shared advice covers failure diagnosis/fixes, cancellation investigation and required approval before appropriate reruns. Existing mixed-case entry test verifies all three issues remain refused without merging.",
+        "Independent focused execution: land/publish/delivery modules 107 passed in 44.00s; updated capture contract module 27 passed in 0.02s. Read refreshed acceptance report/evidence. No repository edits, full-suite execution, evidence-store probes or remote writes."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "c089c6af658d6659c48d33e441a7172bae6f6d28",
+  "tested_commit": "b16dd51c",
+  "reviewed_commit": "90fd90560cd11ee012402af51ca0cf235eaa17f6",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    }
+  ]
+}
