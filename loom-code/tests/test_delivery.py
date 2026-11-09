@@ -32,7 +32,7 @@ def delivery(tmp_path, monkeypatch):
     def external(argv, **kwargs):
         if "api" in argv and any("/pulls?" in part for part in argv):
             calls.calls.append(argv)
-            return subprocess.CompletedProcess(argv, 0, json.dumps([pr]), "")
+            return subprocess.CompletedProcess(argv, 0, json.dumps([pr] if pr else []), "")
         return calls(argv, **kwargs)
 
     monkeypatch.chdir(repo)
@@ -82,12 +82,37 @@ def test_local_without_network(delivery):
 
 
 def test_missing_authorization(delivery):
-    _, intent, calls, _, observe = delivery
+    repo, intent, calls, pr, observe = delivery
     intent.write_text(intent.read_text().replace(
         "publication: automatic — authorized 2026-09-09 by Test\n", ""))
     code, result = observe()
-    assert code == 1 and result["state"] == "unauthorized" and not result["complete"]
-    assert calls.calls == []
+    assert code == 1 and result["state"] == "uncommitted" and not result["complete"]
+    git(repo, "add", "docs/loom/intent/change.md")
+    git(repo, "commit", "-qm", "legacy publication without automatic authorization")
+    calls.head = calls.remote_head = pr["head"]["sha"] = git(repo, "rev-parse", "HEAD")
+    code, result = observe()
+    assert code == 0 and result["state"] == "published" and result["complete"]
+    assert result["evidence"]["automatic_publication_authorized"] is False
+    pr.update(state="closed", merged_at="2026-11-09T00:00:00Z", merge_commit_sha="a" * 40)
+    code, result = observe("--goal", "merged")
+    assert code == 0 and result["state"] == "merged" and result["complete"]
+    assert result["evidence"]["automatic_publication_authorized"] is False
+    assert "publication:" not in intent.read_text()
+
+
+def test_missing_pr_without_automatic_grant(delivery):
+    repo, intent, calls, pr, observe = delivery
+    publication_intent(repo, automatic=False)
+    git(repo, "add", "docs/loom/intent/change.md")
+    git(repo, "commit", "-qm", "legacy intent")
+    calls.head = calls.remote_head = git(repo, "rev-parse", "HEAD")
+    pr.clear()
+    code, result = observe()
+    assert code == 1 and result["state"] == "missing_pr" and not result["complete"]
+    assert result["evidence"]["automatic_publication_authorized"] is False
+    assert "explicit user decision" in result["next"] and "otherwise" in result["next"]
+    assert "--confirm-authorized" in result["next"] and "intent" not in result["next"]
+    assert "publication:" not in intent.read_text()
 
 
 def test_checks_pass(delivery):

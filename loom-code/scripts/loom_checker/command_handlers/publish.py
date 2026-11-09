@@ -337,12 +337,17 @@ def observe_delivery(
         if not re.fullmatch(r"confirmed \d{4}-\d{2}-\d{2}", front.get("status", "")):
             return result("unconfirmed", "identified intent is not committed and confirmed",
                           "Obtain intent confirmation and commit the canonical intent.")
-        if goal != "local":
-            authorized, reason = _intent_authorizes_publication(repo, canonical, change_id)
-            if not authorized:
-                return result("unauthorized", reason,
-                              "Obtain publication authorization in the committed intent; "
-                              "use --goal local only when local delivery was explicitly requested.")
+        authorized, authorization_reason = _intent_authorizes_publication(repo, canonical, change_id)
+        evidence["automatic_publication_authorized"] = authorized
+        if authorization_reason:
+            evidence["automatic_publication_reason"] = authorization_reason
+        publication_next = (
+            "Resume publish for this feature branch only while its automatic authorization remains valid."
+            if authorized else
+            "If an existing explicit user decision authorizes publication, resume publish with "
+            "--confirm-authorized; otherwise obtain that user decision before writing. "
+            "Observation grants no write permission."
+        )
 
         local_base = git_maybe(repo, "symbolic-ref", "--quiet", "refs/remotes/origin/HEAD")
         scope = _delivery_scope(repo, change_id, head, local_base)
@@ -433,14 +438,14 @@ def observe_delivery(
             return result("unconfirmed", "remote branch changed during observation", diagnostic)
         if remote is not None and remote != head:
             return result("unpublished", "local HEAD differs from the live remote branch",
-                          "Fetch and inspect remote divergence, then resume authorized publish on the feature branch.")
+                          "Fetch and inspect remote divergence. " + publication_next)
         if not matching:
             if remote != head:
                 return result("unpublished", "selected HEAD is absent from the live remote branch",
-                              "Resume authorized publish for this feature branch.")
+                              publication_next)
             return result("mismatched_pr" if candidates else "missing_pr",
                           "no PR matches selected HEAD, branch, repository and base",
-                          "Inspect the PR identity and resume authorized publish; preserve the feature branch.")
+                          "Inspect the PR identity and preserve the feature branch. " + publication_next)
         if len(matching) != 1:
             return result("unconfirmed", "multiple PRs match the selected delivery identity", diagnostic)
         pr = matching[0]
@@ -457,10 +462,10 @@ def observe_delivery(
                           "Report the merged PR and its server merge SHA.", True)
         if remote != head:
             return result("unpublished", "open PR HEAD has no matching live remote branch",
-                          "Inspect branch deletion and resume authorized publish; do not recreate trunk work.")
+                          "Inspect branch deletion and preserve the feature branch. " + publication_next)
         if pr.get("state") != "open" or pr.get("draft") is not False:
             return result("mismatched_pr", "selected PR is closed or still a draft",
-                          "Resume authorized publish to obtain a matching Ready PR.")
+                          "A matching Ready PR is required. " + publication_next)
         checks = classify_checks(run_publish_external(
             [trusted_gh, "pr", "checks", url, "--required", "--json", "name,state,bucket"],
             cwd=repo, env=env,
