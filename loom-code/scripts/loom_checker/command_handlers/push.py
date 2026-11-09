@@ -31,6 +31,11 @@ DIRECT_GIT_CHANGE = re.compile(r"^\s*git[ \t]+(merge|commit|push)(?=[ \t]|$)")
 # Static, relocatable POSIX shell: no installed launcher or Python at runtime.
 # These hooks do not intercept reset/rebase or fast-forward merges. Remote PR
 # rules remain necessary; hooks are ordinary Git safeguards, not a security wall.
+# Git's hook interface: https://git-scm.com/docs/githooks (DESCRIPTION,
+# pre-commit, pre-merge-commit, pre-push). Git runs executable hooks from its
+# hooks directory; a nonzero exit aborts the corresponding commit/merge/push.
+# pre-push receives remote name/location as arguments and stdin lines containing
+# <local-ref> <local-object-name> <remote-ref> <remote-object-name>, in that order.
 NATIVE_HOOK = b'''#!/bin/sh
 # loom managed native branch protection v1
 fail() { printf 'loom: %s\\n' "$*" >&2; exit 1; }
