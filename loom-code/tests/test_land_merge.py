@@ -21,12 +21,12 @@ from loom_checker.command_handlers import land
 from loom_checker.rule_checks.publish import CONTEXTUAL_PR_HEADINGS
 
 MERGE_NEXT = (
-    "next: Inspect the merge diagnostics and resolve the named condition before retrying land; "
+    "; next: Inspect the merge diagnostics and resolve the named condition before retrying land; "
     "preserve work and do not switch merge routes.\n"
 )
 ACCEPTANCE_BLOCK = (
     "BLOCK land.merge: acceptance not recorded; "
-    "pass --accepted-by <name> after the maintainer accepts\n"
+    "pass --accepted-by <name> after the maintainer accepts"
 ) + MERGE_NEXT
 PASS = {"name": "gate", "state": "SUCCESS", "bucket": "pass"}
 MERGE_OID = "a1b2c3d" + "0" * 33
@@ -216,8 +216,9 @@ def test_failing_nonrequired_check_blocks(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    assert "BLOCK land.merge: check lint: FAILURE\n" in err
-    assert "BLOCK land.merge: check docs: CANCELLED\n" in err
+    remedy = "; next: Inspect why the check was cancelled and rerun it through the existing CI route.\n"
+    assert "BLOCK land.merge: check lint: FAILURE" + remedy in err
+    assert "BLOCK land.merge: check docs: CANCELLED" + remedy in err
     assert "gate" not in err
     checks_call = next(call for call in calls.calls if "checks" in call)
     assert "--required" not in checks_call
@@ -234,7 +235,7 @@ def test_unstable_state_blocks(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    assert err == "BLOCK land.merge: PR #7 is UNSTABLE\n" + MERGE_NEXT
+    assert err == "BLOCK land.merge: PR #7 is UNSTABLE" + MERGE_NEXT
     assert "Merged PR" not in out
     assert no_merge(calls)
 
@@ -249,7 +250,7 @@ def test_draft_state_blocks(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    assert err == "BLOCK land.merge: PR #7 is DRAFT\n" + MERGE_NEXT
+    assert err == "BLOCK land.merge: PR #7 is DRAFT" + MERGE_NEXT
     assert "Merged PR" not in out
     assert no_merge(calls)
 
@@ -283,7 +284,7 @@ def test_empty_checks_output_blocks(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    assert err == ("BLOCK land.merge: checks on PR #7 could not be observed\n"
+    assert err == ("BLOCK land.merge: checks on PR #7 could not be observed; "
                    "next: Inspect gh authentication, permissions and response diagnostics; "
                    "retry the same route.\n")
     assert "Merged PR" not in out
@@ -315,7 +316,7 @@ def test_unknown_merge_state_past_sixty_seconds_blocks(tmp_path: Path, monkeypat
     )
 
     assert rc == 1
-    assert err == "BLOCK land.merge: PR #7 is UNKNOWN\n" + MERGE_NEXT
+    assert err == "BLOCK land.merge: PR #7 is UNKNOWN" + MERGE_NEXT
     assert sum(waits) <= 60
 
 
@@ -344,7 +345,7 @@ def test_unidentified_change_blocks_before_github(tmp_path: Path, monkeypatch) -
 
     assert rc == 1
     assert err.startswith("BLOCK land.merge: cannot identify the change"), err
-    assert err.count("\n") == 2 and err.endswith(MERGE_NEXT), err
+    assert err.count("\n") == 1 and "rename the branch" in err, err
     assert calls.calls == []
     assert out == ""
 
@@ -406,7 +407,7 @@ def test_missing_heading_refuses_names_it(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing\n' + MERGE_NEXT
+    assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing' + MERGE_NEXT
     assert "Merged PR" not in out
     assert no_merge(calls)
 
@@ -430,7 +431,7 @@ def test_missing_heading_is_named_before_failing_checks_and_blocked_state(
     )
 
     assert rc == 1
-    assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing\n' + MERGE_NEXT
+    assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing' + MERGE_NEXT
     assert "Merged PR" not in out
     assert not any("checks" in call for call in calls.calls)
     assert no_merge(calls)
@@ -445,7 +446,7 @@ def test_body_changed_after_it_was_checked_refuses(tmp_path: Path, monkeypatch) 
     )
 
     assert rc == 1
-    assert err == "BLOCK land.merge: PR body changed after it was checked; run land again\n" + MERGE_NEXT
+    assert err == "BLOCK land.merge: PR body changed after it was checked; run land again" + MERGE_NEXT
     assert "Merged PR" not in out
     assert no_merge(calls)
 
@@ -489,7 +490,7 @@ def test_merge_timeout_still_open_blocks(tmp_path: Path, monkeypatch) -> None:
 
         assert rc == 1, outcome
         assert err.startswith("BLOCK land.merge: merge not performed: "), err
-        assert err.count("\n") == 2 and err.endswith(MERGE_NEXT), err
+        assert err.count("\n") == 1 and err.endswith(MERGE_NEXT), err
         if isinstance(outcome, tuple):
             assert outcome[1] in err
         assert "Merged PR" not in out
@@ -578,7 +579,7 @@ def test_title_only_commit_verify_blocks(tmp_path: Path, monkeypatch) -> None:
 
     assert rc == 1
     assert out.endswith("Merged PR #7 as a1b2c3d\n" + REMINDER), out
-    assert err == "BLOCK land.verify: squash commit lacks the PR body\n" + MERGE_NEXT
+    assert err == "BLOCK land.verify: squash commit lacks the PR body" + MERGE_NEXT
 
 
 def test_body_only_commit_verify_blocks_on_title(tmp_path: Path, monkeypatch) -> None:
@@ -591,7 +592,7 @@ def test_body_only_commit_verify_blocks_on_title(tmp_path: Path, monkeypatch) ->
 
     assert rc == 1
     assert "Merged PR #7 as a1b2c3d\n" in out
-    assert err == "BLOCK land.verify: squash commit lacks the PR title\n" + MERGE_NEXT
+    assert err == "BLOCK land.verify: squash commit lacks the PR title" + MERGE_NEXT
 
 
 def test_title_only_in_body_verify_blocks_on_title(tmp_path: Path, monkeypatch) -> None:
@@ -604,4 +605,4 @@ def test_title_only_in_body_verify_blocks_on_title(tmp_path: Path, monkeypatch) 
 
     assert rc == 1
     assert "Merged PR #7 as a1b2c3d\n" in out
-    assert err == "BLOCK land.verify: squash commit lacks the PR title\n" + MERGE_NEXT
+    assert err == "BLOCK land.verify: squash commit lacks the PR title" + MERGE_NEXT

@@ -90,11 +90,10 @@ def _publish_usage(reason: str, err) -> int:
 
 def _publish_block(reason: str, err, next_action: str | None = None,
                    *, rule: str = "publish.preconditions") -> int:
-    code = report([(rule, reason)], err)
-    err.write("next: " + (next_action or
+    remedy = (next_action or
               "Inspect the publication diagnostics and reconcile the named condition before "
-              "retrying publish; preserve work and do not switch merge routes.") + "\n")
-    return code
+              "retrying publish; preserve work and do not switch merge routes.")
+    return report([(rule, f"{reason}; next: {remedy}")], err)
 
 
 def _publish_origin_state(repo: Path, expected_branch: str) -> tuple[str | None, str | None]:

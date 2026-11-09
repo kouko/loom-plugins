@@ -9,7 +9,7 @@ from loom_checker.command_handlers import publish as loom_checker
 import pytest
 
 PUBLISH_NEXT = (
-    "next: Inspect the publication diagnostics and reconcile the named condition before "
+    "; next: Inspect the publication diagnostics and reconcile the named condition before "
     "retrying publish; preserve work and do not switch merge routes.\n"
 )
 CONTEXT_HEADINGS = (
@@ -1246,7 +1246,7 @@ def test_bad_body_without_attestation_refused_before_push_naming_heading(
     rc, _out, err, calls = unattested_publication(tmp_path, monkeypatch, bad)
 
     assert rc == 1
-    assert err == 'BLOCK push.contextual-body: heading "Scope" is missing\n' + PUBLISH_NEXT
+    assert err == 'BLOCK push.contextual-body: heading "Scope" is missing' + PUBLISH_NEXT
     assert calls.calls == []
 
 
@@ -1258,7 +1258,7 @@ def test_unidentified_change_refused_before_network(tmp_path: Path, monkeypatch)
     assert rc == 1
     assert err == (
         "BLOCK publish.preconditions: cannot identify the change — name the branch "
-        "<type>/<change-id> or commit its intent\n"
+        "<type>/<change-id> or commit its intent"
     ) + PUBLISH_NEXT
     assert calls.calls == []
 

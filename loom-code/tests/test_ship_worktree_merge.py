@@ -103,7 +103,9 @@ def test_merge_without_attestation_reaches_github(tmp_path: Path, monkeypatch) -
 
     assert rc == 1
     assert calls and calls[0][1:3] == ["repo", "view"]
-    assert err == "BLOCK land.merge: default branch lookup failed: offline\n"
+    assert err == ("BLOCK land.merge: default branch lookup failed: offline; "
+                   "next: Inspect gh authentication, permissions and diagnostics; "
+                   "retry land without switching merge routes.\n")
 
 
 # Two attested changes disagree with the change the branch carries: `land`

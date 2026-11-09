@@ -101,11 +101,10 @@ def _usage(reason: str, err) -> int:
 
 def _block(reason: str, err, next_action: str | None = None,
            *, rule: str = "land.merge") -> int:
-    code = report([(rule, reason)], err)
-    err.write("next: " + (next_action or
+    remedy = (next_action or
               "Inspect the merge diagnostics and resolve the named condition before retrying land; "
-              "preserve work and do not switch merge routes.") + "\n")
-    return code
+              "preserve work and do not switch merge routes.")
+    return report([(rule, f"{reason}; next: {remedy}")], err)
 
 
 def _land_args(args: list[str]) -> tuple[str, str | None, str | None] | str:
@@ -924,17 +923,15 @@ def _read(argv: list[str], what: str, *, repo: Path, env: dict[str, str], err,
     try:
         result = run_land_external(argv, LAND_READ_TIMEOUT, cwd=repo, env=env)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        report([(rule, f"{what} could not run: {type(exc).__name__}: {exc}")], err)
-        if rule == "land.merge":
-            err.write("next: Inspect gh authentication, permissions and diagnostics; "
-                      "retry land without switching merge routes.\n")
+        _block(f"{what} could not run: {type(exc).__name__}: {exc}", err,
+               "Inspect gh authentication, permissions and diagnostics; "
+               "retry land without switching merge routes.", rule=rule)
         return None
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
-        report([(rule, f"{what} failed: {detail}")], err)
-        if rule == "land.merge":
-            err.write("next: Inspect gh authentication, permissions and diagnostics; "
-                      "retry land without switching merge routes.\n")
+        _block(f"{what} failed: {detail}", err,
+               "Inspect gh authentication, permissions and diagnostics; "
+               "retry land without switching merge routes.", rule=rule)
         return None
     return result
 
@@ -953,7 +950,8 @@ def _merge_preconditions(
     # (1) the change, from the branch name or its one intent; no attestation needed
     change_id, identify_error = identify_change(repo)
     if identify_error:
-        return _block(identify_error, err)
+        # Identification errors already include their precise rename/commit remedy.
+        return report([("land.merge", identify_error)], err)
 
     # (2) acceptance
     names, intent_error = _accepted_names(repo, change_id)
@@ -1087,9 +1085,8 @@ def _observe_all_checks(
             out.write(f"All checks registered on PR #{number} passed\n")
             return 0
         elif observed.issues:
-            code = report([("land.merge", f"check {name}: {state}")
+            code = report([("land.merge", f"check {name}: {state}; next: {observed.next}")
                            for name, state in observed.issues], err)
-            err.write(f"next: {observed.next}\n")
             return code
         else:
             reason = (f"checks on PR #{number} could not be observed"
