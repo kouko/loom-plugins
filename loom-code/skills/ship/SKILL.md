@@ -24,6 +24,12 @@ decision into Ship; do not ask again. Intent prose, status, or contract version
 never implies authorization. A legacy intent without that machine-readable field
 requires one publication decision before anything leaves the machine.
 The user may still explicitly stop publication before the outward action.
+On withdrawal, remove its `publication:` field immediately and commit that
+withdrawal before another publication attempt; an uncommitted revocation still
+denies authorization. Observation never authorizes publication or merge.
+Small and engineering-only changes retain branch/PR policy regardless of
+workflow simplification. An explicit local-only target permits local delivery
+observation, never a claim of published delivery.
 
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
@@ -164,6 +170,19 @@ agrees, as its own change and never inside the current change's PR, then run
 `github-rules` again for the rules. When it reports that the rules could not be
 confirmed, tell the user and continue publishing.
 
+Repository protection is opt-in and affects ordinary human Git operations too.
+Only after explicit consent, run
+`"<loom-code>/scripts/loom-python" --repair push --install-git-hooks` in that
+repository; explicit removal uses `push --remove-git-hooks` through the same
+launcher. Installation refuses foreign/shared hooks and preserves work; report
+the conflict and integration remedy rather than overwrite it. Static native
+hooks protect the observed default branch plus main/master and remote trunk
+destinations, across shell spellings and linked worktrees. They use local default
+metadata offline; refresh that metadata when the server default changes.
+History operations and fast-forward local merges may not invoke these hooks;
+server PR/check restrictions remain authoritative. Missing or unconfirmed server
+rules must be disclosed; inspection never authorizes setup.
+
 For an intent carrying automatic-publication authorization, pass its absolute
 path to the installed plugin's one publication command:
 
@@ -197,9 +216,12 @@ separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; where a refusal names a
 remedy, take it, and where it names none, report the refusal and stop.
 
-The installed plugin's `PreToolUse` hook only reminds: a direct push or PR
-create prints one line naming the branch's verification status. No
-repository-local checker scaffold or hook-firing ledger is required.
+The installed plugin's `PreToolUse` hook gives early shell feedback and
+publication reminders; it cannot cover every shell spelling. Native Git
+protection is independent of that reminder and of workflow simplification.
+Preserve work on a feature branch/worktree when blocked; never recommend bypass
+or data discard. Follow a scoped failure's observed reason and safe next action;
+if automatic repair is unjustified, report the missing condition and stop.
 
 ## 4. Observe CI
 
@@ -284,6 +306,26 @@ and prints a token; pass `--sweep --confirm <token>` only after the maintainer
 answers yes to the printed list.
 
 ## Handoff
+
+Before reporting published delivery, run the shared read-only observation on
+every supported host:
+
+```text
+"<loom-code>/scripts/loom-python" --repair delivery --goal published --intent <absolute-intent-path> --json
+```
+
+Use `--goal merged` while the merged change remains identifiable on its retained
+feature branch; after land removes that branch/worktree, report land's observed
+merge result. Use `--goal local` only for an explicit local-only target.
+Report the observed state, reason, next action and evidence; PR existence,
+an agent's claim and stale remote-tracking refs cannot prove exact-head delivery.
+Incomplete or unavailable evidence remains incomplete or unconfirmed, never
+success. Observation never authorizes publication or merge.
+Claude Code and Codex Stop hooks request at most one continuation for applicable
+authorized unfinished changes; repeated Stop, human decision boundaries and
+external blockers may stop without claiming completion. OpenCode and Antigravity
+do not have verified termination enforcement; use this same command and disclose
+that limitation rather than claiming a hook blocked termination.
 
 Report the attestation digest when one exists, else the verification status
 publish printed, publication checks, PR URL, CI state, and land's output.

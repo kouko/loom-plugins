@@ -45,6 +45,12 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: project-retro,               owner: loom-workflow, standalone: true}
 
 actions:             # executable steps inside a station; not skills (§3)
+  - name: delivery
+    owner: ship
+    summary: "read-only delivery --goal local|published|merged recomputes Git/PR/check evidence; explicit local target only, no publication or merge authorization inferred, no small-change branch/PR exemption."
+  - name: native-git-protection
+    owner: ship
+    summary: "explicit repository-scoped push --install-git-hooks / --remove-git-hooks preserves foreign hooks; static native hooks cover ordinary trunk operations, with disclosed history limits and independent consent for server setup."
   - name: restate-and-confirm
     owner: write-plan          # also executed by capture-intent when loom-design is installed
     summary: "decision point ① — restate Problem/Acceptance in plain words; merge engineering one-way doors (and a product change's when no spec will be written), any `second-vendor: ask` question and a missing-PRINCIPLES interview into the same dialogue; write `status: confirmed <date>`."

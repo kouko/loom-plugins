@@ -196,3 +196,30 @@ def test_ship_asks_setup_consent_in_consequence_form() -> None:
     assert _gate_marked_occurrences(text, "consequence form") == [], (
         "a new prose gate would raise the net mechanism count; the consent rule is guidance"
     )
+
+
+def test_ship_handoff_requires_observed_delivery_and_explicit_protection_setup() -> None:
+    text = " ".join(SHIP.read_text(encoding="utf-8").split())
+    for required in (
+        "delivery --goal published --intent <absolute-intent-path> --json",
+        "push --install-git-hooks", "push --remove-git-hooks",
+        "Observation never authorizes publication or merge",
+        "Small and engineering-only changes retain branch/PR policy",
+        "OpenCode and Antigravity do not have verified termination enforcement",
+    ):
+        assert required in text, required
+    assert "No repository-local checker scaffold or hook-firing ledger is required" not in text
+    assert "Stop" in text and "local-only" in text
+
+
+def test_delivery_runtime_mechanisms_are_registered() -> None:
+    import sys
+    sys.path.insert(0, str(SHIP.parents[2] / "scripts"))
+    import check_mechanisms as cm
+    repo = SHIP.parents[3]
+    computed = cm.recompute_all(repo)
+    registered = {m["id"] for m in cm.load_mechanisms(repo)}
+    expected = {"Stop::loom-python", "Stop::loom-python@codex",
+                "delivery.observed", "action:delivery", "action:native-git-protection"}
+    assert expected <= set().union(*computed.values())
+    assert expected <= registered

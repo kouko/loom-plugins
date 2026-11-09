@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.60.0] — 2026-11-09 — observe Git delivery and protect ordinary trunk operations
+
+- Reuse publish/land evidence for read-only `delivery --goal local|published|merged`: distinguish pending, failed and unconfirmed results, with safe next actions. Observation never grants publication or merge authorization; working-copy withdrawal immediately revokes a committed grant.
+- Offer explicit repository-scoped static native Git hooks without launcher/cache dependencies; preserve foreign hooks, linked worktrees and safe trunk synchronization. Disclose history-operation limits and inspect effective server PR/check protection without changing it.
+- Connect bounded Claude Code/Codex Stop feedback to the shared observer. OpenCode and Antigravity expose the same executable check with explicit termination-enforcement limitations. Small and engineering-only changes retain branch/PR policy.
+- budget-exception: delivery.observed — one executable delivery rule exposes evidence-based completion; regression eval `loom-code/tests/test_delivery.py`.
+- budget-exception: action:delivery — register Ship's shared read-only observation; regression eval `loom-code/tests/test_delivery.py`.
+- budget-exception: action:native-git-protection — register opt-in static native protection; regression eval `loom-code/tests/test_native_git_protection.py`.
+- budget-exception: Stop::loom-python — count Claude Code's actual Stop entry; regression eval `loom-code/tests/test_delivery_stop.py`.
+- budget-exception: Stop::loom-python@codex — count Codex's actual Stop entry; regression eval `loom-code/tests/test_delivery_stop.py`.
+
 ## [3.59.0] — 2026-11-06 — keep local document delivery concise
 
 - When delivering a local document, provide its actual absolute location in the current project, worktree or external directory; ordinary filename mentions and quoted examples stay outside this rule.
