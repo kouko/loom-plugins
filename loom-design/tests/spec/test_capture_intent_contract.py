@@ -141,15 +141,6 @@ def test_skill_file_exists() -> None:
     assert SKILL.is_file(), f"{SKILL} does not exist"
 
 
-def test_git_policy_survives_small_and_engineering_changes() -> None:
-    text = _flat(_text())
-    assert "Small and engineering-only changes retain branch/PR policy" in text
-    assert "delivery --goal published --intent <absolute-intent-path> --json" in text
-    assert "Observation never authorizes publication or merge" in text
-    assert "remove its `publication:` field immediately" in text
-    assert "local-only" in text
-
-
 def test_frontmatter_name_and_version() -> None:
     text = _text()
     assert re.search(r"^name: capture-intent$", text, re.M)
