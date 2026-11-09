@@ -55,6 +55,23 @@ charter: 1.1
 - Test: A3 negative: same three demonstrated RED cases pass from their permanent suite location.
 - Risk: agent-decided — adversary retains authorship; move its caught program and adjust only location-dependent import. No new attack, assertion or review round.
 
+### Package integration fixes
+
+**F-03 Preserve single-line BLOCK diagnostic framing with actionable remedies** after: F-02 acceptance: 6
+- Files: loom-code/scripts/loom_checker/command_handlers/land.py, loom-code/scripts/loom_checker/command_handlers/publish.py, loom-code/tests/test_land_merge.py, loom-code/tests/test_loom_publish.py, loom-code/tests/test_ship_worktree_merge.py
+- Test: A6 negative: existing blocked-publish adversarial tests remain unchanged and pass; positive: exact diagnostics retain next actions.
+- Risk: agent-decided — class: actionable advice broke legacy BLOCK-line framing. Sweep found publish refusal helper, land refusal helper, direct external-error branches and precheck branch. Keep each refusal a BLOCK line with advice inline; preserve reason prefix, rule and exit.
+
+**F-04 Synchronize exact integration inventories for new public surfaces** after: F-03 acceptance: 7
+- Files: tests/test_loom_plugin_install_layout.py, loom-code/tests/test_loom_checker_cli.py, loom-code/tests/test_loom_checker_modules.py, loom-code/tests/test_legacy_contract_removed.py
+- Test: A7 positive: exact command/rule/host inventories match the new supported surfaces; negative: removed replay flag stays rejected.
+- Risk: agent-decided — class: stale exact integration inventories. Sweep found rule count/list/areas, delivery owner mapping, isolated Codex Stop inventory and push usage text. Keep exactness and negative polarity; no weakening to subsets or arbitrary counts.
+
+**F-05 Remove the new prose-only phrase pin** after: F-04 acceptance: 7
+- Files: loom-code/tests/test_ship_station_text.py
+- Test: A7 negative: existing batch2 phrase-pin adversarial scanner passes; executable delivery and mechanism checks retain behavior coverage.
+- Risk: agent-decided — class: prohibited positive phrase-loop pin. Changed-file sweep found only the newly added Ship handoff phrase-loop test. Remove that redundant test rather than disguising its literals or changing the scanner; production and executable registration tests stay.
+
 ## Simplicity check
 - none found
 
