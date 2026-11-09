@@ -20,6 +20,7 @@ EXPECTED_RULE_IDS = [
     "ci.pr-floor",
     "contract.charter-complete",
     "contract.requires",
+    "delivery.observed",
     "intake.attestation-coverage",
     "intake.commit-identity",
     "intake.confirmed",
@@ -202,7 +203,7 @@ def test_every_rule_id_is_area_dot_name() -> None:
     for line in run_checker("--list-rules").stdout.splitlines():
         rule_id = line.split("\t")[0]
         area, _, name = rule_id.partition(".")
-        assert area in {"adversarial", "ci", "contract", "intent", "intake", "land", "plan", "publish", "push", "review", "spec", "standing"}, rule_id
+        assert area in {"adversarial", "ci", "contract", "delivery", "intent", "intake", "land", "plan", "publish", "push", "review", "spec", "standing"}, rule_id
         assert name and "." not in name, rule_id
 
 
@@ -313,8 +314,8 @@ def test_hooks_probe_is_gone() -> None:
     assert "hooks-probe" not in CHECKER.read_text(encoding="utf-8").split('"""')[1]
 
 
-def test_the_rule_population_is_thirty() -> None:
-    assert len(run_checker("--list-rules").stdout.splitlines()) == 30
+def test_the_rule_population_is_thirty_one() -> None:
+    assert len(run_checker("--list-rules").stdout.splitlines()) == 31
 
 
 # --- contract --require (spec G) -------------------------------------------

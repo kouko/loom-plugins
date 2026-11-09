@@ -28,11 +28,11 @@ assert not any(name.startswith('loom_checker.command_handlers.') for name in sys
     subprocess.run([sys.executable, "-c", script], cwd=SCRIPTS, check=True, capture_output=True, text=True)
 
 
-def test_each_subcommand_has_its_own_module() -> None:
+def test_each_subcommand_resolves_to_its_declared_owner_module() -> None:
     script = """
 import runpy
 commands = runpy.run_path('loom_checker.py')['COMMANDS']
-expected = {'intent': 'intent', 'intents': 'intents', 'intake': 'intake', 'push': 'push', 'publish': 'publish', 'land': 'land', 'sync-trunk': 'sync', 'github-rules': 'github_rules', 'pr-floor': 'pr_floor', 'standing': 'standing', 'contract': 'contract', 'charter': 'charter', 'plan': 'plan', 'reviewer-count': 'reviewer_count', 'finalize-review': 'finalize'}
+expected = {'intent': 'intent', 'intents': 'intents', 'intake': 'intake', 'push': 'push', 'publish': 'publish', 'delivery': 'publish', 'land': 'land', 'sync-trunk': 'sync', 'github-rules': 'github_rules', 'pr-floor': 'pr_floor', 'standing': 'standing', 'contract': 'contract', 'charter': 'charter', 'plan': 'plan', 'reviewer-count': 'reviewer_count', 'finalize-review': 'finalize'}
 assert {name: fn.__module__ for name, fn in commands.items()} == {name: 'loom_checker.command_handlers.' + module for name, module in expected.items()}
 """
     subprocess.run([sys.executable, "-c", script], cwd=SCRIPTS, check=True, capture_output=True, text=True)
@@ -42,7 +42,7 @@ def test_rules_are_importable_without_command_modules() -> None:
     script = """
 import sys
 from loom_checker.rules import RULES
-assert len(RULES) == 30
+assert len(RULES) == 31
 assert not any(name.startswith('loom_checker.command_handlers.') for name in sys.modules)
 """
     subprocess.run(
@@ -84,7 +84,7 @@ def test_list_rules_still_reports_the_complete_public_set() -> None:
         text=True,
     )
     rule_ids = {line.split("\t", 1)[0] for line in result.stdout.splitlines()}
-    assert len(rule_ids) == 30
+    assert len(rule_ids) == 31
     assert "push.attestation" not in rule_ids
     assert "push.merge" not in rule_ids
     assert {"ci.pr-floor", "publish.preconditions"} <= rule_ids
