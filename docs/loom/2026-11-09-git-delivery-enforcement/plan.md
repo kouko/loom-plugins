@@ -36,6 +36,13 @@ charter: 1.1
 - Test: A1 positive: observed_handoff; negative: claimed_publication. A3 positive: native_policy; boundary: local_exception. A4 positive: explicit_setup; negative: implicit_mutation. A6 positive: scoped_next_action; boundary: no_bypass. A7 positive: shared_entry; negative: small_change_exemption.
 - Risk: agent-decided — revise only affected policies per REQ-1/3/4/6/7; executable registration and mechanism-budget exception required. Existing station tests retain polarity; release packet below precedes final attestation.
 
+### Integration — Fetched trunk compatibility
+
+**I-01 Integrate fetched trunk and preserve both release contracts** after: W3-01 acceptance: 7
+- Files: README.md, docs/loom/evidence/mechanisms.yaml, loom-code/.claude-plugin/plugin.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md, loom-code/tests/test_write_plan_station_text.py; derived manifests via sync script only.
+- Test: A7 positive: synchronized_release; boundary: preserved_trunk_contract. Run affected release, mechanism, contract and station suites.
+- Risk: agent-decided — sync-trunk refused conflicts against 361ef5d2 without mutation. Merge fetched trunk preserving its research capability; move this release to 3.62.0. Isolated worktree preserves unrelated untracked user work. No requirements or review-budget reset.
+
 ## Simplicity check
 - none found
 
