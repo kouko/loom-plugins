@@ -57,3 +57,25 @@ Tried on 2026-11-09, in a clean detached worktree at cdae36b6eb85eb98f59836ff5ba
 ## Finding
 
 - important, Acceptance 4 / REQ-4: live protection configuration was observed, but refusal of a direct trunk update and a merge with failed required checks was not exercised. Close with a separately authorized disposable configured server environment and captured refusal output. Do not label this requirement fully verified from configuration or simulated CLI responses.
+
+## Re-run on 2026-11-09, at 025f2f7726dbfc73dd357eae73464138dea81047
+
+- Created new clean detached worktree `/private/tmp/loom-acceptance-independent-r2` at the exact tested commit; initial `git status --porcelain` was empty. Re-read README installation instructions and exercised packaged loading again through the actual OpenCode context -> execute.before -> shell command harness. No installed host settings were changed.
+- Reviewed full fix diff `bbdfd022..025f2f77`: only plan F06 documentation and 94 added lines in test_github_rules.py; no runtime code, prior tests, manifest or host definitions changed.
+- Command: `UV_OFFLINE=1 UV_CACHE_DIR=/private/tmp/loom-delivery-uv-cache uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_github_rules.py loom-code/tests/test_opencode_loader.py::test_packaged_opencode_delivery_executes_without_claiming_stop -q`.
+- Captured result: `20 passed in 8.43s`. This includes every remote-rules classification/setup/bypass/unknown case and the newly configured-server refusal case. No full package suite was run by this tester; finalize-review still owns its mandatory run.
+- Independent live read-only command `python3 loom-code/scripts/loom_checker.py github-rules` returned exit 0: `loom: main requires a pull request (administrators included) and the check "loom-pr-floor / PR floor"`.
+- 1: carried over — diff adds only the remote-rules fixture and plan entry; delivery observer and existing state tests are unchanged.
+- 2: carried over — no authorization, local-goal or publication implementation/test changes.
+- 3: carried over — no native hook implementation/test changes; added simulated remote does not install protecting client hooks.
+- 4: re-tested — complete remote-rules module covers read/setup, absent, bypassed, unreadable and malformed rules. New `test_configured_server_refuses_direct_update_and_failed_check_then_merges` runs a separate policy-deciding subprocess against the identical responses.json used by production observation. Its unprotected client prepares actual Git objects in a temporary bare remote. A direct request is rejected because PR is required; a merge request is rejected because the configured required check fails; each refusal asserts trunk unchanged and PR unmerged. Changing that check to success allows the merge request, updates trunk and marks PR merged. Thus the fixture is configuration-driven with negative and positive controls, not a canned rejection or a client-side precheck.
+- 5: carried over — publication/land runtime, checks and existing tests unchanged; added server test does not change these paths.
+- 6: carried over — reason/remedy runtime and existing coverage unchanged; new server fixture has no effect on production output.
+- 7: carried over — host definitions, loader and policy unchanged; packaged loader setup was nevertheless repeated successfully. Actual installed-host stop enforcement remains unverified.
+
+### Finding resolution and limits
+
+- Earlier important Acceptance 4 finding is resolved by the allowed configured-server simulation, not dismissed. Spec explicitly permits a configured fixture; live GitHub refusal is not required to satisfy this chosen verification boundary.
+- The fixture requests go to a local Python subprocess that applies policy then calls update-ref; they are not Git receive-pack transport requests or GitHub API calls. It proves the simulated server decision contract and stable refs on refusal, not GitHub implementation, transport-level interception, credentials or enforcement against a client that directly modifies the fixture's filesystem. No real server write was attempted.
+- Live GitHub configuration was independently read; actual live direct-push rejection and failed-check merge rejection remain untested, as do installed-host Stop triggers. These limitations are retained rather than conflated with the configured simulation result.
+- No remaining important finding in the scoped Acceptance 4 simulation obligation.
