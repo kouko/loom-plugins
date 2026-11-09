@@ -15,7 +15,7 @@ charter: 1.1
 **W1-02 Protect ordinary native Git operations without parsing shell text** after: W1-01 acceptance: 3, 6
 - Files: loom-code/scripts/loom_checker/command_handlers/push.py, loom-code/tests/test_native_git_protection.py, loom-code/tests/test_main_branch_hook.py
 - Test: A3 positive: feature_commit_and_trunk_sync; negative: compound_main_commit_and_push. A6 positive: protection_remedy; boundary: foreign_hooks_unchanged.
-- Risk: agent-decided — REQ-3/6 requires repository-scoped installation, linked-worktree identity and preserved foreign hooks; widen test_main_branch_hook.py protection without deleting early-feedback cases. No hook installation in real adopting repositories.
+- Risk: agent-decided — REQ-3/6 uses static shell hooks without launcher/cache dependency; test scoped installation, linked worktrees, foreign hooks and history-operation limits. Preserve test_main_branch_hook.py coverage and existing shell-only opt-out. No real-repository installation.
 
 ### Wave 2 — Connect host framing and server-policy observations
 
@@ -45,7 +45,7 @@ charter: 1.1
 ## Risks
 1. Native Git hooks affect human operations too. User chose this boundary; refuse shared/foreign hooks and preserve work. Existing no-Git-hooks principle is explicitly superseded, not silently contradicted.
 2. Host support differs. Claude/Codex Stop gets bounded recovery; OpenCode/Antigravity use executable checks and explicit limitations. Live-host evidence must not be replaced with a configuration assertion.
-3. External Claude review was requested; execution was rejected before start pending explicit Anthropic-egress authorization. Its result remains absent until a successful authorized execution and owner validation; do not silently substitute the native reviewer.
+3. External Claude complexity review completed after explicit Anthropic-egress approval: RESHAPE. Adopt shared CI classification and static Git hooks; unify immediate revocation in existing authorization logic. This proposal review does not certify the later implementation.
 4. Release packet: bump loom-code and loom-design source .claude-plugin/plugin.json minor versions, add same-commit CHANGELOG sections dated 2026-11-09, synchronize README versions and release-pin tests, then derive manifests with scripts/sync_codex_manifests.py --all.
 5. Any net mechanism increase gets a named budget-exception in the release entry. Count final runtime/functions/tests against evidence/complexity-analysis.md rather than treating estimates as achieved reductions.
 6. Repository package command remains the locked isolated Loom-family runner. Use a writable temporary UV_CACHE_DIR when sandbox cache access is unavailable; no base-environment package installation.
