@@ -1,6 +1,6 @@
 # Git delivery enforcement — plan
 intent: 2026-11-09-git-delivery-enforcement@4c555b14
-spec: docs/loom/2026-11-09-git-delivery-enforcement/spec.md@0eec6728
+spec: docs/loom/2026-11-09-git-delivery-enforcement/spec.md@8274b2a3
 charter: 1.1
 
 ## Task DAG
@@ -49,4 +49,4 @@ charter: 1.1
 4. Release packet: bump loom-code and loom-design source .claude-plugin/plugin.json minor versions, add same-commit CHANGELOG sections dated 2026-11-09, synchronize README versions and release-pin tests, then derive manifests with scripts/sync_codex_manifests.py --all.
 5. Any net mechanism increase gets a named budget-exception in the release entry. Count final runtime/functions/tests against evidence/complexity-analysis.md rather than treating estimates as achieved reductions.
 6. Repository package command remains the locked isolated Loom-family runner. Use a writable temporary UV_CACHE_DIR when sandbox cache access is unavailable; no base-environment package installation.
-7. Pre-build spec review is NON_CONVERGENT: third round found unresolved custom-default-branch protection. Build has not started; evidence/pre-build-outcome.md records the accepted finding and unimplemented remedy. No fourth review dispatch or reviewer-identity reset.
+7. Round 3 reached NON_CONVERGENT. User A authorized one limited supplemental check by the same reviewer: PASS for 3e9b3007..8274b2a3. Preserve prior rounds; resume Build with validated default identity. This exception does not reset later budgets.

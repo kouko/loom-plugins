@@ -1,6 +1,8 @@
 # Pre-build outcome
 
-Status: NON_CONVERGENT — implementation has not started.
+Historical status: NON_CONVERGENT — implementation had not started.
+
+Current status: resumed for Build after the user's explicit A authorization and the same reviewer's bounded supplemental PASS over 3e9b3007..8274b2a3. See default-branch-probe.md and spec-review-supplement.yaml. No earlier review round is erased or reset; this exception applies only to the default-branch identity correction. The correction is specified, not yet implemented or accepted.
 
 The confirmed intent remains confirmed and its requirements are unchanged. The feature branch contains the intent, spec, plan and review/research evidence only. No Git hooks were installed and no adopting repository or GitHub protection was modified.
 
