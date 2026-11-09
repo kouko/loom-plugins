@@ -79,6 +79,23 @@ charter: 1.1
 - Test: A4 positive: passing_required_check_merge; negative: remote_direct_push_and_failed_check_merge_refused_without_local_hooks.
 - Risk: agent-decided — class: missing configured-server refusal evidence. Sweep found only JSON stubs and local refusals in github-rules/native/land tests. Share configuration for observation and remote decisions; verify unchanged trunk/PR on refusal and passing-check control. Simulation only.
 
+### Closing review round 1 fixes
+
+**F-07 Match CI remedies to all refused terminal categories** after: F-06 acceptance: 5, 6
+- Files: loom-code/scripts/loom_checker/command_handlers/publish.py, loom-code/tests/test_land_merge.py
+- Test: A6 negative: existing mixed failure/cancelled check case requires diagnosis/fix and cancellation guidance; A5 positive: preserve classification and wait policies.
+- Risk: agent-decided — class: mixed terminal categories receive one mismatched remedy. Whole changed-file and A5/A6 consumer sweep found shared classifier feeding delivery, publish and land; land repeats its remedy per refused issue. Fix shared advice without changing selection or waits.
+
+**F-08 Remove the redundant capture policy prose pin** after: F-07 acceptance: 7
+- Files: loom-design/tests/spec/test_capture_intent_contract.py
+- Test: A7 positive: retained executable delivery/native/host tests and capture contract checks pass.
+- Risk: agent-decided — class: positive prose pin without negation safeguards. Changed-file sweep found the newly added capture policy test; equivalent Ship pin already removed. Delete the redundant test, preserve structural checks and product prose.
+
+**F-09 Ground native hook lifecycle and input protocol** after: F-08 acceptance: 3
+- Files: loom-code/scripts/loom_checker/command_handlers/push.py
+- Test: A3 positive: existing native protection cases retain behavior; no new test for a citation-only change.
+- Risk: agent-decided — class: missing grounding for external hook interface. Whole changed-file/A3 hook-surface sweep found native body lacks official lifecycle/stdin grounding. Add adjacent Git githooks source comment, including nonzero refusal and four-field pre-push input; keep generated hook bytes unchanged.
+
 ## Simplicity check
 - none found
 
