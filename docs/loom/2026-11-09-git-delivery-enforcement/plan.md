@@ -43,6 +43,18 @@ charter: 1.1
 - Test: A7 positive: synchronized_release; boundary: preserved_trunk_contract. Run affected release, mechanism, contract and station suites.
 - Risk: agent-decided — sync-trunk refused conflicts against 361ef5d2 without mutation. Merge fetched trunk preserving its research capability; move this release to 3.62.0. Isolated worktree preserves unrelated untracked user work. No requirements or review-budget reset.
 
+### Adversarial fix tasks
+
+**F-01 Use unambiguous branch identities across Git delivery consumers** after: I-01 acceptance: 1, 3
+- Files: loom-code/scripts/loom_checker/command_handlers/push.py, loom-code/scripts/loom_checker/command_handlers/publish.py, loom-code/scripts/loom_checker/command_handlers/land.py, loom-code/scripts/loom_checker/helpers.py, loom-code/tests/test_main_branch_hook.py, loom-code/tests/test_delivery.py
+- Test: A3 negative: adversarial same-name tag probe must turn GREEN; A1 positive: delivery branch identity remains exact.
+- Risk: agent-decided — class: ambiguous shortened branch identity. Whole changed-file sweep plus A1/A3 Git identity surfaces found push native/shell, four publish calls, two land calls and helpers.branch_base. Compare full heads refs; preserve detached behavior. Commit names class and searched surfaces.
+
+**F-02 Graduate the caught native-hook probe into the package suite** after: F-01 acceptance: 3
+- Files: docs/loom/2026-11-09-git-delivery-enforcement/evidence/probes/test_native_ambiguous_branch.py, loom-code/tests/test_native_ambiguous_branch.py
+- Test: A3 negative: same three demonstrated RED cases pass from their permanent suite location.
+- Risk: agent-decided — adversary retains authorship; move its caught program and adjust only location-dependent import. No new attack, assertion or review round.
+
 ## Simplicity check
 - none found
 
