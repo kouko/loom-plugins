@@ -153,7 +153,7 @@ def test_classic_without_enforce_admins_reported_missing(tmp_path):
     }))
     assert result.returncode == 0, result.stderr
     assert "loom: main does not require a pull request (administrators included)" in result.stdout
-    assert "does not require the check" not in result.stdout
+    assert "does not require the check" in result.stdout
     assert_read_only(calls)
 
 
@@ -201,6 +201,8 @@ def test_missing_rules_listed_with_command(tmp_path):
     assert "loom: main does not require a pull request (administrators included)" in result.stdout
     assert f'loom: main does not require the check "{CONTEXT}"' in result.stdout
     assert "gh api -X POST repos/o/r/rulesets --input -" in result.stdout
+    assert "Next:" in result.stdout
+    assert "authorization" in result.stdout
     assert_read_only(calls)
 
 
@@ -221,7 +223,7 @@ def test_ruleset_with_bypass_actor_reports_pr_missing(tmp_path):
         f"{REPO}/rulesets/7": ok({"id": 7, "bypass_actors": [{"actor_type": "RepositoryRole"}]}),
     }))
     assert "loom: main does not require a pull request (administrators included)" in result.stdout
-    assert "does not require the check" not in result.stdout
+    assert "does not require the check" in result.stdout
 
 
 def test_template_absent_withholds_ruleset(tmp_path):
@@ -269,7 +271,7 @@ def test_no_github_remote_could_not_confirm(tmp_path):
 def test_non_github_host_is_not_queried(tmp_path):
     result, calls = probe(tmp_path, base_responses(), origin="https://gitlab.com/o/r.git")
     assert result.returncode == 0, result.stderr
-    assert result.stdout == "loom: could not confirm GitHub rules for the trunk (no GitHub remote)\n"
+    assert result.stdout.startswith("loom: could not confirm GitHub rules for the trunk (no GitHub remote)\n")
     assert [argv for argv in calls if argv[:1] == ["api"]] == []
 
 
@@ -320,6 +322,7 @@ def test_pr_ruleset_classic_unreadable_check_unconfirmed(tmp_path):
 
 def test_malformed_shapes_could_not_confirm(tmp_path):
     cases = {
+        "rule": {f"{REPO}/rules/branches/main": ok([None])},
         "parameters": {f"{REPO}/rules/branches/main": ok([
             {"type": "required_status_checks", "ruleset_id": 1, "parameters": "x"}])},
         "contexts": {f"{REPO}/rules/branches/main": ok([
@@ -327,6 +330,8 @@ def test_malformed_shapes_could_not_confirm(tmp_path):
              "parameters": {"required_status_checks": "x"}}])},
         "classic": {f"{REPO}/branches/main/protection": ok({
             "enforce_admins": "x", "required_status_checks": ["x"]})},
+        "classic-admins": {f"{REPO}/branches/main/protection": ok({
+            "enforce_admins": "x", "required_status_checks": {"contexts": [CONTEXT]}})},
         "allowances": {f"{REPO}/branches/main/protection": ok({
             "required_pull_request_reviews": {"bypass_pull_request_allowances": {"users": "x"}},
             "enforce_admins": {"enabled": True},
@@ -339,12 +344,21 @@ def test_malformed_shapes_could_not_confirm(tmp_path):
         assert result.returncode == 0, (name, result.stderr)
         assert "loom: could not confirm GitHub rules for main (" in result.stdout, name
         assert "does not require" not in result.stdout, name
+        assert "Next:" in result.stdout, name
 
 
 def test_unreadable_bypass_actors_could_not_confirm(tmp_path):
-    result, _calls = probe(tmp_path, base_responses(**{
-        f"{REPO}/rules/branches/main": ok([rule_pr(7), rule_check(ruleset_id=7)]),
-        f"{REPO}/rulesets/7": ok({"id": 7}),
-    }))
-    assert "loom: could not confirm GitHub rules for main (" in result.stdout
-    assert "does not require a pull request" not in result.stdout
+    # PR and check may come from different rulesets; both need visible bypass rules.
+    for name, detail in {"missing": ok({"id": 7}), "denied": NON_ADMIN,
+                         "malformed": ok({"bypass_actors": "x"})}.items():
+        sub = tmp_path / name
+        sub.mkdir()
+        result, calls = probe(sub, base_responses(**{
+            f"{REPO}/rules/branches/main": ok([rule_pr(3), rule_check(ruleset_id=7)]),
+            f"{REPO}/rulesets/3": ok({"bypass_actors": []}),
+            f"{REPO}/rulesets/7": detail,
+        }))
+        assert "loom: could not confirm GitHub rules for main (" in result.stdout
+        assert "does not require" not in result.stdout
+        assert "Next:" in result.stdout
+        assert_read_only(calls)
