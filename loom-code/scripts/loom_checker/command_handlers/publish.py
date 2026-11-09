@@ -28,6 +28,7 @@ from urllib.parse import quote
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import tempfile
@@ -473,8 +474,73 @@ def observe_delivery(
         return result("unconfirmed", f"delivery evidence unavailable: {exc}", diagnostic)
 
 
+def _delivery_stop(out, err) -> int:
+    """Documented Claude/Codex Stop decision; one deadline, no retry or writes."""
+    class DeadlineExpired(RuntimeError):
+        pass  # Git/remote helpers catch OSError; deadline must cross those catches.
+
+    def expired(_signum, _frame):
+        raise DeadlineExpired("20-second total delivery deadline expired")
+
+    previous_handler = signal.signal(signal.SIGALRM, expired)
+    signal.setitimer(signal.ITIMER_REAL, 20)
+    previous_path = os.environ.get("PATH")
+    try:
+        payload = json.load(sys.stdin)
+        if (not isinstance(payload, dict) or payload.get("hook_event_name") != "Stop"
+                or payload.get("agent_id") or payload.get("parent_session_id")):
+            return 0
+        trusted_git = resolve_publish_executable("git")
+        trusted_gh = resolve_publish_executable("gh")
+        redirected = any(key in PUBLISH_REDIRECT_ENV or key.startswith(
+            ("GIT_CONFIG_KEY_", "GIT_CONFIG_VALUE_")) for key in os.environ)
+        if redirected or not trusted_git:
+            raise UsageError("trusted Git environment is unavailable; remove redirects and provide trusted Git")
+        os.environ["PATH"] = os.pathsep.join(dict.fromkeys(
+            [str(Path(trusted_git).parent), "/usr/bin", "/bin"]))
+        repo = repo_root(Path(payload.get("cwd") or os.getcwd())).resolve()
+        change_id, _ = identify_change(repo)
+        if not change_id:
+            return 0
+        intent = artifact_path(load_manifest(), "intent", change_id, repo)
+        authorized, _ = _intent_authorizes_publication(repo, intent, change_id)
+        if not authorized:
+            return 0
+        front, _ = parse_document(git_text(repo, "show", f"HEAD:{intent.relative_to(repo)}"))
+        spec = artifact_path(load_manifest(), "spec", change_id, repo)
+        if front.get("kind") == "product" and spec.exists():
+            spec_front, _ = parse_document(spec.read_text(encoding="utf-8"))
+            if not spec_front.get("confirmed-behavior"):
+                return 0
+        observed = observe_delivery(repo, goal="published", intent_file=intent,
+                                    trusted_git=trusted_git, trusted_gh=trusted_gh)
+        if observed.complete:
+            return 0  # Publication is the boundary; acceptance never grants merge.
+        feedback = f"Delivery incomplete ({observed.state}): {observed.reason}\nnext: {observed.next}"
+        if payload.get("stop_hook_active") or observed.state == "unconfirmed":
+            err.write(feedback + "\n")
+        else:
+            out.write(json.dumps({"decision": "block", "reason": feedback}, ensure_ascii=False) + "\n")
+    except (OSError, UnicodeError, ValueError, TypeError, UsageError, DeadlineExpired) as exc:
+        err.write(f"Delivery unconfirmed: {exc}\nnext: Restore the missing prerequisites and run "
+                  "loom-python --ready delivery --json before claiming completion.\n")
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_path is None:
+            os.environ.pop("PATH", None)
+        else:
+            os.environ["PATH"] = previous_path
+    return 0
+
+
 def cmd_delivery(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     """Observe an explicit local, published or merged delivery target without writes."""
+    if "--hook" in args:
+        if args != ["--hook"]:
+            err.write("delivery: --hook must be used alone\n")
+            return 2
+        return _delivery_stop(out, err)
     goal, intent_file, as_json = "published", None, False
     seen: set[str] = set()
     rest = list(args)

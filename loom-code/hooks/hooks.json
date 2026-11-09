@@ -1,5 +1,6 @@
 {
   "hooks": {
+    "Stop": [{"hooks": [{"type": "command", "timeout": 25, "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready delivery --hook; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -ne 0 ]; then echo 'loom: delivery unconfirmed; restore the checker runtime and run loom-python delivery --json before claiming completion.' >&2; fi; exit 0"}]}],
     "SessionStart": [
       {
         "matcher": "startup|clear|compact",
