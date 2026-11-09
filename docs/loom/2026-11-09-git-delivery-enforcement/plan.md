@@ -1,6 +1,6 @@
 # Git delivery enforcement — plan
 intent: 2026-11-09-git-delivery-enforcement@4c555b14
-spec: docs/loom/2026-11-09-git-delivery-enforcement/spec.md@8274b2a3
+spec: docs/loom/2026-11-09-git-delivery-enforcement/spec.md@90112053
 charter: 1.1
 
 ## Task DAG
@@ -96,6 +96,23 @@ charter: 1.1
 - Test: A3 positive: existing native protection cases retain behavior; no new test for a citation-only change.
 - Risk: agent-decided — class: missing grounding for external hook interface. Whole changed-file/A3 hook-surface sweep found native body lacks official lifecycle/stdin grounding. Add adjacent Git githooks source comment, including nonzero refusal and four-field pre-push input; keep generated hook bytes unchanged.
 
+### User-authorized additional repair and review
+
+**F-10 Separate read-only observation from publication permission** after: F-09 acceptance: 1, 2, 6
+- Files: loom-code/scripts/loom_checker/command_handlers/publish.py, loom-code/tests/test_delivery.py, loom-code/tests/test_loom_publish.py
+- Test: A1 positive: legacy_matching_ready_pr; A2 negative: observation_never_grants_writes; A6 boundary: missing_pr_without_automatic_grant.
+- Risk: agent-decided — class: observer conflates facts with automatic authorization. Whole changed-file/A1/A2/A6 sweep found observer gate, publish/Stop grant callers and legacy confirm-authorized route. Remove only the observation gate; retain writer/Stop withdrawal checks and safe conditional remedies.
+
+**F-11 Preserve human-wait boundaries in first Stop feedback** after: F-10 acceptance: 2, 6, 7
+- Files: loom-code/scripts/loom_checker/command_handlers/publish.py, loom-code/tests/test_delivery_stop.py
+- Test: A6 negative: first_stop_user_wait_condition; A2 boundary: withdrawal_no_continuation; A7 positive: repeated_stop_and_deadline_preserved.
+- Risk: agent-decided — class: unconditional continuation advice at a user boundary. Whole changed-file/A2/A6/A7 sweep found first Stop block feedback; repeated Stop already permits exit. Add conditional human-wait/withdrawal guidance without inventing host fields or changing the deadline.
+
+**F-12 Restore grounding for shared check-classification behavior** after: F-11 acceptance: 5
+- Files: loom-code/scripts/loom_checker/command_handlers/publish.py
+- Test: A5 positive: existing failed_json, pending and empty-registration cases retain behavior; citation-only, no new test.
+- Risk: agent-decided — class: lost external-interface citations during extraction. Sweep found land manual reference and existing test references, but no pinned implementation grounding beside shared classify_checks. Restore official manual, pinned checks.go/checks_test.go and issue 7401 references; runtime unchanged.
+
 ## Simplicity check
 - none found
 
@@ -111,3 +128,4 @@ charter: 1.1
 6. Repository package command remains the locked isolated Loom-family runner. Use a writable temporary UV_CACHE_DIR when sandbox cache access is unavailable; no base-environment package installation.
 7. Round 3 reached NON_CONVERGENT. User A authorized one limited supplemental check by the same reviewer: PASS for 3e9b3007..8274b2a3. Preserve prior rounds; resume Build with validated default identity. This exception does not reset later budgets.
 8. user-decided — second-vendor selection-confirmed: claude
+9. user-decided — "修復後複核" authorizes one additional bounded repair-and-review pass beyond the stated three-digest limit. Preserve prior rounds and failed-task retries; requirements are unchanged. Retain the explicitly bounded server simulation rather than deleting it on the outside review's judgment alone.
