@@ -199,6 +199,16 @@ class CheckObservation:
     issues: tuple[tuple[str, str], ...] = ()
 
 
+# External-interface grounding:
+# https://cli.github.com/manual/gh_pr_checks documents JSON bucket fields and
+# pending exit 8. The pinned implementation and tests cover the no-(required)-
+# checks stderr forms; issue 7401 describes the check-registration race:
+# https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks.go
+# https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks_test.go
+# https://github.com/cli/cli/issues/7401
+# In v2.88.1 the JSON exporter returns before non-JSON failure/pending exits;
+# accepting valid JSON with exit 1 below is defensive compatibility, not a
+# claim that this pinned exporter produces that combination.
 def classify_checks(result: subprocess.CompletedProcess, *, required: bool) -> CheckObservation:
     """Classify one gh snapshot; callers retain their own selection and wait policy."""
     diagnostic = "Inspect gh authentication, permissions and response diagnostics; retry the same route."
