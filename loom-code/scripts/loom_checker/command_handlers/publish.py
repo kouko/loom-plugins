@@ -532,6 +532,8 @@ def _delivery_stop(out, err) -> int:
         if payload.get("stop_hook_active") or observed.state == "unconfirmed":
             err.write(feedback + "\n")
         else:
+            feedback = ("If you are waiting for the user's answer or publication was withdrawn, "
+                        "stop again and say so; otherwise: " + feedback)
             out.write(json.dumps({"decision": "block", "reason": feedback}, ensure_ascii=False) + "\n")
     except (OSError, UnicodeError, ValueError, TypeError, UsageError, DeadlineExpired) as exc:
         err.write(f"Delivery unconfirmed: {exc}\nnext: Restore the missing prerequisites and run "

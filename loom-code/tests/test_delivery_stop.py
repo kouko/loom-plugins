@@ -23,6 +23,8 @@ def test_premature_stop_and_repeat_disclose_actual_incompletion(delivery, monkey
     result, _ = stop(monkeypatch, repo)
     assert result["decision"] == "block"
     assert "next:" in result["reason"] and "unpublished" in result["reason"]
+    assert "If you are waiting for the user's answer or publication was withdrawn, " in result["reason"]
+    assert "stop again and say so; otherwise: " in result["reason"]
     result, feedback = stop(monkeypatch, repo, stop_hook_active=True)
     assert "decision" not in result
     assert "incomplete" in feedback and "next:" in feedback
