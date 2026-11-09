@@ -241,9 +241,18 @@ def classify_checks(result: subprocess.CompletedProcess, *, required: bool) -> C
     )
     refused = tuple((name, state or bucket) for name, state, bucket in states
                     if any(predicate(state, bucket) for _, _, predicate, _ in groups[:3]))
+    terminal_categories = {
+        next(category for category, _, predicate, _ in groups[:3] if predicate(state, bucket))
+        for _, state, bucket in states
+        if any(predicate(state, bucket) for _, _, predicate, _ in groups[:3])
+    }
     for category, description, predicate, remedy in groups:
         issues = tuple((n, s or b or "unknown") for n, s, b in states if predicate(s, b))
         if issues:
+            if len(terminal_categories) > 1:
+                remedy = ("Inspect the named CI logs and fix failures, determine why checks were cancelled, "
+                          "and obtain any required approval; rerun only the appropriate checks through the "
+                          "existing CI route after resolving those conditions.")
             return CheckObservation(category, description + ": " + ", ".join(n for n, _ in issues),
                                     remedy, refused or issues)
     return CheckObservation("passed", "passed", "Await acceptance before requesting an authorized merge.")

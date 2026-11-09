@@ -208,6 +208,7 @@ def test_failing_nonrequired_check_blocks(tmp_path: Path, monkeypatch) -> None:
             PASS,
             {"name": "lint", "state": "FAILURE", "bucket": "fail"},
             {"name": "docs", "state": "CANCELLED", "bucket": "cancel"},
+            {"name": "approval", "state": "ACTION_REQUIRED", "bucket": "fail"},
         ]]
         calls.check_returncodes = [1]
 
@@ -216,9 +217,12 @@ def test_failing_nonrequired_check_blocks(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    remedy = "; next: Inspect why the check was cancelled and rerun it through the existing CI route.\n"
+    remedy = ("; next: Inspect the named CI logs and fix failures, determine why checks were cancelled, "
+              "and obtain any required approval; rerun only the appropriate checks through the "
+              "existing CI route after resolving those conditions.\n")
     assert "BLOCK land.merge: check lint: FAILURE" + remedy in err
     assert "BLOCK land.merge: check docs: CANCELLED" + remedy in err
+    assert "BLOCK land.merge: check approval: ACTION_REQUIRED" + remedy in err
     assert "gate" not in err
     checks_call = next(call for call in calls.calls if "checks" in call)
     assert "--required" not in checks_call
