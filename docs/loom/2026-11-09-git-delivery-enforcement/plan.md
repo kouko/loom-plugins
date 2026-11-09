@@ -72,6 +72,13 @@ charter: 1.1
 - Test: A7 negative: existing batch2 phrase-pin adversarial scanner passes; executable delivery and mechanism checks retain behavior coverage.
 - Risk: agent-decided — class: prohibited positive phrase-loop pin. Changed-file sweep found only the newly added Ship handoff phrase-loop test. Remove that redundant test rather than disguising its literals or changing the scanner; production and executable registration tests stay.
 
+### Acceptance evidence fix
+
+**F-06 Exercise configured remote refusal with a shared-rule server fixture** after: F-05 acceptance: 4
+- Files: loom-code/tests/test_github_rules.py
+- Test: A4 positive: passing_required_check_merge; negative: remote_direct_push_and_failed_check_merge_refused_without_local_hooks.
+- Risk: agent-decided — class: missing configured-server refusal evidence. Sweep found only JSON stubs and local refusals in github-rules/native/land tests. Share configuration for observation and remote decisions; verify unchanged trunk/PR on refusal and passing-check control. Simulation only.
+
 ## Simplicity check
 - none found
 
