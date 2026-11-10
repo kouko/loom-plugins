@@ -29,6 +29,7 @@ from urllib.parse import quote
 import json
 import os
 import re
+import shlex
 import signal
 import subprocess
 import sys
@@ -546,8 +547,9 @@ def _delivery_stop(out, err) -> int:
                         "stop again and say so; otherwise: " + feedback)
             out.write(json.dumps({"decision": "block", "reason": feedback}, ensure_ascii=False) + "\n")
     except (OSError, UnicodeError, ValueError, TypeError, UsageError, DeadlineExpired) as exc:
+        launcher = shlex.quote(str(Path(__file__).resolve().parents[2] / "loom-python"))
         err.write(f"Delivery unconfirmed: {exc}\nnext: Restore the missing prerequisites and run "
-                  "loom-python --ready delivery --json before claiming completion.\n")
+                  f"{launcher} --ready delivery --json before claiming completion.\n")
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         signal.signal(signal.SIGALRM, previous_handler)

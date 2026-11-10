@@ -1,7 +1,9 @@
 """Documented Stop framing around the same single-shot delivery observer."""
 import json
 import signal
+import shlex
 from io import StringIO
+from pathlib import Path
 
 from loom_checker.command_handlers import publish
 from test_delivery import delivery
@@ -61,4 +63,7 @@ def test_single_total_deadline_is_unconfirmed_and_does_not_continue(delivery, mo
     result, feedback = stop(monkeypatch, repo)
     assert result == {} and "unconfirmed" in feedback and "20" in feedback
     assert armed == [20, 0]
+    recovery = shlex.split(feedback.split("run ")[-1].split(" before claiming completion.")[0])
+    assert Path(recovery[0]).is_absolute() and Path(recovery[0]).is_file()
+    assert recovery[1:] == ["--ready", "delivery", "--json"]
 

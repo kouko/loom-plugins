@@ -9,6 +9,7 @@ this layer stops missed steps, not a goal-directed agent.
 Sub-commands (the CLI contract other stations depend on):
 
     loom_checker.py --list-rules
+    loom_checker.py --help
     loom_checker.py intent <path> [--commit-msg <file>]
     loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]
     loom_checker.py intake <station> <change-id>
@@ -26,8 +27,18 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py finalize-review <change-id> --input <review-input.json>
     loom_checker.py standing <path-to-intent>
     loom_checker.py contract --require <major.minor>
+    loom_checker.py charter [--manifest <path>]
+    loom_checker.py plan <path-to-plan.md>
 
-Exit codes: 0 pass, 1 a rule failed (`BLOCK <rule.id>: <reason>` on
+With the launcher, the checker is selected automatically; omit loom_checker.py:
+    "<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"
+    "<loom-code>/scripts/loom-python" --ready intake <station> <change-id>
+Replace <loom-code> with the installed plugin directory and <path-to-plan.md>
+with your plan file path.
+Plan takes a file path; intake takes a station and a change-id.
+No validation runs for --help or -h alone.
+
+Exit codes: 0 pass (or help displayed), 1 a rule failed (`BLOCK <rule.id>: <reason>` on
 stderr), 2 usage or internal error. Any unexpected exception fails
 closed as exit 2 -- a checker that cannot decide never says "fine".
 
@@ -87,6 +98,9 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
     try:
         if not argv:
             raise UsageError("no sub-command given." + USAGE)
+        if argv in (["--help"], ["-h"]):
+            out.write(USAGE)
+            return 0
         if argv[0] == "--list-rules":
             return list_rules(out)
         command = COMMANDS.get(argv[0])

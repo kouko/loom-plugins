@@ -110,10 +110,45 @@ def test_missing_installer_and_corrupt_cache_are_bootstrap_errors(tmp_path: Path
 
 def test_script_mode_uses_runtime_and_preserves_script_exit(tmp_path: Path) -> None:
     script = tmp_path / "probe.py"
-    script.write_text("import sys, yaml, tomllib; print(sys.executable); sys.exit(7)\n")
-    result = run_launcher(tmp_path, "--repair", "--script", str(script), tools=fake_uv(tmp_path))
+    script.write_text("import sys, yaml, tomllib; print(sys.executable); print(sys.argv[1:]); sys.exit(7)\n")
+    result = run_launcher(tmp_path, "--repair", "--script", str(script), "--help", "space argument", tools=fake_uv(tmp_path))
     assert result.returncode == 7, result.stderr
     assert "/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python" in result.stdout
+    assert "['--help', 'space argument']" in result.stdout
+
+
+def test_launcher_help_and_invalid_calls_need_no_runtime(tmp_path: Path) -> None:
+    for args in [("--help",), ("-h",), (), ("plan", "plan.md"),
+                 (str(LAUNCHER.with_name("loom_checker.py")), "plan", "plan.md"),
+                 ("--ready", "loom_checker.py", "plan", "plan.md"),
+                 ("--repair", str(LAUNCHER.with_name("loom_checker.py")), "plan", "plan.md"),
+                 ("--ready",), ("--help", "plan", "plan.md")]:
+        result = run_launcher(tmp_path, *args)
+        help_only = args in [("--help",), ("-h",)]
+        assert result.returncode == (0 if help_only else 2), (args, result)
+        output = result.stdout if help_only else result.stderr
+        assert '"<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"' in output
+        assert "Replace <loom-code>" in output
+        assert "checker is selected automatically" in output
+        assert "No validation" in output
+        if args and args[0] in ("--ready", "--repair") and len(args) > 1:
+            assert "omit" in output and "loom_checker.py" in output
+    assert not (tmp_path / "cache").exists()
+
+
+def test_checker_help_recovers_to_plan_validation(tmp_path: Path) -> None:
+    tools = fake_uv(tmp_path)
+    help_result = run_launcher(tmp_path, "--repair", "--help", tools=tools)
+    assert help_result.returncode == 0, help_result.stderr
+    assert "plan <path-to-plan.md>" in help_result.stdout
+    assert "charter [--manifest" in help_result.stdout
+    plan = tmp_path / "plan with spaces.md"
+    plan.write_text("charter: 1.0\n## Task DAG\n**T1 Example** after: none\n- Files: src/a.py\n- Test: works\n- Risk: agent-decided — low\n")
+    assert run_launcher(tmp_path, "--ready", "plan", str(plan)).returncode == 0
+    plan.write_text(plan.read_text().replace("- Test: works\n", ""))
+    invalid = run_launcher(tmp_path, "--ready", "plan", str(plan))
+    assert invalid.returncode == 1 and "BLOCK plan.field-caps" in invalid.stderr
+    assert run_launcher(tmp_path, "--ready", "plan", str(plan), "extra").returncode == 2
 
 
 def test_launcher_resolves_its_directory_when_called_by_path_name(tmp_path: Path) -> None:

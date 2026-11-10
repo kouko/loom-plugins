@@ -13,6 +13,7 @@ from loom_checker.helpers import repo_root
 from loom_checker.rule_checks.push import github_repo_from_origin
 from pathlib import Path
 import json
+import shlex
 import shutil
 import subprocess
 import sys
@@ -201,10 +202,11 @@ def setup_command(host: str, slug: str, trunk: str) -> str:
 
 
 def template_step(trunk: str) -> str:
+    launcher = shlex.quote(str(Path(__file__).resolve().parents[2] / "loom-python"))
     return (
         f"loom: template not on {trunk} — land it first, then add the rules\n"
         f"  copy {PLUGIN_TEMPLATE} to {TEMPLATE_PATH}, land it on {trunk}, "
-        f"then run: loom_checker.py github-rules --print-setup\n"
+        f"then run: {launcher} --repair github-rules --print-setup\n"
     )
 
 

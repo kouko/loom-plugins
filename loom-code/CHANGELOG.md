@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.63.0] — 2026-11-11 — recover invalid planning commands
+
+- Explain missing launcher modes and redundant checker paths with a valid planning command; keep invalid calls rejected instead of silently correcting them.
+- Provide launcher help before runtime provisioning and complete checker usage, including plan and charter; preserve custom-script argument forwarding.
+- Correct emitted recovery hints to include the launcher path, mode and original arguments while preserving hook execution and failure policy.
+
 ## [3.62.2] — 2026-11-10 — scope document-path test assertions
 
 - Scope personal-path assertions to portable document-delivery guidance and separately validate the current installation's launcher path; preserve runtime behavior.
