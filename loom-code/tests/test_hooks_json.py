@@ -400,6 +400,51 @@ def test_missing_ready_runtime_reports_repair_without_checker_refusal(hooks, tmp
     assert "--repair" in result.stderr and "publication hook failed" in result.stderr
 
 
+@pytest.mark.parametrize("host,event", [
+    ("claude", "Stop"), ("codex", "Stop"),
+    ("claude", "PreToolUse"), ("codex", "PreToolUse"),
+    ("opencode", "PreToolUse"), ("antigravity", "PreToolUse"),
+])
+def test_failed_hook_hint_replays_operation_without_launcher_on_path(host, event, tmp_path):
+    root = tmp_path / "installed plugin"
+    scripts = root / "scripts"
+    scripts.mkdir(parents=True)
+    launcher = scripts / "loom-python"
+    launcher.write_bytes((REPO / "loom-code/scripts/loom-python").read_bytes())
+    launcher.chmod(0o755)
+    recorder = "import json, sys; print(json.dumps([sys.argv[1:], sys.stdin.read()]))\n"
+    (scripts / "loom_checker.py").write_text(recorder)
+    (root / "hooks").mkdir()
+    (root / "hooks/agy_adapter.py").write_text(recorder)
+    manifests = {"claude": HOOKS_JSON, "codex": CODEX_HOOKS_JSON,
+                 "opencode": HOOKS_DIR / "hooks-opencode.json", "antigravity": AGY_HOOKS_JSON}
+    data = json.loads(manifests[host].read_text())
+    entries = data["loom-code" if host == "antigravity" else "hooks"][event]
+    (command,) = _commands(entries)
+    env = {**os.environ, "PATH": "/bin", "XDG_CACHE_HOME": str(tmp_path / "cache"),
+           "CLAUDE_PLUGIN_ROOT": str(root), "PLUGIN_ROOT": str(root)}
+    payload = '{"tool_input":{"command":"git status"}}'
+    failed = subprocess.run(["/bin/sh", "-c", command], input=payload,
+                            capture_output=True, text=True, cwd=root, env=env, timeout=30)
+    assert failed.returncode == 0, failed.stderr
+    if event == "Stop":
+        hint = failed.stderr.split("run ")[-1].split(" before claiming completion.")[0]
+        expected = ["delivery", "--json"]
+    else:
+        diagnostic = (json.loads(failed.stdout)["systemMessage" if host == "opencode" else "reason"]
+                      if host in {"opencode", "antigravity"} else failed.stderr.splitlines()[-1])
+        instruction = diagnostic.split("; ", 1)[1].split(");")[0]
+        assert instruction == ("rerun the original hook command in an agent station, replacing --ready "
+                               "with --repair and preserving its executable path, arguments, working directory and stdin")
+        hint = command.replace("--ready", "--repair")
+        expected = ["push-gate"] if host == "antigravity" else ["push", "--hook"]
+    env.update(_ready_env(tmp_path))
+    replay = subprocess.run(["/bin/sh", "-c", hint], input=payload,
+                            capture_output=True, text=True, cwd=root, env=env, timeout=30)
+    assert replay.returncode == 0, replay.stderr
+    assert json.loads(replay.stdout) == [expected, payload]
+
+
 @pytest.mark.parametrize("host", ["opencode", "antigravity"])
 def test_json_hosts_return_failure_diagnostic_when_runtime_missing(host, tmp_path):
     root = REPO / "loom-code"

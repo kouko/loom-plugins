@@ -14,7 +14,7 @@ REQ-3 — Preserve validation
 - agent-decided — REQ-1: clarify that the launcher selects the checker implicitly; report complete mode-plus-command usage on invalid launcher calls and a targeted redundant-checker-path diagnostic. Preserve exit 2; never silently normalize invalid arguments.
 - agent-decided — REQ-2: support explicit top-level help and mode-prefixed checker help, with exit 0 for help alone. Launcher help must work before runtime/cache provisioning. Keep the checker command list in its existing usage text and guard its coverage against COMMANDS; no new command registry or framework.
 - agent-decided — REQ-2: include plan and charter in checker usage and explain plan's file path versus intake's station/change-id. Keep custom --script forwarding intact, including its own help arguments.
-- agent-decided — REQ-1/3: the user requested a same-pattern audit. Correct recovery hints in host hook manifests that omit the mode or leave out the original command's arguments; preserve hook execution and failure policy. This is the same invalid-recovery-command class, not a new workflow.
+- agent-decided — REQ-1/3: the user requested a same-pattern audit. Correct emitted recovery hints in host hook manifests and checker handlers that omit the mode, leave out the original command's arguments or assume the launcher is on PATH; preserve execution and failure policy. This is the same invalid-recovery-command class, not a new workflow.
 - agent-decided — retain current runtime repair and read-only mode semantics. No new setting, persistent state, external service or one-way door is needed.
 
 ## Alternatives considered

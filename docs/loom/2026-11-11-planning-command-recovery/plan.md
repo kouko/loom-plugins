@@ -11,8 +11,8 @@ charter: 1.1
 - Risk: agent-decided — follow spec REQ-1/2/3 decisions; preserve existing runtime/CLI tests and custom-script coverage; add no parser framework or implicit correction.
 
 ### Wave 2
-**W2-01 Correct same-class hook recovery hints** after: W1-01 acceptance: 1, 3
-- Files: loom-code/hooks/hooks*.json, loom-code/hooks.json, loom-code/tests/test_hooks_json.py, docs/loom/research/2026-11-11-planning-launcher-argument-mismatch.md
+**W2-01 Correct same-class emitted recovery hints** after: W1-01 acceptance: 1, 3
+- Files: loom-code/hooks/hooks*.json, loom-code/hooks.json, loom-code/tests/test_hooks_json.py, loom-code/scripts/loom_checker/command_handlers/publish.py (entry), loom-code/scripts/loom_checker/command_handlers/github_rules.py (entry), loom-code/tests/test_delivery_stop.py, loom-code/tests/test_github_rules.py, docs/loom/research/2026-11-11-planning-launcher-argument-mismatch.md
 - Test: A1 positive: valid-recovery-hint; negative: missing-mode-hint. A3 positive: existing-hook-policy; negative: runtime-unavailable.
 - Risk: agent-decided — spec REQ-1/3; preserve test_hooks_json.py coverage and failure policy; exercise emitted hints without real publication or installing hooks.
 

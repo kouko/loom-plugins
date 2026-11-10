@@ -97,6 +97,59 @@ commands and acknowledged the unsupported insertion. The current six-call
 capture is retained locally as `launcher-reproduction.json` alongside the
 retrospective's temporary evidence; it contains actual argv and output.
 
+## Version provenance
+
+Git history identifies separate introduction points; each version below was
+checked against that commit's `loom-code/.claude-plugin/plugin.json`:
+
+- `aab60494e` (2026-10-22, 3.45.0, PR #105): the launcher introduced the mode
+  requirement, incomplete bad-mode diagnostic and no top-level help. The
+  incomplete publication-hook repair hints date to this change too.
+- `2b20d37bf` (2026-11-10, 3.62.0, PR #135): Stop's modeless hint and the
+  delivery exception's bare launcher hint were introduced together.
+- `b568ba1ae` (2026-09-23, 3.8.0, PR #43): `template_step` already emitted
+  bare `loom_checker.py`. This predates the launcher: the historical defect was
+  the executable/PATH assumption, not a mismatch with a then-existing launcher.
+- `c08b1f425` (2026-09-06, 1.7.0, PR #798 in the predecessor repository):
+  `plan` and `charter` were introduced but omitted from `USAGE` at that commit.
+
+The earliest caller misuse observed in this investigation is the historical
+Claude Code 3.50.0 incident on 2026-10-28, followed by the present Codex 3.62.2
+incident. Observation dates do not establish when agents first made this mistake
+or prove that the guidance caused it.
+
+## Bounded same-pattern audit during implementation
+
+The follow-up audit searched runtime skill, agent and reference Markdown across
+loom-code, loom-design and loom-workflow for `loom-python` and `loom_checker.py`,
+then inspected emitted hook and checker recovery hints. Formal station examples
+already include a mode and the operation; the host-prefix table is explicitly a
+prefix, not a standalone command. No launcher references were found in
+loom-design or loom-workflow runtime skills. Helper calls correctly select their
+script with `--script`, including dispatch-profile and external-review helpers.
+These findings do not establish whether an agent will follow those examples.
+
+The same incomplete-recovery class was present in six hook hints: Claude/Codex
+Stop omitted the mode and depended on `loom-python` being on PATH; publication
+fallbacks in all four host manifests omitted the original operation and inputs.
+The [hook tests](../../../loom-code/tests/test_hooks_json.py) reproduced those
+six failures, then replayed the corrected hints through the real launcher and a
+recording checker with a cached test interpreter, a plugin path containing spaces
+and no launcher on PATH. Stop now emits the installed launcher path and
+`--repair delivery --json`; publication hints explicitly preserve the original
+executable, arguments, working directory and stdin while replacing the mode.
+Hook commands and fail-open policy are unchanged.
+
+Two checker-emitted hints had the same PATH assumption:
+[delivery Stop fallback](../../../loom-code/scripts/loom_checker/command_handlers/publish.py)
+and [GitHub rules template recovery](../../../loom-code/scripts/loom_checker/command_handlers/github_rules.py).
+Both now derive and shell-quote the installed launcher path and retain the
+operation with an explicit mode. Existing delivery deadline and GitHub template
+tests reproduced the failures; the latter replays the hint against its existing
+fake GitHub fixture. No publication, live GitHub call or hook installation was
+performed by these regression checks. Historical observations above remain
+evidence about the inspected pre-fix versions, not claims about updated installs.
+
 ## Decision impact
 
 Treat caller misuse plus insufficient recovery guidance as the actionable
@@ -117,5 +170,5 @@ syntax and could conceal genuine mistakes. Defer either until evidence requires 
 The other machine is confirmed as Codex by the user. Its full command, raw
 error and installed version are still needed to attribute its incident. It may have a different failure such
 as passing a change id instead of a plan path. Current reproductions establish
-the local mechanism, not that all planning stalls share it. No repair or
-automatic-routing improvement is claimed by this research record.
+the local mechanism, not that all planning stalls share it. The regression
+checks above do not establish an installed-host or automatic-routing improvement.
