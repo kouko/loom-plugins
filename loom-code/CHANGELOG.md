@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.64.0] — 2026-11-11 — scope skill-review gate requirements
+
+- Apply Loom gate-marker and registration requirements only when the reviewed skill is governed by that contract; using Loom to develop a skill alone does not establish applicability. Preserve review of applicable requirements, substantive usage errors and unmet acceptance criteria.
+
 ## [3.63.0] — 2026-11-11 — recover invalid planning commands
 
 - Explain missing launcher modes and redundant checker paths with a valid planning command; keep invalid calls rejected instead of silently correcting them.

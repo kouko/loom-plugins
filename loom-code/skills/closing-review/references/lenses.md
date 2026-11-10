@@ -124,9 +124,13 @@ until it is rebutted with evidence.
 A `SKILL.md` or an agent contract is prose that an agent executes, so it is
 scored on the five docs dimensions plus `user-judgment-leak` and
 `deletion-first` (see "Deletion-first for docs and skill" above), with two
-sharpenings: a step whose input the reader must guess is an omission, and a
-paragraph used as a rule without a `<!-- gate: <id> -->` comment is an
-omission too — an unregistered rule is a mechanism nobody recomputes.
+sharpenings: a step whose input the reader must guess is an omission; a rule
+subject to Loom's gate-registration contract that lacks its required
+`<!-- gate: <id> -->` comment or registration is an omission too — an
+unregistered gate is a mechanism nobody recomputes. Establish applicability
+from the target's governing contract, not its location or use of the Loom
+development workflow. Other skills retain their own requirements; substantive
+usage errors and unmet acceptance conditions remain findings in either case.
 
 ## Plan lens
 
