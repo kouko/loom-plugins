@@ -20,7 +20,7 @@ charter: 1.1
 **W2-01 Release the scoped guidance** after: W1-01 acceptance: 1, 2, 3
 - Files: loom-code/.claude-plugin/plugin.json, loom-code/CHANGELOG.md, README.md, loom-code/README*.md, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/tests/test_write_plan_station_text.py
 - Test: A1 positive: release-parity; negative: stale-manifest. A2 positive: release-parity; negative: stale-pin. A3 positive: package-suite; negative: historical-rule-regression.
-- Risk: agent-decided — minor bump for station guidance; name CHANGELOG entry and rewrite affected release pins before review. Use existing synchronization, add no release mechanism.
+- Risk: agent-decided — minor bump to 3.64.0 for station guidance, preserving trunk's independent 3.63.0 release; name CHANGELOG entry and rewrite affected release pins before review. Use existing synchronization, add no release mechanism.
 
 ## Simplicity check
 - none found

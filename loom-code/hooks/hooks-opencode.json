@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${PLUGIN_ROOT}/scripts/loom-python\" --ready push --hook; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then printf '{\"systemMessage\":\"loom: publication hook failed (checker runtime unavailable; run loom-python --repair in an agent station); allowing.\"}\\n'; exit 0; fi; exit \"$loom_hook_exit_code\""
+            "command": "\"${PLUGIN_ROOT}/scripts/loom-python\" --ready push --hook; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then printf '{\"systemMessage\":\"loom: publication hook failed (checker runtime unavailable; rerun the original hook command in an agent station, replacing --ready with --repair and preserving its executable path, arguments, working directory and stdin); allowing.\"}\\n'; exit 0; fi; exit \"$loom_hook_exit_code\""
           }
         ]
       }

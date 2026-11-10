@@ -1,0 +1,100 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-planning-command-recovery",
+  "content_digest": "d0c08e781c87d36115e9b1d094824b5d2a572d6b",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_hook_recovery_literal_path.py",
+      "artifact": "loom-code/tests/test_hook_recovery_literal_path.py",
+      "result": "pass",
+      "command_digest": "c4269dae47f95dc02b047ac3222126525a79a72253940c14f31058795de8bdc2"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "1e480ff615d2b47c2bfcc75ad93536fa95251848",
+      "review_target_sha": "92c37b6512a7c2257bdce12e3fa8892edc2828a9",
+      "dimension_scores": {
+        "security": "PASS — Concrete Python-emitted launcher paths are shell-quoted; hook hints preserve the original quoted variable reference rather than interpolating a path into replayable shell code. No new external writes or trust boundary changes.",
+        "architecture": "PASS — Help remains in the existing launcher and checker dispatcher; recovery wording remains at existing error sites, without a parser framework or new runtime module.",
+        "correctness": "PASS — Mode and redundant-script mistakes remain exit 2, help alone is exit 0, and custom-script forwarding remains intact. Read retained RED/GREEN logs and independently ran all seven changed test files.",
+        "naming": "PASS — Added names and command examples describe their actual roles and preserve the existing naming conventions.",
+        "tests": "PASS — All seven changed test files ran: 174 passed, no skips. Coverage exercises real launcher dispatch, valid and invalid plan checks, emitted hook replay with recorder endpoints, literal-dollar paths, and existing handler entries.",
+        "refactoring": "PASS — Small local additions preserve the established module boundaries; the two quoted-path expressions do not warrant another shared abstraction.",
+        "cross-task-coherence": "PASS — Intent Acceptance 1–3 and spec REQ-1–3 reconcile with the launcher, hook, handler, release and acceptance artifacts. Host deferral is disclosed and is not represented as live OpenCode validation.",
+        "external-surface-grounding": "PASS — No new external API or CLI invocation shape is introduced; updated recovery commands target the repository-owned launcher and existing checker handlers.",
+        "principles-conformance": "PASS — The bounded change retains fail-open hook policy, explicit invalid-call rejection, independent acceptance evidence and a permanent literal-path regression without adding persistent configuration or a new workflow mechanism.",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists in the reviewed checkout.",
+        "deliberate-simplification": "PASS — The spec explicitly limits recovery to demonstrated mistakes, rejects silent normalization and a CLI framework, and preserves existing runtime provisioning.",
+        "deletion-first": "PASS — The additions repair observed failures at existing entry points; there is no new production module, configuration flag or extension point needing removal."
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran locked uv pytest for test_loom_python_runtime.py, test_loom_checker_cli.py, test_hooks_json.py, test_hook_recovery_literal_path.py, test_delivery_stop.py, test_github_rules.py and test_write_plan_station_text.py: 174 passed in 34.50s.",
+        "Manifest synchronization check passed. Full package suite and adversarial programs under evidence were not rerun, as required by the reviewer protocol; supplied Build and adversarial logs were read.",
+        "Acceptance evidence identifies its clean checkout and live-host recording SHA as 92044c2ef24cad416e0b624640d8bd31b8bc7108; the subsequent target commit only retains the report and evidence. Live hosts were not independently rerun by this reviewer."
+      ],
+      "reviewer": "recovery_review_one",
+      "vendor": "codex",
+      "model": "inherited (host model not exposed)"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "1e480ff615d2b47c2bfcc75ad93536fa95251848",
+      "review_target_sha": "92c37b6512a7c2257bdce12e3fa8892edc2828a9",
+      "dimension_scores": {
+        "security": "PASS — Recovery paths use shell quoting or preserve the original variable references; hook execution and failure policy remain unchanged.",
+        "architecture": "PASS — Help remains in the launcher and checker entry; handler-specific recovery remains in its owning handler.",
+        "correctness": "PASS — Observed argument mistakes fail with exit 2 and actionable usage; valid plans, invalid plans and script-owned arguments retain their behavior.",
+        "naming": "PASS — Added usage and diagnostic names directly express their purpose.",
+        "tests": "PASS — Independently ran all seven changed test files: 174 passed, no skips. The graduated literal-path regression executes the existing hook replay against the changed manifests.",
+        "refactoring": "PASS — Existing dispatch and runtime implementation are retained; the two small handler path expressions do not justify a shared abstraction.",
+        "cross-task-coherence": "PASS — REQ-1 through REQ-3 and all eight UI cases reconcile with implementation, focused tests and independent acceptance evidence; same-pattern hint changes remain within the expanded spec.",
+        "external-surface-grounding": "PASS — No new external API, CLI or host configuration surface is introduced; changes to existing host manifests are diagnostic text only.",
+        "principles-conformance": "PASS — No new persistent mechanism, user decision burden, host installation or user-data mutation is introduced; independent acceptance and adversarial evidence are retained.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the reviewed repository.",
+        "deliberate-simplification": "PASS — The bounded repair preserves strict invalid-call rejection and the existing runtime/parser instead of adding normalization or a command framework.",
+        "deletion-first": "PASS — The usage helper has help and error callers; all changed recovery paths correspond to documented observed failures, with no new configuration or extension point."
+      },
+      "findings": [],
+      "notes": [
+        "Focused command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_delivery_stop.py loom-code/tests/test_github_rules.py loom-code/tests/test_hook_recovery_literal_path.py loom-code/tests/test_hooks_json.py loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_loom_python_runtime.py loom-code/tests/test_write_plan_station_text.py; result: 174 passed in 34.80s. Initial cache permission failure was resolved by rerunning with permitted cache access.",
+        "Manifest synchronization check passed. Acceptance-tested SHA 92044c2ef24cad416e0b624640d8bd31b8bc7108 differs from the review target only in the acceptance report and evidence; raw Codex command results and Claude plan success markers agree with that evidence. OpenCode live execution remains explicitly deferred.",
+        "Read the cumulative delta, ground-truth documents, affected functions and callers, and supplied adversarial log. Did not rerun the complete package suite or modify repository artifacts."
+      ],
+      "reviewer": "recovery_review_two",
+      "vendor": "codex",
+      "model": "inherited (host model not exposed)"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "bcc06047c47a839f2a2c5b719c1cac436834c346",
+  "tested_commit": "92044c2ef24cad416e0b624640d8bd31b8bc7108",
+  "reviewed_commit": "92c37b6512a7c2257bdce12e3fa8892edc2828a9",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}

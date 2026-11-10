@@ -11,9 +11,12 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
 import subprocess
 import sys
 from pathlib import Path
+
+from test_hooks_json import _ready_env
 
 CHECKER = Path(__file__).resolve().parents[1] / "scripts" / "loom_checker.py"
 CONTEXT = "loom-pr-floor / PR floor"
@@ -238,6 +241,14 @@ def test_template_absent_withholds_ruleset(tmp_path):
         assert "loom-pr-floor.yml" in result.stdout
         assert "gh api -X POST" not in result.stdout
         assert_read_only(calls)
+
+        recovery = shlex.split(result.stdout.split("then run: ")[1].strip())
+        env = _ready_env(sub)
+        env.update(PATH=str(sub / "bin") + ":/usr/bin:/bin",
+                   FAKE_GH_RESPONSES=str(sub / "responses.json"), FAKE_GH_LOG=str(sub / "gh.log"))
+        replay = subprocess.run(recovery, cwd=sub / "repo", env=env, capture_output=True, text=True)
+        assert replay.returncode == 0, replay.stderr
+        assert "template not on main" in replay.stdout
 
 
 def test_reusable_workflow_alone_is_not_the_template(tmp_path):
