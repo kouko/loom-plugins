@@ -36,6 +36,7 @@ charter: 1.1
 - 1 — what — 是否確認先處理這項？確認後，驗證通過會推送分支並建立 Ready PR；合併另行確認，可在發布前取消。
 
 ## Risks
+- user-decided — after Claude Code and Codex live-host checks plus required verification pass, merge directly; OpenCode live-host execution is deferred by the user's later instruction. Existing automated host coverage remains part of the package suite; no claim of OpenCode live validation.
 - agent-decided — semantic recovery needs a cold-agent trial; unit tests alone prove output and exit behavior, not successful agent recovery.
 - agent-decided — the user added a same-pattern audit after confirmation; it preserves the confirmed recovery outcome and maps hook hints to the same defect class. No review round or retry counter is reset.
 - agent-decided — engineering change skips product behavior confirmation; no one-way door identified.
