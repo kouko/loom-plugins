@@ -116,9 +116,14 @@ configuration. That negative result is supporting context only.
   `sed`, including the parse-to-database boundary and sanitizer hooks.
 - Read all six linked primary GitHub advisory pages, including their descriptions,
   affected ranges, severity and patched versions. No exploit snippets were run.
-- Copied the supplied snapshot unchanged; this research did not rerun npm audit,
-  install dependencies, change the lockfile, or infer the original audit command,
-  npm version, timestamp or registry configuration from the snapshot.
+- The owning agent reports collecting the supplied snapshot on 2026-11-10 from
+  the repository root with `npm audit --prefix loom-workflow/tests/mermaid --json
+  > /private/tmp/loom-path-npm-audit.json`; exit 1 reported vulnerabilities.
+  After collection, the owning agent checked Node `v22.23.1`, npm `10.9.8` and
+  `npm config get registry` → `https://registry.npmjs.org/`. These later checks
+  describe the observed environment afterward; they are not embedded original-run
+  provenance. This worker copied the snapshot unchanged and did not rerun audit,
+  install dependencies or change the lockfile.
 - Read the saved record in full and resolved its relative Markdown links; checked
   the copied JSON equals the supplied source byte-for-byte.
 
@@ -140,8 +145,9 @@ See the owning [plan](../plan.md).
 
 This is static inspection plus primary advisory comparison, not dynamic coverage
 or exploit testing. No malicious inputs, call tracing, browser execution or
-proof of absent prototype pollution was performed. Node/npm versions and original
-audit collection provenance are not recorded in the supplied JSON. Installed
+proof of absent prototype pollution was performed. Collection command/date and
+later environment checks are attributed to the owning agent above. The JSON has
+no embedded timestamp or independent original environment provenance. Installed
 source was inspected locally at matching package versions; its complete contents
 were not independently revalidated against registry integrity hashes. Ignored
 `node_modules` source anchors are reproducible after installing the lockfile but
