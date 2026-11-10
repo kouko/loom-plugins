@@ -1,0 +1,121 @@
+---
+title: "Why planning launcher calls fail with argument mismatches"
+type: loom-research
+status: concluded
+created: 2026-11-11
+updated: 2026-11-11
+tags:
+  - loom/research
+---
+
+# Why planning launcher calls fail with argument mismatches
+
+## Question and scope
+
+Determine why an agent can stop before planning because its checker call has
+the wrong arguments. Inspect the current checkout at `882d99bf` and installed
+Codex loom-code 3.62.2, with a historical Claude Code 3.50.0 incident as a
+separate observation. The user confirmed the other machine also uses Codex;
+its raw command and error are unavailable. Keep repair complexity low and preserve the preceding
+skill-lens change as separate work.
+
+## Method and rationale
+
+Hypothesis-driven diagnosis: compare caller misuse, documentation mismatch,
+installed-source drift and a failing plan checker. Read the launcher, connected
+checker dispatch and plan handler, station examples and relevant runtime tests.
+Reproduce only read-only argument and help calls. Stop once the local failure
+mechanism is established; do not infer the remote machine's cause.
+
+## Findings
+
+1. **Observed proximate cause:** callers treat `loom-python` as a Python
+   interpreter and insert `loom_checker.py`. It is instead a launcher that
+   already selects that checker. Before the mode, that path fails launcher
+   parsing; after the mode, it reaches the checker as an unknown subcommand.
+2. **Repeated observation:** the earlier Claude Code session first omitted
+   the mode, then added it while retaining the redundant script path, and
+   failed again. The current Codex release implementer made the same insertion;
+   removing it let the plan check pass. These are two observed contexts, not
+   a measured error rate or proof of the other-machine cause.
+3. **Confirmed recovery weakness:** the first error only says to put a mode
+   before checker arguments. It does not say that the checker is implicit or
+   show a complete valid command. Both launcher `--help` and checker `--help`
+   fail with exit 2. The checker's fallback usage prints direct
+   `loom_checker.py` commands and omits the supported `plan` and `charter`
+   commands. This is an incomplete recovery surface. Its contribution to
+   misunderstanding is an inference; it is not proof that documentation caused
+   the initial mistake.
+4. **Counterevidence:** write-plan's command examples already use the correct
+   launcher form. The current implementer says no document supplied its bad
+   form; it scheduled reading the launcher and executing the guessed command
+   in one batch. Installed and checkout launcher bytes have the same SHA-256.
+   A correct plan call returns 0. No local evidence supports a version mismatch
+   or a broken plan validator.
+5. **Separate validation failure:** a ten-entry plan Files field exceeded its
+   eight-entry cap. That returned a named `BLOCK plan.field-caps` with exit 1,
+   unlike the exit-2 command-shape failure. Consolidating only the three README
+   paths resolved it without changing implementation scope.
+
+## Evidence
+
+Source inspection (paths relative to this record):
+
+- [Launcher](../../../loom-code/scripts/loom-python), lines 10–28 and final
+  exec: mode first, default bundled checker, explicit `--script` override.
+- [Checker entry](../../../loom-code/scripts/loom_checker.py), docstring and
+  `COMMANDS` / `main`: fallback usage, no help handler, supported `plan` and
+  `charter` omitted from usage.
+- [Plan handler](../../../loom-code/scripts/loom_checker/command_handlers/plan.py):
+  one plan file argument; usage errors differ from rule failure.
+- [Planning station](../../../loom-code/skills/write-plan/SKILL.md), Workflow
+  setup and final plan check examples: correct launcher prefix and arguments.
+- [Runtime tests](../../../loom-code/tests/test_loom_python_runtime.py): inspected
+  mode/runtime coverage; this investigation does not claim those tests ran.
+
+Measured on installed 3.62.2 from the current project root. `L` below denotes
+the installed `scripts/loom-python`, `P` the existing scoped skill-review plan:
+
+| Call | Exit | Observed result |
+|---|---:|---|
+| `L loom-code/scripts/loom_checker.py --ready plan P` | 2 | use --repair or --ready before checker arguments |
+| `L --ready loom-code/scripts/loom_checker.py plan P` | 2 | unknown sub-command for the checker path |
+| `L --help` | 2 | use --repair or --ready before checker arguments |
+| `L --ready --help` | 2 | unknown sub-command '--help'; fallback usage lacks plan |
+| `L --ready plan` | 2 | plan needs a path |
+| `L --ready plan P` | 0 | no output |
+
+Launcher SHA-256 (checkout and installed copy):
+`2ada1d8b058f33a668017e6d86bea0ef89f980cd1b20c34838fc0c92b72c46f7`.
+
+Private local provenance, intentionally not copied into this repository:
+Claude session `32e806fe-4cb1-4476-85bc-5f89cf7d5aaa`, original JSONL lines
+107–113, 124–125 and 131–133 were read directly. They contain the failed
+commands, mode-only correction, repeated failure and corrected invocation.
+Current implementer `/root/scope_release` returned its exact failed/successful
+commands and acknowledged the unsupported insertion. The current six-call
+capture is retained locally as `launcher-reproduction.json` alongside the
+retrospective's temporary evidence; it contains actual argv and output.
+
+## Decision impact
+
+Treat caller misuse plus insufficient recovery guidance as the actionable
+local problem. Prioritize a bounded fix to help/usage/error guidance, preserving
+the current accepted command syntax and exit semantics for invalid calls.
+Show a complete launcher example, explain the implicit checker, and include
+the existing plan command in discoverable usage. Test the observed mistakes
+and the valid command using existing tests; a small cold-agent recovery trial
+would test whether the guidance actually helps.
+
+Do not introduce a new command framework, silently discard arbitrary arguments,
+or expand planning stages. Documentation-only correction would not repair the
+observed fallback path; permissive argument normalization would expand accepted
+syntax and could conceal genuine mistakes. Defer either until evidence requires it.
+
+## Limitations and open questions
+
+The other machine is confirmed as Codex by the user. Its full command, raw
+error and installed version are still needed to attribute its incident. It may have a different failure such
+as passing a change id instead of a plan path. Current reproductions establish
+the local mechanism, not that all planning stalls share it. No repair or
+automatic-routing improvement is claimed by this research record.
