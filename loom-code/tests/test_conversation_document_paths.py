@@ -34,14 +34,18 @@ def test_direct_design_document_delivery_carries_path_guidance(name):
     skill = DESIGN / name
     text = (skill / "SKILL.md").read_text()
     assert _path_rule(text)
+    assert "/Users/kouko" not in text
 
 
 def test_emitted_code_guidance_and_direct_visualization_cover_document_paths(tmp_path):
     proc = subprocess.run(["bash", str(ROOT / "loom-code" / "hooks" / "session-start")],
                           cwd=tmp_path, input="", capture_output=True, text=True, check=True)
     context = json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"]
+    launcher = ROOT / "loom-code" / "hooks" / ".." / "scripts" / "loom-python"
+    command = f'`"{launcher}" --ready delivery --json`'
+    assert context.count(command) == 1
     for text in (
-        context,
+        context.replace(command, "", 1),
         (VISUAL / "SKILL.md").read_text(),
         (VISUAL / "references" / "plain-language.md").read_text(),
     ):
