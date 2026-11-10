@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.63.0] — 2026-11-11 — scope skill-review gate requirements
+
+- Apply Loom gate-marker and registration requirements only when the reviewed skill is governed by that contract; using Loom to develop a skill alone does not establish applicability. Preserve review of applicable requirements, substantive usage errors and unmet acceptance criteria.
+
 ## [3.62.2] — 2026-11-10 — scope document-path test assertions
 
 - Scope personal-path assertions to portable document-delivery guidance and separately validate the current installation's launcher path; preserve runtime behavior.
