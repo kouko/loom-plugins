@@ -22,6 +22,12 @@ charter: 1.1
 - Test: A1 positive: release-parity; negative: stale-manifest. A2 positive: release-parity; negative: stale-pin. A3 positive: package-suite; negative: invalid-release.
 - Risk: agent-decided — minor release 3.63.0 for shared command guidance, CHANGELOG entry and release-pin rewrite; synchronize existing derived manifests.
 
+### Wave 4
+**W4-01 Preserve literal paths in Stop recovery** after: W3-01 acceptance: 1, 3
+- Files: loom-code/hooks/hooks.json, loom-code/hooks/hooks-codex.json, loom-code/tests/test_hooks_json.py, loom-code/tests/test_hook_recovery_literal_path.py, docs/loom/2026-11-11-planning-command-recovery/evidence/probes/test_hook_recovery_literal_path.py, docs/loom/research/2026-11-11-planning-launcher-argument-mismatch.md
+- Test: A1 positive: literal-path-recovery; negative: dollar-expansion. A3 positive: ordinary-replay; boundary: preserved-command-arguments.
+- Risk: agent-decided — same recovery-guidance class; adversary reproduced dollar expansion in both Stop hints. Use existing instructional form, preserve test_hooks_json.py cases, graduate the unchanged RED probe into the existing suite.
+
 ## Simplicity check
 - none found
 

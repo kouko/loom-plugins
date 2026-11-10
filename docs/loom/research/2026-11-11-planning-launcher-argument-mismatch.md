@@ -135,10 +135,18 @@ fallbacks in all four host manifests omitted the original operation and inputs.
 The [hook tests](../../../loom-code/tests/test_hooks_json.py) reproduced those
 six failures, then replayed the corrected hints through the real launcher and a
 recording checker with a cached test interpreter, a plugin path containing spaces
-and no launcher on PATH. Stop now emits the installed launcher path and
-`--repair delivery --json`; publication hints explicitly preserve the original
-executable, arguments, working directory and stdin while replacing the mode.
+and no launcher on PATH. Stop and publication hints explicitly preserve the
+original executable, arguments, working directory and stdin while replacing
+`--ready` with `--repair`; Stop also replaces `--hook` with `--json`.
 Hook commands and fail-open policy are unchanged.
+
+The first Stop correction emitted a double-quoted concrete path. An adversarial
+replay then found that a valid literal `$cash` in that path was expanded again
+by the shell, producing exit 127 in both Claude and Codex cases. The correction
+now uses the same original-command instruction as publication hints, preserving
+the original variable reference instead of rendering its value as shell code.
+The unchanged adversarial cases were retained as regression coverage; the
+earlier six-case RED/GREEN result did not cover this literal-path boundary.
 
 Two checker-emitted hints had the same PATH assumption:
 [delivery Stop fallback](../../../loom-code/scripts/loom_checker/command_handlers/publish.py)

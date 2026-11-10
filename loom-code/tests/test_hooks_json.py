@@ -428,7 +428,11 @@ def test_failed_hook_hint_replays_operation_without_launcher_on_path(host, event
                             capture_output=True, text=True, cwd=root, env=env, timeout=30)
     assert failed.returncode == 0, failed.stderr
     if event == "Stop":
-        hint = failed.stderr.split("run ")[-1].split(" before claiming completion.")[0]
+        instruction = failed.stderr.splitlines()[-1].split("; ", 1)[1]
+        assert instruction == ("rerun the original hook command in an agent station, replacing --ready "
+                               "with --repair and --hook with --json and preserving its executable path, "
+                               "other arguments, working directory and stdin before claiming completion.")
+        hint = command.replace("--ready", "--repair").replace("--hook", "--json")
         expected = ["delivery", "--json"]
     else:
         diagnostic = (json.loads(failed.stdout)["systemMessage" if host == "opencode" else "reason"]
