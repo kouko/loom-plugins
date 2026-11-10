@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.62.1] — 2026-11-10 — remove unused delivery state
+
+- Remove the unproduced `unauthorized` member from `DeliveryResult.state`; preserve delivery observation and publication authorization behavior.
+
 ## [3.62.0] — 2026-11-09 — observe Git delivery and protect ordinary trunk operations
 
 - Reuse publish/land evidence for read-only `delivery --goal local|published|merged`: distinguish pending, failed and unconfirmed results, with safe next actions. Observation never grants publication or merge authorization; working-copy withdrawal immediately revokes a committed grant.

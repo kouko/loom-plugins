@@ -272,7 +272,7 @@ def classify_checks(result: subprocess.CompletedProcess, *, required: bool) -> C
 class DeliveryResult:
     state: Literal["local", "uncommitted", "unpublished", "missing_pr", "mismatched_pr",
                    "pending", "failed", "cancelled", "action_required", "published",
-                   "merged", "unauthorized", "unconfirmed"]
+                   "merged", "unconfirmed"]
     reason: str
     next: str
     evidence: dict
