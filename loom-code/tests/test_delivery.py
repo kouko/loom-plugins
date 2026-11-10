@@ -1,4 +1,5 @@
 """Read-only delivery evidence, using the existing publication fixtures."""
+# concern: Removing an unused result state must not make delivery require publication authorization.
 import json
 import subprocess
 from io import StringIO
