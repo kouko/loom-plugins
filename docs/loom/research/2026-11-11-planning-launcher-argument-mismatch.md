@@ -14,7 +14,7 @@ tags:
 
 Determine why an agent can stop before planning because its checker call has
 the wrong arguments. Inspect the current checkout at `882d99bf` and installed
-Codex loom-code 3.62.2, with a historical Claude Code 3.50.0 incident as a
+Codex loom-code 3.62.2, with a historical loom-code 3.50.0 incident under Claude Code as a
 separate observation. The user confirmed the other machine also uses Codex;
 its raw command and error are unavailable. Keep repair complexity low and preserve the preceding
 skill-lens change as separate work.
@@ -114,8 +114,8 @@ checked against that commit's `loom-code/.claude-plugin/plugin.json`:
   `plan` and `charter` were introduced but omitted from `USAGE` at that commit.
 
 The earliest caller misuse observed in this investigation is the historical
-Claude Code 3.50.0 incident on 2026-10-28, followed by the present Codex 3.62.2
-incident. Observation dates do not establish when agents first made this mistake
+loom-code 3.50.0 incident under Claude Code on 2026-10-28, followed by the present
+loom-code 3.62.2 incident under Codex. Observation dates do not establish when agents first made this mistake
 or prove that the guidance caused it.
 
 ## Bounded same-pattern audit during implementation
