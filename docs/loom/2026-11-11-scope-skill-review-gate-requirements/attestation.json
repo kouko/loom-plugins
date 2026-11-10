@@ -1,0 +1,87 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-scope-skill-review-gate-requirements",
+  "content_digest": "f9c280cd5e2301859297eb33d9862d8ccce5d04f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "no_program": "The direct skill-reading attacks did not expose a defect. Existing mechanical tests do not exercise contract-applicability behavior; adding a string assertion or a new harness would not reproduce a demonstrated failure. No changed executable algorithm warranted an abuse program. Retain the semantic limitation for closing review."
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "5f2100129f44eb5d84ec7c0db47fa1972808b804",
+      "review_target_sha": "89d6c80e4566c86aef6389fc412df88eb426a8ce",
+      "dimension_scores": {
+        "omission": "PASS — The revised lens preserves missing-input review, requires applicable marker and registration checks, and preserves substantive defects and unmet acceptance findings. The eleven recorded cases cover all three intent acceptance conditions.",
+        "ambiguity": "PASS — Applicability follows the governing contract; location and workflow adoption alone cannot establish it. The unchanged severity rules remain available.",
+        "inconsistency": "PASS — The bounded replacement reconciles the former universal marker requirement with target-specific contracts without removing applicable guarantees. Evidence distinguishes baseline controls from the observed unnecessary recommendation.",
+        "incorrect-fact": "PASS — Release metadata is synchronized at 3.64.0; the changed test file independently passed all 43 tests. The acceptance snapshot contains that version and its lens is unchanged at the review target.",
+        "missing-population": "PASS — Acceptance explicitly reports eleven executions by one independent reader; the adversary reports five direct prose attempts and zero programs. Neither claims population reliability or installed-host coverage.",
+        "user-judgment-leak": "PASS — No new technical decision is delegated to the user, and contract applicability is resolved from project evidence.",
+        "deletion-first": "PASS — One existing paragraph is replaced without a registry, flag, checker, fallback, or additional review step; the retained baseline demonstrates the unnecessary registration recommendation this replacement prevents."
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_write_plan_station_text.py: 43 passed in 0.22s. The initial non-escalated attempt could not lock the existing uv cache; the authorized offline retry succeeded.",
+        "Read the preserved explicit and unprompted baselines, eleven-case acceptance record, direct prose adversary report, cumulative delta, and governing reviewer/lens contracts. The baseline was PASS with unnecessary nonblocking remediation, not a rejected skill.",
+        "Did not rerun the complete suite or adversarial programs, per reviewer contract. No program confirmation is claimed. Host installation, automatic routing, cross-model repeatability, and a universal error rate remain unverified and are explicitly outside the evidence claims."
+      ],
+      "reviewer": "scope_review_one",
+      "vendor": "openai",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "5f2100129f44eb5d84ec7c0db47fa1972808b804",
+      "review_target_sha": "89d6c80e4566c86aef6389fc412df88eb426a8ce",
+      "dimension_scores": {
+        "omission": "PASS — lenses.md:127-134 preserves missing-input review, applicable marker and registration obligations, substantive usage errors, and unmet acceptance; all three intent acceptance conditions have bounded independent evidence.",
+        "ambiguity": "PASS — lenses.md:130-134 makes the governing contract the applicability source and explicitly rejects location and workflow adoption as substitutes; absence of an opt-out does not establish adoption.",
+        "inconsistency": "PASS — Compared the complete lens with the base version and reviewer contract; the intentional narrowing agrees with the existing lens-definition carve-out and leaves governing obligations intact. The acceptance target and reviewed target have identical lens content.",
+        "incorrect-fact": "PASS — Release metadata agrees at 3.64.0 and the changed test file independently passed all 43 tests. Synthetic manuals support the case judgments; baseline evidence is accurately described as unnecessary nonblocking remediation rather than rejection.",
+        "missing-population": "PASS — acceptance-test-report.md:15 scopes the result to eleven executions by one reader and excludes host installation and long-term error-rate inference; acceptance-fresh-reader.md records the one-plus-six-plus-four cases.",
+        "user-judgment-leak": "PASS — Applicability is resolved by project evidence without a new technical question to the user; the plan records outcome and publication authorization rather than asking the user to decide review mechanics.",
+        "deletion-first": "PASS — The delta replaces the existing overbroad sharpening in place. It adds no registry, checker, flag, runtime dependency, or review stage; the retained synthetic evidence supports the explicitly requested boundary without adding a test harness."
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_write_plan_station_text.py: 43 passed in 0.22s, no skips. The initial sandbox cache-lock failure was resolved with authorized access to the existing cache.",
+        "Reviewed preserved baseline limitations and actual fresh-reader observations. Semantic evidence is bounded prose execution, not a runtime benchmark, cross-model reliability estimate, installed-host test, or automatic-routing test.",
+        "No new development-record citation was introduced into runtime prose. Read the supplied five-attempt adversary report; it contains no executable probe, so no probe confirmation is asserted. Did not run the complete suite or adversarial programs."
+      ],
+      "reviewer": "scope_review_two",
+      "vendor": "openai",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "565b2670c558d2621957b69690d7b645710aa12a",
+  "tested_commit": "a689bd1547306d1788888169b06f0dc429782931",
+  "reviewed_commit": "89d6c80e4566c86aef6389fc412df88eb426a8ce",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}
