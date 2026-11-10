@@ -1,0 +1,112 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-10-document-path-test-scope",
+  "content_digest": "bccdadb27ed78534a3e758b19aed3dec8259f2a6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_conversation_document_paths.py",
+      "artifact": "loom-code/tests/test_conversation_document_paths.py",
+      "result": "pass",
+      "command_digest": "f4bccdb9b7493deb59a334efea8b8541f8563ce707276e1059dd1c5bb87a45e7"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "d05b556d27683c98f2d60b8832205a068fcec4e8",
+      "review_target_sha": "fb87cbb4a7216f191435fae6aaf515dad5441ba4",
+      "dimension_scores": {
+        "security": "PASS — No runtime or dependency changes; retained vulnerability assessment explicitly preserves critical severity and uncertainty.",
+        "architecture": "PASS — Scope stays in existing tests and release metadata without new runtime boundaries.",
+        "correctness": "PASS — Exact current launcher occurs once and only that occurrence is exempted; independent baseline-to-target execution reproduces RED then GREEN.",
+        "naming": "PASS — Launcher and command names describe their values clearly.",
+        "tests": "PASS — Both changed test files independently ran: 50 passed, zero skipped; existing affirmative/negation coverage remains and handed mutation evidence covers rejected personal guidance and wrong or duplicate commands.",
+        "refactoring": "PASS — Minimal local adjustment introduces no duplication requiring extraction.",
+        "cross-task-coherence": "PASS — Intent, plan, tests, release metadata and disclosed acceptance scope agree; runtime and locked dependencies remain unchanged.",
+        "external-surface-grounding": "PASS — Existing subprocess and pytest interfaces are unchanged; research identifies concrete commands, tracked call paths and primary advisory links.",
+        "principles-conformance": "PASS — Changes preserve ratified user-choice, mechanical-verification and data boundaries; no new mechanism is introduced.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS — No deferred shortcut or new fallback is introduced.",
+        "deletion-first": "PASS — Narrowing the existing assertion and adding exact-command validation is the smaller shape; no abstraction, flag or extension point is added."
+      },
+      "findings": [],
+      "notes": [
+        "Changed tests independently passed under the locked uv environment after authorized cache escalation; no complete suite or adversarial program was rerun.",
+        "Read /private/tmp/loom-path-baseline-red.log showing the original launcher false positive; independently executed base and target test bodies against the same real installation with RED then GREEN.",
+        "Advisory exploitation and full installed dependency-source integrity were not independently validated; the retained assessment makes neither claim."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_conversation_document_paths.py",
+          "reviewed_sha": "fb87cbb4a7216f191435fae6aaf515dad5441ba4",
+          "quote": "loom-code/tests/test_conversation_document_paths.py .......              [100%]"
+        }
+      ],
+      "reviewer": "/root/review_code",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "d05b556d27683c98f2d60b8832205a068fcec4e8",
+      "review_target_sha": "fb87cbb4a7216f191435fae6aaf515dad5441ba4",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Read intent and plan against the complete changed-path inventory, audit snapshot, validator, runner and relevant installed Mermaid source; all six linked primary GitHub advisory descriptions support the retained bounded assessment.",
+        "Focused review command passed: 50 passed in 0.25s. Full package suite and adversarial programs were not rerun, per reviewer contract.",
+        "Prior shell-summary nit fixed by the sole sentence change in 47dc754d..fb87cbb4. Independently recomputed 17 shell summaries / 145 PASS / 0 FAIL; my earlier 160 aggregate was incorrect. No functional change or test rerun."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_conversation_document_paths.py",
+          "reviewed_sha": "fb87cbb4a7216f191435fae6aaf515dad5441ba4",
+          "quote": "loom-code/tests/test_conversation_document_paths.py .......              [100%]"
+        }
+      ],
+      "reviewer": "/root/review_docs",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "c8be68b5669ee11722803e686c1bb3bfd1059c27",
+  "tested_commit": "45962102",
+  "reviewed_commit": "fb87cbb4a7216f191435fae6aaf515dad5441ba4",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
