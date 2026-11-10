@@ -219,6 +219,22 @@ def test_no_arguments_exits_2() -> None:
     assert result.stderr.strip()
 
 
+def test_help_covers_commands_without_claiming_validation() -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+    for flag in ("--help", "-h"):
+        result = run_checker(flag)
+        assert result.returncode == 0 and not result.stderr
+        documented = {line.split()[1] for line in result.stdout.splitlines()
+                      if line.strip().startswith("loom_checker.py ")}
+        assert set(entry["COMMANDS"]) <= documented
+        assert "plan <path-to-plan.md>" in result.stdout
+        assert "intake <station> <change-id>" in result.stdout
+        assert "No validation" in result.stdout
+        assert '"<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"' in result.stdout
+        assert "Replace <loom-code>" in result.stdout
+        assert run_checker(flag, "plan", "missing.md").returncode == 2
+
+
 def test_publish_is_a_declared_cli_command() -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
 

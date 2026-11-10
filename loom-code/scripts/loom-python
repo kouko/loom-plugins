@@ -7,10 +7,25 @@ case $0 in
     *) launcher_path=$(command -v "$0") || exit 2 ;;
 esac
 script_dir=$(CDPATH= cd -- "${launcher_path%/*}" && pwd) || exit 2
+usage() {
+    printf '%s\n' \
+        'Usage: loom-python (--repair|--ready) <checker-command> [arguments...]' \
+        '       loom-python (--repair|--ready) --script <path> [arguments...]' \
+        '       loom-python --help' \
+        'The checker is selected automatically; omit loom_checker.py from the arguments.' \
+        'Planning: "<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"' \
+        'Checker commands: "<loom-code>/scripts/loom-python" --repair --help' \
+        'Replace <loom-code> with the installed plugin directory and <path-to-plan.md> with your plan file path.' \
+        '--repair provisions the runtime if needed; --ready uses an existing runtime only.' \
+        'No validation has run when usage is displayed.'
+}
+if [ "$#" -eq 1 ]; then
+    case "$1" in --help|-h) usage; exit 0 ;; esac
+fi
 mode=${1-}
 case "$mode" in
     --repair|--ready) shift ;;
-    *) echo 'loom-python: use --repair or --ready before checker arguments.' >&2; exit 2 ;;
+    *) echo 'loom-python: use --repair or --ready before checker arguments.' >&2; usage >&2; exit 2 ;;
 esac
 
 script=$script_dir/loom_checker.py
@@ -25,6 +40,14 @@ if [ "${1-}" = --script ]; then
         *) script=$script_dir/$1 ;;
     esac
     shift
+else
+    case "${1-}" in
+        '') echo 'loom-python: a checker command is required.' >&2; usage >&2; exit 2 ;;
+        loom_checker.py|*/loom_checker.py)
+            echo 'loom-python: omit the redundant loom_checker.py path; pass the checker command directly.' >&2
+            usage >&2
+            exit 2 ;;
+    esac
 fi
 
 cache_base=${XDG_CACHE_HOME:-${HOME:-}/.cache}
