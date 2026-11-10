@@ -88,6 +88,13 @@ def git_maybe(repo: Path, *args: str) -> str | None:
     return run_git(repo, *args, timeout=GIT_TIMEOUT)
 
 
+def current_branch(repo: Path) -> str | None:
+    """Exact heads name, unaffected by same-named tags; None when detached."""
+    ref = git_maybe(repo, "symbolic-ref", "--quiet", "HEAD")
+    prefix = "refs/heads/"
+    return ref[len(prefix):] if ref and ref.startswith(prefix) else None
+
+
 def git_text(repo: Path, *args: str) -> str:
     """Same, but a failure is undecidable and fails closed -- the caller
     must never read a git error as "nothing changed"."""
@@ -334,13 +341,13 @@ def branch_base(repo: Path) -> str:
       `needs-design: no` claim passes without ever being tested.
     """
     head = git_maybe(repo, "rev-parse", "HEAD")
-    current = git_maybe(repo, "rev-parse", "--abbrev-ref", "HEAD") or ""
+    current = current_branch(repo)
     # A branch that has not committed yet also has base == HEAD, and that is
     # fine: the working tree and the untracked files are still in the diff,
     # and the first commit moves HEAD off the base. What is fatal is being ON
     # the trunk, where nothing will ever move.
     on_trunk = current in TRUNK_BRANCH_NAMES
-    detached_at_the_base = current == "HEAD"
+    detached_at_the_base = current is None
     for candidate in TRUNK_CANDIDATES:
         merge_base = git_maybe(repo, "merge-base", "HEAD", candidate)
         if not merge_base:

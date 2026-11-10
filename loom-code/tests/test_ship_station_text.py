@@ -196,3 +196,16 @@ def test_ship_asks_setup_consent_in_consequence_form() -> None:
     assert _gate_marked_occurrences(text, "consequence form") == [], (
         "a new prose gate would raise the net mechanism count; the consent rule is guidance"
     )
+
+
+def test_delivery_runtime_mechanisms_are_registered() -> None:
+    import sys
+    sys.path.insert(0, str(SHIP.parents[2] / "scripts"))
+    import check_mechanisms as cm
+    repo = SHIP.parents[3]
+    computed = cm.recompute_all(repo)
+    registered = {m["id"] for m in cm.load_mechanisms(repo)}
+    expected = {"Stop::loom-python", "Stop::loom-python@codex",
+                "delivery.observed", "action:delivery", "action:native-git-protection"}
+    assert expected <= set().union(*computed.values())
+    assert expected <= registered

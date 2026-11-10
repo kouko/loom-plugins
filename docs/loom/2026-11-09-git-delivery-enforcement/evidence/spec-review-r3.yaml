@@ -1,0 +1,25 @@
+verdict: NEEDS_REVISION
+lens: spec+adversarial
+reviewed_sha: 24b5bc0f
+reviewer: /root/spec_review
+dimension_scores:
+  omission: NEEDS_REVISION
+  ambiguity: PASS
+  inconsistency: PASS
+  incorrect-fact: PASS_WITH_NOTES — supplementary counts were not independently recomputed
+  missing-population: PASS
+  deletion-first: PASS
+  spec-conformance: NEEDS_REVISION
+  design-conformance: N/A — standing waiver
+  principles-conformance: PASS
+  user-judgment-leak: PASS
+findings:
+  - severity: fatal
+    dimension: spec-conformance
+    anchor: spec.md:30
+    text: 'issue (blocking): Local origin/HEAD plus main/master fallbacks can miss an actual default branch such as develop when origin/HEAD is absent.'
+    fix: Establish and validate the default-branch identity before installation succeeds; unresolved identity must fail closed with a remedy rather than certify protection.
+notes:
+  - Earlier repository-scope and local-only Stop findings remain fixed.
+  - Final review of delta 24b5bc0f..0eec6728; no edits, tests or probes.
+  - Third review is terminal; no fourth dispatch is authorized by the reviewer contract.

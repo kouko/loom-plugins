@@ -1,0 +1,11 @@
+verdict: PASS
+lens: spec+adversarial
+reviewed_sha: 8274b2a3
+reviewer: /root/spec_review
+scope: "User-authorized single supplemental check, 3e9b3007..8274b2a3; preserve terminal R1-R3 history."
+findings: []
+notes:
+  - "Installation requires live origin HEAD agreement with valid local metadata. Main/master do not establish unknown defaults."
+  - "Runtime invalid metadata refuses with repair guidance; removal remains available without remote/default metadata."
+  - "Offline enforcement uses last locally known default; server protection remains authoritative for unobserved changes."
+  - "Fixture evidence proves Git observations and repair feasibility only. No implementation, hook test or acceptance is certified."

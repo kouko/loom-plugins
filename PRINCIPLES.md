@@ -21,5 +21,5 @@ Work that passes every gate while its quality is insufficient and the user canno
 
 ## Fixed choices
 - Three plugins with one-way dependency on loom-code: the others hand off to its stations by skill name and never read or run a file inside it at runtime; templates they fill are byte-identical copies kept equal by a repository test. (Briefly four, 2026-09-05 to 2026-09-11, while `loom-memory` shipped as its own independent plugin; retired back into loom-workflow the same day the fourth-plugin wording was ratified.)
-- Host-installed plugin hooks (Claude Code, Codex, Antigravity CLI and OpenCode v2), never repository-local or git hooks.
+- Host-installed plugin hooks (Claude Code, Codex, Antigravity CLI and OpenCode v2), plus explicitly installed repository-scoped static native Git protection. Never install globally, overwrite foreign hooks, or change server protection without explicit consent. Native hooks cover ordinary operations, not every history operation; server PR/check rules remain the remote enforcement boundary. (Git-hook clause amended by kouko 2026-11-09.)
 - Hard cutover: pre-1.0 artifacts are archived in place, never converted.

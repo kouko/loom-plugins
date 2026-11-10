@@ -1,0 +1,28 @@
+verdict: NEEDS_REVISION
+lens: spec+adversarial
+reviewed_sha: 4c555b14
+reviewer: /root/spec_review
+dimension_scores:
+  omission: NEEDS_REVISION
+  ambiguity: PASS_WITH_NOTES
+  inconsistency: PASS
+  incorrect-fact: PASS_WITH_NOTES — supplementary integration/test counts were not independently recomputed
+  missing-population: PASS
+  deletion-first: PASS
+  spec-conformance: PASS
+  design-conformance: N/A — standing waiver
+  principles-conformance: PASS
+  user-judgment-leak: PASS
+findings:
+  - severity: important
+    dimension: omission
+    anchor: spec.md:30
+    text: 'issue (blocking): core.hooksPath may enroll other repositories through a shared directory.'
+    fix: Refuse shared/external hook paths or enforce only enrolled repository identities.
+  - severity: important
+    dimension: ambiguity
+    anchor: spec.md:32
+    text: 'issue (blocking): Stop has no specified carrier for a later local-only publication choice.'
+    fix: Define the target evidence and precedence over earlier publication authorization.
+notes:
+  - No repository edits, tests or probes performed by reviewer.

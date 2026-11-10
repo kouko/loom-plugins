@@ -45,6 +45,8 @@ def test_direct_git_mutation_denied_on_main_branches(tmp_path, branch, command):
     result = _hook(repo, command)
     assert result.returncode == 2
     assert "main/master" in result.stderr
+    assert "feature branch or worktree" in result.stderr
+    assert "protectMain=false" not in result.stderr
     assert result.stdout == ""
 
 

@@ -248,6 +248,8 @@ def test_invocation_zero_injects_station_order(tmp_path):
     (message,) = _messages(out)
     assert "Station order:" in message
     assert "- second-vendor: ask" in message
+    assert "delivery --json" in message
+    assert "OpenCode/Antigravity termination enforcement is unverified" in message
 
 
 def test_first_turn_injects(tmp_path):

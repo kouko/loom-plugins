@@ -8,6 +8,10 @@ from pathlib import Path
 from loom_checker.command_handlers import publish as loom_checker
 import pytest
 
+PUBLISH_NEXT = (
+    "; next: Inspect the publication diagnostics and reconcile the named condition before "
+    "retrying publish; preserve work and do not switch merge routes.\n"
+)
 CONTEXT_HEADINGS = (
     "Context", "Intended outcome", "Scope", "Decisions", "Implementation",
     "Behaviour change", "Verification", "Risks and rollback", "Follow-ups",
@@ -330,7 +334,7 @@ def test_unrelated_intent_cannot_authorize_attested_change(
 def test_untracked_or_mutated_intent_cannot_authorize(
     tmp_path: Path, monkeypatch
 ) -> None:
-    for state in ("untracked", "mutated"):
+    for state in ("untracked", "mutated", "revoked"):
         case = tmp_path / state
         case.mkdir()
         calls = ExternalCalls("")
@@ -338,10 +342,15 @@ def test_untracked_or_mutated_intent_cannot_authorize(
         git(repo, "branch", "main")
         if state == "mutated":
             publication_intent(repo, automatic=False)
+        if state == "revoked":
+            publication_intent(repo, automatic=True)
         attestation(repo)
         git(repo, "add", ".")
         git(repo, "commit", "-q", "-m", "attest change")
         intent = publication_intent(repo, automatic=True)
+        if state == "revoked":
+            intent.write_text(intent.read_text().replace(
+                "publication: automatic — authorized 2026-09-09 by Test\n", ""))
         body = case / "body.md"
         body.write_text(contextual_body(), encoding="utf-8")
         monkeypatch.chdir(repo)
@@ -357,7 +366,8 @@ def test_untracked_or_mutated_intent_cannot_authorize(
         # An untracked intent identifies no change; a mutated one identifies
         # the change but its committed text grants no authorization.
         expected = {"untracked": (1, "cannot identify the change"),
-                    "mutated": (2, "committed intent")}[state]
+                    "mutated": (2, "committed intent"),
+                    "revoked": (2, "revoked")}[state]
         assert rc == expected[0], state
         assert expected[1] in err.getvalue(), state
         assert calls.calls == [], state
@@ -953,6 +963,7 @@ def test_publish_stops_on_required_ci_terminal_blockers(
         calls.required_checks = [
             [{"name": "gate", "state": state, "bucket": "fail"}]
         ]
+        calls.required_check_returncodes = [1]
         waits: list[int] = []
         monkeypatch.setattr(loom_checker, "wait_publish_interval", waits.append, raising=False)
 
@@ -1235,7 +1246,7 @@ def test_bad_body_without_attestation_refused_before_push_naming_heading(
     rc, _out, err, calls = unattested_publication(tmp_path, monkeypatch, bad)
 
     assert rc == 1
-    assert err == 'BLOCK push.contextual-body: heading "Scope" is missing\n'
+    assert err == 'BLOCK push.contextual-body: heading "Scope" is missing' + PUBLISH_NEXT
     assert calls.calls == []
 
 
@@ -1247,8 +1258,8 @@ def test_unidentified_change_refused_before_network(tmp_path: Path, monkeypatch)
     assert rc == 1
     assert err == (
         "BLOCK publish.preconditions: cannot identify the change — name the branch "
-        "<type>/<change-id> or commit its intent\n"
-    )
+        "<type>/<change-id> or commit its intent"
+    ) + PUBLISH_NEXT
     assert calls.calls == []
 
 

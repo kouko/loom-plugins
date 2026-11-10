@@ -1,0 +1,137 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-09-git-delivery-enforcement",
+  "content_digest": "d63ead5a5c9d56607be88e58dfd8813f73a8e5e8",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_native_ambiguous_branch.py -q",
+      "artifact": "loom-code/tests/test_native_ambiguous_branch.py",
+      "result": "pass",
+      "command_digest": "7f8e58e47b9369b7b560b522cd270a946f5b7b59364f34f7438750bc3fddd257"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/closing_reader_two",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "361ef5d200289c72b13744488b2ba0a91cbdf9c3",
+      "review_target_sha": "cf86c96526c23311d492976b758cae672311bf6f",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists."
+      },
+      "findings": [],
+      "notes": [
+        "User-authorized single supplemental verification of f47322ce..cf86c965; prior terminal rounds remain preserved. Original native-hook grounding and mixed-check-remedy findings remain fixed.",
+        "F10–F12 verified: legacy published/merged facts are observable without granting writes; attributable uncommitted work still blocks completion; publisher/Stop authorization and withdrawal checks remain. First Stop guidance preserves human-wait, repeat and deadline boundaries. Official manual and pinned gh sources support the restored citations.",
+        "Independently ran delivery, delivery_stop, loom_publish and land_merge modules: 111 passed in 43.62s. Read updated acceptance evidence and external-review disposition; retained simulation proves no live GitHub/Git-transport enforcement. No edits, full-suite execution, evidence-store probes or remote writes."
+      ]
+    },
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "code",
+      "reviewed_sha": "361ef5d200289c72b13744488b2ba0a91cbdf9c3",
+      "review_target_sha": "cf86c96526c23311d492976b758cae672311bf6f",
+      "dimension_scores": {
+        "security": "PASS — Checked by reading. The repair adds no external argv or write path. observe_delivery still makes the same read-only calls: repo view, ls-remote, pulls GET and pr checks. The local goal now also calls _intent_authorizes_publication, which only reads git show HEAD and the working intent. The trusted git/gh resolution, the refused redirect environment variables and the narrowed PATH are unchanged in cmd_delivery and _delivery_stop.",
+        "architecture": "PASS — _intent_authorizes_publication stays the one shared check for both the automatic grant and working-copy revocation. The publisher still calls it at publish.py:761-771 and Stop at publish.py:528-530. The observer only records its result as evidence (publish.py:350-353) and does not use it as a gate. No new module, host event, state field or ledger was added.",
+        "correctness": "PASS_WITH_NOTES — Prior findings 1 and 2 are fixed. I read all of observe_delivery, _delivery_stop and cmd_delivery, and the publisher's authorization step. Uncommitted scoped work still blocks completion: pending_result includes intent_rel, so an uncommitted withdrawal reports uncommitted (test_delivery.py:89). Matching Ready or merged PRs without the automatic grant now report published or merged with automatic_publication_authorized false. I did not run the changed tests myself; the pass results are the owner's and the acceptance tester's.",
+        "naming": "PASS — publication_next, automatic_publication_authorized and automatic_publication_reason say what they hold. The evidence keys keep the automatic grant separate from what was observed.",
+        "tests": "PASS_WITH_NOTES — test_missing_authorization (test_delivery.py:84-100) now covers an uncommitted withdrawal, then legacy published and merged observation without the grant. It also checks that the intent is not rewritten. test_missing_pr_without_automatic_grant (test_delivery.py:103-115) checks the conditional advice and that it does not mention the intent. test_delivery_stop.py:26-27 checks the first-block condition, and the repeat-stop and deadline cases are unchanged. I read these changed test files but could not run them.",
+        "refactoring": "PASS — The five per-state remedy strings now share one publication_next suffix, and the runtime classifier is not touched.",
+        "cross-task-coherence": "PASS — Ship's step before reporting delivery (ship/SKILL.md:310-314) now works for publications made through the still-supported --confirm-authorized route (ship/SKILL.md:196). spec.md was amended for F-10 and F-11, and plan.md F-10–F-12 matches the code delta. The old 'asserted unauthorized' line in acceptance-test-evidence.md belongs to the earlier dated run and is superseded by the 2026-11-10 section.",
+        "external-surface-grounding": "PASS_WITH_NOTES — Prior finding 3 is fixed. publish.py:202-211 sits directly above classify_checks and restores the gh_pr_checks manual, the pinned v2.88.1 checks.go and checks_test.go, and issue 7401. It describes accepting exit 1 with valid JSON as defensive compatibility, not as behavior the pinned exporter produces. The claims match the classifier logic, land.py:44 and test_loom_publish.py:981,1046. I could not fetch the upstream pages to recheck them here.",
+        "principles-conformance": "PASS_WITH_NOTES — The repair keeps observation separate from writes and grants nothing new, in line with the earlier PRINCIPLES.md amendment. PRINCIPLES.md does not change in this delta. I did not redo the whole-change principles sweep in this follow-up pass.",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists in this repository.",
+        "deliberate-simplification": "PASS — The Stop condition is plain prefixed text. The 20-second deadline, the 25-second timeout and the single shot are unchanged, and no retry or host-detection logic was added.",
+        "deletion-first": "PASS_WITH_NOTES — One nit: removing the observer gate left the 'unauthorized' value in the DeliveryResult Literal with nothing that produces it."
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "deletion-first",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/publish.py:275",
+          "text": "nitpick (non-blocking): F-10 removed the only code that returned the 'unauthorized' delivery state. The value is still listed in the DeliveryResult state Literal, and grep finds nothing in the package that produces or reads it. Readers and host adapters may think the observer can still report it.",
+          "fix": "Remove 'unauthorized' from the DeliveryResult state Literal at publish.py:273-275. Missing permission now shows only as evidence['automatic_publication_authorized'] and the conditional next text."
+        }
+      ],
+      "notes": [
+        "Status of the earlier findings. Finding 1 (publish.py:340 gate) is fixed: observe_delivery no longer requires the grant (publish.py:350-360). When the grant is missing, the advice is conditional: use an existing explicit decision with --confirm-authorized, or get a user decision. It never says to edit the intent. The publisher (publish.py:761-771) and Stop (publish.py:528-530) checks are unchanged. Finding 2 (publish.py:526) is fixed: only the first block, not the stop_hook_active or unconfirmed paths, now starts with the wait-or-withdrawal condition (publish.py:545-547). That condition also covers the state line, which is acceptable. Finding 3 (publish.py:206) is fixed, and the comment makes no runtime change.",
+        "Finding 4 (test_github_rules.py:370) is dismissed as a blocker. Reason: spec.md REQ-7 explicitly allows a configured test server to prove the refusal contract. Acceptance row 4, the report's decisions section and the 2026-11-10 evidence state that it is not proof of live GitHub or Git-transport enforcement. My remaining objection, not blocking: passing this fixture shows only that the simulated contract holds. The PR Verification section must keep that disclosure and must not suggest live server refusal was tested.",
+        "Limits: I used only Read, Grep and Glob, executed nothing, and did not fetch external URLs. The test counts (177 focused, 4,162 package) and the two diagnostic flips come from the owner and the acceptance tester, not from me. I reviewed only the repair delta f47322ce..cf86c965 and the functions and callers it touches, not the whole branch again."
+      ],
+      "reviewer": "claude-code:opus:pr135",
+      "vendor": "anthropic",
+      "model": "opus",
+      "external_review": {
+        "status": "completed",
+        "executor": "claude",
+        "model": "opus",
+        "effort": "high",
+        "family": "anthropic",
+        "evidence_level": "accepted-explicit-settings",
+        "observed_model": "claude-opus-5-5",
+        "observed_effort": null,
+        "output_digest": "f498731138b924f826388822c4d058086d0ab4e3bd08625b7a4f458a9fe6b92e",
+        "reviewer": "claude-code:opus:pr135",
+        "review_target_sha": "cf86c96526c23311d492976b758cae672311bf6f"
+      }
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "c089c6af658d6659c48d33e441a7172bae6f6d28",
+  "tested_commit": "9b522d3a",
+  "reviewed_commit": "cf86c96526c23311d492976b758cae672311bf6f",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    }
+  ]
+}

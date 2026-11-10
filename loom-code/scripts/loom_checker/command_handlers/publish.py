@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
+from typing import Literal
+from git_exec import run_git
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
@@ -15,6 +19,7 @@ from loom_checker.rule_checks.publish import validate_disclosed_outcome
 from loom_checker.rule_checks.publish import validate_stated_status
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
+from loom_checker.rule_checks.intake import _parse_plan_task_fields, _split_respecting_backticks
 from loom_checker.verification import identify_change
 from loom_checker.verification import missing_clause
 from loom_checker.verification import missing_records
@@ -24,6 +29,7 @@ from urllib.parse import quote
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import tempfile
@@ -82,13 +88,17 @@ def _publish_usage(reason: str, err) -> int:
     return 2
 
 
-def _publish_block(reason: str, err) -> int:
-    return report([("publish.preconditions", reason)], err)
+def _publish_block(reason: str, err, next_action: str | None = None,
+                   *, rule: str = "publish.preconditions") -> int:
+    remedy = (next_action or
+              "Inspect the publication diagnostics and reconcile the named condition before "
+              "retrying publish; preserve work and do not switch merge routes.")
+    return report([(rule, f"{reason}; next: {remedy}")], err)
 
 
 def _publish_origin_state(repo: Path, expected_branch: str) -> tuple[str | None, str | None]:
     """Return the single literal origin URL or a publication identity error."""
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(repo)
     if branch != expected_branch:
         return None, "symbolic branch changed before publication"
     origin_urls = (git_maybe(repo, "config", "--get-all", "remote.origin.url") or "").splitlines()
@@ -172,7 +182,439 @@ def _intent_authorizes_publication(
     )
     if match is None or not is_real_date(match.group(1)):
         return False, "committed intent has no valid automatic-publication authorization"
+    try:
+        working_front, _ = parse_document(canonical.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError):
+        return False, "automatic-publication authorization revoked: working intent is unavailable"
+    if working_front.get("publication") != publication:
+        return False, "automatic-publication authorization revoked in the working intent"
     return True, None
+
+
+@dataclass(frozen=True)
+class CheckObservation:
+    state: str
+    reason: str
+    next: str
+    issues: tuple[tuple[str, str], ...] = ()
+
+
+# External-interface grounding:
+# https://cli.github.com/manual/gh_pr_checks documents JSON bucket fields and
+# pending exit 8. The pinned implementation and tests cover the no-(required)-
+# checks stderr forms; issue 7401 describes the check-registration race:
+# https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks.go
+# https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks_test.go
+# https://github.com/cli/cli/issues/7401
+# In v2.88.1 the JSON exporter returns before non-JSON failure/pending exits;
+# accepting valid JSON with exit 1 below is defensive compatibility, not a
+# claim that this pinned exporter produces that combination.
+def classify_checks(result: subprocess.CompletedProcess, *, required: bool) -> CheckObservation:
+    """Classify one gh snapshot; callers retain their own selection and wait policy."""
+    diagnostic = "Inspect gh authentication, permissions and response diagnostics; retry the same route."
+    unavailable = lambda reason: CheckObservation("unconfirmed", reason, diagnostic)
+    no_checks = (result.returncode == 1 and not result.stdout.strip() and re.fullmatch(
+        r"no (?:required )?checks reported on the '.*' branch", result.stderr.strip()) is not None)
+    if result.returncode not in {0, 1, 8} or (
+        result.returncode != 0 and not result.stdout.strip() and not no_checks
+    ):
+        return unavailable("could not be observed: " +
+                           (result.stderr or result.stdout or f"exit {result.returncode}").strip())
+    if no_checks or (required and result.returncode == 0 and not result.stdout.strip()):
+        checks = []
+    elif not result.stdout.strip():
+        return unavailable("could not be observed")
+    else:
+        try:
+            checks = json.loads(result.stdout)
+        except json.JSONDecodeError as exc:
+            return unavailable(f"cannot decode checks response: {exc}")
+    if not isinstance(checks, list) or any(not isinstance(check, dict) for check in checks):
+        return unavailable("response is not a list of checks")
+    if not checks:
+        if result.returncode == 1 and not no_checks:
+            return unavailable("could not be observed: " + (result.stderr or "exit 1").strip())
+        return CheckObservation("empty", "no required checks registered" if required else
+                                "no checks registered", "No check result exists; retain the repository check policy.")
+    states = [(str(c.get("name", "unnamed")), str(c.get("state", "")).upper(),
+               str(c.get("bucket", "")).casefold()) for c in checks]
+    groups = (
+        ("action_required", "requires user action", lambda s, b: s == "ACTION_REQUIRED",
+         "Inspect the named check and obtain its required approval before retrying."),
+        ("cancelled", "cancelled", lambda s, b: s in {"CANCELLED", "CANCELED"} or b == "cancel",
+         "Inspect why the check was cancelled and rerun it through the existing CI route."),
+        ("failed", "failed", lambda s, b: s in {"FAILURE", "TIMED_OUT", "STARTUP_FAILURE"} or b == "fail",
+         "Inspect the named CI logs, fix the failure and rerun checks before retrying."),
+        ("pending", "pending", lambda s, b: s in {"PENDING", "QUEUED", "IN_PROGRESS", "WAITING", "REQUESTED"} or b == "pending",
+         "Continue bounded check observation; wait for a terminal result before proceeding."),
+        ("unconfirmed", "requires user action because its state is unknown", lambda s, b: b not in {"pass", "skipping"}, diagnostic),
+    )
+    refused = tuple((name, state or bucket) for name, state, bucket in states
+                    if any(predicate(state, bucket) for _, _, predicate, _ in groups[:3]))
+    terminal_categories = {
+        next(category for category, _, predicate, _ in groups[:3] if predicate(state, bucket))
+        for _, state, bucket in states
+        if any(predicate(state, bucket) for _, _, predicate, _ in groups[:3])
+    }
+    for category, description, predicate, remedy in groups:
+        issues = tuple((n, s or b or "unknown") for n, s, b in states if predicate(s, b))
+        if issues:
+            if len(terminal_categories) > 1:
+                remedy = ("Inspect the named CI logs and fix failures, determine why checks were cancelled, "
+                          "and obtain any required approval; rerun only the appropriate checks through the "
+                          "existing CI route after resolving those conditions.")
+            return CheckObservation(category, description + ": " + ", ".join(n for n, _ in issues),
+                                    remedy, refused or issues)
+    return CheckObservation("passed", "passed", "Await acceptance before requesting an authorized merge.")
+
+
+@dataclass(frozen=True)
+class DeliveryResult:
+    state: Literal["local", "uncommitted", "unpublished", "missing_pr", "mismatched_pr",
+                   "pending", "failed", "cancelled", "action_required", "published",
+                   "merged", "unauthorized", "unconfirmed"]
+    reason: str
+    next: str
+    evidence: dict
+    complete: bool = False
+
+
+def _delivery_scope(repo: Path, change_id: str, head: str, base: str | None) -> set[str]:
+    """Concrete committed plan paths plus the committed branch delta, never the working plan."""
+    plan = artifact_path(load_manifest(), "plan", change_id, repo).relative_to(repo).as_posix()
+    committed = git_maybe(repo, "show", f"{head}:{plan}")
+    paths: set[str] = set()
+    if committed is not None:
+        _, sections = parse_document(committed)
+        for fields in _parse_plan_task_fields(sections.get("Task DAG", "")).values():
+            for entry in _split_respecting_backticks(fields.get("Files") or ""):
+                value = entry.strip("`")
+                if (value and not Path(value).is_absolute() and ".." not in Path(value).parts
+                        and not re.search(r"[<>*?\[\]]", value)):
+                    paths.add(value)
+    if base:
+        fork = git_maybe(repo, "merge-base", head, base)
+        if fork:
+            delta = run_git(repo, "diff", "--name-only", "-z", fork, head,
+                            timeout=30, strip=False)
+            if delta is None:
+                raise UsageError("cannot attribute the committed branch delta")
+            paths.update(p for p in delta.split("\0") if p)
+    return paths
+
+
+def _delivery_pending(repo: Path, paths: set[str]) -> list[str]:
+    status = run_git(repo, "status", "--porcelain=v1", "-z", "--untracked-files=all",
+                     "--", *(":(literal)" + path for path in sorted(paths)),
+                     timeout=30, strip=False)
+    if status is None:
+        raise UsageError("cannot observe the scoped working tree")
+    # Renames carry a second NUL-separated path. Keep both for diagnostics.
+    return [entry[3:] if entry[:2] in {"??", "!!"} or entry[2:3] == " " else entry
+            for entry in status.split("\0") if entry]
+
+
+def observe_delivery(
+    repo: Path, *, goal: str, intent_file: Path | None, trusted_git: str,
+    trusted_gh: str | None,
+) -> DeliveryResult:
+    """Read current delivery once; neither permission nor this result performs writes."""
+    evidence: dict = {}
+
+    def result(state, reason, next_action, complete=False):
+        return DeliveryResult(state, reason, next_action, dict(evidence), complete)
+
+    diagnostic = ("Inspect remote availability, gh authentication, permissions and response "
+                  "diagnostics; retry the same delivery route without switching merge routes.")
+    try:
+        change_id, _ = identify_change(repo)
+        if not change_id:
+            return result("unconfirmed", "cannot identify a committed change",
+                          "Name the feature branch <type>/<change-id> and commit its confirmed intent.")
+        canonical = artifact_path(load_manifest(), "intent", change_id, repo).resolve()
+        if intent_file is not None and intent_file.resolve() != canonical:
+            return result("unconfirmed", "intent path does not match the identified change",
+                          "Select the identified change's canonical committed intent.")
+        head = git_text(repo, "rev-parse", "HEAD")
+        branch = current_branch(repo)
+        evidence.update(change_id=change_id, head=head, branch=branch)
+        if not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
+            return result("unconfirmed", "a safe symbolic feature branch is required",
+                          "Preserve the current work on a named feature branch before continuing.")
+        intent_rel = canonical.relative_to(repo).as_posix()
+        committed = git_maybe(repo, "show", f"{head}:{intent_rel}")
+        front, _ = parse_document(committed or "")
+        if not re.fullmatch(r"confirmed \d{4}-\d{2}-\d{2}", front.get("status", "")):
+            return result("unconfirmed", "identified intent is not committed and confirmed",
+                          "Obtain intent confirmation and commit the canonical intent.")
+        authorized, authorization_reason = _intent_authorizes_publication(repo, canonical, change_id)
+        evidence["automatic_publication_authorized"] = authorized
+        if authorization_reason:
+            evidence["automatic_publication_reason"] = authorization_reason
+        publication_next = (
+            "Resume publish for this feature branch only while its automatic authorization remains valid."
+            if authorized else
+            "If an existing explicit user decision authorizes publication, resume publish with "
+            "--confirm-authorized; otherwise obtain that user decision before writing. "
+            "Observation grants no write permission."
+        )
+
+        local_base = git_maybe(repo, "symbolic-ref", "--quiet", "refs/remotes/origin/HEAD")
+        scope = _delivery_scope(repo, change_id, head, local_base)
+
+        def pending_result():
+            if not scope:
+                return result("unconfirmed", "change attribution is unavailable",
+                              "Commit concrete Files entries in the change plan or establish its branch delta; "
+                              "unseen working-tree code cannot be certified as delivered.")
+            evidence["scope"] = sorted(scope)
+            pending = _delivery_pending(repo, scope | {intent_rel})
+            if pending:
+                evidence["pending_paths"] = pending
+                return result("uncommitted", "attributable work is not committed",
+                              "Review and commit the named change paths; preserve unrelated work.")
+            return None
+
+        if goal == "local":
+            pending = pending_result()
+            if pending:
+                return pending
+            if git_text(repo, "rev-parse", "HEAD") != head or current_branch(repo) != branch:
+                return result("unconfirmed", "local HEAD or branch changed during observation",
+                              "Stabilize the selected branch and rerun delivery.")
+            return result("local", "attributable work is committed locally",
+                          "Report the explicit local goal; publication needs separate authorization.", True)
+
+        origin, origin_error = _publish_origin_state(repo, branch)
+        identity = github_repo_from_origin(repo)
+        if origin_error or not identity or not trusted_gh:
+            return result("unconfirmed", origin_error or "trusted GitHub origin and gh are required", diagnostic)
+        env = _publish_env(identity, repo, (trusted_git, trusted_gh))
+        evidence["repository"] = identity
+
+        def read(argv):
+            response = run_publish_external(argv, cwd=repo, env=env)
+            if response.returncode != 0:
+                raise UsageError((response.stderr or response.stdout or
+                                  f"exit {response.returncode}").strip())
+            return response.stdout
+
+        base = read([trusted_gh, "repo", "view", identity, "--json", "defaultBranchRef",
+                     "--jq", ".defaultBranchRef.name"]).strip()
+        if not base or base == branch or not git_ok(repo, "check-ref-format", "--branch", base):
+            return result("unconfirmed", "origin default branch is missing, unsafe or equals the head", diagnostic)
+        evidence["base"] = base
+        # The server selects the base name; local base objects only attribute paths.
+        base_ref = next((ref for ref in (f"refs/remotes/origin/{base}", f"refs/heads/{base}")
+                         if git_ok(repo, "rev-parse", "--verify", ref)), None)
+        scope.update(_delivery_scope(repo, change_id, head, base_ref))
+        pending = pending_result()
+        if pending:
+            return pending
+        remote_argv = [trusted_git, "-C", str(repo), "ls-remote", "--heads", "origin",
+                       f"refs/heads/{branch}"]
+
+        def remote_head():
+            rows = [line.split() for line in read(remote_argv).splitlines() if line.strip()]
+            if not rows:
+                return None
+            if (len(rows) != 1 or len(rows[0]) != 2 or rows[0][1] != f"refs/heads/{branch}"
+                    or not re.fullmatch(r"[0-9a-f]{40}(?:[0-9a-f]{24})?", rows[0][0])):
+                raise UsageError("remote branch identity response is malformed or ambiguous")
+            return rows[0][0]
+
+        remote = remote_head()
+        evidence["remote_head"] = remote
+        host, owner, name = identity.split("/", 2)
+        expected_repo = f"{owner}/{name}".casefold()
+        endpoint = (f"repos/{quote(owner, safe='')}/{quote(name, safe='')}/pulls"
+                    f"?state=all&head={quote(f'{owner}:{branch}', safe='')}")
+        candidates = json.loads(read([trusted_gh, "api", "--hostname", host, endpoint]))
+        if not isinstance(candidates, list):
+            raise UsageError("PR response is not a list")
+        matching = []
+        for candidate in candidates:
+            try:
+                if (candidate["head"]["sha"] == head and candidate["head"]["ref"] == branch
+                    and candidate["head"]["repo"]["full_name"].casefold() == expected_repo
+                    and candidate["base"]["ref"] == base
+                    and candidate["base"]["repo"]["full_name"].casefold() == expected_repo):
+                    matching.append(candidate)
+            except (KeyError, TypeError, AttributeError):
+                raise UsageError("PR response lacks exact head/base/repository identity")
+        if git_text(repo, "rev-parse", "HEAD") != head or _publish_origin_state(repo, branch) != (origin, None):
+            return result("unconfirmed", "HEAD, branch or origin changed during observation", diagnostic)
+        if remote_head() != remote:
+            return result("unconfirmed", "remote branch changed during observation", diagnostic)
+        if remote is not None and remote != head:
+            return result("unpublished", "local HEAD differs from the live remote branch",
+                          "Fetch and inspect remote divergence. " + publication_next)
+        if not matching:
+            if remote != head:
+                return result("unpublished", "selected HEAD is absent from the live remote branch",
+                              publication_next)
+            return result("mismatched_pr" if candidates else "missing_pr",
+                          "no PR matches selected HEAD, branch, repository and base",
+                          "Inspect the PR identity and preserve the feature branch. " + publication_next)
+        if len(matching) != 1:
+            return result("unconfirmed", "multiple PRs match the selected delivery identity", diagnostic)
+        pr = matching[0]
+        url = pr.get("html_url", "")
+        if not isinstance(url, str) or not url.startswith(f"https://{host}/{owner}/{name}/pull/"):
+            raise UsageError("PR URL does not match the selected repository")
+        evidence["pr"] = url
+        if pr.get("state") == "closed" and pr.get("merged_at"):
+            merge_sha = pr.get("merge_commit_sha")
+            if not isinstance(merge_sha, str) or not re.fullmatch(r"[0-9a-f]{40}(?:[0-9a-f]{24})?", merge_sha):
+                raise UsageError("merged PR has no valid server merge SHA")
+            evidence["merge_sha"] = merge_sha
+            return result("merged", "server confirms the selected PR was merged",
+                          "Report the merged PR and its server merge SHA.", True)
+        if remote != head:
+            return result("unpublished", "open PR HEAD has no matching live remote branch",
+                          "Inspect branch deletion and preserve the feature branch. " + publication_next)
+        if pr.get("state") != "open" or pr.get("draft") is not False:
+            return result("mismatched_pr", "selected PR is closed or still a draft",
+                          "A matching Ready PR is required. " + publication_next)
+        checks = classify_checks(run_publish_external(
+            [trusted_gh, "pr", "checks", url, "--required", "--json", "name,state,bucket"],
+            cwd=repo, env=env,
+        ), required=True)
+        evidence["checks"] = checks.state
+        # Check observation can race with local edits, a new commit or remote publication.
+        if (git_text(repo, "rev-parse", "HEAD") != head
+                or _publish_origin_state(repo, branch) != (origin, None) or remote_head() != head):
+            return result("unconfirmed", "delivery identity changed while observing checks", diagnostic)
+        pending = pending_result()
+        if pending:
+            return pending
+        if checks.state not in {"passed", "empty"}:
+            return result(checks.state, "required CI " + checks.reason, checks.next)
+        return result("published", "matching Ready PR; required CI " + checks.reason,
+                      "Await maintainer acceptance; merge requires separate authorization.", goal == "published")
+    except (UsageError, OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        return result("unconfirmed", f"delivery evidence unavailable: {exc}", diagnostic)
+
+
+def _delivery_stop(out, err) -> int:
+    """Documented Claude/Codex Stop decision; one deadline, no retry or writes."""
+    class DeadlineExpired(RuntimeError):
+        pass  # Git/remote helpers catch OSError; deadline must cross those catches.
+
+    def expired(_signum, _frame):
+        raise DeadlineExpired("20-second total delivery deadline expired")
+
+    previous_handler = signal.signal(signal.SIGALRM, expired)
+    signal.setitimer(signal.ITIMER_REAL, 20)
+    previous_path = os.environ.get("PATH")
+    try:
+        payload = json.load(sys.stdin)
+        if (not isinstance(payload, dict) or payload.get("hook_event_name") != "Stop"
+                or payload.get("agent_id") or payload.get("parent_session_id")):
+            return 0
+        trusted_git = resolve_publish_executable("git")
+        trusted_gh = resolve_publish_executable("gh")
+        redirected = any(key in PUBLISH_REDIRECT_ENV or key.startswith(
+            ("GIT_CONFIG_KEY_", "GIT_CONFIG_VALUE_")) for key in os.environ)
+        if redirected or not trusted_git:
+            raise UsageError("trusted Git environment is unavailable; remove redirects and provide trusted Git")
+        os.environ["PATH"] = os.pathsep.join(dict.fromkeys(
+            [str(Path(trusted_git).parent), "/usr/bin", "/bin"]))
+        repo = repo_root(Path(payload.get("cwd") or os.getcwd())).resolve()
+        change_id, _ = identify_change(repo)
+        if not change_id:
+            return 0
+        intent = artifact_path(load_manifest(), "intent", change_id, repo)
+        authorized, _ = _intent_authorizes_publication(repo, intent, change_id)
+        if not authorized:
+            return 0
+        front, _ = parse_document(git_text(repo, "show", f"HEAD:{intent.relative_to(repo)}"))
+        spec = artifact_path(load_manifest(), "spec", change_id, repo)
+        if front.get("kind") == "product" and spec.exists():
+            spec_front, _ = parse_document(spec.read_text(encoding="utf-8"))
+            if not spec_front.get("confirmed-behavior"):
+                return 0
+        observed = observe_delivery(repo, goal="published", intent_file=intent,
+                                    trusted_git=trusted_git, trusted_gh=trusted_gh)
+        if observed.complete:
+            return 0  # Publication is the boundary; acceptance never grants merge.
+        feedback = f"Delivery incomplete ({observed.state}): {observed.reason}\nnext: {observed.next}"
+        if payload.get("stop_hook_active") or observed.state == "unconfirmed":
+            err.write(feedback + "\n")
+        else:
+            feedback = ("If you are waiting for the user's answer or publication was withdrawn, "
+                        "stop again and say so; otherwise: " + feedback)
+            out.write(json.dumps({"decision": "block", "reason": feedback}, ensure_ascii=False) + "\n")
+    except (OSError, UnicodeError, ValueError, TypeError, UsageError, DeadlineExpired) as exc:
+        err.write(f"Delivery unconfirmed: {exc}\nnext: Restore the missing prerequisites and run "
+                  "loom-python --ready delivery --json before claiming completion.\n")
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_path is None:
+            os.environ.pop("PATH", None)
+        else:
+            os.environ["PATH"] = previous_path
+    return 0
+
+
+def cmd_delivery(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
+    """Observe an explicit local, published or merged delivery target without writes."""
+    if "--hook" in args:
+        if args != ["--hook"]:
+            err.write("delivery: --hook must be used alone\n")
+            return 2
+        return _delivery_stop(out, err)
+    goal, intent_file, as_json = "published", None, False
+    seen: set[str] = set()
+    rest = list(args)
+    while rest:
+        token = rest.pop(0)
+        if token in seen or token not in {"--goal", "--intent", "--json", "--hook"}:
+            err.write(f"delivery: unexpected or repeated argument {token!r}\n")
+            return 2
+        seen.add(token)
+        if token in {"--goal", "--intent"}:
+            if not rest or rest[0].startswith("--"):
+                err.write(f"delivery: {token} needs a value\n")
+                return 2
+            value = rest.pop(0)
+            if token == "--goal":
+                goal = value
+            else:
+                intent_file = Path(value)
+        elif token == "--json":
+            as_json = True
+    if goal not in {"local", "published", "merged"}:
+        err.write("delivery: --goal must be local, published or merged\n")
+        return 2
+    trusted_git = resolve_publish_executable("git")
+    trusted_gh = resolve_publish_executable("gh") if goal != "local" else None
+    redirected = [key for key in os.environ if key in PUBLISH_REDIRECT_ENV
+                  or key.startswith(("GIT_CONFIG_KEY_", "GIT_CONFIG_VALUE_"))]
+    previous_path = os.environ.get("PATH")
+    try:
+        if redirected or not trusted_git:
+            observed = DeliveryResult("unconfirmed", "trusted Git environment is unavailable",
+                                      "Remove redirect environment variables and provide trusted Git.", {})
+        else:
+            os.environ["PATH"] = os.pathsep.join(dict.fromkeys(
+                [str(Path(trusted_git).parent), "/usr/bin", "/bin"]))
+            observed = observe_delivery(repo_root(Path.cwd()).resolve(), goal=goal,
+                                        intent_file=intent_file, trusted_git=trusted_git,
+                                        trusted_gh=trusted_gh)
+    except UsageError as exc:
+        observed = DeliveryResult("unconfirmed", str(exc), "Run delivery inside the selected repository.", {})
+    finally:
+        if previous_path is None:
+            os.environ.pop("PATH", None)
+        else:
+            os.environ["PATH"] = previous_path
+    if as_json:
+        out.write(json.dumps(asdict(observed), ensure_ascii=False) + "\n")
+    else:
+        out.write(f"Delivery {observed.state}: {observed.reason}\nnext: {observed.next}\n")
+    return 0 if observed.complete else 1
 
 
 def _publish_env(repo_identity: str, repo: Path, trusted_paths: tuple[str, str]) -> dict[str, str]:
@@ -205,94 +647,36 @@ def _observe_required_ci(
     pr_url: str, *, trusted_gh: str, repo: Path, env: dict[str, str], out, err
 ) -> int:
     """Observe required PR checks in this process until a terminal state."""
-    pending_waits = 0
-    registration_waits = 0
+    pending_waits = registration_waits = 0
     while True:
-        argv = [
-            trusted_gh, "pr", "checks", pr_url, "--required",
-            "--json", "name,state,bucket",
-        ]
         try:
-            result = run_publish_external(argv, cwd=repo, env=env)
+            result = run_publish_external(
+                [trusted_gh, "pr", "checks", pr_url, "--required", "--json", "name,state,bucket"],
+                cwd=repo, env=env,
+            )
         except (OSError, subprocess.TimeoutExpired) as exc:
             return _publish_block(
                 f"required CI could not be observed: {type(exc).__name__}: {exc}", err
             )
-        # gh 2.88.1 emits these quoted-branch errors before checks register;
-        # the command layer maps the returned error to exit 1 with blank stdout.
-        # https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks.go
-        # https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks_test.go
-        # https://github.com/cli/cli/issues/7401
-        no_checks_yet = (
-            result.returncode == 1
-            and not result.stdout.strip()
-            and re.fullmatch(
-                r"no (?:required )?checks reported on the '.*' branch",
-                result.stderr.strip(),
-            ) is not None
-        )
-        # gh uses exit 8 while checks are pending and exit 1 before a new
-        # branch's checks register. JSON remains authoritative otherwise.
-        if result.returncode not in {0, 8} and not no_checks_yet:
-            detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
-            return _publish_block(f"required CI could not be observed: {detail}", err)
-        if no_checks_yet or (result.returncode == 0 and not result.stdout.strip()):
-            checks = []
-        else:
-            try:
-                checks = json.loads(result.stdout)
-            except json.JSONDecodeError as exc:
-                return _publish_block(f"cannot decode required CI response: {exc}", err)
-        if not isinstance(checks, list) or any(not isinstance(check, dict) for check in checks):
-            return _publish_block("required CI response is not a list of checks", err)
-        if not checks:
+        observed = classify_checks(result, required=True)
+        if observed.state == "empty":
             if registration_waits >= PUBLISH_CI_REGISTRATION_WAITS:
                 out.write("No required checks registered\n")
                 return 0
-            wait_publish_interval(PUBLISH_CI_POLL_SECONDS)
             registration_waits += 1
-            continue
-
-        states = [(str(check.get("name", "unnamed")),
-                   str(check.get("state", "")).upper(),
-                   str(check.get("bucket", "")).casefold()) for check in checks]
-        action = [name for name, state, _ in states if state == "ACTION_REQUIRED"]
-        cancelled = [name for name, state, bucket in states
-                     if state in {"CANCELLED", "CANCELED"} or bucket == "cancel"]
-        failed = [name for name, state, bucket in states
-                  if state in {"FAILURE", "TIMED_OUT", "STARTUP_FAILURE"}
-                  or bucket == "fail"]
-        if action:
-            return _publish_block(
-                "required CI requires user action: " + ", ".join(action), err
-            )
-        if cancelled:
-            return _publish_block("required CI cancelled: " + ", ".join(cancelled), err)
-        if failed:
-            return _publish_block("required CI failed: " + ", ".join(failed), err)
-
-        pending = [name for name, state, bucket in states
-                   if state in {"PENDING", "QUEUED", "IN_PROGRESS", "WAITING", "REQUESTED"}
-                   or bucket == "pending"]
-        if pending:
+        elif observed.state == "pending":
             if pending_waits >= PUBLISH_CI_PENDING_WAITS:
                 return _publish_block(
                     "required CI requires user action because no reliable terminal result "
-                    "was available after 60 minutes",
-                    err,
+                    "was available after 60 minutes", err, observed.next,
                 )
-            wait_publish_interval(PUBLISH_CI_POLL_SECONDS)
             pending_waits += 1
-            continue
-        unknown = [name for name, _, bucket in states
-                   if bucket not in {"pass", "skipping"}]
-        if unknown:
-            return _publish_block(
-                "required CI requires user action because its state is unknown: "
-                + ", ".join(unknown), err,
-            )
-        out.write("Required CI passed\n")
-        return 0
+        elif observed.state == "passed":
+            out.write("Required CI passed\n")
+            return 0
+        else:
+            return _publish_block("required CI " + observed.reason, err, observed.next)
+        wait_publish_interval(PUBLISH_CI_POLL_SECONDS)
 
 
 def cmd_publish(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
@@ -308,7 +692,7 @@ def cmd_publish(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return _publish_usage(f"cannot read PR body as UTF-8: {exc}", err)
     body_error = validate_contextual_pr_body(body)
     if body_error:
-        return report([("push.contextual-body", body_error)], err)
+        return _publish_block(body_error, err, rule="push.contextual-body")
 
     redirected = sorted(
         key for key in os.environ
@@ -370,8 +754,8 @@ def _cmd_publish_trusted(
 
     change_id, _unidentified = identify_change(repo)
     if change_id is None:
-        return report([("publish.preconditions", "cannot identify the change — name the branch "
-                                   "<type>/<change-id> or commit its intent")], err)
+        return _publish_block("cannot identify the change — name the branch "
+                              "<type>/<change-id> or commit its intent", err)
 
     intent_error: str | None = None
     if not authorized and intent_file is not None:
@@ -387,7 +771,7 @@ def _cmd_publish_trusted(
         )
 
     head = git_maybe(repo, "rev-parse", "HEAD")
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(repo)
     if not head or not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
         return _publish_block("publication requires a safe current symbolic branch and HEAD", err)
     origin_url, origin_error = _publish_origin_state(repo, branch)
@@ -405,18 +789,18 @@ def _cmd_publish_trusted(
     if attestation_file.exists() and git_maybe(
         repo, "status", "--porcelain", "--", attestation_rel
     ) != "":
-        return report([("publish.preconditions", f"{attestation_rel} is not committed — "
-                                                 "commit it, then publish again")], err)
+        return _publish_block(f"{attestation_rel} is not committed — "
+                              "commit it, then publish again", err)
     status = verification_status(repo, change_id, head=head)
     stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
     if stated_error:
-        return report([("push.contextual-body", stated_error)], err)
+        return _publish_block(stated_error, err, rule="push.contextual-body")
     outcome_error = validate_disclosed_outcome(
         body_file.read_text(encoding="utf-8"),
         _no_program_reasons(repo, head, attestation_rel),
     )
     if outcome_error:
-        return report([("push.contextual-body", outcome_error)], err)
+        return _publish_block(outcome_error, err, rule="push.contextual-body")
     out.write(f"Verification {status} for {head}\n")
     if status != "valid":
         clause = missing_clause(missing_records(repo, change_id, status, head))

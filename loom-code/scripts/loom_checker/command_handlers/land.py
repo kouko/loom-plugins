@@ -9,9 +9,11 @@ from loom_checker.command_handlers.publish import PUBLISH_REDIRECT_CONFIG
 from loom_checker.command_handlers.publish import PUBLISH_REDIRECT_ENV
 from loom_checker.command_handlers.publish import _publish_env
 from loom_checker.command_handlers.publish import _publish_origin_state
+from loom_checker.command_handlers.publish import classify_checks
 from loom_checker.command_handlers.publish import resolve_publish_executable
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
@@ -97,8 +99,12 @@ def _usage(reason: str, err) -> int:
     return 2
 
 
-def _block(reason: str, err) -> int:
-    return report([("land.merge", reason)], err)
+def _block(reason: str, err, next_action: str | None = None,
+           *, rule: str = "land.merge") -> int:
+    remedy = (next_action or
+              "Inspect the merge diagnostics and resolve the named condition before retrying land; "
+              "preserve work and do not switch merge routes.")
+    return report([(rule, f"{reason}; next: {remedy}")], err)
 
 
 def _land_args(args: list[str]) -> tuple[str, str | None, str | None] | str:
@@ -665,7 +671,7 @@ def _sweep_list(
     )
     if prs is None:
         return 1
-    invoking = git_maybe(context.repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    invoking = current_branch(context.repo)
 
     lines: list[str] = []
     removable: list[tuple[LandTarget, CleanupPlan]] = []
@@ -861,7 +867,7 @@ def _verify_merge(
 ) -> int:
     """Spec 'Verification': the squash commit carries the PR title and body."""
     def verify_block(reason: str) -> int:
-        return report([("land.verify", reason)], err)
+        return _block(reason, err, rule="land.verify")
 
     try:
         fetched = run_land_external(
@@ -917,11 +923,15 @@ def _read(argv: list[str], what: str, *, repo: Path, env: dict[str, str], err,
     try:
         result = run_land_external(argv, LAND_READ_TIMEOUT, cwd=repo, env=env)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        report([(rule, f"{what} could not run: {type(exc).__name__}: {exc}")], err)
+        _block(f"{what} could not run: {type(exc).__name__}: {exc}", err,
+               "Inspect gh authentication, permissions and diagnostics; "
+               "retry land without switching merge routes.", rule=rule)
         return None
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
-        report([(rule, f"{what} failed: {detail}")], err)
+        _block(f"{what} failed: {detail}", err,
+               "Inspect gh authentication, permissions and diagnostics; "
+               "retry land without switching merge routes.", rule=rule)
         return None
     return result
 
@@ -940,7 +950,8 @@ def _merge_preconditions(
     # (1) the change, from the branch name or its one intent; no attestation needed
     change_id, identify_error = identify_change(repo)
     if identify_error:
-        return _block(identify_error, err)
+        # Identification errors already include their precise rename/commit remedy.
+        return report([("land.merge", identify_error)], err)
 
     # (2) acceptance
     names, intent_error = _accepted_names(repo, change_id)
@@ -950,7 +961,7 @@ def _merge_preconditions(
         return _block(ACCEPTANCE_NOT_RECORDED, err)
 
     head = git_maybe(repo, "rev-parse", "HEAD")
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    branch = current_branch(repo)
     if not head or not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
         return _block("land requires a safe current symbolic branch and HEAD", err)
     _origin_url, origin_error = _publish_origin_state(repo, branch)
@@ -1041,90 +1052,48 @@ def _merge_preconditions(
 def _observe_all_checks(
     number: int, *, trusted_gh: str, repo: Path, env: dict[str, str], out, err
 ) -> int:
-    pending_waits = 0
-    registration_waits = 0
+    pending_waits = registration_waits = 0
     announced = False
     while True:
-        argv = [trusted_gh, "pr", "checks", str(number), "--json", "name,state,bucket"]
         try:
-            result = run_land_external(argv, LAND_READ_TIMEOUT, cwd=repo, env=env)
+            response = run_land_external(
+                [trusted_gh, "pr", "checks", str(number), "--json", "name,state,bucket"],
+                LAND_READ_TIMEOUT, cwd=repo, env=env,
+            )
         except (OSError, subprocess.TimeoutExpired) as exc:
-            return _block(f"checks could not be observed: {type(exc).__name__}: {exc}", err)
-        # gh exits 1 before a new branch's checks register (blank stdout,
-        # quoted-branch message), 1 when a check failed, and 8 while pending;
-        # the JSON stays authoritative whenever it is printed.
-        # https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks.go
-        # https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks_test.go
-        # https://github.com/cli/cli/issues/7401
-        no_checks_yet = (
-            result.returncode == 1
-            and not result.stdout.strip()
-            and re.fullmatch(
-                r"no (?:required )?checks reported on the '.*' branch",
-                result.stderr.strip(),
-            ) is not None
-        )
-        if not no_checks_yet and (
-            result.returncode not in {0, 1, 8}
-            or (result.returncode != 0 and not result.stdout.strip())
-        ):
-            detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
-            return _block(f"checks could not be observed: {detail}", err)
-        if no_checks_yet:
-            checks = []
-        elif not result.stdout.strip():
-            return _block(f"checks on PR #{number} could not be observed", err)
-        else:
-            try:
-                checks = json.loads(result.stdout)
-            except json.JSONDecodeError as exc:
-                return _block(f"cannot decode checks response: {exc}", err)
-        if not isinstance(checks, list) or any(not isinstance(check, dict) for check in checks):
-            return _block("checks response is not a list of checks", err)
-        if not checks:
+            return _block(
+                f"checks could not be observed: {type(exc).__name__}: {exc}", err,
+                "Inspect gh authentication, permissions and diagnostics; retry land without switching merge routes.",
+            )
+        observed = classify_checks(response, required=False)
+        if observed.state == "empty":
             if registration_waits >= PUBLISH_CI_REGISTRATION_WAITS:
                 out.write(f"No checks registered on PR #{number}\n")
                 return 0
-            wait_land_interval(PUBLISH_CI_POLL_SECONDS)
             registration_waits += 1
-            continue
-
-        states = [(str(check.get("name", "unnamed")),
-                   str(check.get("state", "")).upper(),
-                   str(check.get("bucket", "")).casefold()) for check in checks]
-        refused = [
-            (name, state or bucket) for name, state, bucket in states
-            if bucket in {"fail", "cancel"}
-            or state in {"FAILURE", "TIMED_OUT", "STARTUP_FAILURE",
-                         "CANCELLED", "CANCELED", "ACTION_REQUIRED"}
-        ]
-        if refused:
-            return report(
-                [("land.merge", f"check {name}: {state}") for name, state in refused], err
-            )
-        pending = [name for name, state, bucket in states
-                   if state in {"PENDING", "QUEUED", "IN_PROGRESS", "WAITING", "REQUESTED"}
-                   or bucket == "pending"]
-        if pending:
+        elif observed.state == "pending":
             if pending_waits >= PUBLISH_CI_PENDING_WAITS:
                 return _block(
                     f"checks on PR #{number} still pending after 60 minutes: "
-                    + ", ".join(pending), err,
+                    + ", ".join(name for name, _ in observed.issues), err, observed.next,
                 )
             if not announced:
                 out.write(f"Waiting for checks on PR #{number}\n")
                 announced = True
-            wait_land_interval(PUBLISH_CI_POLL_SECONDS)
             pending_waits += 1
-            continue
-        unknown = [(name, state or bucket or "unknown") for name, state, bucket in states
-                   if bucket not in {"pass", "skipping"}]
-        if unknown:
-            return report(
-                [("land.merge", f"check {name}: {state}") for name, state in unknown], err
-            )
-        out.write(f"All checks registered on PR #{number} passed\n")
-        return 0
+        elif observed.state == "passed":
+            out.write(f"All checks registered on PR #{number} passed\n")
+            return 0
+        elif observed.issues:
+            code = report([("land.merge", f"check {name}: {state}; next: {observed.next}")
+                           for name, state in observed.issues], err)
+            return code
+        else:
+            reason = (f"checks on PR #{number} could not be observed"
+                      if observed.reason == "could not be observed"
+                      else "checks " + observed.reason)
+            return _block(reason, err, observed.next)
+        wait_land_interval(PUBLISH_CI_POLL_SECONDS)
 
 
 def _await_mergeable(

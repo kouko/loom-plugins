@@ -64,13 +64,21 @@ def _commands(entries) -> list[str]:
 
 
 def test_event_set_is_exact(hooks):
-    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"}
+    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"}
 
 
 def test_codex_event_set_is_session_start_and_publication_interception(codex_hooks):
-    assert set(codex_hooks) == {"SessionStart", "PreToolUse"}
+    assert set(codex_hooks) == {"SessionStart", "PreToolUse", "Stop"}
     (command,) = _commands(codex_hooks["SessionStart"])
     assert command == '"${PLUGIN_ROOT}/hooks/session-start"'
+
+
+def test_documented_stop_uses_shared_observer_with_bounded_timeout(hooks, codex_hooks):
+    for config, root in ((hooks, "CLAUDE_PLUGIN_ROOT"), (codex_hooks, "PLUGIN_ROOT")):
+        (entry,) = config["Stop"]
+        (hook,) = entry["hooks"]
+        assert hook["timeout"] == 25
+        assert f'"${{{root}}}/scripts/loom-python" --ready delivery --hook' in hook["command"]
 
 
 def test_session_start_runs_the_rewritten_script(hooks):

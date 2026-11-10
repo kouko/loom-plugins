@@ -24,6 +24,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 HARNESS = r"""
 import { pathToFileURL } from "node:url";
+import { spawnSync } from "node:child_process";
 const seen = { skills: [], agents: [], commands: [] };
 const hooks = {};
 const ctx = {
@@ -45,6 +46,10 @@ if (process.argv[2]) {
   for (const fire of [].concat(JSON.parse(process.argv[2]))) {
     threw = null; event = fire.event;
     try { await hooks[fire.hook](fire.event); } catch (e) { threw = e.message; }
+    if (!threw && fire.execute) {
+      const run = spawnSync("/bin/sh", ["-c", event.input.command], { encoding: "utf8" });
+      event.execution = { code: run.status, stdout: run.stdout, stderr: run.stderr };
+    }
   }
   console.log(JSON.stringify({ threw, event }));
 } else {
@@ -164,6 +169,22 @@ def test_shell_push_routed_to_push_hook(tmp_path: Path):
     shell = {"tool": "shell", "sessionID": "root", "id": "c1", "input": {"command": "ls"}}
     assert _fire("loom-code", "execute.before", shell, tmp_path, env)["threw"] is None
     assert "loom_checker.py push --hook" in log.read_text(encoding="utf-8")
+
+
+def test_packaged_opencode_delivery_executes_without_claiming_stop(tmp_path):
+    context = _fire("loom-code", "context", {"sessionID": "root", "system": []}, tmp_path)
+    text = "\n".join(part["text"] for part in context["event"]["system"])
+    command = re.search(r'`([^`]+ delivery --json)`', text).group(1)
+    assert "OpenCode/Antigravity termination enforcement is unverified" in text
+    event = {"tool": "shell", "sessionID": "root", "id": "delivery",
+             "input": {"command": command}}
+    result = _node("loom-code", json.dumps({"hook": "execute.before", "event": event,
+                                            "execute": True}), cwd=tmp_path)
+    assert result["threw"] is None
+    executed = result["event"]["execution"]
+    observed = json.loads(executed["stdout"])
+    assert executed["code"] == 1 and not observed["complete"]
+    assert observed["state"] == "unconfirmed" and observed["next"]
 
 
 ZH = "請幫我把這個功能的測試補齊，然後說明一下為什麼之前的版本會失敗，謝謝你。"

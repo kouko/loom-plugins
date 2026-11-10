@@ -153,7 +153,7 @@ def test_removed_package_replay_flag_is_rejected() -> None:
         capture_output=True,
     )
     assert result.returncode == 2
-    assert "push runs only as a hook" in result.stderr
+    assert result.stderr == "push expects --hook, --install-git-hooks or --remove-git-hooks.\n"
 
 
 def test_live_consumers_require_contract_two() -> None:

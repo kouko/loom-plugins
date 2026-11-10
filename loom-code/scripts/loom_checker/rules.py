@@ -7,6 +7,13 @@ from loom_checker.probes import MAX_PROBE_PROGRAMS
 
 RULES: list[tuple[str, str]] = [
     (
+        "delivery.observed",
+        "delivery succeeds only for the requested local, published or merged goal "
+        "observed from attributable working-tree scope and current Git/PR/check evidence; "
+        "unavailable evidence remains unconfirmed, never authorization to publish or merge. "
+        "Small and engineering-only changes retain the same branch/PR policy.",
+    ),
+    (
         "adversarial.proportionate",
         f"A change produces at most {MAX_PROBE_PROGRAMS} adversarial probe "
         "programs, and every one of them carries a non-empty `concern:` line in "

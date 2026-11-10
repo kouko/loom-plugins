@@ -364,6 +364,12 @@ the intent and restate again; there is no limit on rounds here.
 ## Step 5 — Hand off
 
 Branch: everything after the intent lives on the change branch of Step 4.
+Small and engineering-only changes retain branch/PR policy.
+Observation never authorizes publication or merge. Withdrawal:
+remove its `publication:` field immediately; commit before retrying.
+Explicit local-only: `--goal local`. Observe
+`delivery --goal published --intent <absolute-intent-path> --json`
+via `loom-code:ship` before completion.
 
 Read the `needs-design:` line you wrote:
 

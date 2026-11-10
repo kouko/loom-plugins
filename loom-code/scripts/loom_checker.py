@@ -15,6 +15,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py push --hook
     loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>
     loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>
+    loom_checker.py delivery [--goal local|published|merged] [--intent <path>] [--json]
     loom_checker.py land --accepted-by <name>
     loom_checker.py land --cleanup <branch>
     loom_checker.py land --sweep [--confirm <token>]
@@ -49,6 +50,7 @@ from loom_checker.command_handlers.intents import cmd_intents
 from loom_checker.command_handlers.land import cmd_land
 from loom_checker.command_handlers.plan import cmd_plan
 from loom_checker.command_handlers.publish import cmd_publish
+from loom_checker.command_handlers.publish import cmd_delivery
 from loom_checker.command_handlers.pr_floor import cmd_pr_floor
 from loom_checker.command_handlers.push import cmd_push
 from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
@@ -67,6 +69,7 @@ COMMANDS = {
     "intake": cmd_intake,
     "push": cmd_push,
     "publish": cmd_publish,
+    "delivery": cmd_delivery,
     "land": cmd_land,
     "sync-trunk": cmd_sync_trunk,
     "github-rules": cmd_github_rules,

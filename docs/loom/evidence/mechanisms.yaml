@@ -18,7 +18,7 @@ counting: >
   outside the loom flow and is not part of the skill budget. checker-rule
   = every rule id `loom_checker.py --list-rules` prints (the checker is
   the single source for its own rule population). hook = one entry per
-  PreToolUse / PostToolUse / SessionStart / UserPromptSubmit hook declared in the Claude
+  PreToolUse / PostToolUse / SessionStart / UserPromptSubmit / Stop hook declared in the Claude
   `loom-code/hooks/hooks.json` or Codex `hooks-codex.json` manifest, or in
   the Claude `loom-workflow/hooks/hooks.json` manifest, or in either
   plugin's Codex `hooks-codex.json` or OpenCode `hooks-opencode.json`
@@ -44,6 +44,21 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
+  - id: delivery.observed
+    class: checker-rule
+    eval: loom-code/tests/test_delivery.py
+  - id: "action:delivery"
+    class: contract
+    eval: loom-code/tests/test_delivery.py
+  - id: "action:native-git-protection"
+    class: contract
+    eval: loom-code/tests/test_native_git_protection.py
+  - id: "Stop::loom-python"
+    class: hook
+    eval: loom-code/tests/test_delivery_stop.py
+  - id: "Stop::loom-python@codex"
+    class: hook
+    eval: loom-code/tests/test_delivery_stop.py
   # --- skill (25; 7 stations + 15 non-standalone tools + 3 optional routers;
   #     the 3 standalone tools are excluded from this population) ---
   - id: using-loom-code

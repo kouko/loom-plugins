@@ -447,7 +447,7 @@ def test_isolated_codex_install_selects_only_its_native_hook_manifest(
     selected = (code_root / manifest["hooks"]).resolve()
     selected.relative_to(code_root.resolve())
     hooks = json.loads(selected.read_text(encoding="utf-8"))["hooks"]
-    assert set(hooks) == {"SessionStart", "PreToolUse"}
+    assert set(hooks) == {"SessionStart", "PreToolUse", "Stop"}
     assert "${PLUGIN_ROOT}" in hooks["PreToolUse"][0]["hooks"][0]["command"]
     # Codex marks a hook Failed on keys beside hookSpecificOutput.
     start = _run_hook_command(hooks["SessionStart"][0]["hooks"][0]["command"],
