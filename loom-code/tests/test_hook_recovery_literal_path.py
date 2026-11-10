@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location(
     "recovery_hook_tests", ROOT / "loom-code/tests/test_hooks_json.py"
 )
