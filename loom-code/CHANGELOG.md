@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.62.2] — 2026-11-10 — scope document-path test assertions
+
+- Scope personal-path assertions to portable document-delivery guidance and separately validate the current installation's launcher path; preserve runtime behavior.
+
 ## [3.62.1] — 2026-11-10 — remove unused delivery state
 
 - Remove the unproduced `unauthorized` member from `DeliveryResult.state`; preserve delivery observation and publication authorization behavior.
