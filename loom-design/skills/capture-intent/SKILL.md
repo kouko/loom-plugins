@@ -71,6 +71,11 @@ or updated.
 
 ## Step 1 — Interview
 
+When evidence about the problem, usage context or intended outcome could change
+the intent, identify that decision and gap and use `loom-design:design-research`
+as needed. Reuse adequate evidence directly; bring findings or uncertainty back
+to this interview, preserving user decisions, scope and confirmation point ①.
+
 Read `references/interview.md`; ask only for missing required-field content.
 Draft directly when already sufficient. No intake question quota applies.
 Problems/outcomes are valid before choosing features or implementation.

@@ -1,7 +1,7 @@
 ---
 name: using-loom-design
 description: |
-  Route broad Loom product-definition requests to intent, specification, principles, visual design, or architecture skills when the needed skill is unclear.
+  Route broad Loom product-definition requests to intent, specification, principles, visual design, architecture or design research skills when the needed skill is unclear.
 user-invocable: true
 ---
 
@@ -14,6 +14,7 @@ intent capture from specification.
 
 | Request and artifact state | Load |
 |---|---|
+| A consequential evidence gap about users, outcomes, behavior options or design-owned architecture | [design-research](../design-research/SKILL.md) |
 | A feature or change idea with no intent file yet | [capture-intent](../capture-intent/SKILL.md) |
 | A requested spec, or a confirmed intent marked `needs-design: yes` without a spec | [write-spec](../write-spec/SKILL.md) |
 | Product principles are needed, or the user asks what governs a product, design, or engineering trade-off | [product-principles](../product-principles/SKILL.md) |

@@ -25,6 +25,11 @@ and component tokens — never flows, screens, or navigation.
 
 ## Step 1 — When to run
 
+When a visual-system choice depends on missing consequential evidence about
+users or usage, identify that decision and use `loom-design:design-research`
+as needed. Reuse adequate evidence directly; return findings or uncertainty to
+this task without changing confirmed preferences, scope or ratification authority.
+
 Run this **before or during `write-spec`**, for any product with a UI a
 user reads or types into. `DESIGN.md` is **never required**: an absent or
 unratified `DESIGN.md` never blocks a change, at any station — unlike

@@ -75,6 +75,18 @@ verification. Follow the repository-specific requirements in the source policy.
 
 ## Choosing an evaluation approach
 
+For each material recommendation, identify credible alternatives (including the
+current approach where viable) and compare them on common criteria relevant to
+the pending decision. Separate mandatory constraints, user preferences,
+supported facts, inference and unknowns. Apply comparable versions and conditions;
+choose dimensions such as capability, compatibility, operating burden, failure
+behavior or reversibility only when consequential. No fixed dimension count or
+matrix is required. Evidence for a top-level integration does not settle a
+nested tool choice: support each material choice separately. Capability counts,
+popularity or a user's challenge alone do not establish superiority. Missing
+comparison evidence permits a tentative choice or unresolved result, not a
+claim that an option has been proved better.
+
 For an assessment of alternatives, design/change quality, experimental effects
 or operational risks, read [evaluation selection](references/evaluation-selection.md).
 Choose by the pending decision and missing evidence, not by a preferred framework
@@ -109,6 +121,12 @@ ordinary URLs for external sources; paths must resolve from the record.
   create a separately scoped revalidation, linking the two. Do not silently
   replace the evidence on which an earlier decision depended. Respect frozen
   trial records and explicit no-edit boundaries.
+- **Keep the current conclusion consistent.** A follow-up challenge calls for
+  reassessing support, not agreement or invented new evidence. Before delivering
+  a changed recommendation, update the matching record's conclusion, evidence,
+  limitations and date, explaining what changed. Explicitly withdraw an earlier
+  unsupported recommendation when necessary. If saving is prohibited or
+  unavailable, identify the unsaved update rather than claiming synchronization.
 - **Use the active change.** Save under
   `docs/loom/<change-id>/research/<sequence>-<topic>.md`. Read existing records
   before allocating the next unused sequence; a matching filename alone is not
@@ -143,6 +161,16 @@ ordinary URLs for external sources; paths must resolve from the record.
 This is an on-demand capability, not another Loom station. Identify the pending decision and the factual gap before doing work. Preserve the active station and confirmed authorization. If evidence is already sufficient, reuse it in the retained record and return without additional investigation. Otherwise inspect relevant local artifacts, consult applicable original sources, or run the smallest authorized measurement. Use an existing research tool when its scope fits.
 
 Return the decision, the actual saved record path, and remaining material uncertainty in the conversation; resume the owning task within its authorization. Verify the record content before calling it saved or complete. Do not start a new goal, install tools, publish, or advance a human decision point on the user's behalf.
+
+Research during review remains read-only with respect to the reviewed artifacts;
+it does not replace reviewers or acceptance testing. Source definitions cannot
+prove a successful historical execution, and a fresh check cannot reconstruct
+missing historical output. During Ship, retain unknown publication/check status
+until independently observed; research creates no missing delivery evidence.
+During Maintain, return factual incident evidence without implementing a fix
+or replacing intent capture. Design-owned questions about users, outcomes or
+behavior priorities remain with the owning design capability; separate mixed
+questions instead of broadening an engineering investigation.
 
 ## Optional long-term preservation
 

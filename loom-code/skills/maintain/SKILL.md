@@ -11,6 +11,11 @@ Maintenance changes how work enters Loom, not how it is published.
 An active unmerged change's CI failure stays with that change and follows
 Ship's continuation contract instead of entering Maintain.
 
+When conflicting failure reports or an unverified premise could change incident
+intake, identify that decision and use `loom-code:engineering-research` as needed.
+Reuse adequate evidence directly; return findings or uncertainty to this intake
+without implementing a fix, replacing intent capture or expanding authorization.
+
 1. Reproduce the incident. Reuse an existing test that exposes the root cause,
    or capture the smallest permanent regression case when coverage is missing.
 2. Attach it to the matching open intent, or create one with
