@@ -72,3 +72,41 @@ Timeout command: `python3 /private/tmp/retro_timeout_probe.py`. Its subprocess c
 No full package suite was run by this tester. The owning station states package-tests is not skipped and finalize-review will execute `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; this future check is not reported as a completed acceptance result. Report rows rely on the actual independent CLI runs above.
 
 Host installation, automatic skill triggering, downstream analyst/model proposal generation, duplicate-session ranking and the separately retained threshold-override issue were not verified. No important-or-higher implementation finding was supplied as dismissed. All data fixtures were synthetic; no private session content or user data was read or changed.
+
+## Re-run on 2026-11-11, at 75f9630f564b2aea29222ada7dbf59cbbcc83c50
+
+Reviewed fix range `fa1055d1866c762b24c6d9181047a805bcb412fa..75f9630f564b2aea29222ada7dbf59cbbcc83c50`. Functional repair `22ff4ee5` replaces five Codex discriminator set-membership checks with tuple-membership checks, preventing array/object discriminator TypeError. Ingestion can affect all three rows, so none was carried over. The first-run evidence above remains intact.
+
+Setup: fresh local clone at `/private/tmp/retro-acceptance-75f9630`, checkout of the full SHA above. Followed the same README setup, rerunning `uv run --offline --isolated --with-requirements requirements-package-tests.lock python loom-workflow/skills/skill-retro/scripts/main.py --help` successfully with authorized cache access. Final status was clean and rev-parse returned exactly the tested SHA. No real histories or product files were modified.
+
+Reran `python3 /private/tmp/retro_acceptance_probe.py` after changing only its clean-clone target and adding the malformed-record smoke below. It created fresh temporary real repositories and a worktree, using the same synthetic data shapes and isolated-root CLI commands documented above. Exit 0:
+
+- 1: re-tested — both adapters, repository/subdirectory/worktree grouped as one; distinct repositories counted as two; all known cases had empty unknown lists.
+- 2: re-tested — both adapters, partial sessions retained one known project and disclosed all three affected sessions; all-unknown cases returned zero projects, cross_project_norm 0.0 and low confidence. Missing Git returned zero projects and three unknown sessions per target, exit 0.
+- 3: re-tested — both adapters, equal-frequency/time/friction comparison returned cross_project_norm 1.0 versus 0.5 and high versus low confidence. Binding top-1 selected `loom-code:distinct`. All six invocation source locations per adapter (12 total) again matched their raw JSONL records and canonical project directories.
+
+Captured summary:
+
+```text
+claude known: distinct=2/high/1.0; single=1/low/0.5; winner=loom-code:distinct; source_lines_checked=6; seconds=0.10
+codex  known: distinct=2/high/1.0; single=1/low/0.5; winner=loom-code:distinct; source_lines_checked=6; seconds=0.06
+claude partial: projects=1 confidence=low unknown=[partial-0,partial-1,partial-2]
+codex  partial: projects=1 confidence=low unknown=[partial-0,partial-1,partial-2]
+claude unknown: projects=0 confidence=low cross_project_norm=0.0 unknown_count=3
+codex  unknown: projects=0 confidence=low cross_project_norm=0.0 unknown_count=3
+claude empty: top_skills=[] subagent_payload=[]
+codex  empty: top_skills=[] subagent_payload=[]
+claude missing-git: projects=[0,0] unknown_counts=[3,3]
+codex  missing-git: projects=[0,0] unknown_counts=[3,3]
+```
+
+Additional regression smoke: prefixed three Codex sessions with a top-level record whose type was respectively `[]`, `{}`, or `["session_meta"]`, then valid session_meta and Skill invocation from repository A. Actual CLI exit 0; three usable sessions, one known project, low confidence, no unknown sessions. Every emitted invocation source_line was 3, proving malformed records did not prevent later usable records or displace provenance.
+
+Reran `python3 /private/tmp/retro_timeout_probe.py` against the new clone, using the same eight-second fake Git and three sessions sharing one cwd. Output:
+
+```json
+{"adapter":"claude","seconds":5.05,"projects":0,"unknown_count":3,"exit":0}
+{"adapter":"codex","seconds":5.06,"projects":0,"unknown_count":3,"exit":0}
+```
+
+No findings from this re-run; no dismissed important findings were supplied. Full package tests remain delegated to finalize-review and were not run by this tester. Host installation/automatic routing, downstream model proposals, duplicate-session correctness and threshold overrides remain outside the verified boundary.
