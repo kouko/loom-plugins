@@ -12,13 +12,15 @@ tags:
 
 ## Question and scope
 
-Which inputs are independently observed, which are caller assertions, and what does that imply for a small integration of existing checks? This extends the [RDM assessment](2026-11-11-recursive-decision-models-for-loom.md) with a distinct input-evidence question. Applicable source: checkout `91ee36100708f73af5d1df33107dbf98b91ac44f`, loom-code 3.65.0. The proposed [intake pilot](../intent/2026-11-11-intake-observation-pilot.md) is still open; no implementation is authorized by this record.
+Which inputs are independently observed, which are caller assertions, and what does that imply for a small integration of existing checks? This extends the [RDM assessment](2026-11-11-recursive-decision-models-for-loom.md) with a distinct input-evidence question. Initial source: checkout `91ee36100708f73af5d1df33107dbf98b91ac44f`, loom-code 3.65.0. The [intake pilot](../intent/2026-11-11-intake-observation-pilot.md) was subsequently confirmed on 2026-11-11; its opt-in JSON implementation is commit `26f3049d`. Authorization comes from that confirmed intent, not this research record. The bounded [comparison recipe](../2026-11-11-intake-observation-pilot/evidence/comparison.md) rechecks the input cases and prepares independent-consumption materials.
 
 ## Method and rationale
 
 Trace producers, consumers and corroborating checks in local code; vary one input packet at a time in the existing pure resolver. This addresses the actual Loom boundary more directly than another generic model benchmark. No new external search was needed for these local implementation claims. No historical private sessions were read, no external model called, and no production policy changed.
 
 Evidence levels are kept separate: schema validity, source/content identity, independently observed fact, and semantic correctness. A hash answers identity, not truth; a boolean answers shape, not whether the right evidence was considered.
+
+The dispatch resolver is a model/effort policy helper, not a readiness, acceptance or authorization gate. Its caller-supplied classification predicates must not be generalized to every checker input: intake reads canonical artifacts and Git observations, while publication has its own authority checks. These surfaces share a need for trustworthy inputs but perform different jobs.
 
 ## Findings
 
@@ -39,7 +41,7 @@ Source anchors: [dispatch resolver](../../../loom-code/scripts/dispatch_profile.
 
 ### Executed input perturbation
 
-Common input: initial dispatch, standard/medium parent, all three tiers supporting medium, inherited settings guaranteed, zero completed redispatches. Only `task_evidence` changes. Seven cases ran against the checked-out module with Python; no network or repository mutation.
+Common input: initial dispatch, standard/medium parent, all three tiers supporting medium, inherited settings guaranteed, zero completed redispatches. Only `task_evidence` changes. Seven synthetic packets ran against the checked-out module with Python; the W2 comparison recipe repeats them. The observed classifications are actual resolver outputs, but their input predicates are constructed assertions, not independently labeled real tasks. No network or production policy mutation is involved.
 
 | Case | Supplied evidence | Observed result |
 |---|---|---|
@@ -81,7 +83,7 @@ Interpretation:
 
 ## Implications for the pilot
 
-The best first surface is the planning intake observation, because it already recomputes some facts from artifacts. [Current command](../../../loom-code/scripts/loom_checker/command_handlers/intake.py) accumulates rule/reason pairs, but [report](../../../loom-code/scripts/loom_checker/helpers.py) renders only blocking lines plus an exit code. The [planning skill](../../../loom-code/skills/write-plan/SKILL.md) already requires intake before and after planning. The proposed integration therefore reuses an existing call path, rather than adding a classifier or a second policy engine.
+The chosen pilot surface is planning intake, because it already recomputes some facts from artifacts. The [command](../../../loom-code/scripts/loom_checker/command_handlers/intake.py) accumulates rule/reason pairs; its ordinary [report](../../../loom-code/scripts/loom_checker/helpers.py) renders blocking lines plus an exit code. Commit `26f3049d` adds opt-in JSON over that same evaluation and updates both calls in the [planning skill](../../../loom-code/skills/write-plan/SKILL.md). It adds no classifier or second policy engine. Source/test verification of this integration is distinct from independent agent-consumption evidence.
 
 Important boundary: `cmd_intake` returns early when confirmation fails. A result must not imply that later checks ran. Nor can an intake pass mean that review, acceptance or publication passed: those checks occur elsewhere. Any structured observation should preserve these distinctions and report operational failures distinctly from a successful observation.
 
@@ -92,7 +94,7 @@ Potential benefit is more reliable consumption and less reinterpretation of chec
 Mode: complexity. Mindset: Data over abstractions, favoring ordinary result data over a new controller.
 
 1. Smallest end state: one existing intake observation supplies the results the calling station needs, using the same check functions. No global scheduler, classifier service, durable result database or second rule table. Keep existing text consumers compatible.
-2. Baseline production intake handler is 101 lines; the existing intake test module is 2,012 lines. No patch exists yet, so final counts are unknown. Rough planning allowance, not a measured diff: 30–80 net production lines, 60–140 test lines, 5–20 guidance lines, 0–1 new production helper functions, no new production module. Count release metadata separately. A wrapper/controller would add avoidable surface; the 0-production-line guidance-only alternative must be tested too. Revisit if the estimate expands materially.
+2. The initial baseline intake handler was 101 lines and its test module 2,012 lines. That research estimated 30–80 net production lines, 60–140 test lines, 5–20 guidance lines, 0–1 new helper functions and no new production module. The implemented W1 diff (`26f3049d`) adds 40 net handler lines, 67 test lines and 9 guidance lines; checker help changes are net zero. Two private helpers separate argument validation from existing evaluation, exceeding the tentative helper estimate by one without adding a controller or policy table. Release metadata remains separate. The zero-production-line guidance-only alternative is retained in the comparison; these counts do not establish net simplification or benefit.
 3. Verified safe deletions now: none. No claim of net simplification by LOC. A new duplicate parser of `BLOCK` strings should not be introduced; redundant caller instructions may be removable only after consumer inspection.
 
 Verdict: **PROCEED-WITH-CAVEAT** for a bounded existing-command integration and comparison, not a new orchestration framework. Added reporting/test surface buys inspectable evidence consumption; measured benefit is still pending. If guidance-only performs equally well, prefer it or record no-benefit rather than expand scope.
@@ -110,4 +112,4 @@ Changing dispatch unknown-handling or mechanical precedence is a separate policy
 
 ## Limitations and open questions
 
-No task corpus was labeled, no actual agent classification accuracy measured, and no independent reviewer assessed these conclusions in this research pass. No exploit, actual missed consent or production misroute was demonstrated. The seven cases validate the resolver's handling of supplied packets, not their truth. No latency/token savings, full package test run, host dispatch execution or pilot end-to-end result is claimed. A future benchmark must separate input quality, rule correctness, output consumption and host execution instead of reporting a single success rate.
+No task corpus was labeled and no actual agent classification accuracy was measured. Independent assessment of these research conclusions and agent consumption of the comparison packets remain pending at W2 collection. No exploit, actual missed consent or production misroute was demonstrated. The seven cases validate the resolver's handling of supplied packets, not their truth. The focused implementation suite passed 206 tests; this is not a semantic input-accuracy result. No latency/token savings, full package test run, host dispatch execution or independent pilot end-to-end result is claimed here. A future benchmark must separate input quality, rule correctness, output consumption and host execution instead of reporting a single success rate.
