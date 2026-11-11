@@ -57,5 +57,27 @@ all discovered groups, every test and every assertion. This is a temporary local
 execution setting, not a repository-default change or a skip. Results do not
 establish load-insensitivity on other machines.
 
+## Second attempt and design-group completion
+
+At `76d65d24`, the same complete-inventory command with the supported four-worker
+setting passed the entire root/code group: 2799 passed, 2 skipped in 256.05s.
+The runner then reached design and stopped: 3 failed, 208 passed, 1 skipped.
+Raw local output: `/private/tmp/loom-research-build-suite-fixed.log`.
+
+The design failures exposed two further integration surfaces. Capture-intent's
+new paragraph made its body 3542 words against the unchanged 3500-word cap;
+the baseline was already 3498 words. The handoff is now one sentence and the
+adjacent orientation paragraph is equivalently compressed, preserving required
+fields, sufficient-evidence drafting, no question quota, outcome-first capture
+and unchanged decision points. The body is now 3499 words; the cap was not raised.
+
+Design's current-release assertion and root marketplace description were also
+stale. The whole changed-content and design release-surface search located the
+pin in one test; historical changelog entries remain unchanged. The release
+implementer reproduced the failing version test, then updated only the current
+pins and marketplace entry. The complete design group subsequently passed:
+211 passed, 1 skipped. Manifest synchronization and diff checks passed.
+
+These fixes retain the same six Acceptance obligations and task identities.
 Final Build and finalization results are recorded by their actual commands and
 generated attestation; this record does not claim a future run passed.
