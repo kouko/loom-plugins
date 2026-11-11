@@ -83,9 +83,11 @@ choose dimensions such as capability, compatibility, operating burden, failure
 behavior or reversibility only when consequential. No fixed dimension count or
 matrix is required. Evidence for a top-level integration does not settle a
 nested tool choice: support each material choice separately. Capability counts,
-popularity or a user's challenge alone do not establish superiority. Missing
-comparison evidence permits a tentative choice or unresolved result, not a
-claim that an option has been proved better.
+popularity or a user's challenge alone do not establish superiority. Disclose
+decision-critical unverified context before recommending. If a preference
+reverses with an unknown condition, give conditional alternatives or leave it
+unresolved; investigation tools do not establish the target caller, workflow or
+runtime. Missing comparison evidence does not prove an option better.
 
 For an assessment of alternatives, design/change quality, experimental effects
 or operational risks, read [evaluation selection](references/evaluation-selection.md).

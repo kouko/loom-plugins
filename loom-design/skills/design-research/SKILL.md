@@ -56,8 +56,10 @@ same conditions and criteria to alternatives; no fixed matrix, dimension count
 or numerical score is required. A user's preferred option is a preference,
 not proof that it performs better. Support every material nested choice
 separately; evidence for an overall architecture does not settle a component
-choice. Missing comparative evidence permits a tentative choice or unresolved
-comparison, not a claim of demonstrated superiority.
+choice. Disclose decision-critical unverified context before recommending. If a
+preference reverses with an unknown condition, give conditional alternatives or
+leave it unresolved; investigation tools do not establish the target caller,
+workflow or runtime. Missing comparative evidence does not prove superiority.
 
 ## Retain and continue the conclusion
 

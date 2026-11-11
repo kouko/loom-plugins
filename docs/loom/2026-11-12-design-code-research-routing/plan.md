@@ -20,6 +20,16 @@ charter: 1.1
 - Test: A6 positive: complete-suite; negative: process-group-kill-disabled. Reproduce the five baseline failures, retain live-path evidence, then verify meaningful deadlines, descendant cleanup and blocked-input behavior.
 - Risk: agent-decided — Newly measured fake-CLI startup exceeds existing test deadlines in both installed interpreters. Repair only test fixtures and timing preconditions; preserve production defaults and prove the tests still reject broken termination. This supports, not replaces, research behavior trials.
 
+**W4-01 Resolve unsupported-context ambiguity before the first recommendation** after: W3-01 acceptance: 4, 5, 6
+- Files: loom-code/skills/engineering-research/SKILL.md, loom-design/skills/design-research/SKILL.md
+- Test: A4 positive: cold-initial-choice; negative: assumed-caller. A5 positive: followup-consistency; boundary: changed-conditions. A6 positive: prechallenge-operations; negative: source-only-proof.
+- Risk: agent-decided — Replace ambiguous tentative-choice permission with disclosed decisive conditions and conditional alternatives. This corrects the first observed premise-selection defect, not prior catalog/word-budget repairs; retain failed evidence and existing Review episode.
+
+**W4-02 Drive admitted-skill boundaries through the existing CLI entry** after: W4-01 acceptance: 1
+- Files: loom-code/tests/test_check_mechanisms.py (entry exercised: check_mechanisms.main)
+- Test: A1 positive: CLI-admit26; boundary: CLI-reject27. Preserve fixtures and externally observable count, exit status and rejection evidence; add no new test.
+- Risk: agent-decided — Move both edited cases from internal measurement helpers to the actual --measure entry, preserving budget semantics and unchanged legacy cases.
+
 ## Simplicity check
 
 - none found
@@ -39,3 +49,4 @@ charter: 1.1
 7. agent-decided — Build integration found incomplete new-skill installation/catalog/navigation accounting and a review paragraph caught by the existing verdict-reuse guard. Preserve frozen baselines and protection semantics while covering every affected catalog and localized link.
 8. agent-decided — Keep capture-intent within its existing word cap by shortening only the added handoff; synchronize design release pins in loom-design/tests/spec/test_capture_intent_contract.py and marketplace metadata, preserving historical changelog entries.
 9. agent-decided — W3 addresses a newly observed verification precondition: baseline 70a05fd7 reproduces all five timeout failures, and fresh CLI startup measured about 2.8s in both installed interpreters. W1/W2 remain completed; no research requirement or production behavior changes.
+10. agent-decided — Batch the actual unsupported initial-context finding from acceptance and both reviewers with the CLI-entry test finding. W4 preserves confirmed requirements and fixes distinct newly observed obligations without resetting prior task retries or the bounded Review episode.
