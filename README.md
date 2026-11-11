@@ -108,7 +108,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.64.0. Five stations carry one change from plan to PR with
+Version 3.65.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
