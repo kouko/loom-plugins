@@ -21,11 +21,48 @@ from loom_checker.rule_checks.intent import check_kind_recompute
 from loom_checker.rule_checks.intent import touched_interface_surfaces
 from loom_checker.rule_checks.plan_boundary_tests import check_plan_boundary_tests
 from pathlib import Path
+from io import StringIO
+import json
 import re
 import sys
 
 
 def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
+    json_mode = "--json" in args
+    if json_mode:
+        args = args.copy()
+        args.remove("--json")
+    diagnostics = StringIO()
+    try:
+        station, change_id = _parse_args(args)
+        failures, complete = _evaluate_intake(
+            station, change_id,
+            diagnostics if json_mode else out,
+            diagnostics if json_mode else err,
+        )
+    except (UsageError, OSError) as exc:
+        if not json_mode:
+            raise
+        payload = {
+            "station": args[0] if args else None,
+            "change_id": args[1] if len(args) > 1 else None,
+            "state": "unconfirmed", "checks_complete": False,
+            "failures": [], "diagnostics": diagnostics.getvalue(), "error": str(exc),
+        }
+        out.write(json.dumps(payload) + "\n")
+        return 2
+    if not json_mode:
+        return report(failures, err)
+    out.write(json.dumps({
+        "station": station, "change_id": change_id,
+        "state": "blocked" if failures else "passed", "checks_complete": complete,
+        "failures": [{"rule": rule, "reason": reason} for rule, reason in failures],
+        "diagnostics": diagnostics.getvalue(), "error": None,
+    }) + "\n")
+    return 1 if failures else 0
+
+
+def _parse_args(args: list[str]) -> tuple[str, str]:
     if len(args) < 2:
         raise UsageError("intake needs a station and a change-id.")
     station, change_id = args[0], args[1]
@@ -40,12 +77,15 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         raise UsageError(
             f"unknown station {station!r}; intake covers {' and '.join(INTAKE_STATIONS)}."
         )
+    return station, change_id
 
+
+def _evaluate_intake(station: str, change_id: str, out, err) -> tuple[list[tuple[str, str]], bool]:
     manifest = load_manifest()
     repo = repo_root(Path.cwd())
     failures = check_confirmed(manifest, repo, change_id, station)
     if failures:
-        return report(failures, err)
+        return failures, False
     intent_path = artifact_path(manifest, "intent", change_id, repo)
     front, sections = parse_document(read_text(intent_path))
     skipped: set[str] = set()
@@ -98,4 +138,4 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         # Note: attestation-based checks (coverage, commit-identity, intent-version)
         # are deferred to finalize-review since attestation doesn't exist at intake time
 
-    return report(failures, err)
+    return failures, True
