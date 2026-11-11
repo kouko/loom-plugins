@@ -2,6 +2,29 @@
 
 Scope: Acceptance 3/4 of the [confirmed intent](../../intent/2026-11-11-intake-observation-pilot.md). Collection uses implementation `26f3049d` and existing intake fixtures. This records CLI observations, not agent-consumption results or an acceptance verdict. Independent consumption and replay at `7da5d59` are now recorded in [witnessed acceptance evidence](acceptance-test-evidence.md), with the original packets, answers and scoring retained alongside it.
 
+## Final adoption and continuity
+
+The final design selects **guidance-only** under the original REQ-3 alternative. The witnessed guided-text and JSON answers made equivalent decisions across six cases; JSON added 445 packet bytes over guided text without a demonstrated consumption or error-handling benefit. The JSON handler, help additions and implementer-owned JSON tests are therefore withdrawn, while the existing text command and all its checks remain unchanged. Station guidance explains the existing exit codes, confirmation early exit, blockers, uncertainty and rerun boundaries. This is a bounded selection from measured alternatives, not a claim that text is universally superior or cheaper in model tokens.
+
+The canonical acceptance report at `4fe583e5` remains an unchanged report of the candidate, including Acceptance 3 = partly; it does not certify this revised tree. Raw answers, key, scoring and runtime outputs remain unchanged. Fresh acceptance and adversarial evaluation must address the final scope. The candidate-specific repeated-JSON probe is left unchanged for its independent author to re-evaluate; a failure after withdrawal is expected until that scope is reconciled, and is not hidden as a passing full suite.
+
+| Stage | Retained evidence and cost |
+|---|---|
+| Initial implementation `26f3049d` | 15 RED failures / 191 passes, then 206 passes; handler +40 net lines, tests +67 and guidance +9 |
+| Comparison `15e6d328` | Five real pairs and one injected control; initial expected-rule typo corrected from source, then recipe passed; seven synthetic dispatch cases retained |
+| Release `4c362237` | 3.66.0 metadata; 1 RED release check, then 6 passes |
+| Adversary `fd65d1f1` and repair `7da5d59` | Repeated option became an id; 5 RED failures / 11 passes, then 215 focused passes; unchanged 24-line adversarial probe graduated, regression gained 6 net lines, handler gained 2 |
+| Independent acceptance `4fe583e5` | 377 focused passes and unchanged 3,946-file snapshot at candidate `7da5d59`; all guided-text/JSON decisions equivalent, adoption condition unmet |
+| Final adoption repair | Removes the candidate's 42 net handler lines, help extension and 73 implementer-owned test lines; retains station guidance, release metadata and all experiment records. No new classifier, format, check or authority rule |
+
+The consumer was one fresh agent in a sequential text → guidance → JSON crossover, not independent randomized samples. Text's two justified unknown-completeness answers are information limits, not errors. No measured model-token, parent-turn, monetary or total-latency saving is available. The crash control establishes safe recovery, not the actual number of checks completed before a crash.
+
+### Final guidance acceptance entry
+
+A fresh tester should use a clean checkout of the final candidate, read the final write-plan intake guidance, and invoke `loom-code/scripts/loom-python --ready intake write-plan 2026-11-11-intake-observation-pilot` without a format flag. Retain actual text/exit observations and before/after file snapshots. Reuse the existing fixtures for pass, confirmation blocker, later blocker and unavailable input, then assess consumption of those observations with the final guidance. Check changed-input rerun and downstream-authority boundaries; treat a crash as unknown completeness. The existing focused entry is `python -m pytest -q loom-code/tests/test_loom_checker_intake.py loom-code/tests/test_write_plan_station_text.py` in the locked uv environment. These are replay instructions, not an assertion that final independent acceptance has happened. Update the canonical report through the independent tester; preserve the earlier candidate results and partly finding as history.
+
+Implementer verification of the adoption repair: the existing intake/station modules passed **191 tests in 44.17s**. Handler, checker help and original intake tests are byte-identical to branch base `91ee3610`. The pinned historical replay completed all five pairs, one control and seven input cases at its separate temporary destination. The first final text self-check exposed plan field caps/formatting; reducing that plan's entries and wording restored the existing intake pass. The unchanged candidate-specific adversary probe failed as expected (`JSONDecodeError`, 1 failed in 0.19s) because it still demands the removed output; its SHA-256 remains `b0bbf303000b87268f3eed92cab8959165e51a96824fe52a369441c15f571537`. No complete-suite success or final independent acceptance is claimed by this repair.
+
 ## Experiment boundary
 
 Compare ordinary text, the same text plus explicit interpretation guidance, and opt-in JSON on matched controlled repositories. Keep the same question, fixture inputs and requested answer fields. The guidance-only arm reuses the exact text run; it adds no CLI invocation. Run text and JSON once each per real case, in that order. Elapsed time includes process startup and local Git; this is not a randomized latency benchmark.
@@ -10,13 +33,18 @@ Five real CLI cases cover a pass, confirmation early exit, later rule failure, u
 
 Packets contain `arm`, `instructions`, optional `guidance`, and `cases[]` with `case_id`, `exit_code`, `stdout`, `stderr`. They contain no expected answer, fixture name or measured correctness. The neutral question asks for intake readiness, observed blockers, whether applicable checks completed and whether recovery/rerun is needed. Completeness means only this intake path; it never grants downstream workflow authority. The answer key distinguishes underlying outcomes from observable information: justified unknown completeness in the text-only arm is acceptable, not an agent error. For a crash, uncertainty about completion is also acceptable in every arm. A later scorer must preserve those distinctions rather than rewarding guesses.
 
-## Replay
+## Historical candidate replay
 
-From the repository root, extract the Python block below and execute it with the locked environment. `--offline` requires the dependencies already cached; failure to resolve them is an environment failure, not an experiment result. Files are written only beneath `/private/tmp/loom-intake-comparison`; inspected fixture content is snapshotted before/after each pair, excluding `.git` metadata from this collection check (the focused implementation test checks Git bytes too).
+The recipe below exercises the withdrawn JSON candidate; it is not a command for the final guidance-only tree. Reproduce it in a separate clone at `7da5d59bbf49f415dc61fbedcaeb6e494bddc006`. The following commands read that historical recipe and change only the temporary output destination, leaving the original packets and committed tester results intact. Choose unused clone/output paths for another replay. `--offline` requires cached locked dependencies; environment setup failures are not product findings.
 
 ```sh
-uv run --offline --isolated --with-requirements requirements-package-tests.lock python -c 'from pathlib import Path; p=Path("docs/loom/2026-11-11-intake-observation-pilot/evidence/comparison.md"); exec(p.read_text().split("```python\n", 1)[1].split("```", 1)[0])'
+git clone --local --no-hardlinks . /private/tmp/loom-intake-json-history-7da5d59
+git -C /private/tmp/loom-intake-json-history-7da5d59 checkout --detach 7da5d59bbf49f415dc61fbedcaeb6e494bddc006
+cd /private/tmp/loom-intake-json-history-7da5d59
+uv run --offline --isolated --with-requirements requirements-package-tests.lock python -c 'from pathlib import Path; p=Path("docs/loom/2026-11-11-intake-observation-pilot/evidence/comparison.md"); code=p.read_text().split("```python\n", 1)[1].split("```", 1)[0]; exec(code.replace("/private/tmp/loom-intake-comparison", "/private/tmp/loom-intake-historical-replay"))'
 ```
+
+The unchanged historical Python recipe follows for inspection. Its original output destination was `/private/tmp/loom-intake-comparison`; use the substitution above for replay. Fixture content snapshots exclude `.git` here; the candidate's focused read-only test also checked Git bytes. Removal of that candidate test does not rewrite its historical result.
 
 ```python
 import importlib.util
@@ -159,4 +187,4 @@ Packet sizes: text 1,765 bytes; guided text 2,236 bytes; JSON 2,681 bytes. The g
 
 All seven resolver input results match the research table: missing/empty/negative select ordinary, risk selects complex, mechanical and mixed select mechanical, and a field-level null is rejected. These are real executions of synthetic inputs; they establish handling and precedence, not task-classification accuracy or actual host dispatch.
 
-Independent agent answers and scoring are now retained in [witnessed acceptance evidence](acceptance-test-evidence.md); model-token usage remains unavailable. Output byte counts and one local execution duration cannot establish parent-model call reduction, total latency savings or improved semantic correctness. Guidance-only remains a viable adoption alternative; structured output has not demonstrated an agent-consumption benefit in the witnessed sequential comparison. The parent orchestrator separately reported a successful current-branch `loom-python --ready intake write-plan 2026-11-11-intake-observation-pilot --json` invocation (passed, complete, no failures); that is self-dogfood, not independent consumption.
+Independent agent answers and scoring are retained in [witnessed acceptance evidence](acceptance-test-evidence.md); model-token usage remains unavailable. Output byte counts and one local execution duration cannot establish parent-model call reduction, total latency savings or improved semantic correctness. Guidance-only is now selected because structured output demonstrated no added benefit in this sequential comparison. The parent orchestrator's earlier successful `loom-python --ready intake write-plan 2026-11-11-intake-observation-pilot --json` invocation was candidate self-dogfood, not a current supported command or independent consumption result.

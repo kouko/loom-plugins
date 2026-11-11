@@ -229,18 +229,18 @@ to the intake check below.
 Run this before writing a plan:
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id> --json
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>
 ```
 
-Accept intake readiness only with valid JSON, exit 0, `state: passed` and
-`checks_complete: true`. Use `failures` for blocking rule/reason pairs and
-`diagnostics` for informational text. A blocked result keeps its blockers;
-an `unconfirmed` result, `error`, malformed output or nonzero crash requires
-recovery and a rerun. Confirmation failures end early with
-`checks_complete: false`; later blocking checks can complete with exit 1.
-Completeness covers only the applicable intake path, not every Loom gate.
-This read-only snapshot neither advances the station nor waives confirmation,
-review or acceptance; rerun after inputs change. It checks `intake.confirmed`,
+Use the exit code and text together: exit 0 means the applicable intake checks
+passed; exit 1 returns `BLOCK <rule>: <reason>` failures. An
+`intake.confirmed` blocker stops before later checks; later rule failures
+complete the applicable path without passing. Other output is informational.
+Exit 2 means an invocation or observation error. Recover and rerun errors;
+malformed output or any nonzero exit never establishes readiness. A crash
+alone cannot establish how many checks ran. Preserve blockers and rerun after
+inputs change. This read-only snapshot neither advances the station nor
+waives confirmation, review or acceptance. It checks `intake.confirmed`,
 `intake.spec-ready`, and `intake.confirmed-behavior`. With
 `needs-design: no`, only intent readiness blocks before the plan, plus
 `intake.confirmed-behavior` for a `kind: product` spec.
@@ -330,13 +330,13 @@ Then run both commands before committing it:
 
 ```
 "${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair plan docs/loom/<change-id>/plan.md
-"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id> --json
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>
 ```
 
 The second run is when `intake.test-case-pair` can inspect the completed
 Task DAG and block missing ownership, empty case pairs, or unresolved intent
 questions. A pre-plan intake pass cannot substitute for this readiness run.
-Apply the same JSON readiness conditions from the intake check above.
+Apply the same exit-code and text interpretation from the intake check above.
 
 ### Resolve `second-vendor: suggest`
 

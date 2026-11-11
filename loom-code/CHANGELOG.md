@@ -1,10 +1,10 @@
 # Changelog
 
-## [3.66.0] — 2026-11-11 — observe planning intake with structured results
+## [3.66.0] — 2026-11-11 — clarify existing planning intake observations
 
-- Add opt-in `intake <station> <change-id> --json` output over the existing checks, preserving ordinary text behavior and distinguishing passed, blocked and unavailable observations. Report confirmation early exits without implying later checks completed.
-- Consume structured observations before and after planning; retain confirmation, review and acceptance requirements and rerun after inputs change. Intake readiness is a scoped observation, not workflow authorization.
-- Retain a reproducible text, guidance-only and JSON comparison plus input-provenance research. Synthetic cases establish rule handling, not real task-classification accuracy or proven agent cost savings.
+- Clarify existing intake exit codes and blocking reasons before and after planning, including confirmation early exits, unknown crash completeness and recovery/rerun. Preserve the text CLI and all existing checks.
+- Retain confirmation, review and acceptance requirements; intake readiness is a scoped observation, not workflow authorization.
+- Adopt guidance-only after the bounded comparison found no JSON consumption advantage over guided text. Withdraw the trial JSON interface while preserving its reproducible evidence and input-provenance research; no universal accuracy, token or latency improvement is established.
 
 ## [3.65.0] — 2026-11-11 — frame Stop feedback for each host
 

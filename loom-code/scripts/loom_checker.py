@@ -12,7 +12,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py --help
     loom_checker.py intent <path> [--commit-msg <file>]
     loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]
-    loom_checker.py intake <station> <change-id> [--json]
+    loom_checker.py intake <station> <change-id>
     loom_checker.py push --hook
     loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>
     loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>
@@ -32,7 +32,7 @@ Sub-commands (the CLI contract other stations depend on):
 
 With the launcher, the checker is selected automatically; omit loom_checker.py:
     "<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"
-    "<loom-code>/scripts/loom-python" --ready intake <station> <change-id> [--json]
+    "<loom-code>/scripts/loom-python" --ready intake <station> <change-id>
 Replace <loom-code> with the installed plugin directory and <path-to-plan.md>
 with your plan file path.
 Plan takes a file path; intake takes a station and a change-id.

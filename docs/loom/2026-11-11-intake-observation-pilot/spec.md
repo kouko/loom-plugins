@@ -1,6 +1,6 @@
 # Planning intake observation pilot — spec
 intent: 2026-11-11-intake-observation-pilot@241362a4
-pre-build-review: required — adds a machine-consumed observation format whose failure semantics must not imply unchecked readiness
+pre-build-review: not-required — final scope clarifies consumption of the existing text command; no new CLI/public format, check, authority or confirmation behavior remains
 
 ## Requirements
 REQ-1 — Faithful observation
@@ -13,30 +13,31 @@ REQ-4 — Input evidence boundaries
   The research shall distinguish independently observed inputs from semantic assertions and demonstrate missing or conflicting input behavior without representing synthetic results as real-task accuracy → Acceptance #4
 
 ## Design decision
-- agent-decided — REQ-1: add opt-in `--json` rendering to the existing `intake <station> <change-id>` command, retaining the same checks, ordering, early exit and ordinary text behavior. This avoids a duplicate policy implementation. Both existing supported stations use the parser; the pilot consumer is write-plan only.
-- agent-decided — REQ-1: emit one JSON object on stdout for recognized JSON invocations. Fields: `station`, `change_id`, `state` (`passed`, `blocked`, `unconfirmed`), `checks_complete`, `failures` (objects with `rule` and `reason`), `diagnostics` (text), and `error` (null or diagnostic string). `checks_complete` means the applicable intake path was fully evaluated, not all Loom gates passed. Confirmation early-exit and operational failures set it false. Exit codes remain 0/1 for pass/block and 2 for invalid invocation or unavailable observations. Preserve ordinary mode diagnostics and errors.
-- agent-decided — REQ-1: capture current informational output rather than let it corrupt JSON. Repeated flags, unsafe ids and unsupported stations remain invalid; no new command, global scheduler, result store or rule registry. Unexpected crashes remain nonzero failures and must never be interpreted by the consumer as a pass.
-- agent-decided — REQ-2: recompute each invocation; output is a scoped snapshot, not permission to proceed after inputs change. Existing downstream checks remain in place. No network calls or writes are added by observation rendering; existing read-only Git observations remain.
-- agent-decided — REQ-3: compare ordinary text, text plus explicit interpretation guidance, and structured output on the same controlled cases. Retain actual agent answers and observed correctness/output sizes; record model-token cost only if available. Do not claim call-count or latency savings from shorter output or one fixture run. Prefer guidance-only if structured output adds no demonstrable consumption/error-handling benefit.
+- agent-decided — REQ-1: retain the existing `intake <station> <change-id>` text interface and its checks, ordering, early exit and diagnostics unchanged. Write-plan consumes its exit code and `BLOCK <rule>: <reason>` lines before and after planning. Informational text is not a readiness result; no additional parser, format or policy engine is introduced.
+- agent-decided — REQ-1: exit 0 means all applicable intake checks passed; exit 1 reports returned rule failures. Confirmation failure ends the path before later checks; later returned failures complete the applicable path without passing. Exit 2 is an invocation/observation error. Malformed output, nonzero exits and crashes never establish readiness. A crash alone does not establish how many checks ran.
+- agent-decided — REQ-2: recompute each invocation; output is a scoped snapshot, not permission to proceed after inputs change. Preserve blockers and rerun after relevant changes; recover and rerun errors. Existing downstream checks remain in place. No network calls or writes are added; existing read-only Git observations remain.
+- agent-decided — REQ-3: adopt guidance-only after the retained comparison found equivalent guided-text and JSON decisions on all six cases, with JSON adding 445 packet bytes. The structured candidate is withdrawn under the original no-benefit alternative. Preserve original answers, failures, costs and historical replay; no model-token, call-count, monetary or total-latency saving is established. The single sequential consumer and synthetic cases limit generalization.
 - agent-decided — REQ-4: retain the input provenance research and its seven-case reproduction; independently review its claims. Do not alter dispatch classification or unknown handling in this change.
 - user-decided — The user confirmed the bounded intent and automatic non-forced branch/Ready PR publication on 2026-11-11; merge remains separate.
 
 Outcome mapping (REQ-1, agent-decided):
 
-| Observation | state | checks_complete | exit | error |
+| Observation | Existing output | Applicable checks completed? | Exit | Consumer response |
 |---|---|---|---|---|
-| All applicable intake checks pass | passed | true | 0 | null |
-| Confirmation rule returns a failure before later checks | blocked | false | 1 | null |
-| Later applicable rules return failures | blocked | true | 1 | null |
-| Invalid invocation or unavailable observation | unconfirmed | false | 2 | diagnostic string |
+| All applicable intake checks pass | No returned BLOCK failures | yes | 0 | Intake passed only; retain downstream requirements |
+| Confirmation rule fails before later checks | BLOCK intake.confirmed with reason | no | 1 | Preserve blocker; rerun after recovery/input changes |
+| Later applicable rules return failures | BLOCK lines with rule/reason | yes | 1 | Preserve blockers; completion is not passing |
+| Invalid invocation or unavailable observation | Error diagnostic | not established as complete | 2 | Recover and rerun; readiness unavailable |
+| Crash or malformed observation | Partial/unusable output | unknown | nonzero for crashes; otherwise distrust malformed output | Recover and rerun; never infer passing |
 
-An ordinary confirmation-rule failure is a valid blocking observation, even when its reason concerns indeterminate delivery history. `unconfirmed` is reserved for an invocation/observation error rather than a returned rule failure. If station or change id cannot be obtained from an invalid invocation, its JSON field is null. A consumer accepts readiness only with valid JSON, exit 0, state passed and checks_complete true; every other result preserves the blocker or requires recovery and rerun.
+An ordinary confirmation-rule failure is a valid blocking observation, even when its reason concerns indeterminate delivery history. Error diagnostics do not establish an underlying rule failure or completed path. These are interpretations of existing text/exit behavior, not new emitted fields. Without enough evidence, preserve uncertainty instead of guessing. Intake completion never means all Loom gates passed.
 
 ## Alternatives considered
 - Whole-workflow scheduler: rejected because the pilot concerns an existing observation and requires no automatic action.
 - Classification model: rejected because these outcomes are already computed by code.
-- Parsing rendered `BLOCK` text into another rule system: rejected because the checker already has rule/reason pairs.
-- Guidance-only: retained as the cheaper comparison arm; implementation adoption depends on measured consumption benefit rather than predicted savings.
+- Parsing rendered `BLOCK` text into another rule system: rejected; the station reads existing results without recreating policy.
+- Structured JSON: tried through `7da5d59`, then rejected because the witnessed comparison demonstrated no benefit over guidance-only. Its successful functional checks and duplicate-option repair remain historical evidence, not a reason to retain the interface.
+- Guidance-only: selected under the original adoption condition; final changes clarify interpretation without extending the checker.
 
 ## Current state evidence
 - Forward: `loom-code/scripts/loom_checker/command_handlers/intake.py::cmd_intake` evaluates confirmed intent before remaining applicable checks.
@@ -46,4 +47,4 @@ An ordinary confirmation-rule failure is a valid blocking observation, even when
 - Boundary: `loom-code/references/dispatch-profile.md::Task classification` remains unchanged; intake does not replace review, acceptance or publication checks.
 
 ## UI flows
-N/A — this is an opt-in machine-consumed format for an internal station command; the existing human-facing text invocation remains compatible.
+N/A — final scope is station guidance for the unchanged internal text command; no new public format or UI flow remains.
