@@ -48,3 +48,54 @@ Implementation cost at tested HEAD versus intent commit `241362a4`: handler +44/
 ## Finding and recommendation
 
 Important, spec conformance: REQ-3 adoption condition is unmet. The observed guided-text and JSON decisions are equivalent while JSON adds bytes and production/test surface. Prefer guidance-only; do not infer efficiency or consumer benefit from a structured schema. Acceptance 3 is partly satisfied: comparison and honest limitations exist, but the retained implementation does not follow the agreed no-benefit choice. Other acceptance lines work within the explicitly bounded evidence above.
+
+## Re-run on 2026-11-11, at ede4db79663b960e60b81cf1f0c49fa4d74212a7
+
+All four rows were re-tested against the entire named surface after reviewing fix range `7da5d59..ede4db79`; none is carried over. The previous candidate report is retained verbatim as `candidate-acceptance-report.md`, including Acceptance 3 = partly. Earlier evidence above remains historical and does not certify the final tree.
+
+### Setup and focused verification
+
+Created `/private/tmp/intake-final-acceptance-clean` with `git clone --local --no-hardlinks /private/tmp/loom-intake-observation-pilot /private/tmp/intake-final-acceptance-clean`, then checked out exact detached HEAD `ede4db79663b960e60b81cf1f0c49fa4d74212a7`. Read the README runtime setup and final write-plan intake guidance. The existing ready runtime loaded through the source launcher; no dependency installation or host plugin installation was required or claimed.
+
+Ran `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_intake.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_dispatch_profile_resolver.py loom-code/tests/test_delivery.py` using authorized existing-cache access. **353 passed in 57.00s**, exit 0 (`final-acceptance-focused.log`). No full package suite was run by this tester; it remains required at finalize-review, where failure blocks attestation. Build's supplied full-suite and adversarial results are not relabeled as this tester's runs. No steps were skipped and no important finding was dismissed.
+
+### 1. Faithful observations — re-tested
+
+Executed the final source launcher `loom-code/scripts/loom-python --ready intake write-plan 2026-11-11-intake-observation-pilot` on the clean project, plus actual source-launcher calls on controlled fixtures for pass, open confirmation, invalid acceptance reference, non-repository location and unsupported station. Observations are retained in `final-acceptance-observations.json`. The temporary witness script used the existing fixture constructors, captured subprocess stdout/stderr/exit, snapshotted file hashes, and called the unchanged dispatch resolver; it is not committed as an executable probe.
+
+Actual consumption of the final guidance:
+
+| Live observation | Readiness | Applicable completion | Response |
+|---|---|---|---|
+| Project and fixture pass, exit 0; interface information only | passed for intake only | complete | Retain downstream confirmation/review/acceptance requirements |
+| Open status, exit 1, BLOCK intake.confirmed | blocked | incomplete | Preserve confirmation reason and rerun after legitimate input change |
+| REQ-1 refers to missing Acceptance #99, exit 1, BLOCK spec.req-grammar | blocked | complete | Correct the reference through normal workflow, then rerun |
+| Non-repository location, exit 2 | unknown | not established complete | Recover repository location and rerun; do not invent a rule blocker |
+| Unsupported build station, exit 2 | unknown | not established complete | Use supported intake station and rerun |
+| Previously passing fixture changed to open status, exit 1 | blocked | incomplete | Discard stale pass; preserve current blocker |
+
+The retained synthetic partial-output crash control was also reconsidered under the final wording: readiness and completion are unknown, recover and rerun. This corrects the earlier shared overstatement of false completion without changing the original answers. No real crash was injected in this re-run. These are informed re-run interpretations, not a new blind consumer experiment. The final text explicitly states that crashes alone do not establish how many checks ran.
+
+### 2. Read-only boundary — re-tested
+
+First observation ran while focused tests were running; its project snapshot found 42 Python bytecode-cache changes. Preserve that record as `final-acceptance-concurrent-observations.json`; it cannot attribute writes to the observer and is not used as clean read-only proof. No fixture snapshot changed in that run.
+
+After the tests finished, repeated the entire witness run alone with no concurrent workload. All **4,025** project files, including Git metadata and existing runtime caches, remained byte-identical; all six fixture observations likewise had no changed/added/deleted files. The isolated rerun record is `final-acceptance-observations.json`. This verifies source-launcher observation after runtime load; it does not claim first-import cache creation is absent. The inspected target fixtures contain no launcher source and remained unchanged in both runs.
+
+Changing a fixture from confirmed to open between calls produced the current confirmation blocker; only the tester's explicit setup edit changed that input. The intake command performed no transition. The final station retains both pre-plan and post-plan calls and warns against substituting the first pass for the second. Git diff confirms the handler/help are byte-identical to base `91ee3610`, with no rule-check or dispatch implementation change in the fix range. Existing authorization and independent verification remain separate.
+
+### 3. Comparison integrity and adopted choice — re-tested
+
+Compared the committed original answers and scoring between `4fe583e5` and this tested tree: no change. The historical Python recipe is byte-identical to the recipe independently replayed at `7da5d59`; its current instructions pin replay to that historical commit and a separate output directory. Original packets, answer key, original/replay metrics, answers and scoring remain directly committed. No new blind comparison or historical replay was necessary: this re-run verifies preservation, reproducibility instructions and adoption against the already witnessed run, not a new format-effect measurement.
+
+Final spec, station, comparison and both research records now select guidance-only because JSON added 445 packet bytes without observed benefit over guided text. The candidate production format/help and its tests are removed; original text command bytes are restored. The independent adversary's retirement record preserves the initial repeated-option RED and explains why its JSON-only test no longer matches final scope. No historical failure, cost or partly verdict was erased.
+
+The earlier important finding is **resolved**: final behavior follows REQ-3's original no-benefit alternative. Acceptance 3 now works. There remains no model-token, parent-turn, monetary or total-latency saving claim. A single sequential consumer is not an independent/randomized estimate; deterministic format readability is not measured benefit. Retained historical sunk implementation costs do not become savings when code is removed.
+
+### 4. Research boundaries — re-tested
+
+Read both updated research records and the final comparison/spec, checked the fix diff for input-policy changes (none), and executed all seven dispatch inputs again using the final tree. `final-acceptance-observations.json` input_reproduction equals the original `consumer-input-reproduction.json` exactly: ordinary/ordinary/ordinary/complex/mechanical/mechanical/rejection, with missing-versus-empty uncertainty preserved.
+
+The prior provenance source anchors are unchanged in this fix range. Both records retain the distinction between caller assertions, artifact/Git observations, type validation and semantic truth. They identify final guidance separately from historical JSON, preserve the incomplete external-video/host/runtime validation boundaries, and avoid converting synthetic inputs or mechanical passes into task-classification accuracy. No external service/video or model was newly exercised.
+
+Final verdicts: Acceptance 1 works; 2 works; 3 works; 4 works. No unresolved important findings. This report supplies evidence for the user's acceptance decision and does not replace it or the remaining finalize-review full suite.

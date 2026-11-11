@@ -1,0 +1,129 @@
+{
+  "head": "ede4db79663b960e60b81cf1f0c49fa4d74212a7",
+  "actual_project": {
+    "exit": 0,
+    "stdout": "interface-surfaces (manifest default (KICKOFF-DEFAULTS adds nothing new)): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+    "stderr": "",
+    "files": 4025,
+    "changed": []
+  },
+  "cases": {
+    "pass": {
+      "exit": 0,
+      "stdout": "interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+      "stderr": "",
+      "files": 34,
+      "changed": []
+    },
+    "changed_input": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "BLOCK intake.confirmed: write-plan accepts only `status: confirmed <date>`; status is open.\n",
+      "files": 34,
+      "changed": []
+    },
+    "confirmation": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "BLOCK intake.confirmed: write-plan accepts only `status: confirmed <date>`; status is open.\n",
+      "files": 34,
+      "changed": []
+    },
+    "later": {
+      "exit": 1,
+      "stdout": "interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+      "stderr": "BLOCK spec.req-grammar: REQ-1 points at Acceptance #99, but the intent carries 1 acceptance line(s).\n",
+      "files": 35,
+      "changed": []
+    },
+    "unavailable": {
+      "exit": 2,
+      "stdout": "",
+      "stderr": "/private/tmp/final-intake-fixtures-iee6r4v4/unavailable is not inside a git work tree.\n",
+      "files": 0,
+      "changed": []
+    },
+    "invalid": {
+      "exit": 2,
+      "stdout": "",
+      "stderr": "unknown station 'build'; intake covers write-spec and write-plan.\n",
+      "files": 34,
+      "changed": []
+    }
+  },
+  "input_reproduction": [
+    {
+      "input": null,
+      "task_class": "ordinary",
+      "uncertainty": "insufficient-task-evidence",
+      "effective_profile": {
+        "model": "standard",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {},
+      "task_class": "ordinary",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "standard",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "trust_boundary": false
+      },
+      "task_class": "ordinary",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "standard",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "trust_boundary": true
+      },
+      "task_class": "complex",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "frontier",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "exact_transformation": true,
+        "bounded_targets": true,
+        "mechanical_oracle": true
+      },
+      "task_class": "mechanical",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "economy",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "exact_transformation": true,
+        "bounded_targets": true,
+        "mechanical_oracle": true,
+        "trust_boundary": true
+      },
+      "task_class": "mechanical",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "economy",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "trust_boundary": null
+      },
+      "error": "task evidence values must be booleans"
+    }
+  ]
+}
