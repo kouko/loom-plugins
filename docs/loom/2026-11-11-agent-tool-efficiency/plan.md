@@ -38,6 +38,11 @@ charter: 1.1
 - Test: A1 positive: release_progress_documented; boundary: unsupported_modes_not_claimed. A2 positive: discovery_change_recorded; boundary: policy_unchanged. A3 positive: comparison_link_resolves; negative: unmeasured_benefit_absent. A4 positive: release_metadata_synchronized; boundary: hook_contract_unchanged.
 - Risk: agent-decided — REQ-1/4; existing README Development section carries a short convention/applicability summary. Minor 3.67.0 documents the CLI contract; sync generated manifests, CHANGELOG entry, README versions and CURRENT_VERSION pin before final review.
 
+**W4-02 Synchronize publication waiting guidance** after: W4-01 acceptance: 1, 4
+- Files: `loom-code/skills/ship/SKILL.md`
+- Test: A1 positive: documented_elapsed_notice; boundary: unchanged_polling_not_repeated. A4 positive: existing_ship_station_tests; negative: authorization_guidance_unchanged.
+- Risk: agent-decided — REQ-1/4; fix outdated no-repeat wording found across cumulative changed files and Ship guidance; retain polling limits, authorization and termination policy. Existing test_ship_station_text.py coverage is preserved.
+
 ## Simplicity check
 - none found
 
