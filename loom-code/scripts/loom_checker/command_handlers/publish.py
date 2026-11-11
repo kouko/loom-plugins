@@ -497,7 +497,7 @@ def observe_delivery(
         return result("unconfirmed", f"delivery evidence unavailable: {exc}", diagnostic)
 
 
-def _delivery_stop(out, err) -> int:
+def _delivery_stop(out, err, host="codex") -> int:
     """Documented Claude/Codex Stop decision; one deadline, no retry or writes."""
     class DeadlineExpired(RuntimeError):
         pass  # Git/remote helpers catch OSError; deadline must cross those catches.
@@ -513,6 +513,15 @@ def _delivery_stop(out, err) -> int:
         if (not isinstance(payload, dict) or payload.get("hook_event_name") != "Stop"
                 or payload.get("agent_id") or payload.get("parent_session_id")):
             return 0
+        if payload.get("stop_hook_active") is True:
+            return 0
+        if host == "claude":
+            for field in ("background_tasks", "session_crons"):
+                tasks = payload.get(field)
+                if (isinstance(tasks, list) and tasks and all(
+                        isinstance(task, dict) and isinstance(task.get("id"), str)
+                        and task["id"].strip() for task in tasks)):
+                    return 0
         trusted_git = resolve_publish_executable("git")
         trusted_gh = resolve_publish_executable("gh")
         redirected = any(key in PUBLISH_REDIRECT_ENV or key.startswith(
@@ -540,16 +549,21 @@ def _delivery_stop(out, err) -> int:
         if observed.complete:
             return 0  # Publication is the boundary; acceptance never grants merge.
         feedback = f"Delivery incomplete ({observed.state}): {observed.reason}\nnext: {observed.next}"
-        if payload.get("stop_hook_active") or observed.state == "unconfirmed":
-            err.write(feedback + "\n")
+        if observed.state == "unconfirmed":
+            out.write(json.dumps({"systemMessage":
+                                  f"Delivery unconfirmed: {observed.reason}\nnext: {observed.next}"},
+                                 ensure_ascii=False) + "\n")
         else:
             feedback = ("If you are waiting for the user's answer or publication was withdrawn, "
                         "stop again and say so; otherwise: " + feedback)
-            out.write(json.dumps({"decision": "block", "reason": feedback}, ensure_ascii=False) + "\n")
+            response = ({"hookSpecificOutput": {"hookEventName": "Stop", "additionalContext": feedback}}
+                        if host == "claude" else {"decision": "block", "reason": feedback})
+            out.write(json.dumps(response, ensure_ascii=False) + "\n")
     except (OSError, UnicodeError, ValueError, TypeError, UsageError, DeadlineExpired) as exc:
         launcher = shlex.quote(str(Path(__file__).resolve().parents[2] / "loom-python"))
-        err.write(f"Delivery unconfirmed: {exc}\nnext: Restore the missing prerequisites and run "
-                  f"{launcher} --ready delivery --json before claiming completion.\n")
+        feedback = (f"Delivery unconfirmed: {exc}\nnext: Restore the missing prerequisites and run "
+                    f"{launcher} --ready delivery --json before claiming completion.")
+        out.write(json.dumps({"systemMessage": feedback}, ensure_ascii=False) + "\n")
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         signal.signal(signal.SIGALRM, previous_handler)
@@ -563,10 +577,12 @@ def _delivery_stop(out, err) -> int:
 def cmd_delivery(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     """Observe an explicit local, published or merged delivery target without writes."""
     if "--hook" in args:
-        if args != ["--hook"]:
-            err.write("delivery: --hook must be used alone\n")
+        if args == ["--hook"]:
+            return _delivery_stop(out, err)
+        if len(args) != 3 or args[:2] != ["--hook", "--host"] or args[2] not in {"claude", "codex"}:
+            err.write("delivery: use --hook alone or --hook --host claude|codex\n")
             return 2
-        return _delivery_stop(out, err)
+        return _delivery_stop(out, err, host=args[2])
     goal, intent_file, as_json = "published", None, False
     seen: set[str] = set()
     rest = list(args)

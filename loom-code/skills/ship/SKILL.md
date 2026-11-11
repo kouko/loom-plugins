@@ -322,10 +322,16 @@ an agent's claim and stale remote-tracking refs cannot prove exact-head delivery
 Incomplete or unavailable evidence remains incomplete or unconfirmed, never
 success. Observation never authorizes publication or merge.
 Claude Code and Codex Stop hooks request at most one continuation for applicable
-authorized unfinished changes; repeated Stop, human decision boundaries and
-external blockers may stop without claiming completion. OpenCode and Antigravity
-do not have verified termination enforcement; use this same command and disclose
-that limitation rather than claiming a hook blocked termination.
+authorized unfinished changes: Claude uses normal additional context, while
+Codex uses its supported blocking response. Repeated Stop is silent without
+another delivery lookup; valid Claude background-task or scheduled-wakeup
+metadata also permits a pause. Human decision boundaries and external blockers
+may stop without claiming completion. Unavailable evidence produces a
+non-continuing unconfirmed diagnostic. Native Codex continuation was verified;
+Claude's native Stop execution remains unverified because account quota blocked
+the probe. OpenCode and Antigravity do not have verified termination enforcement;
+use this same command and disclose that limitation rather than claiming a hook
+blocked termination.
 
 Report the attestation digest when one exists, else the verification status
 publish printed, publication checks, PR URL, CI state, and land's output.
