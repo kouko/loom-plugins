@@ -1,4 +1,5 @@
 # concern: Quoted skip-record examples must not waive retained intake requirements.
+# concern: Intake errors and confirmation blockers must never be treated as readiness.
 """Executable contract for `loom_checker.py intake <station> <change-id>`
 (plan W0-03) -- what write-spec and write-plan are allowed to accept.
 
