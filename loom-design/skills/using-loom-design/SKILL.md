@@ -1,7 +1,7 @@
 ---
 name: using-loom-design
 description: |
-  Route broad Loom product-definition requests to intent, specification, principles, visual design, architecture or design research skills when the needed skill is unclear.
+  Route Loom product-definition requests to intent, specification, principles, visual design, architecture or design research skills when the needed skill is unclear.
 user-invocable: true
 ---
 

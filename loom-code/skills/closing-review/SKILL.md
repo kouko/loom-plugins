@@ -19,8 +19,8 @@ compaction.
 ## 1. Establish the content
 
 When a factual contradiction could change a review conclusion, identify the
-pending decision and use `loom-code:engineering-research` as needed; reuse
-adequate evidence directly. Return findings or uncertainty to review without
+pending decision and use `loom-code:engineering-research` as needed; adequate
+evidence needs no new study. Return findings or uncertainty to review without
 editing artifacts, replacing independent verification or creating missing
 execution evidence; preserve scope and user decisions.
 

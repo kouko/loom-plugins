@@ -104,7 +104,7 @@ planning onward; intent and spec work alone.
 | [`product-principles`](loom-design/skills/product-principles/README.md) | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
 | [`design-system`](loom-design/skills/design-system/README.md) | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
 | [`architecture-design`](loom-design/skills/architecture-design/README.md) | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
-| [`design-research`](loom-design/skills/design-research/SKILL.md) | Resolve consequential design evidence gaps, compare relevant alternatives and retain research before returning to the original task. |
+| [`design-research`](loom-design/skills/design-research/README.md) | Resolve consequential design evidence gaps, compare relevant alternatives and retain research before returning to the original task. |
 | [`using-loom-design`](loom-design/skills/using-loom-design/README.md) | Optional router to the right product-definition skill. |
 
 ## loom-code

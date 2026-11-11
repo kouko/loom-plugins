@@ -66,7 +66,7 @@ diagram use `loom-design`.
 | [`product-principles`](skills/product-principles/README.md) | tool | `PRINCIPLES.md` | Ratify the product's standing principles: at least three ordered Non-negotiables and a `ratified-by: <name> <date>` line. |
 | [`design-system`](skills/design-system/README.md) | tool | `DESIGN.md` | Ratify the visual system for a product with a UI: colour, type, spacing, shape and component tokens. |
 | [`architecture-design`](skills/architecture-design/README.md) | tool | `ARCHITECTURE.md` | Design the project's architecture with the user — module boundaries, tech choices, folder layout, CI stages — then back each rule with a guard test. |
-| [`design-research`](skills/design-research/SKILL.md) | tool | `docs/loom/research/<date>-<topic>.md` | Investigate design evidence gaps, compare relevant alternatives and return findings within the original task's authority. |
+| [`design-research`](skills/design-research/README.md) | tool | `docs/loom/research/<date>-<topic>.md` | Investigate design evidence gaps, compare relevant alternatives and return findings within the original task's authority. |
 | [`using-loom-design`](skills/using-loom-design/README.md) | router | — | Optional: route a broad product-definition request to one of the six skills above. It is not a prerequisite; each skill can be called directly. |
 
 **Standing documents.** A `kind: product` change is refused by loom-code's
