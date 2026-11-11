@@ -1,0 +1,100 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-skill-retro-project-identity",
+  "content_digest": "54a5a8afd9d41a92ab6a688ccd821e1247eb3425",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/skill-retro/test_ingest.py",
+      "artifact": "loom-workflow/tests/skill-retro/test_ingest.py",
+      "result": "pass",
+      "command_digest": "2d5d5c05624fa8529029a773d145c0ccc95fd559b3855fb790737646af5382c5"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "a8ec84e02740b58820055249e40e186d63233fbd",
+      "review_target_sha": "5d7fb47e2692d69658fff7ee4a0fcb09f8d9be1c",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists in the repository root.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer identity, bounded Round 2 verification of fa1055d1866c762b24c6d9181047a805bcb412fa..5d7fb47e2692d69658fff7ee4a0fcb09f8d9be1c. My Round 1 findings list was empty. The five tuple-membership replacements avoid hashing untrusted JSON discriminator arrays/objects while preserving valid string behavior; no regression introduced by this fix was identified. Unchanged dimensions retain the Round 1 assessment.",
+        "Independently executed uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/skill-retro/test_ingest_malformed_types.py loom-workflow/tests/skill-retro/test_ingest.py -q: 32 passed in 0.47s, no skips. The single eight-case entry regression verifies usable invocations after malformed records, exact source lines, known attribution and subsequent unknown-context replacement. No full package suite or new adversarial program was run.",
+        "Read the updated plan and acceptance report, appended build/acceptance evidence and affected ingestion functions/callers. W4 stays within the existing requirements; evidence preserves the original run and records RED-to-GREEN and independent re-testing of all three acceptance rows on both adapters. No new abstraction, external call, configuration or output shape was introduced by the fix."
+      ],
+      "reviewer": "retro-review-a",
+      "vendor": "openai",
+      "model": "inherited-unobservable"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "a8ec84e02740b58820055249e40e186d63233fbd",
+      "review_target_sha": "5d7fb47e2692d69658fff7ee4a0fcb09f8d9be1c",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Prior Round 1 fatal correctness finding at ingest.py:452: fixed. Non-hashing tuple membership now rejects array/object metadata discriminators without raising TypeError; the same repair covers content type, message role and both call/output discriminator checks. Valid JSON scalar/string behavior remains equivalent. No finding was dismissed and no new defect was found in the fix delta.",
+        "Independently ran the only changed test file in fa1055d..5d7fb47: PYTHONDONTWRITEBYTECODE=1 uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -p no:cacheprovider loom-workflow/tests/skill-retro/test_ingest_malformed_types.py -q. Result: 8 passed, zero skipped; one harmless cache_dir warning from disabling pytest cache. The entry test verifies usable later invocations, canonical identity, unknown-context replacement and source lines. No complete suite or adversarial program was run.",
+        "Reviewed the complete fix delta, W4 plan addition, retained build evidence, updated acceptance report and independent re-test evidence for all three acceptance rows on both adapters plus malformed-record CLI smoke. Requirement reconciliation from Round 1 remains satisfied, with the malformed-record exception now closed. Existing historical-identity, duplicate-session and host-routing limitations remain disclosed. Repository HEAD matched the target and the working tree was clean; only this external verdict file was written."
+      ],
+      "reviewer": "retro-review-b",
+      "vendor": "openai",
+      "model": "inherited-unobservable"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "6980ebb0d81eaf2a5e018c49ee34b3e3b8c5f723",
+  "tested_commit": "75f9630f564b2aea29222ada7dbf59cbbcc83c50",
+  "reviewed_commit": "5d7fb47e2692d69658fff7ee4a0fcb09f8d9be1c",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}
