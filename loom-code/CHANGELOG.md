@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.66.0] — 2026-11-11 — clarify existing planning intake observations
+
+- Clarify existing intake exit codes and blocking reasons before and after planning, including confirmation early exits, unknown crash completeness and recovery/rerun. Preserve the text CLI and all existing checks.
+- Retain confirmation, review and acceptance requirements; intake readiness is a scoped observation, not workflow authorization.
+- Adopt guidance-only after the bounded comparison found no JSON consumption advantage over guided text. Withdraw the trial JSON interface while preserving its reproducible evidence and input-provenance research; no universal accuracy, token or latency improvement is established.
+
 ## [3.65.0] — 2026-11-11 — frame Stop feedback for each host
 
 - Select Claude Code and Codex explicitly in packaged delivery hooks. Use normal continuation feedback for Claude Code and retain Codex's blocking continuation response; repeated Stop events are silent before delivery lookup.

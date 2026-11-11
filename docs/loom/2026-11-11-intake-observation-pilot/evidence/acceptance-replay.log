@@ -1,0 +1,1 @@
+{"real_cli_pairs": 5, "injected_controls": 1, "packet_cases": {"text": 6, "guided_text": 6, "json": 6}, "input_cases": 7, "output": "/private/tmp/intake-acceptance-replay"}

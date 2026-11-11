@@ -1,0 +1,8 @@
+{
+  "C01": {"ready": true, "blockers": [], "checks_complete": true, "recovery_or_rerun": "none indicated", "reason": "Exit code 0 indicates successful intake; no blocker is reported. This does not authorize later workflow steps."},
+  "C02": {"ready": false, "blockers": ["intake.confirmed: intent status is open; write-plan requires confirmed status with a date"], "checks_complete": "unknown", "recovery_or_rerun": "Confirm the intent appropriately, then rerun intake.", "reason": "A concrete blocker is reported, but the output does not establish whether all applicable checks ran."},
+  "C03": {"ready": false, "blockers": ["spec.req-grammar: REQ-1 references Acceptance #99 although only one acceptance line exists"], "checks_complete": "unknown", "recovery_or_rerun": "Correct the acceptance reference and rerun intake.", "reason": "The invalid requirement reference blocks intake; the output does not establish check completion."},
+  "C04": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Run intake inside the intended Git work tree.", "reason": "The command failed before it could establish intake readiness because the supplied location is not a Git work tree."},
+  "C05": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Select supported station write-spec or write-plan and rerun.", "reason": "The unsupported build station prevents a valid intake evaluation."},
+  "C06": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Resolve the internal checker failure and rerun; disregard the incomplete passed fragment.", "reason": "An internal error and truncated stdout do not provide a trustworthy readiness result."}
+}

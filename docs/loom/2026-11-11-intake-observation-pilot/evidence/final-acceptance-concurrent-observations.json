@@ -1,0 +1,172 @@
+{
+  "head": "ede4db79663b960e60b81cf1f0c49fa4d74212a7",
+  "actual_project": {
+    "exit": 0,
+    "stdout": "interface-surfaces (manifest default (KICKOFF-DEFAULTS adds nothing new)): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+    "stderr": "",
+    "files": 3978,
+    "changed": [
+      "loom-code/scripts/loom_checker/__pycache__/parsing.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/verification.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/probes.cpython-311.pyc",
+      "loom-code/scripts/__pycache__/git_exec.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/__init__.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/commit_identity.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/sync.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/pr_floor.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/intent_version.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/charter.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/github_rules.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/push.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/digest.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/helpers.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/intents.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/finalize.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/rules.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/__init__.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/push.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/plan.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/standing.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/standing.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/evidence_coverage.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/publish.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/intent.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/land.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/reviewers.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/publish.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/artifact_types.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/charter.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/intent_state.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/__init__.cpython-311.pyc",
+      "loom-code/scripts/__pycache__/repo_files.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/intake.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/contract.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/probe_results.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/__pycache__/attestation.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/contract.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/intake.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/intent.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/command_handlers/__pycache__/reviewer_count.cpython-311.pyc",
+      "loom-code/scripts/loom_checker/rule_checks/__pycache__/plan_boundary_tests.cpython-311.pyc"
+    ]
+  },
+  "cases": {
+    "pass": {
+      "exit": 0,
+      "stdout": "interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+      "stderr": "",
+      "files": 34,
+      "changed": []
+    },
+    "changed_input": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "BLOCK intake.confirmed: write-plan accepts only `status: confirmed <date>`; status is open.\n",
+      "files": 34,
+      "changed": []
+    },
+    "confirmation": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "BLOCK intake.confirmed: write-plan accepts only `status: confirmed <date>`; status is open.\n",
+      "files": 34,
+      "changed": []
+    },
+    "later": {
+      "exit": 1,
+      "stdout": "interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+      "stderr": "BLOCK spec.req-grammar: REQ-1 points at Acceptance #99, but the intent carries 1 acceptance line(s).\n",
+      "files": 35,
+      "changed": []
+    },
+    "unavailable": {
+      "exit": 2,
+      "stdout": "",
+      "stderr": "/private/tmp/final-intake-fixtures-0n50ylba/unavailable is not inside a git work tree.\n",
+      "files": 0,
+      "changed": []
+    },
+    "invalid": {
+      "exit": 2,
+      "stdout": "",
+      "stderr": "unknown station 'build'; intake covers write-spec and write-plan.\n",
+      "files": 34,
+      "changed": []
+    }
+  },
+  "input_reproduction": [
+    {
+      "input": null,
+      "task_class": "ordinary",
+      "uncertainty": "insufficient-task-evidence",
+      "effective_profile": {
+        "model": "standard",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {},
+      "task_class": "ordinary",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "standard",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "trust_boundary": false
+      },
+      "task_class": "ordinary",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "standard",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "trust_boundary": true
+      },
+      "task_class": "complex",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "frontier",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "exact_transformation": true,
+        "bounded_targets": true,
+        "mechanical_oracle": true
+      },
+      "task_class": "mechanical",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "economy",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "exact_transformation": true,
+        "bounded_targets": true,
+        "mechanical_oracle": true,
+        "trust_boundary": true
+      },
+      "task_class": "mechanical",
+      "uncertainty": null,
+      "effective_profile": {
+        "model": "economy",
+        "effort": "medium"
+      }
+    },
+    {
+      "input": {
+        "trust_boundary": null
+      },
+      "error": "task evidence values must be booleans"
+    }
+  ]
+}

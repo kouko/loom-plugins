@@ -1,0 +1,42 @@
+{
+  "arm": "json",
+  "instructions": "For each observation determine intake readiness, list observed blockers, say whether applicable intake checks completed, and state whether recovery or rerun is needed. Distinguish unknown from false. Return JSON answers keyed by case_id with ready, blockers, checks_complete, recovery_or_rerun, and a brief reason. Intake readiness alone does not authorize later workflow steps.",
+  "cases": [
+    {
+      "case_id": "C01",
+      "exit_code": 0,
+      "stdout": "{\"station\": \"write-plan\", \"change_id\": \"2026-09-02-a\", \"state\": \"passed\", \"checks_complete\": true, \"failures\": [], \"diagnostics\": \"interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\\n\", \"error\": null}\n",
+      "stderr": ""
+    },
+    {
+      "case_id": "C02",
+      "exit_code": 1,
+      "stdout": "{\"station\": \"write-plan\", \"change_id\": \"2026-09-02-a\", \"state\": \"blocked\", \"checks_complete\": false, \"failures\": [{\"rule\": \"intake.confirmed\", \"reason\": \"write-plan accepts only `status: confirmed <date>`; status is open.\"}], \"diagnostics\": \"\", \"error\": null}\n",
+      "stderr": ""
+    },
+    {
+      "case_id": "C03",
+      "exit_code": 1,
+      "stdout": "{\"station\": \"write-plan\", \"change_id\": \"2026-09-02-a\", \"state\": \"blocked\", \"checks_complete\": true, \"failures\": [{\"rule\": \"spec.req-grammar\", \"reason\": \"REQ-1 points at Acceptance #99, but the intent carries 1 acceptance line(s).\"}], \"diagnostics\": \"interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\\n\", \"error\": null}\n",
+      "stderr": ""
+    },
+    {
+      "case_id": "C04",
+      "exit_code": 2,
+      "stdout": "{\"station\": \"write-plan\", \"change_id\": \"2026-09-02-a\", \"state\": \"unconfirmed\", \"checks_complete\": false, \"failures\": [], \"diagnostics\": \"\", \"error\": \"/private/tmp/loom-intake-comparison/fixtures-yslfa5nv/C04 is not inside a git work tree.\"}\n",
+      "stderr": ""
+    },
+    {
+      "case_id": "C05",
+      "exit_code": 2,
+      "stdout": "{\"station\": \"build\", \"change_id\": \"2026-09-02-a\", \"state\": \"unconfirmed\", \"checks_complete\": false, \"failures\": [], \"diagnostics\": \"\", \"error\": \"unknown station 'build'; intake covers write-spec and write-plan.\"}\n",
+      "stderr": ""
+    },
+    {
+      "case_id": "C06",
+      "exit_code": 2,
+      "stdout": "{\"state\": \"passed\",",
+      "stderr": "loom_checker internal error: RuntimeError: injected control\n"
+    }
+  ]
+}

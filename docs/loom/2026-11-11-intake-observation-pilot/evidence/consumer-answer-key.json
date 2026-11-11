@@ -1,0 +1,140 @@
+{
+  "C01": {
+    "construction": "pass",
+    "source": "real-cli",
+    "ready": true,
+    "checks_complete": true,
+    "failures": [],
+    "error": null,
+    "recovery_or_rerun": false,
+    "acceptable_completeness": {
+      "text": [
+        true,
+        null
+      ],
+      "guided_text": [
+        true
+      ],
+      "json": [
+        true
+      ]
+    }
+  },
+  "C02": {
+    "construction": "confirmation",
+    "source": "real-cli",
+    "ready": false,
+    "checks_complete": false,
+    "failures": [
+      {
+        "rule": "intake.confirmed",
+        "reason": "write-plan accepts only `status: confirmed <date>`; status is open."
+      }
+    ],
+    "error": null,
+    "recovery_or_rerun": true,
+    "acceptable_completeness": {
+      "text": [
+        false,
+        null
+      ],
+      "guided_text": [
+        false
+      ],
+      "json": [
+        false
+      ]
+    }
+  },
+  "C03": {
+    "construction": "later",
+    "source": "real-cli",
+    "ready": false,
+    "checks_complete": true,
+    "failures": [
+      {
+        "rule": "spec.req-grammar",
+        "reason": "REQ-1 points at Acceptance #99, but the intent carries 1 acceptance line(s)."
+      }
+    ],
+    "error": null,
+    "recovery_or_rerun": true,
+    "acceptable_completeness": {
+      "text": [
+        true,
+        null
+      ],
+      "guided_text": [
+        true
+      ],
+      "json": [
+        true
+      ]
+    }
+  },
+  "C04": {
+    "construction": "unavailable",
+    "source": "real-cli",
+    "ready": false,
+    "checks_complete": false,
+    "failures": [],
+    "error": "/private/tmp/loom-intake-comparison/fixtures-yslfa5nv/C04 is not inside a git work tree.",
+    "recovery_or_rerun": true,
+    "acceptable_completeness": {
+      "text": [
+        false,
+        null
+      ],
+      "guided_text": [
+        false
+      ],
+      "json": [
+        false
+      ]
+    }
+  },
+  "C05": {
+    "construction": "invalid",
+    "source": "real-cli",
+    "ready": false,
+    "checks_complete": false,
+    "failures": [],
+    "error": "unknown station 'build'; intake covers write-spec and write-plan.",
+    "recovery_or_rerun": true,
+    "acceptable_completeness": {
+      "text": [
+        false,
+        null
+      ],
+      "guided_text": [
+        false
+      ],
+      "json": [
+        false
+      ]
+    }
+  },
+  "C06": {
+    "construction": "injected partial-output crash",
+    "source": "synthetic-control",
+    "ready": false,
+    "checks_complete": false,
+    "failures": [],
+    "error": "injected crash",
+    "recovery_or_rerun": true,
+    "acceptable_completeness": {
+      "text": [
+        false,
+        null
+      ],
+      "guided_text": [
+        false,
+        null
+      ],
+      "json": [
+        false,
+        null
+      ]
+    }
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "case_id": "C01",
+    "arm": "text",
+    "seconds": 0.16145995794795454,
+    "output_bytes": 151
+  },
+  {
+    "case_id": "C01",
+    "arm": "json",
+    "seconds": 0.15860033291392028,
+    "output_bytes": 301
+  },
+  {
+    "case_id": "C02",
+    "arm": "text",
+    "seconds": 0.07939829188399017,
+    "output_bytes": 92
+  },
+  {
+    "case_id": "C02",
+    "arm": "json",
+    "seconds": 0.07935274997726083,
+    "output_bytes": 260
+  },
+  {
+    "case_id": "C03",
+    "arm": "text",
+    "seconds": 0.15728116710670292,
+    "output_bytes": 252
+  },
+  {
+    "case_id": "C03",
+    "arm": "json",
+    "seconds": 0.16006429097615182,
+    "output_bytes": 420
+  },
+  {
+    "case_id": "C04",
+    "arm": "text",
+    "seconds": 0.07559166708961129,
+    "output_bytes": 89
+  },
+  {
+    "case_id": "C04",
+    "arm": "json",
+    "seconds": 0.07148737483657897,
+    "output_bytes": 241
+  },
+  {
+    "case_id": "C05",
+    "arm": "text",
+    "seconds": 0.04644670803099871,
+    "output_bytes": 66
+  },
+  {
+    "case_id": "C05",
+    "arm": "json",
+    "seconds": 0.04659537482075393,
+    "output_bytes": 213
+  }
+]

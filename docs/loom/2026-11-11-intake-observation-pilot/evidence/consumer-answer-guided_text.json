@@ -1,0 +1,8 @@
+{
+  "C01": {"ready": true, "blockers": [], "checks_complete": true, "recovery_or_rerun": "none indicated", "reason": "Guidance defines exit 0 as all applicable intake checks passing; later workflow steps remain separately authorized."},
+  "C02": {"ready": false, "blockers": ["intake.confirmed: intent status is open; write-plan requires confirmed status with a date"], "checks_complete": false, "recovery_or_rerun": "Confirm the intent appropriately and rerun intake.", "reason": "Guidance says this blocker stops execution before later checks."},
+  "C03": {"ready": false, "blockers": ["spec.req-grammar: REQ-1 references Acceptance #99 although only one acceptance line exists"], "checks_complete": true, "recovery_or_rerun": "Correct the acceptance reference and rerun intake.", "reason": "This is a later returned rule failure, which the guidance says completes the applicable check path."},
+  "C04": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Run intake inside the intended Git work tree.", "reason": "Exit 2 reports an unavailable evaluation, not a rule failure or negative readiness result."},
+  "C05": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Select supported station write-spec or write-plan and rerun.", "reason": "The invocation is invalid, so readiness was not evaluated."},
+  "C06": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Resolve the internal checker failure and rerun; disregard truncated stdout.", "reason": "Exit 2 and the crash invalidate any apparent passed fragment."}
+}

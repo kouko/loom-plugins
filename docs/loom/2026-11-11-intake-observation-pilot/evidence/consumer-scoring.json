@@ -1,0 +1,22 @@
+{
+  "design": "One fresh consumer, sequential crossover: text, guided_text, json. Answers saved before reading the next packet; implementation, fixtures, intent, spec and key withheld until all answers were saved. Not independent samples or randomized estimates.",
+  "scoring": "Manual semantic assessment against observations and key, preserving unknown versus false. The key ready=false for operational failures means readiness cannot be granted, not a proven underlying failed intake. Consumer unknown is justified for C04-C06. Unknown completeness in text C02/C03 is justified and is not an error.",
+  "per_case": {
+    "C01": {"text": "correct", "guided_text": "correct", "json": "correct"},
+    "C02": {"text": "correct; completeness unknown justified", "guided_text": "correct; completeness resolved", "json": "correct; completeness resolved"},
+    "C03": {"text": "correct; completeness unknown justified", "guided_text": "correct; completeness resolved", "json": "correct; completeness resolved"},
+    "C04": {"text": "correct; readiness unknown", "guided_text": "correct; readiness unknown", "json": "correct; readiness unknown"},
+    "C05": {"text": "correct; readiness unknown", "guided_text": "correct; readiness unknown", "json": "correct; readiness unknown"},
+    "C06": {"text": "safe recovery; completion false not established by crash alone", "guided_text": "safe recovery; completion false not established by crash alone", "json": "safe recovery; completion false not established by crash alone"}
+  },
+  "summary": {
+    "readiness_blockers_and_recovery_consistent_cases": {"text": 6, "guided_text": 6, "json": 6},
+    "real_cases_with_resolved_correct_completeness_out_of_five": {"text": 3, "guided_text": 5, "json": 5},
+    "text_justified_unknown_completeness_cases": ["C02", "C03"],
+    "crash_control_limit": "All answers set completion false. Safe recovery is correct, but a crash alone does not establish how many checks ran. The injected key accepts false or unknown; do not generalize this score to real crash completeness.",
+    "json_benefit_over_guidance_observed": false,
+    "model_tokens": null,
+    "efficiency_savings_proven": false,
+    "recommendation": "Prefer guidance-only under REQ-3; do not retain JSON on an unmeasured readability claim."
+  }
+}
