@@ -27,6 +27,17 @@
 - Adversarial replay after the full suite: `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/skill-retro/test_ingest.py` — 24 passed, exit 0.
 - The package runner's temporary npm install emitted an audit advisory (2 low, 1 critical); no dependency change or audit remediation was performed by this repair. The declared suite completed successfully.
 
+## Round 1 finding and Round 2 repair
+
+Reviewer A returned PASS. Reviewer B returned NEEDS_REVISION for one fatal correctness finding at ingest.py:452: hashing an untrusted array/object record type could raise TypeError and abort preview. No finding was dismissed.
+
+The class search covered complete changed files and ingestion acceptance surfaces. Five ingestion membership sites shared the mechanism: metadata record type, content item type, message role, function-call type and output type. The repair at 22ff4ee5d6eda5a53969aed1613721dd15ad64d1 uses non-hashing tuple membership at each site. Plan task W4 retains the same requirements and review episode.
+
+- RED: `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/skill-retro/test_ingest_malformed_types.py -q` — 8 failed with TypeError.
+- GREEN: `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/skill-retro -q` — 162 passed.
+- One parameterized test adds 36 lines, preserving valid later invocations and unknown-context replacement. The existing adversarial artifact remains unchanged.
+- End-of-Build replay at 22ff4ee5: the declared full package suite exited 0, totaling 4199 pytest passes and 6 skips plus successful shell groups; the unchanged adversarial ingestion command then passed all 24 tests. No adversary re-dispatch was needed because its existing program remained runnable and passed.
+
 ## Scope limits
 
 These executions validate the ingestion and preview CLI, not host automatic skill routing or the downstream model-generated proposal. Project identity observes the current filesystem. Duplicate-session handling and threshold configuration overrides remain outside this repair.
