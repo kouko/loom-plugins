@@ -1,3 +1,4 @@
+# concern: Wrong repository attribution from stale context, worktrees, or inherited Git routing.
 """test_ingest.py — verifies ingest_claude_jsonl maps real Claude Code
 JSONL records to Event[] correctly.
 
@@ -22,8 +23,12 @@ Per loom-workflow/skills/skill-retro Plan Part 1 §Task 2 acceptance.
 from __future__ import annotations
 
 import sys
+import json
+import subprocess
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 # Allow `from event import Event` / `from ingest import ...` when pytest
 # is invoked from the repo root.
@@ -257,3 +262,84 @@ def test_codex_stop_policy_requires_user_facing_stop_construction():
         "halt",
         "privacy",
     )
+
+
+@pytest.mark.parametrize("host", ["claude", "codex"])
+def test_known_repository_events(tmp_path, monkeypatch, host):
+    repos = [tmp_path / name for name in ("first", "second")]
+    for repo in repos:
+        subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    nested = repos[0] / "nested"
+    nested.mkdir()
+    logs = tmp_path / "logs"
+    logs.mkdir()
+    records = []
+    locations = [repos[0], nested, repos[1], repos[0]]
+    for cwd in locations:
+        if host == "claude":
+            records.append({"type": "user", "sessionId": "same", "timestamp": "now",
+                            "cwd": str(cwd), "message": {"content": '<command-name>/test</command-name>'}})
+        else:
+            records.extend([{"type": "session_meta" if not records else "turn_context",
+                             "payload": {"cwd": str(cwd), "id": "ignored"}},
+                            {"type": "response_item", "timestamp": "now", "payload": {
+                                "type": "function_call", "name": "Skill", "arguments": '{"skill":"test"}'}}])
+    (logs / "same.jsonl").write_text("\n".join(map(json.dumps, records)))
+    original_run = subprocess.run
+    calls = []
+    def observe(*args, **kwargs):
+        calls.append((args, kwargs))
+        return original_run(*args, **kwargs)
+    monkeypatch.setattr(subprocess, "run", observe)
+    monkeypatch.setenv("GIT_DIR", str(repos[1] / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(repos[1]))
+    monkeypatch.setenv("GIT_COMMON_DIR", str(repos[1] / ".git"))
+    ingest = ingest_claude_jsonl if host == "claude" else ingest_codex_jsonl
+    events = list(ingest(logs))
+    assert [e.project_path for e in events] == [str((repos[i] / ".git").resolve()) for i in (0, 0, 1, 0)]
+    assert [e.cwd for e in events] == list(map(str, locations))
+    assert all(e.session == "same" and e.source_line for e in events)
+    assert len(calls) == 3  # repeated cwd is resolved once per ingest
+    assert all(0 < kwargs["timeout"] <= 5 and kwargs["env"]["GIT_OPTIONAL_LOCKS"] == "0" for _, kwargs in calls)
+
+
+def test_worktree_context_switch(tmp_path):
+    repo, linked = tmp_path / "repo", tmp_path / "linked"
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "-c", "user.name=Test", "-c", "user.email=test@example.com",
+                    "commit", "-qm", "seed", "--allow-empty"], check=True)
+    subprocess.run(["git", "-C", str(repo), "worktree", "add", "--detach", str(linked)], check=True, capture_output=True)
+    records = []
+    for cwd in (str(repo), str(linked), None, 123, "relative", "/bad\0path"):
+        records.append({"type": "turn_context", "payload": {"cwd": cwd}})
+        for payload in ({"type": "message", "role": "user", "content": "hello"},
+                        {"type": "function_call", "name": "Skill", "arguments": '{"skill":"test"}'},
+                        {"type": "function_call_output", "output": "done"}):
+            records.append({"type": "response_item", "timestamp": "now", "payload": payload})
+    (tmp_path / "session.jsonl").write_text("\n".join(map(json.dumps, records)))
+    events = list(ingest_codex_jsonl(tmp_path))
+    assert [e.project_path for e in events if e.skill_invocation] == [str((repo / ".git").resolve())] * 2 + [None] * 4
+    assert [e.cwd for e in events[:6]] == [str(repo)] * 3 + [str(linked)] * 3
+    assert all(e.cwd is None for e in events[6:12])
+
+
+@pytest.mark.parametrize("cwd", [None, 123, "relative", "/bad\0path", "/nonexistent/retro-test"])
+def test_missing_context_unknown(tmp_path, cwd):
+    (tmp_path / "session.jsonl").write_text(json.dumps({
+        "type": "user", "sessionId": "same", "timestamp": "now", "cwd": cwd,
+        "message": {"content": '<command-name>/test</command-name>'}}))
+    event = next(ingest_claude_jsonl(tmp_path))
+    assert event.project_path is None
+    assert event.cwd == (cwd if isinstance(cwd, str) else None)
+
+
+@pytest.mark.parametrize("failure", [None, FileNotFoundError(), PermissionError(), subprocess.TimeoutExpired("git", 5)])
+def test_failed_git_unknown(tmp_path, monkeypatch, failure):
+    (tmp_path / "session.jsonl").write_text(json.dumps({
+        "type": "user", "sessionId": "same", "timestamp": "now", "cwd": str(tmp_path),
+        "message": {"content": '<command-name>/test</command-name>'}}))
+    if failure is not None:
+        def fail(*args, **kwargs):
+            raise failure
+        monkeypatch.setattr(subprocess, "run", fail)
+    assert next(ingest_claude_jsonl(tmp_path)).project_path is None

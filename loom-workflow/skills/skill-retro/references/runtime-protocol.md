@@ -17,6 +17,22 @@ and/or `--codex-root`; once either is supplied, unspecified transcript roots
 are excluded. Use `--facets-root` separately to bound Claude facet lookup.
 The orchestrator supplies any explicit source path in `input.target_skill_path`.
 
+Automatic discovery counts known projects from each matching invocation's
+observed `cwd`, resolved to its current canonical Git common directory.
+Subdirectories and linked worktrees share one identity; independent clones
+remain separate. One session may contribute several known projects, without
+changing the independent-session thresholds. Event `cwd` and `project_path`
+travel with `source_path` / `source_line` for traceability.
+
+Missing or unresolvable locations contribute no known project. Aggregate
+`unknown_project_sessions` lists every session with an unattributed matching
+invocation, even when other invocations in that session resolve. Project counts
+are therefore lower bounds: incomplete attribution can reduce the cross-project
+score and rank. The existing confidence tag describes known project diversity,
+not overall evidence quality. Git inspection observes today's filesystem,
+not historical identity; deleted or reused paths cannot establish the past.
+This does not resolve duplicated sessions or change ranking weights.
+
 Read `top.json`, then fan out one subagent for every
 `subagent_payload[]` entry. Select
 `agents/prompt-failure-analysis.md` or
