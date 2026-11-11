@@ -20,7 +20,7 @@ charter: 1.1
 **W3-01 Restrict publication reminders to verified committed work** after: W2-01 acceptance: 1,2,3
 - Files: loom-code/scripts/loom_checker/command_handlers/publish.py (_delivery_stop only), loom-code/tests/test_delivery_stop.py, loom-code/skills/ship/SKILL.md, loom-code/CHANGELOG.md
 - Test: A1 positive: eligible-reminder; boundary: absent-stale-pending-no-remote. A2 positive: explicit-delivery-and-skip-publication-preserved; boundary: changed-head-no-continuation. A3 positive: packaged-host-replay; boundary: human-wait-remains-conditional.
-- Risk: agent-decided — reuse verification_status and local delivery observation; no new workflow state. Preserve every W1 response/recovery test, supplying eligible evidence only where necessary; add a real valid/stale attestation path using existing fixtures. Existing explicit delivery/publication tests must still pass. Record absent/stale skip paths as silent automatic reminders, not refused publication. Release remains 3.65.0 before first closing review.
+- Risk: agent-decided — reuse verification_status/local delivery; no workflow state. Preserve W1 response/recovery tests and explicit delivery/publication semantics. Exercise real valid/stale attestations with existing fixtures. Silent skip paths never refuse publication; retain 3.65.0 before review.
 
 ## Simplicity check
 - none found
@@ -34,4 +34,4 @@ charter: 1.1
 2. A normal first reminder may still ask the agent to stop and explain a pending human decision. The repeated event is silent; no language classifier guesses that the user has approved publication or merge.
 3. No installed plugin/settings change and no merge of PR #140. Record source, native host support and installed adoption separately.
 4. No outside review selected. Claude executor is installed but currently quota-blocked; availability does not authorize another review.
-5. user-decided — proceed with the recommended evidence investigation and bounded same-change design revision (2026-11-11). [Research](research/01-stop-readiness-evidence.md) establishes that evidence cannot classify all conversational states. W3 narrows automatic reminders, preserves explicit commands and earlier W1/W2 evidence, and adds no new acceptance condition. No closing review round has begun; no budget or retry count is reset.
+5. user-decided — proceed with evidence investigation and bounded revision (2026-11-11). [Research](research/01-stop-readiness-evidence.md) establishes conversational uncertainty. W3 preserves Acceptance, explicit commands and prior W1/W2 evidence. Closing review has not begun; budgets and retries are not reset.
