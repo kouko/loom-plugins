@@ -1,3 +1,4 @@
+# concern: Wrong repository attribution from stale context, worktrees, or inherited Git routing.
 """test_ingest.py — verifies ingest_claude_jsonl maps real Claude Code
 JSONL records to Event[] correctly.
 
