@@ -96,3 +96,34 @@ retains conditions and limitations. W3 repairs only fake-CLI test preconditions;
 three descendant-check failures under a parent-only-kill mutation. The production
 external-review script/defaults remain unchanged. Complete verification is still
 reported separately; these focused results do not substitute for it.
+
+## Final Build result
+
+At committed `c7fd9d5f606aa20cdf87d87587d0b4c23c537c65`, ran the original declared
+complete command with the default interpreter and auto worker selection: no
+worker override, interpreter override, deselection or skip was added.
+
+```sh
+uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q
+```
+
+Exit 0. The 15 pytest summaries total **4225 passed, 11 skipped**; all remaining
+shell/check surfaces also completed successfully. The original root/code group
+reported 2799 passed, 2 skipped in 200.05s. Raw local output:
+`/private/tmp/loom-research-build-suite-verified.log`. Counts were recomputed
+from actual pytest summary lines, not inferred from a zero exit alone.
+
+The retained adversarial program was rerun after all fixes:
+
+```sh
+uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/test_design_research_package.py
+```
+
+Result: 2 passed in 0.03s. No adversary re-dispatch was needed because the
+retained program remained applicable and passing; its recorded initial attack
+scope remains explicit. The independent timeout mutation evidence supplements
+the repaired test behavior without claiming to be research acceptance evidence.
+
+`sync-trunk` reported up to date at `c7fd9d5f`, containing origin/main `70a05fd7`.
+The computed reviewer floor is 2. Build's required mechanical checks are complete;
+independent research-behavior acceptance and closing review remain separate.
