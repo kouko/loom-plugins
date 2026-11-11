@@ -18,7 +18,7 @@ charter: 1.1
 
 ### Wave 3
 **W3-01 Restrict publication reminders to verified committed work** after: W2-01 acceptance: 1,2,3
-- Files: loom-code/scripts/loom_checker/command_handlers/publish.py (_delivery_stop only), loom-code/tests/test_delivery_stop.py, loom-code/skills/ship/SKILL.md, loom-code/CHANGELOG.md
+- Files: loom-code/scripts/loom_checker/command_handlers/publish.py (entry: cmd_delivery; hook behavior only), loom-code/tests/test_delivery_stop.py, loom-code/skills/ship/SKILL.md, loom-code/CHANGELOG.md
 - Test: A1 positive: eligible-reminder; boundary: absent-stale-pending-no-remote. A2 positive: explicit-delivery-and-skip-publication-preserved; boundary: changed-head-no-continuation. A3 positive: packaged-host-replay; boundary: human-wait-remains-conditional.
 - Risk: agent-decided — reuse verification_status/local delivery; no workflow state. Preserve W1 response/recovery tests and explicit delivery/publication semantics. Exercise real valid/stale attestations with existing fixtures. Silent skip paths never refuse publication; retain 3.65.0 before review.
 
