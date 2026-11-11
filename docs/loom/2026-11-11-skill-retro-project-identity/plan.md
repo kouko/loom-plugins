@@ -22,6 +22,12 @@ charter: 1.1
 - Test: A1 positive: release-metadata-sync; boundary: mismatched-version. A2 positive: release-metadata-sync; boundary: mismatched-version. A3 positive: release-metadata-sync; boundary: mismatched-version.
 - Risk: agent-decided — minor 5.21.0 for added output fields; include CHANGELOG entry and pin-test rewrite before closing review.
 
+### Wave 4
+**W4-01 Preserve ingestion across malformed discriminator values** after: W3-01 acceptance: 1,2,3
+- Files: loom-workflow/skills/skill-retro/scripts/ingest.py (entry: ingest_codex_jsonl), loom-workflow/tests/skill-retro/test_ingest_malformed_types.py
+- Test: A1 positive: valid-record-after-malformed; boundary: array-object-type. A2 positive: valid-record-after-malformed; boundary: array-object-type. A3 positive: valid-record-after-malformed; boundary: array-object-type.
+- Risk: agent-decided — Round 1 found untrusted discriminator hashing aborts ingestion; cover record type, content type, role and payload type. Preserve the adversarial replay unchanged and add one parameterized entry regression.
+
 ## Simplicity check
 - none found
 
@@ -32,3 +38,4 @@ charter: 1.1
 1. Unknown attribution can lower cross-project scores; disclose it without changing weights. Duplicate sessions and the separately reproduced threshold-override bug remain out of scope.
 2. Git lookup observes current filesystem identity; deleted or reused historical paths cannot establish historical identity. Never reconstruct identities from names or remotes.
 3. The earlier Claude review covered the proposal only; no authorization for another paid external review is inferred. Current spec review passed independently before this plan.
+4. Round 2 fixes malformed discriminator handling within existing requirements. Earlier evidence remains valid for known records; rerun every acceptance row because ingestion feeds each one. This continues the same review episode and does not reset its digest or retry budget.
