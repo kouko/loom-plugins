@@ -74,11 +74,11 @@ def test_codex_event_set_is_session_start_and_publication_interception(codex_hoo
 
 
 def test_documented_stop_uses_shared_observer_with_bounded_timeout(hooks, codex_hooks):
-    for config, root in ((hooks, "CLAUDE_PLUGIN_ROOT"), (codex_hooks, "PLUGIN_ROOT")):
+    for config, root, host in ((hooks, "CLAUDE_PLUGIN_ROOT", "claude"), (codex_hooks, "PLUGIN_ROOT", "codex")):
         (entry,) = config["Stop"]
         (hook,) = entry["hooks"]
         assert hook["timeout"] == 25
-        assert f'"${{{root}}}/scripts/loom-python" --ready delivery --hook' in hook["command"]
+        assert f'"${{{root}}}/scripts/loom-python" --ready delivery --hook --host {host};' in hook["command"]
 
 
 def test_session_start_runs_the_rewritten_script(hooks):
@@ -430,9 +430,9 @@ def test_failed_hook_hint_replays_operation_without_launcher_on_path(host, event
     if event == "Stop":
         instruction = failed.stderr.splitlines()[-1].split("; ", 1)[1]
         assert instruction == ("rerun the original hook command in an agent station, replacing --ready "
-                               "with --repair and --hook with --json and preserving its executable path, "
+                               "with --repair and --hook with --json, removing --host and its value, and preserving its executable path, "
                                "other arguments, working directory and stdin before claiming completion.")
-        hint = command.replace("--ready", "--repair").replace("--hook", "--json")
+        hint = command.replace("--ready", "--repair").replace("--hook", "--json").replace(f" --host {host}", "")
         expected = ["delivery", "--json"]
     else:
         diagnostic = (json.loads(failed.stdout)["systemMessage" if host == "opencode" else "reason"]

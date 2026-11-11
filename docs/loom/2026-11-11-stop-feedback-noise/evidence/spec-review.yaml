@@ -1,0 +1,19 @@
+verdict: PASS
+lens: spec+adversarial
+reviewed_sha: 57803f88
+dimension_scores:
+  omission: PASS
+  ambiguity: PASS
+  inconsistency: PASS
+  incorrect-fact: PASS
+  missing-population: PASS
+  deletion-first: PASS
+  spec-conformance: PASS
+  design-conformance: "N/A — No DESIGN.md; standing-docs explicitly waives it for this plugin repository."
+  principles-conformance: PASS
+  user-judgment-leak: PASS
+findings: []
+notes:
+  - "All three acceptance requirements have design coverage. Silent repeat/background-task bypass does not certify delivery; the observer and explicit delivery status semantics remain unchanged. No new product-choice confirmation is invented."
+  - "Independently read the official Claude and Codex Stop contracts and raw /private/tmp/stop-host-probe receipts. Claude non-error continuation is documented; Codex receipts show FIRST/SECOND for block versus FIRST for additionalContext. Claude receipts show quota rejection before Stop, correctly disclosed as unverified. No live model invoked."
+  - "Prior recovery-invocation finding: fixed by 05d800b1 at spec.md:15, which explicitly removes --host/value during recovery and requires valid-command replay tests. Re-review inspected only this fix delta. This remains a pre-build specification verdict, not implementation or native-host acceptance; no repository files modified."

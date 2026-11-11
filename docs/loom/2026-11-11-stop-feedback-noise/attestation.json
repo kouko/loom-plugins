@@ -1,0 +1,108 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-stop-feedback-noise",
+  "content_digest": "5814df535b87d02d8e708078c183d0bd1941589b",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_delivery_stop.py",
+      "artifact": "loom-code/tests/test_delivery_stop.py",
+      "result": "pass",
+      "command_digest": "1e0410bef9e8437859f306ba6aa6f0aeeb04ec96009796fe7c980d80586bc13b"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "code",
+      "reviewed_sha": "a8ec84e02740b58820055249e40e186d63233fbd",
+      "review_target_sha": "a4ef9e3d06a1dc7d93d2882f0d50d90dc03ceba1",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES — Source behavior and focused tests agree with the confirmed design; repaired-plugin native behavior remains unverified.",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — All three changed test modules executed: 142 passed, no skips. Native repaired-plugin acceptance remains partial.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the repository.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "tests",
+          "anchor": "docs/loom/2026-11-11-stop-feedback-noise/evidence/acceptance-test-evidence.md:73",
+          "text": "issue (non-blocking): Native Claude repaired-plugin presentation and both hosts' repaired-plugin end-to-end continuation remain unverified. The recorded Codex synthetic framing experiment and local JSON tests cannot establish that the reported real-interface symptom is repaired; the acceptance report correctly keeps these results partial.",
+          "fix": "When the first-party account is available, execute an authorized isolated fresh-session acceptance run using the repaired packaged hook on Claude Code and Codex, capture first/repeated Stop and actual Claude presentation, and update the existing evidence/report with the observed results; until then retain this gap as open and preserve the partial verdicts."
+        }
+      ],
+      "notes": [
+        "Ran uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_delivery_stop.py loom-code/tests/test_hooks_json.py loom-code/tests/test_write_plan_station_text.py -q: 142 passed in 81.56s. Initial sandbox cache-lock failure was followed by authorized offline escalation. No full suite or new probe ran.",
+        "Independently read https://code.claude.com/docs/en/hooks#stop and https://learn.chatgpt.com/docs/hooks#stop, including common systemMessage output. Host-specific response shapes and task metadata are grounded; saved Codex event receipts and Claude quota receipts agree with the evidence limits.",
+        "Review covers the exact base-to-target delta, confirmed intent/spec/plan, implementation entry and observer/verification callers, Ship guidance, release synchronization, and acceptance/build/adversarial evidence. No code defect confirmed, no finding dismissed, and no repository artifact modified. Silence never claims delivery; human waiting with valid review remains an explicitly documented first-reminder limitation."
+      ],
+      "reviewer": "/root/stop_review_one",
+      "vendor": "openai",
+      "model": "inherited-unobservable"
+    },
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "code",
+      "reviewed_sha": "a8ec84e02740b58820055249e40e186d63233fbd",
+      "review_target_sha": "a4ef9e3d06a1dc7d93d2882f0d50d90dc03ceba1",
+      "dimension_scores": {
+        "security": "PASS — The existing trusted executable, redirect rejection, authorization and read-only observation boundaries remain intact; new host values are allowlisted and output is JSON encoded.",
+        "architecture": "PASS — Stop applicability and response formatting remain in the existing command handler, reusing verification_status and observe_delivery without a second workflow state model.",
+        "correctness": "PASS_WITH_NOTES — Source behavior and changed tests pass; native Claude presentation and repaired-plugin continuation on both hosts remain unverified, as the acceptance report explicitly records. A valid review still cannot identify a pending human question.",
+        "naming": "PASS — Host selection, selected HEAD, verification status and response construction have identifiable responsibilities and consistent names.",
+        "tests": "PASS — Independently ran test_delivery_stop.py, test_hooks_json.py, test_write_plan_station_text.py and test_hook_recovery_literal_path.py with the offline locked environment: 144 passed, no skips. Tests reach cmd_delivery and exercise real valid/stale attestation fixtures, host responses, pending work, races and exact recovery replay. Recorded RED/GREEN evidence covers the changed boundaries.",
+        "refactoring": "PASS — Existing observers and verification are reused; the conditional host response avoids duplicate Stop implementations. No new extraction is warranted.",
+        "cross-task-coherence": "PASS — Hook commands, parser, wrapper recovery instructions, Ship behavior and synchronized 3.65.0 metadata agree. Explicit publication remains available with absent/stale verification disclosure.",
+        "external-surface-grounding": "PASS — Independently opened the official Claude and Codex hook references cited by the specification; Claude additionalContext and task metadata, Codex block continuation, and shared systemMessage diagnostics are grounded. Native supporting receipts are correctly scoped as synthetic protocol evidence.",
+        "principles-conformance": "PASS — The change preserves publication and merge authorization boundaries, adds no persistent mechanism, and exposes partial acceptance and native-host limits rather than treating mechanical results as product acceptance.",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md was found in the reviewed tree.",
+        "deliberate-simplification": "PASS — The deliberate repository-evidence approximation explicitly states its human-wait ceiling and preserves conditional guidance; it does not claim conversation classification.",
+        "deletion-first": "PASS — The host flag has two present packaged consumers; the existing verification and local observer calls replace overbroad continuation without new modules, ledgers or fallback routes. No smaller equivalent shape was identified."
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the whole delta and surrounding observer, authorization and verification consumers against intent, specification, plan, research, acceptance evidence, Ship and PRINCIPLES.md. No repository artifact was edited; no full suite, new probe or live model call was run. git diff --check passed.",
+        "Acceptance #1 and #3 remain partly, not a native-host pass. Claude's quota failure precedes Stop; the earlier Codex synthetic framing experiment is not repaired-plugin end-to-end validation. Source, installed adoption and actual host behavior remain distinct. No findings were dismissed.",
+        "Official sources checked: https://code.claude.com/docs/en/hooks#stop and https://learn.chatgpt.com/docs/hooks#stop. Independent test command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_delivery_stop.py loom-code/tests/test_hooks_json.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_hook_recovery_literal_path.py; result: 144 passed in 82.46s (0:01:22)."
+      ],
+      "reviewer": "/root/stop_review_two",
+      "vendor": "openai",
+      "model": "inherited-unobservable"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "d5c19cec3c6fed4458956ada49524dc36a40bf96",
+  "tested_commit": "0c65e553637bf7924cb16b24a28017ab85a14a67",
+  "reviewed_commit": "a4ef9e3d06a1dc7d93d2882f0d50d90dc03ceba1",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "partly"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "partly"
+    }
+  ]
+}
