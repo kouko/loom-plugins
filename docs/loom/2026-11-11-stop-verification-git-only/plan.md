@@ -1,5 +1,5 @@
 # Ordinary added files must not trigger test collection when a review record is rechecked — plan
-intent: 2026-11-11-stop-verification-git-only@9450306
+intent: 2026-11-11-stop-verification-git-only@bddf642
 charter: 1.1
 
 ## Current State Evidence
@@ -28,6 +28,7 @@ charter: 1.1
 
 ## Questions asked
 ① — consequence — 「這樣的理解對嗎？」 restated intent with the automatic-publication consequence (2026-11-11); the user chose 「現在修吧」 after asking for a re-evaluation and a reproduction run.
+① — consequence — 「要改字還是改程式？」 after the adversary measured one git read per added file (2026-11-11): reword the Proposed outcome, recommended, or batch the reads; the user answered 「請繼續」.
 
 ## Risks
 1. A concern-bearing added program beside a `no_program` record still runs collection during recomputation; that state already contradicts the record, and removing it would change which programs count (intent Constraints).
