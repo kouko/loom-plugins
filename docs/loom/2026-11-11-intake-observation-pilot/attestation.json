@@ -1,0 +1,99 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-intake-observation-pilot",
+  "content_digest": "6b165a38e0c810fdea3a3a47ebf5c72b94cb9028",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_intake.py",
+      "artifact": "loom-code/tests/test_loom_checker_intake.py",
+      "result": "pass",
+      "command_digest": "ad5c9fabc60ad0a20010b4bc233eaa118bce0685197cc3da355a740bcbedd1b3"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "91ee36100708f73af5d1df33107dbf98b91ac44f",
+      "review_target_sha": "0578af5ae44ed7c208c905bb7be7c14a1105eada",
+      "dimension_scores": {
+        "security": "PASS — Cumulative source-script delta is empty; observation guidance preserves blockers, uncertainty and downstream authorization. No new data transfer or execution surface remains.",
+        "architecture": "PASS — Existing intake remains the sole check implementation; the final change interprets its text without adding a parser or policy engine.",
+        "correctness": "PASS — Read cmd_intake, report and main; documented exit codes, confirmation early exit, later failure completion and unknown crash completeness match the unchanged implementation. Independent final acceptance covers the retained guidance.",
+        "naming": "PASS — Guidance uses the existing command and rule names, distinguishes readiness from completion, and introduces no new code names.",
+        "tests": "PASS — Independently ran both changed modules with locked uv: 191 passed in 44.10s, no skips. Final executable test delta is only a concern comment and release-version pin; existing CLI-entry coverage remains. Historical candidate RED and retirement evidence are explicitly separated from final guidance acceptance.",
+        "refactoring": "PASS — Candidate handler/help/tests were removed, leaving no production extraction, duplicate format or forwarding layer in the cumulative delta.",
+        "cross-task-coherence": "PASS — All four Acceptance lines and REQs have plan ownership and evidence; spec, station guidance and final acceptance agree on guidance-only adoption. Tested ede4db796 and reviewed target differ only in acceptance report/evidence files.",
+        "external-surface-grounding": "PASS — No new external API, SDK, tool or CLI surface is called by final production changes; the clarified existing intake command was checked directly against its entry, reporter and CLI exception handling.",
+        "principles-conformance": "PASS — No new mechanism, authority bypass or substituted semantic-success claim; the no-benefit candidate was withdrawn and original failures, costs and acceptance limitations remain visible.",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS — Guidance-only scope, single sequential consumer, synthetic cases, unmeasured token/latency benefits and retained downstream gates are explicit; no unsupported universal improvement is claimed.",
+        "deletion-first": "PASS — The measured no-benefit alternative removes the entire candidate production interface and its owned tests. The remaining guidance replaces the shorter intake instruction and addresses the observed completion/uncertainty problem without adding a mechanism."
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative base-to-target delta and ground-truth intent/spec/plan, manifest charters, PRINCIPLES.md, comparison, research, retirement record and final acceptance evidence. No repository files were edited.",
+        "Ran only uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_intake.py loom-code/tests/test_write_plan_station_text.py. Initial sandbox cache-lock failure was resolved with authorized existing-cache access. Full suite and evidence probes were not run by this reviewer.",
+        "Build adversarial output supplied in /private/tmp/intake-final-build-adversarial.log records 148 passing existing intake tests; this is retained-interface coverage, not a new independent consumer-benefit estimate. External services and installed-host behavior are not claimed validated by this code review."
+      ],
+      "reviewer": "/root/intake_code_review",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "91ee36100708f73af5d1df33107dbf98b91ac44f",
+      "review_target_sha": "0578af5ae44ed7c208c905bb7be7c14a1105eada",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative delta, full write-plan station, intent/spec/plan charters, PRINCIPLES, research and retained acceptance evidence. Guidance preserves pre/post-plan checks, confirmation early exit, nonzero/error uncertainty, changed-input reruns and downstream authority. Handler, CLI and dispatch sources are unchanged against the review base; acceptance-tested ede4db79 differs from the target only in this change's report/evidence.",
+        "Verified cited primary pages at raw.works/recursive-decision-models/, docs.typesafe.ai/introduction, docs.typesafe.ai/confidence, pydantic.dev/docs/ai/models/decision/ and anthropic.com/research/building-effective-agents, plus local source anchors. Recomputed packet bytes 1765/2236/2681 and seven-input replay equality. Six cases, one sequential consumer, synthetic inputs and historical JSON withdrawal are disclosed; neither universal equivalence nor token/call/latency savings is claimed. Video and external host/service execution remain explicitly unverified, not evidence for the conclusion.",
+        "Focused reviewer checks passed: test_write_plan_station_text.py 43 passed in 0.20s; test_loom_checker_intake.py 148 passed in 44.32s. Initial uv cache permission failure was recovered with authorized existing-cache access. No full package suite or docs evidence probe was run, no probe was created, and no repository artifact was edited."
+      ],
+      "reviewer": "/root/intake_skill_review",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "27df9050ee80824e9b8f0ad7e4ae06bc20a2689e",
+  "tested_commit": "ede4db79663b960e60b81cf1f0c49fa4d74212a7",
+  "reviewed_commit": "0578af5ae44ed7c208c905bb7be7c14a1105eada",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
