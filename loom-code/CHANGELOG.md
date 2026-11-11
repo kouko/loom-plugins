@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.65.0] — 2026-11-11 — frame Stop feedback for each host
+
+- Select Claude Code and Codex explicitly in packaged delivery hooks. Use normal continuation feedback for Claude Code and retain Codex's blocking continuation response; repeated Stop events are silent before delivery lookup.
+- Allow Claude Code background tasks and scheduled wakeups to pause normally. Report unavailable delivery evidence without requesting continuation, preserving explicit delivery checks and publication authorization.
+- Keep literal-path recovery commands valid with the new host argument. Native Claude Code UI behavior remains unverified because account quota prevented the probe from reaching Stop.
+
 ## [3.64.0] — 2026-11-11 — scope skill-review gate requirements
 
 - Apply Loom gate-marker and registration requirements only when the reviewed skill is governed by that contract; using Loom to develop a skill alone does not establish applicability. Preserve review of applicable requirements, substantive usage errors and unmet acceptance criteria.
