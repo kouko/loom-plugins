@@ -387,6 +387,11 @@ def test_intake_json_equivalent(tmp_path: Path, station: str, case: str) -> None
     ([], True), (["write-plan"], True), (["build", CHANGE], True),
     (["write-plan", "../unsafe"], True), (["write-plan", CHANGE, "--json"], True),
     (["write-plan", CHANGE, "extra"], True), (["write-plan", CHANGE], False),
+] + [
+    (args, True)
+    for station in ("write-spec", "write-plan")
+    for args in ([station, "--json"], ["--json", station],
+                 [station, "--json", CHANGE], ["--json", station, CHANGE])
 ])
 def test_intake_json_unavailable(tmp_path: Path, args: list[str], inside: bool) -> None:
     repo = make_repo(tmp_path) if inside else tmp_path
@@ -397,8 +402,9 @@ def test_intake_json_unavailable(tmp_path: Path, args: list[str], inside: bool) 
     assert payload["checks_complete"] is False
     assert payload["failures"] == []
     assert payload["error"]
-    assert payload["station"] == (args[0] if args else None)
-    assert payload["change_id"] == (args[1] if len(args) > 1 else None)
+    positional = [arg for arg in args if arg != "--json"]
+    assert payload["station"] == (positional[0] if positional else None)
+    assert payload["change_id"] == (positional[1] if len(positional) > 1 else None)
     assert result.stderr == ""
 
 

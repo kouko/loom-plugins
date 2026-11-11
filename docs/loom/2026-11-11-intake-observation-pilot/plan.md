@@ -23,6 +23,12 @@ charter: 1.1
 - Test: A1 positive: release_sync; boundary: release_stale_pin. A2 positive: release_sync; boundary: release_stale_pin. A3 positive: release_sync; boundary: release_stale_pin. A4 positive: release_sync; boundary: release_stale_pin. Run release metadata checks and manifest sync verification.
 - Risk: agent-decided — REQ-1 Design decision changes station guidance; bump 3.66.0, add CHANGELOG entry, rewrite version pin, derive mirrors with `scripts/sync_codex_manifests.py --all`; preserve station-text tests except assertions intentionally changed by W1-01.
 
+### Wave 4 — Adversarial invocation repair
+**W4-01 Reject repeated JSON options before positional interpretation** after: W3-01 acceptance: 1, 2
+- Files: `loom-code/scripts/loom_checker/command_handlers/intake.py` (entry: cmd_intake), `loom-code/tests/test_loom_checker_intake.py`, `docs/loom/2026-11-11-intake-observation-pilot/evidence/probes/test_intake_repeated_json.py` → `loom-code/tests/test_intake_repeated_json.py` (unchanged probe graduation)
+- Test: A1 positive: intake_json_equivalent; boundary: intake_json_unavailable and intake_repeatedflags_unconfirmed. A2 positive: intake_json_readonly; boundary: intake_json_earlyexit. Run intake, station-text and graduated probe modules; retain the existing adversarial RED before implementation.
+- Risk: agent-decided — Duplicate options must remain invocation errors even without an id, across both stations and option positions. Preserve ordinary parsing, observation-only scope and version 3.66.0; move the adversarial probe byte-for-byte without duplication.
+
 ## Simplicity check
 - Keep the reproducible collection recipe in evidence prose instead of committing an executable experiment harness — taken
 

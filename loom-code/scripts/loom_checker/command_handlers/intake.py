@@ -28,12 +28,14 @@ import sys
 
 
 def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
-    json_mode = "--json" in args
+    json_flags = args.count("--json")
+    json_mode = bool(json_flags)
     if json_mode:
-        args = args.copy()
-        args.remove("--json")
+        args = [arg for arg in args if arg != "--json"]
     diagnostics = StringIO()
     try:
+        if json_flags > 1:
+            raise UsageError("--json may be supplied only once.")
         station, change_id = _parse_args(args)
         failures, complete = _evaluate_intake(
             station, change_id,
