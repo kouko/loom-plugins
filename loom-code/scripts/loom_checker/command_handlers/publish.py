@@ -531,23 +531,36 @@ def _delivery_stop(out, err, host="codex") -> int:
         os.environ["PATH"] = os.pathsep.join(dict.fromkeys(
             [str(Path(trusted_git).parent), "/usr/bin", "/bin"]))
         repo = repo_root(Path(payload.get("cwd") or os.getcwd())).resolve()
-        change_id, _ = identify_change(repo)
+        head = git_text(repo, "rev-parse", "HEAD")
+        change_id, _ = identify_change(repo, head=head)
         if not change_id:
             return 0
         intent = artifact_path(load_manifest(), "intent", change_id, repo)
         authorized, _ = _intent_authorizes_publication(repo, intent, change_id)
         if not authorized:
             return 0
-        front, _ = parse_document(git_text(repo, "show", f"HEAD:{intent.relative_to(repo)}"))
+        front, _ = parse_document(git_text(repo, "show", f"{head}:{intent.relative_to(repo)}"))
         spec = artifact_path(load_manifest(), "spec", change_id, repo)
         if front.get("kind") == "product" and spec.exists():
             spec_front, _ = parse_document(spec.read_text(encoding="utf-8"))
             if not spec_front.get("confirmed-behavior"):
                 return 0
-        observed = observe_delivery(repo, goal="published", intent_file=intent,
+        status = verification_status(repo, change_id, head=head)
+        if git_text(repo, "rev-parse", "HEAD") != head:
+            raise UsageError("selected HEAD changed during Stop verification")
+        if status != "valid":
+            return 0  # Missing/stale review permits a pause, not a success claim.
+        observed = observe_delivery(repo, goal="local", intent_file=intent,
                                     trusted_git=trusted_git, trusted_gh=trusted_gh)
+        if git_text(repo, "rev-parse", "HEAD") != head:
+            raise UsageError("selected HEAD changed during local delivery observation")
         if observed.complete:
-            return 0  # Publication is the boundary; acceptance never grants merge.
+            observed = observe_delivery(repo, goal="published", intent_file=intent,
+                                        trusted_git=trusted_git, trusted_gh=trusted_gh)
+            if git_text(repo, "rev-parse", "HEAD") != head:
+                raise UsageError("selected HEAD changed during published delivery observation")
+        if observed.complete or observed.state == "uncommitted":
+            return 0  # A pause certifies nothing; publication never grants merge.
         feedback = f"Delivery incomplete ({observed.state}): {observed.reason}\nnext: {observed.next}"
         if observed.state == "unconfirmed":
             out.write(json.dumps({"systemMessage":

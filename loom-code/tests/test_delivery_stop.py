@@ -9,6 +9,22 @@ import pytest
 from loom_checker.command_handlers import publish
 from test_delivery import delivery
 from test_loom_publish import git
+import test_verification_status as verification_fixtures
+
+
+@pytest.fixture
+def reviewed_delivery(delivery, monkeypatch):
+    repo, _, calls, pr, _ = delivery
+    monkeypatch.setattr(verification_fixtures, "CHANGE", "change")
+    verification_fixtures.write(repo, "src.py", "VALUE = 1\n")
+    verification_fixtures.write(repo, "docs/loom/KICKOFF-DEFAULTS.md",
+                                "- package-tests: python3 -m pytest -q — fixture (2026-09-22)\n")
+    verification_fixtures.commit(repo, "reviewed work")
+    verification_fixtures.commit_attestation(repo, verification_fixtures.attestation(repo),
+                                            "docs/loom/change/attestation.json")
+    assert publish.verification_status(repo, "change") == "valid"
+    calls.head = calls.remote_head = pr["head"]["sha"] = git(repo, "rev-parse", "HEAD")
+    return delivery
 
 
 def stop(monkeypatch, repo, host=None, **payload):
@@ -21,8 +37,8 @@ def stop(monkeypatch, repo, host=None, **payload):
 
 
 @pytest.mark.parametrize("host", [None, "claude", "codex"])
-def test_premature_stop_and_repeat_disclose_actual_incompletion(delivery, monkeypatch, host):
-    repo, _, calls, _, _ = delivery
+def test_premature_stop_and_repeat_disclose_actual_incompletion(reviewed_delivery, monkeypatch, host):
+    repo, _, calls, _, _ = reviewed_delivery
     calls.remote_head = None
     result, feedback = stop(monkeypatch, repo, host=host)
     assert feedback == ""
@@ -39,8 +55,8 @@ def test_premature_stop_and_repeat_disclose_actual_incompletion(delivery, monkey
 
 
 @pytest.mark.parametrize("host", ["claude", "codex"])
-def test_pause_metadata_only_suppresses_valid_pauses(delivery, monkeypatch, host):
-    repo, _, calls, _, _ = delivery
+def test_pause_metadata_only_suppresses_valid_pauses(reviewed_delivery, monkeypatch, host):
+    repo, _, calls, _, _ = reviewed_delivery
     calls.remote_head = None
     original = publish.resolve_publish_executable
     def unexpected_lookup(*args):
@@ -58,8 +74,8 @@ def test_pause_metadata_only_suppresses_valid_pauses(delivery, monkeypatch, host
         assert stop(monkeypatch, repo, host=host, **payload)[0]
 
 
-def test_user_boundaries_and_irrelevant_hooks_can_stop(delivery, monkeypatch):
-    repo, intent, calls, _, _ = delivery
+def test_user_boundaries_and_irrelevant_hooks_can_stop(reviewed_delivery, monkeypatch):
+    repo, intent, calls, _, _ = reviewed_delivery
     assert stop(monkeypatch, repo)[0] == {}  # published, awaiting acceptance
     before = len(calls.calls)
     for payload in ({"agent_id": "child"}, {"hook_event_name": "SubagentStop"}):
@@ -78,8 +94,8 @@ def test_user_boundaries_and_irrelevant_hooks_can_stop(delivery, monkeypatch):
 
 @pytest.mark.parametrize("host", ["claude", "codex"])
 @pytest.mark.parametrize("failure", ["deadline", "unconfirmed", "exception"])
-def test_single_total_deadline_is_unconfirmed_and_does_not_continue(delivery, monkeypatch, host, failure):
-    repo, _, _, _, _ = delivery
+def test_single_total_deadline_is_unconfirmed_and_does_not_continue(reviewed_delivery, monkeypatch, host, failure):
+    repo, _, _, _, _ = reviewed_delivery
     armed = []
     original = signal.setitimer
     monkeypatch.setattr(signal, "setitimer", lambda kind, seconds, *a: (
@@ -107,6 +123,53 @@ def test_single_total_deadline_is_unconfirmed_and_does_not_continue(delivery, mo
     recovery = shlex.split(feedback.split("run ")[-1].split(" before claiming completion.")[0])
     assert Path(recovery[0]).is_absolute() and Path(recovery[0]).is_file()
     assert recovery[1:] == ["--ready", "delivery", "--json"]
+
+
+@pytest.mark.parametrize("host", ["claude", "codex"])
+@pytest.mark.parametrize("state", ["absent", "skip", "stale", "pending"])
+def test_unready_work_stops_before_remote(reviewed_delivery, monkeypatch, host, state):
+    repo, _, calls, _, _ = reviewed_delivery
+    calls.remote_head = None
+    if state in {"absent", "skip"}:
+        (repo / "docs/loom/change/attestation.json").unlink()
+        if state == "skip":
+            plan = repo / "docs/loom/change/plan.md"
+            plan.write_text(plan.read_text() + "\nskipped-by-instruction: closing-review 2026-11-11\n")
+        verification_fixtures.commit(repo, "no verification")
+    else:
+        (repo / "src.py").write_text("VALUE = 2\n")
+        if state == "stale":
+            verification_fixtures.commit(repo, "new unreviewed work")
+    assert publish.verification_status(repo, "change").startswith(
+        "valid" if state == "pending" else "stale" if state == "stale" else "absent")
+    assert stop(monkeypatch, repo, host=host) == ({}, "")
+    assert calls.calls == []
+
+
+@pytest.mark.parametrize("host", ["claude", "codex"])
+@pytest.mark.parametrize("phase", ["verification", "local", "published", "pending"])
+def test_changed_head_cannot_continue(reviewed_delivery, monkeypatch, host, phase):
+    repo, _, calls, _, _ = reviewed_delivery
+    calls.remote_head = None
+    name = "verification_status" if phase == "verification" else "observe_delivery"
+    original = getattr(publish, name)
+    def change_after_read(*args, **kwargs):
+        if phase == "pending" and kwargs["goal"] == "published":
+            (repo / "src.py").write_text("VALUE = 2\n")
+        result = original(*args, **kwargs)
+        if phase == "verification" or kwargs["goal"] == phase:
+            (repo / "src.py").write_text("VALUE = 2\n")
+            verification_fixtures.commit(repo, "concurrent work")
+        return result
+    monkeypatch.setattr(publish, name, change_after_read)
+    result, feedback = stop(monkeypatch, repo, host=host)
+    if phase == "pending":
+        assert (result, feedback) == ({}, "")
+        return
+    assert not feedback and set(result) == {"systemMessage"}
+    assert "unconfirmed" in result["systemMessage"]
+    if phase != "published":
+        assert calls.calls == []
 
 
 @pytest.mark.parametrize("args", [["--host", "claude"], ["--hook", "--host", "unknown"],

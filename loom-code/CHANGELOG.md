@@ -4,6 +4,7 @@
 
 - Select Claude Code and Codex explicitly in packaged delivery hooks. Use normal continuation feedback for Claude Code and retain Codex's blocking continuation response; repeated Stop events are silent before delivery lookup.
 - Allow Claude Code background tasks and scheduled wakeups to pause normally. Report unavailable delivery evidence without requesting continuation, preserving explicit delivery checks and publication authorization.
+- Request automatic publication continuation only for matching verified committed work without attributable pending changes. Unverified, stale and explicitly skipped review paths pause silently before remote lookup; explicit publication remains available with disclosure. Changed HEAD yields an unconfirmed diagnostic, and human-wait guidance remains conditional.
 - Keep literal-path recovery commands valid with the new host argument. Native Claude Code UI behavior remains unverified because account quota prevented the probe from reaching Stop.
 
 ## [3.64.0] — 2026-11-11 — scope skill-review gate requirements
