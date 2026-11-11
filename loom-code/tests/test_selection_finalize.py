@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 from loom_checker import attestation as attestation_module
+from loom_checker import probes
 from loom_checker import verification
 from loom_checker.command_handlers import finalize as finalize_handler
 from loom_checker.probes import MAX_PROBE_PROGRAMS
@@ -650,6 +651,39 @@ def graduate(repo: Path, name: str = "test_graduated_probe.py") -> str:
     )
     commit_all(repo, "graduate the probe into the suite")
     return f"loom-code/tests/{name}"
+
+
+def test_ordinary_files_skip_collection(tmp_path: Path, monkeypatch) -> None:
+    repo = make_repo(tmp_path)
+    graduate_many(repo, 2, concern=False)
+    calls = []
+    monkeypatch.setattr(probes, "suite_collection", lambda *args: (calls.append(args), ""))
+
+    assert probes.graduated_probe_programs(repo, git(repo, "rev-parse", "HEAD"), CHANGE) == []
+    assert calls == []
+
+
+@pytest.mark.parametrize("collected", [True, False, None])
+@pytest.mark.parametrize("moved", [False, True])
+def test_marked_moved_unknown_collection(tmp_path: Path, monkeypatch, collected, moved) -> None:
+    repo = make_repo(tmp_path)
+    artifact = graduate(repo)
+    if moved:
+        git(repo, "branch", "-f", "main", "HEAD")
+        destination = "loom-code/tests/test_moved.py"
+        git(repo, "mv", artifact, destination)
+        commit_all(repo, "move existing probe")
+        artifact = destination
+    calls = []
+
+    def collect(_repo, path):
+        calls.append(path)
+        return collected, "unavailable" if collected is None else ""
+
+    monkeypatch.setattr(probes, "suite_collection", collect)
+    actual = probes.graduated_probe_programs(repo, git(repo, "rev-parse", "HEAD"), CHANGE)
+    assert actual == ([artifact] if not moved and collected is not False else [])
+    assert calls == ([] if moved else [artifact])
 
 
 def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
