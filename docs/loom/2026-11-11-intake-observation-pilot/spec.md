@@ -21,6 +21,17 @@ REQ-4 — Input evidence boundaries
 - agent-decided — REQ-4: retain the input provenance research and its seven-case reproduction; independently review its claims. Do not alter dispatch classification or unknown handling in this change.
 - user-decided — The user confirmed the bounded intent and automatic non-forced branch/Ready PR publication on 2026-11-11; merge remains separate.
 
+Outcome mapping (REQ-1, agent-decided):
+
+| Observation | state | checks_complete | exit | error |
+|---|---|---|---|---|
+| All applicable intake checks pass | passed | true | 0 | null |
+| Confirmation rule returns a failure before later checks | blocked | false | 1 | null |
+| Later applicable rules return failures | blocked | true | 1 | null |
+| Invalid invocation or unavailable observation | unconfirmed | false | 2 | diagnostic string |
+
+An ordinary confirmation-rule failure is a valid blocking observation, even when its reason concerns indeterminate delivery history. `unconfirmed` is reserved for an invocation/observation error rather than a returned rule failure. If station or change id cannot be obtained from an invalid invocation, its JSON field is null. A consumer accepts readiness only with valid JSON, exit 0, state passed and checks_complete true; every other result preserves the blocker or requires recovery and rerun.
+
 ## Alternatives considered
 - Whole-workflow scheduler: rejected because the pilot concerns an existing observation and requires no automatic action.
 - Classification model: rejected because these outcomes are already computed by code.
