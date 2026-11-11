@@ -1,0 +1,140 @@
+{
+  "description": "Public synthetic input; identities and SHAs are invented. No external execution receipts.",
+  "cases": [
+    {
+      "id": "valid",
+      "raw_yaml": "lens: docs\nverdict: PASS\nreviewed_sha: '1111111111111111111111111111111111111111'\nreview_target_sha: '2222222222222222222222222222222222222222'\ndimension_scores:\n  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n  incorrect-fact: PASS\n  missing-population: PASS\n  deletion-first: PASS\nfindings: []\nnotes: []\nprovenance:\n  source: public-synthetic-fixture\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": true,
+        "candidate_ok": true
+      }
+    },
+    {
+      "id": "needs_revision",
+      "raw_yaml": "lens: docs\nverdict: NEEDS_REVISION\nreviewed_sha: '1111111111111111111111111111111111111111'\nreview_target_sha: '2222222222222222222222222222222222222222'\ndimension_scores:\n  omission: NEEDS_REVISION\n  ambiguity: PASS\n  inconsistency: PASS\n  incorrect-fact: PASS\n  missing-population: PASS\n  deletion-first: PASS\nfindings: []\nnotes: []\nprovenance:\n  source: public-synthetic-fixture\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": true,
+        "candidate_ok": true
+      }
+    },
+    {
+      "id": "malformed",
+      "raw_yaml": "lens: [\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": false,
+        "candidate_ok": false
+      }
+    },
+    {
+      "id": "duplicate",
+      "raw_yaml": "lens: docs\nverdict: PASS\nreviewed_sha: '1111111111111111111111111111111111111111'\nreview_target_sha: '2222222222222222222222222222222222222222'\ndimension_scores:\n  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n  incorrect-fact: PASS\n  missing-population: PASS\n  deletion-first: PASS\nfindings: []\nnotes: []\nprovenance:\n  source: public-synthetic-fixture\nverdict: NEEDS_REVISION\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": true,
+        "candidate_ok": false
+      }
+    },
+    {
+      "id": "missing_identity",
+      "raw_yaml": "lens: docs\nverdict: PASS\nreviewed_sha: '1111111111111111111111111111111111111111'\nreview_target_sha: '2222222222222222222222222222222222222222'\ndimension_scores:\n  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n  incorrect-fact: PASS\n  missing-population: PASS\n  deletion-first: PASS\nfindings: []\nnotes: []\nprovenance:\n  source: public-synthetic-fixture\n",
+      "identity": {
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": true,
+        "candidate_ok": false
+      }
+    },
+    {
+      "id": "identity_conflict",
+      "raw_yaml": "lens: docs\nverdict: PASS\nreviewed_sha: '1111111111111111111111111111111111111111'\nreview_target_sha: '2222222222222222222222222222222222222222'\ndimension_scores:\n  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n  incorrect-fact: PASS\n  missing-population: PASS\n  deletion-first: PASS\nfindings: []\nnotes: []\nprovenance:\n  source: public-synthetic-fixture\nreviewer: raw-reviewer-b\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": true,
+        "candidate_ok": false
+      }
+    },
+    {
+      "id": "malformed_shape",
+      "raw_yaml": "- PASS\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": false,
+        "candidate_ok": false
+      }
+    },
+    {
+      "id": "raw_identity",
+      "raw_yaml": "lens: docs\nverdict: PASS\nreviewed_sha: '1111111111111111111111111111111111111111'\nreview_target_sha: '2222222222222222222222222222222222222222'\ndimension_scores:\n  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n  incorrect-fact: PASS\n  missing-population: PASS\n  deletion-first: PASS\nfindings: []\nnotes: []\nprovenance:\n  source: public-synthetic-fixture\nreviewer: synthetic-reviewer-a\nvendor: synthetic\nmodel: fixture-model\n",
+      "identity": {
+        "reviewer": "synthetic-reviewer-a",
+        "vendor": "synthetic",
+        "model": "fixture-model"
+      },
+      "context": {
+        "findings": [],
+        "adversarial": []
+      },
+      "expected": {
+        "baseline_ok": true,
+        "candidate_ok": true
+      }
+    }
+  ]
+}
