@@ -327,9 +327,8 @@ Codex uses its supported blocking response. Repeated Stop is silent without
 another delivery lookup; valid Claude background-task or scheduled-wakeup
 metadata also permits a pause. Human decision boundaries and external blockers
 may stop without claiming completion. Unavailable evidence produces a
-non-continuing unconfirmed diagnostic. Native Codex continuation was verified;
-Claude's native Stop execution remains unverified because account quota blocked
-the probe. OpenCode and Antigravity do not have verified termination enforcement;
+non-continuing unconfirmed diagnostic.
+OpenCode and Antigravity do not have verified termination enforcement;
 use this same command and disclose that limitation rather than claiming a hook
 blocked termination.
 
