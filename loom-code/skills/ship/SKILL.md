@@ -321,11 +321,23 @@ Report the observed state, reason, next action and evidence; PR existence,
 an agent's claim and stale remote-tracking refs cannot prove exact-head delivery.
 Incomplete or unavailable evidence remains incomplete or unconfirmed, never
 success. Observation never authorizes publication or merge.
-Claude Code and Codex Stop hooks request at most one continuation for applicable
-authorized unfinished changes; repeated Stop, human decision boundaries and
-external blockers may stop without claiming completion. OpenCode and Antigravity
-do not have verified termination enforcement; use this same command and disclose
-that limitation rather than claiming a hook blocked termination.
+Claude Code and Codex Stop hooks request at most one continuation for authorized
+unfinished changes whose selected committed HEAD has matching verification and
+no attributable pending work. Absent or stale verification, including explicit
+skips without matching evidence, permits a silent pause before remote lookup;
+explicit publication remains available with verification disclosure. Changed
+HEAD or unavailable local evidence produces an unconfirmed diagnostic without
+continuation. Matching review cannot establish whether a human answer is pending;
+the reminder retains conditional guidance to stop and explain that boundary.
+For eligible reminders, Claude uses normal additional context, while
+Codex uses its supported blocking response. Repeated Stop is silent without
+another delivery lookup; valid Claude background-task or scheduled-wakeup
+metadata also permits a pause. Human decision boundaries and external blockers
+may stop without claiming completion. Unavailable evidence produces a
+non-continuing unconfirmed diagnostic.
+OpenCode and Antigravity do not have verified termination enforcement;
+use this same command and disclose that limitation rather than claiming a hook
+blocked termination.
 
 Report the attestation digest when one exists, else the verification status
 publish printed, publication checks, PR URL, CI state, and land's output.

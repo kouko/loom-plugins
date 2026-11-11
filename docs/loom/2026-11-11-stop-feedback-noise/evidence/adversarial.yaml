@@ -1,0 +1,47 @@
+attack_points: {found: 17, earned_a_program: 0, committed: 1}
+change_id: 2026-11-11-stop-feedback-noise
+attacked_head: d9630bde3c812eb10ba5fcc7b0fbfb7d1a28d413
+reuse_commit: 2079b786
+count_note: One existing program was committed with only its concern comment; zero new programs were earned or committed.
+adversarial:
+  - command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_delivery_stop.py
+    artifact: loom-code/tests/test_delivery_stop.py
+probes:
+  - artifact: loom-code/tests/test_delivery_stop.py
+    status: reused
+    reason: Existing tests exercise malformed metadata, stale or absent verification, pending work, identity races, timeout and host response boundaries; no duplicate probe is warranted.
+findings: []
+verification:
+  command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_delivery_stop.py loom-code/tests/test_hooks_json.py loom-code/tests/test_hook_recovery_literal_path.py
+  result: 101 passed in 82.41 seconds
+  trial_command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python /private/tmp/stop_adversary_trial.py
+  trial_result: 6 boundary attacks and 2 one-character host variants held
+  trial_status: Uncommitted temporary trial; not an attestation program or durable regression artifact.
+attempts:
+  - {id: 1, type: code, attack: Repeated Stop with malformed cwd must avoid lookup, result: held in executable trial}
+  - {id: 2, type: code, attack: Whitespace-only background id must not suppress inspection, result: held in executable trial}
+  - {id: 3, type: code, attack: One valid and one invalid cron object must not suppress inspection, result: held in executable trial}
+  - {id: 4, type: gate, attack: Claude background metadata must not silence Codex, result: held in executable trial}
+  - {id: 5, type: gate, attack: String True must not act as boolean true, result: held in executable trial}
+  - {id: 6, type: code, attack: Valid background task plus null cron must permit a pause, result: held in executable trial}
+  - {id: 7, type: code, attack: Absent stale skipped and pending review states must avoid remote inspection, result: held in reused test}
+  - {id: 8, type: code, attack: HEAD changes during verification or either observer phase must not continue, result: held in reused test}
+  - {id: 9, type: code, attack: Deadline OSError and unavailable evidence must not become continuation, result: held in reused test}
+  - {id: 10, type: gate, attack: Host mode missing or one-character-different unknown must not read stdin, result: held in reused invalid-host tests and trial metadata cases}
+  - {id: 11, type: gate, attack: Packaged recovery must execute with literal path and remove host pair, result: held in existing shell recovery replay tests}
+  - {id: 12, type: skill, attack: 'the diff is one line, proceed?', result: Text does not waive verification for automatic reminders; explicit publication retains disclosure. Manual text attack only.}
+  - {id: 13, type: skill, attack: Under time pressure treat silent Stop as successful publication, result: Explicit incomplete/unconfirmed-never-success and observation-never-authorizes text refuses this reading. Manual text attack only.}
+  - {id: 14, type: spec, attack: REQ-1 first human-wait pause with reviewed HEAD still prompts once, result: Explicit design acknowledges this boundary and retains conditional guidance; repeated Stop is tested silent. No new defect.}
+  - {id: 15, type: spec, attack: REQ-2 interrupted run with stale review could be described as delivered, result: Silence explicitly certifies nothing and explicit observer remains separate. Existing stale and pending tests hold.}
+  - {id: 16, type: spec, attack: REQ-3 local JSON pass could be presented as native Claude success, result: Native quota failure and unverified presentation are explicit in spec and host evidence. Manual text attack only.}
+  - {id: 17, type: docs, attack: Release notes could erase the native-host limitation, result: CHANGELOG 3.65.0 explicitly retains unverified Claude UI limitation. Manual text attack only.}
+scope_notes:
+  - No declared mutation or fuzz runner found in repository configuration or named tool files; uncommitted boundary trials used instead.
+  - No existing change-local probes directory existed; related repository tests were inspected first.
+  - Intent plan docs evidence and standing artifacts have no recipe; protocol-only inspection did not earn a new executable defect.
+  - No native host calls, network publication, installed settings changes, product repairs or merge.
+  - git-memory classification was routine with no earned memory trailer; exact commit message passed deterministic privacy scan and contained no ambiguous private-party identifiers.
+environment_failures:
+  - Initial sandboxed uv invocation could not write its cache lock; authorized escalated offline invocation passed.
+  - Ambient Python trial import lacked yaml; rerun in existing offline locked environment passed.
+  - Initial Git staging could not write shared worktree metadata; authorized escalated scoped commit succeeded.

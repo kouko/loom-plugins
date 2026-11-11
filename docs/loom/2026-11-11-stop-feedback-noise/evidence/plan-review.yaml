@@ -1,0 +1,10 @@
+verdict: PASS
+lens: plan
+reviewed_sha: /private/tmp/loom-stop-feedback-20261111/docs/loom/2026-11-11-stop-feedback-noise/plan.md
+dimension_scores:
+  deletion-first: PASS
+findings: []
+notes:
+  - no simpler shape
+  - The core task changes the existing delivery command and packaged host hooks, extends existing tests, and updates the existing runtime guidance without adding a classifier, persistent state, or a new module.
+  - The dependent release task satisfies required version and generated-manifest synchronization; combining it with the core task would remove no implementation mechanism or required file.
