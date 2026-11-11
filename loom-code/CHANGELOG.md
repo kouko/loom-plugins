@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.67.0] — 2026-11-12 — keep research ownership and stage handoffs bounded
+
+- Use engineering research for consequential evidence gaps in planning, build, review, ship and maintenance; retain each stage's authority and verification requirements.
+- Compare material alternatives with applicable evidence and keep saved conclusions consistent with follow-up recommendations.
+- Admit separately owned design research: the counted skill cap rises from 25 to 26; artifact and session-start budgets stay unchanged.
+- budget-exception: design-research — adds one design-owned research skill; regression eval `loom-design/tests/test_design_research_package.py`.
+- budget-exception: tool:design-research — adds its counted contract registration; regression eval `loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner`.
+
 ## [3.66.0] — 2026-11-11 — clarify existing planning intake observations
 
 - Clarify existing intake exit codes and blocking reasons before and after planning, including confirmation early exits, unknown crash completeness and recovery/rerun. Preserve the text CLI and all existing checks.

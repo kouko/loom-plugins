@@ -11,7 +11,7 @@ charter: 1.1
 - Risk: agent-decided — REQ-1–6 keep methods inside owned skills and stage edits short. Preserve existing ownership, evidence and verification boundaries; extend package invariants only as needed, with independent behavioral cases at acceptance.
 
 **W2-01 Synchronize release metadata and declared capability budget** after: W1-01 acceptance: 1
-- Files: loom-code/.claude-plugin/plugin.json, loom-design/.claude-plugin/plugin.json, loom-code/CHANGELOG.md, loom-design/CHANGELOG.md, README.md, loom-code/README.md, loom-design/README.md, scripts/sync_codex_manifests.py
+- Files: loom-code/.claude-plugin/plugin.json, loom-design/.claude-plugin/plugin.json, loom-code/CHANGELOG.md, loom-design/CHANGELOG.md, README.md, loom-code/README*.md, loom-design/README*.md, scripts/sync_codex_manifests.py
 - Test: A1 positive: synchronized-release; boundary: discoverable-design-research. Run existing metadata and manifest checks; update derived manifests and current-release pin through the established release packet.
 - Risk: agent-decided — REQ-1 adds one capability with explicit budget accounting; bump code/design minor versions before review attestation. Preserve existing generated-manifest conventions and update the release pin in loom-code/tests/test_write_plan_station_text.py.
 

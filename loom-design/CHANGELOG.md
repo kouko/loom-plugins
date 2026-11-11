@@ -12,6 +12,15 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.24.0] — 2026-11-12 — add separately owned design research
+
+- Add discoverable design research for user problems, usage context, behavior alternatives and design decisions, with portable question-scoped records.
+- Keep research methods inside the research skill and return evidence or uncertainty to the original task without changing confirmed goals, user decisions or authorization.
+- Distinguish engineering capability gaps for a bounded skill-name handoff; preserve independent review and acceptance requirements.
+- Admit one additional counted skill, raising the family skill cap from 25 to 26 without expanding artifact or session-start budgets.
+- budget-exception: design-research — adds one design-owned research skill; regression eval `loom-design/tests/test_design_research_package.py`.
+- budget-exception: tool:design-research — adds its counted contract registration; regression eval `loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner`.
+
 ## [2.23.0] — 2026-11-09 — retain Git delivery policy through every change route
 
 - Keep branch/PR policy for small and engineering-only changes; hand off the shared evidence-based delivery check before claiming publication.

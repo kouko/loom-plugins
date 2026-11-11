@@ -13,8 +13,8 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.23.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/README.md) | 3.66.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-design`](loom-design/README.md) | 2.24.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
+| [`loom-code`](loom-code/README.md) | 3.67.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -93,8 +93,8 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.23.0. Turns a rough idea into a confirmed intent and a risk-declared
-spec, and provides product-definition tools. Requires `loom-code` for
+Version 2.24.0. Turns a rough idea into a confirmed intent and a risk-declared
+spec, and provides product-definition tools and optional design research. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
 | Skill | Role |
@@ -104,11 +104,12 @@ planning onward; intent and spec work alone.
 | [`product-principles`](loom-design/skills/product-principles/README.md) | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
 | [`design-system`](loom-design/skills/design-system/README.md) | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
 | [`architecture-design`](loom-design/skills/architecture-design/README.md) | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
+| [`design-research`](loom-design/skills/design-research/SKILL.md) | Resolve consequential design evidence gaps, compare relevant alternatives and retain research before returning to the original task. |
 | [`using-loom-design`](loom-design/skills/using-loom-design/README.md) | Optional router to the right product-definition skill. |
 
 ## loom-code
 
-Version 3.66.0. Five stations carry one change from plan to PR with
+Version 3.67.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
