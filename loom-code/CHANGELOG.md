@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.66.0] — 2026-11-11 — observe planning intake with structured results
+
+- Add opt-in `intake <station> <change-id> --json` output over the existing checks, preserving ordinary text behavior and distinguishing passed, blocked and unavailable observations. Report confirmation early exits without implying later checks completed.
+- Consume structured observations before and after planning; retain confirmation, review and acceptance requirements and rerun after inputs change. Intake readiness is a scoped observation, not workflow authorization.
+- Retain a reproducible text, guidance-only and JSON comparison plus input-provenance research. Synthetic cases establish rule handling, not real task-classification accuracy or proven agent cost savings.
+
 ## [3.65.0] — 2026-11-11 — frame Stop feedback for each host
 
 - Select Claude Code and Codex explicitly in packaged delivery hooks. Use normal continuation feedback for Claude Code and retain Codex's blocking continuation response; repeated Stop events are silent before delivery lookup.
