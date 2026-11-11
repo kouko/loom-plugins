@@ -1,0 +1,139 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-stop-verification-git-only",
+  "content_digest": "6a1c85510caf01d013529f8308d8b39732610d09",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_delivery_stop.py",
+      "artifact": "loom-code/tests/test_delivery_stop.py",
+      "result": "pass",
+      "command_digest": "875dc7039b004ac4426d790745c8c399101654ba960ca586bca0e5a6b3722994"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "gitonly_review_one",
+      "vendor": "anthropic",
+      "model": "inherited-unobservable",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "91ee36100708f73af5d1df33107dbf98b91ac44f",
+      "review_target_sha": "fb1da957ed7d0221029e591d7a13d4d84b8e2d28",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "N/A — the delta adds no call into a surface the author does not own; the existing git and pytest invocations are only reordered",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — the repository has no ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_delivery_stop.py:234",
+          "text": "nitpick (non-blocking): Acceptance 1 says the hook reminder is the same as before the fix, but the test only checks that the text contains 'next:' and 'unpublished', so a reworded reminder would still pass.",
+          "fix": "In test_stop_hook_no_program_ordinary_files_git_only, compare additionalContext with the full expected reminder string, reusing the expectation the neighbouring Stop tests in this file already hold."
+        },
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_delivery_stop.py:243",
+          "text": "nitpick (non-blocking): Acceptance 3 names a concern-bearing program the suite collects, but the filter keeps a file when suite_collection returns True or None, and the test does not show which one the fixture produces.",
+          "fix": "In test_concern_probe_contradicts_no_program, add one assertion that probes.suite_collection(repo, 'tests/test_added.py')[0] is True."
+        },
+        {
+          "severity": "nit",
+          "dimension": "cross-task-coherence",
+          "anchor": "docs/loom/2026-11-11-stop-verification-git-only/plan.md :: boundary: stop_hook_reminder_unchanged. A2 positive: recompute_ordinary_files_git_only_valid; boundary: ordinary_file_never_collected.",
+          "text": "nitpick (non-blocking): the plan names two boundary cases that exist only as inline assertions marked by comments (lines 230 and 238) inside the two positive tests, not as tests of those names.",
+          "fix": "Leave the tests as they are and reword the plan's Test line to say the two boundaries are asserted inside the positive tests."
+        }
+      ],
+      "notes": [
+        "RED to GREEN checked independently: in a scratch export of HEAD with the two filter lines swapped back, the two git-only tests fail with 'collected the ordinary file src.py' and the concern test passes; at HEAD all three pass.",
+        "No acceptance test report: agreed. All four Acceptance lines are mechanical, and PRINCIPLES.md item 2 allows the omission in that case.",
+        "Not verified by me: the package-suite result, the claim that the test_external_review timeouts also fail on origin/main, and the two evidence files (codex-review-leg3.md unread, hook-reproduction.md read but not re-run)."
+      ]
+    },
+    {
+      "reviewer": "gitonly_review_two",
+      "vendor": "anthropic",
+      "model": "inherited-unobservable",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "91ee36100708f73af5d1df33107dbf98b91ac44f",
+      "review_target_sha": "fb1da957ed7d0221029e591d7a13d4d84b8e2d28",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "N/A — the delta adds no call into a surface the author does not own; it only reorders two existing in-module predicates",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — the repository has no ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_delivery_stop.py:217",
+          "text": "note (non-blocking): the `suite_collection` stub fails first, so under a regression the `launched == [] and temporary == []` assertions never see a recorded entry. With the old filter order simulated, both git-only tests went red on the stub's `pytest.fail` alone; the subprocess and temporary-directory spies guard only routes outside `suite_collection` and have not been shown red.",
+          "fix": "In `test_recompute_ordinary_files_git_only_valid` only, record the `suite_collection` call and delegate to the real function instead of calling `pytest.fail`, then assert the record is empty beside the two spy lists. A regression then fails on the observed pytest launch and temporary directory, with no test added."
+        },
+        {
+          "severity": "nit",
+          "dimension": "cross-task-coherence",
+          "anchor": "docs/loom/2026-11-11-stop-verification-git-only/evidence/codex-review-leg3.md :: [loom-code/scripts/loom_checker/command_handlers/publish.py:538](/Users/kouko/GitHub/loom-plugins-wt-2026-11-11-delivery-reminder-session-scope/loom-code/scripts/loom_checker/command_handlers/publish.py:538)",
+          "text": "nitpick (non-blocking): the committed evidence note carries 16 lines with absolute links into another local worktree under a home directory. They resolve on no other machine and publish a local username; the note reads the same with repository-relative paths.",
+          "fix": "Replace each `/Users/.../loom-plugins-wt-2026-11-11-delivery-reminder-session-scope/` link prefix with the repository-relative path, keeping the `path:line` text, and add one line saying the note was written against commit b9ab515c of that change."
+        }
+      ],
+      "notes": [
+        "Regression check: with the pre-fix order simulated (a scratch pytest plugin, nothing in the worktree edited), `test_stop_hook_no_program_ordinary_files_git_only` and `test_recompute_ordinary_files_git_only_valid` failed and `test_concern_probe_contradicts_no_program` passed. At HEAD, `test_delivery_stop.py`, `test_write_plan_station_text.py` and the unedited `test_adversarial_probe_cap_coverage.py` gave 91 passed.",
+        "Reconciliation: the CHANGELOG entry and the plan's file and line citations match the code. After the intent rewording, plan and intent agree: both state one git read per added program file, the plan pins `intent@bddf642`, and plan Risk 1 matches Acceptance 3.",
+        "Release metadata after the #140 merge: every loom-code version string outside `docs/loom` reads 3.65.1 (four manifests, three plugin READMEs, two places in the root README, the pin test, the CHANGELOG heading), and the root README keeps loom-workflow 5.21.0 from trunk."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "anchor": "loom-code/scripts/loom_checker/probes.py:443",
+      "text": "adversary (pre-existing, not introduced here): git_maybe strips stdout, so leading blank lines are dropped before the 20-line concern window is counted; a file with 20 blank lines then a concern line on line 21 is treated as carrying a concern.",
+      "fix": "Read the blob with strip=False in a later change."
+    },
+    {
+      "severity": "nit",
+      "dimension": "tests",
+      "anchor": "loom-code/tests/test_delivery_stop.py:199",
+      "text": "adversary: git_only_spies wraps only subprocess.run and tempfile.TemporaryDirectory; a future route through Popen or mkdtemp would escape it. Plan Risk 3 acknowledges this and a Popen-level trial found no such route today.",
+      "fix": "None required now; the suite_collection stub covers the known route."
+    }
+  ],
+  "selection": null,
+  "intent_confirmed_sha": "bddf642e4d67515a47fdcdf5c9769971c8d1f6e8",
+  "tested_commit": "fb1da957ed7d0221029e591d7a13d4d84b8e2d28",
+  "reviewed_commit": "fb1da957ed7d0221029e591d7a13d4d84b8e2d28",
+  "acceptance_status": []
+}

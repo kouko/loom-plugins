@@ -1,12 +1,16 @@
 """Documented Stop framing around the same single-shot delivery observer."""
 # concern: malformed pause metadata or stale review can trigger publication reminders or hide unconfirmed delivery.
 import json
+import os
 import signal
 import shlex
+import subprocess
+import tempfile
 from io import StringIO
 from pathlib import Path
 import pytest
 
+from loom_checker import probes
 from loom_checker.command_handlers import publish
 from test_delivery import delivery
 from test_loom_publish import git
@@ -171,6 +175,76 @@ def test_changed_head_cannot_continue(reviewed_delivery, monkeypatch, host, phas
     assert "unconfirmed" in result["systemMessage"]
     if phase != "published":
         assert calls.calls == []
+
+
+def no_program_delivery(delivery, monkeypatch, added_test):
+    """A valid review recording no adversarial program, on a branch that adds
+    program files (`delta.py`, `src.py`, `tests/test_added.py`), unpublished."""
+    repo, _, calls, pr, _ = delivery
+    monkeypatch.setattr(verification_fixtures, "CHANGE", "change")
+    verification_fixtures.write(repo, "src.py", "VALUE = 1\n")
+    verification_fixtures.write(repo, "docs/loom/KICKOFF-DEFAULTS.md",
+                                "- package-tests: python3 -m pytest -q — fixture (2026-09-22)\n")
+    verification_fixtures.write(repo, "tests/test_added.py", added_test)
+    verification_fixtures.commit(repo, "reviewed work")
+    payload = verification_fixtures.attestation(repo)
+    payload["executions"] = [item for item in payload["executions"] if item["kind"] != "adversarial"]
+    payload["executions"].append({"kind": "adversarial", "no_program": "nothing earned a program"})
+    verification_fixtures.commit_attestation(repo, payload, "docs/loom/change/attestation.json")
+    calls.head = pr["head"]["sha"] = git(repo, "rev-parse", "HEAD")
+    calls.remote_head = None
+    return repo
+
+
+def git_only_spies(monkeypatch):
+    """Record every non-git subprocess and temporary directory; refuse collection."""
+    launched, temporary = [], []
+    real_run, real_directory = subprocess.run, tempfile.TemporaryDirectory
+
+    def run(*args, **kwargs):
+        argv = args[0] if args else kwargs["args"]
+        first = argv.split()[0] if isinstance(argv, str) else argv[0]
+        if Path(os.fsdecode(first)).name != "git":
+            launched.append(argv)
+        return real_run(*args, **kwargs)
+
+    def directory(*args, **kwargs):
+        temporary.append((args, kwargs))
+        return real_directory(*args, **kwargs)
+
+    monkeypatch.setattr(subprocess, "run", run)
+    monkeypatch.setattr(tempfile, "TemporaryDirectory", directory)
+    monkeypatch.setattr(probes, "suite_collection", lambda repo, path: pytest.fail(
+        f"rechecking a review record collected the ordinary file {path}"))
+    return launched, temporary
+
+
+ORDINARY_TEST = "def test_added():\n    assert True\n"
+
+
+def test_stop_hook_no_program_ordinary_files_git_only(delivery, monkeypatch):
+    repo = no_program_delivery(delivery, monkeypatch, ORDINARY_TEST)
+    launched, temporary = git_only_spies(monkeypatch)
+    result, feedback = stop(monkeypatch, repo, host="claude")
+    assert launched == [] and temporary == []
+    assert feedback == "" and set(result) == {"hookSpecificOutput"}  # reminder unchanged
+    assert result["hookSpecificOutput"]["hookEventName"] == "Stop"
+    reason = result["hookSpecificOutput"]["additionalContext"]
+    assert "next:" in reason and "unpublished" in reason
+
+
+def test_recompute_ordinary_files_git_only_valid(delivery, monkeypatch):
+    repo = no_program_delivery(delivery, monkeypatch, ORDINARY_TEST)
+    launched, temporary = git_only_spies(monkeypatch)  # an ordinary file is never collected
+    assert publish.verification_status(repo, "change") == "valid"
+    assert launched == [] and temporary == []
+
+
+def test_concern_probe_contradicts_no_program(delivery, monkeypatch):
+    repo = no_program_delivery(delivery, monkeypatch,
+                               "# concern: an unbounded retry loop\n" + ORDINARY_TEST)
+    status = publish.verification_status(repo, "change")
+    assert status.startswith("stale") and "a no-program outcome contradicts" in status
 
 
 @pytest.mark.parametrize("args", [["--host", "claude"], ["--hook", "--host", "unknown"],

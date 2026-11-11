@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.65.1] — 2026-11-11 — check the concern line before collecting added files
+
+- Stop collecting ordinary added files when a review record is rechecked. The concern-line check, which only reads Git, now runs before test collection, so a record stating that the adversary committed no program no longer launches `pytest --collect-only` or creates a temporary directory for each added file on every Stop. Files carrying a `concern:` line are still collected; which programs count is unchanged.
+
 ## [3.65.0] — 2026-11-11 — frame Stop feedback for each host
 
 - Select Claude Code and Codex explicitly in packaged delivery hooks. Use normal continuation feedback for Claude Code and retain Codex's blocking continuation response; repeated Stop events are silent before delivery lookup.
