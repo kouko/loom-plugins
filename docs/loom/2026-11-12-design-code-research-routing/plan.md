@@ -15,6 +15,11 @@ charter: 1.1
 - Test: A1 positive: synchronized-release; boundary: discoverable-design-research. Run existing metadata and manifest checks; update derived manifests and current-release pin through the established release packet.
 - Risk: agent-decided — REQ-1 adds one capability with explicit budget accounting; bump code/design minor versions before review attestation. Preserve existing generated-manifest conventions and update the release pin in loom-code/tests/test_write_plan_station_text.py.
 
+**W3-01 Preserve meaningful timeout verification under observed fixture startup** after: W2-01 acceptance: 6
+- Files: loom-code/tests/test_external_review.py, loom-code/tests/test_external_review_adversarial.py, loom-code/CHANGELOG.md
+- Test: A6 positive: complete-suite; negative: process-group-kill-disabled. Reproduce the five baseline failures, retain live-path evidence, then verify meaningful deadlines, descendant cleanup and blocked-input behavior.
+- Risk: agent-decided — Newly measured fake-CLI startup exceeds existing test deadlines in both installed interpreters. Repair only test fixtures and timing preconditions; preserve production defaults and prove the tests still reject broken termination. This supports, not replaces, research behavior trials.
+
 ## Simplicity check
 
 - none found
@@ -33,3 +38,4 @@ charter: 1.1
 6. agent-decided — W2 includes new CHANGELOG entries, README versions, derived manifest synchronization and CURRENT_VERSION pin rewrite; do not claim a release before review and publication evidence.
 7. agent-decided — Build integration found incomplete new-skill installation/catalog/navigation accounting and a review paragraph caught by the existing verdict-reuse guard. Preserve frozen baselines and protection semantics while covering every affected catalog and localized link.
 8. agent-decided — Keep capture-intent within its existing word cap by shortening only the added handoff; synchronize design release pins in loom-design/tests/spec/test_capture_intent_contract.py and marketplace metadata, preserving historical changelog entries.
+9. agent-decided — W3 addresses a newly observed verification precondition: baseline 70a05fd7 reproduces all five timeout failures, and fresh CLI startup measured about 2.8s in both installed interpreters. W1/W2 remain completed; no research requirement or production behavior changes.

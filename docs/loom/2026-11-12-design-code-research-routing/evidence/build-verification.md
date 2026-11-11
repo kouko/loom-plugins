@@ -81,3 +81,18 @@ pins and marketplace entry. The complete design group subsequently passed:
 These fixes retain the same six Acceptance obligations and task identities.
 Final Build and finalization results are recorded by their actual commands and
 generated attestation; this record does not claim a future run passed.
+
+## Further timeout diagnosis and supporting repair
+
+The next four-worker run failed five unchanged timeout cases (2794 passed,
+2 skipped); one-worker execution reproduced those five (1010.76s). All five
+also failed on untouched base `70a05fd7`, and no-worker execution did not solve
+them. Minimal fresh CLI launches measured approximately 2.8s in both installed
+interpreters. Thus the earlier worker-count hypothesis was insufficient.
+
+The [bounded research record](../research/001-timeout-fixture-startup.md)
+retains conditions and limitations. W3 repairs only fake-CLI test preconditions;
+[fixture evidence](timeout-fixture-evidence.md) records 144 focused passes and
+three descendant-check failures under a parent-only-kill mutation. The production
+external-review script/defaults remain unchanged. Complete verification is still
+reported separately; these focused results do not substitute for it.

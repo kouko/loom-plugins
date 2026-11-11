@@ -146,8 +146,9 @@ identify the relevant original spans; no private transcript was sent externally.
   actual artifact, not proof of compression execution.
 - [Main research contract](../../../loom-code/skills/engineering-research/SKILL.md),
   steps 1–5, evaluation selection, retained records, return to owning task.
-  Local file matches installed 3.66.0; historical main command output also
-  matches installed bytes.
+  At the inspected baseline, the local file matched installed 3.66.0; the
+  historical main command output also matched those installed bytes. Later
+  implementation changes are outside that historical comparison.
 - [Evaluation selection](../../../loom-code/skills/engineering-research/references/evaluation-selection.md),
   Frame the decision, question table and Form a supported conclusion.
 - [Research methods](../../../loom-code/skills/engineering-research/references/research-methods.md)

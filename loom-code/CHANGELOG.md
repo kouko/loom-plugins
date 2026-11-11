@@ -4,6 +4,7 @@
 
 - Use engineering research for consequential evidence gaps in planning, build, review, ship and maintenance; retain each stage's authority and verification requirements.
 - Compare material alternatives with applicable evidence and keep saved conclusions consistent with follow-up recommendations.
+- Stabilize existing external-review timeout fixtures against observed cold CLI startup, retaining branch-start, elapsed-bound and process-group cleanup checks; production defaults remain unchanged.
 - Admit separately owned design research: the counted skill cap rises from 25 to 26; artifact and session-start budgets stay unchanged.
 - budget-exception: design-research — adds one design-owned research skill; regression eval `loom-design/tests/test_design_research_package.py`.
 - budget-exception: tool:design-research — adds its counted contract registration; regression eval `loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner`.
