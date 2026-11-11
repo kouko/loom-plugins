@@ -9,13 +9,16 @@ can waive a step (change 2026-10-01-remove-expert-mode).
 from __future__ import annotations
 
 import json
+import io
 import os
+import select
 import subprocess
 import sys
 from pathlib import Path
 
 from loom_checker import attestation as attestation_module
 from loom_checker import verification
+from loom_checker.command_handlers import finalize as finalize_handler
 from loom_checker.probes import MAX_PROBE_PROGRAMS
 from loom_checker.probes import suite_collects
 
@@ -113,6 +116,114 @@ PASSING = [
     {"reviewer": "r1", "vendor": "openai", "model": "m", "lens": "code", "verdict": "PASS", "findings": []},
     {"reviewer": "r2", "vendor": "other", "model": "m", "lens": "code", "verdict": "PASS", "findings": []},
 ]
+
+
+def test_finalize_progress_before_child_exit(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, "python3 wait.py")
+    release = tmp_path / "release"
+    (repo / "wait.py").write_text(
+        "from pathlib import Path\nimport time\n"
+        f"while not Path({str(release)!r}).exists():\n    time.sleep(0.01)\n",
+    )
+    write_probes(repo, 1)
+    input_path = review_input(tmp_path, PASSING, ADVERSARIAL)
+    process = subprocess.Popen(
+        [sys.executable, str(CHECKER), "finalize-review", CHANGE, "--input", str(input_path)],
+        cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    )
+    try:
+        assert select.select([process.stderr], [], [], 10)[0], "no progress before child exit"
+        first = process.stderr.readline()
+        assert first == "finalize-review: package-tests started\n"
+        assert process.poll() is None
+        release.touch()
+        stdout, stderr = process.communicate(timeout=20)
+    finally:
+        release.touch()
+        try:
+            process.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.communicate(timeout=10)
+    assert process.returncode == 0, stderr
+    assert (first + stderr).splitlines() == [
+        f"finalize-review: {stage} {state}"
+        for stage in ("package-tests", "adversarial") for state in ("started", "passed")
+    ]
+    assert stdout.startswith("wrote ")
+
+
+def test_finalize_exit_zero_invalid_evidence(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    (repo / PROBE_0).write_text(
+        "# concern: skipped tests must not pass\nimport pytest\n"
+        "@pytest.mark.skip\ndef test_skipped():\n    assert True\n",
+    )
+    commit_all(repo, "skip the probe")
+    result = finalize(repo, review_input(tmp_path, PASSING, [
+        {"command": f"python3 -m pytest {PROBE_0}", "artifact": PROBE_0},
+    ]))
+    assert result.returncode == 1
+    assert "shows no passed test" in result.stderr
+    assert "finalize-review: adversarial failed\n" in result.stderr
+    assert "finalize-review: adversarial passed" not in result.stderr
+    assert result.stdout == ""
+    assert not (repo / f"docs/loom/{CHANGE}/attestation.json").exists()
+
+
+def test_finalize_stdout_unchanged(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    result = finalize(repo, review_input(tmp_path, PASSING, ADVERSARIAL))
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == (
+        f"wrote docs/loom/{CHANGE}/attestation.json for {written(repo)['content_digest']}\n"
+    )
+
+
+@pytest.mark.parametrize("failure", [None, "exit", "timeout", "execution"])
+@pytest.mark.parametrize("broken", ["write", "flush"])
+def test_finalize_progress_stream_failure(tmp_path: Path, monkeypatch, failure, broken) -> None:
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    input_path = review_input(tmp_path, PASSING, ADVERSARIAL)
+    monkeypatch.chdir(repo)
+    attempts = []
+
+    class BrokenProgress(io.StringIO):
+        def write(self, text):
+            if broken == "write" and text.startswith("finalize-review:"):
+                raise BrokenPipeError("progress unavailable")
+            return super().write(text)
+
+        def flush(self):
+            if broken == "flush":
+                raise OSError("progress unavailable")
+
+    run = subprocess.run
+
+    def child(*args, **kwargs):
+        if "timeout" in kwargs and kwargs.get("stderr") == subprocess.STDOUT:
+            attempts.append(args[0])
+            if failure == "timeout":
+                raise subprocess.TimeoutExpired(args[0], 1)
+            if failure == "execution":
+                raise OSError("child unavailable")
+            if failure == "exit":
+                return subprocess.CompletedProcess(args[0], 7, "failed child log")
+        return run(*args, **kwargs)
+
+    monkeypatch.setattr(subprocess, "run", child)
+    out, err = io.StringIO(), BrokenProgress()
+    result = finalize_handler.cmd_finalize_review([CHANGE, "--input", str(input_path)], out, err)
+    assert result == (1 if failure else 0)
+    assert len(attempts) == (1 if failure else 2)
+    assert (repo / f"docs/loom/{CHANGE}/attestation.json").exists() == (failure is None)
+    if failure:
+        assert "BLOCK finalize.package-tests" in err.getvalue()
+        assert "finalize-review: package-tests passed" not in err.getvalue()
+        assert out.getvalue() == ""
 
 
 # --- Acceptance 3 -----------------------------------------------------------
