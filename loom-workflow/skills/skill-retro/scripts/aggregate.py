@@ -27,13 +27,10 @@ This is uniform across all 4 Signal kinds, not a tool_error_cluster
 special case — when a future detector also emits overlapping windows,
 the same protection applies.
 
-Project-path proxy (v0.1 limitation, documented for T2 / v0.2 follow-up):
-``Event`` does not carry the JSONL file's project tree path; the
-caller-supplied ``session_to_project`` mapping is the bridge.
-``aggregate_by_skill`` accepts it as an optional kw-only arg; when
-omitted, sessions stand in for project paths (1 session = 1 "project"
-at v0.1 — approximation noted in T5 spec). v0.2 surfaces this as an
-``Event.project_path`` field populated by ingest.py.
+Project identity comes from invocation ``Event.project_path`` values.
+An explicit ``session_to_project`` mapping overrides those values for legacy
+callers. Missing identities remain unknown; session IDs never substitute for
+projects.
 
 Per Plan Part 1 §Task 5.
 """
@@ -96,9 +93,9 @@ class AggregateRecord:
     - ``signals``: Signal[] attached to this skill, post-dedup. A signal
       is "attached" when its ``session`` matches any element of
       ``sessions``.
-    - ``project_paths``: distinct project trees this skill appeared in.
-      v0.1 fed by ``session_to_project`` map; v0.2 expected to come
-      from ``Event.project_path``.
+    - ``project_paths``: distinct known projects on matching invocations.
+    - ``unknown_project_sessions``: sessions with any unattributed matching
+      invocation, including sessions that also have known projects.
     - ``facet_summary``: optional FacetRecord-derived aggregate (mean
       claude_helpfulness rank, outcome distribution, etc.). Empty dict at
       v0.1; populated by future facets joiner.
@@ -120,6 +117,7 @@ class AggregateRecord:
     time_cost_norm: float = 0.0
     cross_project_norm: float = 0.0
     recency_norm: float = 0.0
+    unknown_project_sessions: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -279,8 +277,8 @@ def aggregate_by_skill(
         target_pattern: fnmatch glob applied to ``event.skill_invocation``
             (default ``"loom-code:*"``).
         session_to_project: optional dict mapping session id → project
-            tree path. When omitted, sessions themselves stand in for
-            project paths (v0.1 approximation; v0.2 plans Event.project_path).
+            identity, overriding Event.project_path. Missing/empty entries
+            are unknown. When omitted, use each invocation's project_path.
 
     Returns:
         Dict keyed by skill name; one AggregateRecord per skill seen in
@@ -318,12 +316,15 @@ def aggregate_by_skill(
     now = datetime.now(timezone.utc)
     for skill, sk_events in by_skill.items():
         sessions = sorted({ev.session for ev in sk_events})
-        # Project paths: prefer caller-supplied session_to_project; fall
-        # back to sessions-as-projects.
-        if session_to_project is None:
-            project_paths = set(sessions)
-        else:
-            project_paths = {session_to_project.get(s, s) for s in sessions}
+        project_paths: set[str] = set()
+        unknown_project_sessions: set[str] = set()
+        for ev in sk_events:
+            project = (session_to_project.get(ev.session)
+                       if session_to_project is not None else ev.project_path)
+            if isinstance(project, str) and project.strip():
+                project_paths.add(project)
+            else:
+                unknown_project_sessions.add(ev.session)
 
         # Attach signals whose session matches.
         attached = [s for s in deduped_signals if s.session in set(sessions)]
@@ -364,6 +365,7 @@ def aggregate_by_skill(
             event_count=len(sk_events),
             signals=attached,
             project_paths=project_paths,
+            unknown_project_sessions=sorted(unknown_project_sessions),
             facet_summary={},
             confidence=confidence,
             frequency_norm=0.0,  # filled in second pass (needs cross-record max)
@@ -449,7 +451,8 @@ def fingerprint_count(
     Return the max group size — that is, "how many distinct project
     trees does our most-widespread friction-shape appear in?".
 
-    Returns 0 when ``rec.signals`` is empty.
+    Missing/empty mappings contribute no project. Returns 0 when no signal
+    has a known project, including when ``rec.signals`` is empty.
 
     Per plan T5 §(c): "within-run in-memory count" (claude-coach
     pattern). Persistent ledger deferred to v0.2.
@@ -459,9 +462,10 @@ def fingerprint_count(
     fingerprint_projects: dict[str, set[str]] = {}
     for sig in rec.signals:
         fp = signal_fingerprint(sig)
-        project = session_to_project.get(sig.session, sig.session)
-        fingerprint_projects.setdefault(fp, set()).add(project)
-    return max(len(projects) for projects in fingerprint_projects.values())
+        project = session_to_project.get(sig.session)
+        if isinstance(project, str) and project.strip():
+            fingerprint_projects.setdefault(fp, set()).add(project)
+    return max((len(projects) for projects in fingerprint_projects.values()), default=0)
 
 
 # ---------------------------------------------------------------------------

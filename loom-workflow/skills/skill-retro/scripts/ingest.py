@@ -44,6 +44,7 @@ import fnmatch
 import json
 import os
 import re
+import subprocess
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -95,6 +96,34 @@ _COMMAND_NAME_RE = re.compile(r"<command-name>([^<]+)</command-name>")
 # Interrupt marker — Claude Code emits this exact literal in a user
 # text content item when the user hits the interrupt key.
 _INTERRUPT_MARKER = "[Request interrupted by user]"
+
+
+def _project_path(cwd: str | None, cache: dict[str, str | None]) -> str | None:
+    """Observe current Git identity, without inheriting caller Git routing."""
+    if cwd is None:
+        return None
+    if cwd in cache:
+        return cache[cwd]
+    cache[cwd] = None
+    try:
+        directory = Path(cwd)
+        if not directory.is_absolute() or not directory.is_dir():
+            return None
+        # Also excludes injected Git config and discovery overrides. The
+        # transcript supplies only cwd, never a command or Git directory.
+        env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        env["GIT_OPTIONAL_LOCKS"] = "0"
+        result = subprocess.run(
+            ["git", "-C", cwd, "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            capture_output=True, text=True, timeout=5, env=env,
+        )
+        if result.returncode == 0:
+            common = Path(result.stdout.rstrip("\n"))
+            if common.is_absolute() and common.is_dir():
+                cache[cwd] = str(common.resolve(strict=True))
+    except (OSError, ValueError, RuntimeError, UnicodeError, subprocess.TimeoutExpired):
+        pass
+    return cache[cwd]
 
 
 def _path_excluded(path: Path, exclude_globs: list[str]) -> bool:
@@ -253,6 +282,7 @@ def _record_to_event(record: dict, is_subagent: bool) -> Event | None:
         user_interrupt=interrupt,
         is_subagent=is_subagent,
         skill_invocation=skill_invocation,
+        cwd=record.get("cwd") if isinstance(record.get("cwd"), str) else None,
     )
 
 
@@ -288,6 +318,7 @@ def ingest_claude_jsonl(
     if not root.exists():
         return
 
+    project_cache: dict[str, str | None] = {}
     for path in sorted(root.rglob("*.jsonl")):
         if not path.is_file():
             continue
@@ -316,6 +347,8 @@ def ingest_claude_jsonl(
                     if event is not None:
                         event.source_path = str(path.resolve())
                         event.source_line = line_number
+                        if event.skill_invocation:
+                            event.project_path = _project_path(event.cwd, project_cache)
                         yield event
         except OSError:
             # Permission / IO error on one file shouldn't kill the
@@ -333,7 +366,7 @@ def _codex_observable_text(content: object) -> str:
     for item in content:
         if not isinstance(item, dict):
             continue
-        if item.get("type") not in {"input_text", "output_text", "text"}:
+        if item.get("type") not in ("input_text", "output_text", "text"):
             continue
         text = item.get("text")
         if isinstance(text, str):
@@ -392,12 +425,14 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
     if not root.exists():
         return
 
+    project_cache: dict[str, str | None] = {}
     for path in sorted(root.rglob("*.jsonl")):
         if not path.is_file():
             continue
         # Rollout file names are session-scoped and remain available even when
         # individual response records omit a session identifier.
         session = path.stem
+        cwd: str | None = None
         tool_names: dict[str, str] = {}
         try:
             with path.open("r", encoding="utf-8", newline="") as f:
@@ -411,9 +446,15 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                         record = json.loads(line)
                     except json.JSONDecodeError:
                         continue
-                    if not isinstance(record, dict) or record.get("type") != "response_item":
+                    if not isinstance(record, dict):
                         continue
                     payload = record.get("payload")
+                    if record.get("type") in ("session_meta", "turn_context"):
+                        observed = payload.get("cwd") if isinstance(payload, dict) else None
+                        cwd = observed if isinstance(observed, str) else None
+                        continue
+                    if record.get("type") != "response_item":
+                        continue
                     timestamp = record.get("timestamp")
                     if not isinstance(payload, dict) or not isinstance(timestamp, str):
                         continue
@@ -421,7 +462,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                     item_type = payload.get("type")
                     if item_type == "message":
                         role = payload.get("role")
-                        if role not in {"user", "assistant"}:
+                        if role not in ("user", "assistant"):
                             continue
                         text = _codex_observable_text(payload.get("content"))
                         stop_outcome, stop_reason = (
@@ -433,36 +474,41 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                             agent=_CODEX_AGENT_LITERAL,
                             source_path=str(path.resolve()), source_line=line_number,
                             session=session,
+                            cwd=cwd,
                             ts=timestamp,
                             role=role,
                             text=text,
                             stop_policy_outcome=stop_outcome,
                             stop_policy_reason=stop_reason,
                         )
-                    elif item_type in {"function_call", "custom_tool_call"}:
+                    elif item_type in ("function_call", "custom_tool_call"):
                         name = payload.get("name")
                         call_id = payload.get("call_id")
                         if isinstance(call_id, str) and isinstance(name, str):
                             tool_names[call_id] = name
                         arguments = payload.get("arguments", payload.get("input"))
                         text = arguments if isinstance(arguments, str) else ""
+                        skill_invocation = _codex_skill_invocation(name, arguments)
                         yield Event(
                             agent=_CODEX_AGENT_LITERAL,
                             source_path=str(path.resolve()), source_line=line_number,
                             session=session,
+                            cwd=cwd,
+                            project_path=_project_path(cwd, project_cache) if skill_invocation else None,
                             ts=timestamp,
                             role="tool",
                             text=text,
                             tool_name=name if isinstance(name, str) else None,
-                            skill_invocation=_codex_skill_invocation(name, arguments),
+                            skill_invocation=skill_invocation,
                         )
-                    elif item_type in {"function_call_output", "custom_tool_call_output"}:
+                    elif item_type in ("function_call_output", "custom_tool_call_output"):
                         call_id = payload.get("call_id")
                         text = _codex_observable_text(payload.get("output"))
                         yield Event(
                             agent=_CODEX_AGENT_LITERAL,
                             source_path=str(path.resolve()), source_line=line_number,
                             session=session,
+                            cwd=cwd,
                             ts=timestamp,
                             role="tool",
                             text=text,

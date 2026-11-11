@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.21.0] — 2026-11-11 — count known retrospective projects
+
+- Preserve invocation directories and resolve current Git common directories so sessions, subdirectories and linked worktrees in one repository count as one project; independent repositories stay distinct.
+- Exclude unknown attribution from project counts and disclose affected sessions in `unknown_project_sessions`. Keep source locations and event `cwd` / `project_path` available for traceability.
+- Use known projects for the existing cross-project ranking component without changing weights or session thresholds. Missing attribution can lower rankings; current filesystem identity does not establish historical identity, and duplicate-session effects remain unresolved.
+
 ## [5.20.1] — 2026-11-08 — correct the workflow tool census
 
 - Correct all three README counts to nine counted workflow tools among fourteen shipped skills. Engineering research belongs to loom-code; this plugin adds no research capability.

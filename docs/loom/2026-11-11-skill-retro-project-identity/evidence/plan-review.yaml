@@ -1,0 +1,10 @@
+verdict: PASS
+lens: plan
+reviewed_sha: /Users/kouko/GitHub/loom-plugins/docs/loom/2026-11-11-skill-retro-project-identity/plan.md
+dimension_scores:
+  deletion-first: PASS
+findings: []
+notes:
+  - no simpler shape
+  - The two functional tasks extend existing ingestion and aggregation entries and their existing test files; the final task performs required release synchronization. No new module, configuration surface, or general identity framework is proposed.
+  - Per-event attribution and explicit unknown disclosure are needed for the accepted mixed-project and partial-attribution cases; collapsing to a session-first mapping would lose those guarantees.

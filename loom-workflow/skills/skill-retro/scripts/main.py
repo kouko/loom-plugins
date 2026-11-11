@@ -169,6 +169,7 @@ def _aggregate_record_to_dict(rec: AggregateRecord) -> dict[str, object]:
             for s in rec.signals
         ],
         "project_paths": sorted(rec.project_paths),
+        "unknown_project_sessions": sorted(rec.unknown_project_sessions),
         "facet_summary": rec.facet_summary,
         "confidence": rec.confidence,
         "frequency_norm": rec.frequency_norm,

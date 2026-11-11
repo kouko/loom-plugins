@@ -123,6 +123,20 @@ def test_aggregate_by_skill_empty_input_returns_empty_dict():
     assert records == {}
 
 
+def test_partial_map_unknown():
+    events = [_ev("2026-05-22T10:00:00Z", session=s,
+                  skill_invocation="loom-code:build") for s in ("S1", "S2", "S3")]
+    signals = [Signal(kind="tool_error_cluster", session=e.session, ts=e.ts,
+                      severity="high", evidence=[]) for e in events]
+    for mapping, known, unknown in [({}, set(), ["S1", "S2", "S3"]),
+                                   ({"S1": "/p", "S2": ""}, {"/p"}, ["S2", "S3"])]:
+        rec = aggregate_by_skill(events, signals, session_to_project=mapping)["loom-code:build"]
+        assert rec.project_paths == known
+        assert rec.unknown_project_sessions == unknown
+        assert rec.confidence == "low"
+        assert fingerprint_count(rec, mapping) == len(known)
+
+
 def test_aggregate_by_skill_attaches_signals_by_session():
     """Signals are attached to the AggregateRecord whose sessions include
     the signal's session.

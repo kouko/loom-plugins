@@ -1,0 +1,19 @@
+verdict: PASS
+lens: spec+adversarial
+reviewed_sha: ad8f5e4a
+dimension_scores:
+  omission: PASS
+  ambiguity: PASS
+  inconsistency: PASS
+  incorrect-fact: PASS
+  missing-population: PASS
+  deletion-first: PASS
+  spec-conformance: PASS
+  design-conformance: "N/A — No DESIGN.md; kickoff defaults waive it for this plugin repository. The spec includes CLI states and recovery behavior."
+  principles-conformance: PASS
+  user-judgment-leak: PASS
+findings: []
+notes:
+  - "Intent Acceptance 1–3 are covered by REQ-1–3 and decisions at spec.md:14–19: invocation-level identity, canonical Git common directory, unknown exclusion, unchanged session thresholds and ranking weights, and source provenance."
+  - "Negative and boundary behavior covers mixed known/unknown invocations, missing or malformed context, multiple projects in one session, independent clones, deleted paths, unavailable Git and timeouts. Historical path reuse is explicitly a limitation at spec.md:16; session deduplication remains out of scope."
+  - "Read the complete spec and intent, PRINCIPLES.md, kickoff defaults, cited current source locations and research. This is a pre-build specification verdict, not implementation validation; no tests or adversarial programs were run. The repair replaces the demonstrated session-as-project fallback without introducing a new ranking policy."
