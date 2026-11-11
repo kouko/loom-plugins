@@ -151,8 +151,9 @@ The user selected separate research skills owned by loom-design and loom-code,
 and requested planning for research activation across loom-code stages. This
 supersedes the earlier undecided skill-count alternatives, not the historical
 evidence or the absence of a demonstrated behavioral improvement. A separate
-[intent draft](../intent/2026-11-12-design-code-research-routing.md) captures this
-direction; its confirmation remains pending.
+[confirmed intent](../intent/2026-11-12-design-code-research-routing.md) captures
+this direction. The user additionally confirmed that detailed research work
+belongs inside each research skill and existing stage flows should stay simple.
 
 Complexity assessment uses the Design-Is-Taking-Apart reference from the installed
 critique skill: separate responsibilities without unnecessary coupling.
@@ -177,6 +178,6 @@ critique skill: separate responsibilities without unnecessary coupling.
 - Verdict: RESHAPE. Keep separate ownership and the user's requested activation
   behavior, but use Q1's minimal integrated form rather than cloning the full
   research package or adding a universal mandatory research step. This verdict
-  does not establish a final size reduction or authorize implementation before
-  intent confirmation. The admitted extra skill and mechanism-budget impact
+  does not establish a final size reduction. Intent confirmation is now recorded;
+  the admitted extra skill and mechanism-budget impact
   must be handled explicitly during design/planning under existing rules.

@@ -6,7 +6,7 @@ charter: 1.1
 ## Task DAG
 
 **W1-01 Implement separate research ownership and bounded stage handoffs** after: none acceptance: 1, 2, 3, 4, 5, 6
-- Files: loom-design/skills/, loom-code/skills/, loom-design/tests/, loom-code/tests/, loom-code/contract/manifest.yaml, loom-code/scripts/check_mechanisms.py, loom-code/scripts/loom_checker/rule_checks/, loom-design/.claude-plugin/plugin.json
+- Files: loom-design/skills/, loom-code/skills/, loom-design/tests/, loom-code/tests/, loom-code/contract/manifest.yaml, loom-code/scripts/check_mechanisms.py, docs/loom/evidence/mechanisms.yaml, loom-design/.claude-plugin/plugin.json
 - Test: A1 positive: D1; negative: D3. A2 positive: C1-C5; negative: N1-N5. A3 positive: D1; boundary: D2. A4 positive: F1; negative: unsupported-superiority. A5 positive: F1; boundary: F2. A6 positive: actual-trajectories; negative: static-only.
 - Risk: agent-decided — REQ-1–6 keep methods inside owned skills and stage edits short. Preserve existing ownership, evidence and verification boundaries; extend package invariants only as needed, with independent behavioral cases at acceptance.
 
