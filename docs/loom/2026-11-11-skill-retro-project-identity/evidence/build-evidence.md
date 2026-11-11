@@ -17,6 +17,16 @@
 - The provenance test initially referenced a nonexistent payload key and was corrected to the existing `session_events` key; no product behavior was relaxed.
 - Added 74 net test lines. Real CLI cases exercise separate repositories, shared worktrees, unknown and mixed attribution, source locations and a binding top-N cut.
 
+## W3 and integrated Build verification
+
+- Release commit: 2498b645. Updating the existing version pin first produced 10 failures and 4 passes; synchronized 5.21.0 release metadata then produced 14 passes, with no added test lines.
+- `sync-trunk` before adversarial testing and before closing review reported up to date with origin/main at a8ec84e02740b58820055249e40e186d63233fbd; no merge commit or warning.
+- Adversary: 7 attack points, none successful, no product findings. Temporary trials plus focused cases produced 54 passes. Only a concern comment on the existing ingestion test was retained, in fa61939d1a414dd807758f80dc28cad50f372134.
+- Attacks covered path aliases and hostile spelling, malformed context replacement, bad explicit mappings, inherited Git routing, linked worktree context, dependency failure and binding CLI selection.
+- Full suite at fa61939d: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` — exit 0; pytest groups totaled 4191 passed and 6 skipped; shell-test groups also passed.
+- Adversarial replay after the full suite: `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/skill-retro/test_ingest.py` — 24 passed, exit 0.
+- The package runner's temporary npm install emitted an audit advisory (2 low, 1 critical); no dependency change or audit remediation was performed by this repair. The declared suite completed successfully.
+
 ## Scope limits
 
 These executions validate the ingestion and preview CLI, not host automatic skill routing or the downstream model-generated proposal. Project identity observes the current filesystem. Duplicate-session handling and threshold configuration overrides remain outside this repair.
