@@ -121,7 +121,7 @@ uv run --isolated --with-requirements requirements-package-tests.lock python -m 
 
 Result: 2 passed in 0.03s. No adversary re-dispatch was needed because the
 retained program remained applicable and passing; its recorded initial attack
-scope remains explicit. The independent timeout mutation evidence supplements
+scope remains explicit. The timeout mutation evidence supplements
 the repaired test behavior without claiming to be research acceptance evidence.
 
 `sync-trunk` reported up to date at `c7fd9d5f`, containing origin/main `70a05fd7`.
