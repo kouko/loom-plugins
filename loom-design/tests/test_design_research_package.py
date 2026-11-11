@@ -1,3 +1,4 @@
+# concern: Design research must remain discoverable without cross-plugin file dependencies or escaping bundled resources.
 """Portable discovery and resource invariants; behavior is tested independently."""
 
 from pathlib import Path
