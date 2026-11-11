@@ -366,7 +366,7 @@ def _codex_observable_text(content: object) -> str:
     for item in content:
         if not isinstance(item, dict):
             continue
-        if item.get("type") not in {"input_text", "output_text", "text"}:
+        if item.get("type") not in ("input_text", "output_text", "text"):
             continue
         text = item.get("text")
         if isinstance(text, str):
@@ -449,7 +449,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                     if not isinstance(record, dict):
                         continue
                     payload = record.get("payload")
-                    if record.get("type") in {"session_meta", "turn_context"}:
+                    if record.get("type") in ("session_meta", "turn_context"):
                         observed = payload.get("cwd") if isinstance(payload, dict) else None
                         cwd = observed if isinstance(observed, str) else None
                         continue
@@ -462,7 +462,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                     item_type = payload.get("type")
                     if item_type == "message":
                         role = payload.get("role")
-                        if role not in {"user", "assistant"}:
+                        if role not in ("user", "assistant"):
                             continue
                         text = _codex_observable_text(payload.get("content"))
                         stop_outcome, stop_reason = (
@@ -481,7 +481,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                             stop_policy_outcome=stop_outcome,
                             stop_policy_reason=stop_reason,
                         )
-                    elif item_type in {"function_call", "custom_tool_call"}:
+                    elif item_type in ("function_call", "custom_tool_call"):
                         name = payload.get("name")
                         call_id = payload.get("call_id")
                         if isinstance(call_id, str) and isinstance(name, str):
@@ -501,7 +501,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                             tool_name=name if isinstance(name, str) else None,
                             skill_invocation=skill_invocation,
                         )
-                    elif item_type in {"function_call_output", "custom_tool_call_output"}:
+                    elif item_type in ("function_call_output", "custom_tool_call_output"):
                         call_id = payload.get("call_id")
                         text = _codex_observable_text(payload.get("output"))
                         yield Event(
