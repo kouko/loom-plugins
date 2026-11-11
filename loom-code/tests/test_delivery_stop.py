@@ -1,4 +1,5 @@
 """Documented Stop framing around the same single-shot delivery observer."""
+# concern: malformed pause metadata or stale review can trigger publication reminders or hide unconfirmed delivery.
 import json
 import signal
 import shlex
