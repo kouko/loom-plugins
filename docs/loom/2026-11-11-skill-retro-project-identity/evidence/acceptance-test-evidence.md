@@ -110,3 +110,59 @@ Reran `python3 /private/tmp/retro_timeout_probe.py` against the new clone, using
 ```
 
 No findings from this re-run; no dismissed important findings were supplied. Full package tests remain delegated to finalize-review and were not run by this tester. Host installation/automatic routing, downstream model proposals, duplicate-session correctness and threshold overrides remain outside the verified boundary.
+
+## Re-run on 2026-11-11, at 9013867c5d90d609c72bf5bf1091745d97945ca4
+
+Independent integration re-test after merging main and resolving the shared README version table to retain loom-code 3.65.0 and loom-workflow 5.21.0. Inspected `5d7fb47e2692d69658fff7ee4a0fcb09f8d9be1c..9013867c5d90d609c72bf5bf1091745d97945ca4`: no loom-workflow changes; merged Stop-hook changes belong to loom-code. Requirements are unchanged. All three rows were nevertheless re-tested across both adapters, with no carried-over row and no production edits.
+
+Setup: `git clone --quiet --no-hardlinks /Users/kouko/GitHub/loom-plugins /private/tmp/retro-acceptance-9013867`, then checkout of the full tested SHA. Read root README Development and skill-retro README Quick start. Following the documented Python CLI entry, `python3 loom-workflow/skills/skill-retro/scripts/main.py --help` exited 0 and advertised isolated transcript roots and top-N. Final `git status --short` was empty; `git rev-parse HEAD` returned the exact tested SHA.
+
+Inspected and copied the earlier independent harness to `/private/tmp/retro_acceptance_integration_probe.py`, changing only its clean-clone target. Executed `python3 /private/tmp/retro_acceptance_integration_probe.py`; exit 0, captured output `/private/tmp/retro-acceptance-9013867-output.json`. All fixtures were fresh synthetic histories and real temporary Git repositories/worktrees; explicit roots excluded live histories.
+
+- 1: re-tested — Claude and Codex each grouped repository A, its subdirectory and linked worktree into one project; A and B produced two projects. Known cases had no unknown sessions.
+- 2: re-tested — both adapters returned one known project and three disclosed unknown sessions for partial attribution, then zero projects, low confidence and cross_project_norm 0.0 for wholly unknown attribution. Missing Git returned zero known projects and three unknown sessions for each target.
+- 3: re-tested — equal frequency/time/friction cases produced cross_project_norm 1.0 versus 0.5 and high versus low confidence; binding top-1 selected `loom-code:distinct` on both adapters. Six invocation source locations per adapter (12 total) matched raw records and canonical project directories. Duplicate-session correctness remains unclaimed.
+
+Captured summary:
+
+```text
+claude known: distinct=2/high/1.0; single=1/low/0.5; winner=loom-code:distinct; source_lines_checked=6; seconds=0.08
+codex  known: distinct=2/high/1.0; single=1/low/0.5; winner=loom-code:distinct; source_lines_checked=6; seconds=0.08
+claude partial: projects=1 confidence=low unknown=[partial-0,partial-1,partial-2]
+codex  partial: projects=1 confidence=low unknown=[partial-0,partial-1,partial-2]
+claude unknown: projects=0 confidence=low cross_project_norm=0.0 unknown_count=3
+codex  unknown: projects=0 confidence=low cross_project_norm=0.0 unknown_count=3
+claude empty: top_skills=[] subagent_payload=[]
+codex  empty: top_skills=[] subagent_payload=[]
+claude missing-git: projects=[0,0] unknown_counts=[3,3]
+codex  missing-git: projects=[0,0] unknown_counts=[3,3]
+codex malformed-discriminator: projects=1 confidence=low sessions=3 source_line=3 exit=0
+```
+
+Copied the inspected timeout harness to `/private/tmp/retro_timeout_integration_probe.py`, changing only its clean-clone target, and ran `python3 /private/tmp/retro_timeout_integration_probe.py`. Three sessions at the same location and the existing temporary eight-second fake Git produced:
+
+```json
+{"adapter":"claude","seconds":5.04,"projects":0,"unknown_count":3,"exit":0}
+{"adapter":"codex","seconds":5.05,"projects":0,"unknown_count":3,"exit":0}
+```
+
+No findings; no dismissed important findings were supplied. No full package suite ran in this tester. The station will run the unchanged finalize-review suite command documented above; that future check is not a completed acceptance result. Host installation/automatic routing, downstream proposals, duplicate sessions and threshold overrides remain unverified. Previous evidence is retained above.
+
+## Re-run on 2026-11-11, at 3a131c70020c6dccd211ef24f81acb106ae58f81
+
+The owning station reported that its first integration package run found three failures caused by one additional stale README version string, then committed that correction. Inspected `9013867c..3a131c70`: only README.md changed, one insertion and one deletion. No skill-retro behavior changed. The preceding acceptance run remains evidence at its original SHA and is not represented as a full-suite pass.
+
+Fetched the local source branch into the clean clone above and checked out the exact new SHA. Repeated the documented CLI `--help` load from that clone (exit 0), with output at `/private/tmp/retro-acceptance-3a131c70-help.txt`; its final status stayed clean. Re-executed both inspected temporary harnesses unchanged against the clone at this SHA. Both exited 0. Captured primary output: `/private/tmp/retro-acceptance-3a131c70-output.json`.
+
+- 1: re-tested — both adapters still grouped repository/subdirectory/worktree as one and distinct repositories as two; unknown lists empty in known cases.
+- 2: re-tested — both adapters retained one known project plus three unknown sessions in partial cases; all-unknown cases returned zero projects, low confidence and cross_project_norm 0.0. Missing Git returned zero projects and three unknown sessions for each target.
+- 3: re-tested — both adapters returned two/high/1.0 versus one/low/0.5, selected `loom-code:distinct` under binding top-1, and matched all six raw source records per adapter. Known previews took 0.12s each.
+
+Empty inputs again returned empty output lists on both adapters. Malformed Codex discriminators again preserved three valid later sessions, one project, low confidence and source line 3. Timeout output:
+
+```json
+{"adapter":"claude","seconds":5.05,"projects":0,"unknown_count":3,"exit":0}
+{"adapter":"codex","seconds":5.06,"projects":0,"unknown_count":3,"exit":0}
+```
+
+All three rows are re-tested and work; no findings. The full suite is still delegated to the owning station and finalize-review, not claimed here. Existing host/model/deduplication limitations and absence of dismissed important findings remain unchanged.

@@ -1,6 +1,6 @@
 # 修正回顧工具的專案計數 — 實際試用結果
 
-Tried on 2026-11-11, in a clean copy of the project at 75f9630f564b2aea29222ada7dbf59cbbcc83c50. How I tried each line and what came back: `docs/loom/2026-11-11-skill-retro-project-identity/evidence/acceptance-test-evidence.md`.
+Tried on 2026-11-11, in a clean copy of the project at 3a131c70020c6dccd211ef24f81acb106ae58f81. How I tried each line and what came back: `docs/loom/2026-11-11-skill-retro-project-identity/evidence/acceptance-test-evidence.md`.
 
 ## 逐條驗證你要的結果
 
@@ -13,6 +13,8 @@ Tried on 2026-11-11, in a clean copy of the project at 75f9630f564b2aea29222ada7
 另試過空資料及無法使用 Git 的情況，兩種格式都正常完成；查詢刻意延遲時，三場同位置對話約五秒便結束並標為歸屬不明。
 
 審查發現格式錯誤的 Codex 記錄會中斷讀取，修正後已重跑全部三條；另外確認錯誤記錄後的有效呼叫仍被計入，來源行號也正確保留。
+
+整合主分支並保留兩項外掛的新版本後，再以乾淨副本重跑全部三條、空資料、Git 無法使用與超時案例，結果仍通過。
 
 ## 對你既有的資料做了什麼
 
