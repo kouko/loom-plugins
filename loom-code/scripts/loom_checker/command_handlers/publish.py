@@ -678,6 +678,17 @@ def _observe_required_ci(
     pr_url: str, *, trusted_gh: str, repo: Path, env: dict[str, str], out, err
 ) -> int:
     """Observe required PR checks in this process until a terminal state."""
+    def progress(state: str) -> None:
+        try:
+            err.write(f"publish: CI {state}\n")
+            err.flush()
+        except OSError:
+            pass  # Progress loss must not change publication or CI decisions.
+
+    started = time.monotonic()
+    next_notice = 60
+    previous_state = None
+    progress("observation started")
     pending_waits = registration_waits = 0
     while True:
         try:
@@ -686,27 +697,41 @@ def _observe_required_ci(
                 cwd=repo, env=env,
             )
         except (OSError, subprocess.TimeoutExpired) as exc:
+            progress("unconfirmed")
             return _publish_block(
                 f"required CI could not be observed: {type(exc).__name__}: {exc}", err
             )
         observed = classify_checks(result, required=True)
         if observed.state == "empty":
             if registration_waits >= PUBLISH_CI_REGISTRATION_WAITS:
+                progress("no-required-checks")
                 out.write("No required checks registered\n")
                 return 0
             registration_waits += 1
         elif observed.state == "pending":
             if pending_waits >= PUBLISH_CI_PENDING_WAITS:
+                progress("unconfirmed")
                 return _publish_block(
                     "required CI requires user action because no reliable terminal result "
                     "was available after 60 minutes", err, observed.next,
                 )
             pending_waits += 1
         elif observed.state == "passed":
+            progress("passed")
             out.write("Required CI passed\n")
             return 0
         else:
+            progress(observed.state)
             return _publish_block("required CI " + observed.reason, err, observed.next)
+        state = "registration-wait" if observed.state == "empty" else "pending"
+        elapsed = int(time.monotonic() - started)
+        if state != previous_state:
+            progress(state)
+        elif elapsed >= next_notice:
+            progress(f"{state}; elapsed {elapsed}s")
+        if elapsed >= next_notice:
+            next_notice = (elapsed // 60 + 1) * 60
+        previous_state = state
         wait_publish_interval(PUBLISH_CI_POLL_SECONDS)
 
 
