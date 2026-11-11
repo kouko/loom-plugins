@@ -74,3 +74,7 @@ class Event:
     stop_policy_reason: str | None = None
     source_path: str | None = None
     source_line: int | None = None
+    # Observed directory and current canonical Git common directory. Only
+    # invocation events resolve project_path; unknown attribution stays None.
+    cwd: str | None = None
+    project_path: str | None = None
