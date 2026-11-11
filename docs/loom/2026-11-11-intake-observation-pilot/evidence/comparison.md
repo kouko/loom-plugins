@@ -1,6 +1,6 @@
 # Intake observation comparison — reproducible collection
 
-Scope: Acceptance 3/4 of the [confirmed intent](../../intent/2026-11-11-intake-observation-pilot.md). Collection uses implementation `26f3049d` and existing intake fixtures. This records CLI observations, not agent-consumption results or an acceptance verdict. Independent consumption is pending.
+Scope: Acceptance 3/4 of the [confirmed intent](../../intent/2026-11-11-intake-observation-pilot.md). Collection uses implementation `26f3049d` and existing intake fixtures. This records CLI observations, not agent-consumption results or an acceptance verdict. Independent consumption and replay at `7da5d59` are now recorded in [witnessed acceptance evidence](acceptance-test-evidence.md), with the original packets, answers and scoring retained alongside it.
 
 ## Experiment boundary
 
@@ -159,4 +159,4 @@ Packet sizes: text 1,765 bytes; guided text 2,236 bytes; JSON 2,681 bytes. The g
 
 All seven resolver input results match the research table: missing/empty/negative select ordinary, risk selects complex, mechanical and mixed select mechanical, and a field-level null is rejected. These are real executions of synthetic inputs; they establish handling and precedence, not task-classification accuracy or actual host dispatch.
 
-Independent agent answers, correctness scoring and model-token usage are not yet available. Output byte counts and one local execution duration cannot establish parent-model call reduction, total latency savings or improved semantic correctness. Guidance-only remains a viable adoption alternative; structured output has not yet demonstrated an agent-consumption benefit. The parent orchestrator separately reported a successful current-branch `loom-python --ready intake write-plan 2026-11-11-intake-observation-pilot --json` invocation (passed, complete, no failures); that is self-dogfood, not independent consumption.
+Independent agent answers and scoring are now retained in [witnessed acceptance evidence](acceptance-test-evidence.md); model-token usage remains unavailable. Output byte counts and one local execution duration cannot establish parent-model call reduction, total latency savings or improved semantic correctness. Guidance-only remains a viable adoption alternative; structured output has not demonstrated an agent-consumption benefit in the witnessed sequential comparison. The parent orchestrator separately reported a successful current-branch `loom-python --ready intake write-plan 2026-11-11-intake-observation-pilot --json` invocation (passed, complete, no failures); that is self-dogfood, not independent consumption.

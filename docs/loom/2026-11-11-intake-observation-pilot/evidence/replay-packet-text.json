@@ -1,0 +1,42 @@
+{
+  "arm": "text",
+  "instructions": "For each observation determine intake readiness, list observed blockers, say whether applicable intake checks completed, and state whether recovery or rerun is needed. Distinguish unknown from false. Return JSON answers keyed by case_id with ready, blockers, checks_complete, recovery_or_rerun, and a brief reason. Intake readiness alone does not authorize later workflow steps.",
+  "cases": [
+    {
+      "case_id": "C01",
+      "exit_code": 0,
+      "stdout": "interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+      "stderr": ""
+    },
+    {
+      "case_id": "C02",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "BLOCK intake.confirmed: write-plan accepts only `status: confirmed <date>`; status is open.\n"
+    },
+    {
+      "case_id": "C03",
+      "exit_code": 1,
+      "stdout": "interface-surfaces (manifest default): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\n",
+      "stderr": "BLOCK spec.req-grammar: REQ-1 points at Acceptance #99, but the intent carries 1 acceptance line(s).\n"
+    },
+    {
+      "case_id": "C04",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "/private/tmp/intake-acceptance-replay/fixtures-p3mq14vp/C04 is not inside a git work tree.\n"
+    },
+    {
+      "case_id": "C05",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "unknown station 'build'; intake covers write-spec and write-plan.\n"
+    },
+    {
+      "case_id": "C06",
+      "exit_code": 2,
+      "stdout": "{\"state\": \"passed\",",
+      "stderr": "loom_checker internal error: RuntimeError: injected control\n"
+    }
+  ]
+}

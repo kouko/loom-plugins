@@ -1,0 +1,8 @@
+{
+  "head": "7da5d59bbf49f415dc61fbedcaeb6e494bddc006",
+  "exit": 0,
+  "stdout": "{\"station\": \"write-plan\", \"change_id\": \"2026-11-11-intake-observation-pilot\", \"state\": \"passed\", \"checks_complete\": true, \"failures\": [], \"diagnostics\": \"interface-surfaces (manifest default (KICKOFF-DEFAULTS adds nothing new)): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)\\n\", \"error\": null}\n",
+  "stderr": "",
+  "snapshot_files": 3946,
+  "changed": []
+}

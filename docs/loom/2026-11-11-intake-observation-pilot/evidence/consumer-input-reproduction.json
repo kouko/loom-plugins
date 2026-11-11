@@ -1,0 +1,75 @@
+[
+  {
+    "input": null,
+    "task_class": "ordinary",
+    "uncertainty": "insufficient-task-evidence",
+    "effective_profile": {
+      "model": "standard",
+      "effort": "medium"
+    }
+  },
+  {
+    "input": {},
+    "task_class": "ordinary",
+    "uncertainty": null,
+    "effective_profile": {
+      "model": "standard",
+      "effort": "medium"
+    }
+  },
+  {
+    "input": {
+      "trust_boundary": false
+    },
+    "task_class": "ordinary",
+    "uncertainty": null,
+    "effective_profile": {
+      "model": "standard",
+      "effort": "medium"
+    }
+  },
+  {
+    "input": {
+      "trust_boundary": true
+    },
+    "task_class": "complex",
+    "uncertainty": null,
+    "effective_profile": {
+      "model": "frontier",
+      "effort": "medium"
+    }
+  },
+  {
+    "input": {
+      "exact_transformation": true,
+      "bounded_targets": true,
+      "mechanical_oracle": true
+    },
+    "task_class": "mechanical",
+    "uncertainty": null,
+    "effective_profile": {
+      "model": "economy",
+      "effort": "medium"
+    }
+  },
+  {
+    "input": {
+      "exact_transformation": true,
+      "bounded_targets": true,
+      "mechanical_oracle": true,
+      "trust_boundary": true
+    },
+    "task_class": "mechanical",
+    "uncertainty": null,
+    "effective_profile": {
+      "model": "economy",
+      "effort": "medium"
+    }
+  },
+  {
+    "input": {
+      "trust_boundary": null
+    },
+    "error": "task evidence values must be booleans"
+  }
+]

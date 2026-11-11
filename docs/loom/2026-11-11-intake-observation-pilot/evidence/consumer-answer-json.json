@@ -1,0 +1,8 @@
+{
+  "C01": {"ready": true, "blockers": [], "checks_complete": true, "recovery_or_rerun": "none indicated", "reason": "The complete observation says passed, checks complete, and no failures or error; this is intake readiness only."},
+  "C02": {"ready": false, "blockers": ["intake.confirmed: intent status is open; write-plan requires confirmed status with a date"], "checks_complete": false, "recovery_or_rerun": "Confirm the intent appropriately and rerun intake.", "reason": "The observation explicitly reports blocked with incomplete checks and the confirmation failure."},
+  "C03": {"ready": false, "blockers": ["spec.req-grammar: REQ-1 references Acceptance #99 although only one acceptance line exists"], "checks_complete": true, "recovery_or_rerun": "Correct the acceptance reference and rerun intake.", "reason": "The observation explicitly reports blocked despite completed checks."},
+  "C04": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Run intake inside the intended Git work tree.", "reason": "Unconfirmed state and the work-tree error mean readiness is unavailable; no rule blockers were observed."},
+  "C05": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Select supported station write-spec or write-plan and rerun.", "reason": "Unconfirmed state and the unsupported-station error mean readiness is unavailable."},
+  "C06": {"ready": "unknown", "blockers": [], "checks_complete": false, "recovery_or_rerun": "Resolve the internal checker failure and rerun; disregard the incomplete JSON.", "reason": "Truncated JSON plus an internal error cannot establish readiness or a completed successful intake."}
+}
