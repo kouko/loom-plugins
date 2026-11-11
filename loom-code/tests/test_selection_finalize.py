@@ -6,6 +6,7 @@ writes `null` and validation refuses anything else: no typed confirmation
 can waive a step (change 2026-10-01-remove-expert-mode).
 """
 # concern: Automatic waivers must not erase verification floors.
+# concern: Progress stream failures and concern-first discovery must not bypass verification.
 from __future__ import annotations
 
 import json
