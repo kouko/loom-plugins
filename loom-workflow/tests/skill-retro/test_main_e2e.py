@@ -57,9 +57,12 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import subprocess
 import sys
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+
+import pytest
 
 # Allow `import main` when pytest is invoked from the repo root — same
 # pattern as test_main.py.
@@ -439,6 +442,63 @@ def _snapshot_hash(payload: dict) -> str:
     subset = _snapshot_subset(payload)
     blob = json.dumps(subset, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(blob).hexdigest()
+
+
+@pytest.mark.parametrize("case", ["distinct", "shared-worktrees", "unknown", "top-one", "mixed-session"])
+def test_cli_project_attribution(tmp_path: Path, case: str) -> None:
+    projects, facets = _build_e2e_tree(tmp_path)
+    # Replace golden sessions with equally frequent, friction-free invocations.
+    for path in projects.rglob("*.jsonl"):
+        path.unlink()
+    repos = [tmp_path / f"repo{i}" for i in range(3)]
+    for repo in repos:
+        subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repos[0]), "-c", "user.name=Fixture",
+                    "-c", "user.email=fixture@example.invalid", "commit", "--allow-empty", "-qm", "fixture"], check=True)
+    nested = repos[0] / "nested"
+    nested.mkdir()
+    worktree = tmp_path / "worktree"
+    subprocess.run(["git", "-C", str(repos[0]), "worktree", "add", "-qb", "fixture", str(worktree)], check=True)
+    a_dirs = [repos[0], nested, worktree, repos[0]]
+    b_dirs = repos
+    if case == "distinct":
+        a_dirs = repos
+    elif case == "unknown":
+        a_dirs = [None, None, None]
+    elif case == "mixed-session":
+        a_dirs = [repos[0], repos[0], repos[0]]
+    groups = [("a", a_dirs)] + ([("b", b_dirs)] if case == "top-one" else [])
+    for name, directories in groups:
+        for i, directory in enumerate(directories):
+            records = [json.loads(line) for line in _session3_jsonl().splitlines()]
+            invocation = records[1]
+            invocation["message"]["content"][0]["input"]["skill"] = f"loom-code:{name}"
+            invocations = [json.loads(_line(invocation)) for _ in range(12 // len(directories))]
+            for record in invocations:
+                record.update(sessionId=f"{name}{i}", cwd=str(directory) if directory else None)
+            if case == "mixed-session" and i == 0:
+                invocations[1]["cwd"] = str(repos[1])
+                invocations[2]["cwd"] = None
+            (projects / f"{name}{i}.jsonl").write_text("\n".join(_line(r) for r in invocations) + "\n")
+    result = subprocess.run([sys.executable, str(_HERE / "main.py"), "--project-root", str(projects),
+                             "--facets-root", str(facets), "--target-skill-pattern", "loom-code:*",
+                             "--top-n", "1"], check=True, capture_output=True, text=True)
+    payload = json.loads(result.stdout)
+    assert len(payload["top_skills"]) == 1
+    top = payload["top_skills"][0]
+    assert top["skill"] == ("loom-code:b" if case == "top-one" else "loom-code:a")
+    rec = top["aggregate_record"]
+    expected = {"distinct": 3, "shared-worktrees": 1, "unknown": 0, "top-one": 3, "mixed-session": 2}[case]
+    assert len(rec["project_paths"]) == expected
+    assert rec["confidence"] == ("high" if expected >= 2 else "low")
+    assert rec["unknown_project_sessions"] == (["a0", "a1", "a2"] if case == "unknown" else ["a0"] if case == "mixed-session" else [])
+    assert rec["cross_project_norm"] == (0.0 if case == "unknown" else 1.0)
+    events = [event for entry in payload["subagent_payload"] for event in entry["input"]["session_events"]
+              if event["skill_invocation"] == top["skill"]]
+    assert set(rec["project_paths"]) == {e["project_path"] for e in events if e["project_path"]}
+    for event in events:
+        source = json.loads(Path(event["source_path"]).read_text().splitlines()[event["source_line"] - 1])
+        assert event["cwd"] == source["cwd"]
 
 
 # ---------------------------------------------------------------------------
