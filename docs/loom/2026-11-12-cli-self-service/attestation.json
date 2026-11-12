@@ -1,0 +1,102 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-cli-self-service",
+  "content_digest": "3373cdbc28083d4276279e98e2a9c2bf8d2a318a",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "15396ee8255fb8d175f6961cd93160bea37efa43d2e6bb55d7fdd61f4af9bbc3"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
+      "review_target_sha": "e37def08e5e2dc41003c08721e4d0c1678b3491a",
+      "dimension_scores": {
+        "security": "PASS — Exact help forms return before handler dispatch; no shell interpolation, authorization bypass or new remote operation is introduced.",
+        "architecture": "PASS — The bounded help mapping and hint policy remain in the public dispatcher; existing handler ownership and main-only callable guard are preserved.",
+        "correctness": "PASS — Read main and its launcher caller, handler entry paths and help contracts; exact help, nonexact rejection, preserved diagnostics, result streams and hook behavior pass focused execution. Retained RED failures exercise the new behavior.",
+        "naming": "PASS — COMMAND_HELP, HELP_NOTICE and the local hint express their responsibilities without a new abstraction.",
+        "tests": "PASS — Independently executed both changed test files and the existing dispatcher architecture check: 82 passed, no skips. Added tests invoke the public subprocess or main entry; handler stubs isolate dispatcher behavior without replacing that behavior.",
+        "refactoring": "PASS — No unrelated handler rewrite or speculative extraction; the three intentionally distinct guidance bodies share only their help notice.",
+        "cross-task-coherence": "PASS — Dispatcher behavior, specified three-command scope, release metadata and retained first-use evidence agree; acceptance disclosures distinguish historical-job finalization from candidate verification.",
+        "external-surface-grounding": "PASS — No new external API or CLI dependency call; launcher usage and linked closing-review/ship contracts were read and match the exposed guidance.",
+        "principles-conformance": "PASS — Guidance preserves authentic evidence, existing authorization and independent review; the spec explicitly budgets the bounded help mechanism with regression coverage.",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists in this checkout; the existing dispatcher architecture test was separately executed and passed.",
+        "deliberate-simplification": "PASS — The spec and README bound migration to three commands and explicitly defer all-command help, structured errors and further output modes pending compatibility work.",
+        "deletion-first": "PASS — The explicit self-service request motivates the bounded mapping and error hint; no forwarding function, new registry, framework or redundant validator was introduced."
+      },
+      "findings": [],
+      "notes": [
+        "Focused command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch; 82 passed in 5.08s. System Python lacked pytest and sandboxed uv cache access failed before the approved successful run.",
+        "Read retained RED/GREEN, adversarial and acceptance evidence; did not rerun the full package suite or stored probes, as required by the reviewer contract. No live remote publication or cross-host claim is made.",
+        "git diff --check flags only whitespace preserved in two raw failing-test transcripts; these are evidence bytes, not product defects. Repository artifacts were not edited."
+      ],
+      "reviewer": "selfservice_code_review",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
+      "review_target_sha": "e37def08e5e2dc41003c08721e4d0c1678b3491a",
+      "dimension_scores": {
+        "omission": "PASS — The three covered help forms describe usable inputs, evidence preservation, authorization, outcomes and recovery; detailed receipt and publication rules resolve to the bundled owner skills.",
+        "ambiguity": "PASS — Help-only exit zero, progress, stage completion, local delivery and completed verification are distinguished; missing invocation authorization is explicitly narrower than an unauthorized intent.",
+        "inconsistency": "PASS — Public help agrees with the existing handlers and owner skills; the updated README supersedes the earlier future-help statement without dropping compatibility or authorization boundaries. Historical verification is not presented as candidate attestation.",
+        "incorrect-fact": "PASS — Checked help claims against actual dispatch/finalize/publish/delivery code, preserved source hashes and verdict fields, retained command results, release versions and package summary totals.",
+        "missing-population": "PASS — Evidence scopes the 15 captured operator commands, four attack points with 2460 permutations and 13 subprocess cases, 180 focused passes, and 4261 package passes plus 6 skips. Reconstruction, setup retries, source identity and untested host/remote/efficiency boundaries are disclosed.",
+        "deletion-first": "PASS — The bounded mapping and error hint address the documented discovery/recovery failure; no converter, framework, output envelope or retry mechanism was introduced, and superseded README wording was replaced."
+      },
+      "findings": [],
+      "notes": [
+        "Read the confirmed intent, spec, plan, acceptance report and retained evidence, applicable principles/defaults, changed public prose, dispatcher and relevant existing handlers/owner guidance. No repository artifacts or tests were modified.",
+        "Recomputed all four retained source SHA-256 values and the package log totals; checked original review fields against converted verdicts and confirmed generated attestation verdicts equal the input. Candidate b3204e76 and historical job fe64dfa7 remain separately identified; later target changes contain direct evidence only.",
+        "This docs review independently inspected source and retained output, without rerunning the full suite or stored adversarial programs. It does not certify remote publication, installed-host behavior, fresh-machine provisioning, concrete inherited-model routing or efficiency gains."
+      ],
+      "reviewer": "selfservice_docs_review",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "776c3fcea22b3fd5c2b4d37ac0786ea6d1f333a2",
+  "tested_commit": "b3204e76a99c2c2af4be8188706f6edab58c051b",
+  "reviewed_commit": "e37def08e5e2dc41003c08721e4d0c1678b3491a",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}
