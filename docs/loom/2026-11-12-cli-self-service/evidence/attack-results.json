@@ -1,0 +1,22 @@
+[
+  {
+    "attack": "REQ-4 nonexact help and hook argument permutations preserve dispatch and streams",
+    "cases": 2460,
+    "result": "held"
+  },
+  {
+    "attack": "REQ-1 help outside repository requires no credentials or filesystem writes",
+    "cases": 6,
+    "result": "held"
+  },
+  {
+    "attack": "REQ-2 missing authorization and misleading help values remain refused",
+    "cases": 4,
+    "result": "held"
+  },
+  {
+    "attack": "REQ-3 unknown repository never masquerades as complete delivery",
+    "cases": 3,
+    "result": "held"
+  }
+]

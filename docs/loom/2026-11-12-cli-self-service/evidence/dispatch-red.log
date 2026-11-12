@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_entry_point_owns_only_cli_dispatch ____________________
+
+    def test_entry_point_owns_only_cli_dispatch() -> None:
+        tree = ast.parse(ENTRY.read_text(encoding="utf-8"))
+        definitions = {
+            node.name
+            for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+        }
+>       assert definitions == {"main"}
+E       AssertionError: assert {'help_hint', 'main'} == {'main'}
+E         
+E         Extra items in the left set:
+E         'help_hint'
+E         Use -v to get more diff
+
+loom-code/tests/test_loom_checker_modules.py:64: AssertionError
+=========================== short test summary info ============================
+FAILED loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch
+1 failed in 0.02s

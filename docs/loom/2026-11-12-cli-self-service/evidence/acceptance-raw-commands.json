@@ -1,0 +1,305 @@
+{
+  "candidate_commit": "b3204e76a99c2c2af4be8188706f6edab58c051b",
+  "historical_job_commit": "fe64dfa7ef283be4becfa95f4b0a3c1fce542a10",
+  "operator_commands": [
+    {
+      "name": "broken-finalize",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "finalize-review",
+        "2026-11-11-agent-tool-efficiency",
+        "--input",
+        "/private/tmp/loom-selfservice-raw-evidence/broken-input.json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465548.624943,
+      "exit": 2,
+      "stdout": "",
+      "stderr": "cannot read review input: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)\nHelp: \"<loom-code>/scripts/loom-python\" --ready finalize-review --help (replace <loom-code> with the installed loom-code plugin directory).\n"
+    },
+    {
+      "name": "conversion-uv-escalated",
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "--with",
+        "pyyaml",
+        "python",
+        "/private/tmp/loom-selfservice-cold-run/convert.py"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465585.9959528,
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "conversion-uv",
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "--with",
+        "pyyaml",
+        "python",
+        "/private/tmp/loom-selfservice-cold-run/convert.py"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465576.791018,
+      "exit": 2,
+      "stdout": "",
+      "stderr": "error: Could not acquire lock\n  cause: Could not create temporary file\n  cause: Operation not permitted (os error 1) at path \"/Users/kouko/.cache/uv/.tmpHk3DyD\"\n"
+    },
+    {
+      "name": "corrected-finalize",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "finalize-review",
+        "2026-11-11-agent-tool-efficiency",
+        "--input",
+        "/private/tmp/loom-selfservice-cold-run/review-input.json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465567.619054,
+      "exit": 2,
+      "stdout": "",
+      "stderr": "cannot read review input: [Errno 2] No such file or directory: '/private/tmp/loom-selfservice-cold-run/review-input.json'\nHelp: \"<loom-code>/scripts/loom-python\" --ready finalize-review --help (replace <loom-code> with the installed loom-code plugin directory).\n"
+    },
+    {
+      "name": "delivery-local-after-finalize",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "delivery",
+        "--goal",
+        "local",
+        "--json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465859.949478,
+      "exit": 0,
+      "stdout": "{\"state\": \"local\", \"reason\": \"attributable work is committed locally\", \"next\": \"Report the explicit local goal; publication needs separate authorization.\", \"evidence\": {\"change_id\": \"2026-11-11-agent-tool-efficiency\", \"head\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\", \"branch\": \"refactor/2026-11-11-agent-tool-efficiency\", \"automatic_publication_authorized\": true, \"scope\": [\"README.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/acceptance-test-report.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/acceptance-test-evidence.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-comparison.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-fixtures.json\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-results.json\", \"docs/loom/2026-11-11-agent-tool-efficiency/plan.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/research/01-agent-interface-conventions.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/spec.md\", \"docs/loom/intent/2026-11-11-agent-tool-efficiency.md\", \"loom-code/.claude-plugin/plugin.json\", \"loom-code/.codex-plugin/plugin.json\", \"loom-code/CHANGELOG.md\", \"loom-code/README.ja.md\", \"loom-code/README.md\", \"loom-code/README.zh-TW.md\", \"loom-code/package.json\", \"loom-code/plugin.json\", \"loom-code/scripts/loom_checker/command_handlers/finalize.py\", \"loom-code/scripts/loom_checker/command_handlers/finalize.py` (entry: cmd_finalize_review)\", \"loom-code/scripts/loom_checker/command_handlers/publish.py\", \"loom-code/scripts/loom_checker/command_handlers/publish.py` (entry: cmd_publish)\", \"loom-code/scripts/loom_checker/probes.py\", \"loom-code/scripts/loom_checker/probes.py` (entry: graduated_probe_programs)\", \"loom-code/skills/ship/SKILL.md\", \"loom-code/tests/test_loom_publish.py\", \"loom-code/tests/test_selection_finalize.py\", \"loom-code/tests/test_write_plan_station_text.py\"]}, \"complete\": true}\n",
+      "stderr": ""
+    },
+    {
+      "name": "delivery-local-before-completion",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "delivery",
+        "--goal",
+        "local",
+        "--json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465687.5586061,
+      "exit": 0,
+      "stdout": "{\"state\": \"local\", \"reason\": \"attributable work is committed locally\", \"next\": \"Report the explicit local goal; publication needs separate authorization.\", \"evidence\": {\"change_id\": \"2026-11-11-agent-tool-efficiency\", \"head\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\", \"branch\": \"refactor/2026-11-11-agent-tool-efficiency\", \"automatic_publication_authorized\": true, \"scope\": [\"README.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/acceptance-test-report.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/acceptance-test-evidence.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-comparison.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-fixtures.json\", \"docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-results.json\", \"docs/loom/2026-11-11-agent-tool-efficiency/plan.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/research/01-agent-interface-conventions.md\", \"docs/loom/2026-11-11-agent-tool-efficiency/spec.md\", \"docs/loom/intent/2026-11-11-agent-tool-efficiency.md\", \"loom-code/.claude-plugin/plugin.json\", \"loom-code/.codex-plugin/plugin.json\", \"loom-code/CHANGELOG.md\", \"loom-code/README.ja.md\", \"loom-code/README.md\", \"loom-code/README.zh-TW.md\", \"loom-code/package.json\", \"loom-code/plugin.json\", \"loom-code/scripts/loom_checker/command_handlers/finalize.py\", \"loom-code/scripts/loom_checker/command_handlers/finalize.py` (entry: cmd_finalize_review)\", \"loom-code/scripts/loom_checker/command_handlers/publish.py\", \"loom-code/scripts/loom_checker/command_handlers/publish.py` (entry: cmd_publish)\", \"loom-code/scripts/loom_checker/probes.py\", \"loom-code/scripts/loom_checker/probes.py` (entry: graduated_probe_programs)\", \"loom-code/skills/ship/SKILL.md\", \"loom-code/tests/test_loom_publish.py\", \"loom-code/tests/test_selection_finalize.py\", \"loom-code/tests/test_write_plan_station_text.py\"]}, \"complete\": true}\n",
+      "stderr": ""
+    },
+    {
+      "name": "delivery-published",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "delivery",
+        "--goal",
+        "published",
+        "--json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465643.93937,
+      "exit": 1,
+      "stdout": "{\"state\": \"unconfirmed\", \"reason\": \"trusted GitHub origin and gh are required\", \"next\": \"Inspect remote availability, gh authentication, permissions and response diagnostics; retry the same delivery route without switching merge routes.\", \"evidence\": {\"change_id\": \"2026-11-11-agent-tool-efficiency\", \"head\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\", \"branch\": \"refactor/2026-11-11-agent-tool-efficiency\", \"automatic_publication_authorized\": true}, \"complete\": false}\n",
+      "stderr": "Help: \"<loom-code>/scripts/loom-python\" --ready delivery --help (replace <loom-code> with the installed loom-code plugin directory).\n"
+    },
+    {
+      "name": "final-git-status",
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465853.6932638,
+      "exit": 0,
+      "stdout": "?? docs/loom/2026-11-11-agent-tool-efficiency/attestation.json\n",
+      "stderr": ""
+    },
+    {
+      "name": "help-delivery",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "delivery",
+        "--help"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465612.7790651,
+      "exit": 0,
+      "stdout": "delivery — observe the selected delivery goal without writes\nUsage: delivery [--goal local|published|merged] [--intent <path>] [--json]\nRun inside the selected repository on its identified feature branch.\n--goal defaults to published. local checks local completion; published checks\nthe matching Ready PR and required CI; merged checks merged delivery evidence.\n--intent optionally identifies the change's canonical committed intent (a\nrelative or absolute path); it does not create or grant authorization.\nLocal observation does not claim publication. Observation never authorizes\npublication or merge, and does not perform either action.\n\n--json emits the existing object on stdout:\nstate: observed delivery condition; reason: why it was classified that way;\nnext: suggested next action, subject to existing authorization;\nevidence: observations supporting the result; complete: whether the goal is met.\nA JSON object by itself, especially complete: false, is not proof of delivery.\nUse state, reason, next and evidence together with the process exit status.\nExit 0 means the selected goal was achieved; exit 1 means incomplete or\nunconfirmed; exit 2 means invocation/internal error. Pending means wait and\nobserve again; blocked means resolve the stated condition; unconfirmed means\nevidence is unavailable, not success. Correct invocation errors using the\ndiagnostic. Re-observation grants no permission to retry a remote write.\nStderr progress is advisory and can also contain errors; inspect final results.\nMore workflow guidance: <loom-code>/skills/ship/SKILL.md.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+      "stderr": ""
+    },
+    {
+      "name": "help-finalize",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "finalize-review",
+        "--help"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465541.937723,
+      "exit": 0,
+      "stdout": "finalize-review — verify committed content and generate an attestation\nUsage: finalize-review <change-id> --input <review-input.json>\n<change-id> identifies the change; it is not a file path. --input names a\nreadable JSON file (relative to the working directory or absolute). Keep this\ntemporary input outside the repository so the checkout stays clean.\n\nRun inside the selected repository after committing functional content, intent,\nplan, required acceptance report and adversarial programs. Resolve the trunk\nused for the branch diff. Review the current HEAD's content; the diff base is\nthe comparison starting point, not the reviewed target. Compute the required\nreviewer count with reviewer-count <change-id>; use distinct real reviewers\nindependent of the writer. Preserve each original verdict and its findings;\nnever invent identities, passing judgments, probe evidence or authorization.\n\nIllustrative JSON shape only — replace placeholders with authentic output;\nthis is not ready-to-submit review evidence:\n{\n  \"verdicts\": [{\n    \"reviewer\": \"<actual reviewer id>\", \"vendor\": \"<actual vendor>\",\n    \"model\": \"<actual model>\", \"lens\": \"<actual review lens>\",\n    \"verdict\": \"<original verdict>\", \"findings\": []\n  }],\n  \"findings\": [],\n  \"adversarial\": [{\"command\": \"<artifact-bound execution command>\",\n                   \"artifact\": \"<committed repository-relative program path>\"}]\n}\nRepeat verdict rows for the required reviewers. Empty findings arrays are\nappropriate only when the source has none; top-level findings carry every\nunresolved adversarial finding from Build. Finalization accepts only PASS or\nPASS_WITH_NOTES verdicts; a failing judgment requires the normal fix/review\nroute, not relabelling. Preserve scores and notes from the actual review too.\nFor a selected outside reviewer, retain its complete external_review runner\nresult, dimension_scores, notes and reviewed_sha; review_target_sha is the\nconcrete HEAD supplied to that review, not the diff base. The raw review output\nmust match the attributed verdict. Do not manufacture a receipt.\n\nUse the actual committed probe and supported runner command from Build's\nhandoff. Where required, copy the reviewer's probe confirmation as\n\"confirmation\": {\"reviewer\": \"<id>\", \"reviewed_sha\": \"<reviewed commit>\",\n                 \"quote\": \"<whole output lines naming this probe>\"}.\nIf the adversary actually recorded no program, replace the adversarial list\nwith [{\"no_program\": \"<observed reason>\"}]; never mix it with program rows.\nThe reason must be nonblank, single-line, trimmed and contain no HTML comment.\nThis observed outcome is not a bypass. Follow existing explicit skip\ninstructions: when reviewers, adversarial or package-tests were skipped by\ninstruction, skip finalization and disclose absent verification. The checker\nstill recomputes any automatic narrow-change simplification.\nComplete outside-review receipt and probe rules: <loom-code>/skills/closing-review/SKILL.md.\n\nResults: exit 0 announces the generated attestation; exit 1 reports a BLOCK\nrule and reason; exit 2 reports invocation/internal errors. Correct malformed\nJSON or missing inputs using the diagnostic; obtain missing authentic evidence\nthrough the normal review workflow. A passed stage is not overall success.\nStderr progress is advisory and can also contain errors: while running, keep\nobserving the same process; inspect its final exit and generated evidence.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+      "stderr": ""
+    },
+    {
+      "name": "help-publish",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "publish",
+        "--help"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465612.49692,
+      "exit": 0,
+      "stdout": "publish — publish an authorized branch and observe required CI\nUsage: publish --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>\nLegacy: publish --confirm-authorized --title <text> --body-file <absolute-body-path>\n\nPublication may perform a remote write (push and create/update a Ready PR).\n--intent must name this change's canonical, committed, confirmed intent with\nan existing valid automatic-publication authorization that remains unrevoked.\nThe legacy --confirm-authorized argument records an actual explicit user\npublication decision; it is not a way to supply missing consent. If neither\nauthorization exists, stop and obtain that decision. Help grants no authority.\nObservation grants neither publication nor merge authorization.\n\n--title needs non-empty text; keep the existing branch/title policy.\n--body-file must be an absolute path to a readable UTF-8 Markdown file.\nPrepare the body from the confirmed intent, current diff, review and actual\nverification evidence. Include each of these nine headings exactly once,\nwith substantive content (Follow-ups may say None):\n## Context\n## Intended outcome\n## Scope\n## Decisions\n## Implementation\n## Behaviour change\n## Verification\n## Risks and rollback\n## Follow-ups\n\nUnder Verification include Verification status: <computed status>.\nThe checker reports valid, absent or stale (<reason>); if refused, copy the\nreported corrected Verification status: line into the body without inventing\na stronger status. Disclose actual instructed skips and missing evidence.\nWhen recorded, include Adversarial outcome: no program — <recorded reason>.\nDetailed body, skipped-step and risk requirements: <loom-code>/skills/ship/SKILL.md.\nExisting body snapshots, origin/HEAD reconciliation and branch/title checks\nstill apply. Correct the named input or condition, preserving work.\n\nResults: exit 0 completes publication and its required-check observation;\nexit 1 means blocked or unconfirmed; exit 2 means invocation/internal error.\nVerification output or a PR URL alone is not completion. Stderr progress is\nadvisory and can also contain errors; while CI is pending keep observing the\nsame process. Inspect the final exit and evidence. Exit 0 with\n\"No required checks registered\" means no checks registered, not tests passed.\nAn observation failure may follow a successful remote write. Before considering\nanother publish, run delivery --goal published --json to observe existing\nstate and follow its diagnostic; do not blindly repeat a write or switch routes.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+      "stderr": ""
+    },
+    {
+      "name": "publish-no-authorization",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "publish",
+        "--title",
+        "Verify historical agent tool efficiency",
+        "--body-file",
+        "/private/tmp/loom-selfservice-cold-run/publication-body.md"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465643.5600882,
+      "exit": 2,
+      "stdout": "",
+      "stderr": "publish: --intent or --confirm-authorized is required for publication authorization\nHelp: \"<loom-code>/scripts/loom-python\" --ready publish --help (replace <loom-code> with the installed loom-code plugin directory).\n"
+    },
+    {
+      "name": "reviewer-count",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "reviewer-count",
+        "2026-11-11-agent-tool-efficiency"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465556.1914392,
+      "exit": 0,
+      "stdout": "2\n",
+      "stderr": ""
+    },
+    {
+      "name": "valid-finalize-escalated",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "finalize-review",
+        "2026-11-11-agent-tool-efficiency",
+        "--input",
+        "/private/tmp/loom-selfservice-cold-run/review-input.json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465611.2463942,
+      "exit": 0,
+      "stdout": "wrote docs/loom/2026-11-11-agent-tool-efficiency/attestation.json for 58ad98b9d6a93338be10dc1c022a3767c47859e2\n",
+      "stderr": "finalize-review: package-tests started\nfinalize-review: package-tests passed\nfinalize-review: adversarial started\nfinalize-review: adversarial passed\n"
+    },
+    {
+      "name": "valid-finalize",
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "finalize-review",
+        "2026-11-11-agent-tool-efficiency",
+        "--input",
+        "/private/tmp/loom-selfservice-cold-run/review-input.json"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-job",
+      "start": 1794465592.4955862,
+      "exit": 1,
+      "stdout": "",
+      "stderr": "BLOCK finalize.adversarial: package suite collection unavailable: error: Could not acquire lock   cause: Could not create temporary file   cause: Operation not permitted (os error 1) at path \"/Users/kouko/.cache/uv/.tmpNbjvq4\"\nHelp: \"<loom-code>/scripts/loom-python\" --ready finalize-review --help (replace <loom-code> with the installed loom-code plugin directory).\n"
+    }
+  ],
+  "retained_sources": {
+    "report.md": "# Independent first-use operator report\n\n## Outcome\n\nLocal verification completed: candidate `loom-python --ready finalize-review` exited 0 and generated a new attestation for the genuine historical job. It is not an attestation of the new candidate implementation. Both package-tests and adversarial executions are recorded as pass. The generated artifact remains uncommitted in the disposable job checkout; no production code, validator, test, original source worktree, remote, or installation was changed.\n\nPublication was not attempted with authorization and is not confirmed. The missing-authorization invocation exited 2 with a diagnostic requiring `--intent` or `--confirm-authorized`. It did not grant consent. The read-only published-delivery command exited 1 with state `unconfirmed`, `complete: false`, reason `trusted GitHub origin and gh are required`. The historical intent itself already contains an automatic-publication line, but this exercise forbade writes and no authorization-bearing argument was supplied. Thus the missing-authority exercise specifically tests missing invocation authorization, not an intent with no authorization line.\n\n## Observations\n\n- Broken starting input was actually submitted: exit 2, malformed JSON error and a command-help hint (`broken-finalize.*`).\n- Public finalize help provided enough shape and preservation rules to convert the authentic reviews; no reviewer identity, verdict, finding, note, reviewed SHA, target SHA, or probe fact was invented or relabelled. The unresolved code-review nit is preserved.\n- System Python lacked PyYAML. The first conversion failed, and the resulting missing-input finalization also exited 2. See `setup-failures.md` and `corrected-finalize.*`.\n- Cached offline conversion first hit a uv lock/temp permission denial. A narrowly scoped escalation succeeded (`conversion-uv*`). No conda installation was performed.\n- Valid finalization first hit the same uv cache restriction during collection, exit 1 (`valid-finalize.*`); approved escalation reran the same user-level command, and the tool itself ran the suite and adversarial probe. I never independently invoked the package test command.\n- Running progress was observed before completion: `package-tests started` was visible while exec session 34992 remained running and no exit file existed. Several polls had no new stderr; at 172 seconds it was still in that stage. Final stderr announced package-tests passed, adversarial started, adversarial passed. Final exit was 0; the final liveness snapshot was about 230 seconds after start. `liveness.jsonl` retains observations. No per-child heartbeat or live test counts were observed.\n- A `ps` liveness query was sandbox-denied; session polling and stderr observations were used instead. This setup failure is retained.\n- `delivery --goal local --json` returned exit 0/state local/complete true both before and after finalization. Its reason was attributable work committed locally. That observation is distinct from verification success: the first call happened while finalization was still running. Final git status shows the newly generated attestation untracked.\n- No remote writes, pushes, PR creation, installation, commits, or external reviewer calls occurred. Model and effort were inherited and are not independently observable; supplied resolver context was overrides:null, inherited failure count 0. No subagents were launched.\n\n## Evidence inventory\n\nEach recorded user-level command has `<name>.meta.json` (argv/cwd/start), `<name>.stdout`, `<name>.stderr`, and `<name>.exit` (the child command exit, not the logging wrapper's exit).\n\n- Discovery: `help-finalize.*`, `help-publish.*`, `help-delivery.*`, `reviewer-count.*`.\n- First input/error: `original-broken-input.json`, `broken-finalize.*`.\n- Authentic preserved sources: `original-provenance.md`, `original-code-review.yaml`, `original-skill-review.yaml`, `raw-evidence-sha256.json`.\n- Conversion and correction: `convert.py`, `conversion-uv.*`, `conversion-uv-escalated.*`, `review-input.json`, `corrected-finalize.*`, `setup-failures.md`.\n- Finalization: `valid-finalize.*`, `valid-finalize-escalated.*`, `liveness.jsonl`, `generated-attestation.json`.\n- Publication refusal: `publication-body.md`, `publish-no-authorization.*`.\n- Delivery: `delivery-published.*`, `delivery-local-before-completion.*`, `delivery-local-after-finalize.*`, `final-git-status.*`.\n\nGenerated job artifact: `/private/tmp/loom-selfservice-job/docs/loom/2026-11-11-agent-tool-efficiency/attestation.json`.\nReviewed commit: `fe64dfa7ef283be4becfa95f4b0a3c1fce542a10`.\nGenerated functional content digest: `58ad98b9d6a93338be10dc1c022a3767c47859e2`.\n\n## Boundaries\n\nOnly the candidate README, public closing-review skill, command help, supplied raw evidence, and the job intent/git state were consulted before running. The new generated attestation was inspected only after completion. I did not inspect implementation, tests, the candidate change's spec/plan/evidence, prior logs/completed JSON, or the acceptance-expectations file. The delivery command automatically named retained artifact paths, but their contents were not opened. No parent/operator hints were required beyond the provided assignment and cache escalations.\n\nLocal verification: complete. Active waiting: none. Missing-authorization publish: refused (exit 2). Published delivery: unconfirmed (exit 1). Original non-blocking nit: unresolved and preserved. Formal acceptance evaluation remains for the later independent tester.\n\n## Late evidence-recording guidance\n\nAfter the report was drafted and all scenarios had finished, the parent sent: \"When finished, retain the first command/help observations even if they were initially only tool output (mark reconstructed transcript versus raw captured output honestly). Include all failed attempts and any setup recovery. No more extra scenarios needed after assigned outcomes; return raw report promptly for independent acceptance evaluation. This is evidence-recording guidance, not an operation answer; disclose this message.\" This guidance supplied no command solution and did not influence the operational outcomes above.\n\nThe first root README/provenance read, public closing-review skill read, raw YAML/input read, initial git/intent read, first inline conversion traceback, and attempted `ps` traceback were initially tool-output-only. Their descriptions in `setup-failures.md` are reconstructed from visible tool output, not raw captured subprocess streams. The three actual help invocations and every scenario command were captured directly by `run.py`; these are raw stdout/stderr. For the initial inline conversion, the retained `convert.py` reproduces the conversion logic but is not a byte-for-byte capture of the original shell heredoc. The initial wrapper attempt continued after conversion failed; its exit file accurately records the child finalize exit 2, not the earlier Python exit 1.\n",
+    "setup-failures.md": "# First-use setup failures\n\n- First conversion was an inline `python3 -` YAML-to-JSON script in `/private/tmp/loom-selfservice-job`; same conversion source is retained in `convert.py`. It exited 1 with `ModuleNotFoundError: No module named 'yaml'`. The subsequent finalize attempt still ran and failed for the missing input; see `corrected-finalize.*`. No package was installed into the conda environment.\n- Cached conversion via `uv run --offline --with pyyaml python /private/tmp/loom-selfservice-cold-run/convert.py` first failed because the uv cache could not create a lock/temp file. Full first denial and escalated success are retained as `conversion-uv.*` and `conversion-uv-escalated.*`.\n- First genuine finalize with valid JSON failed on package collection because the uv cache could not create a temp file. See `valid-finalize.*`; narrow cache access escalation retried the same user-level command, not an independently invoked package suite.\n- An attempted liveness check ran Python subprocess `ps -p 73101 -o pid=,etime=,stat=,command=` from the candidate/source cwd and failed with `PermissionError: [Errno 1] Operation not permitted: 'ps'`, exit 1. Subsequent liveness used the existing exec session and captured stderr instead.\n\nPublic documents consulted: candidate root README.md (including the command discovery section), candidate loom-code/skills/closing-review/SKILL.md, and actual finalize-review/publish/delivery help. Read-only job observations: `git status --short` (clean), `git rev-parse HEAD` (fe64dfa7ef283be4becfa95f4b0a3c1fce542a10), and `docs/loom/intent/2026-11-11-agent-tool-efficiency.md`. Raw reviews/provenance/broken-input were read from the supplied raw-evidence directory. No implementation, tests, prior completed verification JSON, new change spec/plan/evidence, or prior experiment reports were read.\n\nThe historical intent contains automatic publication authorization. It was not supplied to publish: the exercise prohibits remote writes. The missing-authorization attempt tests omitted authorization arguments, and does not claim the historical intent itself lacks an authorization line.\n",
+    "original-provenance.md": "# Authentic job evidence\n\nJob checkout: /private/tmp/loom-selfservice-job\nChange: 2026-11-11-agent-tool-efficiency\nReviewed content: fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\nDiff base: 70a05fd73b86c6629a89b816fc45a3ad14a509ed\n\nThese are unmodified review outputs from two distinct original reviewers:\n- code-review.yaml: reviewer cli_code_review, vendor codex, model inherited.\n- skill-review.yaml: reviewer cli_skill_review, vendor codex, model inherited.\n\nThe independent adversary's original executable declaration was:\nartifact: loom-code/tests/test_selection_finalize.py\ncommand: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_selection_finalize.py\n\nIt passed on the reviewed content. It remains an executable declaration, not permission to substitute an asserted pass for a new execution. There were no unresolved adversarial findings. Preserve the original reviewer findings and notes verbatim. The code review's non-blocking nit remains unresolved.\n\nThe job checkout is a disposable local clone at the genuine historical target; its main and origin/main references are fixed to the genuine historical diff base. Its origin points only to the local source worktree. No remote writes, pushes, PR creation, install changes, or changes to the actual source worktree are authorized by this exercise. Completing this historical job does not attest the new implementation.\n",
+    "original-code-review.yaml": "verdict: PASS_WITH_NOTES\nlens: code\nreviewed_sha: 70a05fd73b86c6629a89b816fc45a3ad14a509ed\nreview_target_sha: fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\ndimension_scores:\n  security: PASS\n  architecture: PASS\n  correctness: \"PASS_WITH_NOTES — Current behavior and compatibility passed independent checks; historical RED-to-GREEN execution order is supported only by implementer reports, not retained raw output.\"\n  naming: PASS\n  tests: \"PASS_WITH_NOTES — All 185 tests in the three changed modules passed without skips; original RED output was not retained for independent inspection.\"\n  refactoring: PASS\n  cross-task-coherence: PASS\n  external-surface-grounding: PASS\n  principles-conformance: PASS\n  architecture-conformance: \"N/A — No ratified ARCHITECTURE.md exists.\"\n  deliberate-simplification: PASS\n  deletion-first: PASS\nfindings:\n  - severity: nit\n    dimension: tests\n    anchor: \"loom-code/tests/test_selection_finalize.py:663\"\n    text: \"nitpick (non-blocking): This new test and the call at line 685 exercise graduated_probe_programs directly, although production callers use it only within probes.py. The reviewer contract defines the module entry by production callers; marking this helper as the plan entry does not make it one.\"\n    fix: \"Keep the two existing tests and their collection-call assertions, but invoke stored_probe_programs and assert counts 0 or 1 instead of the helper's path list; update W2-01's entry designation to stored_probe_programs.\"\nnotes:\n  - \"Independent run: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_write_plan_station_text.py -q; 185 passed in 87.82s, no skips. Initial sandbox cache denial was resolved by approved escalation.\"\n  - \"Read intent, spec, plan, acceptance report/evidence, PRINCIPLES.md, changed functions and production callers. Progress remains advisory; stdout, authority, evidence validation, failure decisions and concern-filter semantics are preserved. Publish checks use controlled remote responses, not live GitHub publication.\"\n  - \"Original RED stdout was not retained. Parent supplied explicit implementer reports for W1-01, W1-02 and W2-01, which are not raw execution evidence; no historical chronology is inferred from combined implementation commits. Full package suite and stored adversarial probes were not rerun by this reviewer.\"\n",
+    "original-skill-review.yaml": "verdict: PASS\nlens: skill\nreviewed_sha: 70a05fd73b86c6629a89b816fc45a3ad14a509ed\nreview_target_sha: fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\ndimension_scores:\n  omission: PASS — The bounded command applicability, progress channels, failure behavior and remaining host/remote limits are stated and supported by the implementation and focused checks.\n  ambiguity: PASS — Advisory progress is explicitly separated from final verification; deferred JSON/help/error migrations are not represented as current support.\n  inconsistency: PASS — Read the base Ship polarity clause and its replacement; the intentional elapsed-notice change matches the implementation while authorization, waiting limits and merge acceptance remain intact.\n  incorrect-fact: PASS — Opened the cited primary sources, checked local implementation contracts, replayed the conversion comparison and verified release synchronization.\n  missing-population: PASS — The eight synthetic fixtures, sixteen runs, five semantic caller tasks and 6/15 function-line footprints are scoped explicitly; model costs and real remote behavior remain unmeasured.\n  user-judgment-leak: PASS — No new technical approval question or paid/external-data obligation is introduced; user authorization and acceptance boundaries remain unchanged.\n  deletion-first: PASS — Ship replaces the obsolete silent-wait sentence, progress addresses the observed waiting gap with local emitters, and the experiment rejects adding a production adapter.\nfindings: []\nnotes:\n  - Targeted verification passed 53 Ship/release text tests and 142 publish/finalization tests; no full package suite or adversarial program was run by this reviewer.\n  - All 16 conversion replay records matched committed case/arm/status/stdout/stderr/predicate evidence; manifest synchronization, skill cross-references and contract citations passed with existing citation debt unchanged.\n  - Review is source and controlled-test evidence only; it does not claim installed-host behavior, live GitHub publication, model latency/token savings or final attestation completion.\n",
+    "raw-evidence-sha256.json": "{\n  \"provenance.md\": \"23e5810e75d858e784943cb01757c4ff4cda56f236a195bced292e304a847156\",\n  \"code-review.yaml\": \"7d9a1380767c6a794446a0c9493e4205efcd9a41c660e19bc9c2baf4da811188\",\n  \"skill-review.yaml\": \"928ba2ed8a71e619ca9538c8b01a1d40124b2c3b6672a7441bcb3f43f6a46736\",\n  \"broken-input.json\": \"578e653b9c6a4223498c599f2341dd5fb81eb4a9d89d6e57094e32ff07b03e51\"\n}\n",
+    "review-input.json": "{\n  \"verdicts\": [\n    {\n      \"verdict\": \"PASS_WITH_NOTES\",\n      \"lens\": \"code\",\n      \"reviewed_sha\": \"70a05fd73b86c6629a89b816fc45a3ad14a509ed\",\n      \"review_target_sha\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\",\n      \"dimension_scores\": {\n        \"security\": \"PASS\",\n        \"architecture\": \"PASS\",\n        \"correctness\": \"PASS_WITH_NOTES — Current behavior and compatibility passed independent checks; historical RED-to-GREEN execution order is supported only by implementer reports, not retained raw output.\",\n        \"naming\": \"PASS\",\n        \"tests\": \"PASS_WITH_NOTES — All 185 tests in the three changed modules passed without skips; original RED output was not retained for independent inspection.\",\n        \"refactoring\": \"PASS\",\n        \"cross-task-coherence\": \"PASS\",\n        \"external-surface-grounding\": \"PASS\",\n        \"principles-conformance\": \"PASS\",\n        \"architecture-conformance\": \"N/A — No ratified ARCHITECTURE.md exists.\",\n        \"deliberate-simplification\": \"PASS\",\n        \"deletion-first\": \"PASS\"\n      },\n      \"findings\": [\n        {\n          \"severity\": \"nit\",\n          \"dimension\": \"tests\",\n          \"anchor\": \"loom-code/tests/test_selection_finalize.py:663\",\n          \"text\": \"nitpick (non-blocking): This new test and the call at line 685 exercise graduated_probe_programs directly, although production callers use it only within probes.py. The reviewer contract defines the module entry by production callers; marking this helper as the plan entry does not make it one.\",\n          \"fix\": \"Keep the two existing tests and their collection-call assertions, but invoke stored_probe_programs and assert counts 0 or 1 instead of the helper's path list; update W2-01's entry designation to stored_probe_programs.\"\n        }\n      ],\n      \"notes\": [\n        \"Independent run: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_write_plan_station_text.py -q; 185 passed in 87.82s, no skips. Initial sandbox cache denial was resolved by approved escalation.\",\n        \"Read intent, spec, plan, acceptance report/evidence, PRINCIPLES.md, changed functions and production callers. Progress remains advisory; stdout, authority, evidence validation, failure decisions and concern-filter semantics are preserved. Publish checks use controlled remote responses, not live GitHub publication.\",\n        \"Original RED stdout was not retained. Parent supplied explicit implementer reports for W1-01, W1-02 and W2-01, which are not raw execution evidence; no historical chronology is inferred from combined implementation commits. Full package suite and stored adversarial probes were not rerun by this reviewer.\"\n      ],\n      \"reviewer\": \"cli_code_review\",\n      \"vendor\": \"codex\",\n      \"model\": \"inherited\"\n    },\n    {\n      \"verdict\": \"PASS\",\n      \"lens\": \"skill\",\n      \"reviewed_sha\": \"70a05fd73b86c6629a89b816fc45a3ad14a509ed\",\n      \"review_target_sha\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\",\n      \"dimension_scores\": {\n        \"omission\": \"PASS — The bounded command applicability, progress channels, failure behavior and remaining host/remote limits are stated and supported by the implementation and focused checks.\",\n        \"ambiguity\": \"PASS — Advisory progress is explicitly separated from final verification; deferred JSON/help/error migrations are not represented as current support.\",\n        \"inconsistency\": \"PASS — Read the base Ship polarity clause and its replacement; the intentional elapsed-notice change matches the implementation while authorization, waiting limits and merge acceptance remain intact.\",\n        \"incorrect-fact\": \"PASS — Opened the cited primary sources, checked local implementation contracts, replayed the conversion comparison and verified release synchronization.\",\n        \"missing-population\": \"PASS — The eight synthetic fixtures, sixteen runs, five semantic caller tasks and 6/15 function-line footprints are scoped explicitly; model costs and real remote behavior remain unmeasured.\",\n        \"user-judgment-leak\": \"PASS — No new technical approval question or paid/external-data obligation is introduced; user authorization and acceptance boundaries remain unchanged.\",\n        \"deletion-first\": \"PASS — Ship replaces the obsolete silent-wait sentence, progress addresses the observed waiting gap with local emitters, and the experiment rejects adding a production adapter.\"\n      },\n      \"findings\": [],\n      \"notes\": [\n        \"Targeted verification passed 53 Ship/release text tests and 142 publish/finalization tests; no full package suite or adversarial program was run by this reviewer.\",\n        \"All 16 conversion replay records matched committed case/arm/status/stdout/stderr/predicate evidence; manifest synchronization, skill cross-references and contract citations passed with existing citation debt unchanged.\",\n        \"Review is source and controlled-test evidence only; it does not claim installed-host behavior, live GitHub publication, model latency/token savings or final attestation completion.\"\n      ],\n      \"reviewer\": \"cli_skill_review\",\n      \"vendor\": \"codex\",\n      \"model\": \"inherited\"\n    }\n  ],\n  \"findings\": [],\n  \"adversarial\": [\n    {\n      \"artifact\": \"loom-code/tests/test_selection_finalize.py\",\n      \"command\": \"uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_selection_finalize.py\"\n    }\n  ]\n}\n",
+    "generated-attestation.json": "{\n  \"schema\": \"loom-attestation/v2\",\n  \"change_id\": \"2026-11-11-agent-tool-efficiency\",\n  \"content_digest\": \"58ad98b9d6a93338be10dc1c022a3767c47859e2\",\n  \"executions\": [\n    {\n      \"kind\": \"package-tests\",\n      \"command\": \"uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q\",\n      \"artifact\": \"\",\n      \"result\": \"pass\",\n      \"command_digest\": \"4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62\"\n    },\n    {\n      \"kind\": \"adversarial\",\n      \"command\": \"uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_selection_finalize.py\",\n      \"artifact\": \"loom-code/tests/test_selection_finalize.py\",\n      \"result\": \"pass\",\n      \"command_digest\": \"de27ea73e8178f4172e0fc49daa8df30d7c1bebbdcc9cb97df27ec9e272ae070\"\n    }\n  ],\n  \"verdicts\": [\n    {\n      \"verdict\": \"PASS_WITH_NOTES\",\n      \"lens\": \"code\",\n      \"reviewed_sha\": \"70a05fd73b86c6629a89b816fc45a3ad14a509ed\",\n      \"review_target_sha\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\",\n      \"dimension_scores\": {\n        \"security\": \"PASS\",\n        \"architecture\": \"PASS\",\n        \"correctness\": \"PASS_WITH_NOTES — Current behavior and compatibility passed independent checks; historical RED-to-GREEN execution order is supported only by implementer reports, not retained raw output.\",\n        \"naming\": \"PASS\",\n        \"tests\": \"PASS_WITH_NOTES — All 185 tests in the three changed modules passed without skips; original RED output was not retained for independent inspection.\",\n        \"refactoring\": \"PASS\",\n        \"cross-task-coherence\": \"PASS\",\n        \"external-surface-grounding\": \"PASS\",\n        \"principles-conformance\": \"PASS\",\n        \"architecture-conformance\": \"N/A — No ratified ARCHITECTURE.md exists.\",\n        \"deliberate-simplification\": \"PASS\",\n        \"deletion-first\": \"PASS\"\n      },\n      \"findings\": [\n        {\n          \"severity\": \"nit\",\n          \"dimension\": \"tests\",\n          \"anchor\": \"loom-code/tests/test_selection_finalize.py:663\",\n          \"text\": \"nitpick (non-blocking): This new test and the call at line 685 exercise graduated_probe_programs directly, although production callers use it only within probes.py. The reviewer contract defines the module entry by production callers; marking this helper as the plan entry does not make it one.\",\n          \"fix\": \"Keep the two existing tests and their collection-call assertions, but invoke stored_probe_programs and assert counts 0 or 1 instead of the helper's path list; update W2-01's entry designation to stored_probe_programs.\"\n        }\n      ],\n      \"notes\": [\n        \"Independent run: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_write_plan_station_text.py -q; 185 passed in 87.82s, no skips. Initial sandbox cache denial was resolved by approved escalation.\",\n        \"Read intent, spec, plan, acceptance report/evidence, PRINCIPLES.md, changed functions and production callers. Progress remains advisory; stdout, authority, evidence validation, failure decisions and concern-filter semantics are preserved. Publish checks use controlled remote responses, not live GitHub publication.\",\n        \"Original RED stdout was not retained. Parent supplied explicit implementer reports for W1-01, W1-02 and W2-01, which are not raw execution evidence; no historical chronology is inferred from combined implementation commits. Full package suite and stored adversarial probes were not rerun by this reviewer.\"\n      ],\n      \"reviewer\": \"cli_code_review\",\n      \"vendor\": \"codex\",\n      \"model\": \"inherited\"\n    },\n    {\n      \"verdict\": \"PASS\",\n      \"lens\": \"skill\",\n      \"reviewed_sha\": \"70a05fd73b86c6629a89b816fc45a3ad14a509ed\",\n      \"review_target_sha\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\",\n      \"dimension_scores\": {\n        \"omission\": \"PASS — The bounded command applicability, progress channels, failure behavior and remaining host/remote limits are stated and supported by the implementation and focused checks.\",\n        \"ambiguity\": \"PASS — Advisory progress is explicitly separated from final verification; deferred JSON/help/error migrations are not represented as current support.\",\n        \"inconsistency\": \"PASS — Read the base Ship polarity clause and its replacement; the intentional elapsed-notice change matches the implementation while authorization, waiting limits and merge acceptance remain intact.\",\n        \"incorrect-fact\": \"PASS — Opened the cited primary sources, checked local implementation contracts, replayed the conversion comparison and verified release synchronization.\",\n        \"missing-population\": \"PASS — The eight synthetic fixtures, sixteen runs, five semantic caller tasks and 6/15 function-line footprints are scoped explicitly; model costs and real remote behavior remain unmeasured.\",\n        \"user-judgment-leak\": \"PASS — No new technical approval question or paid/external-data obligation is introduced; user authorization and acceptance boundaries remain unchanged.\",\n        \"deletion-first\": \"PASS — Ship replaces the obsolete silent-wait sentence, progress addresses the observed waiting gap with local emitters, and the experiment rejects adding a production adapter.\"\n      },\n      \"findings\": [],\n      \"notes\": [\n        \"Targeted verification passed 53 Ship/release text tests and 142 publish/finalization tests; no full package suite or adversarial program was run by this reviewer.\",\n        \"All 16 conversion replay records matched committed case/arm/status/stdout/stderr/predicate evidence; manifest synchronization, skill cross-references and contract citations passed with existing citation debt unchanged.\",\n        \"Review is source and controlled-test evidence only; it does not claim installed-host behavior, live GitHub publication, model latency/token savings or final attestation completion.\"\n      ],\n      \"reviewer\": \"cli_skill_review\",\n      \"vendor\": \"codex\",\n      \"model\": \"inherited\"\n    }\n  ],\n  \"findings\": [],\n  \"selection\": null,\n  \"intent_confirmed_sha\": \"f68d8e308654dab2807fc07e133c7594ce0c1fbb\",\n  \"tested_commit\": \"0dcaa4bda4bc2ed44e567e883ab0f357ed1c64b8\",\n  \"reviewed_commit\": \"fe64dfa7ef283be4becfa95f4b0a3c1fce542a10\",\n  \"acceptance_status\": [\n    {\n      \"acceptance\": 1,\n      \"status\": \"works\"\n    },\n    {\n      \"acceptance\": 2,\n      \"status\": \"works\"\n    },\n    {\n      \"acceptance\": 3,\n      \"status\": \"works\"\n    },\n    {\n      \"acceptance\": 4,\n      \"status\": \"works\"\n    }\n  ]\n}\n",
+    "liveness.jsonl": "{\"time\": 1794465625.758883, \"exit_file\": false, \"stderr\": \"finalize-review: package-tests started\\n\", \"liveness\": \"exec session 34992 was returned running; ps denied by sandbox\"}\n{\"time\": 1794465660.003545, \"exit_file\": false, \"stderr\": \"finalize-review: package-tests started\\n\", \"liveness\": \"session 34992 poll returned running with no new output\"}\n{\"time\": 1794465699.282519, \"exit_file\": false, \"stderr\": \"finalize-review: package-tests started\\n\", \"liveness\": \"same process session polled; no replacement process launched\"}\n{\"time\": 1794465734.993255, \"elapsed_seconds\": 123.7, \"exit_file\": false, \"stderr\": \"finalize-review: package-tests started\\n\", \"liveness\": \"session 34992 remained running on repeated polls\"}\n{\"time\": 1794465783.258304, \"elapsed_seconds\": 172.0, \"exit_file\": false, \"stderr\": \"finalize-review: package-tests started\\n\", \"liveness\": \"session 34992 continued running after a 30-second wait; no final exit\"}\n{\"time\": 1794465841.496583, \"elapsed_seconds\": 230.3, \"exit_file\": true, \"stderr\": \"finalize-review: package-tests started\\nfinalize-review: package-tests passed\\nfinalize-review: adversarial started\\nfinalize-review: adversarial passed\\n\", \"liveness\": \"same exec session observed through 30-second poll\"}\n",
+    "original-broken-input.json": "{invalid\n"
+  },
+  "tester_commands": [
+    {
+      "argv": [
+        "/private/tmp/loom-selfservice-candidate/loom-code/scripts/loom-python",
+        "--ready",
+        "finalize-review",
+        "--help"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-candidate",
+      "exit": 0,
+      "stdout": "finalize-review — verify committed content and generate an attestation\nUsage: finalize-review <change-id> --input <review-input.json>\n<change-id> identifies the change; it is not a file path. --input names a\nreadable JSON file (relative to the working directory or absolute). Keep this\ntemporary input outside the repository so the checkout stays clean.\n\nRun inside the selected repository after committing functional content, intent,\nplan, required acceptance report and adversarial programs. Resolve the trunk\nused for the branch diff. Review the current HEAD's content; the diff base is\nthe comparison starting point, not the reviewed target. Compute the required\nreviewer count with reviewer-count <change-id>; use distinct real reviewers\nindependent of the writer. Preserve each original verdict and its findings;\nnever invent identities, passing judgments, probe evidence or authorization.\n\nIllustrative JSON shape only — replace placeholders with authentic output;\nthis is not ready-to-submit review evidence:\n{\n  \"verdicts\": [{\n    \"reviewer\": \"<actual reviewer id>\", \"vendor\": \"<actual vendor>\",\n    \"model\": \"<actual model>\", \"lens\": \"<actual review lens>\",\n    \"verdict\": \"<original verdict>\", \"findings\": []\n  }],\n  \"findings\": [],\n  \"adversarial\": [{\"command\": \"<artifact-bound execution command>\",\n                   \"artifact\": \"<committed repository-relative program path>\"}]\n}\nRepeat verdict rows for the required reviewers. Empty findings arrays are\nappropriate only when the source has none; top-level findings carry every\nunresolved adversarial finding from Build. Finalization accepts only PASS or\nPASS_WITH_NOTES verdicts; a failing judgment requires the normal fix/review\nroute, not relabelling. Preserve scores and notes from the actual review too.\nFor a selected outside reviewer, retain its complete external_review runner\nresult, dimension_scores, notes and reviewed_sha; review_target_sha is the\nconcrete HEAD supplied to that review, not the diff base. The raw review output\nmust match the attributed verdict. Do not manufacture a receipt.\n\nUse the actual committed probe and supported runner command from Build's\nhandoff. Where required, copy the reviewer's probe confirmation as\n\"confirmation\": {\"reviewer\": \"<id>\", \"reviewed_sha\": \"<reviewed commit>\",\n                 \"quote\": \"<whole output lines naming this probe>\"}.\nIf the adversary actually recorded no program, replace the adversarial list\nwith [{\"no_program\": \"<observed reason>\"}]; never mix it with program rows.\nThe reason must be nonblank, single-line, trimmed and contain no HTML comment.\nThis observed outcome is not a bypass. Follow existing explicit skip\ninstructions: when reviewers, adversarial or package-tests were skipped by\ninstruction, skip finalization and disclose absent verification. The checker\nstill recomputes any automatic narrow-change simplification.\nComplete outside-review receipt and probe rules: <loom-code>/skills/closing-review/SKILL.md.\n\nResults: exit 0 announces the generated attestation; exit 1 reports a BLOCK\nrule and reason; exit 2 reports invocation/internal errors. Correct malformed\nJSON or missing inputs using the diagnostic; obtain missing authentic evidence\nthrough the normal review workflow. A passed stage is not overall success.\nStderr progress is advisory and can also contain errors: while running, keep\nobserving the same process; inspect its final exit and generated evidence.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--isolated",
+        "--with-requirements",
+        "requirements-package-tests.lock",
+        "python",
+        "-m",
+        "pytest",
+        "loom-code/tests/test_loom_checker_cli.py",
+        "loom-code/tests/test_loom_publish.py",
+        "loom-code/tests/test_selection_finalize.py",
+        "-q"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-candidate",
+      "exit": 2,
+      "stdout": "",
+      "stderr": "error: Could not acquire lock\n  cause: Could not create temporary file\n  cause: Operation not permitted (os error 1) at path \"/Users/kouko/.cache/uv/.tmpBkneNt\"\n"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--isolated",
+        "--with-requirements",
+        "requirements-package-tests.lock",
+        "python",
+        "-m",
+        "pytest",
+        "loom-code/tests/test_loom_checker_cli.py",
+        "loom-code/tests/test_loom_publish.py",
+        "loom-code/tests/test_selection_finalize.py",
+        "-q"
+      ],
+      "cwd": "/private/tmp/loom-selfservice-candidate",
+      "exit": 0,
+      "stdout": "........................................................................ [ 40%]\n........................................................................ [ 80%]\n....................................                                     [100%]\n180 passed in 79.83s (0:01:19)\n",
+      "stderr": "",
+      "context": "approved cache access retry"
+    }
+  ]
+}

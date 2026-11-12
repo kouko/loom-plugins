@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.69.0] — 2026-11-12 — expose command help and input recovery guidance
+
+- Add exact `--help` and `-h` forms for `finalize-review`, `publish` and `delivery`, before command dispatch and repository lookup. Describe authentic review inputs, publication authorization and body requirements, and delivery outcomes; help performs no validation or publication.
+- Append command-specific help hints to covered failures while preserving original diagnostics, stdout and exit status. Preserve hook behavior and internal-error handling; no automatic retry, new output envelope or handler rewrite.
+- Retain focused test-first evidence and disclose untested first-use, publication and host boundaries separately from mechanical test results.
+
 ## [3.68.0] — 2026-11-12 — keep research ownership and stage handoffs bounded
 
 - Use engineering research for consequential evidence gaps in planning, build, review, ship and maintenance; retain each stage's authority and verification requirements.

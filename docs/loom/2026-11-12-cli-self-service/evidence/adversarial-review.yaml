@@ -1,0 +1,45 @@
+attack_points: {found: 4, earned_a_program: 0, committed: 1}
+change_id: 2026-11-12-cli-self-service
+attacked_head: 8ad3c84bb282911da2e1495e5a49c86ff9ce8204
+reuse_commit: 453200ca
+new_programs_committed: 0
+reused_programs_committed: 1
+adversarial:
+  - command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py
+    artifact: loom-code/tests/test_loom_checker_cli.py
+probes:
+  - artifact: loom-code/tests/test_loom_checker_cli.py
+    status: reused
+    reason: Existing public CLI tests cover exact help routing, rejection, stream preservation and hook compatibility; only its concern comment was added.
+findings: []
+attempt_command: uv run --isolated --with-requirements requirements-package-tests.lock python /private/tmp/loom-selfservice-attacks.py /private/tmp/loom-agent-tool-efficiency
+attempt_artifact: /private/tmp/loom-selfservice-attacks.py
+attempt_results: /private/tmp/loom-selfservice-attacks.log
+attempts:
+  - point: REQ-4 nonexact help and hook values
+    action: Exhausted 2460 argv permutations with empty, Unicode, traversal-like, repeated and misplaced help tokens; substituted handlers to detect dispatch and exact stream changes.
+    outcome: Held; only six exact forms avoided dispatch, every other argv and stdout was retained, and delivery hook hints stayed suppressed.
+  - point: REQ-1 missing repository and credential context
+    action: Ran all six exact help forms in an empty temporary directory.
+    outcome: Held; exit zero, empty stderr, explicit help-only notice, directory unchanged.
+  - point: REQ-2 malformed caller and missing authorization
+    action: Ran four missing-authorization or misleading help-value calls through actual subprocess entry.
+    outcome: Held; all rejected with nonzero exit and a help hint, none announced help success.
+  - point: REQ-3 unconfirmed outcome
+    action: Observed all three delivery goals with JSON output outside a repository.
+    outcome: Held; all returned exit one, unconfirmed state and complete false; hint remained on stderr.
+reuse_result:
+  log: /private/tmp/loom-selfservice-reused-test.log
+  result: 38 passed in 4.94s
+setup_failures:
+  - uv initially could not create its cache lock; authorized escalation succeeded.
+  - Trial harness initially omitted the scripts import path and raised ModuleNotFoundError before attacking; added the import path and reran successfully.
+  - Git initially could not create the worktree index.lock outside writable roots; authorized escalation committed successfully.
+scope_notes:
+  - Code and spec recipes were read; no declared mutation or fuzz runner was found in the package dependency/config surfaces.
+  - Intent, plan, standing, evidence and docs have no dedicated adversarial recipe. No cross-document reconciliation verdict is claimed.
+  - REQ-5 independent operator evidence belongs to subsequent acceptance testing; this run does not claim first-use acceptance, remote writes, installed-host verification or efficiency improvement.
+  - No attack earned a new RED program; no graduation task is needed. The single committed program is reused coverage, not a newly green trial.
+git_memory:
+  classification: Routine concern-only reuse annotation; no memory trailers earned.
+  privacy: Deterministic scanner passed with an empty findings list; no ambiguous private-party identifiers required a semantic judge.

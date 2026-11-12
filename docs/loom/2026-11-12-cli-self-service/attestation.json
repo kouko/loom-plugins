@@ -1,0 +1,102 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-cli-self-service",
+  "content_digest": "96227a2eae073e7057a7dcd25253236d3a02995f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "15396ee8255fb8d175f6961cd93160bea37efa43d2e6bb55d7fdd61f4af9bbc3"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "781fc1cbf49bd0f30b3b93b1156f110a75eeeb72",
+      "review_target_sha": "68b55124a2ea30c55a18e0435614c8a68b60a599",
+      "dimension_scores": {
+        "security": "PASS — Prior conclusion retained; the two help clarifications add no execution or authorization path.",
+        "architecture": "PASS — Prior dispatcher boundaries remain unchanged and the existing architecture check still passes.",
+        "correctness": "PASS — Clarified publish exit 2 agrees with _publish_args and _publish_usage; local-goal wording agrees with observe_delivery's committed-path branch, which does not check attestation or verification.",
+        "naming": "PASS — Prior conclusion retained; the fix introduces no identifiers or functions.",
+        "tests": "PASS — Re-executed both branch-changed test files and the existing dispatcher architecture check: 82 passed without skips. No artificial text-pin test is needed for these explanatory clarifications.",
+        "refactoring": "PASS — No new extraction or handler rewrite; prior conclusion retained.",
+        "cross-task-coherence": "PASS — Help and spec agree; plan records W3/W4, release synchronization passes at 3.69.0, and README/changelog preserve upstream research additions. Acceptance distinguishes carried first-use evidence from informed fix verification.",
+        "external-surface-grounding": "PASS — No new external call; prior source grounding retained and clarified outcomes checked against actual handler implementation.",
+        "principles-conformance": "PASS — Clarifications reinforce the distinction between local commitment, verification and authorization; prior mechanism-budget and independent-evidence conclusions remain applicable.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md applies; the existing dispatcher architecture check separately passed.",
+        "deliberate-simplification": "PASS — Original bounded scope remains; no framework, retry or expanded output protocol was introduced.",
+        "deletion-first": "PASS — Two existing descriptions were replaced to remove ambiguity; no new mechanism or extension point was introduced."
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer, Round 2 of the existing episode. Prior findings were empty. Enumerated 16d5f2f213b451c3a1e03f7f6a116a5756ee375b..target and upstream-base..target paths; reviewed the fix and merge interaction, retaining untouched Round 1 conclusions rather than reopening the full checkpoint.",
+        "Independent focused command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch; 82 passed in 5.13s.",
+        "Read followup clarification, Build and renewed acceptance evidence. Full suite and stored probes were not rerun. Supplemental Claude text is not treated as a formal verdict or receipt. Repository artifacts were not edited."
+      ],
+      "reviewer": "selfservice_code_review",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "781fc1cbf49bd0f30b3b93b1156f110a75eeeb72",
+      "review_target_sha": "68b55124a2ea30c55a18e0435614c8a68b60a599",
+      "dimension_scores": {
+        "omission": "PASS — The fix adds the missing authorization-error category and explicitly excludes finalization, attestation and verification from the local delivery goal; related spec decisions and acceptance evidence match.",
+        "ambiguity": "PASS — Exit 2 is no longer described as solely invocation/internal failure, and local completion is bounded to committed attributable paths; neither clarification permits retries or supplies authorization.",
+        "inconsistency": "PASS — Checked the fix range and its integration boundary: upstream research/contract/skill content is unchanged against the new base, original command evidence remains unchanged, and current release metadata consistently uses 3.69.0 while historical runs retain their original versions.",
+        "incorrect-fact": "PASS — The unchanged handler returns 2 for missing authorization and returns local completion before checking remote or verification evidence. Retained actual refusal and unattested-local output agree; focused output reports 223 passes, integrated logs total 4263 passes and 6 skips, and adversarial output reports 38 passes.",
+        "missing-population": "PASS — The report separates carried-over A1/A2 from retested A3/A4/A5, identifies the replacement independent tester and exact candidate/job commits, and does not recast informed retesting as first use or controlled tests as live remote evidence.",
+        "deletion-first": "PASS — The fix replaces two ambiguous descriptions in place and reuses existing regression coverage; release integration preserves upstream work without adding a command mechanism or new text-pin tests."
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer, Round 2 fix verification only. Prior findings were empty. Enumerated 16d5f2f213b451c3a1e03f7f6a116a5756ee375b..target and checked introduced changes rather than starting a new full review. No repository artifact or test was modified.",
+        "Verified target changes after tested commit 96a577c8a51ce5a07dda6e508a753b9e295d622b contain report/direct-evidence files only. Read actual retained focused and command output, recomputed package summary totals, and checked all four code manifest versions. Full suite and stored adversarial programs were not rerun.",
+        "Supplemental Claude suggestions remain source-checked input, not a conforming formal verdict or outside-review receipt. First-use reconstruction and environment failures remain disclosed; no remote publication, new host, concrete inherited-model routing or efficiency claim was added."
+      ],
+      "reviewer": "selfservice_docs_review",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "776c3fcea22b3fd5c2b4d37ac0786ea6d1f333a2",
+  "tested_commit": "96a577c8a51ce5a07dda6e508a753b9e295d622b",
+  "reviewed_commit": "68b55124a2ea30c55a18e0435614c8a68b60a599",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}
