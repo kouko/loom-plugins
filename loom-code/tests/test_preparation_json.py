@@ -1,4 +1,5 @@
 """Public-entry checks for optional preparation JSON and legacy parity."""
+# concern: JSON result contamination, selector ambiguity and exception notice loss.
 from __future__ import annotations
 
 import io
