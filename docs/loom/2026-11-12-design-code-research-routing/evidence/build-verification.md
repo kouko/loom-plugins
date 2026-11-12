@@ -127,3 +127,25 @@ the repaired test behavior without claiming to be research acceptance evidence.
 `sync-trunk` reported up to date at `c7fd9d5f`, containing origin/main `70a05fd7`.
 The computed reviewer floor is 2. Build's required mechanical checks are complete;
 independent research-behavior acceptance and closing review remain separate.
+
+
+## Round 2 fix verification
+
+At committed `1adb52d239d0a05677b05150e45e9eceff41d065`, the original declared
+complete command passed again, with default interpreter and auto worker selection.
+No worker override, interpreter override, deselection or skip was added.
+The 15 actual pytest summaries total **4225 passed, 11 skipped**; every remaining
+shell/check surface completed successfully, exit 0. Root/code reported 2799 passed,
+2 skipped in 205.26s. Raw local output: `/private/tmp/loom-research-build-round2.log`.
+
+The retained adversarial program was rerun with the same declared command:
+`uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/test_design_research_package.py`.
+Result: 2 passed in 0.03s. An initial sandbox attempt could not acquire the existing
+uv cache lock; the host-approved invocation executed successfully. No assertion
+or program changed. `sync-trunk` reported up to date at `1adb52d2`, containing
+origin/main `70a05fd7`, with no commit added.
+
+The fixes disclose decision-critical unverified context before recommending in
+both research skills and exercise the two edited budget boundaries through the
+actual CLI entry. Independent behavioral acceptance and the same reviewers'
+Round 2 fix verification remain separate from these mechanical results.
