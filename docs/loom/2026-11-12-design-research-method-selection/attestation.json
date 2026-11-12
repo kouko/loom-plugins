@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-12-design-research-method-selection",
-  "content_digest": "7a868f85cc2a3aed6b7356cbb010625fd25b09a1",
+  "content_digest": "99d2bd4fbb303718ccad29f51b99501861a89950",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,64 +20,64 @@
   ],
   "verdicts": [
     {
-      "verdict": "PASS",
+      "reviewer": "/root/simplification_closing_skill",
+      "vendor": "codex",
+      "model": "inherited-unobserved",
       "lens": "skill",
-      "reviewed_sha": "7925246f25e8c89ba7ddbbf55b9b531b025c4a1f",
-      "review_target_sha": "03d1925aa1fa09cba309286359d5fadddb6d9f4b",
+      "verdict": "PASS",
+      "reviewed_sha": "391fd01723efedfada3447673b1b99c3894af859",
+      "review_target_sha": "0bf752661332a45b0b4907938f7cce349a964e31",
       "dimension_scores": {
-        "omission": "PASS — No prior findings; the terminal delta adds no missing runtime obligation. Research guidance and template remain unchanged.",
-        "ambiguity": "PASS — Current evidence distinguishes unsuccessful historical repairs, exact restoration, newly executed checks and carried-over behavioral observations.",
-        "inconsistency": "PASS — The final disposition explicitly withdraws the incidental fixture rewrites and sole-startup-cause interpretation. Both test files equal trunk; research requirements and acceptance surfaces remain unchanged.",
-        "incorrect-fact": "PASS — Independently confirmed exact trunk equality of both restored test files and unchanged research resources. Current evidence reports the diagnostic pass without claiming it identified the intermittent cause or established a reliability repair.",
-        "missing-population": "PASS — Original six matched-case observations retain their executor, sequence and inference limits. Supplemental results identify their separate witness, test selection and deselected population without presenting carryover as fresh behavioral execution.",
-        "user-judgment-leak": "PASS — No new user question, authorization obligation or human decision point appears in the delta.",
-        "deletion-first": "PASS — Withdrawing unproved incidental fixture mechanisms returns the shipped change to the requested research/release scope. Retained development evidence explains the observed failures, unsuccessful alternatives and unresolved timing uncertainty."
+        "omission": "PASS — Both owners explicitly require active equivalent simplification, necessity reasoning, consequential-gap reassessment and retained findings.",
+        "ambiguity": "PASS — Important proposals trigger comparison; routine facts and adequate-evidence reuse return directly. Unknowns do not become capability proof.",
+        "inconsistency": "PASS — Base-polarity comparison preserves evidence, authorization, ownership and record safeguards. Design acquisition is intentionally narrowed by the confirmed scope.",
+        "incorrect-fact": "PASS — Runtime paths and templates inspected; both changed ordinary test files ran successfully, with 70 tests passing.",
+        "missing-population": "PASS — Fresh acceptance and adversarial evidence identify their bounded inputs, execution conditions and non-blind limitations without general reliability claims.",
+        "user-judgment-leak": "PASS — Technical questions remain evidence-owned; user questions concern unresolved preferences, facts or authorization. No new confirmation point is introduced.",
+        "deletion-first": "PASS — Existing comparison guidance is extended in place for the explicit requirement; no new station, router, schema, scoring mechanism, quota or shared runtime dependency is introduced."
       },
       "findings": [],
       "notes": [
-        "Terminal Round 3 reviewed only the fix delta and effects on the previous empty findings list; no new whole-branch review was performed.",
-        "Independently ran the changed ordinary test file: python3 -m pytest loom-code/tests/test_external_review_adversarial.py -q — 9 passed in 11.12s.",
-        "Read phase diagnosis, shared-fixture history, withdrawal, final Build evidence and supplemental acceptance. Did not run the full suite, mutation experiments or reused adversarial packaging program."
-      ],
-      "reviewer": "/root/method_closing_skill",
-      "vendor": "codex",
-      "model": "inherited-unobserved"
+        "Fresh controlled executions support REQ-7; earlier cases and the historical attestation are not treated as proof of the added obligation.",
+        "Controlled self-executions do not establish independent-model reliability, population behavior or actual implementation capability.",
+        "No complete package suite or adversarial program was run during review; no artifacts were edited."
+      ]
     },
     {
-      "verdict": "PASS",
+      "reviewer": "/root/simplification_closing_code",
+      "vendor": "codex",
+      "model": "inherited-unobserved",
       "lens": "code",
-      "reviewed_sha": "7925246f25e8c89ba7ddbbf55b9b531b025c4a1f",
-      "review_target_sha": "03d1925aa1fa09cba309286359d5fadddb6d9f4b",
+      "verdict": "PASS",
+      "reviewed_sha": "391fd01723efedfada3447673b1b99c3894af859",
+      "review_target_sha": "0bf752661332a45b0b4907938f7cce349a964e31",
       "dimension_scores": {
-        "security": "PASS — Restores original test fixtures; no production security surface changes.",
-        "architecture": "PASS — Withdraws incidental fixture rewrites and returns the delivered change to the requested research guidance and release scope.",
-        "correctness": "PASS — Independently confirmed both complete external-review test files and production runner match trunk; withdrawal preserves original behavior and assertions.",
-        "naming": "PASS — Restored test identity still describes the exercised blocked-input behavior; current evidence clearly identifies the withdrawn experiments.",
-        "tests": "PASS — Independently ran the fix-delta changed ordinary test module: 9 passed in 11.17s, none skipped. Original deadlines, large input, stage marker, cleanup and elapsed assertions remain intact.",
-        "refactoring": "PASS — Removes the unproved incidental rewrite without introducing replacements or abstractions.",
-        "cross-task-coherence": "PASS — Final spec/plan disposition, withdrawal record, Build evidence and acceptance supplement consistently distinguish the final candidate from historical fixture experiments.",
-        "external-surface-grounding": "PASS — No new external integration remains; complete restoration is grounded by independently checked Git content equality.",
-        "principles-conformance": "PASS — Preserves verification coverage, discloses unresolved timing uncertainty and attributes carried-over design trials separately from newly executed restoration checks.",
-        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the reviewed repository.",
-        "deliberate-simplification": "PASS — Removes fixture complexity whose reliability advantage was unproved; retained evidence explicitly limits the passing verification claim.",
-        "deletion-first": "PASS — Deletes the incidental shell rewrite and retains the smaller requested change without weakening tests."
+        "security": "PASS — Mandatory controls and authorization boundaries remain intact; simplification cannot justify removing required safeguards.",
+        "architecture": "PASS — Each research skill owns its comparison guidance independently, without shared runtime dependencies or workflow additions.",
+        "correctness": "PASS — Guidance implements bounded design inquiry and active equivalent simplification while preserving constraints and explicit unknowns.",
+        "naming": "PASS — Existing skill names, headings and record terminology remain consistent.",
+        "tests": "PASS — Both changed ordinary test files ran: 70 passed, none skipped. Behavioral evidence includes actual responses and substantive saved-record readbacks, with limitations disclosed.",
+        "refactoring": "PASS — Simplification extends existing comparison guidance without introducing a parallel procedure or unnecessary abstraction.",
+        "cross-task-coherence": "PASS — Both owners cover REQ-7 consistently; retained and new behavioral evidence cover their applicable obligations, and both release packets remain synchronized.",
+        "external-surface-grounding": "PASS — No new executable external integration is introduced; engineering handoff remains by skill name without private cross-plugin imports.",
+        "principles-conformance": "PASS — No new station, gate, schema field or confirmation point; evidence limitations and publication authorization remain explicit.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS — The bounded inline solution preserves necessary complexity and states when consequential new evidence warrants reassessment.",
+        "deletion-first": "PASS — Existing comparison sections accommodate the requested behavior without a new helper, framework, dispatch mechanism or report format."
       },
       "findings": [],
       "notes": [
-        "Terminal verification reviewed only the supplied fix delta and its effects. Previous findings were empty.",
-        "The current report appropriately carries over the unchanged design-trial surfaces while separately attributing supplemental restoration checks. It does not present the twelve original executions as fresh trials.",
-        "Preflight intermittence remains unresolved; historical fixture and mutation receipts establish no shipped repair. Full-suite and adversarial reruns remain assigned to finalization; no target-bound probe confirmation is asserted here."
-      ],
-      "reviewer": "/root/method_closing_code",
-      "vendor": "codex",
-      "model": "inherited-unobserved"
+        "Executed python3 -m pytest -q -p no:cacheprovider loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py: 70 passed in 0.23s.",
+        "Confirmed both external-review timeout test files are unchanged from the supplied base; changes since the acceptance-tested ed20a045 commit affect publication evidence only.",
+        "Controlled native executions support the recorded cases, not general reliability or production capability. Historical attestation does not verify REQ-7; renewed finalization remains necessary."
+      ]
     }
   ],
   "findings": [],
   "selection": null,
-  "intent_confirmed_sha": "2fdbc2b3339046631bf7f1adae9d83567fb0e5eb",
-  "tested_commit": "79789ae2",
-  "reviewed_commit": "03d1925aa1fa09cba309286359d5fadddb6d9f4b",
+  "intent_confirmed_sha": "fa54053c310ef34fe2844af90e9857d8e1d9526d",
+  "tested_commit": "ed20a0452e5b2d22b89168686eb07de8bee9f7b1",
+  "reviewed_commit": "0bf752661332a45b0b4907938f7cce349a964e31",
   "acceptance_status": [
     {
       "acceptance": 1,
@@ -101,6 +101,10 @@
     },
     {
       "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
       "status": "works"
     }
   ]

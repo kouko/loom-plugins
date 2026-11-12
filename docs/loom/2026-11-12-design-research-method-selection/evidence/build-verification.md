@@ -144,3 +144,39 @@ was relaxed. The passing run is observed verification of this candidate, not
 proof that its unchanged pre-existing timing tests are universally reliable.
 Supplemental clean-load/restoration acceptance and the original reviewers'
 terminal verification remain the next steps in this same bounded episode.
+
+## 2026-11-13 — Confirmed two-owner simplification scope
+
+The renewed confirmed requirement adds active equivalent simplification to both
+research owners (REQ-7) and expands actual behavioral coverage (REQ-6). The
+specification records this substantive difference and the bounded episode
+continuity; no failed fixture-repair task was restarted. Earlier sections are
+historical observations, not validation of the added requirement.
+
+All W6–W9 tasks landed by `00d9681c`. Focused design packaging passed 2 tests;
+engineering packaging passed 5. The existing code release synchronization test
+first failed with the 3.71.0 pin against 3.70.0 manifests, then passed after the
+release packet update. Design synchronization plus packaging passed 3 tests.
+
+At `ed20a045`, sync-trunk confirmed the branch contained origin/main
+`391fd01723efedfada3447673b1b99c3894af859`. The exact standing package command
+passed with 4,264 pytest tests passed, 6 skipped and 17 shell summary groups
+reporting zero failures. Local output: `/private/tmp/loom-simplification-build-suite.log`.
+The reused adversarial command `python3 -m pytest loom-design/tests/test_design_research_package.py`
+then passed 2 tests. Both external-review timeout test files remain exact trunk
+bytes; the historical intermittent timeout remains unexplained.
+
+Independent clean-copy acceptance at `ed20a045` exercised five new controlled
+candidate cases, retaining exact inputs, actual responses, saved records and
+substantive readbacks. Seven Acceptance rows were reported works. Earlier
+evidence was retained only for unchanged surfaces. Two fresh reviewers assessed
+the cumulative branch at `0bf752661332a45b0b4907938f7cce349a964e31`, each returned
+PASS with no findings and ran the two changed ordinary test files (70 passed).
+Controlled, nonblind executions do not establish general reliability or real
+product capability.
+
+Finalization on that committed target reran the standing complete suite and
+reused adversarial program successfully, then generated the attestation for
+functional digest `99d2bd4fbb303718ccad29f51b99501861a89950`.
+Local finalization output: `/private/tmp/loom-simplification-finalize.log`.
+Publication and installed-plugin updates have not been performed.
