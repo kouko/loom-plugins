@@ -1,0 +1,111 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-design-research-method-selection",
+  "content_digest": "99d2bd4fbb303718ccad29f51b99501861a89950",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-design/tests/test_design_research_package.py",
+      "artifact": "loom-design/tests/test_design_research_package.py",
+      "result": "pass",
+      "command_digest": "8b35f81f60bdf4202fda823aef4f164c496e34677e81a2c6b0858ffc0226f204"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/simplification_closing_skill",
+      "vendor": "codex",
+      "model": "inherited-unobserved",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "391fd01723efedfada3447673b1b99c3894af859",
+      "review_target_sha": "0bf752661332a45b0b4907938f7cce349a964e31",
+      "dimension_scores": {
+        "omission": "PASS — Both owners explicitly require active equivalent simplification, necessity reasoning, consequential-gap reassessment and retained findings.",
+        "ambiguity": "PASS — Important proposals trigger comparison; routine facts and adequate-evidence reuse return directly. Unknowns do not become capability proof.",
+        "inconsistency": "PASS — Base-polarity comparison preserves evidence, authorization, ownership and record safeguards. Design acquisition is intentionally narrowed by the confirmed scope.",
+        "incorrect-fact": "PASS — Runtime paths and templates inspected; both changed ordinary test files ran successfully, with 70 tests passing.",
+        "missing-population": "PASS — Fresh acceptance and adversarial evidence identify their bounded inputs, execution conditions and non-blind limitations without general reliability claims.",
+        "user-judgment-leak": "PASS — Technical questions remain evidence-owned; user questions concern unresolved preferences, facts or authorization. No new confirmation point is introduced.",
+        "deletion-first": "PASS — Existing comparison guidance is extended in place for the explicit requirement; no new station, router, schema, scoring mechanism, quota or shared runtime dependency is introduced."
+      },
+      "findings": [],
+      "notes": [
+        "Fresh controlled executions support REQ-7; earlier cases and the historical attestation are not treated as proof of the added obligation.",
+        "Controlled self-executions do not establish independent-model reliability, population behavior or actual implementation capability.",
+        "No complete package suite or adversarial program was run during review; no artifacts were edited."
+      ]
+    },
+    {
+      "reviewer": "/root/simplification_closing_code",
+      "vendor": "codex",
+      "model": "inherited-unobserved",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "391fd01723efedfada3447673b1b99c3894af859",
+      "review_target_sha": "0bf752661332a45b0b4907938f7cce349a964e31",
+      "dimension_scores": {
+        "security": "PASS — Mandatory controls and authorization boundaries remain intact; simplification cannot justify removing required safeguards.",
+        "architecture": "PASS — Each research skill owns its comparison guidance independently, without shared runtime dependencies or workflow additions.",
+        "correctness": "PASS — Guidance implements bounded design inquiry and active equivalent simplification while preserving constraints and explicit unknowns.",
+        "naming": "PASS — Existing skill names, headings and record terminology remain consistent.",
+        "tests": "PASS — Both changed ordinary test files ran: 70 passed, none skipped. Behavioral evidence includes actual responses and substantive saved-record readbacks, with limitations disclosed.",
+        "refactoring": "PASS — Simplification extends existing comparison guidance without introducing a parallel procedure or unnecessary abstraction.",
+        "cross-task-coherence": "PASS — Both owners cover REQ-7 consistently; retained and new behavioral evidence cover their applicable obligations, and both release packets remain synchronized.",
+        "external-surface-grounding": "PASS — No new executable external integration is introduced; engineering handoff remains by skill name without private cross-plugin imports.",
+        "principles-conformance": "PASS — No new station, gate, schema field or confirmation point; evidence limitations and publication authorization remain explicit.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS — The bounded inline solution preserves necessary complexity and states when consequential new evidence warrants reassessment.",
+        "deletion-first": "PASS — Existing comparison sections accommodate the requested behavior without a new helper, framework, dispatch mechanism or report format."
+      },
+      "findings": [],
+      "notes": [
+        "Executed python3 -m pytest -q -p no:cacheprovider loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py: 70 passed in 0.23s.",
+        "Confirmed both external-review timeout test files are unchanged from the supplied base; changes since the acceptance-tested ed20a045 commit affect publication evidence only.",
+        "Controlled native executions support the recorded cases, not general reliability or production capability. Historical attestation does not verify REQ-7; renewed finalization remains necessary."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "fa54053c310ef34fe2844af90e9857d8e1d9526d",
+  "tested_commit": "ed20a0452e5b2d22b89168686eb07de8bee9f7b1",
+  "reviewed_commit": "0bf752661332a45b0b4907938f7cce349a964e31",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    }
+  ]
+}

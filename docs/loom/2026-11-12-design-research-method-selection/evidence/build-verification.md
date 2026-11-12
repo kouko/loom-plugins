@@ -1,0 +1,182 @@
+# End-of-Build verification
+
+Tested commit: `029cce3a6328e86e8d66b1c6b23b2db0947f7cbb`.
+Branch base: `391fd01723efedfada3447673b1b99c3894af859`.
+
+## Integration
+
+The installed checker's `sync-trunk` reported up to date against `origin/main`
+at the branch base; no sync commit was added. A second observation before
+independent acceptance returned the same result. The computed reviewer floor
+is two. No workflow step is skipped by instruction.
+
+Command:
+
+```
+uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q
+```
+
+Observed exit code: 0. The fifteen pytest invocations reported an aggregate
+4,259 passed and 11 skipped. All seventeen shell-test summary groups reported
+zero failures. The final npm deprecation notice did not fail the command.
+This is the complete declared inventory, not a bare root pytest invocation.
+Full terminal output is retained locally at
+`/private/tmp/design-research-build-suite.log`; its relevant pytest summaries:
+
+```
+2833 passed, 2 skipped in 217.74s (0:03:37)
+211 passed, 1 skipped in 11.52s
+53 passed in 2.35s
+264 passed in 7.36s
+64 passed in 14.08s
+22 passed in 0.06s
+13 passed in 0.03s
+12 passed in 0.02s
+58 passed in 3.02s
+125 passed, 3 skipped in 2.57s
+248 passed, 5 skipped in 1.54s
+12 passed in 0.02s
+19 passed in 0.04s
+163 passed in 1.73s
+162 passed in 1.43s
+```
+
+## Adversarial handoff
+
+Independent attacker: native agent `method_adversary`, inherited profile,
+not an implementation author. Seven attack points, no earned new program,
+no product changes and no unresolved findings. Two executable attempts:
+relocated archive packaging (2 passed), release-pin consistency (1 passed).
+Five additional prose temptation inspections were not model executions and
+do not establish behavioral resistance.
+
+Reused concern-tagged program:
+
+```
+python3 -m pytest loom-design/tests/test_design_research_package.py
+loom-design/tests/test_design_research_package.py ..                     [100%]
+============================== 2 passed in 0.03s ===============================
+```
+
+The orchestrator reran this exact command after the complete suite; exit 0.
+This program establishes packaging invariants, not method-selection behavior.
+Actual baseline/candidate trials and their limits belong to independent
+acceptance evidence. Finalization must execute the full suite and this program
+again on the committed reviewed content.
+
+## Earlier independent checks and outside-review limitation
+
+Native `method_spec_review` returned PASS on the spec at `3404c009` with base
+`bd14580d`; native `method_plan_review` returned PASS and no simpler shape.
+Neither edited the target. These checks do not validate runtime behavior.
+
+The explicitly requested Claude Code proposal review produced no usable review:
+the Opus/high preflight exited 1 with an unknown error. Its result had no
+observed model or effort, evidence level `none`, and no review output. Local
+doctor reported inaccessible credentials/keychain in that execution context;
+that does not establish the exact preflight cause. No retry or outside-vendor
+closing-review verdict is claimed.
+
+## Integration repair and repeated Build verification
+
+The first `finalize-review` attempt stopped before generating an attestation:
+the package suite failed an existing blocked-input regression during the
+five-second preflight instead of reaching its six-second review deadline.
+See [integration-repair.md](integration-repair.md) for the actual failure,
+bounded diagnosis, test-only repair and additional mutation checks.
+The research requirements and twelve retained design-trial executions did not
+change. This remains the same bounded review episode, with the original two
+closing reviewers; it is not a new episode or a retry-budget reset.
+
+Repeated Build target: `3bf869d138a8a743b20b01ddab0dbe95e7fbbd20`.
+`sync-trunk` again reported up to date against `391fd017`. The exact locked
+package command above exited 0; fifteen pytest invocations totaled 4,264 passed
+and 6 skipped, and all seventeen shell summary groups had zero failures.
+Both inventories total 4,270 pytest cases; five previously skipped cases ran
+in this later invocation. These are observed run counts, not five new tests
+attributed to the repair. Detailed local output:
+`/private/tmp/design-research-build-suite-r2.log`.
+
+After that complete suite, the same committed adversarial program was rerun:
+
+```
+python3 -m pytest loom-design/tests/test_design_research_package.py
+loom-design/tests/test_design_research_package.py ..                     [100%]
+============================== 2 passed in 0.03s ===============================
+```
+
+No adversary was redispatched: the existing program remains applicable and
+passes. The test-only repair has not changed its covered packaging invariant.
+Renewed acceptance setup and same-reviewer fix verification precede the next
+finalization. No formal outside-review verdict or skipped step is added.
+
+## Final minimal candidate after withdrawing incidental fixture edits
+
+The subsequent finalization and Build attempts still encountered the same
+preflight timeout, including with native shell. The instrumented diagnostic
+code-group run passed without reproducing the failure; the exact cause remains
+unresolved. See the retained
+[phase diagnosis](../research/01-preflight-timeout-phase.md) and
+[withdrawal evidence](fixture-repair-withdrawal.md). No complete reliability
+repair is claimed. Both incidental test-file rewrites were withdrawn; their
+complete bytes equal trunk `391fd017`, preserving all original assertions,
+deadlines and coverage. The final net code change is again only the requested
+research guidance plus its design release metadata and existing release pins.
+
+Final Build target: `79789ae2230d8d0e8f163509c5275f119a5938f4`.
+`sync-trunk` reported up to date against the same trunk. The exact locked
+complete package command above exited 0: 4,264 passed, 6 skipped across fifteen
+pytest invocations; seventeen shell summary groups reported zero failures.
+Code-group output was `2833 passed, 2 skipped in 203.46s`. Detailed local output:
+`/private/tmp/design-research-build-suite-final.log`.
+
+The reused adversarial program then passed on this same target:
+
+```
+python3 -m pytest loom-design/tests/test_design_research_package.py
+loom-design/tests/test_design_research_package.py ..                     [100%]
+============================== 2 passed in 0.04s ===============================
+```
+
+An exact `git diff --exit-code 391fd017 --` comparison of both restored external
+review test files also returned 0. No test, worker setting or verification step
+was relaxed. The passing run is observed verification of this candidate, not
+proof that its unchanged pre-existing timing tests are universally reliable.
+Supplemental clean-load/restoration acceptance and the original reviewers'
+terminal verification remain the next steps in this same bounded episode.
+
+## 2026-11-13 — Confirmed two-owner simplification scope
+
+The renewed confirmed requirement adds active equivalent simplification to both
+research owners (REQ-7) and expands actual behavioral coverage (REQ-6). The
+specification records this substantive difference and the bounded episode
+continuity; no failed fixture-repair task was restarted. Earlier sections are
+historical observations, not validation of the added requirement.
+
+All W6–W9 tasks landed by `00d9681c`. Focused design packaging passed 2 tests;
+engineering packaging passed 5. The existing code release synchronization test
+first failed with the 3.71.0 pin against 3.70.0 manifests, then passed after the
+release packet update. Design synchronization plus packaging passed 3 tests.
+
+At `ed20a045`, sync-trunk confirmed the branch contained origin/main
+`391fd01723efedfada3447673b1b99c3894af859`. The exact standing package command
+passed with 4,264 pytest tests passed, 6 skipped and 17 shell summary groups
+reporting zero failures. Local output: `/private/tmp/loom-simplification-build-suite.log`.
+The reused adversarial command `python3 -m pytest loom-design/tests/test_design_research_package.py`
+then passed 2 tests. Both external-review timeout test files remain exact trunk
+bytes; the historical intermittent timeout remains unexplained.
+
+Independent clean-copy acceptance at `ed20a045` exercised five new controlled
+candidate cases, retaining exact inputs, actual responses, saved records and
+substantive readbacks. Seven Acceptance rows were reported works. Earlier
+evidence was retained only for unchanged surfaces. Two fresh reviewers assessed
+the cumulative branch at `0bf752661332a45b0b4907938f7cce349a964e31`, each returned
+PASS with no findings and ran the two changed ordinary test files (70 passed).
+Controlled, nonblind executions do not establish general reliability or real
+product capability.
+
+Finalization on that committed target reran the standing complete suite and
+reused adversarial program successfully, then generated the attestation for
+functional digest `99d2bd4fbb303718ccad29f51b99501861a89950`.
+Local finalization output: `/private/tmp/loom-simplification-finalize.log`.
+Publication and installed-plugin updates have not been performed.
