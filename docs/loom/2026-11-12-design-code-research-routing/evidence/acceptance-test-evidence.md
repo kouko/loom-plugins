@@ -119,3 +119,55 @@ Complete discovery/usage surface: read current code/design router, loaded both o
 ### 6: re-tested
 - Re-audited retained A1–A6 behavior receipts, original live challenge and changed-condition continuation; added actual clean-copy setup, independently inspected cold INITIAL output, rerun measurement and newly generated engineering/design records. [round2-research-records.md](round2-research-records.md) contains complete direct Markdown snapshots of request, probe source, saved JSON, original external record and new witness records. External files are not described as committed repository artifacts.
 - No new executable harness, no fullsuite, no changed implementation. One corrected cold initial case plus witness continuation does not establish all models/hosts, automatic routing rates, real deployment, real usability or missing historical execution. Research-choice evidence remains bounded to synthetic design sources and one real 11-byte local payload. Unknown caller/collision context remains unknown.
+
+## Re-run on 2026-11-12, at cdc5da8a193d7c1862e97af01e9ec6a97472dfdc
+
+Tried on 2026-11-12, in a clean copy of the project at cdc5da8a193d7c1862e97af01e9ec6a97472dfdc.
+
+### Setup and integration scope
+- Fresh `git clone --no-hardlinks --local /private/tmp/loom-design-code-research /private/tmp/loom-acceptance-round3-20261112`, exact SHA checkout; initial status empty and rev-parse matched.
+- Read intent/spec/plan, earlier acceptance evidence and upstream compatibility research. Inspected integration diff `d1142de89f0750802d8bd5636fafa55abc8a068a..cdc5da8a193d7c1862e97af01e9ec6a97472dfdc`. Both research skill directories have no delta. This is integration of progress/discovery behavior and release identity, not a new research-method revision.
+- Read current routers/research skills, stage entry research paragraphs and Ship observation section. Same explicit clean-package loading/setup scope; no installation, autoactivation claim or external account access.
+- Manifest read reports code3.68.0/design2.24.0. `python3 scripts/sync_codex_manifests.py --check --all` exit0; boundary check returned `OK: loom-design is filesystem-boundary clean.`
+- Focused actual command: `python3 -m pytest -q loom-design/tests/test_design_research_package.py loom-code/tests/engineering-research/test_package.py loom-code/tests/test_check_mechanisms.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py`: **263 passed in 101.52s**, exit0. These exercise release pins, package discovery, mechanism entry, integrated publication/finalization progress. Fullsuite not run; finalization still owns complete-suite execution and its blocking result.
+- Actual collection API call `suite_collection(repo,"loom-design/tests/test_design_research_package.py")` returned `(None, 'error: Could not acquire lock ... Operation not permitted ... /Users/kouko/.cache/uv/...')`; exact declared-runner collection could not complete under this sandbox. `graduated_probe_programs(repo, exactSHA, changeID)` actually returned `['loom-design/tests/test_design_research_package.py']`, so the concern-first integrated discovery retains the package when collection is unknown. Separately the focused actual pytest command did collect/execute its two tests successfully. Unknown is not represented as declared-runner collection success.
+
+### 1: re-tested
+- Full representative use, beyond metadata: explicit router discovery led to engineering capability/diagnosis tasks and design outcome comparison. Reran the previously inspected existing 11-byte receipt probe (external original path remains `/private/tmp/loom-initial-choice-_azq987_/probe.py`, not a committed artifact). Both writers exit0, exact receipt.txt member/payload, CRC null, source bytes/mtime/mode unchanged. Python3.15.2/macOS26.7; temp path ended `receipt-zip-check-1wexu4u6`, cleaned by probe.
+- Design reread original synthetic observation/interview and compared modal/inline/current options on recovery/focus/accessibility. Kept unknown screen-reader context explicit, only conditional outcome choices, no feasibility/consent inferred. Saved/read a new design record; engineering records below return actual technical findings. Different ownership observable in generated contents, not registration alone.
+- Release identities/checks above passed; actual integrated concern-based admission returned the design package. This is clean-package use, not real marketplace publication or installed-host discovery.
+
+### 2: re-tested — all five stages, positive and negative
+- Re-read original fixture-sources.md. Actual `/usr/bin/zip -q /private/tmp/loom-round3-empty.zip` printed `zip error: Nothing to do!`; `command -v zip` returned `/usr/bin/zip`; fresh nonempty receipt probe succeeded. No product edit.
+- C1 plan: consequential alleged missing dependency → engineering research using path and actual export evidence; returned no dependency installation from absence premise, conditional writer fit only. N1 matching applicable receipt → reuse directly, no new research.
+- C2 Build: competing absent-binary versus empty-input premise → reproduced empty-input symptom and nonempty success; returned diagnostic evidence, historical remote cause unknown, no repair. N2 successful receipt without contradiction → no extra investigation.
+- C3 review: synthetic completion claim with definition but no past output → retain historical uncertainty; fresh run cannot reconstruct it, no reviewed-artifact modification/verdict. N3 supplied synthetic matching actual output → assess directly, no research.
+- C4 Ship: source-only publication claim plus new waiting display requires evidence, not inference. After inspecting existing `ExternalCalls`/`invoke`, actually ran integrated publication handler using those fixtures; all external calls intercepted, no network or real publication. A direct Python command imported current test helper, created a temp local repo, used MonkeyPatch for run_publish_external/trusted_executable/verification fixtures, simulated monotonic time and supplied eight pending snapshots then MYSTERY/unknown. It called the real `cmd_publish` via existing invoke, returned captured stdout/stderr, and undid patches.
+
+Actual returned receipt:
+```text
+fixture_repo: /private/tmp/loom-r3-observe-c_nzfpcb/repo
+simulated_elapsed: 80
+rc: 1
+stdout: Verification valid for ca2922fcfab82a37da51308604e6c32637e07c4d
+Publication target: github.com/example/project base main
+Published PR: https://github.com/example/project/pull/1
+stderr: publish: CI observation started
+publish: CI pending
+publish: CI pending; elapsed 60s
+publish: CI unconfirmed
+BLOCK publish.preconditions: required CI requires user action because its state is unknown: fixture-only; next: Inspect gh authentication, permissions and response diagnostics; retry the same route.
+```
+- This stdout is explicitly synthetic fixture output, not observed real publication. Research returned unknown check status despite elapsed progress; no automatic retry or external-action authorization inferred. N4 supplied synthetic terminal-success receipt → reuse directly without mandatory study; no real account success claimed.
+- C5 maintain: alert absence contradicted by actual local executable/export → retain present capability and unknown alert-host historical cause, return intake without fix/intent confirmation. N5 supplied matching bounded diagnosis → reuse, no further study. Immaterial filename spelling → no research.
+- Saved five question-separated research records and read them in full via `cat`; all source links checked true. Negative cases required no additional investigation; original bounded question record describes the continuation, rather than inventing new studies. Records preserve original task/authorization.
+
+### 3: carried over — no design ownership, activation, goal/authorization or return-rule change in integration; original D1/D2/D3 evidence remains applicable.
+
+### 4: carried over — both research comparison rules and supporting references unchanged; Round2 complete engineering/design comparison and initial-context disclosure evidence remains applicable. First-trial partly history retained above.
+
+### 5: carried over — record maintenance, same-question continuation, changed-condition preservation and no-write rules unchanged; actual original live follow-up and retained records remain applicable.
+
+### 6: re-tested
+- Rechecked retained routing/non-routing, bounded return, live follow-up and Round2 initial-choice evidence against integration delta. Added fresh full A1/A2 actual behavior above plus focused executed progress/finalize tests; complete new research records in [round3-research-records.md](round3-research-records.md).
+- Limitations: synthetic design/operator/remote evidence, intercepted publication (no account action), accelerated fixture clock (no real80s wait), one local tiny payload, explicit source loading. Declared-runner collector cache lock remains unavailable; discovery admitted unknown, actual focused pytest execution passed. No host activation-rate, real publication, real usability, all-input or all-model guarantee. No new executable harness, implementation edits, fullsuite run or commit by witness.

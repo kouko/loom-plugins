@@ -149,3 +149,27 @@ The fixes disclose decision-critical unverified context before recommending in
 both research skills and exercise the two edited budget boundaries through the
 actual CLI entry. Independent behavioral acceptance and the same reviewers'
 Round 2 fix verification remain separate from these mechanical results.
+
+
+## Upstream integration / terminal-round Build result
+
+Upstream `ab40f0e634db492c9b250da8e95b53579aeb23c2` independently published code
+3.67.0 after Round 2. Initial sync reported README/changelog conflicts and did
+not mutate the branch. W5 names the new integration obligation without resetting
+requirements, retries or the Review episode. The [compatibility assessment](../research/002-upstream-design-compatibility.md)
+records the actual source inspection. Integration preserves upstream progress,
+collection filtering and our research handoffs; this code release becomes 3.68.0,
+while design stays 2.24.0.
+
+At `cdc5da8a193d7c1862e97af01e9ec6a97472dfdc`, the original declared complete
+command passed with default auto workers and interpreter, without deselection or
+additional skips. The 15 actual pytest summaries total **4251 passed, 11 skipped**;
+all remaining shell/check surfaces passed, exit 0. Root/code reported 2825 passed,
+2 skipped in 203.20s. Raw local output: `/private/tmp/loom-research-build-round3.log`.
+
+The retained adversarial command passed: 2 passed in 0.02s. The upstream ordering
+change did not make the program inapplicable or unable to run, so no adversary
+re-dispatch or program rewrite was needed. Sync-trunk before the independent
+acceptance re-dispatch reported up to date at `cdc5da8a`, containing `ab40f0e6`.
+The previous attestation does not establish readiness for this new content;
+affected acceptance and original-reviewer terminal verification remain required.
