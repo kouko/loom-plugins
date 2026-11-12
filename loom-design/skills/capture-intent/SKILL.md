@@ -71,10 +71,11 @@ or updated.
 
 ## Step 1 — Interview
 
-Read `references/interview.md`; ask only for missing required-field content.
-Draft directly when already sufficient. No intake question quota applies.
-Problems/outcomes are valid before choosing features or implementation.
-Existing decision points remain unchanged.
+For consequential evidence gaps, use `loom-design:design-research`; resume this interview.
+
+Read `references/interview.md`; ask only for missing required fields, otherwise
+draft. No question quota; problems/outcomes may precede features or implementation.
+Decision points remain unchanged.
 
 Cover affected people, workaround, clean-environment observable outcomes,
 fixed constraints, and exclusions. For product also cover urgency, existing

@@ -96,6 +96,11 @@ never blocks this station; write from what exists.
 
 ## Step 2 — Write the spec
 
+When a behavior or design choice depends on a consequential evidence gap,
+identify the pending decision and use `loom-design:design-research` as needed.
+Reuse adequate evidence directly; return findings or uncertainty to this spec
+without reopening confirmed goals, expanding scope or advancing decision point ②.
+
 Write `docs/loom/<change-id>/spec.md` from `templates/spec-minimal.md`.
 Every section is required —
 `N/A — <reason>` is an answer, silence is not.

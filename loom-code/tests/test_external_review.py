@@ -942,9 +942,10 @@ def test_codex_discovery_keeps_stdin_open_for_model_list(tmp_path, monkeypatch):
 
 def test_codex_discovery_times_out_when_app_server_never_answers(tmp_path, monkeypatch):
     pidfile = _fake_codex(tmp_path, monkeypatch, "hang")
-    monkeypatch.setattr(review, "CODEX_DISCOVERY_TIMEOUT", 1)
+    # Cold fake-Python startup measured ~2.8s; leave time to reach the hang.
+    monkeypatch.setattr(review, "CODEX_DISCOVERY_TIMEOUT", 6)
     result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
-    assert result["reason"] == "discovery-timeout: 1s"
+    assert result["reason"] == "discovery-timeout: 6s"
     _assert_reaped(pidfile)
 
 
@@ -956,7 +957,7 @@ if mode == "codex-exit":
 if mode == "codex-exit0":
     sys.exit(0)
 if mode == "codex-exit-orphan":
-    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    child = subprocess.Popen(["/bin/sleep", "60"])
     open({pidfile!r}, "w").write(str(child.pid))
     sys.exit(3)
 text = sys.stdin.read()
@@ -964,10 +965,10 @@ if mode == "claude" and "single word ok" in text:
     print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
     sys.exit(0)
 print("gemini-2.5-pro", flush=True)
-child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"])
+child = subprocess.Popen(["/bin/sleep", "60"])
 open({pidfile!r}, "w").write(str(child.pid))
 if mode != "exit-early":
-    time.sleep(5)
+    time.sleep(60)
 """
 
 
@@ -999,11 +1000,11 @@ def _assert_descendant_gone(pidfile):
 def test_agy_discovery_times_out_when_descendant_holds_stdout(tmp_path, monkeypatch):
     import time
     pidfile = _fake_cli(tmp_path, monkeypatch, "agy", "hang")
-    monkeypatch.setattr(review, "AGY_DISCOVERY_TIMEOUT", 1)
+    monkeypatch.setattr(review, "AGY_DISCOVERY_TIMEOUT", 6)
     start = time.monotonic()
     result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
-    assert result["reason"] == "discovery-timeout: 1s"
-    assert time.monotonic() - start < 4
+    assert result["reason"] == "discovery-timeout: 6s"
+    assert time.monotonic() - start < 9
     _assert_descendant_gone(pidfile)
 
 
@@ -1013,7 +1014,7 @@ def test_agy_discovery_exit_with_lingering_descendant_is_not_timeout(tmp_path, m
     start = time.monotonic()
     result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
     assert result["candidates"] == ["gemini-2.5-pro"], result
-    assert time.monotonic() - start < 4
+    assert time.monotonic() - start < 8
     _assert_descendant_gone(pidfile)
 
 
@@ -1023,9 +1024,9 @@ def test_review_stage_times_out_when_descendant_holds_stdout(tmp_path, monkeypat
     start = time.monotonic()
     result = review.execute("claude", "sonnet", "high", "anthropic", str(tmp_path),
                             "review", consent("claude", scope=str(tmp_path)),
-                            probe_timeout=1, review_timeout=2)
-    assert result["reason"] == "execution-timeout: 2s", result
-    assert time.monotonic() - start < 4.5
+                            probe_timeout=5, review_timeout=6)
+    assert result["reason"] == "execution-timeout: 6s", result
+    assert time.monotonic() - start < 15
     _assert_descendant_gone(pidfile)
 
 

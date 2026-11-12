@@ -28,6 +28,11 @@ For a shared editable diagram during discussion, use
 
 ## Step 1 — When to run
 
+When architecture boundaries or tradeoffs depend on missing consequential
+evidence, identify the decision and use `loom-design:design-research` as needed.
+Reuse adequate evidence directly; return findings or uncertainty to this task
+while preserving user choices, scope and ratification authority.
+
 Run this **on request** only. `ARCHITECTURE.md` is **never required**: an
 absent or unratified `ARCHITECTURE.md` never blocks a change, at any
 station.

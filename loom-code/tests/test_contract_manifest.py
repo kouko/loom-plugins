@@ -133,12 +133,12 @@ def test_dispatch_is_not_part_of_generated_attestation(manifest):
 def test_tools_count_and_owner(manifest):
     tools = manifest["tools"]
     counted = [t for t in tools if not t.get("standalone")]
-    assert len(counted) == 13  # Research adds one contract tool; CHANGELOG declares the budget exception.
+    assert len(counted) == 14  # Research tools declare their CHANGELOG budget exceptions.
     assert {t["name"] for t in tools if t.get("standalone")} == {"goal-create", "dbt-model-style", "project-retro"}
     owners = {t["name"]: t["owner"] for t in tools}
     assert owners.pop("engineering-research") == "loom-code"
     assert owners == {
-        **dict.fromkeys({"product-principles", "design-system", "architecture-design"}, "loom-design"),
+        **dict.fromkeys({"product-principles", "design-system", "architecture-design", "design-research"}, "loom-design"),
         **dict.fromkeys({"decision-map", "handoff", "recap-state", "loom-visualization",
                          "loom-interactive-diagram", "skill-retro", "git-memory",
                          "independent-advisor", "critique", "goal-create",

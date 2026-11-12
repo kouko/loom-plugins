@@ -16,6 +16,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 import external_review  # noqa: E402
@@ -221,19 +223,22 @@ def test_unreadPromptOverPipeBuffer_timesOutAtLimit(tmp_path, monkeypatch):
     """A CLI that never reads the review prompt must still stop at the limit.
 
     The prompt (1 MiB) exceeds the pipe buffer, so writing it blocks until
-    the child reads or exits. The fake answers the probe, then sleeps 10 s
-    without reading the review prompt; the review limit is 2 s.
+    the child reads or exits. The fake answers the probe, then sleeps 60 s
+    without reading the remaining review prompt; the review limit is 6 s,
+    leaving margin for the measured ~2.8s cold Python startup.
     """
     import io
     import time
     fake = tmp_path / "bin" / "claude"
+    started = tmp_path / "review-started"
     fake.parent.mkdir()
     fake.write_text(
         f"#!{sys.executable}\nimport json, os, sys, time\n"
         "if b'single word ok' in os.read(0, 4096):\n"
         "    print(json.dumps({'result': 'ok', 'modelUsage': {'claude-sonnet-4-5': {}}}))\n"
         "    sys.exit(0)\n"
-        "time.sleep(10)\n")
+        f"open({str(started)!r}, 'w').write(str(os.getpid()))\n"
+        "time.sleep(60)\n")
     fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
     monkeypatch.setenv("PATH", f"{fake.parent}{os.pathsep}{os.environ['PATH']}")
     record = _consent_file(tmp_path, "claude", model="sonnet", effort="high")
@@ -242,7 +247,10 @@ def test_unreadPromptOverPipeBuffer_timesOutAtLimit(tmp_path, monkeypatch):
     external_review.main(
         ["--executor", "claude", "--model", "sonnet", "--effort", "high",
          "--family", "anthropic", "--scope", str(tmp_path), "--consent-record", record,
-         "--probe-timeout-seconds", "1", "--review-timeout-seconds", "2"],
+         "--probe-timeout-seconds", "5", "--review-timeout-seconds", "6"],
         stdin=io.StringIO("x" * (1 << 20)), out=out)
-    assert json.loads(out.getvalue())["reason"] == "execution-timeout: 2s", out.getvalue()
-    assert time.monotonic() - start < 5
+    assert json.loads(out.getvalue())["reason"] == "execution-timeout: 6s", out.getvalue()
+    assert started.exists(), "review must reach the blocked-input branch before timing out"
+    with pytest.raises(ProcessLookupError):
+        os.kill(int(started.read_text()), 0)
+    assert time.monotonic() - start < 15

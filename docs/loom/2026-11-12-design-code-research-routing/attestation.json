@@ -1,0 +1,107 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-design-code-research-routing",
+  "content_digest": "787bad70f97c0cb32e71177c769f6a3a6996c692",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/test_design_research_package.py",
+      "artifact": "loom-design/tests/test_design_research_package.py",
+      "result": "pass",
+      "command_digest": "ee4895c4776513cbfb0666a61a9db3879d85b7cd5ce4c478718181cac94a17d7"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/review_code",
+      "vendor": "codex",
+      "model": "inherited/unverified",
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
+      "review_target_sha": "b216d5f8b6b81a13855c7c14e2a9f5f118539f51",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Both original findings remain fixed: unknown decisive context requires conditional recommendations, and edited budget boundaries exercise cm.main. Their implementations are unchanged by integration.",
+        "Verified integrated finalize/publish/probes match the new base; Ship retains both guidance paragraphs. Progress supplies no verification authority; concern-first discovery preserves unknown-collection handling, while finalization still requires actual collection evidence.",
+        "Independently ran all three integration-changed test files: 185 passed in 94.39s, none skipped. Reviewed renewed acceptance evidence and release synchronization; no integration-caused blocker found."
+      ]
+    },
+    {
+      "reviewer": "/root/review_skill",
+      "vendor": "codex",
+      "model": "inherited/unverified",
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
+      "review_target_sha": "b216d5f8b6b81a13855c7c14e2a9f5f118539f51",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS",
+        "user-judgment-leak": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "fixed — Original unsupported-caller ambiguity remains fixed. Both research skills are unchanged since Round 2; conditional recommendations and disclosure of decisive unknown context remain intact. Reviewed integration delta 679aaa8441af7b5485d1d59d30f750b1d1ba3b1a..b216d5f8b6b81a13855c7c14e2a9f5f118539f51; found no integration-caused regression.",
+        "Inspected upstream compatibility research, connected progress/discovery source changes, Ship prose and Round 3 receipts. Elapsed progress supplies no completion authority: the retained intercepted-publication case emits elapsed progress then returns unknown/BLOCK. Integrated publish/finalize/probes source has no delta against the supplied upstream base.",
+        "The design package carries its concern marker; reordered discovery retains unknown collection instead of claiming success. Acceptance explicitly distinguishes the cache-lock collection limitation from successful focused pytest execution, synthetic publication from real delivery, and source assessment from runtime verification. Carryover reasons and original failed-trial history remain visible. No edits, probes or complete-suite execution performed."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "b71bf52776c68db8a61a35820d7abeac7c953a97",
+  "tested_commit": "cdc5da8a193d7c1862e97af01e9ec6a97472dfdc",
+  "reviewed_commit": "b216d5f8b6b81a13855c7c14e2a9f5f118539f51",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}

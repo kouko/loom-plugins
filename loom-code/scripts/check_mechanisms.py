@@ -706,14 +706,16 @@ def run_measure(repo: Path) -> int:
     # shared editable diagrams are admitted in release 3.53.0 with an R3
     # budget-exception entry in loom-workflow 5.17.0;
     # optional engineering research is admitted in release 3.60.0 with
-    # matching skill/tool exceptions in loom-workflow 5.21.0.
-    if skill_count > 25:
-        print(f"RED: skill count {skill_count} exceeds the loom budget of 25")
+    # matching skill/tool exceptions in loom-workflow 5.21.0;
+    # separately owned design research admits one more skill with matching
+    # skill/tool exceptions in the design/code research release packet.
+    if skill_count > 26:
+        print(f"RED: skill count {skill_count} exceeds the loom budget of 26")
     if artifact_types > 8:
         print(f"RED: artifact-type count {artifact_types} exceeds the per-change budget of 8")
     print(f"session-start word count: {words}")
 
-    exit_code = 1 if (skill_count > 25 or artifact_types > 8) else 0
+    exit_code = 1 if (skill_count > 26 or artifact_types > 8) else 0
     if words < 0:
         print("RED: no loom-code/hooks/session-start to measure; the injection "
               "budget cannot be recomputed")

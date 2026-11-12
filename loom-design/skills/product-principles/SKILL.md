@@ -7,6 +7,11 @@ version: 1.0.0
 
 ## What this tool does
 
+When an outcome priority depends on a consequential evidence gap, identify
+that decision and use `loom-design:design-research` as needed. Reuse adequate
+evidence directly; return findings or uncertainty to this task while preserving
+the user's preferences, authorization and authority to confirm principles.
+
 Relative paths in this document are relative to this skill's own directory.
 
 Deliver local documents with actual absolute paths from the active worktree or
