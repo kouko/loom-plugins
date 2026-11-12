@@ -75,8 +75,15 @@ answers. A reported preference is not observed behavior; inference is neither
 consent nor feasibility evidence. Stop when support is sufficient; otherwise
 return the consequential unknown, even when resolving it needs excluded work.
 
-For a material choice, identify credible alternatives, including the current
-approach where viable. Choose common criteria relevant to the outcome: for
+When proposing or materially restructuring an important design solution,
+actively check for a smaller alternative that preserves the same confirmed
+outcomes and mandatory constraints, including applicable correctness, security,
+accessibility and compatibility requirements. Compare keeping the current
+approach, narrowing user steps or roles, removing unnecessary elements, or
+combining overlapping responsibilities where applicable; do not require a quota
+of alternatives or deletion. For this and other material choices, identify
+credible alternatives, including the current approach where viable. Choose
+common criteria relevant to the outcome: for
 example affected users' effort, accessibility, reversibility, operational
 burden or architectural boundaries. Separate mandatory constraints from
 preferences and source-supported facts from inference and unknowns. Apply the
@@ -88,6 +95,12 @@ choice. Disclose decision-critical unverified context before recommending. If a
 preference reverses with an unknown condition, give conditional alternatives or
 leave it unresolved; investigation tools do not establish the target caller,
 workflow or runtime. Missing comparative evidence does not prove superiority.
+Explain the smaller shape and burden removed, or the concrete reason complexity
+is necessary, in the retained findings and decision impact. Revisit research
+only when a consequential unresolved premise could change this comparison;
+stop with adequate support or return the explicit unknown when permitted inquiry
+cannot settle it. No fixed rounds are required; routine facts and reuse of
+adequate evidence still return directly.
 
 ## Retain and continue the conclusion
 
