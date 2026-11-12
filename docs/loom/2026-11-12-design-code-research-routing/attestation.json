@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-12-design-code-research-routing",
-  "content_digest": "f6a963d7d67d0b3c39ca8322a254da20297a12ed",
+  "content_digest": "787bad70f97c0cb32e71177c769f6a3a6996c692",
   "executions": [
     {
       "kind": "package-tests",
@@ -25,8 +25,8 @@
       "model": "inherited/unverified",
       "verdict": "PASS",
       "lens": "code",
-      "reviewed_sha": "70a05fd73b86c6629a89b816fc45a3ad14a509ed",
-      "review_target_sha": "679aaa8441af7b5485d1d59d30f750b1d1ba3b1a",
+      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
+      "review_target_sha": "b216d5f8b6b81a13855c7c14e2a9f5f118539f51",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
@@ -43,9 +43,9 @@
       },
       "findings": [],
       "notes": [
-        "Fixed — unsupported decisive caller premise: both skills now require disclosure before recommending and conditional alternatives when unknown context reverses preference. Retained initial-choice and independent acceptance evidence demonstrate this bounded behavior; the original partial result remains preserved.",
-        "Fixed — budget tests bypassing entry: both edited 26/27 cases now exercise cm.main with --measure, retaining observable counts, exit statuses and rejection output. Independently ran the changed test file: 71 passed in 3.17s, none skipped.",
-        "Round 2 verified only the fix delta and prior findings. Acceptance claims remain limited to explicit package loading and bounded trials; no universal quality or automatic activation guarantee is inferred."
+        "Both original findings remain fixed: unknown decisive context requires conditional recommendations, and edited budget boundaries exercise cm.main. Their implementations are unchanged by integration.",
+        "Verified integrated finalize/publish/probes match the new base; Ship retains both guidance paragraphs. Progress supplies no verification authority; concern-first discovery preserves unknown-collection handling, while finalization still requires actual collection evidence.",
+        "Independently ran all three integration-changed test files: 185 passed in 94.39s, none skipped. Reviewed renewed acceptance evidence and release synchronization; no integration-caused blocker found."
       ]
     },
     {
@@ -54,8 +54,8 @@
       "model": "inherited/unverified",
       "verdict": "PASS",
       "lens": "skill",
-      "reviewed_sha": "70a05fd73b86c6629a89b816fc45a3ad14a509ed",
-      "review_target_sha": "679aaa8441af7b5485d1d59d30f750b1d1ba3b1a",
+      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
+      "review_target_sha": "b216d5f8b6b81a13855c7c14e2a9f5f118539f51",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -67,17 +67,17 @@
       },
       "findings": [],
       "notes": [
-        "fixed — Original important ambiguity finding at engineering-research/SKILL.md:87. Both research skills now require disclosure of decision-critical unknown context before recommending, conditional alternatives when that context reverses preference, and separation of investigation tools from target runtime assumptions. This replaces the ambiguous tentative-choice permission without adding stage complexity.",
-        "Read fix delta 9c898bfadf64abc15d25a5f02f1e33ae3fe3d79c..679aaa8441af7b5485d1d59d30f750b1d1ba3b1a and retained Round 2 evidence. The inspected initial engineering record identifies unspecified caller context before its conditional recommendations; witness engineering and design records likewise retain decisive unknowns. The original unsupported preference and historical partly result remain disclosed.",
-        "The evidence distinguishes supplied cold-actor provenance from independently inspected content and rerun operations, and limits conclusions to bounded cases. Carryover reasons for unchanged trigger, authority and continuing-record behavior are explicit. No new issue caused by the skill fix was found; no artifacts were edited, probes executed or complete suite rerun."
+        "fixed — Original unsupported-caller ambiguity remains fixed. Both research skills are unchanged since Round 2; conditional recommendations and disclosure of decisive unknown context remain intact. Reviewed integration delta 679aaa8441af7b5485d1d59d30f750b1d1ba3b1a..b216d5f8b6b81a13855c7c14e2a9f5f118539f51; found no integration-caused regression.",
+        "Inspected upstream compatibility research, connected progress/discovery source changes, Ship prose and Round 3 receipts. Elapsed progress supplies no completion authority: the retained intercepted-publication case emits elapsed progress then returns unknown/BLOCK. Integrated publish/finalize/probes source has no delta against the supplied upstream base.",
+        "The design package carries its concern marker; reordered discovery retains unknown collection instead of claiming success. Acceptance explicitly distinguishes the cache-lock collection limitation from successful focused pytest execution, synthetic publication from real delivery, and source assessment from runtime verification. Carryover reasons and original failed-trial history remain visible. No edits, probes or complete-suite execution performed."
       ]
     }
   ],
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "b71bf52776c68db8a61a35820d7abeac7c953a97",
-  "tested_commit": "1adb52d239d0a05677b05150e45e9eceff41d065",
-  "reviewed_commit": "679aaa8441af7b5485d1d59d30f750b1d1ba3b1a",
+  "tested_commit": "cdc5da8a193d7c1862e97af01e9ec6a97472dfdc",
+  "reviewed_commit": "b216d5f8b6b81a13855c7c14e2a9f5f118539f51",
   "acceptance_status": [
     {
       "acceptance": 1,
