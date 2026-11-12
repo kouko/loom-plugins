@@ -1,0 +1,107 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-design-code-research-routing",
+  "content_digest": "f6a963d7d67d0b3c39ca8322a254da20297a12ed",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/test_design_research_package.py",
+      "artifact": "loom-design/tests/test_design_research_package.py",
+      "result": "pass",
+      "command_digest": "ee4895c4776513cbfb0666a61a9db3879d85b7cd5ce4c478718181cac94a17d7"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/review_code",
+      "vendor": "codex",
+      "model": "inherited/unverified",
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "70a05fd73b86c6629a89b816fc45a3ad14a509ed",
+      "review_target_sha": "679aaa8441af7b5485d1d59d30f750b1d1ba3b1a",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Fixed — unsupported decisive caller premise: both skills now require disclosure before recommending and conditional alternatives when unknown context reverses preference. Retained initial-choice and independent acceptance evidence demonstrate this bounded behavior; the original partial result remains preserved.",
+        "Fixed — budget tests bypassing entry: both edited 26/27 cases now exercise cm.main with --measure, retaining observable counts, exit statuses and rejection output. Independently ran the changed test file: 71 passed in 3.17s, none skipped.",
+        "Round 2 verified only the fix delta and prior findings. Acceptance claims remain limited to explicit package loading and bounded trials; no universal quality or automatic activation guarantee is inferred."
+      ]
+    },
+    {
+      "reviewer": "/root/review_skill",
+      "vendor": "codex",
+      "model": "inherited/unverified",
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "70a05fd73b86c6629a89b816fc45a3ad14a509ed",
+      "review_target_sha": "679aaa8441af7b5485d1d59d30f750b1d1ba3b1a",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS",
+        "user-judgment-leak": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "fixed — Original important ambiguity finding at engineering-research/SKILL.md:87. Both research skills now require disclosure of decision-critical unknown context before recommending, conditional alternatives when that context reverses preference, and separation of investigation tools from target runtime assumptions. This replaces the ambiguous tentative-choice permission without adding stage complexity.",
+        "Read fix delta 9c898bfadf64abc15d25a5f02f1e33ae3fe3d79c..679aaa8441af7b5485d1d59d30f750b1d1ba3b1a and retained Round 2 evidence. The inspected initial engineering record identifies unspecified caller context before its conditional recommendations; witness engineering and design records likewise retain decisive unknowns. The original unsupported preference and historical partly result remain disclosed.",
+        "The evidence distinguishes supplied cold-actor provenance from independently inspected content and rerun operations, and limits conclusions to bounded cases. Carryover reasons for unchanged trigger, authority and continuing-record behavior are explicit. No new issue caused by the skill fix was found; no artifacts were edited, probes executed or complete suite rerun."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "b71bf52776c68db8a61a35820d7abeac7c953a97",
+  "tested_commit": "1adb52d239d0a05677b05150e45e9eceff41d065",
+  "reviewed_commit": "679aaa8441af7b5485d1d59d30f750b1d1ba3b1a",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}
