@@ -1,6 +1,6 @@
 # Optional preparation JSON — independent acceptance evidence
 
-Tried on 2026-11-13, in a clean copy of the project at cf1deadd98b1593370fcc606a2d0226c917cff9d.
+Tried on 2026-11-13, in a clean copy of the project at 84297c3adff32f822810365e110895aea9905617.
 
 The final clean-copy recheck is recorded below. Initial functional execution and its unchanged carried evidence used 468a1679fea7cd13efff79997290a6efbe6f1dd9.
 
@@ -68,3 +68,12 @@ Clean copy: `/private/tmp/loom-json-acceptance-clean`, created with `git clone -
 - Read all initial answers against frozen outcome, cause/rule and advisory propositions: zero interpretation disagreements identified. Final answers agree with actual final pass exits. Answers and the declared controlled corrections remain separately retained rather than replacing first answers. Independently rehashed three historical artifacts in all 24 task copies plus all four corrected T2 plan copies: **76 checks, zero mismatches** against the unchanged oracle.
 - Important finding closed for the deliverable by the separately identified complete R2 comparison. **R1 remains partly complete**, including its original stream-detail gap and sequencing deviations; R2 does not repair or erase R1 history. The final Acceptance 3 result is **works** because the requested same-task, four-metric comparison now has complete traceable supplemental measurements and explicit limitations. This is not a waiver or a performance-improvement verdict.
 - Remaining limitations: same operators already knew R1; each second mode knew its first mode; task starts and corrections are prescribed. No blindness, spontaneous error-rate, population gain, automatic-routing, other-host, token or time claim is established. These limits are disclosed rather than hidden or pooled into an inflated independent sample.
+
+## Re-run on 2026-11-13, at 84297c3adff32f822810365e110895aea9905617 — advanced-trunk integration
+
+- Created another fresh clone `/private/tmp/loom-json-acceptance-integration-clean`; independently resolved HEAD to the full SHA above. Read `evidence/integration.md` and checked the actual integration diff rather than relying on the implementer's summary.
+- Compared `cf1deadd98b1593370fcc606a2d0226c917cff9d..84297c3adff32f822810365e110895aea9905617` under `loom-code/scripts` and `loom-code/contract`: empty diff, not merely semantic similarity. Upstream research/design changes and the concurrent release packet do not change the tested JSON runtime.
+- 1: carried over — original complete functional checks remain applicable to identical runtime bytes. Additionally executed the actual current clean-copy launcher: empty readable plan passed/0; charter-only plan blocked/1; missing plan operand error/2; missing intake operands error/2; intake outside Git error/2. Every response parsed as JSON and stderr was empty.
+- 2: carried over — identical runtime/contract bytes retain the earlier baseline comparisons and 48 focused test results. Independently ran `python3 scripts/sync_codex_manifests.py --all --check`: exit 0. Inspected the SSOT and generated release surfaces, root and three language READMEs, CHANGELOG and CURRENT_VERSION test pin: candidate is now 3.72.0, preserving upstream 3.71.0. This release collision resolution changes metadata rather than the legacy command behavior. Final full-suite execution remains the parent's/finalization's obligation; no new full-suite result is claimed here.
+- 3: carried over — the comparison artifacts, frozen oracle and runtime are unchanged; neither historical operator round was rerun or relabeled as 3.72.0. R1's partly-complete history and R2's complete supplemental capture remain exactly the evidence judged in the preceding section. No metric, operation counter or limitation was reset.
+- No new acceptance findings. All three final results remain works; no skipped step or dismissed important finding was supplied. Only the acceptance report and this evidence record were edited by acceptance.

@@ -1,6 +1,6 @@
 # 準備檢查的結構化結果 — 實際驗收結果
 
-Tried on 2026-11-13, in a clean copy of the project at cf1deadd98b1593370fcc606a2d0226c917cff9d. How I tried each line and what came back: `docs/loom/2026-11-12-cli-json-pilot/evidence/acceptance-test-evidence.md`.
+Tried on 2026-11-13, in a clean copy of the project at 84297c3adff32f822810365e110895aea9905617. How I tried each line and what came back: `docs/loom/2026-11-12-cli-json-pilot/evidence/acceptance-test-evidence.md`.
 
 ## 逐條驗收
 
@@ -8,7 +8,7 @@ Tried on 2026-11-13, in a clean copy of the project at cf1deadd98b1593370fcc606a
 |---|---|---|---|---|
 | 1 | plan 與 intake 可選擇輸出可被程式穩定解析的結果，能辨識通過、規則阻擋與呼叫錯誤，以及對應的診斷資訊。 | works | 兩個命令的通過、阻擋、呼叫錯誤及內部錯誤均可解析，提示不會混入輸出。 | carried over — 補證沒有更動程式 |
 | 2 | 既有文字呼叫的輸出、退出狀態、檢查範圍及授權與驗證條件保持相容。 | works | 針對測試通過；另直接對照原版，六種既有呼叫的輸出與退出狀態完全相同；完整自動測試仍會在接受變更前執行並在失敗時阻擋。 | carried over — 補證沒有更動程式 |
-| 3 | 同一組真實任務的文字與結構化操作有可追溯比較，列出判讀錯誤、修正次數、操作步數及輸出量，明列限制與未改善項目。 | works | 另行標明的補測完整保存四項量測與初始說明的分流輸出；原輪缺漏仍保留，沒有宣稱效能改善。 | re-tested |
+| 3 | 同一組真實任務的文字與結構化操作有可追溯比較，列出判讀錯誤、修正次數、操作步數及輸出量，明列限制與未改善項目。 | works | 另行標明的補測完整保存四項量測與初始說明的分流輸出；原輪缺漏仍保留，沒有宣稱效能改善。 | carried over — 整合沒有更動量測或程式 |
 
 ## 對你既有的資料做了什麼
 
