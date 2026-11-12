@@ -28,6 +28,12 @@ REQ-6 — Observable validation
 
 - agent-decided — technical re-look after recurrence: the initial single-test boundary missed a shared sibling CLI factory. Repair the shared short-deadline fixtures and all their existing consumers as one bounded obligation, preserving actual stdin EOF detection, exited-parent/lingering-child distinctions and process cleanup. Reject higher deadlines, bypassed preflights, fewer workers and weakened assertions. Longer-budget progress fixtures are a different condition and remain unchanged. No research requirement or review-episode reset follows; only one terminal functional digest remains.
 
+Supplemental acceptance for this added shared-factory obligation must check a
+clean package load plus the newly affected model-list EOF, exit/descendant and
+review-stage protocol cases. It retains the completed design-trial evidence
+because no research guidance or production runner changes; it is not another
+execution of that completed trial task or a reset of its task continuity.
+
 ## Alternatives considered
 - No skill edit, trials only: leaves the installed acquisition scope inconsistent with the requested boundary.
 - Selection hints entirely inline: viable if shorter after implementation; prefer this over a separate reference when the latter adds no meaningful reading boundary.
