@@ -26,6 +26,8 @@ REQ-6 — Observable validation
 - agent-decided — release: bump only loom-design minor version and synchronize its derived manifests, changelog, localized README strings and affected pins before final review.
 - agent-decided — integration repair after first finalization: an existing blocked-input timeout regression expired in its five-second preflight instead of reaching its six-second review branch. Remove the fake CLI's Python cold-start dependency while preserving real subprocess/pipe, deadline and cleanup checks. This changes only test machinery, not research requirements or production external review; the existing design trial evidence remains applicable.
 
+- agent-decided — technical re-look after recurrence: the initial single-test boundary missed a shared sibling CLI factory. Repair the shared short-deadline fixtures and all their existing consumers as one bounded obligation, preserving actual stdin EOF detection, exited-parent/lingering-child distinctions and process cleanup. Reject higher deadlines, bypassed preflights, fewer workers and weakened assertions. Longer-budget progress fixtures are a different condition and remain unchanged. No research requirement or review-episode reset follows; only one terminal functional digest remains.
+
 ## Alternatives considered
 - No skill edit, trials only: leaves the installed acquisition scope inconsistent with the requested boundary.
 - Selection hints entirely inline: viable if shorter after implementation; prefer this over a separate reference when the latter adds no meaningful reading boundary.

@@ -26,6 +26,13 @@ charter: 1.1
 - Test: A6 positive: preflight-reaches-review; boundary: unread-large-prompt-times-out. Existing full-suite failure is RED; retain the 1 MiB input, distinct timeouts, review-start marker, cleanup and elapsed assertions.
 - Risk: agent-decided — preserve existing test coverage; remove short-deadline fake Python startup dependency without changing production timeout behavior. Defect-class sweep found one applicable instance in changed files plus the failing test; unrelated changelog cold-install mentions excluded.
 
+### Wave 4 — technical re-look of the shared fixture boundary
+
+**W4-01 Remove startup timing from shared CLI timeout fixtures** after: W3-01 acceptance: 6
+- Files: loom-code/tests/test_external_review.py (exercised entries: external_review.discover and external_review.execute), docs/loom/2026-11-12-design-research-method-selection/evidence/shared-fixture-relook.md
+- Test: A6 positive: shared-fake-consumers-reach-intended-stage; boundary: eof-exit-descendant-timeouts. Preserve all existing entry-level assertions, deadlines, model-list EOF detection, descendant cleanup and review-stage coverage; run the complete existing module and bounded concurrent repetitions.
+- Risk: agent-decided — preserve test_external_review.py coverage. Re-look moves the repair unit from one failing test to shared short-deadline CLI factories and every consumer. Longer-budget progress fixtures stay unchanged; no production changes or new harness.
+
 ## Simplicity check
 - Inline selection guidance instead of a separate reference when it creates no useful reading boundary — taken
 - No additional smaller shape found by the independent reviewer — declined: reviewer returned PASS with no deletion findings
@@ -38,3 +45,4 @@ charter: 1.1
 2. agent-decided — The requested Claude Code proposal review failed preflight with no usable review; retain that limitation. Native independent specification, plan, acceptance and closing reviews remain required.
 3. agent-decided — Preserve current stage callers and template; modify only design research acquisition/selection, not engineering research or station semantics.
 4. agent-decided — First finalization failed an unchanged blocked-input regression during preflight. Repair its test double only; no new requirement, production external-review behavior, installed code-plugin change or retry-budget reset. Existing design trials remain applicable.
+5. agent-decided — Recurrence exposed the shared-factory boundary. Replace applicable shared fixtures while preserving protocol/EOF semantics, not individual failures. The added shared-factory obligation resets neither the review episode nor task retry counts.
