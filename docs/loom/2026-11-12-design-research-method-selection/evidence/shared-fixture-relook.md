@@ -70,7 +70,29 @@ unchanged. No tests or assertion harness were added.
 - Final handshake shape, three concurrent critical-case runs (the same nine
   cases per process): 9 passed in 31.49s, 9 passed in 32.20s and 9 passed in
   30.59s. No worker setting or deadline changed.
-- Committed-byte mutation receipts follow in a separate evidence update.
+- Final committed-byte checks used `git show 5eee5722` for the complete test
+  module, production runner and `prose_pin.py`. Every copied test module was
+  byte-equal to that commit before execution (SHA-256
+  `8e0e1bc0adbc6722a7fcf5950ebc19ada260ce1ce2297cb190b3c20b26c0cb04`).
+  Only the copied production runner changed; repository production and test
+  bytes were untouched. Commands used the existing test selections with
+  `python3 -m pytest -q --confcutdir <copy> <copy>/test_external_review.py -k <selection>`
+  and `PYTHONPATH=<copy>`; no new test program or harness was introduced.
+
+| Copied-runner mutation | Existing selection | Observed assertion failure |
+| --- | --- | --- |
+| Always close stdin after writing, including before response id 2 | `keeps_stdin_open` | 1 failed in 2.90s: candidates `[]` rather than `gpt-a`, `gpt-b`; discovery error reports exit 0. |
+| Send the review prompt during the preflight tuple instead of `PROBE_PROMPT` | `review_stage_times_out` | 1 failed in 5.11s: observed preflight timeout 5s rather than review timeout 6s. |
+| Replace the model/list nonzero-exit diagnostic with exit 0 | `exit_before_answer` | 2 failed, 1 passed in 9.73s: both expected exit-3 modes reject exit-0 diagnostics; the genuine exit-0 case still passes. |
+
+The committed-byte mutation output is retained in temporary local copies
+`committed-shared-fixture-mutations-unpi4w57/{early-eof,wrong-phase,wrong-exit}/receipt.txt`
+under the system temporary directory; these paths are receipts, not package
+dependencies. The failing mutation assertions are the intended outcomes.
+Three additional concurrent processes ran the same committed-byte early-EOF
+mutation: each failed the existing candidates assertion, in 3.29s, 2.70s and
+3.82s. This checks EOF detection under bounded concurrent load as well as the
+unmutated concurrent success runs above.
 
 ## Limits
 
