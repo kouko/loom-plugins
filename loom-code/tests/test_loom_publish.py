@@ -198,7 +198,7 @@ class ExternalCalls:
         raise AssertionError(argv)
 
 
-def invoke(tmp_path: Path, monkeypatch, calls: ExternalCalls, *extra: str):
+def invoke(tmp_path: Path, monkeypatch, calls: ExternalCalls, *extra: str, err_stream=None):
     repo = repository(tmp_path)
     body = tmp_path / "body.md"
     body.write_text(contextual_body(), encoding="utf-8")
@@ -211,7 +211,7 @@ def invoke(tmp_path: Path, monkeypatch, calls: ExternalCalls, *extra: str):
         loom_checker, "resolve_publish_executable",
         trusted_executable,
     )
-    out, err = StringIO(), StringIO()
+    out, err = StringIO(), err_stream if err_stream is not None else StringIO()
     argv = [
         "--confirm-authorized", "--title", "feat(loom): publish safely",
         "--body-file", str(body), *extra,
@@ -924,6 +924,96 @@ def test_retry_after_pr_creation_failure_does_not_repush(tmp_path: Path, monkeyp
     assert second_rc == 0, err.getvalue()
     assert sum("push" in call for call in calls.calls) == first_pushes
     assert "pull/1" in out.getvalue()
+
+
+def test_publish_progress_before_wait(tmp_path: Path, monkeypatch) -> None:
+    err = StringIO()
+    flushed = []
+    monkeypatch.setattr(err, "flush", lambda: flushed.append(err.getvalue()))
+
+    class ObservedCalls(ExternalCalls):
+        def __call__(self, argv, **kwargs):
+            if "checks" in argv:
+                assert flushed and flushed[0] == "publish: CI observation started\n"
+            return super().__call__(argv, **kwargs)
+
+    calls = ObservedCalls("")
+    calls.required_checks.insert(0, [])
+
+    def wait(seconds):
+        assert seconds == 10
+        assert flushed == ["publish: CI observation started\n",
+                           "publish: CI observation started\npublish: CI registration-wait\n"]
+
+    monkeypatch.setattr(loom_checker, "wait_publish_interval", wait)
+    _, rc, _, _ = invoke(tmp_path, monkeypatch, calls, err_stream=err)
+    assert rc == 0
+    assert flushed[-1].endswith("publish: CI passed\n")
+
+
+def test_publish_progress_cadence(tmp_path: Path, monkeypatch) -> None:
+    elapsed = [0]
+    monkeypatch.setattr(loom_checker.time, "monotonic", lambda: elapsed[0])
+    monkeypatch.setattr(loom_checker, "wait_publish_interval",
+                        lambda seconds: elapsed.__setitem__(0, elapsed[0] + seconds))
+    calls = ExternalCalls("")
+    pending = [{"name": "private-check", "state": "IN_PROGRESS", "bucket": "pending"}]
+    calls.required_checks = [[], pending] + [pending] * 12 + calls.required_checks
+    _, rc, _, err = invoke(tmp_path, monkeypatch, calls)
+    assert rc == 0
+    assert err.splitlines() == [
+        "publish: CI observation started", "publish: CI registration-wait",
+        "publish: CI pending", "publish: CI pending; elapsed 60s",
+        "publish: CI pending; elapsed 120s", "publish: CI passed",
+    ]
+
+
+@pytest.mark.parametrize("state,terminal,rc", [
+    ("SUCCESS", "passed", 0), ("empty", "no-required-checks", 0),
+    ("FAILURE", "failed", 1), ("unknown", "unconfirmed", 1),
+])
+def test_publish_stdout_unchanged(tmp_path: Path, monkeypatch, state, terminal, rc) -> None:
+    calls = ExternalCalls("")
+    calls.required_checks = ([[]] * 7 if state == "empty" else
+                             [[{"name": "gate", "state": state,
+                                "bucket": "pass" if rc == 0 else "unknown"}]])
+    monkeypatch.setattr(loom_checker, "wait_publish_interval", lambda _: None)
+    _, actual, out, err = invoke(tmp_path, monkeypatch, calls)
+    assert actual == rc
+    expected = (f"Verification valid for {calls.head}\n"
+                "Publication target: github.com/example/project base main\n"
+                "Published PR: https://github.com/example/project/pull/1\n")
+    expected += {"SUCCESS": "Required CI passed\n",
+                 "empty": "No required checks registered\n"}.get(state, "")
+    assert out == expected
+    assert f"publish: CI {terminal}\n" in err
+
+
+@pytest.mark.parametrize("failure", ["write", "flush"])
+def test_publish_progress_failure_preserves_authority(tmp_path: Path, monkeypatch, failure) -> None:
+    err = StringIO()
+    original_write = err.write
+    attempts = []
+
+    def write(text):
+        if text.startswith("publish: CI "):
+            attempts.append(text)
+            if failure == "write":
+                raise OSError("progress unavailable")
+        return original_write(text)
+
+    def flush():
+        raise BrokenPipeError("progress unavailable")
+
+    monkeypatch.setattr(err, "write", write)
+    monkeypatch.setattr(err, "flush", flush)
+    calls = ExternalCalls("")
+    calls.required_checks = [[{"name": "gate", "state": "FAILURE", "bucket": "fail"}]]
+    _, rc, out, errors = invoke(tmp_path, monkeypatch, calls, err_stream=err)
+    assert attempts
+    assert rc == 1 and "BLOCK" in errors and "Required CI passed" not in out
+    assert sum("push" in call for call in calls.calls) == 1
+    assert sum("create" in call for call in calls.calls) == 1
 
 
 def test_publish_observes_required_ci_immediately_then_every_ten_seconds(

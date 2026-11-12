@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.67.0] — 2026-11-12 — expose bounded CLI progress and avoid irrelevant collection
+
+- Add flushed stderr progress for publish CI observation and finalization verification stages while preserving stdout, exit behavior, authorization and evidence validation. Stage success requires accepted evidence; progress does not establish final attestation success.
+- Check concern markers before graduated-probe test collection. Preserve marked/moved-path handling, unavailable-collection policy and all required verification.
+- Document first-rollout CLI applicability and preserved delivery/dispatch JSON. Broader help, typed errors and global JSON migration remain future work; host hook protocols are unchanged.
+- Keep conversion outside production after the [local comparison](../docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-comparison.md): stricter parsing still needs caller-supplied identity and context and demonstrates no reduction in caller operations, latency or token cost.
+
 ## [3.66.0] — 2026-11-11 — clarify existing planning intake observations
 
 - Clarify existing intake exit codes and blocking reasons before and after planning, including confirmation early exits, unknown crash completeness and recovery/rerun. Preserve the text CLI and all existing checks.
