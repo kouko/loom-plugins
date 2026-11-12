@@ -33,6 +33,13 @@ charter: 1.1
 - Test: A3 positive: two-operator-matched-results; boundary: carryover-and-non-improvement-disclosure.
 - Risk: agent-decided — REQ-3 comparison design; dispatch fresh non-implementing operators sequentially with opposite mode order, keep the oracle private until scoring, retain failures and recomputable counts. Independent acceptance judges the results; the implementer produces artifacts, never a verdict.
 
+### Wave 4 — Integrate the advanced research release
+
+**W4-01 Preserve advanced trunk and synchronize the JSON release packet** after: W3-01 acceptance: 1, 2, 3
+- Files: README.md, loom-code/CHANGELOG.md, loom-code/.claude-plugin/plugin.json (SSOT), loom-code/.codex-plugin/plugin.json and loom-code/plugin.json and loom-code/package.json (generated), loom-code/README.md and README.zh-TW.md and README.ja.md, loom-code/tests/test_write_plan_station_text.py (CURRENT_VERSION), docs/loom/2026-11-12-cli-json-pilot/evidence/integration.md, docs/loom/2026-11-12-cli-json-pilot/evidence/integration-changed-paths.txt
+- Test: A1 positive: release-3-72-json-guidance; boundary: upstream-3-71-entry-preserved. A2 positive: focused-cli-and-manifest-parity; boundary: unchanged-json-runtime. A3 positive: historical-candidate-evidence-retained; boundary: no-relabelled-comparison-run.
+- Risk: agent-decided — REQ-1/2/3 scope remains unchanged; merge origin/main b9ebc787dc4e3c73d1ab0257302b1516b2be3550 after sync-trunk reported README/CHANGELOG conflicts without mutation. Preserve upstream research/design content and its 3.71.0 release, renumber this JSON packet to 3.72.0, and retain candidate 2cef4016 evidence as historical.
+
 ## Simplicity check
 
 - none found
@@ -53,3 +60,4 @@ charter: 1.1
 8. If an operator cannot complete a task, retain the incomplete result and actual resource boundary; do not manufacture interpretation counts or silently replace the operator. An alternative run needs a separately identified record and disclosed rationale.
 9. No tests, adversarial work, independent acceptance or package suite are skipped. Build uses the locked complete runner, synchronizes trunk first, and reruns committed adversarial programs; finalization repeats checks on the reviewed candidate. No new paid external review is selected.
 10. Required spec+adversarial review passed before planning. Engineering is exempt from decision point ②; decision point ① is already confirmed with automatic publication authorization. Merge remains a separate acceptance; retain every existing worktree.
+11. PR 148 advanced main to b9ebc787dc4e3c73d1ab0257302b1516b2be3550 and consumed 3.71.0. sync-trunk stopped before merge. W4 preserves upstream content and original comparison records without new JSON behavior. No closing-review episode has begun.
