@@ -1,0 +1,20 @@
+attack_points: {found: 18, earned_a_program: 0, committed: 0}
+adversarial:
+  - command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_preparation_json.py
+    artifact: loom-code/tests/test_preparation_json.py
+probes:
+  - artifact: loom-code/tests/test_preparation_json.py
+    status: reused
+    reason: Public-entry tests cover JSON integrity, blockers, notices, exceptions and unchanged callers; added only the required concern comment.
+findings: []
+attempts:
+  - command: uv run --isolated --with-requirements requirements-package-tests.lock python /private/tmp/loom_json_trial.py
+    artifact: /private/tmp/loom_json_trial.py
+    result: 18 trials held; temporary executable retained for inspection, not a committed program.
+    cases: missing plan operand; duplicate selector; earlier selector plus extra operand; help plus selector; literal selector filename; literal help filename; Unicode newline quote filename; missing newline quote filename; directory operand; missing intake operands; incomplete intake operands; traversal change-id; Unicode change-id; extra intake operand; intake help plus selector; intake outside repository; RuntimeError after hostile notice; OSError after hostile notice.
+  - command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_preparation_json.py loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_loom_checker_modules.py -q
+    result: 48 passed in 10.59s
+limitations:
+  - No declared mutation/fuzz tooling found; executable boundary and dependency-failure trials used.
+  - Intent, plan, docs and evidence have no dedicated adversarial recipe. Spec requirements were read; no executable specification escape was found.
+  - Initial trial harness attempts with system python lacked package path and yaml; corrected harness and locked uv invocation passed.

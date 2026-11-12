@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: /private/tmp/loom-cli-json-pilot
+plugins: xdist-3.8.0
+collected 4 items
+
+loom-code/tests/test_preparation_json.py ....                            [100%]
+
+============================== 4 passed in 2.40s ===============================
