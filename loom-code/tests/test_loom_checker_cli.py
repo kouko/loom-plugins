@@ -7,6 +7,7 @@ rename is a deliberate, visible edit rather than silent drift.
 """
 from __future__ import annotations
 
+import io
 import json
 import runpy
 import subprocess
@@ -419,3 +420,122 @@ def test_descriptions_name_their_load_bearing_condition() -> None:
         description = described[rule_id]
         missing = [word for word in words if word not in description]
         assert not missing, f"{rule_id} description omits {missing}: {description!r}"
+
+
+# Self-service help is a public-entry contract, not handler-specific parsing.
+def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> None:
+    overall = run_checker("--help", cwd=tmp_path).stdout
+    required = {
+        "finalize-review": ["--input", "reviewer", "vendor", "model", "lens",
+                            "verdict", "findings", "adversarial", "no_program",
+                            "review_target_sha", "reviewed_sha", "diff base",
+                            "skills/closing-review/SKILL.md"],
+        "publish": ["--intent", "--confirm-authorized", "--title", "--body-file",
+                    "## Context", "## Intended outcome", "## Scope", "## Decisions",
+                    "## Implementation", "## Behaviour change", "## Verification",
+                    "## Risks and rollback", "## Follow-ups", "Verification status:",
+                    "skills/ship/SKILL.md"],
+        "delivery": ["--goal", "local", "published", "merged", "--intent", "--json",
+                     "state", "reason", "next", "evidence", "complete"],
+    }
+    for command, words in required.items():
+        assert f"{command} --help" in overall
+        for flag in ("--help", "-h"):
+            result = run_checker(command, flag, cwd=tmp_path)
+            assert (result.returncode, result.stderr) == (0, "")
+            assert all(word in result.stdout for word in words), result.stdout
+            assert "No validation or publication" in result.stdout
+            assert "Replace <loom-code>" in result.stdout
+    assert not list(tmp_path.iterdir())
+
+
+def test_exact_help_never_dispatches_handlers(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+    def forbidden(*args):
+        raise AssertionError("help dispatched a handler")
+    for command in ("finalize-review", "publish", "delivery"):
+        monkeypatch.setitem(entry["COMMANDS"], command, forbidden)
+        for flag in ("--help", "-h"):
+            out, err = io.StringIO(), io.StringIO()
+            assert entry["main"]([command, flag], out, err) == 0
+            assert out.getvalue() and not err.getvalue()
+
+
+def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_path: Path) -> None:
+    repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+    malformed = tmp_path / "review.json"
+    malformed.write_text("{", encoding="utf-8")
+    cases = [
+        (["finalize-review"], 2, "finalize-review needs a change-id."),
+        (["finalize-review", "2026-09-09-example", "--input", str(malformed)],
+         2, "cannot read review input:"),
+        (["publish"], 2, "publish: --intent or --confirm-authorized is required"),
+        (["delivery", "--goal", "invalid"], 2, "delivery: --goal must be local, published or merged"),
+    ]
+    for argv, code, diagnostic in cases:
+        result = run_checker(*argv, cwd=repo)
+        assert result.returncode == code and not result.stdout
+        assert result.stderr.startswith(diagnostic)
+        assert result.stderr.count(f'--ready {argv[0]} --help') == 1
+    malformed.write_text("{}", encoding="utf-8")
+    result = run_checker(*cases[1][0], cwd=repo)
+    assert result.returncode == 1 and not result.stdout
+    assert result.stderr.startswith("BLOCK finalize.verdicts: review input has no verdicts\n")
+    assert result.stderr.count("--ready finalize-review --help") == 1
+
+
+def test_help_explains_outcomes_and_authority(tmp_path: Path) -> None:
+    finalize = run_checker("finalize-review", "--help", cwd=tmp_path).stdout
+    publish = run_checker("publish", "--help", cwd=tmp_path).stdout
+    delivery = run_checker("delivery", "--help", cwd=tmp_path).stdout
+    assert "original verdict" in finalize and "clean" in finalize
+    assert "stage" in finalize and "overall" in finalize
+    assert "authorization" in publish and "legacy" in publish
+    assert "No required checks registered" in publish
+    assert "remote write" in publish and "delivery" in publish
+    assert "complete: false" in delivery and "exit 1" in delivery and "exit 2" in delivery
+
+
+def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
+    result = run_checker("delivery", "--goal", "local", "--json", cwd=tmp_path)
+    assert result.returncode == 1
+    observed = json.loads(result.stdout)
+    assert set(observed) == {"state", "reason", "next", "evidence", "complete"}
+    assert observed["complete"] is False and observed["state"] == "unconfirmed"
+    assert result.stderr.count("--ready delivery --help") == 1
+
+
+def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+    for command in ("finalize-review", "publish", "delivery", "push"):
+        for code in (0, 1, 2):
+            def handler(args, out, err):
+                out.write('{"unchanged": true}\n')
+                err.write("original diagnostic\n")
+                return code
+            monkeypatch.setitem(entry["COMMANDS"], command, handler)
+            out, err = io.StringIO(), io.StringIO()
+            assert entry["main"]([command, "--hook"], out, err) == code
+            assert out.getvalue() == '{"unchanged": true}\n'
+            hint_expected = code != 0 and command in {"finalize-review", "publish"}
+            assert ("--help" in err.getvalue()) == hint_expected
+            assert err.getvalue().startswith("original diagnostic\n")
+        def crash(args, out, err):
+            raise RuntimeError("fixture crash")
+        monkeypatch.setitem(entry["COMMANDS"], command, crash)
+        out, err = io.StringIO(), io.StringIO()
+        assert entry["main"]([command], out, err) == 2
+        assert err.getvalue() == "loom_checker internal error: RuntimeError: fixture crash\n"
+        if command == "push":
+            assert entry["main"]([command, "--hook"], io.StringIO(), io.StringIO()) == 0
+
+
+def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
+    for command in ("finalize-review", "publish", "delivery", "unknown"):
+        for args in (("--help", "extra"), ("extra", "--help"), ("-h", "extra")):
+            result = run_checker(command, *args, cwd=tmp_path)
+            assert result.returncode != 0
+            assert "No validation or publication" not in result.stdout
+    hook = run_checker("delivery", "--hook", "--help", cwd=tmp_path)
+    assert (hook.returncode, hook.stdout, hook.stderr) == (
+        2, "", "delivery: use --hook alone or --hook --host claude|codex\n")

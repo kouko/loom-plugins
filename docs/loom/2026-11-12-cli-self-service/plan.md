@@ -15,7 +15,7 @@ charter: 1.1
 ### Wave 2 — Release and reproducible first-use evidence
 
 **W2-01 Document and package the bounded interface** after: W1-01 acceptance: 5
-- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, CHANGELOG.md, README.md, loom-code/tests/test_write_plan_station_text.py, docs/loom/2026-11-12-cli-self-service/evidence/
+- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json and loom-code/package.json (generated), loom-code/CHANGELOG.md, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py, docs/loom/2026-11-12-cli-self-service/evidence/
 - Test: A5 positive: retained-first-attempts; boundary: untested-host-disclosure. Run synchronized-release metadata test and package suite; independent acceptance owns actual operator evidence.
 - Risk: agent-decided — REQ-5 retain raw attempts and limits without measuring unsupported efficiency gains. Bump code minor to 3.68.0; synchronize generated manifests, README and CHANGELOG entry; rewrite existing version pins only where needed.
 
