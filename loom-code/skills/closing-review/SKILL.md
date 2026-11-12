@@ -18,6 +18,12 @@ compaction.
 
 ## 1. Establish the content
 
+When a factual contradiction could change a review conclusion, identify the
+pending decision and use `loom-code:engineering-research` as needed; adequate
+evidence needs no new study. Return findings or uncertainty to review without
+editing artifacts, replacing independent verification or creating missing
+execution evidence; preserve scope and user decisions.
+
 Resolve the branch base, read the confirmed intent and retained plan when present, and list the
 cumulative diff. If only publication metadata changed and a matching
 attestation already exists, call `loom-code:ship` in the same turn unless a

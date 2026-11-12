@@ -68,7 +68,7 @@ def test_code_owns_the_only_discoverable_package_without_design_routing():
 
 def test_code_stations_delegate_research_to_their_bundled_skill():
     root = Path(__file__).resolve().parents[3]
-    for station in ("write-plan", "build", "ship"):
+    for station in ("write-plan", "build", "closing-review", "ship", "maintain"):
         text = (root / f"loom-code/skills/{station}/SKILL.md").read_text()
         calls = set(re.findall(r"`(loom-[\w-]+:engineering-research)`", text))
         assert calls == {"loom-code:engineering-research"}, station

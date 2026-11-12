@@ -9,7 +9,7 @@
 > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
 > 下判斷的 agent 不是寫草稿的那一個。
 
-**Version**: 2.23.0 — 5 個 skill + 1 個可選入口路由。版本資訊見
+**Version**: 2.24.0 — 6 個 skill + 1 個可選入口路由。版本資訊見
 [CHANGELOG.md](CHANGELOG.md)。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -60,7 +60,8 @@ flowchart TD
 | [`product-principles`](skills/product-principles/README.md) | 工具 | `PRINCIPLES.md` | Ratify 產品的常設原則：至少三條有順序的 Non-negotiables，以及一行 `ratified-by: <name> <date>`。 |
 | [`design-system`](skills/design-system/README.md) | 工具 | `DESIGN.md` | Ratify 有 UI 的產品的視覺系統：顏色、字級、間距、形狀與元件 token。 |
 | [`architecture-design`](skills/architecture-design/README.md) | 工具 | `ARCHITECTURE.md` | 和使用者一起設計專案架構：模組邊界、技術選型、資料夾結構、CI 階段，再用守護測試撐住每條規則。 |
-| [`using-loom-design`](skills/using-loom-design/README.md) | 入口路由 | — | 可選：把較廣泛的產品定義請求分派給上面五個 skill 之一。不是前置條件；每個 skill 都能直接呼叫。 |
+| [`design-research`](skills/design-research/README.md) | 工具 | 研究紀錄 | 針對會影響設計決策的證據缺口研究、比較方案，再將發現帶回原任務。 |
+| [`using-loom-design`](skills/using-loom-design/README.md) | 入口路由 | — | 可選：把較廣泛的產品定義請求分派給上面六個 skill 之一。不是前置條件；每個 skill 都能直接呼叫。 |
 
 **常設文件。** 只要 repo 裡沒有 ratify 過的 `PRINCIPLES.md`，`kind: product`
 的變更就會被 loom-code 的 checker（`standing.product-principles-reject`）

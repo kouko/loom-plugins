@@ -10,7 +10,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.23.0 — 5 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.24.0 — 6 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -63,7 +63,8 @@ flowchart TD
 | [`product-principles`](skills/product-principles/README.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
 | [`design-system`](skills/design-system/README.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
 | [`architecture-design`](skills/architecture-design/README.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
-| [`using-loom-design`](skills/using-loom-design/README.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
+| [`design-research`](skills/design-research/README.md) | ツール | 調査記録 | 設計判断に影響する証拠の不足を調べ、選択肢を比較し、結果を元のタスクに戻す。 |
+| [`using-loom-design`](skills/using-loom-design/README.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 6 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
 
 **常設ドキュメント。** リポジトリに ratify 済みの `PRINCIPLES.md` が無い
 間は、`kind: product` の変更を loom-code の checker

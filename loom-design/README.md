@@ -5,12 +5,12 @@
 Skill guides open in English unless a matching translation is available.
 
 > **The front of the Loom flow: two stations turn a rough idea into a
-> confirmed intent and, when the change needs design, a spec; three tools give
-> a product its principles, its visual system and its architecture.** loom-design drafts; it
+> confirmed intent and, when the change needs design, a spec; four tools provide
+> product principles, visual design, architecture and design research.** loom-design drafts; it
 > never grades. Every verdict on what it produces is rendered by
 > `loom-code:closing-review`, by an agent that did not write the draft.
 
-**Version**: 2.23.0 — 5 skills + 1 optional router. See
+**Version**: 2.24.0 — 6 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -54,6 +54,8 @@ diagram use `loom-design`.
   goes straight to `loom-code:write-plan`.
 - **Tools** — `product-principles`, `design-system` and `architecture-design` run when asked, each
   writing one standing document at the project root. They are not steps in the flow.
+- **Research** — `design-research` resolves consequential design evidence gaps as needed,
+  retains applicable sources and conclusions, and returns to the original task.
 
 ## Skills
 
@@ -64,7 +66,8 @@ diagram use `loom-design`.
 | [`product-principles`](skills/product-principles/README.md) | tool | `PRINCIPLES.md` | Ratify the product's standing principles: at least three ordered Non-negotiables and a `ratified-by: <name> <date>` line. |
 | [`design-system`](skills/design-system/README.md) | tool | `DESIGN.md` | Ratify the visual system for a product with a UI: colour, type, spacing, shape and component tokens. |
 | [`architecture-design`](skills/architecture-design/README.md) | tool | `ARCHITECTURE.md` | Design the project's architecture with the user — module boundaries, tech choices, folder layout, CI stages — then back each rule with a guard test. |
-| [`using-loom-design`](skills/using-loom-design/README.md) | router | — | Optional: route a broad product-definition request to one of the five skills above. It is not a prerequisite; each skill can be called directly. |
+| [`design-research`](skills/design-research/README.md) | tool | `docs/loom/research/<date>-<topic>.md` | Investigate design evidence gaps, compare relevant alternatives and return findings within the original task's authority. |
+| [`using-loom-design`](skills/using-loom-design/README.md) | router | — | Optional: route a broad product-definition request to one of the six skills above. It is not a prerequisite; each skill can be called directly. |
 
 **Standing documents.** A `kind: product` change is refused by loom-code's
 checker (`standing.product-principles-reject`) while the repository has no

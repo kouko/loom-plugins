@@ -49,13 +49,14 @@ REQUIRED_LOOM_WORKFLOW_SKILLS = {
     "using-loom-workflow",
 }
 
-# loom-design's whole skill surface: two stations, three tools, one optional router.
+# loom-design's whole skill surface: two stations, four tools, one optional router.
 DESIGN_SKILLS = {
     "capture-intent",
     "write-spec",
     "product-principles",
     "design-system",
     "architecture-design",
+    "design-research",
     "using-loom-design",
 }
 

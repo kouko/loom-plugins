@@ -32,6 +32,7 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: architecture-design,  owner: loom-design,   produces: ARCHITECTURE.md}
   - {name: decision-map,        owner: loom-workflow}
   - {name: engineering-research, owner: loom-code}
+  - {name: design-research, owner: loom-design}
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
   - {name: loom-visualization,  owner: loom-workflow}

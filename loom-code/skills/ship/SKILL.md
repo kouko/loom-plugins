@@ -18,6 +18,12 @@ remain English.
 
 ## 1. Confirm publication authorization
 
+When a factual gap could change a publication decision, identify it and use
+`loom-code:engineering-research` as needed; reuse adequate evidence directly.
+Return findings or uncertainty to Ship within existing authorization. Missing
+observed publication or check success remains unknown; research does not supply
+delivery proof or advance user decisions.
+
 Read the intent and acceptance test report when one was required. A confirmed intent
 with `publication: automatic — authorized <YYYY-MM-DD> by <name>` carries that
 decision into Ship; do not ask again. Intent prose, status, or contract version
