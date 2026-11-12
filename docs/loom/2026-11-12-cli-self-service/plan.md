@@ -19,6 +19,13 @@ charter: 1.1
 - Test: A5 positive: retained-first-attempts; boundary: untested-host-disclosure. Run synchronized-release metadata test and package suite; independent acceptance owns actual operator evidence.
 - Risk: agent-decided — REQ-5 retain raw attempts and limits without measuring unsupported efficiency gains. Bump code minor to 3.68.0; synchronize generated manifests, README and CHANGELOG entry; rewrite existing version pins only where needed.
 
+### Wave 3 — Clarify existing outcome meanings
+
+**W3-01 Clarify authorization errors and local completion** after: W2-01 acceptance: 3, 4
+- Files: loom-code/scripts/loom_checker.py (public entry: main), docs/loom/2026-11-12-cli-self-service/spec.md, docs/loom/2026-11-12-cli-self-service/evidence/
+- Test: A3 positive: clarified-help-readback; boundary: committed-without-verification. A4 positive: existing-cli-regression; negative: authorization-refusal. Reuse existing CLI tests unchanged and independently exercise the clarified help against actual outcomes.
+- Risk: agent-decided — REQ-3/4 clarify two descriptions without changing handlers or exit codes. Retain existing test separation; prose-only clarification needs independent readback, not new text-pin tests. Existing 3.68.0 bump remains this unmerged PR's release.
+
 ## Simplicity check
 - none found
 
