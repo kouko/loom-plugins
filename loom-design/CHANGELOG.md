@@ -12,11 +12,13 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.25.0] — 2026-11-12 — bound design research and select useful methods
+## [2.25.0] — 2026-11-13 — bound design research and simplify important proposals
 
 - Limit new evidence acquisition to online research and dialogue with the current user; select only question-appropriate inquiry after reusing sufficient evidence.
 - Distinguish source claims, user accounts, inference and unknowns, and hand unresolved capability, compatibility, feasibility and security-control evidence back to engineering research.
 - Preserve continuing research records with changed conclusions, reasons and limitations; retain actual behavioral trial evidence for independent assessment.
+- Actively compare smaller equivalent design proposals while preserving confirmed outcomes and mandatory constraints; retain the burden removed or the reason necessary complexity remains.
+- Revisit only decision-changing evidence gaps, stopping with sufficient support or an explicit unknown; keep simplification inside design research without extra stages or fixed rounds.
 
 ## [2.24.0] — 2026-11-12 — add separately owned design research
 
