@@ -227,13 +227,20 @@ def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         raise UsageError("finalize-review needs a change-id.")
     change_id, *rest = args
     repo = repo_root(Path.cwd())
-    findings = _finalize(repo, change_id, rest, out)
+    findings = _finalize(repo, change_id, rest, out, err)
     if findings:
         return report(findings, err)
     return 0
 
 
-def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[str, str]]:
+def _finalize(repo: Path, change_id: str, rest: list[str], out, err=sys.stderr) -> list[tuple[str, str]]:
+    def progress(kind: str, state: str) -> None:
+        try:
+            err.write(f"finalize-review: {kind} {state}\n")
+            err.flush()
+        except OSError:
+            pass
+
     if len(rest) != 2 or rest[0] != "--input":
         raise UsageError("finalize-review expects `--input <review-input.json>`.")
     input_path = Path(rest[1])
@@ -352,6 +359,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         pytest_probe = (kind == "adversarial" and how["route"] == "direct"
                         and runs_pytest(command))
         scratch = tempfile.TemporaryDirectory() if pytest_probe else None
+        progress(kind, "started")
         try:
             completed = subprocess.run(
                 argv_for(command), cwd=str(repo), stdout=subprocess.PIPE,
@@ -361,6 +369,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             own_pass = (_pytest_own_pass_failure(command, repo, artifact, Path(scratch.name))
                         if scratch else None)
         except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
+            progress(kind, "failed")
             return [(f"finalize.{kind}", f"execution failed: {exc}")]
         finally:
             if scratch:
@@ -369,6 +378,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         detail = output.strip()
         suffix = f"\n{detail[-4000:]}" if detail else ""
         if completed.returncode != 0:
+            progress(kind, "failed")
             return [(
                 f"finalize.{kind}",
                 f"`{command}` exited {completed.returncode}{suffix}",
@@ -383,13 +393,16 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
                 how, output,
             )
             if failure:
+                progress(kind, "failed")
                 return [("finalize.adversarial", f"{failure}{suffix}")]
             execution.update(evidence)
         elif pytest_probe:
             failure = _pytest_summary_failure(command, output) or own_pass
             if failure:
+                progress(kind, "failed")
                 return [("finalize.adversarial", f"{failure}{suffix}")]
         executions.append(execution)
+        progress(kind, "passed")
 
     executions += [{"kind": "adversarial", "no_program": reason} for reason in no_program]
 

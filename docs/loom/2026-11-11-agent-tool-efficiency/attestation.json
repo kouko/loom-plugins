@@ -1,0 +1,107 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-11-agent-tool-efficiency",
+  "content_digest": "58ad98b9d6a93338be10dc1c022a3767c47859e2",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_selection_finalize.py",
+      "artifact": "loom-code/tests/test_selection_finalize.py",
+      "result": "pass",
+      "command_digest": "de27ea73e8178f4172e0fc49daa8df30d7c1bebbdcc9cb97df27ec9e272ae070"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "code",
+      "reviewed_sha": "70a05fd73b86c6629a89b816fc45a3ad14a509ed",
+      "review_target_sha": "fe64dfa7ef283be4becfa95f4b0a3c1fce542a10",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES — Current behavior and compatibility passed independent checks; historical RED-to-GREEN execution order is supported only by implementer reports, not retained raw output.",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — All 185 tests in the three changed modules passed without skips; original RED output was not retained for independent inspection.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_selection_finalize.py:663",
+          "text": "nitpick (non-blocking): This new test and the call at line 685 exercise graduated_probe_programs directly, although production callers use it only within probes.py. The reviewer contract defines the module entry by production callers; marking this helper as the plan entry does not make it one.",
+          "fix": "Keep the two existing tests and their collection-call assertions, but invoke stored_probe_programs and assert counts 0 or 1 instead of the helper's path list; update W2-01's entry designation to stored_probe_programs."
+        }
+      ],
+      "notes": [
+        "Independent run: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_write_plan_station_text.py -q; 185 passed in 87.82s, no skips. Initial sandbox cache denial was resolved by approved escalation.",
+        "Read intent, spec, plan, acceptance report/evidence, PRINCIPLES.md, changed functions and production callers. Progress remains advisory; stdout, authority, evidence validation, failure decisions and concern-filter semantics are preserved. Publish checks use controlled remote responses, not live GitHub publication.",
+        "Original RED stdout was not retained. Parent supplied explicit implementer reports for W1-01, W1-02 and W2-01, which are not raw execution evidence; no historical chronology is inferred from combined implementation commits. Full package suite and stored adversarial probes were not rerun by this reviewer."
+      ],
+      "reviewer": "cli_code_review",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "70a05fd73b86c6629a89b816fc45a3ad14a509ed",
+      "review_target_sha": "fe64dfa7ef283be4becfa95f4b0a3c1fce542a10",
+      "dimension_scores": {
+        "omission": "PASS — The bounded command applicability, progress channels, failure behavior and remaining host/remote limits are stated and supported by the implementation and focused checks.",
+        "ambiguity": "PASS — Advisory progress is explicitly separated from final verification; deferred JSON/help/error migrations are not represented as current support.",
+        "inconsistency": "PASS — Read the base Ship polarity clause and its replacement; the intentional elapsed-notice change matches the implementation while authorization, waiting limits and merge acceptance remain intact.",
+        "incorrect-fact": "PASS — Opened the cited primary sources, checked local implementation contracts, replayed the conversion comparison and verified release synchronization.",
+        "missing-population": "PASS — The eight synthetic fixtures, sixteen runs, five semantic caller tasks and 6/15 function-line footprints are scoped explicitly; model costs and real remote behavior remain unmeasured.",
+        "user-judgment-leak": "PASS — No new technical approval question or paid/external-data obligation is introduced; user authorization and acceptance boundaries remain unchanged.",
+        "deletion-first": "PASS — Ship replaces the obsolete silent-wait sentence, progress addresses the observed waiting gap with local emitters, and the experiment rejects adding a production adapter."
+      },
+      "findings": [],
+      "notes": [
+        "Targeted verification passed 53 Ship/release text tests and 142 publish/finalization tests; no full package suite or adversarial program was run by this reviewer.",
+        "All 16 conversion replay records matched committed case/arm/status/stdout/stderr/predicate evidence; manifest synchronization, skill cross-references and contract citations passed with existing citation debt unchanged.",
+        "Review is source and controlled-test evidence only; it does not claim installed-host behavior, live GitHub publication, model latency/token savings or final attestation completion."
+      ],
+      "reviewer": "cli_skill_review",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "f68d8e308654dab2807fc07e133c7594ce0c1fbb",
+  "tested_commit": "0dcaa4bda4bc2ed44e567e883ab0f357ed1c64b8",
+  "reviewed_commit": "fe64dfa7ef283be4becfa95f4b0a3c1fce542a10",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}

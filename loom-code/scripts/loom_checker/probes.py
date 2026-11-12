@@ -513,8 +513,8 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
         path for path in added
         if path not in moved
         and is_program_path(path)
-        and suite_collection(repo, path)[0] is not False
         and _carries_concern(repo, head_sha, path)
+        and suite_collection(repo, path)[0] is not False
     )
 
 

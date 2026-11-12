@@ -235,8 +235,9 @@ The publication command reports the PR URL, inspects required CI immediately,
 and checks again every 10 seconds while any required check remains pending.
 It stops when all required checks pass, a required check fails or is cancelled,
 or GitHub reports that user action is required. Optional checks do not keep the
-command alive. Unchanged pending snapshots produce no repeated user-facing
-output.
+command alive. Unchanged pending snapshots produce no per-poll repetition;
+stderr emits a flushed elapsed-wait notice at the first polling opportunity
+after each 60-second interval of unchanged waiting.
 
 If checks remain pending after 360 polling intervals (60 minutes), stop and
 report that a reliable terminal result could not be obtained. Treat an empty

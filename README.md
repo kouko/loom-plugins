@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.24.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.67.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.68.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.67.0. Five stations carry one change from plan to PR with
+Version 3.68.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -252,6 +252,35 @@ Limits on OpenCode:
 - Node is not needed to use the plugins.
 
 ## Development
+
+### CLI conventions and applicability
+
+Long-running commands should expose truthful progress before completion while
+preserving their existing results and exit behavior. The first rollout is bounded:
+
+| Command | Current behavior |
+|---|---|
+| `publish` | Flushed, newline-delimited stderr reports CI observation, registration/pending transitions, and elapsed waiting at the first polling opportunity after each 60-second interval. Terminal states distinguish passed, no required checks, and failed/unconfirmed observations. Existing polling, timeout, stdout and authorization behavior remain unchanged. |
+| `finalize-review` | Flushed stderr names each probe/package-suite stage before execution and reports its result after evidence validation. Child exit 0 alone is insufficient; a passed stage is not final attestation success. Child logs remain captured, with no heartbeat inside a subprocess. |
+| `delivery --json` and dispatch JSON | Existing machine-readable payloads are preserved; the first rollout adds no global JSON envelope. |
+
+Progress is advisory: never parse it for gate decisions. It contains stage/state
+labels, not operands, credentials or raw child logs. Progress-only write failures
+are best-effort loss; existing result/error handling and mutation counts remain
+unchanged. A publication timeout is an unknown outcome: observe delivery before
+retrying a potentially completed mutation. No automatic retry is added.
+
+Broader help, typed error categories and additional JSON modes remain future
+migrations requiring compatibility checks. Exit 2 still conflates usage errors
+and internal faults. Host hook protocols, review, acceptance and failure-blocking
+rules remain unchanged.
+
+Graduated probe discovery now checks the concern marker before test collection;
+marked, moved and unavailable-collection handling retain the existing policy.
+The [local conversion comparison](docs/loom/2026-11-11-agent-tool-efficiency/evidence/conversion-comparison.md)
+supports adding no production converter in this change: the candidate still needs
+caller identity and context, and demonstrates no reduction in caller operations,
+latency or token cost.
 
 From the repository root, run the complete existing package inventory in an
 isolated environment:

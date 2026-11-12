@@ -1,0 +1,269 @@
+{
+  "source_head": "a5aed8fbef0fe4542958c9951f093ba4779b942a",
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+  "pyyaml": "6.0.3",
+  "replay_command": "uv run --isolated --with-requirements requirements-package-tests.lock python /private/tmp/loom-conversion-replay.py --replay",
+  "scope": "Transformation only. No finalization, external providers or suite.",
+  "footprint_function_lines_including_blank_and_comment": {
+    "baseline": 6,
+    "candidate": 15
+  },
+  "results": [
+    {
+      "case": "valid",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "valid"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"PASS\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": true
+    },
+    {
+      "case": "valid",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "valid"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"PASS\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": true
+    },
+    {
+      "case": "needs_revision",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "needs_revision"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"NEEDS_REVISION\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"NEEDS_REVISION\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "needs_revision",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "needs_revision"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"NEEDS_REVISION\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"NEEDS_REVISION\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "malformed",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "malformed"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ParserError: while parsing a flow node\nexpected the node content, but found '<stream end>'\n  in \"<unicode string>\", line 2, column 1:\n    \n    ^\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "malformed",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "malformed"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ParserError: while parsing a flow node\nexpected the node content, but found '<stream end>'\n  in \"<unicode string>\", line 2, column 1:\n    \n    ^\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "duplicate",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "duplicate"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"NEEDS_REVISION\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "duplicate",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "duplicate"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ConstructorError: duplicate YAML mapping key\n  in \"<unicode string>\", line 16, column 1:\n    verdict: NEEDS_REVISION\n    ^\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "missing_identity",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "missing_identity"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"vendor\": \"synthetic\", \"verdict\": \"PASS\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": true
+    },
+    {
+      "case": "missing_identity",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "missing_identity"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ValueError: missing caller identity: reviewer\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "identity_conflict",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "identity_conflict"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"PASS\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": true
+    },
+    {
+      "case": "identity_conflict",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "identity_conflict"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ValueError: raw/caller identity conflict: reviewer\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "malformed_shape",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "malformed_shape"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ValueError: dictionary update sequence element #0 has length 4; 2 is required\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "malformed_shape",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "malformed_shape"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ValueError: review must be an object\n",
+      "passes_finalizer_verdict_predicate_only": false
+    },
+    {
+      "case": "raw_identity",
+      "arm": "baseline",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "baseline",
+        "--case",
+        "raw_identity"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"PASS\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": true
+    },
+    {
+      "case": "raw_identity",
+      "arm": "candidate",
+      "command": [
+        "/Users/kouko/.cache/uv/builds-v0/.tmpJ87xxE/bin/python",
+        "/private/tmp/loom-conversion-replay.py",
+        "--arm",
+        "candidate",
+        "--case",
+        "raw_identity"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"adversarial\": [], \"findings\": [], \"verdicts\": [{\"dimension_scores\": {\"ambiguity\": \"PASS\", \"deletion-first\": \"PASS\", \"inconsistency\": \"PASS\", \"incorrect-fact\": \"PASS\", \"missing-population\": \"PASS\", \"omission\": \"PASS\"}, \"findings\": [], \"lens\": \"docs\", \"model\": \"fixture-model\", \"notes\": [], \"provenance\": {\"source\": \"public-synthetic-fixture\"}, \"review_target_sha\": \"2222222222222222222222222222222222222222\", \"reviewed_sha\": \"1111111111111111111111111111111111111111\", \"reviewer\": \"synthetic-reviewer-a\", \"vendor\": \"synthetic\", \"verdict\": \"PASS\"}]}\n",
+      "stderr": "",
+      "passes_finalizer_verdict_predicate_only": true
+    }
+  ]
+}
