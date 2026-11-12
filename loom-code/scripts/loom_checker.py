@@ -170,7 +170,9 @@ Existing body snapshots, origin/HEAD reconciliation and branch/title checks
 still apply. Correct the named input or condition, preserving work.
 
 Results: exit 0 completes publication and its required-check observation;
-exit 1 means blocked or unconfirmed; exit 2 means invocation/internal error.
+exit 1 means blocked or unconfirmed; exit 2 means invocation or authorization
+errors, or internal failures. Read the diagnostic to determine the next action;
+the exit code alone is not a reason to retry.
 Verification output or a PR URL alone is not completion. Stderr progress is
 advisory and can also contain errors; while CI is pending keep observing the
 same process. Inspect the final exit and evidence. Exit 0 with
@@ -182,8 +184,9 @@ state and follow its diagnostic; do not blindly repeat a write or switch routes.
     "delivery": """delivery — observe the selected delivery goal without writes
 Usage: delivery [--goal local|published|merged] [--intent <path>] [--json]
 Run inside the selected repository on its identified feature branch.
---goal defaults to published. local checks local completion; published checks
-the matching Ready PR and required CI; merged checks merged delivery evidence.
+--goal defaults to published. local checks that attributable paths are committed;
+it does not check finalization, attestation or verification. published checks the
+matching Ready PR and required CI; merged checks merged delivery evidence.
 --intent optionally identifies the change's canonical committed intent (a
 relative or absolute path); it does not create or grant authorization.
 Local observation does not claim publication. Observation never authorizes
