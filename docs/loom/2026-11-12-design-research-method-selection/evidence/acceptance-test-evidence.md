@@ -1,6 +1,6 @@
 # Design research method selection — acceptance test evidence
 
-Tried on 2026-11-12, in a clean copy of the project at 3bf869d138a8a743b20b01ddab0dbe95e7fbbd20.
+Tried on 2026-11-12, in a clean copy of the project at 79789ae2230d8d0e8f163509c5275f119a5938f4.
 
 Original behavioral trials ran at 029cce3a6328e86e8d66b1c6b23b2db0947f7cbb; the setup/provenance and numbered observations below retain that original execution, not a claim that the twelve cases were rerun. The dated re-run section records the clean setup recheck and per-row carryover at the current target.
 
@@ -90,4 +90,30 @@ This is the same acceptance witness and review episode after the integration-onl
 - 6: carried over — original actual transcripts and record snapshots remain intact; added development evidence does not replace them with invented outputs. Setup was rechecked separately above.
 
 No findings arose from these checks. No important-or-worse dismissed findings were supplied. Original sample, sequence, source-reuse and non-blind limitations remain unchanged.
+
+## Supplemental restoration witness on 2026-11-12, at 79789ae2230d8d0e8f163509c5275f119a5938f4
+
+This new independent witness (`method_restoration_acceptance`) tested only the added W5 exact-restoration obligation and clean setup. The original witness was `method_acceptance`; its twelve actual baseline/candidate executions at 029cce3a and later setup receipt at 3bf869d1 remain attributed to it. This supplement neither reran nor renamed that completed design-trial task, and resets no task or review continuity. Intent, spec, plan, report, earlier evidence, withdrawal record and retained trial outputs were inspected before deciding carryover.
+
+### Newly executed commands and results
+
+- `git clone --no-hardlinks /private/tmp/loom-design-research-method-selection /private/tmp/method-restoration-acceptance-79789ae2`: exit 0. `git rev-parse HEAD` returned `79789ae2230d8d0e8f163509c5275f119a5938f4`; `git status --porcelain` was empty before and after checks.
+- Read root README local installation/validation instructions and loom-design README Install section; loaded the clean candidate skill and research template for inspection. `agy plugin validate ./loom-design`: exit 0, seven skills, `Validation passed`; generic-logo advisory only. Local package validation is established; no global install or remote-marketplace claim is made.
+- `python3 -m pytest loom-design/tests/test_design_research_package.py -q`: exit 0, `2 passed in 0.02s`.
+- Complete-file byte oracle used `pathlib.Path(path).read_bytes() == subprocess.check_output(["git", "show", "391fd01723efedfada3447673b1b99c3894af859:" + path])` and asserted equality for both files. Both returned `exact_bytes=True`. SHA256: `test_external_review.py` = `82a62069791fd92d002c9b426ef82c1fdafecfeaecb9fea8c51ad11e3909a937`; `test_external_review_adversarial.py` = `da875e872dd67a53312f06fa99bea1e9ef52a77eadfdcfcfc63daa1da6518c25`.
+- `git diff --exit-code 391fd01723efedfada3447673b1b99c3894af859 -- loom-code/tests/test_external_review.py loom-code/tests/test_external_review_adversarial.py`: exit 0, empty output. All original assertions, coverage and deadlines are preserved by complete-byte equality, rather than inferred from selected passing tests.
+- `python3 -m pytest -q loom-code/tests/test_external_review.py loom-code/tests/test_external_review_adversarial.py -k 'keeps_stdin_open or never_answers or holds_stdout or lingering_descendant or exit_before_answer or unreadPromptOverPipeBuffer'`: exit 0, `10 passed, 134 deselected in 47.86s`. This covers model-list stdin/EOF, no answer, exited parent/lingering descendant, review-stage descendant timeout, exit-before-answer and unread pipe-buffer prompt behavior using restored fixtures. No test code was edited.
+- `git diff --exit-code 029cce3a..HEAD -- loom-design/skills/design-research loom-design/.claude-plugin/plugin.json loom-design/.codex-plugin/plugin.json loom-design/plugin.json loom-design/package.json`: exit 0, empty output. Production external-review resources likewise have no changes over the original-trial interval. `git diff --name-only 391fd017..HEAD` confirms final non-development changes are design-research guidance, design release metadata/README strings and its version-pin test; neither incidental test file remains changed.
+- `git diff --exit-code 3bf869d1..HEAD -- docs/loom/2026-11-12-design-research-method-selection/evidence/baseline-trials.md docs/loom/2026-11-12-design-research-method-selection/evidence/candidate-trials.md docs/loom/2026-11-12-design-research-method-selection/evidence/behavioral-cases.md`: exit 0, empty output. These retained outputs were added after their original execution target; their absence from the original commit is not an output change. The immediately prior canonical evidence already contains them and they remain unchanged.
+
+### Per-row carryover checked against the complete interval
+
+- 1: carried over — research acquisition text and C2/C3/C5 inputs/outputs remain unchanged; withdrawing incidental test rewrites cannot change permitted research activities.
+- 2: carried over — reuse/selection guidance, callers and C1–C4 observations are unchanged; original decisions remain the witnessed result.
+- 3: carried over — evidence-category rules, inspected-source account and C2–C6 retained records are unchanged; restoration provides no new participant or technical proof.
+- 4: carried over — design/engineering boundary, production runner and C4 handoff are unchanged; restored test fixtures cannot alter the handoff.
+- 5: carried over — template, continuation/readback contract and C1/C2/C6 record snapshots are unchanged; original same-record readbacks remain attributed to their executor.
+- 6: carried over — six matched baseline/candidate outputs and their snapshots remain inspectable and byte-unchanged from prior canonical evidence. Only new mechanical restoration/setup results above were executed by this supplemental witness.
+
+Supplemental outcome: exact withdrawal/restoration works; clean local package validation and focused protocol checks work. No findings or dismissed important findings were supplied. Native fixture rewrites are withdrawn, not a shipped reliability fix. Original preflight timing uncertainty remains unresolved; this passing focused run does not guarantee stability. The station reports the locked full suite at this target passed (4264 passed, six skipped, 17 shell groups, zero failures), followed by two reused adversarial packaging checks; this is supplied provenance, not a full-suite execution by this witness. Package tests are not skipped. Finalize-review will run `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` and block acceptance on failure. The failed prior Claude proposal review still supplied no verdict and is not counted as passed.
 

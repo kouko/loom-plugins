@@ -109,3 +109,38 @@ No adversary was redispatched: the existing program remains applicable and
 passes. The test-only repair has not changed its covered packaging invariant.
 Renewed acceptance setup and same-reviewer fix verification precede the next
 finalization. No formal outside-review verdict or skipped step is added.
+
+## Final minimal candidate after withdrawing incidental fixture edits
+
+The subsequent finalization and Build attempts still encountered the same
+preflight timeout, including with native shell. The instrumented diagnostic
+code-group run passed without reproducing the failure; the exact cause remains
+unresolved. See the retained
+[phase diagnosis](../research/01-preflight-timeout-phase.md) and
+[withdrawal evidence](fixture-repair-withdrawal.md). No complete reliability
+repair is claimed. Both incidental test-file rewrites were withdrawn; their
+complete bytes equal trunk `391fd017`, preserving all original assertions,
+deadlines and coverage. The final net code change is again only the requested
+research guidance plus its design release metadata and existing release pins.
+
+Final Build target: `79789ae2230d8d0e8f163509c5275f119a5938f4`.
+`sync-trunk` reported up to date against the same trunk. The exact locked
+complete package command above exited 0: 4,264 passed, 6 skipped across fifteen
+pytest invocations; seventeen shell summary groups reported zero failures.
+Code-group output was `2833 passed, 2 skipped in 203.46s`. Detailed local output:
+`/private/tmp/design-research-build-suite-final.log`.
+
+The reused adversarial program then passed on this same target:
+
+```
+python3 -m pytest loom-design/tests/test_design_research_package.py
+loom-design/tests/test_design_research_package.py ..                     [100%]
+============================== 2 passed in 0.04s ===============================
+```
+
+An exact `git diff --exit-code 391fd017 --` comparison of both restored external
+review test files also returned 0. No test, worker setting or verification step
+was relaxed. The passing run is observed verification of this candidate, not
+proof that its unchanged pre-existing timing tests are universally reliable.
+Supplemental clean-load/restoration acceptance and the original reviewers'
+terminal verification remain the next steps in this same bounded episode.
