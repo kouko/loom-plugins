@@ -896,31 +896,40 @@ def test_failed_selection_or_execution_never_falls_back(case):
     assert len(calls) <= 2
 
 
-_FAKE_CODEX = """#!{python}
-import json, os, select, sys, time
-open({pidfile!r}, "w").write(str(os.getpid()))
-for _ in range(3):
-    sys.stdin.readline()
-if {mode!r} == "hang":
-    time.sleep(60)
-ready, _, _ = select.select([sys.stdin], [], [], 0.3)
-if ready and sys.stdin.readline() == "":
-    sys.exit(0)  # real app-server: stdin EOF before model/list answer
-print(json.dumps({{"jsonrpc": "2.0", "id": 1, "result": {{}}}}))
-print(json.dumps({{"jsonrpc": "2.0", "method": "note", "params": {{}}}}))
-print("not json")
-print(json.dumps({{"id": 2, "result": {{"data": [{{"id": "gpt-a"}}, {{"id": "gpt-b"}}]}}}}), flush=True)
-time.sleep(60)
+_FAKE_CODEX = """#!/bin/sh
+printf '%s' "$$" > {pidfile}
+IFS= read -r initialize || exit 0
+IFS= read -r initialized || exit 0
+IFS= read -r model_list || exit 0
+if [ {mode} = hang ]; then
+    exec /bin/sleep 60
+fi
+# A background shell normally gets /dev/null stdin: duplicate the real pipe.
+exec 3<&0
+server_pid=$$
+trap 'exit 0' USR1
+(printf '' > {pidfile}.ready
+ IFS= read -r extra <&3 || kill -USR1 "$server_pid") &
+reader=$!
+while [ ! -f {pidfile}.ready ]; do /bin/sleep 0.01; done
+/bin/sleep 0.3
+kill "$reader" 2>/dev/null
+wait "$reader" 2>/dev/null
+trap - USR1
+printf '%s\\n' '{{"jsonrpc":"2.0","id":1,"result":{{}}}}' \\
+    '{{"jsonrpc":"2.0","method":"note","params":{{}}}}' 'not json' \\
+    '{{"id":2,"result":{{"data":[{{"id":"gpt-a"}},{{"id":"gpt-b"}}]}}}}'
+exec /bin/sleep 60
 """
 
 
 def _fake_codex(tmp_path, monkeypatch, mode):
-    import sys
+    import shlex
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     pidfile = tmp_path / "pid"
     script = bin_dir / "codex"
-    script.write_text(_FAKE_CODEX.format(python=sys.executable, pidfile=str(pidfile), mode=mode))
+    script.write_text(_FAKE_CODEX.format(pidfile=shlex.quote(str(pidfile)), mode=shlex.quote(mode)))
     script.chmod(0o755)
     monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
     return pidfile
@@ -942,43 +951,44 @@ def test_codex_discovery_keeps_stdin_open_for_model_list(tmp_path, monkeypatch):
 
 def test_codex_discovery_times_out_when_app_server_never_answers(tmp_path, monkeypatch):
     pidfile = _fake_codex(tmp_path, monkeypatch, "hang")
-    # Cold fake-Python startup measured ~2.8s; leave time to reach the hang.
     monkeypatch.setattr(review, "CODEX_DISCOVERY_TIMEOUT", 6)
     result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
     assert result["reason"] == "discovery-timeout: 6s"
     _assert_reaped(pidfile)
 
 
-_FAKE_CLI = """#!{python}
-import json, os, subprocess, sys, time
-mode = {mode!r}
-if mode == "codex-exit":
-    sys.exit(3)
-if mode == "codex-exit0":
-    sys.exit(0)
-if mode == "codex-exit-orphan":
-    child = subprocess.Popen(["/bin/sleep", "60"])
-    open({pidfile!r}, "w").write(str(child.pid))
-    sys.exit(3)
-text = sys.stdin.read()
-if mode == "claude" and "single word ok" in text:
-    print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
-    sys.exit(0)
-print("gemini-2.5-pro", flush=True)
-child = subprocess.Popen(["/bin/sleep", "60"])
-open({pidfile!r}, "w").write(str(child.pid))
-if mode != "exit-early":
-    time.sleep(60)
+_FAKE_CLI = """#!/bin/sh
+mode={mode}
+case "$mode" in
+    codex-exit) exit 3 ;;
+    codex-exit0) exit 0 ;;
+    codex-exit-orphan)
+        /bin/sleep 60 &
+        printf '%s' "$!" > {pidfile}
+        exit 3 ;;
+esac
+text=$(cat)
+case "$mode:$text" in
+    claude:*single\\ word\\ ok*)
+        printf '%s\\n' '{{"result":"ok","modelUsage":{{"claude-sonnet-4-5":{{}}}}}}'
+        exit 0 ;;
+esac
+printf '%s\\n' gemini-2.5-pro
+/bin/sleep 60 &
+printf '%s' "$!" > {pidfile}
+if [ "$mode" != exit-early ]; then
+    wait
+fi
 """
 
 
 def _fake_cli(tmp_path, monkeypatch, name, mode):
-    import sys
+    import shlex
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     pidfile = tmp_path / "pid"
     script = bin_dir / name
-    script.write_text(_FAKE_CLI.format(python=sys.executable, pidfile=str(pidfile), mode=mode))
+    script.write_text(_FAKE_CLI.format(pidfile=shlex.quote(str(pidfile)), mode=shlex.quote(mode)))
     script.chmod(0o755)
     monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
     return pidfile
