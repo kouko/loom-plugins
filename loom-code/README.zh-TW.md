@@ -10,7 +10,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.70.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.71.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -108,6 +108,11 @@ repo 測試保持一致）並宣告 `requires-contract`；兩個 sibling 執行�
 package。
 
 ## checker
+
+`plan <path> --json` 與 `intake <station> <change-id> --json` 可選擇輸出
+版本 1 的準備檢查結果。`--json` 必須放最後；預設文字與退出碼保持不變。
+結果區分通過、規則阻擋與使用／內部錯誤，保留診斷及提示的順序，並不代表
+整體工作完成。六個欄位與啟動／程序失敗限制可由各命令的精確 `--help` 查閱。
 
 `scripts/loom_checker.py` 是決定性層：每條規則都從 repo 重算，不採信宣稱，
 規則清單以 `--list-rules` 為準。通過時退出碼 0，規則擋下時 1，用法或內部
