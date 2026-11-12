@@ -1,5 +1,10 @@
 # Matched preparation-result comparison — retained observations
 
+The original capture findings below are retained. The final section,
+"Recovery from original native tool records", adds subsequently recovered
+operation counts and merged bootstrap output from these same runs. It does
+not replace missing separate streams or invent additive per-task allocation.
+
 Two independent, non-implementing operators completed the six preregistered
 tasks in both modes against candidate
 `2cef40163b6a562971780da6e6fd107289304962`. A used text then JSON; B used JSON
@@ -139,3 +144,71 @@ Requirements and the preregistered task set were not changed to erase these
 limitations. Independent acceptance must judge whether the evidence fulfills
 the requested comparison despite the incomplete operation capture. No passing
 gate verdict is produced by this worker.
+
+## Recovery from original native tool records
+
+Independent acceptance identified incomplete all-tool accounting. The
+coordinator recovered the actual native tool-call records from the two local
+operator sessions, verified each session's `agent_path`, and added the
+`tool_capture_recovery` object to [comparison-raw.json](comparison-raw.json).
+No operator was rerun, no task or expectation changed, and no retry counter
+was reset. The original incomplete-capture reports and null fields remain
+intact for provenance; recovery fields are separately named.
+
+| Operator | functions.exec calls | Coordination calls | All native host tool calls | Nested shell-runner invocations |
+|---|---|---|---|---|
+| A | 23 | 2 | 25 | 24 |
+| B | 20 | 2 | 22 | 20 |
+
+These are exact inventories across each operator's complete run, including
+bootstrap, discovery, report work and messages. They are not directly
+comparable to the recorded child-operation totals of 38 and 47, nor an
+estimate of intrinsic task difficulty. A's 23 exec calls comprise five
+bootstrap/discovery calls, 17 task-activity calls and one reporting call;
+B's 20 comprise five bootstrap/discovery, 13 task-activity and two reporting
+calls. Each also made two coordination calls. The shell-runner count is a
+distinct nested layer: A's third exec invoked the runner twice; B's execs
+each invoked it once. Do not add these layers together.
+
+The actual outer calls frequently batch a preceding answer with the next
+task's check, or checks from multiple tasks. The following exact touch counts
+include task check/read/edit/answer activity. They overlap: a shared call
+cannot be uniquely assigned to one task without inventing a new allocation
+rule. Therefore the preregistered additive per-task all-tool metric remains
+unavailable; the raw appendix lists every associated call ID and its source
+line so this limitation is auditable rather than erased.
+
+| Operator | Mode | T1 touches | T2 touches | T3 touches | T4 touches | T5 touches | T6 touches |
+|---|---|---|---|---|---|---|---|
+| A | text | 2 | 5 | 3 | 2 | 4 | 3 |
+| A | JSON | 2 | 3 | 3 | 2 | 3 | 3 |
+| B | JSON | 2 | 4 | 2 | 2 | 3 | 3 |
+| B | text | 2 | 2 | 2 | 2 | 2 | 2 |
+
+The original bootstrap launcher-help calls are also present, with native
+timestamps, exit 0 and exactly 625 UTF-8 bytes of merged tool output for
+each operator. Their full-output hashes match, but equality was measured
+from both original records, not imputed from a later run. Native exec
+results do not separate stdout and stderr; their individual byte counts
+remain unknown. Across both runs, 40 check calls, six captured checker-help
+calls and the two recovered launcher-help calls emitted 23,618 bytes in
+combined result streams (11,809 per operator). This is the observed merged
+checker/launcher output subtotal, not a reconstructed all-bookkeeping volume
+or a separately attributed stdout/stderr total. Existing per-check separated
+byte totals above remain unchanged.
+
+Recovery provenance includes each source filename, full-file SHA-256,
+session identity, verified agent path, call/result line numbers, native
+timestamps, exact command hash and bounded command/result excerpts. Task
+associations are derived from actual command paths and retained answer
+records, not unrelated template references. Bootstrap, reporting and
+coordination are explicitly separate. Only tool records were extracted;
+reasoning, analysis, unrelated messages and encrypted coordination bodies
+were not copied or decrypted. Original local session files remain the
+audit source for full commands behind bounded excerpts.
+
+The recovery improves evidence completeness without establishing faster
+operation or eliminating carryover. Additive per-task counts and separate
+bootstrap streams remain limited. Independent acceptance must re-audit
+these recovered observations against the original requirements; this
+worker does not waive that obligation or issue a gate verdict.

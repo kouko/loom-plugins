@@ -3908,5 +3908,1942 @@
     "checked_original_and_repaired_artifacts": 76,
     "mismatches": 0,
     "method": "Recomputed all three original artifact hashes in each of 24 task repositories and the four repaired T2 plan copies against frozen oracle hashes."
+  },
+  "tool_capture_recovery": {
+    "method": "Read only response_item tool calls/results and session agent-path metadata; no reasoning, analysis or unrelated messages were extracted.",
+    "metric_continuity": "Original incomplete captures remain unchanged. This is recovery from the same two runs, not a rerun, new operator or changed measurement definition.",
+    "operators": {
+      "A": {
+        "source_file": "rollout-2026-11-13T01-21-06-01a1d0c7-076c-7d61-8437-2e987183871b.jsonl",
+        "source_file_sha256": "6ad3f47d06d976fdecf3a086c13b93b20e85785409f67352b20f0465542fc844",
+        "source_session_id": "01a1d0c7-076c-7d61-8437-2e987183871b",
+        "verified_agent_path": "/root/json_operator_a",
+        "functions_exec_calls": 23,
+        "coordination_calls": 2,
+        "all_host_tool_calls": 25,
+        "nested_exec_command_invocations": 24,
+        "phase_host_counts": {
+          "bootstrap/discovery": 5,
+          "task activity": 17,
+          "reporting": 1,
+          "coordination": 2
+        },
+        "calls": [
+          {
+            "sequence": 1,
+            "custom_sequence": 1,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "25df93eac06dc1869ddb20eb102b5d1ba30549f5bee70c17be5d83a1bb7e8f18",
+            "command_characters": 115,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat /private/tmp/loom-json-operator-A-packet.json\",max_output_tokens:20000}));\n",
+            "task_associations": [],
+            "call_id": "call_4dd59e2024014a08a0622df576654ffe",
+            "timestamp": "2026-11-12T17:21:11.008Z",
+            "source_line": 14,
+            "result_source_line": 17,
+            "result_timestamp": "2026-11-12T17:21:11.209Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 4892,
+                "merged_tool_output_sha256": "5563a1414002d3c15798ad72d82368f58e8490d0fa9d2b618fcc1c54eb1e1835",
+                "merged_tool_output_excerpt": "{\n  \"candidate_sha\": \"2cef40163b6a562971780da6e6fd107289304962\",\n  \"candidate_launcher\": \"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\",\n  \"operator_instructions\": \"/private/tmp/loom-json-comparison-20261113/operator-instructions.md\",\n  \"historical_change_id\": \"2026-11-12-cli-guidance-consistency\",\n  \"operator\": \"A\",\n  \"tasks\": {\n    \"mode_order\": [\n      \"text\",\n      \"json\"\n    ],\n    \"modes\": {\n      \"text\": [\n        {\n          \"task_id\": \"T1\",\n        ",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 2,
+            "custom_sequence": 2,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "d6ce4d088b2e22f4620636bb6462201a9f0109d4f85fc993dd711c5d2d33c912",
+            "command_characters": 137,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat /private/tmp/loom-json-comparison-20261113/operator-instructions.md\",max_output_tokens:16000}));\n",
+            "task_associations": [],
+            "call_id": "call_5e40b415b6be49189792ad927f382a7c",
+            "timestamp": "2026-11-12T17:21:14.796Z",
+            "source_line": 19,
+            "result_source_line": 22,
+            "result_timestamp": "2026-11-12T17:21:14.990Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2965,
+                "merged_tool_output_sha256": "d83fba022e517404dddd2f9f04d7d6a107cdd81e22323ae4a3c9fc3379324f6c",
+                "merged_tool_output_excerpt": "# Operator task packet — preparation-result comparison\n\nYou are an independent operator evaluating two representations of the same\nlocal checks. You did not implement the candidate. Your assigned mode order,\ncandidate launcher, candidate commit and fresh task directories are supplied\nby the coordinator. Use the same task order T1 through T6 within each mode.\nDiscover command syntax from public help; no prepared commands are supplied.\nFor JSON mode select the optional JSON representation when che",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 3,
+            "custom_sequence": 3,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 2,
+            "command_sha256": "f6fe3be0b50923bd7da36176cbbeb7bf72d7c8ae6cb0d98b441f6cfadcbf4d80",
+            "command_characters": 269,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"mkdir -p /private/tmp/loom-json-operator-A-results\",max_output_tokens:1000}));\ntext(await tools.exec_command({cmd:\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --help\",max_output_tokens:6000}));\n",
+            "task_associations": [],
+            "call_id": "call_23f7ed7c513a4b08a1c0ac1b0e2d92da",
+            "timestamp": "2026-11-12T17:21:19.500Z",
+            "source_line": 26,
+            "result_source_line": 30,
+            "result_timestamp": "2026-11-12T17:21:20.480Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 0,
+                "merged_tool_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "merged_tool_output_excerpt": "",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              },
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 625,
+                "merged_tool_output_sha256": "34d6acde03d61ad7d54580361619cc05c190de8f9db2c8c5c11dc6ad85c72d80",
+                "merged_tool_output_excerpt": "Usage: loom-python (--repair|--ready) <checker-command> [arguments...]\n       loom-python (--repair|--ready) --script <path> [arguments...]\n       loom-python --help\nThe checker is selected automatically; omit loom_checker.py from the arguments.\nPlanning: \"<loom-code>/scripts/loom-python\" --repair plan \"<path-to-plan.md>\"\nChecker commands: \"<loom-code>/scripts/loom-python\" --repair --help\nReplace <loom-code> with the installed plugin directory and <path-to-plan.md> with your plan file path.\n--re",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 4,
+            "custom_sequence": 4,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "6050f8efa641ef1bc16df8d72eaa5d110a0ff571d23268a35ad4c2803a8f86c2",
+            "command_characters": 1236,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat > /private/tmp/loom-json-operator-A-results/run.py <<'PY'\\nimport subprocess,json,datetime,pathlib,sys\\nroot=pathlib.Path('/private/tmp/loom-json-operator-A-results'); ledger=root/'ledger.jsonl'\\nargs=json.loads(sys.argv[1]); cwd=sys.argv[2]; label=sys.argv[3]\\nstart=datetime.datetime.now(datetime.timezone.utc).isoformat(); p=subprocess.run(args,cwd=cwd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)\\n(root/(label+'.stdout')).write_bytes(p.stdout); (root/(label+'.stderr')).write_bytes(p.stderr)\\ne={'label':label,'argv':args,'cwd':cwd,'started':start,'finished':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit':p.returncode,'stdout_path':str(root/(label+'.stdout')),'stderr_path':str(root/(label+'.stderr')),'stdout_bytes':len(p.stdout),'stderr_bytes':len(p.stderr)}\\nwith ledger.open('a') as f:f.write(json.dumps(e)+'\\\\n')\\nprint(json.dumps(e));print(p.stdout.decode());print('STDERR:',p.stderr.decode())\\nPY\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"--help\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T1/project help\",max_output_tokens:10000}));\n",
+            "task_associations": [],
+            "call_id": "call_30822cc500c040dcb03dd24ebbb3503c",
+            "timestamp": "2026-11-12T17:21:29.945Z",
+            "source_line": 34,
+            "result_source_line": 37,
+            "result_timestamp": "2026-11-12T17:21:30.280Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2902,
+                "merged_tool_output_sha256": "6f78236228b06e856122b632f0cd9d0400f2aa43097b3fb609dd3c08f8ba65a8",
+                "merged_tool_output_excerpt": "{\"label\": \"help\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"--help\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T1/project\", \"started\": \"2026-11-12T17:21:30.152989+00:00\", \"finished\": \"2026-11-12T17:21:30.276175+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/help.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/help.stderr\", \"stdout_bytes\": 2395, \"stderr_bytes\": 0}\n\n\n ",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 5,
+            "custom_sequence": 5,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "4ea27ed09ae6217c9b1d4c225e0414c68e83775da64837c0610ee3b0b4f28316",
+            "command_characters": 571,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"--help\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T1/project plan-help\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"--help\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T1/project intake-help\",max_output_tokens:7000}));\n",
+            "task_associations": [],
+            "call_id": "call_23de413d3d32488fbf2f5dfd114cabb8",
+            "timestamp": "2026-11-12T17:21:35.870Z",
+            "source_line": 39,
+            "result_source_line": 42,
+            "result_timestamp": "2026-11-12T17:21:36.257Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 6097,
+                "merged_tool_output_sha256": "33d1446234d40f3c20ec560e16c0e3cfb90afd1479f187104262613b289da15e",
+                "merged_tool_output_excerpt": "{\"label\": \"plan-help\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"--help\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T1/project\", \"started\": \"2026-11-12T17:21:36.059758+00:00\", \"finished\": \"2026-11-12T17:21:36.146725+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/plan-help.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/plan-help.stderr\", \"stdout_bytes\": 2401,",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 6,
+            "custom_sequence": 6,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "f26d4d3d2e08d1957bfda61e6b33fde64eb4601a3697b0179168b787448cb6fc",
+            "command_characters": 368,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T1/project text-T1-initial\",max_output_tokens:3000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T1"
+              }
+            ],
+            "call_id": "call_f0594db87d8d44d58ea530bbd9593aca",
+            "timestamp": "2026-11-12T17:21:41.595Z",
+            "source_line": 46,
+            "result_source_line": 49,
+            "result_timestamp": "2026-11-12T17:21:41.890Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 592,
+                "merged_tool_output_sha256": "2aac1522e259c383d450218088a76e75ad04a5275fd237ee1305e344dfab3bf7",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T1-initial\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T1/project\", \"started\": \"2026-11-12T17:21:41.778277+00:00\", \"finished\": \"2026-11-12T17:21:41.864577+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T1-initial.stdout\", \"stderr_path\": \"/private/tmp/loom-json-",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 7,
+            "custom_sequence": 7,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "b045632a0b6bbee4a61dfef281cdcfe333f3526595573acf129263913472e39b",
+            "command_characters": 672,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat > /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T1\\\",\\\"initial\\\":\\\"passed: exit 0 and empty streams. Implemented field caps passed for named canonical file; not approval, requirements completeness, verification, or workflow completion.\\\",\\\"final\\\":\\\"passed\\\",\\\"correction\\\":null}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"comparison-plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T2/project text-T2-initial\",max_output_tokens:3000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T1"
+              },
+              {
+                "mode": "text",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_db79717dcd834220b472bfe60a0432a3",
+            "timestamp": "2026-11-12T17:21:47.983Z",
+            "source_line": 51,
+            "result_source_line": 54,
+            "result_timestamp": "2026-11-12T17:21:48.292Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 767,
+                "merged_tool_output_sha256": "4c57e8492bc559c742f548655b18588988c99b2717bf4d029a0d20386db55ec1",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T2-initial\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"comparison-plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T2/project\", \"started\": \"2026-11-12T17:21:48.169906+00:00\", \"finished\": \"2026-11-12T17:21:48.266556+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-initial.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-initial.",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 8,
+            "custom_sequence": 8,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "412ac0f8e7b020edb654877571bd2d67b48acb03ed67151dab6534c7719fb60f",
+            "command_characters": 673,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T2\\\",\\\"initial\\\":\\\"blocked: plan.field-caps says Simplicity check missing or empty for charter 1.1. No advisory success.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"find\\\",\\\".\\\",\\\"-maxdepth\\\",\\\"3\\\",\\\"-type\\\",\\\"f\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T2/originals text-T2-list\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"cat\\\",\\\"comparison-plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T2/project text-T2-read\",max_output_tokens:6000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_5494a47555ae47eebfa5cb49569a566b",
+            "timestamp": "2026-11-12T17:21:53.526Z",
+            "source_line": 56,
+            "result_source_line": 59,
+            "result_timestamp": "2026-11-12T17:21:53.765Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 5279,
+                "merged_tool_output_sha256": "9dda9d53d0f1635c39ced7f16f6f42248756e66593fcdb0c4c1eb979636a8e72",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T2-list\", \"argv\": [\"find\", \".\", \"-maxdepth\", \"3\", \"-type\", \"f\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T2/originals\", \"started\": \"2026-11-12T17:21:53.712402+00:00\", \"finished\": \"2026-11-12T17:21:53.716621+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-list.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-list.stderr\", \"stdout_bytes\": 32, \"stderr_bytes\": 0}\n./intent.md\n./plan.md\n./spec.md\n\nSTDERR: ",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 9,
+            "custom_sequence": 9,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "8cc810196b84fb46f1bb47c604c84020de6b0496fc2c9829a711af7c8817f5a3",
+            "command_characters": 225,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"cat\\\",\\\"plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T2/originals text-T2-original\",max_output_tokens:6000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_0263f8a3b20447e4b19d0f0f08d26da2",
+            "timestamp": "2026-11-12T17:21:56.818Z",
+            "source_line": 61,
+            "result_source_line": 64,
+            "result_timestamp": "2026-11-12T17:21:57.038Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 4759,
+                "merged_tool_output_sha256": "40d97193a02dcf5ca5dd4f4957748cabb9ae3694ace054776a92b1a479077e49",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T2-original\", \"argv\": [\"cat\", \"plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T2/originals\", \"started\": \"2026-11-12T17:21:57.009453+00:00\", \"finished\": \"2026-11-12T17:21:57.012313+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-original.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-original.stderr\", \"stdout_bytes\": 4303, \"stderr_bytes\": 0}\n# Consistent planning-command guidance — plan\nintent: ",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 10,
+            "custom_sequence": 10,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "0bbbaad342343db7866c013f22ce0a4b86a9167b902bcd84c260a82e249bc620",
+            "command_characters": 912,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"python3\\\",\\\"-c\\\",\\\"from pathlib import Path;p=Path(\\\\\\\"comparison-plan.md\\\\\\\");p.write_text(p.read_text().replace(\\\\\\\"## Deliberately removed simplicity record\\\\\\\",\\\\\\\"## Simplicity check\\\\\\\"))\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T2/project text-T2-edit\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"comparison-plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T2/project text-T2-final\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T3/project text-T3-initial\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T2"
+              },
+              {
+                "mode": "text",
+                "task_id": "T3"
+              }
+            ],
+            "call_id": "call_3876a2527bfb4ea08fc73b8be7e4000a",
+            "timestamp": "2026-11-12T17:22:04.204Z",
+            "source_line": 68,
+            "result_source_line": 71,
+            "result_timestamp": "2026-11-12T17:22:04.656Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1840,
+                "merged_tool_output_sha256": "fdc3c3615b1910cae91688ff80951fc99ea6c87b17f0b37a3f3a0dd080559844",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T2-edit\", \"argv\": [\"python3\", \"-c\", \"from pathlib import Path;p=Path(\\\"comparison-plan.md\\\");p.write_text(p.read_text().replace(\\\"## Deliberately removed simplicity record\\\",\\\"## Simplicity check\\\"))\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T2/project\", \"started\": \"2026-11-12T17:22:04.391313+00:00\", \"finished\": \"2026-11-12T17:22:04.408594+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T2-edit.stdout\", \"stderr_path\": \"/private",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 11,
+            "custom_sequence": 11,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "e1a01dba7da8219feb223ab26297a31092e984baa463805650303f006885d85f",
+            "command_characters": 1148,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T2\\\",\\\"update\\\":\\\"restored only original heading Simplicity check; final passed exit 0. Partial field validation remains the limit.\\\"}\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T3\\\",\\\"initial\\\":\\\"error exit 2: plan needs a path; invocation did not check a plan. Required canonical path is supplied by packet; help confirms file path rather than change-id.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T3/project text-T3-final\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T4/project text-T4-initial\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T2"
+              },
+              {
+                "mode": "text",
+                "task_id": "T3"
+              },
+              {
+                "mode": "text",
+                "task_id": "T4"
+              }
+            ],
+            "call_id": "call_14b94e3c166c45d4a0a716f71ec0eb97",
+            "timestamp": "2026-11-12T17:22:12.425Z",
+            "source_line": 73,
+            "result_source_line": 76,
+            "result_timestamp": "2026-11-12T17:22:14.135Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1365,
+                "merged_tool_output_sha256": "b677226f8b74b38395e544adce65ad091912b791101634c49ab859feaa1612f6",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T3-final\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T3/project\", \"started\": \"2026-11-12T17:22:12.607072+00:00\", \"finished\": \"2026-11-12T17:22:12.693616+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T3-final.stdout\", \"stderr_path\": \"/private/tmp/loom-json-oper",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 12,
+            "custom_sequence": 12,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "e12ad2e71928877dc6dc9cd97da756e53e7c3a7bdaf25821a0c76a561b5a1500",
+            "command_characters": 923,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T3\\\",\\\"update\\\":\\\"final passed exit 0 after supplying canonical plan path; field caps only, no plan approval.\\\"}\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T4\\\",\\\"initial\\\":\\\"passed exit 0: current write-plan prerequisites passed. interface-surfaces is advisory configuration information and is not success evidence on its own.\\\",\\\"final\\\":\\\"passed\\\",\\\"correction\\\":null,\\\"limitation\\\":\\\"does not perform write-plan, verify change, or authorize publication\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T5/project text-T5-initial\",max_output_tokens:3500}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T3"
+              },
+              {
+                "mode": "text",
+                "task_id": "T4"
+              },
+              {
+                "mode": "text",
+                "task_id": "T5"
+              }
+            ],
+            "call_id": "call_3958160ca6d64ccc8f06621897b90775",
+            "timestamp": "2026-11-12T17:22:20.103Z",
+            "source_line": 78,
+            "result_source_line": 81,
+            "result_timestamp": "2026-11-12T17:22:20.419Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 815,
+                "merged_tool_output_sha256": "188ccefb1dbf9a689c576aac2bb91365db29aefea5ff06d23614fa5de44889ab",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T5-initial\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"intake\", \"write-plan\", \"2026-11-12-cli-guidance-consistency\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T5/project\", \"started\": \"2026-11-12T17:22:20.290245+00:00\", \"finished\": \"2026-11-12T17:22:20.415731+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T5-initial.stdout\", \"stderr_path\": \"/private/tmp/loom-json-op",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 13,
+            "custom_sequence": 13,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "fc0f9329cfbee57993c84a0a1138a83bc162e3ebafcf80581080cdddce0aa9c5",
+            "command_characters": 627,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T5\\\",\\\"initial\\\":\\\"blocked exit 1 intake.confirmed: intent status open; write-plan requires confirmed date. No advisory output means success.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"diff\\\",\\\"-u\\\",\\\"/private/tmp/loom-json-comparison-20261113/A/text/T5/originals/intent.md\\\",\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T5/project text-T5-diff\",max_output_tokens:3500}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T5"
+              }
+            ],
+            "call_id": "call_950b5cda767f4d69953d3c79bb4ee67b",
+            "timestamp": "2026-11-12T17:22:25.389Z",
+            "source_line": 83,
+            "result_source_line": 86,
+            "result_timestamp": "2026-11-12T17:22:25.582Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1070,
+                "merged_tool_output_sha256": "3a533696fc624cb7f1550267af4c8d34fb95a72714a7b76314b44ae0893a3e29",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T5-diff\", \"argv\": [\"diff\", \"-u\", \"/private/tmp/loom-json-comparison-20261113/A/text/T5/originals/intent.md\", \"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T5/project\", \"started\": \"2026-11-12T17:22:25.551651+00:00\", \"finished\": \"2026-11-12T17:22:25.556205+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T5-diff.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 14,
+            "custom_sequence": 14,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "778f4741f0eb3c5af1161efea432cc68851b88fda012f05d0c620958f453bcd5",
+            "command_characters": 1020,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"python3\\\",\\\"-c\\\",\\\"from pathlib import Path;p=Path(\\\\\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\\\\\");p.write_text(p.read_text().replace(\\\\\\\"status: open\\\\\\\",\\\\\\\"status: confirmed 2026-11-12\\\\\\\"))\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T5/project text-T5-edit\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T5/project text-T5-final\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T6/project text-T6-initial\",max_output_tokens:4500}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T5"
+              },
+              {
+                "mode": "text",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_a02c8ca7e2c844f1944a93237ae9d9ff",
+            "timestamp": "2026-11-12T17:22:33.012Z",
+            "source_line": 88,
+            "result_source_line": 91,
+            "result_timestamp": "2026-11-12T17:22:33.766Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2385,
+                "merged_tool_output_sha256": "7c22d772ffa976028f4f5b49ccacd81fff2dc2fb99757e49acd82fbc5533a83e",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T5-edit\", \"argv\": [\"python3\", \"-c\", \"from pathlib import Path;p=Path(\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\");p.write_text(p.read_text().replace(\\\"status: open\\\",\\\"status: confirmed 2026-11-12\\\"))\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T5/project\", \"started\": \"2026-11-12T17:22:33.195192+00:00\", \"finished\": \"2026-11-12T17:22:33.209043+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T5-edit.stdout\", \"stderr",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 15,
+            "custom_sequence": 15,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "161defb21f0fdddfe91b7c2a62c1eca0cd6c78ddad3ebb36d50392dd30fd22ee",
+            "command_characters": 1101,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T5\\\",\\\"update\\\":\\\"restored only authentic confirmed status line; final passed exit 0, prerequisites only; advisory not success by itself.\\\"}\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T6\\\",\\\"initial\\\":\\\"blocked exit 1 plan.field-caps: Simplicity check absent/empty. interface-surfaces notice preceded blocker and does not imply success.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"diff\\\",\\\"-u\\\",\\\"/private/tmp/loom-json-comparison-20261113/A/text/T6/originals/spec.md\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/spec.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T6/project text-T6-spec-diff\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"diff\\\",\\\"-u\\\",\\\"/private/tmp/loom-json-comparison-20261113/A/text/T6/originals/plan.md\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T6/project text-T6-plan-diff\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T5"
+              },
+              {
+                "mode": "text",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_0a62ae46f87e486daaa8365e95fa40c9",
+            "timestamp": "2026-11-12T17:22:41.708Z",
+            "source_line": 93,
+            "result_source_line": 96,
+            "result_timestamp": "2026-11-12T17:22:41.937Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1917,
+                "merged_tool_output_sha256": "f19f9d75602433f202b2a4fa00a967ac6786c5dd7b89553a48e837ee687e4ae3",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T6-spec-diff\", \"argv\": [\"diff\", \"-u\", \"/private/tmp/loom-json-comparison-20261113/A/text/T6/originals/spec.md\", \"docs/loom/2026-11-12-cli-guidance-consistency/spec.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T6/project\", \"started\": \"2026-11-12T17:22:41.889374+00:00\", \"finished\": \"2026-11-12T17:22:41.892254+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T6-spec-diff.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-re",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 16,
+            "custom_sequence": 16,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "77239078f9417ba9b113ef3b5d791bbeefb525bbe39a838c693bb3615742bb1d",
+            "command_characters": 1291,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"python3\\\",\\\"-c\\\",\\\"from pathlib import Path;p=Path(\\\\\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\\\\\");p.write_text(p.read_text().replace(\\\\\\\"## Deliberately removed simplicity record\\\\\\\",\\\\\\\"## Simplicity check\\\\\\\"))\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T6/project text-T6-edit\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\"]' /private/tmp/loom-json-comparison-20261113/A/text/T6/project text-T6-final\\ncat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"text\\\",\\\"task\\\":\\\"T6\\\",\\\"update\\\":\\\"restored original Simplicity check heading only; final passed exit 0 with advisory; prerequisite snapshot only.\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T1/project json-T1-initial\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T1"
+              },
+              {
+                "mode": "text",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_cc19bc9a427f47e8bd2e5f70d67f1abf",
+            "timestamp": "2026-11-12T17:22:50.460Z",
+            "source_line": 98,
+            "result_source_line": 101,
+            "result_timestamp": "2026-11-12T17:22:51.055Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2126,
+                "merged_tool_output_sha256": "4108c765add5d9625aa6e536c32321b20d87dfae6634422183502014fff1ccbd",
+                "merged_tool_output_excerpt": "{\"label\": \"text-T6-edit\", \"argv\": [\"python3\", \"-c\", \"from pathlib import Path;p=Path(\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\");p.write_text(p.read_text().replace(\\\"## Deliberately removed simplicity record\\\",\\\"## Simplicity check\\\"))\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/text/T6/project\", \"started\": \"2026-11-12T17:22:50.638804+00:00\", \"finished\": \"2026-11-12T17:22:50.653618+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/text-T6-edi",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 17,
+            "custom_sequence": 17,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "6d6f367c2a99dae0dc8581899508b6ee9cb082a9d7008552609269481007e039",
+            "command_characters": 736,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T1\\\",\\\"initial\\\":\\\"passed status and exit 0; empty diagnostics/notices, null error. Named plan field checks only; not approval/completeness/change verification.\\\",\\\"final\\\":\\\"passed\\\",\\\"correction\\\":null,\\\"carryover\\\":\\\"JSON mode informed by all six text tasks and help discovery.\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"comparison-plan.md\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T2/project json-T2-initial\",max_output_tokens:3000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T1"
+              },
+              {
+                "mode": "json",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_3ef8fda25d5246bead35c229051a74a7",
+            "timestamp": "2026-11-12T17:22:56.337Z",
+            "source_line": 103,
+            "result_source_line": 106,
+            "result_timestamp": "2026-11-12T17:22:56.636Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 780,
+                "merged_tool_output_sha256": "6be4f172526673ff866cce7da3ef20ad42b82a66a1d175676efecda7337c2fdc",
+                "merged_tool_output_excerpt": "{\"label\": \"json-T2-initial\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"comparison-plan.md\", \"--json\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/json/T2/project\", \"started\": \"2026-11-12T17:22:56.518655+00:00\", \"finished\": \"2026-11-12T17:22:56.607429+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/json-T2-initial.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/json-T",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 18,
+            "custom_sequence": 18,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "6e8076072f1353056f885133e8238f5eb662503d98dc3b36dd6a2e2c0d1050aa",
+            "command_characters": 1439,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T2\\\",\\\"initial\\\":\\\"blocked status exit 1 plan.field-caps missing/empty Simplicity check charter 1.1; no advisory success.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"diff\\\",\\\"-u\\\",\\\"/private/tmp/loom-json-comparison-20261113/A/json/T2/originals/plan.md\\\",\\\"comparison-plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T2/project json-T2-diff\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"python3\\\",\\\"-c\\\",\\\"from pathlib import Path;p=Path(\\\\\\\"comparison-plan.md\\\\\\\");p.write_text(p.read_text().replace(\\\\\\\"## Deliberately removed simplicity record\\\\\\\",\\\\\\\"## Simplicity check\\\\\\\"))\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T2/project json-T2-edit\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"comparison-plan.md\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T2/project json-T2-final\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T3/project json-T3-initial\",max_output_tokens:5000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T2"
+              },
+              {
+                "mode": "json",
+                "task_id": "T3"
+              }
+            ],
+            "call_id": "call_75ac3523ca9642f8879cacb90e35a492",
+            "timestamp": "2026-11-12T17:23:06.230Z",
+            "source_line": 108,
+            "result_source_line": 111,
+            "result_timestamp": "2026-11-12T17:23:06.655Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 3230,
+                "merged_tool_output_sha256": "ad6a42f9477b7951cfc6dbcb46b6da3026d65c006901542d1f32781b3b7d3e14",
+                "merged_tool_output_excerpt": "{\"label\": \"json-T2-diff\", \"argv\": [\"diff\", \"-u\", \"/private/tmp/loom-json-comparison-20261113/A/json/T2/originals/plan.md\", \"comparison-plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/json/T2/project\", \"started\": \"2026-11-12T17:23:06.409908+00:00\", \"finished\": \"2026-11-12T17:23:06.412788+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/json-T2-diff.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/json-T2-diff.stderr\", \"stdout_bytes\": 7",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 19,
+            "custom_sequence": 19,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "0313835daf374ec3e4d28f8323d3fedd0ceac74b8703e6126c3a049027e0367c",
+            "command_characters": 1161,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T2\\\",\\\"update\\\":\\\"restored only original heading; final passed status exit 0. Field-cap validation limit remains.\\\"}\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T3\\\",\\\"initial\\\":\\\"error status exit 2, error.kind usage: plan needs a path; no diagnostic blocker and no plan checked. Packet and previously read help supply missing canonical file path.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"plan\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T3/project json-T3-final\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T4/project json-T4-initial\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T2"
+              },
+              {
+                "mode": "json",
+                "task_id": "T3"
+              },
+              {
+                "mode": "json",
+                "task_id": "T4"
+              }
+            ],
+            "call_id": "call_bc7809ccb4aa41429871f99ddd1213d9",
+            "timestamp": "2026-11-12T17:23:14.218Z",
+            "source_line": 113,
+            "result_source_line": 116,
+            "result_timestamp": "2026-11-12T17:23:14.781Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1610,
+                "merged_tool_output_sha256": "2142799d7d11b501aced66b626d6b7afb4567002a12dff7ffb4caf95d4782845",
+                "merged_tool_output_excerpt": "{\"label\": \"json-T3-final\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\", \"--json\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/json/T3/project\", \"started\": \"2026-11-12T17:23:14.385618+00:00\", \"finished\": \"2026-11-12T17:23:14.472257+00:00\", \"exit\": 0, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/json-T3-final.stdout\", \"stderr_path\": \"/private/tmp/loom",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 20,
+            "custom_sequence": 20,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "45b833ecaa387f0d411ff928ef94a69564d0ced5bf8f7c125231cb011b10da34",
+            "command_characters": 913,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T3\\\",\\\"update\\\":\\\"final passed status exit 0 by supplying canonical file path; not plan approval.\\\"}\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T4\\\",\\\"initial\\\":\\\"passed status exit 0: applicable write-plan prerequisites passed in snapshot. notices interface-surfaces advisory does not independently establish success.\\\",\\\"final\\\":\\\"passed\\\",\\\"correction\\\":null,\\\"limitation\\\":\\\"does not run station/verify change/authorize publication\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T5/project json-T5-initial\",max_output_tokens:3000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T3"
+              },
+              {
+                "mode": "json",
+                "task_id": "T4"
+              },
+              {
+                "mode": "json",
+                "task_id": "T5"
+              }
+            ],
+            "call_id": "call_1e672664b6494714b4202fa0231b4a75",
+            "timestamp": "2026-11-12T17:23:21.035Z",
+            "source_line": 118,
+            "result_source_line": 121,
+            "result_timestamp": "2026-11-12T17:23:21.374Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 828,
+                "merged_tool_output_sha256": "6c5459631195f19aa60369f52824365bdf8caf8b2f6006cec9ef31f1b6b5f6a0",
+                "merged_tool_output_excerpt": "{\"label\": \"json-T5-initial\", \"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"intake\", \"write-plan\", \"2026-11-12-cli-guidance-consistency\", \"--json\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/json/T5/project\", \"started\": \"2026-11-12T17:23:21.226797+00:00\", \"finished\": \"2026-11-12T17:23:21.369653+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/json-T5-initial.stdout\", \"stderr_path\": \"/private/tmp/lo",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 21,
+            "tool": "collaboration.send_message",
+            "phase": "coordination",
+            "target": "/root",
+            "task_associations": [],
+            "content_omitted": "Coordination body not needed for operation counting; not copied or decrypted.",
+            "call_id": "call_ea76d3efa9ed4584ba90681c0f309817",
+            "timestamp": "2026-11-12T17:23:25.669Z",
+            "source_line": 125,
+            "result_source_line": 128,
+            "result_timestamp": "2026-11-12T17:23:25.778Z"
+          },
+          {
+            "sequence": 22,
+            "custom_sequence": 21,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "70b6b08ba67f138dd4aa40885b4c9c5855c0f6ea86759b031b7fc5565b5357d5",
+            "command_characters": 1582,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T5\\\",\\\"initial\\\":\\\"blocked exit 1 intake.confirmed: status open instead of confirmed date; notices empty, no success.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"diff\\\",\\\"-u\\\",\\\"/private/tmp/loom-json-comparison-20261113/A/json/T5/originals/intent.md\\\",\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T5/project json-T5-diff\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"python3\\\",\\\"-c\\\",\\\"from pathlib import Path;p=Path(\\\\\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\\\\\");p.write_text(p.read_text().replace(\\\\\\\"status: open\\\\\\\",\\\\\\\"status: confirmed 2026-11-12\\\\\\\"))\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T5/project json-T5-edit\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T5/project json-T5-final\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T6/project json-T6-initial\",max_output_tokens:4500}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T5"
+              },
+              {
+                "mode": "json",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_07b4e5c2c1d341e58fda7a01461f6daf",
+            "timestamp": "2026-11-12T17:23:36.402Z",
+            "source_line": 130,
+            "result_source_line": 133,
+            "result_timestamp": "2026-11-12T17:23:37.226Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 3590,
+                "merged_tool_output_sha256": "f8ab6906e7fe6722e5bd5f2e2fe67eb72fd8d8542091f4acb183b03d20754703",
+                "merged_tool_output_excerpt": "{\"label\": \"json-T5-diff\", \"argv\": [\"diff\", \"-u\", \"/private/tmp/loom-json-comparison-20261113/A/json/T5/originals/intent.md\", \"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/json/T5/project\", \"started\": \"2026-11-12T17:23:36.588104+00:00\", \"finished\": \"2026-11-12T17:23:36.591532+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/json-T5-diff.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 23,
+            "custom_sequence": 22,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "ddf201d317f2db990a800cd9a8895484540d478b09227a43e2ef84f0d0409d68",
+            "command_characters": 1497,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T5\\\",\\\"update\\\":\\\"restored authentic confirmed date line only. Final passed exit 0, advisory surface configuration; prerequisites only.\\\"}\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T6\\\",\\\"initial\\\":\\\"blocked status exit 1 plan.field-caps: missing/empty Simplicity check. notices interface-surfaces coexists with blocker and never means success.\\\",\\\"final\\\":\\\"pending\\\"}\\nEOF\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"diff\\\",\\\"-u\\\",\\\"/private/tmp/loom-json-comparison-20261113/A/json/T6/originals/plan.md\\\",\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T6/project json-T6-diff\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"python3\\\",\\\"-c\\\",\\\"from pathlib import Path;p=Path(\\\\\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\\\\\");p.write_text(p.read_text().replace(\\\\\\\"## Deliberately removed simplicity record\\\\\\\",\\\\\\\"## Simplicity check\\\\\\\"))\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T6/project json-T6-edit\\npython3 /private/tmp/loom-json-operator-A-results/run.py '[\\\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\\\",\\\"--ready\\\",\\\"intake\\\",\\\"write-plan\\\",\\\"2026-11-12-cli-guidance-consistency\\\",\\\"--json\\\"]' /private/tmp/loom-json-comparison-20261113/A/json/T6/project json-T6-final\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T5"
+              },
+              {
+                "mode": "json",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_c6c87f1863394cfc9984c43de3f7fd00",
+            "timestamp": "2026-11-12T17:23:48.511Z",
+            "source_line": 135,
+            "result_source_line": 138,
+            "result_timestamp": "2026-11-12T17:23:49.012Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2856,
+                "merged_tool_output_sha256": "627b6fe19a0b3cc357c9bb7d8049eca438a10f8125a3e277f939e247e3aa9b3d",
+                "merged_tool_output_excerpt": "{\"label\": \"json-T6-diff\", \"argv\": [\"diff\", \"-u\", \"/private/tmp/loom-json-comparison-20261113/A/json/T6/originals/plan.md\", \"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/A/json/T6/project\", \"started\": \"2026-11-12T17:23:48.694908+00:00\", \"finished\": \"2026-11-12T17:23:48.697468+00:00\", \"exit\": 1, \"stdout_path\": \"/private/tmp/loom-json-operator-A-results/json-T6-diff.stdout\", \"stderr_path\": \"/private/tmp/loom-json-operator-A-results/json",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 24,
+            "custom_sequence": 23,
+            "tool": "functions.exec",
+            "phase": "reporting",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "046700640478323bd48bf293615259474375fc518cb364c14fa562e936fc0464",
+            "command_characters": 6498,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat >> /private/tmp/loom-json-operator-A-results/answers.jsonl <<'EOF'\\n{\\\"mode\\\":\\\"json\\\",\\\"task\\\":\\\"T6\\\",\\\"update\\\":\\\"restored original Simplicity check heading only; final passed status exit 0 with advisory. Current prerequisites only.\\\"}\\nEOF\\ncat > /private/tmp/loom-json-operator-A-results/finalize.py <<'PY'\\nfrom pathlib import Path\\nimport json,collections\\nr=Path('/private/tmp/loom-json-operator-A-results')\\nledger=[json.loads(s) for s in (r/'ledger.jsonl').read_text().splitlines()]\\nanswers=[json.loads(s) for s in (r/'answers.jsonl').read_text().splitlines()]\\ngoals=['Check the historical change\\\\'s canonical plan. Explain the outcome and what it does and does not establish.','Check the provided plan copy. Explain any failure, correct only the identified defect using the authentic source supplied, and check it again.','Try the plan check without supplying its required target. Explain the result, discover the missing input and check the histo\n[bounded excerpt; see hashed source line]\ne conversation transcript.','','Artifacts: results.json, answers.jsonl, ledger.jsonl, and per-operation .stdout/.stderr files.']\\n(r/'report.md').write_text('\\\\n'.join(lines)+'\\\\n')\\nprint(json.dumps({'tasks':len(tasks),'counts':dict(counts),'results':str(r/'results.json'),'report':str(r/'report.md')}))\\nPY\\npython3 /private/tmp/loom-json-operator-A-results/finalize.py\",max_output_tokens:2000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_6a15c0b0ab6d49fab5259c4cbc3270e1",
+            "timestamp": "2026-11-12T17:24:22.017Z",
+            "source_line": 142,
+            "result_source_line": 145,
+            "result_timestamp": "2026-11-12T17:24:22.224Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 249,
+                "merged_tool_output_sha256": "133a968426cb66bfecd864cc679f8f3624acad2354f1d5f605f297c2864860f8",
+                "merged_tool_output_excerpt": "{\"tasks\": 12, \"counts\": {\"total_recorded_constituent_calls\": 38, \"help\": 3, \"checks\": 20, \"reads\": 9, \"edits\": 6}, \"results\": \"/private/tmp/loom-json-operator-A-results/results.json\", \"report\": \"/private/tmp/loom-json-operator-A-results/report.md\"}\n",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 25,
+            "tool": "collaboration.send_message",
+            "phase": "coordination",
+            "target": "/root",
+            "task_associations": [],
+            "content_omitted": "Coordination body not needed for operation counting; not copied or decrypted.",
+            "call_id": "call_53599e513a5e402fb871900adfcf9550",
+            "timestamp": "2026-11-12T17:24:26.204Z",
+            "source_line": 147,
+            "result_source_line": 150,
+            "result_timestamp": "2026-11-12T17:24:26.290Z"
+          }
+        ],
+        "task_associations": [
+          {
+            "mode": "text",
+            "task_id": "T1",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_f0594db87d8d44d58ea530bbd9593aca",
+              "call_db79717dcd834220b472bfe60a0432a3"
+            ],
+            "shared_call_ids": [
+              "call_db79717dcd834220b472bfe60a0432a3"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T2",
+            "exact_tool_call_touch_count": 5,
+            "call_ids": [
+              "call_db79717dcd834220b472bfe60a0432a3",
+              "call_5494a47555ae47eebfa5cb49569a566b",
+              "call_0263f8a3b20447e4b19d0f0f08d26da2",
+              "call_3876a2527bfb4ea08fc73b8be7e4000a",
+              "call_14b94e3c166c45d4a0a716f71ec0eb97"
+            ],
+            "shared_call_ids": [
+              "call_db79717dcd834220b472bfe60a0432a3",
+              "call_3876a2527bfb4ea08fc73b8be7e4000a",
+              "call_14b94e3c166c45d4a0a716f71ec0eb97"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T3",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_3876a2527bfb4ea08fc73b8be7e4000a",
+              "call_14b94e3c166c45d4a0a716f71ec0eb97",
+              "call_3958160ca6d64ccc8f06621897b90775"
+            ],
+            "shared_call_ids": [
+              "call_3876a2527bfb4ea08fc73b8be7e4000a",
+              "call_14b94e3c166c45d4a0a716f71ec0eb97",
+              "call_3958160ca6d64ccc8f06621897b90775"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T4",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_14b94e3c166c45d4a0a716f71ec0eb97",
+              "call_3958160ca6d64ccc8f06621897b90775"
+            ],
+            "shared_call_ids": [
+              "call_14b94e3c166c45d4a0a716f71ec0eb97",
+              "call_3958160ca6d64ccc8f06621897b90775"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T5",
+            "exact_tool_call_touch_count": 4,
+            "call_ids": [
+              "call_3958160ca6d64ccc8f06621897b90775",
+              "call_950b5cda767f4d69953d3c79bb4ee67b",
+              "call_a02c8ca7e2c844f1944a93237ae9d9ff",
+              "call_0a62ae46f87e486daaa8365e95fa40c9"
+            ],
+            "shared_call_ids": [
+              "call_3958160ca6d64ccc8f06621897b90775",
+              "call_a02c8ca7e2c844f1944a93237ae9d9ff",
+              "call_0a62ae46f87e486daaa8365e95fa40c9"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T6",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_a02c8ca7e2c844f1944a93237ae9d9ff",
+              "call_0a62ae46f87e486daaa8365e95fa40c9",
+              "call_cc19bc9a427f47e8bd2e5f70d67f1abf"
+            ],
+            "shared_call_ids": [
+              "call_a02c8ca7e2c844f1944a93237ae9d9ff",
+              "call_0a62ae46f87e486daaa8365e95fa40c9",
+              "call_cc19bc9a427f47e8bd2e5f70d67f1abf"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T1",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_cc19bc9a427f47e8bd2e5f70d67f1abf",
+              "call_3ef8fda25d5246bead35c229051a74a7"
+            ],
+            "shared_call_ids": [
+              "call_cc19bc9a427f47e8bd2e5f70d67f1abf",
+              "call_3ef8fda25d5246bead35c229051a74a7"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T2",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_3ef8fda25d5246bead35c229051a74a7",
+              "call_75ac3523ca9642f8879cacb90e35a492",
+              "call_bc7809ccb4aa41429871f99ddd1213d9"
+            ],
+            "shared_call_ids": [
+              "call_3ef8fda25d5246bead35c229051a74a7",
+              "call_75ac3523ca9642f8879cacb90e35a492",
+              "call_bc7809ccb4aa41429871f99ddd1213d9"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T3",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_75ac3523ca9642f8879cacb90e35a492",
+              "call_bc7809ccb4aa41429871f99ddd1213d9",
+              "call_1e672664b6494714b4202fa0231b4a75"
+            ],
+            "shared_call_ids": [
+              "call_75ac3523ca9642f8879cacb90e35a492",
+              "call_bc7809ccb4aa41429871f99ddd1213d9",
+              "call_1e672664b6494714b4202fa0231b4a75"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T4",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_bc7809ccb4aa41429871f99ddd1213d9",
+              "call_1e672664b6494714b4202fa0231b4a75"
+            ],
+            "shared_call_ids": [
+              "call_bc7809ccb4aa41429871f99ddd1213d9",
+              "call_1e672664b6494714b4202fa0231b4a75"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T5",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_1e672664b6494714b4202fa0231b4a75",
+              "call_07b4e5c2c1d341e58fda7a01461f6daf",
+              "call_c6c87f1863394cfc9984c43de3f7fd00"
+            ],
+            "shared_call_ids": [
+              "call_1e672664b6494714b4202fa0231b4a75",
+              "call_07b4e5c2c1d341e58fda7a01461f6daf",
+              "call_c6c87f1863394cfc9984c43de3f7fd00"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T6",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_07b4e5c2c1d341e58fda7a01461f6daf",
+              "call_c6c87f1863394cfc9984c43de3f7fd00",
+              "call_6a15c0b0ab6d49fab5259c4cbc3270e1"
+            ],
+            "shared_call_ids": [
+              "call_07b4e5c2c1d341e58fda7a01461f6daf",
+              "call_c6c87f1863394cfc9984c43de3f7fd00"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          }
+        ],
+        "bootstrap_stream_limit": "Native exec tool results combine output streams. Merged output bytes are recovered exactly; stdout/stderr separation remains unknown, not inferred from success exit."
+      },
+      "B": {
+        "source_file": "rollout-2026-11-13T01-24-43-01a1d0ca-53cb-74d0-9d42-ddf331de0e20.jsonl",
+        "source_file_sha256": "bf2a4ef205aded823b714f801ef2a1b6cfa750a1ac13f87f15c5453b3e7e0759",
+        "source_session_id": "01a1d0ca-53cb-74d0-9d42-ddf331de0e20",
+        "verified_agent_path": "/root/json_operator_b",
+        "functions_exec_calls": 20,
+        "coordination_calls": 2,
+        "all_host_tool_calls": 22,
+        "nested_exec_command_invocations": 20,
+        "phase_host_counts": {
+          "bootstrap/discovery": 5,
+          "task activity": 13,
+          "reporting": 2,
+          "coordination": 2
+        },
+        "calls": [
+          {
+            "sequence": 1,
+            "custom_sequence": 1,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "d6506fa966eae7c597538b2788101189a88d88817b6d06ffe1bc0c19c857380a",
+            "command_characters": 125,
+            "command_excerpt": "const r=await tools.exec_command({cmd:\"cat /private/tmp/loom-json-operator-B-packet.json\",max_output_tokens:12000});text(r);\n",
+            "task_associations": [],
+            "call_id": "call_3a2ff101f676462f9d71a0b55c1dd019",
+            "timestamp": "2026-11-12T17:24:46.794Z",
+            "source_line": 14,
+            "result_source_line": 17,
+            "result_timestamp": "2026-11-12T17:24:46.987Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 4892,
+                "merged_tool_output_sha256": "ab2066e8cecc1776153ea83ff684d7dc056e15c5d3ae2cf7f40d3bf98522053d",
+                "merged_tool_output_excerpt": "{\n  \"candidate_sha\": \"2cef40163b6a562971780da6e6fd107289304962\",\n  \"candidate_launcher\": \"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\",\n  \"operator_instructions\": \"/private/tmp/loom-json-comparison-20261113/operator-instructions.md\",\n  \"historical_change_id\": \"2026-11-12-cli-guidance-consistency\",\n  \"operator\": \"B\",\n  \"tasks\": {\n    \"mode_order\": [\n      \"json\",\n      \"text\"\n    ],\n    \"modes\": {\n      \"json\": [\n        {\n          \"task_id\": \"T1\",\n        ",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 2,
+            "custom_sequence": 2,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "563d621c7f7eb8dd34b4b07f3b8c44cb46790ee38ba08a32c1c838ea3b2b0abd",
+            "command_characters": 137,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat /private/tmp/loom-json-comparison-20261113/operator-instructions.md\",max_output_tokens:12000}));\n",
+            "task_associations": [],
+            "call_id": "call_d463f3397b304fe5ae8ee7845f86e5a2",
+            "timestamp": "2026-11-12T17:24:49.425Z",
+            "source_line": 19,
+            "result_source_line": 22,
+            "result_timestamp": "2026-11-12T17:24:49.614Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2965,
+                "merged_tool_output_sha256": "d83fba022e517404dddd2f9f04d7d6a107cdd81e22323ae4a3c9fc3379324f6c",
+                "merged_tool_output_excerpt": "# Operator task packet — preparation-result comparison\n\nYou are an independent operator evaluating two representations of the same\nlocal checks. You did not implement the candidate. Your assigned mode order,\ncandidate launcher, candidate commit and fresh task directories are supplied\nby the coordinator. Use the same task order T1 through T6 within each mode.\nDiscover command syntax from public help; no prepared commands are supplied.\nFor JSON mode select the optional JSON representation when che",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 3,
+            "custom_sequence": 3,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "ca1ebb58eae067eee1ad2d39b0c50cae2112506795d9b7dcbc9e1c80420818fa",
+            "command_characters": 154,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --help\",max_output_tokens:4000}));\n",
+            "task_associations": [],
+            "call_id": "call_b9eb9080227849fc91096c85debfcec8",
+            "timestamp": "2026-11-12T17:24:52.925Z",
+            "source_line": 26,
+            "result_source_line": 29,
+            "result_timestamp": "2026-11-12T17:24:53.113Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 625,
+                "merged_tool_output_sha256": "34d6acde03d61ad7d54580361619cc05c190de8f9db2c8c5c11dc6ad85c72d80",
+                "merged_tool_output_excerpt": "Usage: loom-python (--repair|--ready) <checker-command> [arguments...]\n       loom-python (--repair|--ready) --script <path> [arguments...]\n       loom-python --help\nThe checker is selected automatically; omit loom_checker.py from the arguments.\nPlanning: \"<loom-code>/scripts/loom-python\" --repair plan \"<path-to-plan.md>\"\nChecker commands: \"<loom-code>/scripts/loom-python\" --repair --help\nReplace <loom-code> with the installed plugin directory and <path-to-plan.md> with your plan file path.\n--re",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 4,
+            "custom_sequence": 4,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "265aef90b7a63e53bc55e29a1dcbb07c015df46544a0c9891c9a6b0fe6d3c9f3",
+            "command_characters": 932,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"mkdir -p /private/tmp/loom-json-operator-B-results && cat > /private/tmp/loom-json-operator-B-results/run.py <<'PY'\\nimport subprocess,json,datetime,sys,pathlib\\nroot=pathlib.Path('/private/tmp/loom-json-operator-B-results')\\nargv=sys.argv[2:];cwd=sys.argv[1]\\nt=datetime.datetime.now(datetime.timezone.utc).isoformat(); p=subprocess.run(argv,cwd=cwd,capture_output=True)\\nr={'argv':argv,'cwd':cwd,'timestamp_utc':t,'exit':p.returncode,'stdout':p.stdout.decode(),'stderr':p.stderr.decode(),'stdout_bytes':len(p.stdout),'stderr_bytes':len(p.stderr)}\\nwith (root/'operations.jsonl').open('a') as f:f.write(json.dumps(r)+'\\\\n')\\nprint(json.dumps(r))\\nPY\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T1/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready --help\",max_output_tokens:8000}));\n",
+            "task_associations": [],
+            "call_id": "call_f33ff4a8e2ff48ec8399c95161ec2c69",
+            "timestamp": "2026-11-12T17:25:02.106Z",
+            "source_line": 33,
+            "result_source_line": 36,
+            "result_timestamp": "2026-11-12T17:25:02.428Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2769,
+                "merged_tool_output_sha256": "c7ce90063b5ab848b8593f16fb23dd6fdb2d32ca82c906ead55fda097eea73ff",
+                "merged_tool_output_excerpt": "{\"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"--help\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/B/json/T1/project\", \"timestamp_utc\": \"2026-11-12T17:25:02.303369+00:00\", \"exit\": 0, \"stdout\": \"\\n\\n    loom_checker.py --list-rules\\n    loom_checker.py --help\\n    loom_checker.py intent <path> [--commit-msg <file>]\\n    loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]\\n    loom_checker.py intake <station> <c",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 5,
+            "custom_sequence": 5,
+            "tool": "functions.exec",
+            "phase": "bootstrap/discovery",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "92a46f539ddaa84fcfc74956de361799789ab2ff123a6ceaef77f7f922b36101",
+            "command_characters": 509,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T1/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan --help\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T1/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake --help\",max_output_tokens:8000}));\n",
+            "task_associations": [],
+            "call_id": "call_883848861d9c4cf09d5d2babe57af054",
+            "timestamp": "2026-11-12T17:25:06.861Z",
+            "source_line": 38,
+            "result_source_line": 41,
+            "result_timestamp": "2026-11-12T17:25:07.227Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 5778,
+                "merged_tool_output_sha256": "907de83e18f91dabfc4a03cc28892abab93e5bc39382211e85c9a6a5aa1eb01b",
+                "merged_tool_output_excerpt": "{\"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"--help\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/B/json/T1/project\", \"timestamp_utc\": \"2026-11-12T17:25:07.028554+00:00\", \"exit\": 0, \"stdout\": \"plan \\u2014 check the implemented field caps on one named file\\nUsage: plan <path-to-plan.md> [--json]\\nSupply a readable file path, relative to the working directory or absolute;\\nthis command does not resolve a change-id or se",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 6,
+            "custom_sequence": 6,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "2a80f0ef7f337c7a7a9955886b8e245002edcb4a0ec0cf92e5e1a4567fa7ae59",
+            "command_characters": 580,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T1/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan docs/loom/2026-11-12-cli-guidance-consistency/plan.md --json\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T2/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan comparison-plan.md --json\",max_output_tokens:5000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T1"
+              },
+              {
+                "mode": "json",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_3c0a2375622d460882beddeaec14b699",
+            "timestamp": "2026-11-12T17:25:13.595Z",
+            "source_line": 45,
+            "result_source_line": 48,
+            "result_timestamp": "2026-11-12T17:25:13.979Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1100,
+                "merged_tool_output_sha256": "a23ed957e30ea80d73e762788731e13f026b5049d559453d9f30adcebd903ba7",
+                "merged_tool_output_excerpt": "{\"argv\": [\"/private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python\", \"--ready\", \"plan\", \"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\", \"--json\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/B/json/T1/project\", \"timestamp_utc\": \"2026-11-12T17:25:13.782971+00:00\", \"exit\": 0, \"stdout\": \"{\\\"schema_version\\\": 1, \\\"command\\\": \\\"plan\\\", \\\"status\\\": \\\"passed\\\", \\\"diagnostics\\\": [], \\\"notices\\\": [], \\\"error\\\": null}\\n\", \"stderr\": \"\", \"stdout_bytes\": 110, \"stder",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 7,
+            "tool": "collaboration.send_message",
+            "phase": "coordination",
+            "target": "/root",
+            "task_associations": [],
+            "content_omitted": "Coordination body not needed for operation counting; not copied or decrypted.",
+            "call_id": "call_fc55bbd5ee894389aee6b78cfe0f98b7",
+            "timestamp": "2026-11-12T17:25:18.212Z",
+            "source_line": 50,
+            "result_source_line": 53,
+            "result_timestamp": "2026-11-12T17:25:18.274Z"
+          },
+          {
+            "sequence": 8,
+            "custom_sequence": 7,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "ba56b7859e07b040c527db2d146d8f0d890d3935c958e69aaeb14ce2016d7b07",
+            "command_characters": 901,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json; p=pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\"); p.open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T1\\\":\\\"Passed implemented field checks only; no plan approval, completeness or change verification.\\\",\\\"T2\\\":\\\"Blocked plan.field-caps: missing/empty Simplicity check charter 1.1; no notices; restore only missing section from authentic original.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T2/project find /private/tmp/loom-json-comparison-20261113/B/json/T2/originals -type f\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T2/project cat comparison-plan.md\",max_output_tokens:8000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T1"
+              },
+              {
+                "mode": "json",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_0548f6b022f942f5b419d598e0fe390f",
+            "timestamp": "2026-11-12T17:25:24.717Z",
+            "source_line": 55,
+            "result_source_line": 58,
+            "result_timestamp": "2026-11-12T17:25:25.006Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 5881,
+                "merged_tool_output_sha256": "f1503ab760be584260421bcc2124481bc9fe5c138d6c4665f8fc67c9e39f421c",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json; p=pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\"); p.open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T1\\\":\\\"Passed implemented field checks only; no plan approval, completeness or change verification.\\\",\\\"T2\\\":\\\"Blocked plan.field-caps: missing/empty Simplicity check charter 1.1; no notices; restore only missing section from authentic original.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 9,
+            "custom_sequence": 8,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "2ebb54e8a72e3096c292f6d53c7d5766c001bfb4206faf9ea18452620217a365",
+            "command_characters": 429,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T2/project cat ../originals/plan.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T3/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan --json\",max_output_tokens:6500}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T2"
+              },
+              {
+                "mode": "json",
+                "task_id": "T3"
+              }
+            ],
+            "call_id": "call_5a4927979ed94845b835e767621ddcba",
+            "timestamp": "2026-11-12T17:25:28.962Z",
+            "source_line": 60,
+            "result_source_line": 63,
+            "result_timestamp": "2026-11-12T17:25:29.300Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 5249,
+                "merged_tool_output_sha256": "74b83799de37e68a33c692b5eb5e81a91cde2b3938c7f14b806de981dbd69d39",
+                "merged_tool_output_excerpt": "{\"argv\": [\"cat\", \"../originals/plan.md\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/B/json/T2/project\", \"timestamp_utc\": \"2026-11-12T17:25:29.160177+00:00\", \"exit\": 0, \"stdout\": \"# Consistent planning-command guidance \\u2014 plan\\nintent: 2026-11-12-cli-guidance-consistency@ecaac7d971c5e7ffc75996b4c78ac76517eaf908\\nspec: docs/loom/2026-11-12-cli-guidance-consistency/spec.md@391993b5c57b55e740439086c20114fce719af19\\ncharter: 1.1\\n\\nCurrent state evidence and behavior decisions: [spec.md]",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 10,
+            "custom_sequence": 9,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "5a9c280fd89c19965e09dff8c0e04f41aedd272ba9892f25744efe9ae293e30c",
+            "command_characters": 1707,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json; pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T3\\\":\\\"Error usage exit 2: plan needs a path; not blocked or passed. Packet supplies canonical plan path; retry that target.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T2/project python3 -c 'from pathlib import Path;p=Path(\\\"comparison-plan.md\\\");s=Path(\\\"../originals/plan.md\\\").read_text();section=s.split(\\\"## Simplicity check\\\",1)[1].split(\\\"## Questions asked\\\",1)[0];t=p.read_text();a=t.index(\\\"## Deliberately removed simplicity record\\\");b=t.index(\\\"## Questions asked\\\",a);p.write_text(t[:a]+\\\"## Simplicity check\\\"+section+t[b:])'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T\n[bounded excerpt; see hashed source line]\nm-code/scripts/loom-python --ready plan docs/loom/2026-11-12-cli-guidance-consistency/plan.md --json\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T4/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency --json\",max_output_tokens:5000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T2"
+              },
+              {
+                "mode": "json",
+                "task_id": "T3"
+              },
+              {
+                "mode": "json",
+                "task_id": "T4"
+              }
+            ],
+            "call_id": "call_051bdf4199134c63be4e4b968de8e6e2",
+            "timestamp": "2026-11-12T17:25:39.931Z",
+            "source_line": 65,
+            "result_source_line": 68,
+            "result_timestamp": "2026-11-12T17:25:40.666Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2750,
+                "merged_tool_output_sha256": "04af09e60426e1202ab48a627afb21a2ea399fc9f3c75f095760bd4c623df81f",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json; pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T3\\\":\\\"Error usage exit 2: plan needs a path; not blocked or passed. Packet supplies canonical plan path; retry that target.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:25:40.111887+00:00\", \"exit\": 0, \"stdout\": \"\", \"stderr\": \"\", \"stdout_bytes\": 0, \"stderr_bytes\": 0}\n{\"argv\": [\"python3\", \"-c\"",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 11,
+            "custom_sequence": 10,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "7ed0a43897f8832f564cfe0909d2f28330df5e057e0dd12efa8770f1c7ce2fc7",
+            "command_characters": 1086,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json; pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T4\\\":\\\"Passed applicable write-plan prerequisites for current snapshot. interface-surfaces notice lists default interface matching patterns, advisory only; success comes from exit/status, does not perform station or verify change.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T5/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency --json\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T6/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency --json\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T4"
+              },
+              {
+                "mode": "json",
+                "task_id": "T5"
+              },
+              {
+                "mode": "json",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_86a4ab8191964874836cad4286d86b65",
+            "timestamp": "2026-11-12T17:25:47.709Z",
+            "source_line": 70,
+            "result_source_line": 73,
+            "result_timestamp": "2026-11-12T17:25:48.368Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2028,
+                "merged_tool_output_sha256": "8ee344b5a884b2bc53eaac2ff952e02647670233d4f1063b5bc90bc829cbac88",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json; pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T4\\\":\\\"Passed applicable write-plan prerequisites for current snapshot. interface-surfaces notice lists default interface matching patterns, advisory only; success comes from exit/status, does not perform station or verify change.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:25:47.892334+00:0",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 12,
+            "custom_sequence": 11,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "195d56e7d5d69f8cf9efa21470a92e65b0769c0487424bd21150e6bdeed82b2e",
+            "command_characters": 1016,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json; pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T5\\\":\\\"Blocked intake.confirmed because status open; requires confirmed date; no notices. Restore only original intent status.\\\",\\\"T6\\\":\\\"Blocked plan.field-caps missing/empty Simplicity check. interface-surfaces advisory precedes blocker and is not success; restore affected plan section only.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T5/project diff -u ../originals/intent.md docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T6/project diff -u ../originals/plan.md docs/loom/2026-11-12-cli-guidance-consistency/plan.md\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T5"
+              },
+              {
+                "mode": "json",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_9634c5d1af9146adb6ef364fab928fdd",
+            "timestamp": "2026-11-12T17:25:57.135Z",
+            "source_line": 77,
+            "result_source_line": 80,
+            "result_timestamp": "2026-11-12T17:25:57.395Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2534,
+                "merged_tool_output_sha256": "4c01b2eeb32131672738ac423aeb84ba358fff1395d61da76e5c195e7685a831",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json; pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"json\\\",\\\"T5\\\":\\\"Blocked intake.confirmed because status open; requires confirmed date; no notices. Restore only original intent status.\\\",\\\"T6\\\":\\\"Blocked plan.field-caps missing/empty Simplicity check. interface-surfaces advisory precedes blocker and is not success; restore affected plan section only.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 13,
+            "custom_sequence": 12,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "f40e31fc5778cd56a847d93234a529bd8969934fed3e5679990d49ba1482a532",
+            "command_characters": 1435,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T5/project python3 -c 'from pathlib import Path;p=Path(\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\");s=Path(\\\"../originals/intent.md\\\").read_text();status=next(x for x in s.splitlines() if x.startswith(\\\"status:\\\"));p.write_text(p.read_text().replace(\\\"status: open\\\",status))'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T5/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency --json\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T6/project python3 -c 'from pathlib import Path;p=Path(\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\");s=Path(\\\"../originals/plan.md\\\").read_text();heading=next(x for x in s.splitlines() if x==\\\"## Simplicity check\\\");p.write_text(p.read_text().replace(\\\"## Deliberately removed simplicity record\\\",heading))'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/json/T6/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency --json\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "json",
+                "task_id": "T5"
+              },
+              {
+                "mode": "json",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_709df247c94d48b2ba0bf4275c37c0d1",
+            "timestamp": "2026-11-12T17:26:08.257Z",
+            "source_line": 82,
+            "result_source_line": 85,
+            "result_timestamp": "2026-11-12T17:26:09.065Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2436,
+                "merged_tool_output_sha256": "8e2b695cb678faaa965d249387ee7809876d218ce14e880bece1f302c4cf640b",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"from pathlib import Path;p=Path(\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\");s=Path(\\\"../originals/intent.md\\\").read_text();status=next(x for x in s.splitlines() if x.startswith(\\\"status:\\\"));p.write_text(p.read_text().replace(\\\"status: open\\\",status))\"], \"cwd\": \"/private/tmp/loom-json-comparison-20261113/B/json/T5/project\", \"timestamp_utc\": \"2026-11-12T17:26:08.438750+00:00\", \"exit\": 0, \"stdout\": \"\", \"stderr\": \"\", \"stdout_bytes\": 0, \"stderr_bytes\": 0}",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 14,
+            "custom_sequence": 13,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "25bf4fa323caa95289fc25456736b9b2c662eb53d44665aaead579ff6856fae5",
+            "command_characters": 927,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"carryover\\\":\\\"Second mode uses syntax, diagnostic meaning and repair knowledge learned in JSON mode; not blind.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T1/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T2/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan comparison-plan.md\",max_output_tokens:3000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T1"
+              },
+              {
+                "mode": "text",
+                "task_id": "T2"
+              }
+            ],
+            "call_id": "call_5bd35ca04edf4b83b9a63c66d79d2ae2",
+            "timestamp": "2026-11-12T17:26:17.169Z",
+            "source_line": 89,
+            "result_source_line": 92,
+            "result_timestamp": "2026-11-12T17:26:17.579Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1388,
+                "merged_tool_output_sha256": "b0be148882dadbd8651a842d6e4fcf7aceb063479f63cab718655e18d0997802",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"carryover\\\":\\\"Second mode uses syntax, diagnostic meaning and repair knowledge learned in JSON mode; not blind.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:26:17.338814+00:00\", \"exit\": 0, \"stdout\": \"\", \"stderr\": \"\", \"stdout_bytes\": 0, \"stderr_bytes\": 0}\n{\"argv\": [\"/private/tmp/loom-json-compa",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 15,
+            "custom_sequence": 14,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "4a59e3b0b26379b393b1cb087db7465225ff54d13837a39c3cff888db0fb448a",
+            "command_characters": 1577,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T1\\\":\\\"Passed field checks exit 0, silent output is expected; does not approve plan or verify change.\\\",\\\"T2\\\":\\\"Blocked plan.field-caps, missing Simplicity check. Help hint is guidance not success; inspect authentic difference then restore only section.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T2/project diff -u ../originals/plan.md comparison-plan.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T2/project python3 -c 'from pathlib import Path;p=Path(\\\"comparison-plan.md\\\");s=Path(\\\"../originals/plan.md\\\").read_text();heading=next(x for x in s.splitlines() if x==\\\"## Simplicity check\\\");p.write_text(p.read_text().replace(\\\"## Deliberately removed simplicity record\\\",heading))'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T2/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan comparison-plan.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T3/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T1"
+              },
+              {
+                "mode": "text",
+                "task_id": "T2"
+              },
+              {
+                "mode": "text",
+                "task_id": "T3"
+              }
+            ],
+            "call_id": "call_1befa13173de47349017fcc9a5425e76",
+            "timestamp": "2026-11-12T17:26:27.233Z",
+            "source_line": 94,
+            "result_source_line": 97,
+            "result_timestamp": "2026-11-12T17:26:27.697Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2866,
+                "merged_tool_output_sha256": "7700c2a15629fbd7217733f7e169ed4458dcf7885bd7c335fd0c46b2fb482e36",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T1\\\":\\\"Passed field checks exit 0, silent output is expected; does not approve plan or verify change.\\\",\\\"T2\\\":\\\"Blocked plan.field-caps, missing Simplicity check. Help hint is guidance not success; inspect authentic difference then restore only section.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 16,
+            "custom_sequence": 15,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "ae28718298f883d6676679c04614f7d152d02e84ac6dc40573619af8ecb1d04f",
+            "command_characters": 981,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T3\\\":\\\"Usage error exit 2 missing path; help points to plan syntax. Canonical path from packet is required operand; not a rule failure.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T3/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready plan docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T4/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency\",max_output_tokens:3000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T3"
+              },
+              {
+                "mode": "text",
+                "task_id": "T4"
+              }
+            ],
+            "call_id": "call_a5c6c4698d894d83af77cdcae734e0bb",
+            "timestamp": "2026-11-12T17:26:36.587Z",
+            "source_line": 99,
+            "result_source_line": 102,
+            "result_timestamp": "2026-11-12T17:26:37.222Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1421,
+                "merged_tool_output_sha256": "f62c1b5c9a41bcfd65833b566ef1b0e9038451a6b000918cd4849ac5cc05fecc",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T3\\\":\\\"Usage error exit 2 missing path; help points to plan syntax. Canonical path from packet is required operand; not a rule failure.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:26:36.772062+00:00\", \"exit\": 0, \"stdout\": \"\", \"stderr\": \"\", \"stdout_bytes\": 0, \"stderr_bytes\": 0}\n{\"argv\": [\"/pri",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 17,
+            "custom_sequence": 16,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "af68e9ef7d1215d664c5776e6b2b1e4dd606d2ce6083ac182cad395b5f665ad7",
+            "command_characters": 761,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T4\\\":\\\"Passed current write-plan prerequisites exit 0; interface-surfaces stdout is advisory defaults not success by itself. Does not execute station, grant authority or verify change.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T5/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency\",max_output_tokens:2000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T4"
+              },
+              {
+                "mode": "text",
+                "task_id": "T5"
+              }
+            ],
+            "call_id": "call_fcfa02955cad40fa9946846dd243dd46",
+            "timestamp": "2026-11-12T17:26:43.158Z",
+            "source_line": 104,
+            "result_source_line": 107,
+            "result_timestamp": "2026-11-12T17:26:43.539Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 1135,
+                "merged_tool_output_sha256": "4fb211fdb4678c0c21e1dee699d31b8a129b0386b2946eade4a155dfa56e4300",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T4\\\":\\\"Passed current write-plan prerequisites exit 0; interface-surfaces stdout is advisory defaults not success by itself. Does not execute station, grant authority or verify change.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:26:43.346921+00:00\", \"exit\": 0, \"stdout\": \"\", \"stderr\": \"\", \"std",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 18,
+            "custom_sequence": 17,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "6e248afb5177070f0d562c20c6a82e136d8ec4838d6ef934c51a450710d6b8e9",
+            "command_characters": 1562,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T5\\\":\\\"Blocked intake.confirmed: status open, requires confirmed date. No advisory. Restore authentic status only.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T5/project diff -u ../originals/intent.md docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T5/project python3 -c 'from pathlib import Path;p=Path(\\\"docs/loom/intent/2026-11-12-cli-guidance-consistency.md\\\");s=Path(\\\"../originals/intent.md\\\").read_text();status=next(x for x in s.splitlines() if x.startswith(\\\"status:\\\"));p.write_text(p.read_text().replace(\\\"status: open\\\",status))'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T5/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T6/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T5"
+              },
+              {
+                "mode": "text",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_145be5856c1a4ea39b2dc2ce7d154d57",
+            "timestamp": "2026-11-12T17:26:53.541Z",
+            "source_line": 109,
+            "result_source_line": 112,
+            "result_timestamp": "2026-11-12T17:26:54.436Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 3166,
+                "merged_tool_output_sha256": "8571a5e2fc4ce21780f742a380ecab948d6e87e59b444243e90c1f9a63f897d8",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T5\\\":\\\"Blocked intake.confirmed: status open, requires confirmed date. No advisory. Restore authentic status only.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:26:53.726334+00:00\", \"exit\": 0, \"stdout\": \"\", \"stderr\": \"\", \"stdout_bytes\": 0, \"stderr_bytes\": 0}\n{\"argv\": [\"diff\", \"-u\", \"../original",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 19,
+            "custom_sequence": 18,
+            "tool": "functions.exec",
+            "phase": "task activity",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "de86da36e79640f615d544bbd196663cb75f938264cb58beb754fdf60735693e",
+            "command_characters": 1434,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp python3 -c 'import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T6\\\":\\\"Blocked plan.field-caps despite interface-surfaces stdout advisory: missing Simplicity check. Advisory lists default interface patterns, never implies success. Restore authentic heading only after difference inspection.\\\"})+\\\"\\\\n\\\")'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T6/project diff -u ../originals/plan.md docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T6/project python3 -c 'from pathlib import Path;p=Path(\\\"docs/loom/2026-11-12-cli-guidance-consistency/plan.md\\\");s=Path(\\\"../originals/plan.md\\\").read_text();heading=next(x for x in s.splitlines() if x==\\\"## Simplicity check\\\");p.write_text(p.read_text().replace(\\\"## Deliberately removed simplicity record\\\",heading))'\\npython3 /private/tmp/loom-json-operator-B-results/run.py /private/tmp/loom-json-comparison-20261113/B/text/T6/project /private/tmp/loom-json-comparison-20261113/candidate/loom-code/scripts/loom-python --ready intake write-plan 2026-11-12-cli-guidance-consistency\",max_output_tokens:4000}));\n",
+            "task_associations": [
+              {
+                "mode": "text",
+                "task_id": "T6"
+              }
+            ],
+            "call_id": "call_793e38b5ea2c4cb59638b64dc9e2bb6c",
+            "timestamp": "2026-11-12T17:27:03.428Z",
+            "source_line": 114,
+            "result_source_line": 117,
+            "result_timestamp": "2026-11-12T17:27:04.007Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 2695,
+                "merged_tool_output_sha256": "cf8bfc7fe24ecfc495a018551c7735acf17c3eafe4ab9e840aacd63befd242a3",
+                "merged_tool_output_excerpt": "{\"argv\": [\"python3\", \"-c\", \"import pathlib,json;pathlib.Path(\\\"/private/tmp/loom-json-operator-B-results/interpretations.jsonl\\\").open(\\\"a\\\").write(json.dumps({\\\"mode\\\":\\\"text\\\",\\\"T6\\\":\\\"Blocked plan.field-caps despite interface-surfaces stdout advisory: missing Simplicity check. Advisory lists default interface patterns, never implies success. Restore authentic heading only after difference inspection.\\\"})+\\\"\\\\n\\\")\"], \"cwd\": \"/private/tmp\", \"timestamp_utc\": \"2026-11-12T17:27:03.617339+00:00\", \"",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 20,
+            "tool": "collaboration.send_message",
+            "phase": "coordination",
+            "target": "/root",
+            "task_associations": [],
+            "content_omitted": "Coordination body not needed for operation counting; not copied or decrypted.",
+            "call_id": "call_9bd6b603b050464eb72b419068682844",
+            "timestamp": "2026-11-12T17:27:17.275Z",
+            "source_line": 121,
+            "result_source_line": 124,
+            "result_timestamp": "2026-11-12T17:27:17.384Z"
+          },
+          {
+            "sequence": 21,
+            "custom_sequence": 19,
+            "tool": "functions.exec",
+            "phase": "reporting",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "b34c5f337e79051f60c2578ad87a778be08e175521b96bc3190763b7d19d1959",
+            "command_characters": 6260,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"cat > /private/tmp/loom-json-operator-B-results/finalize.py <<'PY'\\nfrom pathlib import Path\\nimport json\\nr=Path('/private/tmp/loom-json-operator-B-results'); ops=[json.loads(x) for x in (r/'operations.jsonl').read_text().splitlines()]; ints=[json.loads(x) for x in (r/'interpretations.jsonl').read_text().splitlines()]\\nanswers=[]\\nfor mode in ['json','text']:\\n for n in range(1,7):\\n  tid=f'T{n}'; initial=next(x[tid] for x in ints if x.get('mode')==mode and tid in x)\\n  relevant=[i for i,o in enumerate(ops,1) if f'/B/{mode}/{tid}/project'==o['cwd'] and o['argv'][0].endswith('loom-python')]\\n  answers.append(dict(mode=mode,task_id=tid,first_interpretation=initial,initial_classification={1:'passed',2:'blocked',3:'error',4:'passed',5:'blocked',6:'blocked'}[n],final_classification='passed',advisory_means_success=False,correction={1:None,2:'Restored authentic Simplicity check section/heading only',3:'Supplied canonical plan file path',4:None,5:'Restored \n[bounded excerpt; see hashed source line]\n child operations; do not treat each wrapper as one CLI. Initial bootstrap and report I/O are separately inventoried. No time/token savings or self-scoring is claimed.']\\n(r/'report.md').write_text('\\\\n'.join(lines)+'\\\\n')\\nprint(json.dumps({'operations':len(ops),'kinds':counts,'answers':len(answers)}))\\nPY\\npython3 /private/tmp/loom-json-operator-B-results/finalize.py\",max_output_tokens:2000}));\n",
+            "task_associations": [],
+            "call_id": "call_4b41ed51ab6a480ab3906d3d173820db",
+            "timestamp": "2026-11-12T17:27:48.811Z",
+            "source_line": 126,
+            "result_source_line": 129,
+            "result_timestamp": "2026-11-12T17:27:49.018Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 132,
+                "merged_tool_output_sha256": "1635859c78663d9f745fe0a8e8fed610fdc200d61ee16f51db070d363d26fe87",
+                "merged_tool_output_excerpt": "{\"operations\": 47, \"kinds\": {\"checker_help\": 3, \"checker_check\": 20, \"python3\": 16, \"find\": 1, \"cat\": 2, \"diff\": 5}, \"answers\": 12}\n",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          },
+          {
+            "sequence": 22,
+            "custom_sequence": 20,
+            "tool": "functions.exec",
+            "phase": "reporting",
+            "nested_exec_command_invocations": 1,
+            "command_sha256": "560a018182cf3cf007b122b925e2a92277836b4f1affaeb174ee2547908fdc81",
+            "command_characters": 691,
+            "command_excerpt": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\nimport json\\np=Path('/private/tmp/loom-json-operator-B-results');r=json.loads((p/'results.json').read_text());report=(p/'report.md').read_text()\\nassert len(r['answers'])==12\\nassert len(r['operations'])==47\\nassert all(a['final_classification']=='passed' for a in r['answers'])\\nassert sum(r['recorded_cli_by_kind'].values())==47\\nassert r['capture_complete'] is False\\nassert 'Capture is incomplete' in report\\nprint(json.dumps({'verified':True,'results_bytes':(p/'results.json').stat().st_size,'report_bytes':(p/'report.md').stat().st_size,'tool_counts':r['tool_counts']}))\\nPY\",\"max_output_tokens\":1000}));\n",
+            "task_associations": [],
+            "call_id": "call_fdf7abcd6d544a67b0551f2a696d62fb",
+            "timestamp": "2026-11-12T17:27:55.582Z",
+            "source_line": 133,
+            "result_source_line": 136,
+            "result_timestamp": "2026-11-12T17:27:55.788Z",
+            "native_result_summaries": [
+              {
+                "exit_code": 0,
+                "session_id": null,
+                "merged_tool_output_utf8_bytes": 243,
+                "merged_tool_output_sha256": "25c026de777beba13cb80e6cb600dee5e2204366afc1d3254ef81020c5f7f560",
+                "merged_tool_output_excerpt": "{\"verified\": true, \"results_bytes\": 60220, \"report_bytes\": 2586, \"tool_counts\": {\"functions_exec\": 20, \"collaboration_send_message\": 2, \"total_tool_calls\": 22, \"scope\": \"includes planned final verification exec; no tools after verification\"}}\n",
+                "separate_stdout_bytes": null,
+                "separate_stderr_bytes": null
+              }
+            ]
+          }
+        ],
+        "task_associations": [
+          {
+            "mode": "text",
+            "task_id": "T1",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_5bd35ca04edf4b83b9a63c66d79d2ae2",
+              "call_1befa13173de47349017fcc9a5425e76"
+            ],
+            "shared_call_ids": [
+              "call_5bd35ca04edf4b83b9a63c66d79d2ae2",
+              "call_1befa13173de47349017fcc9a5425e76"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T2",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_5bd35ca04edf4b83b9a63c66d79d2ae2",
+              "call_1befa13173de47349017fcc9a5425e76"
+            ],
+            "shared_call_ids": [
+              "call_5bd35ca04edf4b83b9a63c66d79d2ae2",
+              "call_1befa13173de47349017fcc9a5425e76"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T3",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_1befa13173de47349017fcc9a5425e76",
+              "call_a5c6c4698d894d83af77cdcae734e0bb"
+            ],
+            "shared_call_ids": [
+              "call_1befa13173de47349017fcc9a5425e76",
+              "call_a5c6c4698d894d83af77cdcae734e0bb"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T4",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_a5c6c4698d894d83af77cdcae734e0bb",
+              "call_fcfa02955cad40fa9946846dd243dd46"
+            ],
+            "shared_call_ids": [
+              "call_a5c6c4698d894d83af77cdcae734e0bb",
+              "call_fcfa02955cad40fa9946846dd243dd46"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T5",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_fcfa02955cad40fa9946846dd243dd46",
+              "call_145be5856c1a4ea39b2dc2ce7d154d57"
+            ],
+            "shared_call_ids": [
+              "call_fcfa02955cad40fa9946846dd243dd46",
+              "call_145be5856c1a4ea39b2dc2ce7d154d57"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "text",
+            "task_id": "T6",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_145be5856c1a4ea39b2dc2ce7d154d57",
+              "call_793e38b5ea2c4cb59638b64dc9e2bb6c"
+            ],
+            "shared_call_ids": [
+              "call_145be5856c1a4ea39b2dc2ce7d154d57"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T1",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_3c0a2375622d460882beddeaec14b699",
+              "call_0548f6b022f942f5b419d598e0fe390f"
+            ],
+            "shared_call_ids": [
+              "call_3c0a2375622d460882beddeaec14b699",
+              "call_0548f6b022f942f5b419d598e0fe390f"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T2",
+            "exact_tool_call_touch_count": 4,
+            "call_ids": [
+              "call_3c0a2375622d460882beddeaec14b699",
+              "call_0548f6b022f942f5b419d598e0fe390f",
+              "call_5a4927979ed94845b835e767621ddcba",
+              "call_051bdf4199134c63be4e4b968de8e6e2"
+            ],
+            "shared_call_ids": [
+              "call_3c0a2375622d460882beddeaec14b699",
+              "call_0548f6b022f942f5b419d598e0fe390f",
+              "call_5a4927979ed94845b835e767621ddcba",
+              "call_051bdf4199134c63be4e4b968de8e6e2"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T3",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_5a4927979ed94845b835e767621ddcba",
+              "call_051bdf4199134c63be4e4b968de8e6e2"
+            ],
+            "shared_call_ids": [
+              "call_5a4927979ed94845b835e767621ddcba",
+              "call_051bdf4199134c63be4e4b968de8e6e2"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T4",
+            "exact_tool_call_touch_count": 2,
+            "call_ids": [
+              "call_051bdf4199134c63be4e4b968de8e6e2",
+              "call_86a4ab8191964874836cad4286d86b65"
+            ],
+            "shared_call_ids": [
+              "call_051bdf4199134c63be4e4b968de8e6e2",
+              "call_86a4ab8191964874836cad4286d86b65"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T5",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_86a4ab8191964874836cad4286d86b65",
+              "call_9634c5d1af9146adb6ef364fab928fdd",
+              "call_709df247c94d48b2ba0bf4275c37c0d1"
+            ],
+            "shared_call_ids": [
+              "call_86a4ab8191964874836cad4286d86b65",
+              "call_9634c5d1af9146adb6ef364fab928fdd",
+              "call_709df247c94d48b2ba0bf4275c37c0d1"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          },
+          {
+            "mode": "json",
+            "task_id": "T6",
+            "exact_tool_call_touch_count": 3,
+            "call_ids": [
+              "call_86a4ab8191964874836cad4286d86b65",
+              "call_9634c5d1af9146adb6ef364fab928fdd",
+              "call_709df247c94d48b2ba0bf4275c37c0d1"
+            ],
+            "shared_call_ids": [
+              "call_86a4ab8191964874836cad4286d86b65",
+              "call_9634c5d1af9146adb6ef364fab928fdd",
+              "call_709df247c94d48b2ba0bf4275c37c0d1"
+            ],
+            "additive_unique_task_count": null,
+            "reason": "A call touching multiple tasks cannot be uniquely allocated without a new posthoc counting rule."
+          }
+        ],
+        "bootstrap_stream_limit": "Native exec tool results combine output streams. Merged output bytes are recovered exactly; stdout/stderr separation remains unknown, not inferred from success exit."
+      }
+    }
   }
 }
