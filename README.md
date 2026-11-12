@@ -13,7 +13,7 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.24.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
+| [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
 | [`loom-code`](loom-code/README.md) | 3.70.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
@@ -93,7 +93,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.24.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.25.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools and optional design research. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
