@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.23.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/README.md) | 3.67.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.68.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -108,7 +108,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.67.0. Five stations carry one change from plan to PR with
+Version 3.68.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -269,8 +269,17 @@ are best-effort loss; existing result/error handling and mutation counts remain
 unchanged. A publication timeout is an unknown outcome: observe delivery before
 retrying a potentially completed mutation. No automatic retry is added.
 
-Broader help, typed error categories and additional JSON modes remain future
-migrations requiring compatibility checks. Exit 2 still conflates usage errors
+For command discovery and input recovery, run
+`"<loom-code>/scripts/loom-python" --ready <command> --help`, replacing
+`<loom-code>` with the installed plugin directory and `<command>` with
+`finalize-review`, `publish` or `delivery`. These commands also accept exact
+`<command> -h` calls. Help describes inputs, authentic evidence, authorization
+and outcomes without validation or publication; covered failures retain their
+diagnostics and exit status and add a help hint. Hook and internal-error behavior
+are unchanged.
+
+Help for other commands, typed error categories and additional JSON modes remain
+future migrations requiring compatibility checks. Exit 2 still conflates usage errors
 and internal faults. Host hook protocols, review, acceptance and failure-blocking
 rules remain unchanged.
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.68.0] — 2026-11-12 — expose command help and input recovery guidance
+
+- Add exact `--help` and `-h` forms for `finalize-review`, `publish` and `delivery`, before command dispatch and repository lookup. Describe authentic review inputs, publication authorization and body requirements, and delivery outcomes; help performs no validation or publication.
+- Append command-specific help hints to covered failures while preserving original diagnostics, stdout and exit status. Preserve hook behavior and internal-error handling; no automatic retry, new output envelope or handler rewrite.
+- Retain focused test-first evidence and disclose untested first-use, publication and host boundaries separately from mechanical test results.
+
 ## [3.67.0] — 2026-11-12 — expose bounded CLI progress and avoid irrelevant collection
 
 - Add flushed stderr progress for publish CI observation and finalization verification stages while preserving stdout, exit behavior, authorization and evidence validation. Stage success requires accepted evidence; progress does not establish final attestation success.
