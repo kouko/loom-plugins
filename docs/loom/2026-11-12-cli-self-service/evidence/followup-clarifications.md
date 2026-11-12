@@ -83,3 +83,20 @@ The orchestrator's previous successful package log,
 `/private/tmp/loom-selfservice-w3-package.log`, predates the merge and does not
 prove this tree. This implementer ran no full suite or new independent
 acceptance; integrated-tree verification remains subsequent work.
+
+## Integrated Build handoff
+
+The orchestrator committed the integration as
+`96a577c8a51ce5a07dda6e508a753b9e295d622b`. At that committed tree, the complete
+package runner passed: 4,263 pytest cases passed, 6 skipped, and the runner's
+shell checks passed. The existing adversarial CLI program also passed all
+38 cases. Full combined outputs are retained in [followup-package.txt](followup-package.txt)
+and [followup-adversarial.txt](followup-adversarial.txt).
+
+An approved `sync-trunk` observation confirmed this tree already contains
+`origin/main` at `781fc1cbf49bd0f30b3b93b1156f110a75eeeb72`, without adding a
+commit. The preceding sandboxed observation could not write external Git
+metadata; its warning was resolved by this successful observation.
+These executions establish the Build handoff, not independent acceptance or
+updated review attestation. The original bounded review episode continues at
+Round 2; requirements are unchanged.
