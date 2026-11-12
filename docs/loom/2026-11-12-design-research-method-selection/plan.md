@@ -19,6 +19,13 @@ charter: 1.1
 - Test: A1 positive: version-match; boundary: stale-pin. A2 positive: version-match; boundary: stale-pin. A3 positive: version-match; boundary: stale-pin. A4 positive: version-match; boundary: stale-pin. A5 positive: version-match; boundary: stale-pin. A6 positive: version-match; boundary: stale-pin. Existing release synchronization and complete package suite.
 - Risk: agent-decided — REQ-1–6 ship together in loom-design minor release; no unrelated plugin bump. Check actual sync outputs and existing release pins before committing.
 
+### Wave 3 — integration repair
+
+**W3-01 Preserve the blocked-input timeout regression under suite load** after: W2-01 acceptance: 6
+- Files: loom-code/tests/test_external_review_adversarial.py (exercised entry: external_review.main), docs/loom/2026-11-12-design-research-method-selection/evidence/integration-repair.md
+- Test: A6 positive: preflight-reaches-review; boundary: unread-large-prompt-times-out. Existing full-suite failure is RED; retain the 1 MiB input, distinct timeouts, review-start marker, cleanup and elapsed assertions.
+- Risk: agent-decided — preserve existing test coverage; remove short-deadline fake Python startup dependency without changing production timeout behavior. Defect-class sweep found one applicable instance in changed files plus the failing test; unrelated changelog cold-install mentions excluded.
+
 ## Simplicity check
 - Inline selection guidance instead of a separate reference when it creates no useful reading boundary — taken
 - No additional smaller shape found by the independent reviewer — declined: reviewer returned PASS with no deletion findings
@@ -30,3 +37,4 @@ charter: 1.1
 1. agent-decided — A small controlled before/after sample supports bounded behavior only, not framework superiority, population validity or reliable performance across all future tasks.
 2. agent-decided — The requested Claude Code proposal review failed preflight with no usable review; retain that limitation. Native independent specification, plan, acceptance and closing reviews remain required.
 3. agent-decided — Preserve current stage callers and template; modify only design research acquisition/selection, not engineering research or station semantics.
+4. agent-decided — First finalization failed an unchanged blocked-input regression during preflight. Repair its test double only; no new requirement, production external-review behavior, installed code-plugin change or retry-budget reset. Existing design trials remain applicable.

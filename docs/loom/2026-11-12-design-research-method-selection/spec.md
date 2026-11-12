@@ -24,6 +24,7 @@ REQ-6 — Observable validation
 - agent-decided — REQ-5: preserve the existing template, paths, flat metadata, follow-up and readback contract; no new record schema.
 - agent-decided — REQ-6: use isolated agent trials with controlled source/user fixtures and retained transcripts, including a baseline and candidate run on matched cases. Trial actors simulate inputs only; their answers are not product research. Case assertions evaluate behavior and artifacts, not framework keywords. No general superiority claim from this small sample.
 - agent-decided — release: bump only loom-design minor version and synchronize its derived manifests, changelog, localized README strings and affected pins before final review.
+- agent-decided — integration repair after first finalization: an existing blocked-input timeout regression expired in its five-second preflight instead of reaching its six-second review branch. Remove the fake CLI's Python cold-start dependency while preserving real subprocess/pipe, deadline and cleanup checks. This changes only test machinery, not research requirements or production external review; the existing design trial evidence remains applicable.
 
 ## Alternatives considered
 - No skill edit, trials only: leaves the installed acquisition scope inconsistent with the requested boundary.
