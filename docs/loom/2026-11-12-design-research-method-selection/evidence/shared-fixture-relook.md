@@ -86,8 +86,8 @@ unchanged. No tests or assertion harness were added.
 | Replace the model/list nonzero-exit diagnostic with exit 0 | `exit_before_answer` | 2 failed, 1 passed in 9.73s: both expected exit-3 modes reject exit-0 diagnostics; the genuine exit-0 case still passes. |
 
 The committed-byte mutation output is retained in temporary local copies
-`committed-shared-fixture-mutations-unpi4w57/{early-eof,wrong-phase,wrong-exit}/receipt.txt`
-under the system temporary directory; these paths are receipts, not package
+`/var/folders/pv/m7y9m2v56lg68nl8wtxkbm0c0000gn/T/committed-shared-fixture-mutations-unpi4w57/{early-eof,wrong-phase,wrong-exit}/receipt.txt`;
+these paths are receipts, not package
 dependencies. The failing mutation assertions are the intended outcomes.
 Three additional concurrent processes ran the same committed-byte early-EOF
 mutation: each failed the existing candidates assertion, in 3.29s, 2.70s and

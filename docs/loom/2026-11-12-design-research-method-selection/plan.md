@@ -33,6 +33,13 @@ charter: 1.1
 - Test: A6 positive: shared-fake-consumers-reach-intended-stage; boundary: eof-exit-descendant-timeouts. Preserve all existing entry-level assertions, deadlines, model-list EOF detection, descendant cleanup and review-stage coverage; run the complete existing module and bounded concurrent repetitions.
 - Risk: agent-decided — preserve test_external_review.py coverage. Re-look moves the repair unit from one failing test to shared short-deadline CLI factories and every consumer. Longer-budget progress fixtures stay unchanged; no production changes or new harness.
 
+### Wave 5 — withdraw the unproven incidental repair
+
+**W5-01 Restore original timeout fixtures without weakening their checks** after: W4-01 acceptance: 6
+- Files: loom-code/tests/test_external_review.py, loom-code/tests/test_external_review_adversarial.py, docs/loom/2026-11-12-design-research-method-selection/evidence/fixture-repair-withdrawal.md
+- Test: A6 positive: exact-trunk-fixture-bytes; boundary: no-weakened-tests. Preserve original complete files at trunk391fd017, retain failure/diagnostic evidence, then run the unchanged focused modules and mandatory complete suite.
+- Risk: agent-decided — preserve original test coverage exactly. Native rewrites failed to establish reliable repair; diagnostic code run passed without reproducing failure. Remove only this branch's incidental test changes, keep research guidance and disclose unresolved preflight intermittence.
+
 ## Simplicity check
 - Inline selection guidance instead of a separate reference when it creates no useful reading boundary — taken
 - No additional smaller shape found by the independent reviewer — declined: reviewer returned PASS with no deletion findings
@@ -46,3 +53,4 @@ charter: 1.1
 3. agent-decided — Preserve current stage callers and template; modify only design research acquisition/selection, not engineering research or station semantics.
 4. agent-decided — First finalization failed an unchanged blocked-input regression during preflight. Repair its test double only; no new requirement, production external-review behavior, installed code-plugin change or retry-budget reset. Existing design trials remain applicable.
 5. agent-decided — Recurrence exposed the shared-factory boundary. Replace applicable shared fixtures while preserving protocol/EOF semantics, not individual failures. The added shared-factory obligation resets neither the review episode nor task retry counts.
+6. agent-decided — Native fixtures still timed out; the bounded phase-marker diagnostic passed without locating a cause. Withdraw unproven incidental test edits, retain original tests/evidence, and require complete verification of the minimal research-only candidate before terminal review.

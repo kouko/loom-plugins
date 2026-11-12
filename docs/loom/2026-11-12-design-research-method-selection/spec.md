@@ -34,6 +34,16 @@ review-stage protocol cases. It retains the completed design-trial evidence
 because no research guidance or production runner changes; it is not another
 execution of that completed trial task or a reset of its task continuity.
 
+The bounded phase-marker experiment passed without reproducing the failure;
+native fixtures had also failed in the original full workload. Therefore their
+reliability advantage remains unproved. agent-decided — withdraw both incidental
+test-file rewrites and restore their exact trunk bytes, preserving all original
+coverage and deadlines. Keep the diagnosis and unsuccessful attempts as history,
+not shipped repairs. The final candidate returns to the requested research
+guidance/release scope; complete mechanical verification and the same terminal
+review remain required. This is a smaller technical shape, not a requirement,
+test skip, evidence substitution or review-budget reset.
+
 ## Alternatives considered
 - No skill edit, trials only: leaves the installed acquisition scope inconsistent with the requested boundary.
 - Selection hints entirely inline: viable if shorter after implementation; prefer this over a separate reference when the latter adds no meaningful reading boundary.
