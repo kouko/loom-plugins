@@ -37,6 +37,7 @@ Replace <loom-code> with the installed plugin directory and <path-to-plan.md>
 with your plan file path.
 Plan takes a file path; intake takes a station and a change-id.
 Detailed help: finalize-review --help, publish --help, delivery --help
+              plan --help, intake --help, reviewer-count --help
 (each also accepts -h). Only these exact command-plus-help forms are help.
 No validation runs for --help or -h alone.
 
@@ -77,6 +78,58 @@ USAGE = __doc__.split("Sub-commands (the CLI contract other stations depend on):
 
 
 COMMAND_HELP = {
+    "plan": """plan — check the implemented field caps on one named file
+Usage: plan <path-to-plan.md>
+Supply a readable file path, relative to the working directory or absolute;
+this command does not resolve a change-id or select a canonical plan.
+
+The check applies field caps only when the file has a charter: frontmatter
+key. Charter 1.1 or later also requires a valid Simplicity check record.
+A file without that key, including an empty file, may pass. Passing does not
+approve the plan, prove its requirements are complete or verify the change.
+
+Results: exit 0 has no success payload on stdout; the implemented checks on
+the named file passed. Exit 1 reports BLOCK plan.field-caps on stderr;
+correct the reported field and rerun. Exit 2 means a missing/unreadable file,
+invalid invocation or internal failure; correct the path, access or invocation
+from the diagnostic. No artifact is rewritten and no later station runs.
+Planning guidance: <loom-code>/skills/write-plan/SKILL.md.
+""",
+    "intake": """intake — check the selected station's current prerequisites
+Usage: intake <write-spec|write-plan> <change-id>
+Run inside the selected repository. Supply a change-id, not a file path;
+accepted identifiers contain only letters, digits, dots, underscores and
+hyphens. Canonical artifacts are resolved through the bundled contract.
+
+Results: exit 0 means the applicable prerequisites passed for this snapshot;
+it does not perform the station, authorize publication or verify the change.
+Conditional interface-surfaces (...) information may appear on stdout for
+engineering intents or applicable needs-design=yes write-plan intake.
+That information is advisory and may precede a later BLOCK; it is not a
+success result. Other intake paths have no stdout payload.
+
+Exit 1 reports BLOCK <rule>: <reason> on stderr. Supply or correct authentic
+required artifacts through their owning workflow, then rerun. Exit 2 means
+invalid station/change-id/arguments or an internal failure; correct the
+invocation or repository/environment from the diagnostic. These checks are
+read-only and synchronous; no previous pass waives the next check.
+Station and prerequisite guidance: <loom-code>/skills/write-plan/SKILL.md.
+""",
+    "reviewer-count": """reviewer-count — compute the required independent reviewer floor
+Usage: reviewer-count <change-id>
+Run inside the selected repository with a clean tree and committed functional
+content. Supply one nonblank change-id operand. Preserve work and finish and
+commit the change before requesting the floor; do not discard files to pass.
+
+Results: exit 0 prints the integer floor and newline on stdout. Obtain that
+many independent reviewers; the number is not a verdict or proof of review,
+acceptance, finalization or completed verification. The policy conservatively
+requires two when it cannot classify the complete committed delta.
+Exit 2 means missing/extra operands, a dirty tree or an internal failure;
+use the diagnostic to correct the invocation or repository condition, then
+rerun. This read-only command neither dispatches reviewers nor writes evidence.
+Review guidance: <loom-code>/skills/closing-review/SKILL.md.
+""",
     "finalize-review": """finalize-review — verify committed content and generate an attestation
 Usage: finalize-review <change-id> --input <review-input.json>
 <change-id> identifies the change; it is not a file path. --input names a
