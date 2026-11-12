@@ -224,24 +224,21 @@ def test_unreadPromptOverPipeBuffer_timesOutAtLimit(tmp_path, monkeypatch):
 
     The prompt (1 MiB) exceeds the pipe buffer, so writing it blocks until
     the child reads or exits. The fake answers the probe, then sleeps 60 s
-    without reading the remaining review prompt. A shell fake avoids making
-    the 5 s preflight deadline depend on cold Python interpreter startup.
+    without reading the remaining review prompt; the review limit is 6 s,
+    leaving margin for the measured ~2.8s cold Python startup.
     """
     import io
-    import shlex
     import time
     fake = tmp_path / "bin" / "claude"
     started = tmp_path / "review-started"
     fake.parent.mkdir()
     fake.write_text(
-        "#!/bin/sh\n"
-        "prefix=$(dd bs=4096 count=1 2>/dev/null)\n"
-        "if [ \"$prefix\" = 'Reply with the single word ok. Do not inspect files.' ]; then\n"
-        "    printf '%s\\n' '{\"result\":\"ok\",\"modelUsage\":{\"claude-sonnet-4-5\":{}}}'\n"
-        "    exit 0\n"
-        "fi\n"
-        f"printf '%s' \"$$\" > {shlex.quote(str(started))}\n"
-        "exec sleep 60\n")
+        f"#!{sys.executable}\nimport json, os, sys, time\n"
+        "if b'single word ok' in os.read(0, 4096):\n"
+        "    print(json.dumps({'result': 'ok', 'modelUsage': {'claude-sonnet-4-5': {}}}))\n"
+        "    sys.exit(0)\n"
+        f"open({str(started)!r}, 'w').write(str(os.getpid()))\n"
+        "time.sleep(60)\n")
     fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
     monkeypatch.setenv("PATH", f"{fake.parent}{os.pathsep}{os.environ['PATH']}")
     record = _consent_file(tmp_path, "claude", model="sonnet", effort="high")
