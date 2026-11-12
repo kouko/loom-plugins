@@ -1,6 +1,6 @@
 # Consistent planning-command guidance — plan
 intent: 2026-11-12-cli-guidance-consistency@ecaac7d971c5e7ffc75996b4c78ac76517eaf908
-spec: docs/loom/2026-11-12-cli-guidance-consistency/spec.md@d61475f09a2d6ecbd076df2a5784f5b3ceaac2b2
+spec: docs/loom/2026-11-12-cli-guidance-consistency/spec.md@391993b5c57b55e740439086c20114fce719af19
 charter: 1.1
 
 Current state evidence and behavior decisions: [spec.md](spec.md).
@@ -20,6 +20,13 @@ Current state evidence and behavior decisions: [spec.md](spec.md).
 - Files: `loom-code/.claude-plugin/plugin.json`, generated code manifests, `loom-code/CHANGELOG.md`, `loom-code/README*.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`, `docs/loom/2026-11-12-cli-guidance-consistency/evidence/`
 - Test: A1 positive: release-guidance-present; boundary: deferred-commands-unchanged. A2 positive: release-help-consistent; negative: misleading-success-claim. A3 positive: release-metadata-synchronized; boundary: generated-manifest-drift.
 - Risk: agent-decided — REQ-3 Design decisions preserve runtime contracts. Bump SSOT to 3.70.0; add dated CHANGELOG section, update README versions and CURRENT_VERSION pin, run sync_codex_manifests.py --all and --check; retain existing release-test coverage. Finalize only after all release edits.
+
+### Wave 3 — Clarify the acceptance-discovered error distinction
+
+**W3-01 Separate invocation recovery from internal exceptions in the spec** after: W2-01 acceptance: 2, 3
+- Files: `docs/loom/2026-11-12-cli-guidance-consistency/spec.md`, `docs/loom/2026-11-12-cli-guidance-consistency/plan.md`
+- Test: A2 positive: outside-repository-help-hint; boundary: internal-exception-without-hint. A3 positive: existing-diagnostics-preserved; boundary: unchanged-handler-paths.
+- Risk: agent-decided — REQ-2/3 Design decisions already distinguish usage and internal paths. Correct the sole conflated UI-flow row after searching changed prose, help and tests; preserve production code and reuse existing entry coverage plus independent acceptance observations.
 
 ## Simplicity check
 - none found
