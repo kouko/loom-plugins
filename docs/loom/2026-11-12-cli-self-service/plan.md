@@ -17,14 +17,21 @@ charter: 1.1
 **W2-01 Document and package the bounded interface** after: W1-01 acceptance: 5
 - Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json and loom-code/package.json (generated), loom-code/CHANGELOG.md, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py, docs/loom/2026-11-12-cli-self-service/evidence/
 - Test: A5 positive: retained-first-attempts; boundary: untested-host-disclosure. Run synchronized-release metadata test and package suite; independent acceptance owns actual operator evidence.
-- Risk: agent-decided — REQ-5 retain raw attempts and limits without measuring unsupported efficiency gains. Bump code minor to 3.68.0; synchronize generated manifests, README and CHANGELOG entry; rewrite existing version pins only where needed.
+- Risk: agent-decided — REQ-5 retain raw attempts and limits without measuring unsupported efficiency gains. Release as 3.69.0 after upstream PR 144 consumed 3.68.0; synchronize generated manifests, README and CHANGELOG entry; preserve historical test evidence.
 
 ### Wave 3 — Clarify existing outcome meanings
 
 **W3-01 Clarify authorization errors and local completion** after: W2-01 acceptance: 3, 4
 - Files: loom-code/scripts/loom_checker.py (public entry: main), docs/loom/2026-11-12-cli-self-service/spec.md, docs/loom/2026-11-12-cli-self-service/evidence/
 - Test: A3 positive: clarified-help-readback; boundary: committed-without-verification. A4 positive: existing-cli-regression; negative: authorization-refusal. Reuse existing CLI tests unchanged and independently exercise the clarified help against actual outcomes.
-- Risk: agent-decided — REQ-3/4 clarify two descriptions without changing handlers or exit codes. Retain existing test separation; prose-only clarification needs independent readback, not new text-pin tests. Existing 3.68.0 bump remains this unmerged PR's release.
+- Risk: agent-decided — REQ-3/4 clarify two descriptions without changing handlers or exit codes. Retain existing test separation; prose-only clarification needs independent readback, not new text-pin tests. Upstream integration requires a distinct release number.
+
+### Wave 4 — Integrate the advanced trunk
+
+**W4-01 Preserve upstream research changes and release identity** after: W3-01 acceptance: 4, 5
+- Files: README.md, loom-code/CHANGELOG.md, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json and loom-code/package.json (generated), loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py, docs/loom/2026-11-12-cli-self-service/evidence/
+- Test: A4 positive: merged-package-suite; negative: release-version-collision. A5 positive: retained-before-sync-evidence; boundary: pre-sync-run-not-final-proof. Reuse release synchronization and complete package checks.
+- Risk: agent-decided — preserve upstream 781fc1cb's design-research content and 3.68.0 changelog; keep this PR's CLI documentation under 3.69.0. Resolve README/changelog conflicts without dropping either change; no upstream behavior redesign.
 
 ## Simplicity check
 - none found
