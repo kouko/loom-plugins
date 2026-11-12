@@ -137,3 +137,28 @@ and reported the historical change delivered; explicitly selecting the frozen
 comparison base corrected that fixture setup. Both setup failures remain
 disclosed rather than counted as task interpretation errors. Raw fixture
 observations remain at `/private/tmp/loom-json-prereg-baseline.json`.
+
+## Bound candidate for W3
+
+Candidate: `2cef40163b6a562971780da6e6fd107289304962` (release 3.71.0).
+Preregistration commit remains `030eb89604df322e6dafea25294c76c97edd645e`.
+
+The 66 tracked files under `loom-code/scripts` and `loom-code/contract`
+have aggregate SHA-256
+`ed77294ca4699ccbd5e099576b7dd47a6e2b3500d8f59700e1846057b8eacbc3`.
+Recompute by sorting tracked paths lexicographically, concatenating each
+UTF-8 path, NUL, its lowercase content SHA-256 and newline, then hashing that
+concatenation with SHA-256. Exclude untracked files; do not normalize bytes.
+
+Fixture originals and deliberate mutation hashes are pinned in
+`comparison-oracle.json` under `source_artifacts`; the historical checkout
+and selected comparison-base SHA remain frozen above. Every task starts
+with a fresh checkout before its declared mutation. The coordinator verifies
+those hashes before dispatch. Operators receive only
+`operator-instructions.md`, assigned mode order and task directory paths.
+No operator has run and no comparison outcome has been observed.
+
+A combined inventory/prose-writing shell request was refused by the local
+command guard before execution. The inventory was obtained with a direct Git
+read, hashes computed separately and this prose applied with the edit tool;
+no command guard or security setting was changed.
