@@ -47,3 +47,41 @@ installed-host operation, cross-host compatibility or efficiency improvement
 was established by these runs. The complete package suite, adversarial pass
 and independent acceptance remain separate subsequent work. No user approvals
 or reviewer judgments were synthesized for test or help examples.
+
+## Build integration correction — dispatcher callable boundary
+
+The subsequent orchestrator package run found the existing architecture test
+`test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch` failing:
+the code group reported **1 failed, 2831 passed, 2 skipped in 120.39s**.
+The original integration log remains at
+`/private/tmp/loom-selfservice-package-build.log`; this supersedes the earlier
+statement that the package suite was still subsequent work, but is not a
+successful complete-suite result.
+
+Defect class: an extra top-level callable violated the public dispatcher's
+main-only architecture contract. The orchestrator's search covered the whole
+contents of changed files and Acceptance 4 surfaces; it found only `help_hint`
+and its two calls in `loom-code/scripts/loom_checker.py`, the only changed
+production Python file. The implementer re-read that module and the existing
+architecture test before editing. The fix removes the helper, computes an
+optional hint string once inside `main`, and emits it at the same two error
+paths. The existing architecture guard and CLI tests remain unchanged.
+
+Focused reproduction before the fix:
+
+```text
+uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch -q
+```
+
+Exit 1, **1 failed in 0.02s**; [retained RED output](dispatch-red.log).
+
+Focused verification after the fix:
+
+```text
+uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_modules.py loom-code/tests/test_loom_checker_cli.py -q
+```
+
+Exit 0, **43 passed in 21.30s**; [retained GREEN output](dispatch-green.log).
+`git diff --check` returned 0. This correction did not rerun the complete
+package suite or modify adversarial material; those integration steps remain
+with the orchestrator. No closing-review or acceptance result is claimed.

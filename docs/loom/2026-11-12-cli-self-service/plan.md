@@ -9,8 +9,8 @@ charter: 1.1
 
 **W1-01 Expose bounded help and recovery guidance** after: none acceptance: 1, 2, 3, 4
 - Files: loom-code/scripts/loom_checker.py (public entry: main), loom-code/tests/test_loom_checker_cli.py
-- Test: A1 positive: discover-input; boundary: help-outside-repo. A2 positive: usage-recovery; negative: preserve-rejection. A3 positive: outcome-guidance; boundary: incomplete-json. A4 positive: unchanged-success; negative: invalid-help-shape.
-- Risk: agent-decided — REQ-1/2/3/4 use dispatch-local help without handler rewrites. Preserve and widen existing coverage in loom-code/tests/test_loom_checker_cli.py; original diagnostics and hook behavior remain authoritative.
+- Test: A1 positive: discover-input; boundary: help-outside-repo. A2 positive: usage-recovery; negative: preserve-rejection. A3 positive: outcome-guidance; boundary: incomplete-json. A4 positive: unchanged-success; negative: invalid-help-shape; architecture: loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch.
+- Risk: agent-decided — REQ-1/2/3/4 use dispatch-local help without handler rewrites. Preserve and widen existing coverage in loom-code/tests/test_loom_checker_cli.py; retain the main-only callable boundary checked by test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch. Original diagnostics and hook behavior remain authoritative.
 
 ### Wave 2 — Release and reproducible first-use evidence
 

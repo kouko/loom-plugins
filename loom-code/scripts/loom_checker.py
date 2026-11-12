@@ -213,12 +213,6 @@ runtime readiness is still required. Bundled paths above are plugin-relative.
 """
 
 
-def help_hint(argv: list[str], err) -> None:
-    if argv and argv[0] in COMMAND_HELP and not (argv[0] == "delivery" and "--hook" in argv[1:]):
-        err.write(f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
-                  '(replace <loom-code> with the installed loom-code plugin directory).\n')
-
-
 COMMANDS = {
     "intent": cmd_intent,
     "intents": cmd_intents,
@@ -240,6 +234,10 @@ COMMANDS = {
 
 
 def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
+    hint = ""
+    if argv and argv[0] in COMMAND_HELP and not (argv[0] == "delivery" and "--hook" in argv[1:]):
+        hint = (f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
+                '(replace <loom-code> with the installed loom-code plugin directory).\n')
     try:
         if not argv:
             raise UsageError("no sub-command given." + USAGE)
@@ -255,12 +253,13 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         if command is None:
             raise UsageError(f"unknown sub-command {argv[0]!r}." + USAGE)
         result = command(argv[1:], out, err)
-        if result != 0:
-            help_hint(argv, err)
+        if result != 0 and hint:
+            err.write(hint)
         return result
     except UsageError as exc:
         err.write(f"{exc}\n")
-        help_hint(argv, err)
+        if hint:
+            err.write(hint)
         return 2
     except Exception as exc:
         if argv[:2] == ["push", "--hook"]:  # the publication hook never refuses on a crash (REQ-4)
