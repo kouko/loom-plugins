@@ -1,3 +1,4 @@
+# concern: Help routing must not bypass validation, alter result streams, or grant authority.
 """Executable contract for `loom_checker.py`'s CLI surface (plan W0-02).
 
 The rule-id table this asserts is a mechanism population: `--list-rules`
