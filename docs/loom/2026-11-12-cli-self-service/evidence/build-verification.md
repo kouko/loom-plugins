@@ -1,5 +1,32 @@
 # Build verification — W1-01 and W2-01
 
+## Completed Build checkpoint
+
+At `b3204e76a99c2c2af4be8188706f6edab58c051b`, the complete declared
+package command exited 0: 4,261 pytest passes and 6 skips across its printed
+pytest summaries, plus the runner's shell surfaces. See
+[complete output](package-after-fix.txt). The earlier integration run exited 1
+on the dispatcher architecture guard; [failed output](package-before-fix.txt)
+is retained. The existing guard was preserved and the extra callable removed.
+
+The independent adversary tried four attack points (2,460 argument permutations
+and 13 real subprocess calls), found no defect and reused the existing CLI
+test module with a concern-only annotation. See
+[raw report](adversarial-review.yaml) and [results](attack-results.json).
+After the fix, its declared command was rerun unchanged and exited 0 with
+38 passes; [output](adversarial-after-fix.txt). No adversary redispatch was
+needed: the existing program still passed and scope did not widen.
+
+The installed `sync-trunk` command reported up to date before Build verification
+and again before Closing Review: the branch already contained
+`origin/main` at `ab40f0e634db492c9b250da8e95b53579aeb23c2`.
+No unresolved adversary finding remains. This is mechanical Build evidence;
+independent first-use acceptance and closing review are separate.
+
+Commands:
+- `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+- `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py`
+
 Date: 2026-11-12. Worktree: `/private/tmp/loom-agent-tool-efficiency`.
 W1 implementation was tested before commit; its subsequently committed source
 is `b6084d6e55f8b5e293a662f265bb01c62d7d24e7`. W2 release checks below ran
