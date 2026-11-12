@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.70.0] — 2026-11-12 — extend planning-command help and recovery guidance
+
+- Add exact `--help` and `-h` forms for `plan`, `intake` and `reviewer-count`, reusing the existing help mapping and failure hints. Explain each check's inputs and limited outcomes without executing its handler.
+- Preserve existing plan field-cap validation, intake prerequisites and conditional `interface-surfaces` stdout, reviewer-floor computation, exits and hook behavior. A successful preparatory check is not completed review or verification.
+- Extend public-entry regression coverage for discovery, input recovery, real blocked checks and unchanged result streams; no new parser, output envelope or automatic repair.
+
 ## [3.69.0] — 2026-11-12 — expose command help and input recovery guidance
 
 - Add exact `--help` and `-h` forms for `finalize-review`, `publish` and `delivery`, before command dispatch and repository lookup. Describe authentic review inputs, publication authorization and body requirements, and delivery outcomes; help performs no validation or publication.

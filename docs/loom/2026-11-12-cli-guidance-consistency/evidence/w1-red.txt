@@ -1,0 +1,157 @@
+FF.............................FFF..F..                                  [100%]
+=================================== FAILURES ===================================
+________ test_reviewer_count_cli_preserves_output_and_dirty_tree_error _________
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6096/test_reviewer_count_cli_preser0')
+
+    def test_reviewer_count_cli_preserves_output_and_dirty_tree_error(tmp_path: Path) -> None:
+        repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+        (repo / "guide.md").write_text("Usage clarification.\n", encoding="utf-8")
+        git(repo, "add", "guide.md")
+        git(repo, "commit", "-q", "-m", "clarify usage")
+    
+        result = run_checker("reviewer-count", "2026-09-09-example", cwd=repo)
+        assert (result.returncode, result.stdout, result.stderr) == (0, "1\n", "")
+    
+        (repo / "guide.md").write_text("Uncommitted change.\n", encoding="utf-8")
+        result = run_checker("reviewer-count", "2026-09-09-example", cwd=repo)
+>       assert (result.returncode, result.stdout, result.stderr) == (
+            2,
+            "",
+            "reviewer-count needs a clean tree with completed functional content.\n"
+            'Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help '
+            '(replace <loom-code> with the installed loom-code plugin directory).\n',
+        )
+E       assert (2, '', 'revi...l content.\n') == (2, '', 'revi...irectory).\n')
+E         
+E         At index 2 diff: 'reviewer-count needs a clean tree with completed functional content.\n' != 'reviewer-count needs a clean tree with completed functional content.\nHelp: "<loom-code>/scripts/loom-python" --ready reviewer-count --help (replace <loom-code> with the installed loom-code plugin directory).\n'
+E         Use -v to get more diff
+
+loom-code/tests/test_loom_checker_cli.py:150: AssertionError
+______________ test_reviewer_count_cli_preserves_argument_errors _______________
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6096/test_reviewer_count_cli_preser1')
+
+    def test_reviewer_count_cli_preserves_argument_errors(tmp_path: Path) -> None:
+        for args in [(), (" ",), ("change", "extra")]:
+            result = run_checker("reviewer-count", *args, cwd=tmp_path)
+>           assert (result.returncode, result.stdout, result.stderr) == (
+                2,
+                "",
+                "reviewer-count needs one change-id.\n"
+                'Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help '
+                '(replace <loom-code> with the installed loom-code plugin directory).\n',
+            )
+E           assert (2, '', 'revi...change-id.\n') == (2, '', 'revi...irectory).\n')
+E             
+E             At index 2 diff: 'reviewer-count needs one change-id.\n' != 'reviewer-count needs one change-id.\nHelp: "<loom-code>/scripts/loom-python" --ready reviewer-count --help (replace <loom-code> with the installed loom-code plugin directory).\n'
+E             Use -v to get more diff
+
+loom-code/tests/test_loom_checker_cli.py:162: AssertionError
+____________ test_covered_help_is_discoverable_and_explains_inputs _____________
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6096/test_covered_help_is_discovera0')
+
+    def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> None:
+        overall = run_checker("--help", cwd=tmp_path).stdout
+        required = {
+            "finalize-review": ["--input", "reviewer", "vendor", "model", "lens",
+                                "verdict", "findings", "adversarial", "no_program",
+                                "review_target_sha", "reviewed_sha", "diff base",
+                                "skills/closing-review/SKILL.md"],
+            "publish": ["--intent", "--confirm-authorized", "--title", "--body-file",
+                        "## Context", "## Intended outcome", "## Scope", "## Decisions",
+                        "## Implementation", "## Behaviour change", "## Verification",
+                        "## Risks and rollback", "## Follow-ups", "Verification status:",
+                        "skills/ship/SKILL.md"],
+            "delivery": ["--goal", "local", "published", "merged", "--intent", "--json",
+                         "state", "reason", "next", "evidence", "complete"],
+            "plan": ["<path", "charter:", "1.1", "empty", "field", "exit 1", "exit 2"],
+            "intake": ["write-spec", "write-plan", "change-id", "interface-surfaces",
+                       "stdout", "BLOCK", "exit 1", "exit 2"],
+            "reviewer-count": ["change-id", "clean", "committed", "floor", "two", "exit 2"],
+        }
+        for command, words in required.items():
+>           assert f"{command} --help" in overall
+E           AssertionError: assert 'plan --help' in '\n\n    loom_checker.py --list-rules\n    loom_checker.py --help\n    loom_checker.py intent <path> [--commit-msg <fi...are read\nfrom `loom-code/contract/manifest.yaml`, which is the versioned contract\npackage this checker ships with.\n'
+
+loom-code/tests/test_loom_checker_cli.py:451: AssertionError
+__________________ test_exact_help_never_dispatches_handlers ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10438a650>
+
+    def test_exact_help_never_dispatches_handlers(monkeypatch) -> None:
+        entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+        def forbidden(*args):
+            raise AssertionError("help dispatched a handler")
+        for command in ("finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"):
+            monkeypatch.setitem(entry["COMMANDS"], command, forbidden)
+            for flag in ("--help", "-h"):
+                out, err = io.StringIO(), io.StringIO()
+>               assert entry["main"]([command, flag], out, err) == 0
+E               AssertionError: assert 2 == 0
+E                +  where 2 = <function main at 0x1043be840>(['plan', '--help'], <_io.StringIO object at 0x10432a680>, <_io.StringIO object at 0x10432a440>)
+
+loom-code/tests/test_loom_checker_cli.py:469: AssertionError
+_____ test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint _____
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6096/test_usage_and_evidence_reject0')
+
+    def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_path: Path) -> None:
+        repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+        malformed = tmp_path / "review.json"
+        malformed.write_text("{", encoding="utf-8")
+        cases = [
+            (["finalize-review"], 2, "finalize-review needs a change-id."),
+            (["finalize-review", "2026-09-09-example", "--input", str(malformed)],
+             2, "cannot read review input:"),
+            (["publish"], 2, "publish: --intent or --confirm-authorized is required"),
+            (["delivery", "--goal", "invalid"], 2, "delivery: --goal must be local, published or merged"),
+            (["plan"], 2, "plan needs a path."),
+            (["plan", str(tmp_path / "absent.md")], 2, "no such plan file:"),
+            (["intake"], 2, "intake needs a station and a change-id."),
+            (["intake", "unknown", "example"], 2, "unknown station"),
+            (["reviewer-count"], 2, "reviewer-count needs one change-id."),
+        ]
+        for argv, code, diagnostic in cases:
+            result = run_checker(*argv, cwd=repo)
+            assert result.returncode == code and not result.stdout
+            assert result.stderr.startswith(diagnostic)
+>           assert result.stderr.count(f'--ready {argv[0]} --help') == 1
+E           AssertionError: assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0x1049a1970>('--ready plan --help')
+E            +    where <built-in method count of str object at 0x1049a1970> = 'plan needs a path.\n'.count
+E            +      where 'plan needs a path.\n' = CompletedProcess(args=['/Users/kouko/.cache/uv/builds-v0/.tmprUeqDb/bin/python', '/private/tmp/loom-cli-guidance-consistency/loom-code/scripts/loom_checker.py', 'plan'], returncode=2, stdout='', stderr='plan needs a path.\n').stderr
+
+loom-code/tests/test_loom_checker_cli.py:493: AssertionError
+__________ test_dispatch_preserves_success_internal_errors_and_hooks ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10438b100>
+
+    def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> None:
+        entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+        for command in ("finalize-review", "publish", "delivery", "push", "plan", "intake", "reviewer-count"):
+            for code in (0, 1, 2):
+                def handler(args, out, err):
+                    out.write('{"unchanged": true}\n')
+                    err.write("original diagnostic\n")
+                    return code
+                monkeypatch.setitem(entry["COMMANDS"], command, handler)
+                out, err = io.StringIO(), io.StringIO()
+                assert entry["main"]([command, "--hook"], out, err) == code
+                assert out.getvalue() == '{"unchanged": true}\n'
+                hint_expected = code != 0 and command in {"finalize-review", "publish", "plan", "intake", "reviewer-count"}
+>               assert ("--help" in err.getvalue()) == hint_expected
+E               AssertionError: assert ('--help' in 'original diagnostic\n') == True
+E                +  where 'original diagnostic\n' = <built-in method getvalue of _io.StringIO object at 0x10432ab00>()
+E                +    where <built-in method getvalue of _io.StringIO object at 0x10432ab00> = <_io.StringIO object at 0x10432ab00>.getvalue
+
+loom-code/tests/test_loom_checker_cli.py:535: AssertionError
+=========================== short test summary info ============================
+FAILED loom-code/tests/test_loom_checker_cli.py::test_reviewer_count_cli_preserves_output_and_dirty_tree_error
+FAILED loom-code/tests/test_loom_checker_cli.py::test_reviewer_count_cli_preserves_argument_errors
+FAILED loom-code/tests/test_loom_checker_cli.py::test_covered_help_is_discoverable_and_explains_inputs
+FAILED loom-code/tests/test_loom_checker_cli.py::test_exact_help_never_dispatches_handlers
+FAILED loom-code/tests/test_loom_checker_cli.py::test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint
+FAILED loom-code/tests/test_loom_checker_cli.py::test_dispatch_preserves_success_internal_errors_and_hooks
+6 failed, 33 passed in 9.65s
