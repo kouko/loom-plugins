@@ -162,3 +162,55 @@ A combined inventory/prose-writing shell request was refused by the local
 command guard before execution. The inventory was obtained with a direct Git
 read, hashes computed separately and this prose applied with the edit tool;
 no command guard or security setting was changed.
+
+## R2 supplemental capture amendment — fixed before supplemental execution
+
+Registered on 2026-11-13, before either supplemental operator starts. This
+amendment preserves the confirmed requirements, six tasks, frozen oracle,
+candidate `2cef40163b6a562971780da6e6fd107289304962`, historical artifact/base
+identities, mutations and four metrics. R1 remains retained and partially
+complete; no R1 failure or missing measurement is overwritten by R2.
+
+R1's subprocess recorder omitted initial launcher help and complete native
+tool bookkeeping. The first technical repair recovered original native-call
+counts and merged bootstrap bytes from the same two R1 sessions, but could
+not separate those bootstrap streams or uniquely allocate shared task calls.
+Independent acceptance therefore reported Acceptance 3 partly complete.
+That repair attempt is spent and stays recorded. R2 is the second technical
+repair path for the same comparison obligation, not a newly named task or a
+counter/budget reset. No substantive requirement change is claimed.
+
+R2 uses the same original operator identities, separately labeled R2A/R2B,
+with fresh identical task directories. A keeps text then JSON; B keeps JSON
+then text. Both operators already know R1's outcomes and repairs. This is an
+informed supplemental capture exercise, not a replacement blind trial or an
+independent replication of efficiency. Report R1 and R2 separately; never
+pool them to inflate sample size or claim removed learning effects.
+
+The new capture obligation is mechanical: load the generic subprocess
+harness before any launcher call, capture every checker/launcher invocation
+including the first launcher help with separate original streams and byte
+counts, tag each native tool call with one unambiguous phase, and finish
+one task before another starts. A tool call cannot mix tasks or task answer
+bookkeeping with a later check. Native tool counts will be independently
+recovered from the original R2 sessions after execution; bootstrap, reporting
+and coordination stay separately inventoried. The underlying preregistered
+metric is unchanged: actual tool calls, not fractional allocations or child
+command counts used as substitutes.
+
+The general-purpose measurement harness is temporary infrastructure, not
+production code or an adversarial probe: `/private/tmp/loom-json-r2-capture.py`,
+SHA-256 `71d0e5a165b88c3a1bf13cb67873b28a4008b5d4b47721c2146cda4a84f135d5`.
+It exposes only `run(argv, cwd)` and records supplied arguments/results;
+it contains no task commands, interpretation logic or expected answers.
+The operator-only packet is `operator-instructions-r2.md`; the oracle remains
+withheld. Coordinator fixture creation and hash checks remain setup activity,
+outside task metrics. No new paid execution or remote write is introduced.
+
+Before dispatch, commit this amendment and operator packet and verify all
+24 R2 fixtures against the unchanged original/mutation hashes. Preserve the
+amendment commit, candidate SHA, harness hash, actual operator session IDs,
+exact tool/CLI records, initial answers, failures and all R2 deviations.
+If capture still fails, retain the limitation and return to independent
+acceptance; do not silently rename or restart the experiment. R2 outcomes
+are pending at amendment time. This document issues no passing verdict.
