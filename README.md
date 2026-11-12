@@ -13,8 +13,8 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.24.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.71.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
+| [`loom-code`](loom-code/README.md) | 3.72.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -93,7 +93,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.24.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.25.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools and optional design research. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.71.0. Five stations carry one change from plan to PR with
+Version 3.72.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |

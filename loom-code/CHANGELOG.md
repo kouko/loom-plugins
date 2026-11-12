@@ -1,10 +1,16 @@
 # Changelog
 
-## [3.71.0] — 2026-11-13 — pilot optional JSON preparation results
+## [3.72.0] — 2026-11-13 — pilot optional JSON preparation results
 
 - Add an optional final `--json` selector to `plan` and `intake`, with a versioned result object for passed checks, ordered rule blockers, notices and usage/internal errors. Rule diagnostics are serialized directly rather than recovered from human output.
 - Keep default text streams, exits, evaluated checks and hook behavior unchanged. Structured status covers only the selected invocation, not completed verification or publication authority; startup failures remain outside the in-process result guarantee.
 - Document the bounded schema and selector grammar in help, and preregister a matched-task text/JSON comparison without promising efficiency improvement.
+
+## [3.71.0] — 2026-11-13 — actively compare smaller equivalent engineering proposals
+
+- Check important new or materially restructured engineering proposals for smaller alternatives that preserve confirmed outcomes and mandatory correctness, security and compatibility constraints.
+- Explain removed engineering or operating burden, or why retained complexity is necessary, within existing research findings and decision impact.
+- Revisit only consequential unresolved premises; stop with sufficient support or an explicit unknown. Keep routine facts and adequate-evidence reuse direct, without new workflow stages, quotas or required deletion.
 
 ## [3.70.0] — 2026-11-12 — extend planning-command help and recovery guidance
 

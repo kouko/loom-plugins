@@ -75,9 +75,15 @@ verification. Follow the repository-specific requirements in the source policy.
 
 ## Choosing an evaluation approach
 
-For each material recommendation, identify credible alternatives (including the
-current approach where viable) and compare them on common criteria relevant to
-the pending decision. Separate mandatory constraints, user preferences,
+When proposing or materially restructuring an important engineering solution,
+actively check for a smaller alternative preserving the same confirmed outcomes
+and mandatory constraints, including applicable correctness, security and
+compatibility requirements. Consider keeping the current approach, removing
+unnecessary components or dependencies, narrowing abstractions, or combining
+overlapping responsibilities where applicable; do not require a quota of
+alternatives or deletion. For each material recommendation, identify credible
+alternatives (including the current approach where viable) and compare them on
+common criteria relevant to the pending decision. Separate mandatory constraints, user preferences,
 supported facts, inference and unknowns. Apply comparable versions and conditions;
 choose dimensions such as capability, compatibility, operating burden, failure
 behavior or reversibility only when consequential. No fixed dimension count or
@@ -88,6 +94,12 @@ decision-critical unverified context before recommending. If a preference
 reverses with an unknown condition, give conditional alternatives or leave it
 unresolved; investigation tools do not establish the target caller, workflow or
 runtime. Missing comparison evidence does not prove an option better.
+Explain the smaller shape and engineering or operating burden removed, or the
+concrete reason complexity remains necessary, in the retained findings and
+decision impact. Revisit inquiry only when a consequential unresolved premise
+could change this comparison; stop with sufficient support or return the
+explicit unknown when permitted investigation cannot settle it. No fixed rounds
+are required; routine facts and reuse of adequate evidence still return directly.
 
 For an assessment of alternatives, design/change quality, experimental effects
 or operational risks, read [evaluation selection](references/evaluation-selection.md).
