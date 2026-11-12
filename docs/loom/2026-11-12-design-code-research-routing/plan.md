@@ -30,6 +30,11 @@ charter: 1.1
 - Test: A1 positive: CLI-admit26; boundary: CLI-reject27. Preserve fixtures and externally observable count, exit status and rejection evidence; add no new test.
 - Risk: agent-decided — Move both edited cases from internal measurement helpers to the actual --measure entry, preserving budget semantics and unchanged legacy cases.
 
+**W5-01 Integrate the newly published trunk release without losing research routing** after: W4-02 acceptance: 1, 2, 3, 4, 5, 6
+- Files: README.md, loom-code/CHANGELOG.md, loom-code/.claude-plugin/plugin.json, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py, derived manifests, upstream merge paths, docs/loom/2026-11-12-design-code-research-routing/research/002-upstream-design-compatibility.md
+- Test: A1 positive: synchronized-release; boundary: preserve-upstream367. Run the existing release pin before the bump to observe rejection, then synchronize 3.68.0 and run focused checks; repeat complete integration and retained adversarial commands.
+- Risk: agent-decided — Upstream ab40f0e6 published 3.67.0 after review. Preserve upstream progress and research routing while resolving conflicts. This new integration obligation preserves W4 requirements and retries; continue the same episode at terminal Round 3.
+
 ## Simplicity check
 
 - none found
