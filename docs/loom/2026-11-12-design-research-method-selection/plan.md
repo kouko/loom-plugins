@@ -1,56 +1,48 @@
-# Bounded design research method selection — plan
-intent: 2026-11-12-design-research-method-selection@bd14580d
-spec: docs/loom/2026-11-12-design-research-method-selection/spec.md@3404c009
+# Bounded research and active simplification — plan
+intent: 2026-11-12-design-research-method-selection@6869846f
+spec: docs/loom/2026-11-12-design-research-method-selection/spec.md@282020e9
 charter: 1.1
 
 ## Task DAG
 
-### Wave 1
+### Wave 6 — design-owned simplification
 
-**W1-01 Bound acquisition and select useful inquiry** after: none acceptance: 1, 2, 3, 4, 5, 6
-- Files: loom-design/skills/design-research/SKILL.md (entry), loom-design/skills/design-research/references/method-selection.md, docs/loom/2026-11-12-design-research-method-selection/evidence/
-- Test: A1 positive: source-dialogue; boundary: excluded-activity. A2 positive: useful-method; boundary: sufficient-evidence. A3 positive: attributed-source; boundary: missing-population. A4 positive: mixed-handoff; boundary: design-only. A5 positive: revised-record; boundary: unsupported-challenge. A6 positive: retained-trials; boundary: unverified-claim.
-- Risk: agent-decided — preserve existing package tests and retention contract (REQ-1–6); use real isolated agent executions with controlled fixtures before/after guidance, not keyword assertions or invented participant evidence. No production executable code changes.
+**W6-01 Actively simplify material design proposals** after: none acceptance: 1, 2, 3, 4, 5, 6, 7
+- Files: loom-design/skills/design-research/SKILL.md (entry), docs/loom/2026-11-12-design-research-method-selection/evidence/design-simplification-cases.md
+- Test: A1 positive: permitted-inquiry; boundary: excluded-study. A2 positive: sufficient-reuse; boundary: quota. A3 positive: supported-claim; boundary: unknown. A4 positive: design-owned; boundary: feasibility. A5 positive: saved-reason; boundary: stale-record. A6 positive: actual-output; boundary: text-only. A7 positive: smaller-equivalent; boundary: necessary-complexity.
+- Risk: agent-decided — REQ-1–7; preserve existing packaging checks and scope/record safeguards. Pure prose needs meaningful native executions, not keyword tests. Add one positive and one boundary proposal fixture; reuse the existing adequate-evidence case.
 
-### Wave 2
+### Wave 7 — engineering-owned simplification
 
-**W2-01 Release the bounded research guidance** after: W1-01 acceptance: 1, 2, 3, 4, 5, 6
-- Files: loom-design/.claude-plugin/plugin.json, loom-design/CHANGELOG.md, loom-design/README*.md, README.md, loom-design/.codex-plugin/plugin.json, loom-design/plugin.json, loom-design/package.json, loom-design/tests/spec/test_capture_intent_contract.py
-- Test: A1 positive: version-match; boundary: stale-pin. A2 positive: version-match; boundary: stale-pin. A3 positive: version-match; boundary: stale-pin. A4 positive: version-match; boundary: stale-pin. A5 positive: version-match; boundary: stale-pin. A6 positive: version-match; boundary: stale-pin. Existing release synchronization and complete package suite.
-- Risk: agent-decided — REQ-1–6 ship together in loom-design minor release; no unrelated plugin bump. Check actual sync outputs and existing release pins before committing.
+**W7-01 Actively simplify material engineering proposals** after: W6-01 acceptance: 6, 7
+- Files: loom-code/skills/engineering-research/SKILL.md (entry), loom-code/skills/engineering-research/references/evaluation-selection.md, docs/loom/2026-11-12-design-research-method-selection/evidence/engineering-simplification-cases.md
+- Test: A6 positive: retained-output; boundary: unsupported-claim. A7 positive: fewer-dependencies; boundary: mandatory-controls. Run existing engineering research package checks; actual native cases are separate from packaging.
+- Risk: agent-decided — REQ-6/7; integrate existing alternatives guidance without repeating a new procedure in the reference. Preserve permission, evidence and investigation boundaries; no production experiments or additional framework requirement.
 
-### Wave 3 — integration repair
+### Wave 8 — code release packet
 
-**W3-01 Preserve the blocked-input timeout regression under suite load** after: W2-01 acceptance: 6
-- Files: loom-code/tests/test_external_review_adversarial.py (exercised entry: external_review.main), docs/loom/2026-11-12-design-research-method-selection/evidence/integration-repair.md
-- Test: A6 positive: preflight-reaches-review; boundary: unread-large-prompt-times-out. Existing full-suite failure is RED; retain the 1 MiB input, distinct timeouts, review-start marker, cleanup and elapsed assertions.
-- Risk: agent-decided — preserve existing test coverage; remove short-deadline fake Python startup dependency without changing production timeout behavior. Defect-class sweep found one applicable instance in changed files plus the failing test; unrelated changelog cold-install mentions excluded.
+**W8-01 Release code-owned research guidance** after: W7-01 acceptance: 6, 7
+- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/CHANGELOG.md, loom-code/README*.md, README.md, loom-code/tests/test_write_plan_station_text.py
+- Test: A6 positive: version-match; boundary: stale-pin. A7 positive: version-match; boundary: stale-pin. Existing synchronization test RED before metadata update, then GREEN.
+- Risk: agent-decided — REQ-6/7; bump code 3.70.0 to 3.71.0 minor and derive mirrors through sync_codex_manifests.py. Preserve all existing release-test assertions; do not change timeout fixtures or worker settings.
 
-### Wave 4 — technical re-look of the shared fixture boundary
+### Wave 9 — design release note
 
-**W4-01 Remove startup timing from shared CLI timeout fixtures** after: W3-01 acceptance: 6
-- Files: loom-code/tests/test_external_review.py (exercised entries: external_review.discover and external_review.execute), docs/loom/2026-11-12-design-research-method-selection/evidence/shared-fixture-relook.md
-- Test: A6 positive: shared-fake-consumers-reach-intended-stage; boundary: eof-exit-descendant-timeouts. Preserve all existing entry-level assertions, deadlines, model-list EOF detection, descendant cleanup and review-stage coverage; run the complete existing module and bounded concurrent repetitions.
-- Risk: agent-decided — preserve test_external_review.py coverage. Re-look moves the repair unit from one failing test to shared short-deadline CLI factories and every consumer. Longer-budget progress fixtures stay unchanged; no production changes or new harness.
-
-### Wave 5 — withdraw the unproven incidental repair
-
-**W5-01 Restore original timeout fixtures without weakening their checks** after: W4-01 acceptance: 6
-- Files: loom-code/tests/test_external_review.py, loom-code/tests/test_external_review_adversarial.py, docs/loom/2026-11-12-design-research-method-selection/evidence/fixture-repair-withdrawal.md
-- Test: A6 positive: exact-trunk-fixture-bytes; boundary: no-weakened-tests. Preserve original complete files at trunk391fd017, retain failure/diagnostic evidence, then run the unchanged focused modules and mandatory complete suite.
-- Risk: agent-decided — preserve original test coverage exactly. Native rewrites failed to establish reliable repair; diagnostic code run passed without reproducing failure. Remove only this branch's incidental test changes, keep research guidance and disclose unresolved preflight intermittence.
+**W9-01 Include simplification in the unshipped design release** after: W8-01 acceptance: 1, 2, 3, 4, 5, 6, 7
+- Files: loom-design/CHANGELOG.md
+- Test: Existing design release synchronization and packaging checks; keep 2.25.0 across all metadata and include the new guidance in its existing unreleased entry.
+- Risk: agent-decided — REQ-1–7; no second minor increment for the same unpublished PR. Existing documentation versions and derived manifests remain synchronized.
 
 ## Simplicity check
-- Inline selection guidance instead of a separate reference when it creates no useful reading boundary — taken
-- No additional smaller shape found by the independent reviewer — declined: reviewer returned PASS with no deletion findings
+- none found
 
 ## Questions asked
 ① — what — 以上是否就是你要的範圍？
+① — what — 是否確認本次兩個 skill 都納入這項簡化責任？
 
 ## Risks
-1. agent-decided — A small controlled before/after sample supports bounded behavior only, not framework superiority, population validity or reliable performance across all future tasks.
-2. agent-decided — The requested Claude Code proposal review failed preflight with no usable review; retain that limitation. Native independent specification, plan, acceptance and closing reviews remain required.
-3. agent-decided — Preserve current stage callers and template; modify only design research acquisition/selection, not engineering research or station semantics.
-4. agent-decided — First finalization failed an unchanged blocked-input regression during preflight. Repair its test double only; no new requirement, production external-review behavior, installed code-plugin change or retry-budget reset. Existing design trials remain applicable.
-5. agent-decided — Recurrence exposed the shared-factory boundary. Replace applicable shared fixtures while preserving protocol/EOF semantics, not individual failures. The added shared-factory obligation resets neither the review episode nor task retry counts.
-6. agent-decided — Native fixtures still timed out; the bounded phase-marker diagnostic passed without locating a cause. Withdraw unproven incidental test edits, retain original tests/evidence, and require complete verification of the minimal research-only candidate before terminal review.
+1. agent-decided — REQ-7 and expanded REQ-6 are newly confirmed obligations. Retain earlier work/evidence only where applicable; new behavioral cases must establish active simplification and necessary-complexity preservation in each owner.
+2. agent-decided — Prior fixture experiments were withdrawn; original timeout tests remain exact trunk bytes. Their intermittence remains unresolved. Preserve failed-task counts; this feature is not authorization to reopen fixture repair.
+3. agent-decided — Publication remains unapproved. Local work, review or saved metadata never supplies GitHub egress or merge consent.
+4. agent-decided — Main workflow callers, templates and field schemas stay unchanged. The two skills keep independent ownership; do not introduce a shared runtime helper, station or automatic critique dispatch.
+5. agent-decided — Existing small-sample and non-blind case limitations remain. New controlled executions support only their tested contexts; full package suite and independent closing review remain required.
