@@ -1,12 +1,14 @@
 # Design research method selection — acceptance test evidence
 
-Tried on 2026-11-12, in a clean copy of the project at 029cce3a6328e86e8d66b1c6b23b2db0947f7cbb.
+Tried on 2026-11-12, in a clean copy of the project at 3bf869d138a8a743b20b01ddab0dbe95e7fbbd20.
+
+Original behavioral trials ran at 029cce3a6328e86e8d66b1c6b23b2db0947f7cbb; the setup/provenance and numbered observations below retain that original execution, not a claim that the twelve cases were rerun. The dated re-run section records the clean setup recheck and per-row carryover at the current target.
 
 ## Setup and execution provenance
 
 - Independent native acceptance witness; did not implement the change. No product/code changes or repairs made.
 - Stage A loaded only `/private/tmp/design-research-trial-inputs.md` and saved baseline skill/template. Six scratch project directories were used. Raw responses, records and readbacks were retained immediately, then archived before candidate/expected checks were read. Archive SHA256: `c6983ddf01e54d4924d20cba54670a456d03155a01df9237369c721b9ce03fd6`.
-- Stage B read acceptance-tester contract/report template, confirmed intent/spec/plan, expected checks, and candidate skill/template. `git clone --no-hardlinks /private/tmp/loom-design-research-method-selection /private/tmp/design-research-execution/clean-candidate` returned `Cloning ... done.`; `git rev-parse HEAD` returned the exact tested HEAD above; `git status --porcelain` was empty before trial setup and after focused checks. No uncommitted implementation was copied.
+- Stage B read acceptance-tester contract/report template, confirmed intent/spec/plan, expected checks, and candidate skill/template. `git clone --no-hardlinks /private/tmp/loom-design-research-method-selection /private/tmp/design-research-execution/clean-candidate` returned `Cloning ... done.`; `git rev-parse HEAD` returned original behavioral target `029cce3a6328e86e8d66b1c6b23b2db0947f7cbb`; `git status --porcelain` was empty before trial setup and after focused checks. No uncommitted implementation was copied.
 - README Install section was inspected. `agy plugin validate ./loom-design` in the clean clone exited 0: `skills 7 · agents 0 · rules 0 · hooks 0 · mcpServers 0 · sidecars 0`, `Validation passed`. Advisory: missing logo means a generic icon. Direct native load of clean skill/template succeeded and was used for actual candidate runs. This verifies local load/usability and package validation; marketplace installation and existing installed copies were not changed or tested.
 - `cmp loom-design/skills/design-research/templates/research.md docs/loom/2026-11-12-design-research-method-selection/evidence/baseline/templates/research.md` exited 0, confirming unchanged template.
 - Focused command in clean clone: `python3 -m pytest loom-design/tests/test_design_research_package.py -q`; exit 0, `2 passed in 0.02s`. It covers portable discovery, relative bundled targets and flat template metadata, not behavior. The automated test suite, which runs before the change is accepted and blocks it on failure, remains the final mechanical check. Full-suite command reserved for finalize-review: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; this witness did not rerun it.
@@ -60,4 +62,32 @@ Tried on 2026-11-12, in a clean copy of the project at 029cce3a6328e86e8d66b1c6b
 Baseline already reused sufficient evidence, asked about the missing episode, rejected the W3C conformance inference, separated technical unknowns and corrected the contradictory record. Therefore those candidate outcomes do not demonstrate newly acquired abilities. Baseline C5 proposed future workshop/prototype activity under supplied authorization, whereas candidate C5 excluded it as outside the skill; neither performed those activities. The observed scope response is the useful contrast. Small sample, identical executor, visible expected checks during candidate, sequential learning and source reuse limit inference. No statistical or general efficacy result is claimed.
 
 No important-or-worse dismissed findings were supplied. Requested Claude Code proposal review previously failed preflight and supplied no verdict; not counted as passed or as a requirement of native acceptance. No user-instructed skipped steps were found in intent constraints or plan risks.
+
+## Re-run on 2026-11-12, at 3bf869d138a8a743b20b01ddab0dbe95e7fbbd20
+
+This is the same acceptance witness and review episode after the integration-only repair, not a new behavioral trial round. Previous integrated target: 71aa3cf2. Original behavioral-trial target: 029cce3a. No new requirements, altered acceptance lines or product flows were introduced; spec UI flows remain N/A.
+
+### Actual clean setup and focused results
+
+- Command: `git clone --no-hardlinks /private/tmp/loom-design-research-method-selection /private/tmp/design-research-execution/clean-rerun-3bf869d1`. Result: exit 0, `Cloning ... done.`.
+- In that clone, `git rev-parse HEAD` returned `3bf869d138a8a743b20b01ddab0dbe95e7fbbd20`; `git status --porcelain` returned no lines before checks and after the focused timeout test.
+- Re-read README Install instructions and the candidate skill/template in that clean clone. `agy plugin validate ./loom-design`: exit 0, `Validation passed`, seven skills; unchanged generic-logo advisory only. This is local load/package revalidation, not a marketplace installation claim.
+- `python3 -m pytest loom-design/tests/test_design_research_package.py -q`: exit 0, `2 passed in 0.03s`.
+- `python3 -m pytest loom-code/tests/test_external_review_adversarial.py::test_unreadPromptOverPipeBuffer_timesOutAtLimit -q`: exit 0, `1 passed in 6.98s`. This actually exercises the modified test double through the unchanged runner: 1 MiB prompt, 5-second preflight deadline, 6-second review deadline, review-start marker and process-cleanup/elapsed assertions.
+- `git diff --stat 71aa3cf2..3bf869d1`: four files, 74 insertions and eight deletions; only plan/spec development additions, integration-repair evidence and the one test file.
+- Read the full test repair via `git diff 71aa3cf2..3bf869d1 -- loom-code/tests/test_external_review_adversarial.py`: Python fake replaced by a shell fake reading one bounded prefix, returning preflight JSON or entering `exec sleep 60`. Actual runner, prompt size, distinct deadlines and assertions are unchanged.
+- `git diff 029cce3a..3bf869d1 -- loom-design/skills/design-research loom-design/.claude-plugin/plugin.json loom-design/.codex-plugin/plugin.json loom-design/plugin.json loom-design/package.json` produced no output. `git diff --name-only 029cce3a..3bf869d1` listed only retained reports/evidence, plan/spec and the test repair; original research behavior, template, caller code and installed code are unchanged. This comparison covers the whole interval from actual trials, not only the latest repair.
+- Original twelve controlled executions were not rerun. Their retained responses, source accesses and snapshots remain the observations; setup/focused mechanical checks above are the only newly executed checks.
+- The station reports Build's locked suite passed at this target: 4264 passed, six skipped and 17 shell groups with zero failures, followed by two passing reused packaging adversarial checks. This witness did not independently rerun the full suite. Finalize-review will execute `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` and block acceptance on failure. Package tests and finalization are not skipped.
+
+### Per-row carryover, checked against the complete diff
+
+- 1: carried over — acquisition-scope guidance and all trial inputs are unchanged; the test-only CLI replacement cannot enable participant, product-operation or experimental activities. C2/C3/C5 actual observations still apply.
+- 2: carried over — evidence-reuse and question-led selection text, supplied episodes and callers are unchanged. No change reaches C1–C4 decision behavior.
+- 3: carried over — evidence-honesty rules and actual C2–C6 records/source observations are unchanged; repair supplies no new product-user or technical evidence.
+- 4: carried over — design/engineering ownership text and production runner are unchanged; replacing a test double does not alter the C4 bounded engineering handoff.
+- 5: carried over — research template, metadata, continuation and readback rules are unchanged. Original same-record updates and retained readbacks remain the result.
+- 6: carried over — original actual transcripts and record snapshots remain intact; added development evidence does not replace them with invented outputs. Setup was rechecked separately above.
+
+No findings arose from these checks. No important-or-worse dismissed findings were supplied. Original sample, sequence, source-reuse and non-blind limitations remain unchanged.
 

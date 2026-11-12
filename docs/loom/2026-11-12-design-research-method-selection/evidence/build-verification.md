@@ -76,3 +76,36 @@ observed model or effort, evidence level `none`, and no review output. Local
 doctor reported inaccessible credentials/keychain in that execution context;
 that does not establish the exact preflight cause. No retry or outside-vendor
 closing-review verdict is claimed.
+
+## Integration repair and repeated Build verification
+
+The first `finalize-review` attempt stopped before generating an attestation:
+the package suite failed an existing blocked-input regression during the
+five-second preflight instead of reaching its six-second review deadline.
+See [integration-repair.md](integration-repair.md) for the actual failure,
+bounded diagnosis, test-only repair and additional mutation checks.
+The research requirements and twelve retained design-trial executions did not
+change. This remains the same bounded review episode, with the original two
+closing reviewers; it is not a new episode or a retry-budget reset.
+
+Repeated Build target: `3bf869d138a8a743b20b01ddab0dbe95e7fbbd20`.
+`sync-trunk` again reported up to date against `391fd017`. The exact locked
+package command above exited 0; fifteen pytest invocations totaled 4,264 passed
+and 6 skipped, and all seventeen shell summary groups had zero failures.
+Both inventories total 4,270 pytest cases; five previously skipped cases ran
+in this later invocation. These are observed run counts, not five new tests
+attributed to the repair. Detailed local output:
+`/private/tmp/design-research-build-suite-r2.log`.
+
+After that complete suite, the same committed adversarial program was rerun:
+
+```
+python3 -m pytest loom-design/tests/test_design_research_package.py
+loom-design/tests/test_design_research_package.py ..                     [100%]
+============================== 2 passed in 0.03s ===============================
+```
+
+No adversary was redispatched: the existing program remains applicable and
+passes. The test-only repair has not changed its covered packaging invariant.
+Renewed acceptance setup and same-reviewer fix verification precede the next
+finalization. No formal outside-review verdict or skipped step is added.

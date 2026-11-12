@@ -51,4 +51,41 @@ to this test-only repair; the design release remains 2.25.0.
 Existing design-research behavioral cases and retained trials remain
 applicable: this repair changes only their integration test environment,
 not design guidance or runtime external-review behavior. The orchestrator
-will run complete-suite verification and fresh checkpoint review.
+will run complete-suite verification and renew the checkpoint using the same
+reviewer identities in the existing bounded review episode.
+
+## Additional orchestrator mutation checks
+
+After the implementer's checks above, the orchestrator copied the script tree
+and the committed target test at `3bf869d1` into two temporary trees under
+`/private/tmp/design-repair-mutations-v2`. The test bytes were compared with
+`git show 3bf869d1:loom-code/tests/test_external_review_adversarial.py` and were
+identical in both copies. Only the copied production runner was mutated;
+the actual repository's production runner and test were left untouched.
+
+Each copy executed this unchanged committed test through pytest:
+
+```
+python3 -m pytest loom-code/tests/test_external_review_adversarial.py::test_unreadPromptOverPipeBuffer_timesOutAtLimit -q --basetemp <copy>/pytest-tmp
+```
+
+- `synchronous-input`: replaced exactly one `writer.start()` with `write_in()`
+  in the copied launcher, restoring synchronous large-input writing outside
+  the deadline. The review-start PID marker proved the blocked-input branch
+  was reached. The test did not return within the external 25-second guard;
+  the guard terminated it (return code -9) and explicitly reaped the marked
+  CLI process group. This is bounded nontermination evidence, not a normal
+  pytest assertion result. Output was empty before the guard.
+- `generic-probe-word`: changed exactly one occurrence of the real probe's
+  `single word ok` to `single word okay` in the copied runner. The exact shell
+  selector did not accept the near miss; pytest returned 1 with
+  `expected execution-timeout: 6s`, `observed execution-timeout: 5s`, and
+  `1 failed in 5.10s`. The target test and its assertions were unchanged.
+
+Both marked child PIDs were checked absent afterward. The initial copy-setup
+attempt failed before tests because it assumed a nonexistent pytest.ini;
+the corrected copies required no project config. No production mutation was
+applied to the source worktree, no new executable harness was committed, and
+these two checks do not establish sensitivity to every possible mutant.
+Local result receipts and output are retained under the temporary directory
+above. They supplement, rather than change, the implementer's reported scope.
