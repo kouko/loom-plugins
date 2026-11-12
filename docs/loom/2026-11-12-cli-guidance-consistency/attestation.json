@@ -1,0 +1,109 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-cli-guidance-consistency",
+  "content_digest": "7cfd89c9352e0a5e774f8aef0e5a27edb9df95e7",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "15396ee8255fb8d175f6961cd93160bea37efa43d2e6bb55d7fdd61f4af9bbc3"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "21cdc28d0044f642c6b8409b166ed510e24d3a12",
+      "review_target_sha": "25dcae5d0b7268401bd1f85e758a7dd17ed46afc",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_loom_checker_cli.py:575",
+          "text": "suggestion (non-blocking): The new compatibility case invokes internal cmd_intake here and again at line 586 to generate expected output, although this behavior is reachable through the declared public main entry. This duplicates execution and couples the expected result to the implementation; the subprocess assertions already exercise the real behavior.",
+          "fix": "Remove the internal cmd_intake calls and their runpy/chdir setup from this test, and assert the expected subprocess status, interface-surfaces output and BLOCK diagnostic directly in the existing case."
+        }
+      ],
+      "notes": [
+        "Inspected all 27 cumulative changed paths, the intent/spec/plan/report, dispatcher and three unchanged handlers, reviewer-floor fallback, field-cap implementation, PRINCIPLES.md and retained RED/build evidence. Production changes only extend the existing help mapping and discovery text.",
+        "Independently ran the two changed test modules using the locked uv invocation: 82 passed in 7.16s, with no skips. No complete package suite or evidence probe was run.",
+        "No new external API, SDK, MCP or CLI dependency was introduced; help guidance agrees with the inspected owned handlers and preserves limited success semantics."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_loom_checker_cli.py",
+          "reviewed_sha": "25dcae5d0b7268401bd1f85e758a7dd17ed46afc",
+          "quote": "loom-code/tests/test_loom_checker_cli.py ............................... [ 79%]"
+        }
+      ],
+      "reviewer": "guidance_code_review",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "21cdc28d0044f642c6b8409b166ed510e24d3a12",
+      "review_target_sha": "25dcae5d0b7268401bd1f85e758a7dd17ed46afc",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative 27-path delta, confirmed intent, spec, plan, acceptance report and retained evidence against the dispatcher and all three handlers. Conditional intake stdout and outside-repository UsageError versus unexpected internal exceptions are now represented consistently; limited successful checks confer no review or publication authority.",
+        "Release surfaces agree on 3.70.0. Retained package logs separately support the initial 4259 passed / 11 skipped run, the 253-pass visualization supplement, and the final 4264 passed / 6 skipped run; the final adversarial CLI module records 39 passes. Full suites and adversarial programs were not rerun by this reviewer.",
+        "Independent acceptance records all three criteria as works at c2bab0811a1ba1083e2452d84375d9c02c79bc3a; the later target commit only retains reports and evidence. The resolved acceptance wording nit and the separately retained nonblocking code-review test nit do not represent dismissed important findings."
+      ],
+      "reviewer": "guidance_docs_review",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "9455be5ff8c81053bc88d3d0e6b531c05a0eb08c",
+  "tested_commit": "c2bab0811a1ba1083e2452d84375d9c02c79bc3a",
+  "reviewed_commit": "25dcae5d0b7268401bd1f85e758a7dd17ed46afc",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}
