@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.24.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.69.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.70.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.69.0. Five stations carry one change from plan to PR with
+Version 3.70.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -273,11 +273,20 @@ retrying a potentially completed mutation. No automatic retry is added.
 For command discovery and input recovery, run
 `"<loom-code>/scripts/loom-python" --ready <command> --help`, replacing
 `<loom-code>` with the installed plugin directory and `<command>` with
-`finalize-review`, `publish` or `delivery`. These commands also accept exact
+`finalize-review`, `publish`, `delivery`, `plan`, `intake` or `reviewer-count`.
+These commands also accept exact
 `<command> -h` calls. Help describes inputs, authentic evidence, authorization
 and outcomes without validation or publication; covered failures retain their
 diagnostics and exit status and add a help hint. Hook and internal-error behavior
 are unchanged.
+
+The preparatory checks keep their limited scope: `plan <path>` checks the
+named file's implemented field caps, `intake <station> <change-id>` checks
+current station prerequisites, and `reviewer-count <change-id>` prints the
+required independent reviewer floor for clean committed content. Passing one
+does not run its station or establish completed review or verification.
+Intake's conditional `interface-surfaces (...)` stdout remains advisory and
+can precede a later failure; inspect the exit status and diagnostics too.
 
 Help for other commands, typed error categories and additional JSON modes remain
 future migrations requiring compatibility checks. Exit 2 still conflates usage errors

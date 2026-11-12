@@ -1,0 +1,44 @@
+attack_points: {found: 6, earned_a_program: 0, committed: 0}
+head: 159af54d7f11f92bdecba9e9d93fb515f1bc317c
+base: 21cdc28
+adversarial:
+  - command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py
+    artifact: loom-code/tests/test_loom_checker_cli.py
+probes:
+  - artifact: loom-code/tests/test_loom_checker_cli.py
+    status: reused
+    reason: Existing concern comment already names help validation bypass, result-stream drift and false authority; the unchanged module covers all three added commands.
+findings: []
+attempts:
+  - point: Malformed help forms and missing operands
+    command: /Users/kouko/.cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python /private/tmp/loom-guidance-attacks.py
+    artifact: /private/tmp/loom-guidance-attacks.py
+    result: Held. Extra operands and help tokens in nonexact positions preserve handler exit status and diagnostics, adding only the single matching hint.
+  - point: Hostile or unusual plan path operands
+    command: /Users/kouko/.cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python /private/tmp/loom-guidance-attacks.py
+    artifact: /private/tmp/loom-guidance-attacks.py
+    result: Held. Unicode/spaces/help-like filenames, literal ./--help, directory, invalid UTF-8, missing path and NUL preserve normal status/stdout; internal failures gain no misleading hint.
+  - point: Identifier and blank-input boundaries
+    command: /Users/kouko/.cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python /private/tmp/loom-guidance-attacks.py
+    artifact: /private/tmp/loom-guidance-attacks.py
+    result: Held. Traversal and non-ASCII intake identifiers, blank intake identifiers, and empty/whitespace reviewer-count operands preserve existing rejection.
+  - point: Exact help dispatches validation unexpectedly
+    command: /Users/kouko/.cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python /private/tmp/loom-guidance-attacks.py
+    artifact: /private/tmp/loom-guidance-attacks.py
+    result: Held. Both exact help forms for each added command returned stdout/0 with handlers replaced by a raising sentinel outside a repository. The trial script exercised 30 calls total across the first four attack points.
+  - point: Failure hints corrupt normal output or conceal conditional intake BLOCK
+    command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py
+    artifact: loom-code/tests/test_loom_checker_cli.py
+    result: Held. All 39 tests passed, including conditional interface-surfaces stdout followed by BLOCK, genuine success, dirty-tree refusal, exception paths and existing hook behavior.
+  - point: Generated release metadata drift
+    commands:
+      - python3 scripts/sync_codex_manifests.py --all --check
+      - uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_write_plan_station_text.py
+    artifact: loom-code/tests/test_write_plan_station_text.py
+    result: Held. Manifest check exited 0; all 43 station/release tests passed.
+limitations:
+  - No mutation/fuzz tooling was declared in the inspected dependency locks, package manifests or package runner; executable boundary attacks used instead.
+  - Intent, plan, standing/docs and evidence artifact types have no adversarial recipe; they were used to scope attacks, without claiming cross-document reconciliation or independent acceptance.
+  - No full suite, remote mutation or paid external call was run.
+  - System python initially lacked yaml/pytest; final successful commands used the existing cached yaml runtime and repository locked uv test environment. An initial launcher invocation without --script was rejected as expected and was corrected to the canonical test runner.
+  - Trial script remains uncommitted; no attack succeeded, so no new regression program earned a commit. Existing reusable module already carries the required concern line.

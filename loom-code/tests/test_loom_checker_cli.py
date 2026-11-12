@@ -150,7 +150,9 @@ def test_reviewer_count_cli_preserves_output_and_dirty_tree_error(tmp_path: Path
     assert (result.returncode, result.stdout, result.stderr) == (
         2,
         "",
-        "reviewer-count needs a clean tree with completed functional content.\n",
+        "reviewer-count needs a clean tree with completed functional content.\n"
+        'Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help '
+        '(replace <loom-code> with the installed loom-code plugin directory).\n',
     )
 
 
@@ -160,7 +162,9 @@ def test_reviewer_count_cli_preserves_argument_errors(tmp_path: Path) -> None:
         assert (result.returncode, result.stdout, result.stderr) == (
             2,
             "",
-            "reviewer-count needs one change-id.\n",
+            "reviewer-count needs one change-id.\n"
+            'Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help '
+            '(replace <loom-code> with the installed loom-code plugin directory).\n',
         )
 
 
@@ -438,6 +442,10 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
                     "skills/ship/SKILL.md"],
         "delivery": ["--goal", "local", "published", "merged", "--intent", "--json",
                      "state", "reason", "next", "evidence", "complete"],
+        "plan": ["<path", "charter:", "1.1", "empty", "field", "Exit 1", "Exit 2"],
+        "intake": ["write-spec", "write-plan", "change-id", "interface-surfaces",
+                   "stdout", "BLOCK", "Exit 1", "Exit 2"],
+        "reviewer-count": ["change-id", "clean", "committed", "floor", "two", "Exit 2"],
     }
     for command, words in required.items():
         assert f"{command} --help" in overall
@@ -454,7 +462,7 @@ def test_exact_help_never_dispatches_handlers(monkeypatch) -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
     def forbidden(*args):
         raise AssertionError("help dispatched a handler")
-    for command in ("finalize-review", "publish", "delivery"):
+    for command in ("finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"):
         monkeypatch.setitem(entry["COMMANDS"], command, forbidden)
         for flag in ("--help", "-h"):
             out, err = io.StringIO(), io.StringIO()
@@ -472,6 +480,11 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
          2, "cannot read review input:"),
         (["publish"], 2, "publish: --intent or --confirm-authorized is required"),
         (["delivery", "--goal", "invalid"], 2, "delivery: --goal must be local, published or merged"),
+        (["plan"], 2, "plan needs a path."),
+        (["plan", str(tmp_path / "absent.md")], 2, "no such plan file:"),
+        (["intake"], 2, "intake needs a station and a change-id."),
+        (["intake", "unknown", "example"], 2, "unknown station"),
+        (["reviewer-count"], 2, "reviewer-count needs one change-id."),
     ]
     for argv, code, diagnostic in cases:
         result = run_checker(*argv, cwd=repo)
@@ -483,6 +496,12 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
     assert result.returncode == 1 and not result.stdout
     assert result.stderr.startswith("BLOCK finalize.verdicts: review input has no verdicts\n")
     assert result.stderr.count("--ready finalize-review --help") == 1
+    plan = tmp_path / "invalid-plan.md"
+    plan.write_text("charter: 1.1\n", encoding="utf-8")
+    result = run_checker("plan", str(plan), cwd=repo)
+    assert result.returncode == 1 and not result.stdout
+    assert result.stderr.startswith("BLOCK plan.field-caps:")
+    assert result.stderr.count("--ready plan --help") == 1
 
 
 def test_help_explains_outcomes_and_authority(tmp_path: Path) -> None:
@@ -508,7 +527,7 @@ def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
 
 def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
-    for command in ("finalize-review", "publish", "delivery", "push"):
+    for command in ("finalize-review", "publish", "delivery", "push", "plan", "intake", "reviewer-count"):
         for code in (0, 1, 2):
             def handler(args, out, err):
                 out.write('{"unchanged": true}\n')
@@ -518,7 +537,7 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
             out, err = io.StringIO(), io.StringIO()
             assert entry["main"]([command, "--hook"], out, err) == code
             assert out.getvalue() == '{"unchanged": true}\n'
-            hint_expected = code != 0 and command in {"finalize-review", "publish"}
+            hint_expected = code != 0 and command in {"finalize-review", "publish", "plan", "intake", "reviewer-count"}
             assert ("--help" in err.getvalue()) == hint_expected
             assert err.getvalue().startswith("original diagnostic\n")
         def crash(args, out, err):
@@ -532,7 +551,7 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
 
 
 def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
-    for command in ("finalize-review", "publish", "delivery", "unknown"):
+    for command in ("finalize-review", "publish", "delivery", "unknown", "plan", "intake", "reviewer-count"):
         for args in (("--help", "extra"), ("extra", "--help"), ("-h", "extra")):
             result = run_checker(command, *args, cwd=tmp_path)
             assert result.returncode != 0
@@ -540,3 +559,34 @@ def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
     hook = run_checker("delivery", "--hook", "--help", cwd=tmp_path)
     assert (hook.returncode, hook.stdout, hook.stderr) == (
         2, "", "delivery: use --hook alone or --hook --host claude|codex\n")
+
+
+def test_planning_checks_preserve_real_success_and_conditional_stdout(tmp_path: Path, monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+    repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+    monkeypatch.chdir(repo)
+    plan = tmp_path / "empty.md"
+    plan.write_text("", encoding="utf-8")
+    result = run_checker("plan", str(plan), cwd=repo)
+    assert (result.returncode, result.stdout, result.stderr) == (0, "", "")
+    for station in ("write-spec", "write-plan"):
+        args = [station, "2026-09-09-example"]
+        out, err = io.StringIO(), io.StringIO()
+        code = entry["cmd_intake"](args, out, err)
+        result = run_checker("intake", *args, cwd=repo)
+        assert code == result.returncode == 0
+        assert result.stdout == out.getvalue()
+        assert result.stdout.startswith("interface-surfaces (")
+        assert result.stderr == err.getvalue() == ""
+    invalid = repo / "docs/loom/2026-09-09-example/plan.md"
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text("charter: 1.1\n", encoding="utf-8")
+    out, err = io.StringIO(), io.StringIO()
+    args = ["write-plan", "2026-09-09-example"]
+    code = entry["cmd_intake"](args, out, err)
+    result = run_checker("intake", *args, cwd=repo)
+    assert code == result.returncode == 1
+    assert result.stdout == out.getvalue()
+    assert result.stdout.startswith("interface-surfaces (")
+    assert result.stderr.startswith(err.getvalue()) and "BLOCK plan.field-caps:" in result.stderr
+    assert result.stderr.count("--ready intake --help") == 1
