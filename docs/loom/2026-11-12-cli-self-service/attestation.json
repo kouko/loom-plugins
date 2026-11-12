@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-12-cli-self-service",
-  "content_digest": "3373cdbc28083d4276279e98e2a9c2bf8d2a318a",
+  "content_digest": "96227a2eae073e7057a7dcd25253236d3a02995f",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,27 +22,27 @@
     {
       "verdict": "PASS",
       "lens": "code",
-      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
-      "review_target_sha": "e37def08e5e2dc41003c08721e4d0c1678b3491a",
+      "reviewed_sha": "781fc1cbf49bd0f30b3b93b1156f110a75eeeb72",
+      "review_target_sha": "68b55124a2ea30c55a18e0435614c8a68b60a599",
       "dimension_scores": {
-        "security": "PASS — Exact help forms return before handler dispatch; no shell interpolation, authorization bypass or new remote operation is introduced.",
-        "architecture": "PASS — The bounded help mapping and hint policy remain in the public dispatcher; existing handler ownership and main-only callable guard are preserved.",
-        "correctness": "PASS — Read main and its launcher caller, handler entry paths and help contracts; exact help, nonexact rejection, preserved diagnostics, result streams and hook behavior pass focused execution. Retained RED failures exercise the new behavior.",
-        "naming": "PASS — COMMAND_HELP, HELP_NOTICE and the local hint express their responsibilities without a new abstraction.",
-        "tests": "PASS — Independently executed both changed test files and the existing dispatcher architecture check: 82 passed, no skips. Added tests invoke the public subprocess or main entry; handler stubs isolate dispatcher behavior without replacing that behavior.",
-        "refactoring": "PASS — No unrelated handler rewrite or speculative extraction; the three intentionally distinct guidance bodies share only their help notice.",
-        "cross-task-coherence": "PASS — Dispatcher behavior, specified three-command scope, release metadata and retained first-use evidence agree; acceptance disclosures distinguish historical-job finalization from candidate verification.",
-        "external-surface-grounding": "PASS — No new external API or CLI dependency call; launcher usage and linked closing-review/ship contracts were read and match the exposed guidance.",
-        "principles-conformance": "PASS — Guidance preserves authentic evidence, existing authorization and independent review; the spec explicitly budgets the bounded help mechanism with regression coverage.",
-        "architecture-conformance": "N/A — No ARCHITECTURE.md exists in this checkout; the existing dispatcher architecture test was separately executed and passed.",
-        "deliberate-simplification": "PASS — The spec and README bound migration to three commands and explicitly defer all-command help, structured errors and further output modes pending compatibility work.",
-        "deletion-first": "PASS — The explicit self-service request motivates the bounded mapping and error hint; no forwarding function, new registry, framework or redundant validator was introduced."
+        "security": "PASS — Prior conclusion retained; the two help clarifications add no execution or authorization path.",
+        "architecture": "PASS — Prior dispatcher boundaries remain unchanged and the existing architecture check still passes.",
+        "correctness": "PASS — Clarified publish exit 2 agrees with _publish_args and _publish_usage; local-goal wording agrees with observe_delivery's committed-path branch, which does not check attestation or verification.",
+        "naming": "PASS — Prior conclusion retained; the fix introduces no identifiers or functions.",
+        "tests": "PASS — Re-executed both branch-changed test files and the existing dispatcher architecture check: 82 passed without skips. No artificial text-pin test is needed for these explanatory clarifications.",
+        "refactoring": "PASS — No new extraction or handler rewrite; prior conclusion retained.",
+        "cross-task-coherence": "PASS — Help and spec agree; plan records W3/W4, release synchronization passes at 3.69.0, and README/changelog preserve upstream research additions. Acceptance distinguishes carried first-use evidence from informed fix verification.",
+        "external-surface-grounding": "PASS — No new external call; prior source grounding retained and clarified outcomes checked against actual handler implementation.",
+        "principles-conformance": "PASS — Clarifications reinforce the distinction between local commitment, verification and authorization; prior mechanism-budget and independent-evidence conclusions remain applicable.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md applies; the existing dispatcher architecture check separately passed.",
+        "deliberate-simplification": "PASS — Original bounded scope remains; no framework, retry or expanded output protocol was introduced.",
+        "deletion-first": "PASS — Two existing descriptions were replaced to remove ambiguity; no new mechanism or extension point was introduced."
       },
       "findings": [],
       "notes": [
-        "Focused command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch; 82 passed in 5.08s. System Python lacked pytest and sandboxed uv cache access failed before the approved successful run.",
-        "Read retained RED/GREEN, adversarial and acceptance evidence; did not rerun the full package suite or stored probes, as required by the reviewer contract. No live remote publication or cross-host claim is made.",
-        "git diff --check flags only whitespace preserved in two raw failing-test transcripts; these are evidence bytes, not product defects. Repository artifacts were not edited."
+        "Same reviewer, Round 2 of the existing episode. Prior findings were empty. Enumerated 16d5f2f213b451c3a1e03f7f6a116a5756ee375b..target and upstream-base..target paths; reviewed the fix and merge interaction, retaining untouched Round 1 conclusions rather than reopening the full checkpoint.",
+        "Independent focused command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_checker_modules.py::test_entry_point_owns_only_cli_dispatch; 82 passed in 5.13s.",
+        "Read followup clarification, Build and renewed acceptance evidence. Full suite and stored probes were not rerun. Supplemental Claude text is not treated as a formal verdict or receipt. Repository artifacts were not edited."
       ],
       "reviewer": "selfservice_code_review",
       "vendor": "codex",
@@ -51,21 +51,21 @@
     {
       "verdict": "PASS",
       "lens": "docs",
-      "reviewed_sha": "ab40f0e634db492c9b250da8e95b53579aeb23c2",
-      "review_target_sha": "e37def08e5e2dc41003c08721e4d0c1678b3491a",
+      "reviewed_sha": "781fc1cbf49bd0f30b3b93b1156f110a75eeeb72",
+      "review_target_sha": "68b55124a2ea30c55a18e0435614c8a68b60a599",
       "dimension_scores": {
-        "omission": "PASS — The three covered help forms describe usable inputs, evidence preservation, authorization, outcomes and recovery; detailed receipt and publication rules resolve to the bundled owner skills.",
-        "ambiguity": "PASS — Help-only exit zero, progress, stage completion, local delivery and completed verification are distinguished; missing invocation authorization is explicitly narrower than an unauthorized intent.",
-        "inconsistency": "PASS — Public help agrees with the existing handlers and owner skills; the updated README supersedes the earlier future-help statement without dropping compatibility or authorization boundaries. Historical verification is not presented as candidate attestation.",
-        "incorrect-fact": "PASS — Checked help claims against actual dispatch/finalize/publish/delivery code, preserved source hashes and verdict fields, retained command results, release versions and package summary totals.",
-        "missing-population": "PASS — Evidence scopes the 15 captured operator commands, four attack points with 2460 permutations and 13 subprocess cases, 180 focused passes, and 4261 package passes plus 6 skips. Reconstruction, setup retries, source identity and untested host/remote/efficiency boundaries are disclosed.",
-        "deletion-first": "PASS — The bounded mapping and error hint address the documented discovery/recovery failure; no converter, framework, output envelope or retry mechanism was introduced, and superseded README wording was replaced."
+        "omission": "PASS — The fix adds the missing authorization-error category and explicitly excludes finalization, attestation and verification from the local delivery goal; related spec decisions and acceptance evidence match.",
+        "ambiguity": "PASS — Exit 2 is no longer described as solely invocation/internal failure, and local completion is bounded to committed attributable paths; neither clarification permits retries or supplies authorization.",
+        "inconsistency": "PASS — Checked the fix range and its integration boundary: upstream research/contract/skill content is unchanged against the new base, original command evidence remains unchanged, and current release metadata consistently uses 3.69.0 while historical runs retain their original versions.",
+        "incorrect-fact": "PASS — The unchanged handler returns 2 for missing authorization and returns local completion before checking remote or verification evidence. Retained actual refusal and unattested-local output agree; focused output reports 223 passes, integrated logs total 4263 passes and 6 skips, and adversarial output reports 38 passes.",
+        "missing-population": "PASS — The report separates carried-over A1/A2 from retested A3/A4/A5, identifies the replacement independent tester and exact candidate/job commits, and does not recast informed retesting as first use or controlled tests as live remote evidence.",
+        "deletion-first": "PASS — The fix replaces two ambiguous descriptions in place and reuses existing regression coverage; release integration preserves upstream work without adding a command mechanism or new text-pin tests."
       },
       "findings": [],
       "notes": [
-        "Read the confirmed intent, spec, plan, acceptance report and retained evidence, applicable principles/defaults, changed public prose, dispatcher and relevant existing handlers/owner guidance. No repository artifacts or tests were modified.",
-        "Recomputed all four retained source SHA-256 values and the package log totals; checked original review fields against converted verdicts and confirmed generated attestation verdicts equal the input. Candidate b3204e76 and historical job fe64dfa7 remain separately identified; later target changes contain direct evidence only.",
-        "This docs review independently inspected source and retained output, without rerunning the full suite or stored adversarial programs. It does not certify remote publication, installed-host behavior, fresh-machine provisioning, concrete inherited-model routing or efficiency gains."
+        "Same reviewer, Round 2 fix verification only. Prior findings were empty. Enumerated 16d5f2f213b451c3a1e03f7f6a116a5756ee375b..target and checked introduced changes rather than starting a new full review. No repository artifact or test was modified.",
+        "Verified target changes after tested commit 96a577c8a51ce5a07dda6e508a753b9e295d622b contain report/direct-evidence files only. Read actual retained focused and command output, recomputed package summary totals, and checked all four code manifest versions. Full suite and stored adversarial programs were not rerun.",
+        "Supplemental Claude suggestions remain source-checked input, not a conforming formal verdict or outside-review receipt. First-use reconstruction and environment failures remain disclosed; no remote publication, new host, concrete inherited-model routing or efficiency claim was added."
       ],
       "reviewer": "selfservice_docs_review",
       "vendor": "codex",
@@ -75,8 +75,8 @@
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "776c3fcea22b3fd5c2b4d37ac0786ea6d1f333a2",
-  "tested_commit": "b3204e76a99c2c2af4be8188706f6edab58c051b",
-  "reviewed_commit": "e37def08e5e2dc41003c08721e4d0c1678b3491a",
+  "tested_commit": "96a577c8a51ce5a07dda6e508a753b9e295d622b",
+  "reviewed_commit": "68b55124a2ea30c55a18e0435614c8a68b60a599",
   "acceptance_status": [
     {
       "acceptance": 1,
