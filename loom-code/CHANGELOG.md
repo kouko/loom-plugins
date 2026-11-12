@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.71.0] — 2026-11-13 — actively compare smaller equivalent engineering proposals
+
+- Check important new or materially restructured engineering proposals for smaller alternatives that preserve confirmed outcomes and mandatory correctness, security and compatibility constraints.
+- Explain removed engineering or operating burden, or why retained complexity is necessary, within existing research findings and decision impact.
+- Revisit only consequential unresolved premises; stop with sufficient support or an explicit unknown. Keep routine facts and adequate-evidence reuse direct, without new workflow stages, quotas or required deletion.
+
 ## [3.70.0] — 2026-11-12 — extend planning-command help and recovery guidance
 
 - Add exact `--help` and `-h` forms for `plan`, `intake` and `reviewer-count`, reusing the existing help mapping and failure hints. Explain each check's inputs and limited outcomes without executing its handler.
