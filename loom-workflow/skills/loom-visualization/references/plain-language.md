@@ -74,6 +74,10 @@ one, and keep every fact.
 | A dropped connecting word | "The file the script wrote failed the check." | "The file that the script wrote failed the check." |
 | A dropped connecting word | 「測試失敗，版號沒改。」 | 「測試失敗，因為版號沒改。」 |
 
+Add a connecting word only when you know how the two parts relate, from the
+original reply or from the work you did. When you do not know, write two
+separate sentences and do not guess a cause.
+
 Why: Clark, Martin and Mahowald (2026) compared text from nine frontier and
 near-frontier models with text from human writers
 ([arXiv 2610.29162](https://arxiv.org/abs/2610.29162)). All nine models put
@@ -154,7 +158,8 @@ Leave out process detail unless the user asks for it.
 
 Being concise means leaving out content that the user does not need. It
 never means dropping the words that connect a sentence: keep "that",
-"because", "so", 「因為」 and 「所以」.
+"because", "so", 「因為」 and 「所以」 where the original has them or the
+relation is known.
 
 | Hard to read | Plain |
 |---|---|
