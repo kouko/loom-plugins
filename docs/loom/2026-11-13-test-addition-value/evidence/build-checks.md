@@ -144,3 +144,12 @@ The first plan validation rejected the new authorization summary (70 words,
 exception; plan validation then exited zero. A package run started too early
 was interrupted by the coordinator (exit 130), and supplies no passing result.
 The complete package command is restarted on the corrected committed content.
+
+The corrected complete command exited zero on `7b3945b58`: 4,275 passed across
+15 pytest sessions, no skips reported, with all discovered shell tests and
+Mermaid checks passing. Local log:
+`/private/tmp/loom-test-addition-package-374-corrected.log`. The reused
+adversarial artifact passed again (2 passed). Independent acceptance used a
+fresh clone of that exact commit, ran 100 focused checks, examined upstream
+external-review interactions, and carried over all four acceptance results
+with explicit reasons. No new model CLI run or installed-host claim was made.
