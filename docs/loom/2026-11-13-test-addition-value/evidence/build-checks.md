@@ -138,3 +138,9 @@ constant. Manifest synchronization checks and 60 focused tests passed before
 and after; these checks did not detect Markdown conflict markers, so no false
 semantic RED is claimed. The actual conflicted index and markers established
 the integration problem. New integrated-content checks follow below.
+
+The first plan validation rejected the new authorization summary (70 words,
+40-word field cap). The coordinator shortened it without changing the approved
+exception; plan validation then exited zero. A package run started too early
+was interrupted by the coordinator (exit 130), and supplies no passing result.
+The complete package command is restarted on the corrected committed content.
