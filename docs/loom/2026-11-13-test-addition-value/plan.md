@@ -43,7 +43,7 @@ charter: 1.1
 
 ## Risks
 1. user-decided — later messages authorize implementation and dogfood, then standard publication/merge conditional on successful dogfood, acceptance, review and CI. Acceptance is unchanged; prior planning-only and one-review spending boundaries are historical, not current implementation limits.
-2. agent-decided — reuse the existing reduce-testing-amount worktree and branch because they already hold this change's research and intent; preserve prior research files and unrelated state.
+2. agent-decided — implementation began in reduce-testing-amount; final verification and publication use a clean feature worktree from its committed HEAD. Original research inventory and outside-review raw records stay untouched in the original worktree and are excluded from publication.
 3. agent-decided — evaluation uses fresh-context actor trials with fixed reuse, novel-defect, duplicate and distinct-risk labels; compare baseline and candidate decisions. Store observable outputs under this change's evidence directory; text-presence assertions do not establish successful behavior.
 4. agent-decided — pairwise cases are behavioral evaluation identifiers, not promised new permanent pytest functions. Existing tests remain; no new sentence-pin suite, test harness, audit skill, metadata schema, checker rule, or mechanism-count exception is planned.
 5. agent-decided — Build still requires its independent adversarial pass and full package command from KICKOFF-DEFAULTS; closing review still repeats required checks. A genuinely defect-catching probe follows existing graduation rules; do not promise zero additional permanent tests.
