@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.73.0] — 2026-11-13 — identify the added protection before adding tests
+
+- Reuse sufficient existing coverage during planning and implementation; identify the distinct defect or uncovered behavior when extending permanent tests, while preserving defect reproduction, test-first work and independent boundary coverage.
+- Compare duplicate tests by the protection they provide, preserving unique integration and environment risks and requiring replacement evidence before recommending removal.
+- Keep existing test budgets, required adversarial probe graduation and quality checks unchanged; add no test inventory, deletion mechanism or new report field.
+
 ## [3.72.0] — 2026-11-13 — pilot optional JSON preparation results
 
 - Add an optional final `--json` selector to `plan` and `intake`, with a versioned result object for passed checks, ordered rule blockers, notices and usage/internal errors. Rule diagnostics are serialized directly rather than recovered from human output.
