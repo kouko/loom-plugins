@@ -6,7 +6,7 @@ charter: 1.1
 - Forward: `loom-code/skills/write-plan/SKILL.md`, Shape: case pairs and Acceptance ownership exist; the Test field does not explicitly identify already sufficient permanent coverage.
 - Reverse: `loom-code/skills/closing-review/references/lenses.md`, tests row: duplicate cases are findings, but touched behavior's existing coverage is not explicitly compared before recommending another test.
 - Error: `loom-code/agents/implementer.md`, Role contract item 2: prohibits weakening tests for green; preserves the test budget, fixture reuse, and defect reproduction.
-- Data: `docs/loom/research/2026-11-13-test-suite-growth.md`, Findings 2: matching charter assertions and isolated literal-only Redshift functions demonstrate candidate redundancy without establishing a universal deletion percentage.
+- Data: `docs/loom/2026-11-13-test-addition-value/evidence/research-context.md`, Local evidence: identical charter assertions demonstrate candidate redundancy; source inspection does not establish a universal deletion percentage.
 - Boundary: `loom-code/skills/closing-review/SKILL.md`, review.probe-graduation: defect-catching adversarial programs enter the permanent suite; this plan does not change that obligation or its checker.
 
 ## Task DAG
@@ -42,11 +42,11 @@ charter: 1.1
 - ① — what — 這是否符合你要的最小範圍？確認後我會完成正式實作計畫，停在規劃，不開始實作或發布。
 
 ## Risks
-1. user-decided — planning only: the user confirmed the bounded scope with "OK 繼續吧" after the file inventory. Complete and review this plan, then stop; no Build, test deletion, plugin/cache update, push, PR, or merge is authorized.
+1. user-decided — later messages authorize implementation and dogfood, then standard publication/merge conditional on successful dogfood, acceptance, review and CI. Acceptance is unchanged; prior planning-only and one-review spending boundaries are historical, not current implementation limits.
 2. agent-decided — reuse the existing reduce-testing-amount worktree and branch because they already hold this change's research and intent; preserve prior research files and unrelated state.
 3. agent-decided — evaluation uses fresh-context actor trials with fixed reuse, novel-defect, duplicate and distinct-risk labels; compare baseline and candidate decisions. Store observable outputs under this change's evidence directory; text-presence assertions do not establish successful behavior.
 4. agent-decided — pairwise cases are behavioral evaluation identifiers, not promised new permanent pytest functions. Existing tests remain; no new sentence-pin suite, test harness, audit skill, metadata schema, checker rule, or mechanism-count exception is planned.
 5. agent-decided — Build still requires its independent adversarial pass and full package command from KICKOFF-DEFAULTS; closing review still repeats required checks. A genuinely defect-catching probe follows existing graduation rules; do not promise zero additional permanent tests.
 6. agent-decided — scope is three functional prose files plus ten release files; initial estimate: zero new production functions/modules and at most 120 added English guidance words. Prefer replacing redundant wording; estimates exclude release strings and workflow evidence.
 7. agent-decided — ordinary-test consolidation suggestions identify surviving defect detection; they do not exempt mandatory probe retention or authorize broad cleanup. No claim of lower case count, shorter suite time, or installed-host improvement precedes measurement.
-8. agent-decided — a same-host independent plan reviewer checks simplicity. second-vendor remains suggest; no outside executor, quota use or repository egress is authorized. Research evidence is retained locally and is not automatically published with this plan.
+8. agent-decided — same-host plan review passed; one separately authorized Claude plan review completed with an inconsistent formal verdict and incomplete release context. It does not authorize further Claude calls. Private research inventory and outside-review raw records remain local, unpublished.

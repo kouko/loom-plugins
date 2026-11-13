@@ -2,9 +2,10 @@
 originator: kouko
 kind: engineering
 needs-design: no — 僅調整既有規劃、實作與審查指引；不新增介面、資料格式或多狀態流程。
-evidence: [docs/loom/research/2026-11-13-test-suite-growth.md]
+evidence: [docs/loom/2026-11-13-test-addition-value/evidence/research-context.md]
 status: confirmed 2026-11-13
-intent_confirmed_sha: 9dab53a6b789d8c251e35c71f26789539c026bdc
+intent_confirmed_sha: 56ee6b110ed771f876b85ac2b158306246dc44f9
+publication: automatic — authorized 2026-11-13 by kouko
 
 ## Problem
 使用 Loom 開發的專案會持續累積測試，維護者難以判斷新增的測試是否提供既有測試沒有的保障。現有專案已出現重複檢查與未觸及正式程式的測試；單看測試數量或檔案數，也無法分辨必要保障與多餘維護負擔。
@@ -19,7 +20,7 @@ Loom 在既有開發流程中能辨別既有保障與新增保障，優先沿用
 4. 有獨立價值的錯誤重現、邊界與整合保障，不會僅為減少測試數而被移除；沒有替代證據的刪減不能被視為已維持相同保障。
 
 ## Constraints
-- 本次使用者要求為規劃最小實作；目前授權只到產出規劃，不包含實作、刪除既有測試或發布。
+- 原先授權僅到規劃；使用者後續授權繼續實作並進行 dogfood testing，且「如果 dogfood testing 沒問題 就幫我走標準流程合併」。實作、驗收、審查與 CI 通過後才發布及合併；不包含既有測試庫的批次刪除。
 - 延續研究的目標：精簡後保留必要的錯誤偵測能力，不能以測試數下降替代保障證據。
 
 ## Out of scope
