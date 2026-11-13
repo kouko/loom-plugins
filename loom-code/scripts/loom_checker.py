@@ -127,8 +127,11 @@ Run in the repository. The remote defaults to origin and must be a safe literal.
 Identifiers contain letters, digits, dots, underscores and hyphens; a selected
 ID needs its canonical intent file. --metadata requires one ID.
 Without an ID, lists active/indeterminate confirmed intents and may print nothing.
-With an ID, reports its state. Tab-separated stdout contains ID/state/detail;
-delivered metadata can add commit, pr and committed_at (committer, not merge date).
+With an ID, reports its state. Tab-separated rows start with ID and state;
+named active rows add detail, and indeterminate rows add detail plus refresh
+advice. Delivered --metadata rows append available commit/pr/committed_at
+key=value fields (pr may be absent; dates are committer, not merge dates).
+Other rows may contain only two fields; there is no fixed three-column shape.
 Exit 0 is a local-ref observation, not live freshness proof. Indeterminate gives
 exit 1 and refresh advice; Exit 2 means invocation or internal error on stderr.
 Reads local Git only, never fetches. Refresh the selected remote-default ref
