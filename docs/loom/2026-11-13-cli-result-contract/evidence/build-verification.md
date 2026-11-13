@@ -79,3 +79,26 @@ The same declared adversarial command then reran: **exit 0, 39 passed in
 The original Build result remains above; these are new observations rather
 than edits to the earlier numbers. Clean-copy acceptance is being rerun for
 the document fix before branch-end reviewers are dispatched.
+
+## Round 2 after canonical confirmation repair
+
+Round-1 finalization passed both functional execution stages but refused the
+old canonical confirmation ancestry; no attestation was generated. The actual
+cause and narrow repair are retained in
+[confirmation-provenance-fix.md](confirmation-provenance-fix.md). This does not
+change the user's help-only requirements or retry accounting.
+
+At `6aad2e920e7d2507f26a659295ab573e4518dfd8`, `sync-trunk` fetched and reported
+up to date against origin/main `fbdc29af358413bc9d55b599231b2a6cbcb4524d`.
+The complete suite above reran: **exit 0, 4269 passed, 6 skipped**, all shell
+and Mermaid groups passed. Raw output:
+`/private/tmp/loom-help-release-package-tests-round2.txt`.
+The same reused adversarial command reran afterwards: **exit 0, 39 passed
+in 9.38s**; output `/private/tmp/loom-help-release-adversarial-round2.txt`.
+No adversarial program failed or changed scope, so the prior independent
+adversary's artifact remains applicable without redispatch.
+
+The intent's identity excluding its status/pin remains unchanged. Source,
+tests, help text, ordinary output and release bytes are unchanged. Fresh
+acceptance will record this corrected candidate; the same two branch-end
+reviewers resume with the confirmation/plan-only fix delta for Round 2.
