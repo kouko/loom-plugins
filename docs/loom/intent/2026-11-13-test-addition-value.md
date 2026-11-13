@@ -4,7 +4,7 @@ kind: engineering
 needs-design: no — 僅調整既有規劃、實作與審查指引；不新增介面、資料格式或多狀態流程。
 evidence: [docs/loom/2026-11-13-test-addition-value/evidence/research-context.md]
 status: confirmed 2026-11-13
-intent_confirmed_sha: 56ee6b110ed771f876b85ac2b158306246dc44f9
+intent_confirmed_sha: 7619afaa087574d41f2cffe92e5084c421819852
 publication: automatic — authorized 2026-11-13 by kouko
 
 ## Problem
@@ -21,6 +21,7 @@ Loom 在既有開發流程中能辨別既有保障與新增保障，優先沿用
 
 ## Constraints
 - 原先授權僅到規劃；使用者後續授權繼續實作並進行 dogfood testing，且「如果 dogfood testing 沒問題 就幫我走標準流程合併」。實作、驗收、審查與 CI 通過後才發布及合併；不包含既有測試庫的批次刪除。
+- 延續已授權的最小實作；重新記錄後續授權的確認版本，不改變上述四項驗收條件，也不重設既有審查輪次或執行額度。
 - 延續研究的目標：精簡後保留必要的錯誤偵測能力，不能以測試數下降替代保障證據。
 
 ## Out of scope
