@@ -164,10 +164,25 @@ def test_no_adversary_dispatch_in_closing_review() -> None:
             assert has_negation(sentence), sentence
 
 
+def _affirmative_verdict_reuse(text: str) -> list[str]:
+    return [
+        sentence for sentence in _sentences(text)
+        if re.search(r"\breus(?:e|ed|es|ing)\b", sentence, re.IGNORECASE)
+        and re.search(r"\bverdicts?\b", sentence, re.IGNORECASE)
+        and not has_negation(sentence)
+    ]
+
+
+def test_verdict_reuse_recognizer_synthetic() -> None:
+    for instruction in ("Reuse earlier verdicts for the fixed content.",
+                        "The existing verdict is reused after the fix."):
+        assert _affirmative_verdict_reuse("## Unrelated section\n" + instruction)
+    assert not _affirmative_verdict_reuse("Earlier verdicts are never reused for fixed content.")
+    assert not _affirmative_verdict_reuse("Reuse the existing authorization instead of waiting for another user answer.")
+
+
 def test_earlier_verdicts_not_reused() -> None:
-    for sentence in _sentences(REVIEW_WORDS):
-        if re.search(r"\breus(?:e|ed|es|ing)\b", sentence, re.IGNORECASE):
-            assert has_negation(sentence), sentence
+    assert _affirmative_verdict_reuse(REVIEW_WORDS) == []
     rerun_with_old = re.compile(
         r"\b(?:re-?run|run)\b[^.]*`finalize-review`[^.]*\b(?:same|earlier|previous|existing|prior) verdicts",
         re.IGNORECASE,

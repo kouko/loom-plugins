@@ -14,8 +14,8 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.72.1 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
-| [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
+| [`loom-code`](loom-code/README.md) | 3.73.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-workflow`](loom-workflow/README.md) | 5.22.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
 links open its README; skill links below open the detailed usage guide.
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.72.1. Five stations carry one change from plan to PR with
+Version 3.73.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -128,7 +128,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.21.0. Workflow tools used around the stations; most work without
+Version 5.22.0. Workflow tools used around the stations; most work without
 `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they

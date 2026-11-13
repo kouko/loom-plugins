@@ -1,0 +1,26 @@
+{
+  "nonempty": true,
+  "not_refusal": true,
+  "required_fields": [
+    "core claim",
+    "key assumptions",
+    "failure modes",
+    "cost"
+  ],
+  "all_required_fields_present": true,
+  "adds_analysis": true,
+  "reasoning_present": true,
+  "source_checks": {
+    "no_expiry_or_packet_digest": "confirmed lines 70-111, 526",
+    "agy_prompt_in_argv": "confirmed lines 488-491",
+    "environment_inherited": "confirmed Popen lacks env parameter; actual secret presence NOT established",
+    "uncapped_output_lists": "confirmed lines 155-156, 177-186",
+    "claude_non_anthropic_profile_spends_probe": "confirmed using local fake runner: one call then execution-error: claude observed provider family mismatch"
+  },
+  "rejection_key": "unbacked-claim",
+  "fabrication_suspect": [
+    "External text states other vendors API keys and tokens reach every CLI and secrets in environment leak to vendor CLI; actual presence or egress of such secrets was not established. Inheritance is source-confirmed; actual-secret exposure remains an unchecked claim."
+  ],
+  "usable_leg": false,
+  "no_retry": true
+}

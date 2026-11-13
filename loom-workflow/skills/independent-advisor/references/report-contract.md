@@ -28,6 +28,12 @@ Write the fields in this order. Divergence comes before anything summarising.
 7. `known_weaknesses` — the standing note below.
 8. `coverage_disclaimer` — what was consulted, in the words below.
 
+For an explicit unowned artifact review, disclose unavailable rejected-options history
+under `known_weaknesses`, using the factual marker retained in the dispatch packet.
+This limits conclusions about prior design choices; it does not invalidate an
+otherwise usable audit of the inspected target. Keep the existing audit report
+fields and output-validation requirements.
+
 ## The six rejection keys
 
 Record exactly one key per rejected leg output:
