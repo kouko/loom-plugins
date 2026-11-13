@@ -542,6 +542,22 @@ def test_help_explains_outcomes_and_authority(tmp_path: Path) -> None:
     assert "complete: false" in delivery and "exit 1" in delivery and "exit 2" in delivery
     assert "loom.protectMain=false" in push and "allows" in push
     assert "trunk not updated" in land and "exit 0" in land
+    caveats = {
+        "publish": ("in this order", "no other", "temporary", "upstream", "server default", "nonblank"),
+        "delivery": ("action_required", "missing_pr", "No required checks", "authenticated"),
+        "push": ("literal", "shared", "fast-forward", "reset/rebase"),
+        "land": ("originator", "360", "10-second", "not a gate", "next: cd"),
+        "github-rules": ("template not on", "before", "without --print-setup"),
+        "intent": ("branch base",),
+        "intake": ("branch base", "closed", "delivered", "indeterminate"),
+        "contract": ("older major", "update loom-code"),
+        "standing": ("existence", "product", "KICKOFF-DEFAULTS.md"),
+    }
+    missing = []
+    for command, terms in caveats.items():
+        text = run_checker(command, "--help", cwd=tmp_path).stdout
+        missing.extend((command, term) for term in terms if term not in text)
+    assert not missing, missing
 
 
 def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
