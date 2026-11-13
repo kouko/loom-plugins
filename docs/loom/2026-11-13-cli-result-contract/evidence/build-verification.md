@@ -180,3 +180,11 @@ offline adversarial declaration above remains unchanged. Complete integration,
 its adversarial rerun, clean-copy acceptance and content-matched closing review
 remain the parent's next verification boundaries; these focused results do not
 claim them complete or establish CI at a new remote HEAD.
+
+## Complete integration observed at 0efb5f2e6
+
+The configured complete package command exited zero with 4,276 pytest cases passed across 15 sessions, zero skipped, and all shell and Mermaid groups passing. Raw output: `/private/tmp/loom-help-main-package-tests.txt`.
+
+The retained declaration `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py` exited zero with 39 passed in 8.77s; raw output: `/private/tmp/loom-help-main-adversarial.txt`. It remains applicable to unchanged help behavior, so no new adversarial program or adversary redispatch was required for this integration.
+
+Build and pre-acceptance sync both reported up to date against origin/main 7c137958db0f78af4d50b99e43d96e17225c8cce. Original closing-review agents are no longer available to resume; current integrated content will receive fresh independent code and docs review without relabeling or resetting the original three rounds. The plan retains the user's post-disclosure continuation and its interpretation. No new outside-model execution was authorized. Acceptance and exact-head remote CI remain pending at this observation.
