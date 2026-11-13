@@ -37,7 +37,7 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 **W3-02 Adversarial and integration evidence**  after: W3-01  acceptance: 1, 2, 3, 4
 - Files: `docs/loom/2026-11-13-cli-result-contract/evidence/probes/`, `docs/loom/2026-11-13-cli-result-contract/evidence/build-verification.md`
 - Test: A1 positive: inventory-current; boundary: effects-caveats. A2 positive: help-source-accuracy; negative: operational-overclaim. A3 positive: package-suite; negative: legacy-regression. A4 positive: safe-discovery; negative: execution-tripwire.
-- Risk: REQ-3 compatibility; agent-decided release 3.73.0 before attestation. Update dated CHANGELOG, sync derived manifests via scripts/sync_codex_manifests.py --all, rewrite version pin and root plus three-language README versions. Preserve other localized content; test_readme_version_matches_manifest covers language parity.
+- Risk: REQ-1/2/3/4 verification; agent-decided independent adversary reuses qualified tests without green-padding. Rerun complete package suite and declared probes after fixes; preserve failures. No live writers or paid calls.
 
 **W3-03 Correct superseded discovery documentation**  after: W3-02  acceptance: 1, 4
 - Files: `README.md`, `docs/loom/research/2026-11-13-cli-agent-design-guidelines.md`, `docs/loom/2026-11-13-cli-result-contract/plan.md`
@@ -47,7 +47,7 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 **W3-04 Repair canonical confirmation provenance**  after: W3-03  acceptance: 1, 2, 3, 4
 - Files: `docs/loom/intent/2026-11-13-cli-result-contract.md`, `docs/loom/2026-11-13-cli-result-contract/spec.md`, `docs/loom/2026-11-13-cli-result-contract/plan.md`, `docs/loom/2026-11-13-cli-result-contract/evidence/confirmation-provenance-fix.md`
 - Test: A1 positive: canonical-scope-resolution; boundary: historical-baseline-preserved. A2 positive: unchanged-help-requirements; negative: superseded-json-scope. A3 positive: identical-intent-identity; boundary: pin-prefix-equivalence. A4 positive: current-scope-check; negative: stale-confirmation-selection.
-- Risk: REQ-1/4 acceptance finding; agent-decided advertise all sixteen exact-help pairs while preserving six failure hints and readiness limits. Label historical research snapshots without rewriting original rows or acceptance reports. Rerun integration and independent acceptance after correction.
+- Risk: REQ-1/2/3/4 provenance; agent-decided canonical confirmation records existing user consent without changing scope. Verify equivalent pin identity, current references and confirmation ancestry; preserve historical reports and prior failed evidence.
 
 **W3-05 Retained localized release-version parity**  after: W3-01  acceptance: 3
 - Files: `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`

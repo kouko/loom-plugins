@@ -31,3 +31,13 @@ This bounded input is not attestation evidence or a reviewer verdict. The first
 attempt with system Python lacked PyYAML; no installation was performed.
 Parent reruns the full suite and same adversary, then fresh acceptance and the
 same closing reviewers for the corrected committed content.
+
+## Round-3 task-guidance correction
+
+Both Round-2 reviewers identified the same defect class: copied Risk guidance
+contradicted task scope. The bounded search covered every current plan Risk
+and cumulative changed surfaces; only W3-02 and W3-04 carried another task's
+instructions. Their Risk lines now describe adversarial/integration work and
+canonical confirmation provenance respectively. Files, Test lines, original
+W3-01/W3-03 guidance and historical reviews remain unchanged. This correction
+does not claim a gate verdict, new consent or runtime change.
