@@ -293,7 +293,13 @@ this when coverage was dropped.
 - Each task carries three one-line fields -- Files, Test and Risk -- whose
   content kinds and word caps are set by the plan row of the artifact
   charter (`contract/manifest.yaml`, `artifacts.plan.charter`, rendered by
-  `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair charter`). Run
+  `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair charter`). In Test,
+  first locate existing cases and their paths. Reuse sufficient coverage;
+  planned case-ids do not require new permanent functions or files. Before
+  adding or extending a permanent case, name the distinct defect or untested
+  behaviour it detects. Keep this within the existing field caps and pair
+  grammar; changed executable behaviour still needs a real RED before its
+  fix. Run
   `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair plan
   docs/loom/<change-id>/plan.md` before the plan commit. Keep the plan useful
   when implementation changes; no separate plan-history ledger is required.
