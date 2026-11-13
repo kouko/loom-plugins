@@ -1,6 +1,6 @@
 # 明確指定外部 review 後不中斷 — 實際驗收結果
 
-Tried on 2026-11-13, in a clean copy of the project at 8a14f06c6ae4b3584976f9ce96b795718a07b1ae.
+Tried on 2026-11-14, in a clean copy of the project at bb8f8f486b1a6802c9ffc693b771b8ef7d7578d6.
 詳細證據：`docs/loom/2026-11-13-uninterrupted-external-review/evidence/acceptance-test-evidence.md`。
 
 ## 逐條驗收
