@@ -72,7 +72,7 @@ one, and keep every fact.
 | Three or more nouns in a row | 「版號同步檢查測試失敗」 | 「檢查版號是否同步的那個測試失敗了」 |
 | A noun used as a verb | "I will calendar the review." | "I will put the review on the calendar." |
 | A dropped connecting word | "The file the script wrote failed the check." | "The file that the script wrote failed the check." |
-| A dropped connecting word | 「測試失敗，版號沒改。」 | 「測試失敗，因為版號沒改。」 |
+| A dropped connecting word | 「測試失敗，版號沒改。」 | 「測試失敗了。版號沒有改。」 |
 
 Add a connecting word only when you know how the two parts relate, from the
 original reply or from the work you did. When you do not know, write two
