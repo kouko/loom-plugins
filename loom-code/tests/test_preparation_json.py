@@ -7,7 +7,88 @@ import json
 import runpy
 from pathlib import Path
 
-from test_loom_checker_cli import CHECKER, make_intent_state_repo, run_checker
+from test_loom_checker_cli import CHECKER, git, make_intent_state_repo, run_checker
+
+
+def test_readonly_json_typed_observations_and_text_parity(tmp_path: Path) -> None:
+    repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+    for required, compatible in (("2.0", True), (" 2.00 ", True), ("02.0", False), ("2.99", False)):
+        args = ("contract", "--require", "bad", "--require", required)
+        text = run_checker(*args, cwd=tmp_path)
+        result = run_checker(*args, "--json", cwd=tmp_path)
+        payload = json.loads(result.stdout)
+        assert result.returncode == text.returncode == (0 if compatible else 1)
+        assert result.stderr == "" and result.stdout.endswith("\n")
+        assert set(payload) == {"schema_version", "command", "status", "diagnostics", "notices", "error", "data"}
+        assert payload["schema_version"] == 1 and payload["command"] == "contract"
+        assert payload["data"] == {"contract_version": "2.3.1", "required_version": required, "compatible": compatible}
+        assert payload["status"] == ("passed" if compatible else "blocked")
+        assert payload["error"] is None and payload["notices"] == []
+        assert bool(payload["diagnostics"]) is not compatible
+        for diagnostic in payload["diagnostics"]:
+            assert f"BLOCK {diagnostic['rule_id']}: {diagnostic['message']}\n" in text.stderr
+    for floor in (2, 1):
+        if floor == 1:
+            (repo / "guide.md").write_text("Usage clarification.\n")
+            git(repo, "add", "guide.md")
+            git(repo, "commit", "-q", "-m", "clarify usage")
+        result = run_checker("reviewer-count", " odd id ", "--json", cwd=repo)
+        payload = json.loads(result.stdout)
+        assert (result.returncode, result.stderr) == (0, "")
+        assert payload["data"] == {"change_id": " odd id ", "reviewer_floor": floor}
+        assert type(payload["data"]["reviewer_floor"]) is int
+        assert payload["status"] == "passed" and payload["diagnostics"] == []
+        assert payload["notices"] == [] and payload["error"] is None
+        assert run_checker("reviewer-count", " odd id ", cwd=repo).stdout == f"{floor}\n"
+
+
+def test_readonly_json_usage_and_selectors_before_domain_work(tmp_path: Path, monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_readonly_entry")
+    import loom_checker.command_handlers.contract as contract
+    import loom_checker.command_handlers.reviewer_count as reviewer
+    def forbidden(*args, **kwargs):
+        raise AssertionError("invalid arguments performed domain work")
+    monkeypatch.setattr(contract, "load_manifest", forbidden)
+    monkeypatch.setattr(reviewer, "repo_root", forbidden)
+    for command, operands in (("contract", ()), ("contract", ("--require",)),
+                              ("contract", ("--require", "bad")), ("reviewer-count", ()),
+                              ("reviewer-count", (" ",)), ("reviewer-count", ("id", "extra"))):
+        for args in (operands, ("--help",), ("-h",), ("--json",)):
+            out, err = io.StringIO(), io.StringIO()
+            assert entry["main"]([command, *args, "--json"], out, err) == 2
+            payload = json.loads(out.getvalue())
+            assert err.getvalue() == "" and out.getvalue().endswith("\n")
+            assert payload["status"] == "error" and payload["error"]["kind"] == "usage"
+            assert payload["diagnostics"] == [] and all(value is None for value in payload["data"].values())
+
+
+def test_readonly_json_repository_errors_and_late_failure_cleanup(tmp_path: Path, monkeypatch) -> None:
+    repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+    (repo / "dirty").touch()
+    for cwd in (tmp_path, repo):
+        result = run_checker("reviewer-count", "id", "--json", cwd=cwd)
+        payload = json.loads(result.stdout)
+        assert (result.returncode, result.stderr) == (2, "")
+        assert payload["error"]["kind"] == "usage" and payload["data"] == {"change_id": None, "reviewer_floor": None}
+    entry = runpy.run_path(str(CHECKER), run_name="_readonly_entry")
+    from loom_checker.helpers import UsageError
+    for command, data in (("contract", {"contract_version": "2.0", "required_version": "2.0", "compatible": True}),
+                          ("reviewer-count", {"change_id": "id", "reviewer_floor": 1})):
+        for exception, kind in ((RuntimeError("late"), "internal"), (UsageError("late"), "usage")):
+            calls = []
+            def crash(args, out, err, *, result):
+                calls.append(args)
+                result["data"].update(data)
+                out.write("partial stdout\n")
+                err.write("partial stderr\n")
+                raise exception
+            monkeypatch.setitem(entry["COMMANDS"], command, crash)
+            out, err = io.StringIO(), io.StringIO()
+            assert entry["main"]([command, "operand", "--json"], out, err) == 2
+            payload = json.loads(out.getvalue())
+            assert calls == [["operand"]] and err.getvalue() == ""
+            assert payload["error"]["kind"] == kind and payload["diagnostics"] == []
+            assert all(value is None for value in payload["data"].values())
 
 
 def test_preparation_json_passes_and_preserves_real_notices(tmp_path: Path) -> None:

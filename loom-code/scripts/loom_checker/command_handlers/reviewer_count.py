@@ -8,12 +8,16 @@ from pathlib import Path
 import sys
 
 
-def cmd_reviewer_count(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
+def cmd_reviewer_count(args: list[str], out=sys.stdout, err=sys.stderr, *, result=None) -> int:
     """Print the reviewer floor Closing Review and finalization must use."""
-    if len(args) != 1 or not args[0].strip():
+    if len(args) != 1 or not args[0].strip() or (result is not None and args[0] in {"--help", "-h"}):
         raise UsageError("reviewer-count needs one change-id.")
     repo = repo_root(Path.cwd())
     if git_text(repo, "status", "--porcelain"):
         raise UsageError("reviewer-count needs a clean tree with completed functional content.")
-    out.write(f"{required_reviewer_count(repo, args[0])}\n")
+    floor = required_reviewer_count(repo, args[0])
+    if result is not None:
+        result["data"].update(change_id=args[0], reviewer_floor=floor)
+    else:
+        out.write(f"{floor}\n")
     return 0
