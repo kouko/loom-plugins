@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.23.0] — 2026-11-14 — name hard-to-read sentence shapes in the plain-language guide
+
+- Name five hard-to-read sentence shapes in rule 3 of the chat plain-language guide, each with a Hard to read / Plain rewrite pair that keeps every fact: English pairs for all five, Traditional Chinese pairs for four.
+- State in rule 7 that being concise never means dropping connecting words, and widen rewrite step 5 to check the five shapes alongside metaphor words. The guide keeps seven rules and five rewrite steps; its scope is unchanged.
+- Cite Clark, Martin and Mahowald (2026, arXiv 2610.29162) with the study's three limits: no human reading experiment, English only, and no test of whether instructing a model reduces these shapes. The Traditional Chinese pairs are the guide's own extension, not a finding of the study.
+
 ## [5.22.0] — 2026-11-13 — continue named outside reviews after disclosure
 
 - Continue an explicit named independent review in the same active turn after disclosure, keeping its existing authorization, owning review criteria and result validation.
