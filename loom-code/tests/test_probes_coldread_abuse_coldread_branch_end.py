@@ -202,7 +202,7 @@ def test_run_headers_carry_status_ok_model_sonnet_and_correct_prompt_hash(dirnam
 
 
 def test_graduated_probe_copies_byte_identical_to_evidence_originals() -> None:
-    """The nine `loom-code/tests/test_probes_coldread_*.py` files are
+    """The remaining `loom-code/tests/test_probes_coldread_*.py` files are
     supposed to be graduated copies of the nine `evidence/probes/
     test_*.py` files, with at most their path-referencing lines
     differing (the plan says the fixture-verbatim check is "rewritten
@@ -278,41 +278,4 @@ def test_arm_b_taken_adversary_positioning_paragraph_unchanged_since_measurement
     measured = (EVIDENCE_DIR / "contract-measured-adversary.md").read_text(encoding="utf-8")
     assert _positioning_paragraph(current) == _positioning_paragraph(measured), (
         "the adversary positioning paragraph changed after the measurement despite arm B"
-    )
-
-
-def test_memory_step_store_integrity_check_exits_zero() -> None:
-    """The plan's W2-memory task originally named its own verification
-    test as `python3 loom-code/scripts/loom_checker.py memory` — that
-    sub-command does not exist (`--list-rules`, `intent`, `intake`,
-    `push`, `standing`, `contract` are the only ones) and the command
-    exited 2 ("unknown sub-command"), never 0. The plan line was
-    corrected at branch-end to name the real memory-store checker,
-    `python3 scripts/check_loom_memory_integrity.py --check` at repo
-    root. This probe runs the corrected command from the repo root
-    (resolved from `__file__`, not the process cwd) and asserts it
-    exits 0 against the committed memory store — the positive case the
-    original probe never carried.
-
-    The checker it names is a fact of that branch's moment. Change
-    `2026-09-10-okf-compatible-loom-memory` retired
-    `scripts/check_loom_memory_integrity.py` and moved the store to the
-    plugin-owned OKF profile validator, so where the legacy checker is
-    absent this probe skips with that reason rather than reporting a
-    phantom failure — the graduated-probe rule recorded in
-    `a-graduated-probe-that-pins-a-fact-of-the-moment-goes-red-at-the-next-change`."""
-    checker = REPO_ROOT / "scripts" / "check_loom_memory_integrity.py"
-    if not checker.is_file():
-        pytest.skip(
-            "scripts/check_loom_memory_integrity.py was retired by change "
-            "2026-09-10-okf-compatible-loom-memory; the memory store is now "
-            "validated by loom-memory/scripts/loom_memory.py"
-        )
-    result = subprocess.run(
-        [sys.executable, "scripts/check_loom_memory_integrity.py", "--check"],
-        cwd=REPO_ROOT, capture_output=True, text=True,
-    )
-    assert result.returncode == 0, (
-        f"expected the corrected memory-store checker to pass with exit 0, "
-        f"got {result.returncode}: {result.stdout}{result.stderr}"
     )

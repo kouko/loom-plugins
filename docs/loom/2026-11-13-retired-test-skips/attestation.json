@@ -1,0 +1,120 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-retired-test-skips",
+  "content_digest": "fad630f4e78c76eed484f8c8b5573acd2bb1b726",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+      "artifact": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+      "result": "pass",
+      "command_digest": "5efa28671c4b6fdb9eba46675cb8b72c679e281a9faa821a36cf644ba21bf2c0"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
+      "review_target_sha": "0588057763091c3d85f538d5be4e050570787f7d",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer and episode, Round 2: prior findings were empty. Reviewed only the diagnostic fix delta e98b17f0a..058805776 and affected runner call path, with confirmed AC1–6 and previous verdict retained. The runner's subprocess.call inherits PYTEST_ADDOPTS; all three suite steps now configure -rs there and remove the ignored argument. Independently ran the changed regression module: 5 passed in 2.61s, zero skipped. Repository status remained clean.",
+        "The existing parameterized guard exercises real pytest with each configured environment and checks an actual printed skip reason; it retains setup ordering and corrupt-download failure coverage. Official pytest environment contract: https://docs.pytest.org/en/stable/reference/reference.html#envvar-PYTEST_ADDOPTS. No runner API, suite inventory or dependency setup changes are introduced.",
+        "Prior Linux installation and validator evidence applies to e98b17f0aea026899e7980a9cfbbae58665cd3ed; exact new-head remote execution remains pending and the current report says so. Full-suite and adversarial output were handed Build evidence, not rerun by this reviewer. Exact inherited model identity remains unobservable."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+          "reviewed_sha": "0588057763091c3d85f538d5be4e050570787f7d",
+          "quote": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py ........... [ 64%]\n......                                                                   [100%]\n============================== 17 passed in 0.90s ==============================\n"
+        }
+      ],
+      "reviewer": "ci_environment_code_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
+      "review_target_sha": "0588057763091c3d85f538d5be4e050570787f7d",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Same-episode Round 2: prior findings were empty; bounded verification covers e98b17f0a..target and reconciles its reporting correction with earlier evidence. The ignored runner argument is explicitly acknowledged rather than rewriting historical success claims.",
+        "AC1-3 carry-over is justified by unchanged owners/dependencies; AC4-6 combine current local verification with unchanged setup observed on Linux at e98b17f0a. The report explicitly distinguishes that older 4271-pass/2-platform-skip result from current local 4273/0 and the exact-head GitHub rerun still pending publication.",
+        "Read workflow/test fix, actual retained Linux/local outputs, and both platform guards; verified three suite environments now carry PYTEST_ADDOPTS and the strengthened regression executes real pytest to check printed reasons. No suite or adversarial program was rerun; old attestation awaits replacement. Native reviewer model/profile remains inherited and unobserved."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+          "reviewed_sha": "0588057763091c3d85f538d5be4e050570787f7d",
+          "quote": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py ........... [ 64%]\n......                                                                   [100%]\n\n============================== 17 passed in 0.90s ==============================\n"
+        }
+      ],
+      "reviewer": "ci_environment_docs_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "1318ed54c5fc612cf860ce91026aa4941acf7788",
+  "tested_commit": "8a5e00da3",
+  "reviewed_commit": "0588057763091c3d85f538d5be4e050570787f7d",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}

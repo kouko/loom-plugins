@@ -18,8 +18,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SUITE_ROOT = Path(__file__).resolve().parent
 SUITE = "loom-design/tests/"
@@ -133,30 +131,4 @@ def test_duplicated_non_test_basenames_are_only_the_known_shadowed_pair():
         "duplicated basename resolves from the first station on that line "
         "for EVERY test, so the other copy is imported by nobody. Give a new "
         "collision a lockstep guard and pin it here, or rename it."
-    )
-
-
-def test_shadowed_basename_resolves_from_the_expected_station():
-    """The `pythonpath` ORDER, not just its contents, decides the winner.
-
-    Reordering the line -- or adding a station sorting before `interface` --
-    would swap which copy every test exercises with nothing else failing, so
-    the resolution is pinned here explicitly.
-    """
-    if not SHADOWED_BASENAMES:
-        pytest.skip(
-            "no shadowed basename is pinned any more -- the one collision "
-            "went out with the critic skills, so there is no winner to pin. "
-            "test_duplicated_non_test_basenames_are_only_the_known_shadowed_"
-            "pair is what keeps that state honest."
-        )
-    modules = _non_test_modules()
-    order = _pythonpath_entries()
-    winners = {
-        name: next(st for st in order if name in modules.get(st, ()))
-        for name in sorted(SHADOWED_BASENAMES)
-    }
-    assert winners == {}, (
-        "the station that wins a shadowed import changed: "
-        f"{winners}. pythonpath order is {order}."
     )

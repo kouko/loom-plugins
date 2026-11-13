@@ -38,6 +38,8 @@ on:
       # must fire this gate too.
       - 'scripts/run_package_tests.py'
       - '.github/workflows/loom-design-ci.yml'
+      - 'requirements-dev.txt'
+      - 'requirements-package-tests.lock'
   push:
     branches: [main]
     paths:
@@ -47,6 +49,8 @@ on:
       - '.claude-plugin/marketplace.json'
       - 'scripts/run_package_tests.py'
       - '.github/workflows/loom-design-ci.yml'
+      - 'requirements-dev.txt'
+      - 'requirements-package-tests.lock'
 
 permissions:
   contents: read
@@ -65,9 +69,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install test deps
-        # pytest = test runner; pyyaml = test_ci_workflow.py parses this
-        # workflow to check its own path triggers.
-        run: python3 -m pip install --quiet pytest pyyaml
+        run: python3 -m pip install --quiet --require-hashes -r requirements-package-tests.lock
 
       - name: Run the loom-design pytest suite
         # Trade accepted deliberately: the deleted per-station jobs gave
@@ -81,4 +83,5 @@ jobs:
         # the fan-out in the first place.
         env:
           PYTHONDONTWRITEBYTECODE: "1"
+          PYTEST_ADDOPTS: '-rs'
         run: python3 scripts/run_package_tests.py --loom-family --only design -q
