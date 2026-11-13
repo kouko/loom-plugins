@@ -26,3 +26,9 @@ The live reviewer identified conflation between consent and host execution appro
 ## Behavioral continuation gap
 
 A fresh caller actor with a readable single-file target and a natural named review request stopped on unavailable rejected-options history before calling the controlled simulator. This revealed a separate instance of the interruption class: generic consultation packet prerequisites applied to explicit unowned artifact reviews. The implementation repair preserves the report shape and consultation completeness while allowing a factual unavailable-history marker for this artifact-only context. Cancellation control dispatched nothing. No second real vendor execution was attempted.
+
+## First complete package-suite attempt
+
+Command: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+The first code group returned 1 failed, 2836 passed, 2 skipped in 115.95s. Failure: `test_review_convergence_contract.py::test_earlier_verdicts_not_reused` treated the affirmative reuse of existing request authorization as prohibited reuse of an earlier review verdict. The runner stopped before subsequent groups. This failure is retained; it is not a completed package pass. The repair must preserve whole-document detection of affirmative verdict reuse while excluding authorization reuse.

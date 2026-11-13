@@ -12,9 +12,9 @@ charter: 1.1
 ## Task DAG
 ### Wave 1 — Correct the existing execution contract
 **W1-01 Remove confirmation-shaped pauses from explicit review requests** acceptance: 1, 2, 4
-- Files: loom-code/skills/external-review/, loom-code/skills/closing-review/SKILL.md, loom-workflow/skills/independent-advisor/ (including references/dispatch-protocol.md and references/report-contract.md), loom-workflow/tests/independent-advisor/, loom-code/tests/test_external_review.py
+- Files: loom-code/skills/external-review/, loom-code/skills/closing-review/SKILL.md, loom-workflow/skills/independent-advisor/ (including references/dispatch-protocol.md and references/report-contract.md), loom-workflow/tests/independent-advisor/, loom-code/tests/ (test_external_review.py and test_review_convergence_contract.py)
 - Test: A1 positive: direct-request-continues and unowned-artifact-review-with-unavailable-design-history; boundary: cancelled-request-stops and open-ended-consultation-retains-packet-completeness. A2 positive: disclosure-continues; negative: disclosure-question. A4 positive: refusal-reported-incomplete; negative: refusal-bypassed.
-- Risk: agent-decided — preserve runner authorization schema and host approval; tighten the caller's continuation contract, not permissions. Preserve existing external-review and advisor tests; add targeted behavioral cases.
+- Risk: agent-decided — preserve runner authorization schema and host approval; tighten the caller's continuation contract, not permissions. Preserve existing external-review and advisor tests; add targeted behavioral cases. Keep whole-file verdict-freshness detection while distinguishing unrelated authorization reuse.
 
 ### Wave 2 — Validate the actual interruption boundary
 **W2-01 Probe test for uninterrupted host execution** after: W1-01 acceptance: 1, 2, 3, 4
