@@ -35,6 +35,8 @@ on:
       - 'loom-workflow/**'
       - '.github/workflows/loom-workflow-ci.yml'
       - 'scripts/run_package_tests.py'
+      - 'requirements-dev.txt'
+      - 'requirements-package-tests.lock'
       # The shell job runs every test-*.sh under every TEST_ROOTS folder in
       # scripts/run_package_tests.py, so an edit under any of them must fire it.
       - 'tests/**'
@@ -46,6 +48,8 @@ on:
       - 'loom-workflow/**'
       - '.github/workflows/loom-workflow-ci.yml'
       - 'scripts/run_package_tests.py'
+      - 'requirements-dev.txt'
+      - 'requirements-package-tests.lock'
       - 'tests/**'
       - 'loom-code/tests/**'
       - 'loom-design/tests/**'
@@ -90,16 +94,23 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Pinned, like every other external surface on this branch
-      # (checkout@v4, setup-python@v5, mermaid@11.17.0). The renderer is
-      # stdlib-only, so no markdown parser is installed: CI tests exactly
-      # what runs on a machine with plain Python.
+      # This job selects every workflow Python suite, not just the stdlib
+      # renderer. Its YAML and Mermaid checks need dependencies in this job.
       - name: Install test dependencies
-        run: python3 -m pip install --quiet 'pytest~=8.3'
+        run: python3 -m pip install --quiet --require-hashes -r requirements-package-tests.lock
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Mermaid test dependencies
+        run: npm ci --prefix loom-workflow/tests/mermaid
 
       - name: Run loom-visualization page script tests
         env:
           PYTHONDONTWRITEBYTECODE: '1'
+          PYTEST_ADDOPTS: '-rs'
         run: python3 scripts/run_package_tests.py --loom-family --only workflow-python -v
 
   # Every mermaid block in loom-visualization's templates/ and references/
