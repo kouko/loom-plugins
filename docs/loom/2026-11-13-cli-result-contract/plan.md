@@ -39,6 +39,11 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 - Test: A1 positive: inventory-current; boundary: effects-caveats. A2 positive: help-source-accuracy; negative: operational-overclaim. A3 positive: package-suite; negative: legacy-regression. A4 positive: safe-discovery; negative: execution-tripwire.
 - Risk: REQ-1/2/3/4 verification decision; independent adversary writes and executes bounded probes, respecting five-program ceiling and concern headers. Run complete scripts/run_package_tests.py --loom-family after final fixes; no live writer/cleanup or paid calls. Finalization reruns declared checks later.
 
+**W3-03 Correct superseded discovery documentation**  after: W3-02  acceptance: 1, 4
+- Files: `README.md`, `docs/loom/research/2026-11-13-cli-agent-design-guidelines.md`, `docs/loom/2026-11-13-cli-result-contract/plan.md`
+- Test: A1 positive: historical-inventory-labelled; boundary: current-versus-retained-snapshot. A4 positive: all-command-help-discovery; negative: superseded-six-help-guidance.
+- Risk: REQ-1/4 acceptance finding; agent-decided update current README discovery to all sixteen exact-help pairs while keeping the original six failure hints and runtime-readiness boundary. Label the research's retained pre-implementation snapshot and narrowed confirmed intent without rewriting historical rows or prior acceptance reports. Parent reruns integration checks and independent acceptance after this prose-only fix.
+
 Implementer dispatch applies to every implementation task. Shared dispatcher,
 tests and mirrored documentation keep the tasks sequential. W1-02 uses an
 independent verifier; W3-02 uses the independent adversary. Build proceeds once

@@ -14,9 +14,12 @@ tags:
 
 Which external CLI conventions should inform Loom's common machine-readable
 contract, and what is the smallest useful next change? This follows the
-[research scoping assessment](2026-11-13-cli-design-research-scope.md) and informs
-the still-open [result-contract intent](../intent/2026-11-13-cli-result-contract.md).
-This is research, not a ratified interface specification or implementation.
+[research scoping assessment](2026-11-13-cli-design-research-scope.md). This
+concluded pre-implementation study informed the original result-contract scope;
+the confirmed [intent](../intent/2026-11-13-cli-result-contract.md) now narrows
+delivery to help only. See the [current conformance evidence](../2026-11-13-cli-result-contract/evidence/help-conformance.md)
+for implemented help coverage. This retained research is not a ratified interface
+specification or implementation.
 
 Local baseline: merged commit `fbdc29af358413bc9d55b599231b2a6cbcb4524d`,
 loom-code 3.72.0, inspected in `/private/tmp/loom-pr149-land` and the installed
@@ -85,7 +88,10 @@ error formatter; that formatter also emits human stderr. No build, login or
 API call was performed. Its architecture document had stale crate paths;
 actual paths above were verified in the source checkout.
 
-### Loom inventory: all sixteen principal subcommands
+### Historical baseline inventory: all sixteen principal subcommands
+
+The following rows and result retain the inspected `fbdc29a` / 3.72.0 snapshot,
+before the help implementation. They do not describe current help availability.
 
 Paths below are relative to `loom-code/scripts/loom_checker/command_handlers/`.
 Each row's `cmd_*` function was read; selected nested paths are identified

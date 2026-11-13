@@ -273,13 +273,19 @@ retrying a potentially completed mutation. No automatic retry is added.
 
 For command discovery and input recovery, run
 `"<loom-code>/scripts/loom-python" --ready <command> --help`, replacing
-`<loom-code>` with the installed plugin directory and `<command>` with
-`finalize-review`, `publish`, `delivery`, `plan`, `intake` or `reviewer-count`.
-These commands also accept exact
-`<command> -h` calls. Help describes inputs, authentic evidence, authorization
-and outcomes without validation or publication; covered text-mode failures retain their
-diagnostics and exit status and add a help hint. Hook and internal-error behavior
-are unchanged.
+`<loom-code>` with the installed plugin directory. All sixteen principal
+subcommands listed by the overall checker help support exact `<command> --help`
+and `<command> -h` calls. Help describes inputs, prerequisites, results and
+operational consequences without running the handler or reading stdin. Only
+these exact forms are safe discovery; adding other arguments retains ordinary
+command parsing. `--ready` needs a valid cached runtime and exits 86 when it is
+missing or invalid; `--repair` may download dependencies and write runtime
+caches before showing checker help.
+
+Failure hints remain limited to `finalize-review`, `publish`, `delivery`, `plan`,
+`intake` and `reviewer-count`; their covered text-mode failures retain diagnostics
+and exit status. Help coverage does not add hints to other commands. Hook and
+internal-error behavior are unchanged.
 
 The preparatory checks keep their limited scope: `plan <path>` checks the
 named file's implemented field caps, `intake <station> <change-id>` checks
@@ -289,8 +295,8 @@ does not run its station or establish completed review or verification.
 Intake's conditional `interface-surfaces (...)` stdout remains advisory and
 can precede a later failure; inspect the exit status and diagnostics too.
 
-Help for other commands, typed error categories and additional JSON modes remain
-future migrations requiring compatibility checks. Exit 2 still conflates usage errors
+Typed error categories and additional JSON modes remain future migrations
+requiring compatibility checks; this release adds no JSON interface. Exit 2 still conflates usage errors
 and internal faults. Host hook protocols, review, acceptance and failure-blocking
 rules remain unchanged.
 
