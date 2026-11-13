@@ -64,12 +64,12 @@ one, and keep every fact.
 
 | Sentence shape | Hard to read | Plain |
 |---|---|---|
-| A thing does what only a person does | "`is_file()` swallows the error." | "`is_file()` returns False when the read fails and reports no error." |
-| A thing does what only a person does | 「這支函式吞掉了錯誤。」 | 「讀取失敗時，這支函式回傳 False，不回報錯誤。」 |
+| A thing does what only a person does | "`is_file()` swallows the read error and returns False." | "When the read fails, `is_file()` returns False and reports no error." |
+| A thing does what only a person does | 「這支函式吞掉了讀取錯誤，回傳 False。」 | 「讀取失敗時，這支函式回傳 False，不回報錯誤。」 |
 | The subject is far from its verb | "The test that the reviewer who joined last week asked for after the second failure passes." | "The test passes. The reviewer who joined last week asked for it after the second failure." |
 | The subject is far from its verb | 「上週加入的審查者在第二次失敗後要求補上的那個測試通過了。」 | 「那個測試通過了。它是上週加入的審查者在第二次失敗後要求補上的。」 |
-| Three or more nouns in a row | "the release metadata sync test failure" | "the failure of the test that checks that the version numbers match" |
-| Three or more nouns in a row | 「版號同步檢查測試失敗」 | 「檢查版號是否一致的那個測試失敗了」 |
+| Three or more nouns in a row | "the version sync check test failure" | "the failure of the test that checks that the versions are in sync" |
+| Three or more nouns in a row | 「版號同步檢查測試失敗」 | 「檢查版號是否同步的那個測試失敗了」 |
 | A noun used as a verb | "I will calendar the review." | "I will put the review on the calendar." |
 | A dropped connecting word | "The file the script wrote failed the check." | "The file that the script wrote failed the check." |
 | A dropped connecting word | 「測試失敗，版號沒改。」 | 「測試失敗，因為版號沒改。」 |
@@ -78,9 +78,9 @@ Why: Clark, Martin and Mahowald (2026) compared text from nine frontier and
 near-frontier models with text from human writers
 ([arXiv 2610.29162](https://arxiv.org/abs/2610.29162)). All nine models put
 a thing as the subject of a verb that only a person does more often than
-the human writers did. Most of the models also wrote longer distances
-between subject and verb, more nouns in a row, and more clauses with the
-connecting word dropped. The study has three limits: it ran no human reading
+the human writers did. In conversation, most of the models also wrote
+longer distances between subject and verb, more nouns in a row, and more
+clauses with the connecting word dropped. The study has three limits: it ran no human reading
 experiment, it measured English only, and it did not test whether
 instructing a model reduces these shapes. The Traditional Chinese pairs are
 this guide's own extension, not a finding of the study.
