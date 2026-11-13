@@ -32,7 +32,7 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 **W3-01 Complete minor release metadata packet**  after: W1-02  acceptance: 3
 - Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A3 positive: release-metadata-synchronized; negative: stale-release-pin-detected.
-- Risk: REQ-3 compatibility; agent-decided release 3.73.0 before attestation. Update dated CHANGELOG, sync derived manifests via scripts/sync_codex_manifests.py --all, rewrite version pin and root plus three-language README versions. Preserve other localized content; test_readme_version_matches_manifest covers language parity.
+- Risk: REQ-3 compatibility; agent-decided release 3.75.0 after integrating main 7c137958d. Preserve upstream 3.74/3.73/3.72.1 changelog history, regenerate manifests, and synchronize README versions and pin tests before attestation. Keep main's historical-version guard and localized non-version prose; existing release tests cover parity.
 
 **W3-02 Adversarial and integration evidence**  after: W3-01  acceptance: 1, 2, 3, 4
 - Files: `docs/loom/2026-11-13-cli-result-contract/evidence/probes/`, `docs/loom/2026-11-13-cli-result-contract/evidence/build-verification.md`
@@ -54,10 +54,14 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 - Test: A3 positive: localized-release-version-parity; negative: stale-localized-version.
 - Risk: REQ-3 retained completed release work; agent-decided split localized README ownership from W3-01 to keep exact file inventory within field caps. Existing test_readme_version_matches_manifest covers parity; preserve non-version localized text.
 
-W3-01, W3-02, W3-03 and W3-05 describe already implemented release,
-verification and documentation work retained in history. W3-04 is the current
-provenance repair. The complete suite/adversary and acceptance/review must run
-again on this corrected content; prior success is not finalization success.
+W3-01, W3-02, W3-03 and W3-05 retain completed release, verification and
+documentation history. W3-04's provenance repair is complete. Current work
+integrates main 7c137958d through the existing release and verification tasks:
+retain upstream CI, external-review continuation and incremental-test-protection
+changes; resolve release metadata and README conflicts without changing the
+confirmed help behavior. Rerun the complete suite, retained adversarial checks,
+independent acceptance and review on the integrated content. Earlier results
+prove their recorded revisions, not this integration.
 
 Implementer dispatch applies to every implementation task. Shared dispatcher,
 tests and mirrored documentation keep the tasks sequential. W1-02 uses an
@@ -80,3 +84,6 @@ The user answered 好 to the proposal “先把 help 整理獨立交付，JSON �
 3. No runtime provisioning redesign or new JSON for any command. Ready-runtime discovery does not imply --repair is offline. Existing delivery/preparation consumers and hook host responses retain their published contracts.
 4. Release metadata, changelog, README strings and pin tests must agree before closing-review finalization. Later functional corrections invalidate prior attestation; never bump the version after attestation and call it current.
 5. No JSON performance benefit is claimed. Acceptance must expose limitations and actual failed evidence; source inspection and package success alone cannot prove help explains the real operational consequences.
+6. User said “遠端有新版本” then “請繼續” after disclosure of the completed Round 3 and “never dispatch Round 4” limit. Agent-decided interpretation: informed continuation authorizes finishing this integration. Preserve prior rounds and failures; no counter reset, requirements change or skipped checks.
+7. Agent-decided — main now releases loom-code 3.74.0 and loom-workflow 5.22.0. Deliver help as loom-code 3.75.0, preserving upstream plugin versions and all release history. The earlier unmerged help 3.73.0 entry becomes 3.75.0; do not replace upstream's distinct 3.73.0 release.
+8. Agent-decided — release-metadata divergence search covers cumulative changed paths and release guards: four manifests, four READMEs, CHANGELOG and version pin. Preserve main-side safeguards and sixteen-command help. Add no permanent tests; reuse current coverage and retained reproduction evidence.
