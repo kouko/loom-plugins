@@ -102,3 +102,24 @@ The intent's identity excluding its status/pin remains unchanged. Source,
 tests, help text, ordinary output and release bytes are unchanged. Fresh
 acceptance will record this corrected candidate; the same two branch-end
 reviewers resume with the confirmation/plan-only fix delta for Round 2.
+
+## Round 3 after task-specific Risk correction
+
+Both resumed Round-2 reviewers identified the same important class: two plan
+Risk lines copied unrelated task guidance. The bounded fix
+`4e6e2d4dac8e904c527e15e425c8ea337a4769b7` changes only those two lines and
+appends their disposition to the existing provenance evidence. User
+requirements, source, tests, help and release metadata are unchanged.
+The public plan and write-plan intake checks passed; focused existing plan
+field tests passed (9 tests). No finding was dismissed.
+
+`sync-trunk` again reported up to date against the same origin/main. The
+complete package command reran at this fixed commit: **exit 0, 4269 passed,
+6 skipped**, all shell/Mermaid groups passed. Raw output:
+`/private/tmp/loom-help-release-package-tests-round3.txt`.
+The declared reused adversarial artifact reran afterwards: **exit 0,
+39 passed in 9.57s**; output
+`/private/tmp/loom-help-release-adversarial-round3.txt`.
+The program and covered production behavior did not change, so no new
+adversary dispatch or program was justified. Fresh clean-copy acceptance and
+the same two reviewers' terminal Round 3 follow on this corrected content.

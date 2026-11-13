@@ -2,6 +2,45 @@
 
 Tried on 2026-11-13, in a clean copy of the project at 1ccb7f514ec63aaf2d02d90108ea5b67d65fe4b7.
 
+## Re-run on 2026-11-13, at 4e6e2d4dac8e904c527e15e425c8ea337a4769b7
+
+### Bounded risk-guidance correction and preserved history
+
+Fresh clone: `git clone --no-hardlinks /private/tmp/loom-cli-result-contract /private/tmp/loom-help-acceptance-rerun-4e6`, success. Actual HEAD:4e6e2d4dac8e904c527e15e425c8ea337a4769b7. Existing worktrees preserved.
+
+Read actual e244a5f3..4e6e2d4 plan diff and both full task blocks: W3-02 Risk now describes independent adversarial/full-suite execution, no padding, failure preservation, no live writers/paid calls; W3-04 Risk now describes existing consent, same scope, equivalent identity/current references/confirmation ancestry and preserved historical evidence. Those match each task's Files/Test/purpose. Round2 reviewers had found copied Risk text from unrelated tasks; this was a real documentation finding, now fixed, not dismissed. It supplements the already preserved initial partly discovery finding and round1 finalization provenance refusal below. No successful finalization is inferred.
+
+`git diff 6aad2e920 4e6e2d4 --name-only -- loom-code/scripts loom-code/tests loom-code/hooks loom-code/contract docs/loom/intent/2026-11-13-cli-result-contract.md docs/loom/2026-11-13-cli-result-contract/spec.md`: empty. Full cumulative paths only plan and this change's acceptance/build/provenance evidence. Thus intent identity, confirmation selection, spec, four Acceptance lines, all help/source/tests/hooks/contracts/version and existing consumer assertions are unchanged.
+
+### README setup and actual checks
+
+Followed README startup in the new clean clone:
+`/bin/sh loom-code/scripts/loom-python --repair contract --require 2.3`.
+Exit0; stdout `contract 2.3.1 satisfies requires-contract >=2.3`; empty stderr. Uses actual pre-existing valid cached runtime; no first-install/download claim.
+
+Separately ran each check to obtain individual tool exit codes:
+- `/bin/sh loom-code/scripts/loom-python --ready plan docs/loom/2026-11-13-cli-result-contract/plan.md`: exit0, empty stdout/stderr.
+- `/bin/sh loom-code/scripts/loom-python --ready intake write-plan 2026-11-13-cli-result-contract`: exit0, empty stderr; stdout exactly:
+  `interface-surfaces (manifest default (KICKOFF-DEFAULTS adds nothing new)): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)`.
+
+The interface line is advisory and these checks do not approve or execute a station. A Python wrapper attempted solely to collect individual exits was blocked before execution by the local command guard because its expanded subprocess argv could not be statically verified. Used the direct fixed commands above successfully; no permission bypass or source repair occurred.
+
+Reused the same external temporary probe in memory, replacing candidate root with /private/tmp/loom-help-acceptance-rerun-4e6 and capture destination with /private/tmp/loom-help-acceptance-round3-captures.json. No executable file added. Explicit /Users/kouko/.conda/envs/dbt-redshift/bin/python3 returned0:
+`32 ready exact-help calls identical to initial captures; overall discovery lists16; README current and research historical boundaries correct; coldready86no-cache; clean tree`.
+
+All16 commands intent/intents/intake/push/publish/delivery/land/sync-trunk/github-rules/pr-floor/standing/contract/charter/plan/reviewer-count/finalize-review were actually invoked with both exact --help and -h outside repo. Every result exit0/empty stderr and stdout byte-identical to original full capture retained below. Overall help still lists16. Fixed README/research/current-conformance paths remain accurate. Missing-ready cache still exits86 with prescribed diagnostic and no cache directory; clean tree confirmed. Earlier tripwire tests are unchanged carried evidence, not a new test execution.
+
+### Current row decisions
+
+- **1: re-tested**, over all16 help/inventory surfaces plus current plan/provenance documentation. Read corrected W3-02/04 Risks against real tasks, retained current scope/identity and original16handler source anchors; actual plan/intake and all32help calls passed.
+- **2: carried over —** no source/help/spec/test change since prior tested6aad or341; original independent16handler readback and actual help text remain valid. Full stdout equality independently re-observed.
+- **3: carried over —** no intent/schema/consumer/hook/test/runtime/version change; original25base-equivalence outputs and45JSON/delivery/Stop consumer passes remain applicable. The90second deadline suite was not repeated.
+- **4: re-tested**, all16x2 exact help calls, overview/current documentation and cold-ready behavior as above. Bounded risk prose does not change execution safety; prior tripwire tests remain valid.
+
+All four current verdicts are works; no new findings or important dismissals. Only canonical report and this evidence edited by this tester. Report EOF normalized to one newline. No live writer, paid call or outside review CLI.
+
+Complete suite remains finalization's responsibility; no step skipped. Station supplies round3 Build exit0/4269passed/6skipped plus all runner groups and the same declared adversary39passed9.57s. Those supplied results are not this tester's rerun; formal finalization and reviews remain separate from acceptance.
+
 ## Re-run on 2026-11-13, at 6aad2e920e7d2507f26a659295ab573e4518dfd8
 
 ### Provenance repair, prior refusal and scope

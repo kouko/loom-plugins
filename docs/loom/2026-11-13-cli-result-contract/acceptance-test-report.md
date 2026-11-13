@@ -1,6 +1,6 @@
 # CLI 說明獨立交付 — 實際驗收結果
 
-Tried on 2026-11-13, in a clean copy of the project at 6aad2e920e7d2507f26a659295ab573e4518dfd8. How I tried each line and what came back: `docs/loom/2026-11-13-cli-result-contract/evidence/acceptance-test-evidence.md`.
+Tried on 2026-11-13, in a clean copy of the project at 4e6e2d4dac8e904c527e15e425c8ea337a4769b7. How I tried each line and what came back: `docs/loom/2026-11-13-cli-result-contract/evidence/acceptance-test-evidence.md`.
 
 ## 逐條驗收
 
@@ -20,6 +20,7 @@ Tried on 2026-11-13, in a clean copy of the project at 6aad2e920e7d2507f26a65929
 - **相容性驗證方式** — 使用隔離資料與模擬遠端回應，避免為了閱讀說明而真的寫入遠端；實際遠端寫入與全新環境下載安裝的行為未驗證。
 - **保留原始未通過結果** — 首頁矛盾修正後已重新驗收，原始部分通過的判定與證據仍完整保留。
 - **確認紀錄修正** — 先前正式驗證因確認紀錄對應錯誤被拒絕；已核對修正後仍是原先同意的範圍，正式驗證尚須重新完成。
+- **計畫說明修正** — 後續審查發現兩處風險說明放錯任務，已修正並重新核對；功能與驗收要求均未改變。
 
 沒有收到被主流程駁回的重要或更嚴重問題。
 
