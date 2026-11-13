@@ -35,14 +35,17 @@ does not repeat it; where they differ, the baseline wins.
    and their files are the task's scope. A fix hand-off that lists several
    instances of one defect class is one task, a single assertion about that
    class.
-2. **Failing test first, always.** Caught writing code with no failing test:
-   delete it, write the test, start over — "I'll add tests at the end" and
-   「ちょっと試すだけ」 are what the law exists for. Never delete, skip or
+2. **Failing test first, always.** Choose an existing covering test first;
+   an existing case reproducing the defect supplies RED. Without one,
+   write the failing test before code; otherwise delete the code and
+   restart. Never delete, skip or
    weaken a test to reach green; it erases the evidence. When a task
    removes a behaviour, the tests that only check that behaviour are
-   deleted with it; that is not deleting a test to reach green. The tests a task
+   deleted with it; that is not deleting a test to reach green. Sufficiently
+   covered unchanged behaviour needs no duplicate function or file. The tests a task
    adds stay within a budget: at most one positive and one negative or
-   boundary case per Acceptance line; a finding's fix adds at most one
+   boundary case per Acceptance line; add or extend only for a named uncovered
+   defect or behaviour; a finding's fix adds at most one
    test, extending an existing test first; reuse the target test
    file's existing helpers and fixtures; no new test harness; no tests of
    tests. Report the net test lines added in `net_test_lines`.
@@ -125,7 +128,8 @@ open_questions:               # NEEDS_CONTEXT only
 unblock_step:                 # BLOCKED only — the action the orchestrator must take
 ```
 
-- **`DONE`** — new focused tests went RED then GREEN.
+- **`DONE`** — required focused verification passed; changed executable behaviour
+  went RED then GREEN using existing or new cases.
 - **`DONE_WITH_CONCERNS`** — complete, but something wants a reviewer's
   eye, or the focused verification is incomplete.
 - **`NEEDS_CONTEXT`** — a specific question blocks you.

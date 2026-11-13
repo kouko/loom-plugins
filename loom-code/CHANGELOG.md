@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.74.0] — 2026-11-14 — identify the added protection before adding tests
+
+- Reuse sufficient existing coverage during planning and implementation; identify the distinct defect or uncovered behavior when extending permanent tests, while preserving defect reproduction, test-first work and independent boundary coverage.
+- Compare duplicate tests by the protection they provide, preserving unique integration and environment risks and requiring replacement evidence before recommending removal.
+- Keep existing test budgets, required adversarial probe graduation and quality checks unchanged; add no test inventory, deletion mechanism or new report field.
+
 ## [3.73.0] — 2026-11-13 — continue explicitly authorized external reviews
 
 - Continue a clear named external-review request in the same active turn after nonblocking disclosure, using its existing bounded authorization through execution and owner validation.
