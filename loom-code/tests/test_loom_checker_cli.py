@@ -449,7 +449,8 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
         "plan": ["<path", "charter:", "1.1", "empty", "field", "Exit 1", "Exit 2"],
         "intake": ["write-spec", "write-plan", "change-id", "interface-surfaces",
                    "stdout", "BLOCK", "Exit 1", "Exit 2"],
-        "reviewer-count": ["change-id", "clean", "committed", "floor", "two", "Exit 2"],
+        "reviewer-count": ["change-id", "clean", "committed", "floor", "two", "Exit 2",
+                           "--json", "reviewer_floor", "null", "exit 86", "parseability"],
         "intent": ["--commit-msg", "stdout", "stderr", "Exit 1", "Exit 2"],
         "intents": ["--remote", "origin", "--metadata", "committer", "indeterminate"],
         "push": ["--hook", "--install-git-hooks", "--remove-git-hooks", "core.hooksPath", "three"],
@@ -458,7 +459,8 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
         "github-rules": ["--print-setup", "advisory", "unconfirmed", "Exit 2"],
         "pr-floor": ["--body-file", "--base", "--head", "--branch", "GITHUB_STEP_SUMMARY"],
         "standing": ["PRINCIPLES.md", "DESIGN.md", "ARCHITECTURE.md", "stderr", "Exit 1"],
-        "contract": ["--require", "major", "minor", "manifest", "Exit 1", "Exit 2"],
+        "contract": ["--require", "major", "minor", "manifest", "Exit 1", "Exit 2",
+                     "--json", "contract_version", "required_version", "compatible", "last --require wins"],
         "charter": ["--manifest", "table", "stdout", "BLOCK", "Exit 2"],
     }
     for command, words in required.items():

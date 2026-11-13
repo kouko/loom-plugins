@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.75.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.76.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -129,6 +129,79 @@ text behavior and exit codes. Results distinguish passed checks, blockers and
 usage/internal errors, retain ordered diagnostics and notices, and do not
 claim whole-workflow completion. Use either command's exact `--help` for the
 six-field contract and startup/process limitations.
+
+Five checker commands support JSON: `plan`, `intake`, `contract`,
+`reviewer-count`, and `delivery`. The first four select JSON only with a final
+`--json`; duplicate selectors are usage errors. Exact command `--help`/`-h`
+remains text; mixed help and final JSON is a usage error. Delivery retains its
+distinct `{state, reason, next, evidence, complete}` object.
+
+The two read-only modes add `data` to the preparation envelope:
+
+| Command | Typed data on a completed observation |
+|---|---|
+| `contract --require <major.minor> --json` | `contract_version` and `required_version` strings, `compatible` boolean; last `--require` wins. The supplied requirement string is preserved, and the manifest version is stripped. |
+| `reviewer-count <change-id> --json` | Unchanged `change_id` string and integer `reviewer_floor` (currently 1 or 2); requires a clean repository and one nonblank operand. |
+
+Each emits exactly one stdout object plus newline and empty checker stderr:
+`schema_version: 1`, `command`, `status`, ordered `diagnostics` objects
+(`rule_id`, `message`), ordered string `notices`, `error`, and `data`.
+Passed means exit 0, empty diagnostics and null error; blocked means exit 1,
+rule diagnostics and null error; error means exit 2, empty diagnostics and
+`error: {kind: usage|internal, message}`. Every error data value is null.
+Reviewer-count has no blocker result; missing/dirty repositories are usage
+errors. Empty arrays remain `[]`. Use fields and types rather than key order
+or human message prose.
+
+These Python examples consume actual fields without invoking writers. Set
+`plugin` to the installed loom-code directory and run the reviewer example
+inside the selected clean repository. Runtime must already be ready.
+
+```python
+import json
+import subprocess
+from pathlib import Path
+
+plugin = Path("/absolute/path/to/loom-code")
+
+def observe(*args):
+    process = subprocess.run(
+        [str(plugin / "scripts/loom-python"), "--ready", *args, "--json"],
+        capture_output=True, text=True,
+    )
+    try:
+        result = json.loads(process.stdout)
+    except ValueError:
+        raise RuntimeError(f"No parseable JSON; process exit {process.returncode}")
+    if not isinstance(result, dict):
+        raise RuntimeError("Expected a result object")
+    if (process.returncode != 0 or result.get("status") != "passed"
+            or result.get("error") is not None):
+        raise RuntimeError(f"Observation rejected; process exit {process.returncode}")
+    return result["data"]
+
+compatibility = observe("contract", "--require", "2.0")
+if compatibility["compatible"] is not True:
+    raise RuntimeError("Compatibility not established")
+print("Compatible: simulated next step permitted")
+
+reviewers = observe("reviewer-count", "2026-11-14-example")
+floor = reviewers["reviewer_floor"]
+if type(floor) is not int or floor not in (1, 2):
+    raise RuntimeError("Unexpected reviewer floor")
+print(f"Require {floor} distinct reviewers for the simulated review")
+```
+
+An incompatible requirement (for example `2.99`) blocks the simulated next
+step; malformed `bad` errors. Floor two can follow ordinary policy,
+outside-review selection or an unclassifiable delta; it proves neither
+complete classification nor completed review. Floor one does not waive review.
+Neither command writes artifacts, installs runtime, dispatches reviewers,
+changes authority or retries. Correct inputs/repository conditions and rerun
+deliberately. The JSON guarantee starts in the loaded checker: launcher/import
+failures, unavailable runtime (`--ready` exit 86), termination and broken pipes
+are outside it. Inspect both process exit and parseability before consumption.
+Existing text behavior and preparation/delivery JSON contracts are preserved.
 
 `scripts/loom_checker.py` is the deterministic layer: every rule recomputes
 from the repository instead of trusting a claim, and `--list-rules` is the

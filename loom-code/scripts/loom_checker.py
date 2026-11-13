@@ -25,10 +25,10 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py sync-trunk
     loom_checker.py github-rules [--print-setup]
     loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha> [--branch <name>]
-    loom_checker.py reviewer-count <change-id>
+    loom_checker.py reviewer-count <change-id> [--json]
     loom_checker.py finalize-review <change-id> --input <review-input.json>
     loom_checker.py standing <path-to-intent>
-    loom_checker.py contract --require <major.minor>
+    loom_checker.py contract --require <major.minor> [--json]
     loom_checker.py charter [--manifest <path>]
     loom_checker.py plan <path-to-plan.md> [--json]
 
@@ -38,7 +38,8 @@ With the launcher, the checker is selected automatically; omit loom_checker.py:
 Replace <loom-code> with the installed plugin directory and <path-to-plan.md>
 with your plan file path.
 Plan takes a file path; intake takes a station and a change-id.
-Plan and intake accept an optional final --json selector; text remains default.
+Plan, intake, contract and reviewer-count accept an optional final --json selector;
+text remains default. Delivery retains its separate JSON interface.
 Detailed help: finalize-review --help, publish --help, delivery --help
               plan --help, intake --help, reviewer-count --help
               intent --help, intents --help, push --help, land --help
@@ -60,6 +61,7 @@ package this checker ships with.
 """
 from __future__ import annotations
 
+import io
 import sys
 
 from loom_checker.command_handlers.charter import cmd_charter
@@ -102,6 +104,27 @@ workflow completion or authority. Do not depend on key order or message prose.
 Launcher/startup failures, termination and broken pipes are outside this
 in-process result guarantee. Read the actual process result; do not retry
 automatically. Without --json, existing text streams and exits are unchanged.
+"""
+
+
+READONLY_JSON_HELP = """Optional JSON: append --json as the final argument only. Exact --help/-h
+remains text; mixed help and final --json is a usage error. Duplicate selectors
+are usage errors before domain work. Without a final selector, earlier tokens
+retain their existing operand meaning.
+JSON stdout is one object plus newline; checker stderr is empty. Fields:
+schema_version: 1; command: contract|reviewer-count; status: passed|blocked|error;
+diagnostics: ordered [{rule_id, message}]; notices: ordered strings;
+error: null or {kind: usage|internal, message}; data: the command object above.
+Exit 0 means passed with empty diagnostics and null error; Exit 1 means blocked
+with rule diagnostics and null error; Exit 2 means error with empty diagnostics.
+Empty arrays are []. Use keys and types, not key order or message prose.
+Missing repositories and dirty trees are usage errors. Neither mode writes,
+installs runtime, dispatches reviewers, requests authorization or retries.
+Correct inputs or repository conditions before deliberately rerunning.
+The guarantee begins in the loaded checker: launcher/import failures, unavailable
+runtime (--ready exit 86), termination and broken pipes remain outside it.
+Inspect process exit and parseability before consuming JSON. Text is unchanged
+without --json; these observations do not grant authority or prove completion.
 """
 
 
@@ -255,7 +278,7 @@ authentic policy/document record through its owning workflow, then rerun.
 Read-only; does not ratify documents or perform review.
 """,
     "contract": """contract — check compatibility with the bundled contract manifest
-Usage: contract --require <major.minor>
+Usage: contract --require <major.minor> [--json]
 Supply a numeric major.minor requirement. Reads the manifest in effect; a
 matching major and sufficiently high minor pass. Exit 0 prints current and
 required versions on stdout; Exit 1 reports BLOCK contract.requires on stderr;
@@ -265,6 +288,10 @@ requires-contract updated to a supported major; update loom-code when a newer
 major/minor is required. Do not lower a requirement just to pass. Then retry.
 Read-only: this does not check plugin release version, provision
 runtime, run station prerequisites or authorize a later operation.
+JSON data: {contract_version: string|null, required_version: string|null,
+compatible: boolean|null}. Passed/blocked provide the stripped manifest version,
+the final supplied requirement (last --require wins), and true/false respectively.
+Errors set all data values to null. Existing numeric matching is unchanged.
 """,
     "charter": """charter — render and validate artifact charter rows
 Usage: charter [--manifest <path>]
@@ -319,7 +346,7 @@ remote-default evidence. Conditional interface recomputation needs a resolvable
 branch base on a change branch rather than trunk.
 """,
     "reviewer-count": """reviewer-count — compute the required independent reviewer floor
-Usage: reviewer-count <change-id>
+Usage: reviewer-count <change-id> [--json]
 Run inside the selected repository with a clean tree and committed functional
 content. Supply one nonblank change-id operand. Preserve work and finish and
 commit the change before requesting the floor; do not discard files to pass.
@@ -332,6 +359,10 @@ Exit 2 means missing/extra operands, a dirty tree or an internal failure;
 use the diagnostic to correct the invocation or repository condition, then
 rerun. This read-only command neither dispatches reviewers nor writes evidence.
 Review guidance: <loom-code>/skills/closing-review/SKILL.md.
+JSON data: {change_id: string|null, reviewer_floor: integer|null}. Passed
+provides the unchanged operand and floor; errors set both values to null.
+There is no blocked result for this command. Two can also follow ordinary
+policy or outside-review selection; it does not prove complete classification.
 """,
     "finalize-review": """finalize-review — verify committed content and generate an attestation
 Usage: finalize-review <change-id> --input <review-input.json>
@@ -517,7 +548,7 @@ COMMANDS = {
 
 
 def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
-    preparation = new_result(argv[0]) if len(argv) >= 2 and argv[0] in {"plan", "intake"} and argv[-1] == "--json" else None
+    preparation = new_result(argv[0]) if len(argv) >= 2 and argv[0] in {"plan", "intake", "contract", "reviewer-count"} and argv[-1] == "--json" else None
     if preparation is not None:
         argv = argv[:-1]
     hint = ""
@@ -536,6 +567,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
             out.write(COMMAND_HELP[argv[0]])
             if argv[0] in {"plan", "intake"}:
                 out.write(PREPARATION_JSON_HELP)
+            elif argv[0] in {"contract", "reviewer-count"}:
+                out.write(READONLY_JSON_HELP)
             out.write(HELP_NOTICE)
             return 0
         if argv[0] == "--list-rules":
@@ -544,7 +577,11 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         if command is None:
             raise UsageError(f"unknown sub-command {argv[0]!r}." + USAGE)
         if preparation is not None:
-            result = command(argv[1:], out, err, result=preparation)
+            if argv[0] in {"contract", "reviewer-count"}:
+                # Keep partial handler text out of the single JSON result, even on failure.
+                result = command(argv[1:], io.StringIO(), io.StringIO(), result=preparation)
+            else:
+                result = command(argv[1:], out, err, result=preparation)
             write_result(preparation, out)
             return result
         result = command(argv[1:], out, err)
