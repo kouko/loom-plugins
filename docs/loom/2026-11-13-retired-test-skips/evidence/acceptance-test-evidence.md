@@ -100,3 +100,41 @@ Did not run the full package suite, as required by the tester contract. Independ
 The executed named check `test_ci_agy_corrupt_download_stops_before_extraction` runs the workflow's actual install script under `bash --noprofile --norc -eo pipefail` with corrupt download bytes and an extraction trap. Passing means checksum rejects it, extraction never occurs, and GITHUB_PATH is not published. Other four checks verify dependencies precede suites, no continue-on-error/if override, and trigger coverage. This establishes local step failure and the configured native Actions success dependency; it does not simulate or observe the GitHub scheduler. There is no claim of Linux success or a failed real GitHub job.
 
 Actual current execution: 79 historical-owner checks + 5 CI checks + 3 real local validator checks = 87 passed, zero skips; 32 deselected are selection exclusions, not passes. External full-suite log: 4273 passed, zero skips, plus shell and Mermaid passes. Linux actual executions/skips: not yet observed. Retained Ubuntu restrictions cover case-insensitive paths and macOS /var-alias behavior; only actual Linux -rs output can establish their final counts/reasons. AC6 remains partly until those logs identify the actual executed/skipped inventory and job outcome. Old failures/skips above remain historical facts.
+
+## Re-run on 2026-11-13, at 8a5e00da3d0806226ae13ae77e02359017e47251
+
+### Clean setup and scope
+
+Fresh `git clone --no-hardlinks /private/tmp/loom-retired-test-skips /private/tmp/loom-ci-acceptance-round2`, followed by detached checkout of exact tested HEAD above; initial/final status empty. README checks for generated manifest parity, both code/design boundaries and relative skill cross-references all exited 0. Locked isolated uv dependency access was approved; no base installation, credentials, model call, VM/container or full-suite rerun. Package-tests and finalize-review are not skipped. No important dismissed findings supplied. No user-instructed skips or spec.
+
+Read current confirmed intent and full `git diff e98b17f0a 8a5e00da3`: only three suite-step diagnostics environment/arguments, the CI regression guard, release note and maintenance evidence/disposition changed. Setup commands, dependencies, runner inventory, release guards, collection/conflict and migration owners are unchanged. Earlier daf2..e98 changes were evidence/review publication records, not those owners.
+
+### 1. Dispositions — carried over
+
+The previous six-disposition readback and executed owners remain applicable: no disposition or owner changed in the diagnostic fix. Retired proofs remain retired and not passing cases.
+
+### 2. Clean owner execution — carried over
+
+Previous clean-copy 59 code + 3 design + 17 migration passes remain applicable; no corresponding test, production seam, dependency or lock changed. This round does not claim those 79 were rerun.
+
+### 3. Preserved safeguards — carried over
+
+Version consistency, module collection/conflict and all migration data/failure guards are unchanged; fix only changes reporting of skips and tests that reporting. Previous actual pass and historical corruption sensitivity results remain applicable.
+
+### 4. Full inventory — re-tested by retained output inspection
+
+Did not run full suite. Independently inspected `/private/tmp/loom-ci-fix-package-tests.txt` at this tested functional HEAD: fifteen actual pytest session summaries sum to 4273 passed, zero skips; shell groups and 13/13 Mermaid parsing plus deliberate invalid-input rejection pass. Parent records process exit 0; tester observed log rather than earlier process. Finalize-review's mandatory automated full suite still blocks acceptance on failure. The package command remains the README locked isolated full runner. These current local results are distinct from the older Linux inventory below.
+
+### 5. Whole CI preparation surface — re-tested
+
+Executed `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest tests/test_ci_environment_preparation.py -q -rs` in the fresh clone: exit 0, `5 passed in 2.60s`, zero skips. All three job-specific checks inspect lock/setup/trigger/order and launch real pytest subprocesses using each actual suite step's environment; each subprocess produces `SKIPPED [1]` and `CI diagnostic reason is visible`. This verifies environment propagation, not just an option string. The unchanged failure check runs actual workflow install shell with corrupt bytes. No fake agy is counted as validator success.
+
+Inspected actual retained Linux logs at source HEAD e98b17f0aea026899e7980a9cfbbae58665cd3ed (the PR merge checkout SHA differs; these are NOT a run of 8a5e00da3): runs 43444813208 / 43444813139 / 43444812907, raw `/private/tmp/loom-ci-code-remote.txt`, `/private/tmp/loom-ci-design-remote.txt`, `/private/tmp/loom-ci-workflow-remote.txt`. Code reports zsh 5.9, uv 0.13.1, Python 3.11.18, downloaded archive checksum OK, agy 1.5.8 and three actual plugin validations before tests; code summary 2842 passed. Design prepares Python 3.11/hash-verified lock before 211 passed. Workflow Python prepares Python 3.12/hash-verified lock and Node/Mermaid in its own job before all thirteen session results (1218 passed, 2 skipped). Separate Mermaid job also succeeds. No account credentials/model requests were needed. All setup commands and inventory are unchanged by the fix, so these observations apply to AC5 preparation behavior, combined with current actual three-job diagnostics execution.
+
+### 6. Failure and skip boundaries — re-tested
+
+Current five-check execution again exercises `test_ci_agy_corrupt_download_stops_before_extraction`: checksum failure exits nonzero before extraction/PATH export; all three jobs retain native default success dependency without `if` or continue-on-error overrides. This is a real failed local step plus configured GitHub ordering, not a claim that a GitHub job was deliberately failed. Older actual Linux jobs succeeded and reached tests after setup.
+
+Actual older Linux pytest inventory: code 2842/0 skipped, design 211/0, workflow 1218/2, combined 4271 passed and 2 skipped. Logs name only `test_accepts_ticket_in_callers_var_repo_root_namespace` and `test_set_output_case_variant_of_old_change_refused` as skipped. Read their unchanged guards: `macOS /var alias is unavailable`, and `case-sensitive filesystem: the variant is a different directory`. The older run omitted detailed reason summaries because the runner consumed the original -rs argument; this historical reporting deficiency is preserved, not retrospectively claimed successful. This fix's actual per-job pytest subprocesses now print the expected reason using PYTEST_ADDOPTS=-rs. Neither platform-only skipped case is counted as passed. Current local full log remains 4273/0, not the Linux total.
+
+AC5 and AC6 now work based on unchanged setup's actual Linux execution plus current three-job actual reporting and failure-boundary checks. Exact 8a5e00da3 GitHub rerun is pending publication; never label the older run as this HEAD. Validator warnings are preserved: code has hooks/hooks.json never-loaded and closing-review body 29757 bytes exceeds 24000 loaded bytes; workflow has the same hooks-path warning. Validators still passed (code 2 warnings, design none, workflow 1); these pre-existing host warnings are outside test-environment maintenance, not dismissed gate findings supplied by the station.
