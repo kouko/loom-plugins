@@ -116,3 +116,7 @@ and 2 passed because each suite environment lacked the option. Raw output:
 unified-design focused run reported 10 passed, zero skipped, retained at
 `/private/tmp/loom-ci-diagnostics-green.txt`; later integration and remote
 observations must establish the cumulative result.
+
+## Round 2 Build integration at 8a5e00da3
+
+The configured complete package command exited zero again: 4,273 passed across 15 pytest sessions, zero skipped, with all shell and Mermaid commands passing. Raw output: `/private/tmp/loom-ci-fix-package-tests.txt`. The unchanged migration adversarial declaration exited zero with 17 passed; raw output: `/private/tmp/loom-ci-fix-adversarial-rerun.txt`. Pre-acceptance sync remained up to date against origin/main fbdc29af358413bc9d55b599231b2a6cbcb4524d. This is the existing episode's second functional digest; no requirements or retry budgets were reset.
