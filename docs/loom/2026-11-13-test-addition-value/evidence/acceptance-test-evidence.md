@@ -1,6 +1,6 @@
 # Test-addition value — acceptance test evidence
 
-Tried on 2026-11-13, in a fresh clone at df1e8c0ce352fe99cb095ee8fc78c11ebfe4736a.
+Tried on 2026-11-13, in a fresh clone at a85b8775ee63cd874a3a61e92b1975027f917977.
 
 ## Original results preserved — 2026-11-13 at d158a7e16f5cdf072e9a2eada6fdeb13cf066de1
 
@@ -47,3 +47,17 @@ The original report returned works for all four AC within the bounded observed a
 - 3: carried over — the fix changes neither reviewer guidance nor the supplied duplicate proposal, actor decision, discovery assertions or tests. Checked the full fix diff; the prior command/assertion comparison and retained-detection observation remain applicable. Original reviewer pytest initialization failure remains unresolved, not relabeled a pass.
 - 4: carried over — the fix changes completion status eligibility only, preserving the no-delete/no-skip/no-weaken rules, boundary-retention guidance, actual unchanged test variants and review decisions. Checked full diff; it removes no test and supplies no new equivalence claim. Prior bounded boundary/environment rejection observations remain applicable.
 - Old raw actor hashes remain historical and are not assigned to this SHA. No new model CLI/external call, full suite or permanent test was run. No causal or installed-host inference added. Unsupported commit-failure/escalation narratives remain excluded.
+
+## Re-run on 2026-11-13, at a85b8775ee63cd874a3a61e92b1975027f917977
+
+- Preserved prior fix-verification results above: at df1e8c0ce352fe99cb095ee8fc78c11ebfe4736a, AC1/2 were re-tested, AC3/4 carried over, 70 focused checks passed in 3.69s, and the actual synthetic replay observed two RED failures then GREEN. Those executions remain bound to that earlier scope; raw actor observations retain their original guidance hashes.
+- Fresh cloned delivery into `/private/tmp/loom-value-acceptance-final`; `git rev-parse HEAD` exactly matched the SHA above. README source setup `./loom-code/scripts/loom-python --ready plan --help` and `python3 scripts/sync_codex_manifests.py --check --all` each exited 0.
+- Read complete `git diff 34fabd..a85b8775ee63cd874a3a61e92b1975027f917977`: only build-checks history, intent confirmation pin plus explicit continuation constraint, and plan intent reference changed. No executable or guidance change. `git diff df1e8c0ce352fe99cb095ee8fc78c11ebfe4736a..HEAD -- loom-code/agents loom-code/skills loom-code/tests` produced no output.
+- Programmatically extracted the entire Acceptance section at 34fabd and new HEAD and asserted exact equality: `AC verbatim equality: PASS`.
+- Compared all three guidance SHA256 values against df1e8c0c: planner `5e757e2bf77741858c46af59e432972cb97ec11bb17b1c94a381c85497cf371b`; implementer `d20de97a74fb041aba1623a96c8da16b3a76e2a4a48f4539c817c4c1aa46f208`; reviewer lenses `7b0ab250aead79fa128009d0894787f329f7724c62aca2145b56d0386b222693`. All pairs matched.
+- Read canonical commit ad9d3b402dbec255a9226f181a868730fa251e37 and current Constraints: the retained user quotation is `如果 dogfood testing 沒問題 就幫我走標準流程合併`; prior authorization already covered continued implementation/dogfood and conditional publication/merge. New constraint explicitly retains all four AC, existing review rounds and execution allocation. This is recording existing consent, not a new requirement, new consent or reset inferred from a gate refusal. Existing intent-version diagnostic replay is coordinator evidence; this witness did not independently repeat that checker call or infer finalization success.
+- 1: carried over — only confirmation provenance changed; reuse guidance, completion condition, existing-case replay and Acceptance text remain identical. Full diff checked.
+- 2: carried over — named-uncovered-defect rules, planning evidence, completion condition, fixtures and Acceptance text remain identical. Full diff checked.
+- 3: carried over — reviewer guidance, duplicate comparison sources, observed decision and Acceptance text remain identical. Full diff checked.
+- 4: carried over — preservation rules, boundary/environment cases, observed rejection and Acceptance text remain identical. Full diff checked.
+- No focused-test repeat was necessary after proving all executable/guidance/test content unchanged. No full suite, new model CLI, external call or permanent test executed. First finalization refusal and later full-suite/finalization outcomes remain coordinator observations, not successes claimed by this witness. No important finding was dismissed in this continuation.

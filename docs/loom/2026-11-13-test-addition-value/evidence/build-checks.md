@@ -111,3 +111,11 @@ historical reviewed commit and its actual pin: it reproduced the same blocking
 diagnostic. Against the new canonical confirmation and its recomputed pin,
 it returned no diagnostics. No checker rule or permanent test was changed.
 The same final review episode continues; earlier round history is retained.
+
+The complete package command exited zero again after confirmation repair:
+4,273 passed across 15 pytest sessions, no skips reported, plus passing shell
+and Mermaid checks (`/private/tmp/loom-test-addition-package-confirmation.log`).
+The portable reused adversarial artifact also passed, 2 passed. Independent
+acceptance loaded a fresh clone of `a85b8775e`, verified all four Acceptance
+lines byte-for-byte unchanged and all three guidance hashes unchanged from
+the prior fix, and carried over the four results with explicit reasons.
