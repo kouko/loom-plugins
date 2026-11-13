@@ -20,3 +20,64 @@ Implementation source readback found that the existing graduated-copy guard comp
 ## Verification to append during Build
 
 Retain the original skip observations already captured by the parent task. Append actual focused `pytest -rs` output for the four affected test modules plus current release guard; run plugin suites separately to respect their pytest configurations. Append the configured full package-suite result and enough pytest `-rs` evidence to identify every remaining skip. Explicitly distinguish passed, failed and skipped outcomes, and retain any failed attempts. The complete package runner remains the final inventory; focused results alone cannot establish Acceptance 4.
+
+## W1-01 implementation and focused verification
+
+Implemented the six dispositions. The historical changelog module is removed;
+its unconditional `## [1.5.1]` assertion now lives in the existing current-release
+metadata test. The graduated-copy guard continues to compare all remaining
+matching pairs without an exception or archive modification. The migration
+module retains all 17 formerly active cases, including current-store validation
+and every failure/no-write guard. Its existing public-entry fixture now has two
+distinct lessons and a separate guide, independent expected metadata/body bytes,
+a captured introducing Git SHA followed by a later unrelated commit, dated extra
+metadata, exact output inventory/counts, complete normalized charter bytes, and
+idempotent valid index regeneration. Only orphaned historical helpers were removed.
+
+No production/tool code, current real memory-store files, historical evidence,
+other worktrees, or package dependencies changed. Across the five test files,
+the W1 diff is 67 inserted and 356 removed lines (net 289 removed). The retired
+functions are the six historical cases; the old heading check's responsibility
+moves into an already collected test rather than adding a new test case.
+
+Baseline commands used `uv run --with-requirements requirements-package-tests.lock
+python -m pytest <paths> -q -rs`, separately for each plugin configuration:
+
+| Stage | Paths / cases | Actual outcome | Raw output |
+| --- | --- | --- | --- |
+| Baseline code | Historical changelog + coldread branch-end modules | 16 passed, 2 skipped | `/private/tmp/loom-retired-skips-baseline-code.txt` |
+| Baseline design | Unified pytest root module | 3 passed, 1 skipped | `/private/tmp/loom-retired-skips-baseline-design.txt` |
+| Baseline workflow | Migration module | 17 passed, 3 skipped | `/private/tmp/loom-retired-skips-baseline-workflow.txt` |
+| W1 code | Coldread branch-end module + `test_current_release_metadata_is_synchronized` | 17 passed, 0 skipped | `/private/tmp/loom-retired-skips-green-code.txt` |
+| W1 design | Unified pytest root module | 3 passed, 0 skipped | `/private/tmp/loom-retired-skips-green-design.txt` |
+| W1 workflow | Migration module | 17 passed, 0 skipped | `/private/tmp/loom-retired-skips-green-workflow.txt` |
+
+The initial sandboxed uv attempt could not create its cache lock under
+`/Users/kouko/.cache/uv` (operation not permitted), before test collection. The
+same isolated dependency command succeeded with approved cache access; no package
+was installed into a base environment. This is an environment attempt, not a test
+failure or pass.
+
+### Strengthened assertion sensitivity
+
+Because production migration behavior is already correct, no artificial
+production fix or fabricated pre-implementation failing test is claimed. The six
+baseline skips above are the original observed gap. To verify the strengthened
+test actually detects fidelity regressions, a temporary `git archive HEAD` copy
+at `/private/tmp/loom-retired-skips-mutation` received the updated migration test.
+Each isolated mutation changed the copied **production migration** seam, never
+the test oracle. Each was restored with `apply_patch` before the next mutation:
+
+| Copied production mutation | Actual outcome | Raw output |
+| --- | --- | --- |
+| Replace a lesson description with another valid description | 1 failed: exact description assertion | `/private/tmp/loom-retired-skips-mutation-description-red.txt` |
+| Append text to a migrated lesson body | 1 failed: exact body bytes assertion | `/private/tmp/loom-retired-skips-mutation-body-red.txt` |
+| Append text to the guide charter | 1 failed: complete charter bytes assertion | `/private/tmp/loom-retired-skips-mutation-charter-red.txt` |
+| Replace origin-less provenance with a syntactically valid wrong SHA | 1 failed: independently captured introducing SHA assertion | `/private/tmp/loom-retired-skips-mutation-source-red.txt` |
+| Restore all copied production mutations | 1 passed | `/private/tmp/loom-retired-skips-mutation-restored-green.txt` |
+
+These are implementer sensitivity checks, not the mandatory independent Build
+adversarial pass or independent acceptance testing. Full-suite acceptance remains
+pending Wave 2 and end-of-Build verification; these focused runs do not establish
+Acceptance 4 by themselves. Historical 293-file migration execution is not
+reclaimed as a current passing result.

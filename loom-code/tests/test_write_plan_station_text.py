@@ -409,6 +409,7 @@ def test_current_release_metadata_is_synchronized() -> None:
     assert agy_manifest["version"] == CURRENT_VERSION
     assert package["version"] == CURRENT_VERSION
     assert f"## [{CURRENT_VERSION}]" in changelog
+    assert "## [1.5.1]" in changelog  # Preserve the retired probe's historical heading.
     assert f"| [`loom-code`](loom-code/README.md) | {CURRENT_VERSION} |" in root_readme
     assert f"Version {CURRENT_VERSION}. Five stations" in root_readme
 
