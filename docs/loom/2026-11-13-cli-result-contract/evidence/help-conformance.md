@@ -47,8 +47,9 @@ contexts and a ready launcher with repair unavailable; separately confirm that
 missing runtime remains exit 86 and does not install anything. No live mutation
 is authorized by these probes. Retain authentic failed results before fixes.
 
-After this checkpoint passes independently, the two-command JSON work can begin.
-This ordering is a delivery boundary, not a new checker rule or runtime gate.
+The original proposal placed two-command JSON after this checkpoint. The user
+subsequently narrowed this delivery to help only on 2026-11-13; no JSON work is
+required or authorized by this checkpoint. Its failed/pass evidence is preserved.
 
 ## W1-01 implementation evidence
 
@@ -82,3 +83,13 @@ push/land handlers. The current assertions requiring correction were push's
 host-hook refusal and land's exit-0 completion claim, including their table rows.
 Help now states the repository-local loom.protectMain=false host-hook opt-out
 and land's nonfatal trunk-sync failure, without changing handler behavior.
+
+## Narrowed delivery applicability — 2026-11-13
+
+The user accepted standalone help delivery and deferred all JSON expansion.
+Earlier references to later command-data JSON in this baseline describe the
+retained proposal only; they impose no implementation or acceptance obligation.
+Current Acceptance 1 covers inventory, 2 source accuracy, 3 existing-mode
+compatibility, and 4 safe discovery. Original failed and passing checkpoint
+records keep their original Acceptance numbering and are evidence of their
+named observations, not proof of new JSON or final release completion.
