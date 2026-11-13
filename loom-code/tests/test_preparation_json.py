@@ -1,5 +1,6 @@
 """Public-entry checks for optional preparation JSON and legacy parity."""
 # concern: JSON result contamination, selector ambiguity and exception notice loss.
+# concern: Read-only JSON must reject malformed operands before domain reads and clear partial data on failure.
 from __future__ import annotations
 
 import io
