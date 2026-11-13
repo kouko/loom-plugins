@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-13-cli-result-contract",
-  "content_digest": "43a4dd189fae2330c996a23bd4c655144596a489",
+  "content_digest": "3541b65b14018c85e13fd2f0db874fe5bb0ff571",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,52 +22,59 @@
     {
       "verdict": "PASS",
       "lens": "code",
-      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
-      "review_target_sha": "2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90",
+      "reviewed_sha": "7c137958db0f78af4d50b99e43d96e17225c8cce",
+      "review_target_sha": "212b999753de52eb4052af867c270c4664744ca3",
       "dimension_scores": {
-        "security": "PASS — Prior conclusion retained; the bounded Round-3 delta adds no executable, hook, authorization or external-call change.",
-        "architecture": "PASS — Prior conclusion retained; no production module or dependency boundary changed.",
-        "correctness": "PASS — The two task Risk corrections match their respective Files/Test/purpose. Existing intent-version functions independently retain canonical confirmation 2f29db8ab63a49c5b69decf2973d201112e63f59, identity 66583a51db46b4517f692cab4dcf61318fc19b21 and an empty check_intent_version failure list at this target.",
-        "naming": "PASS — Prior conclusion retained; corrected task guidance uses its actual verification/provenance responsibilities, and no production identifiers changed.",
-        "tests": "PASS — No test or production executable changed in this fix delta; the independently run 92 Round-1 cases remain applicable. Fresh acceptance records actual setup, plan/intake and 32 help calls separately from carried-over source/consumer tests and supplied Build execution.",
-        "refactoring": "PASS — The fix replaces only the two incorrect Risk lines and appends their evidence; no unrelated refactor was introduced.",
-        "cross-task-coherence": "PASS — Previous important finding fixed: plan.md:40 now specifies adversarial/full-suite verification, failure preservation and no live writers/paid calls; plan.md:50 now specifies existing-consent canonical provenance, equivalent identity, references/ancestry and preserved history. Both match their own task blocks.",
-        "external-surface-grounding": "PASS — Prior conclusion retained; no external integration or call shape changed.",
-        "principles-conformance": "PASS — Existing-consent and unchanged-scope boundaries remain intact; the actual prior refusal and important documentation finding remain disclosed rather than dismissed or overwritten.",
-        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists; unchanged from prior rounds.",
-        "deliberate-simplification": "PASS — The fix uses two task-specific lines without introducing another checker, exception or instruction mechanism.",
-        "deletion-first": "PASS — The two copied instructions were replaced in place; no new runtime abstraction, flag, configuration or extension point was added."
+        "security": "PASS — Exact two-argument discovery returns before handlers, stdin, subprocesses or artifact access; ordinary authorization and writer handlers are unchanged. Native-hook, repair and partial-write limitations are disclosed without granting permission.",
+        "architecture": "PASS — Reuses the existing COMMAND_HELP dispatcher boundary and COMMANDS inventory; adds no handler parser, registry, dependency or execution mechanism.",
+        "correctness": "PASS — Reconciled all sixteen pages and the overview with their command handlers and applicable rule/result implementations. Existing preparation/delivery selectors and six failure hints retain their boundaries. Reviewed retained RED and correction evidence; changed test files passed independently.",
+        "naming": "PASS — Existing command and helper names remain precise; no new function or abstraction obscures responsibilities. Command-specific caveats distinguish advisory process success from operational completion.",
+        "tests": "PASS — Independently ran all three changed test files: 92 passed, zero skipped. Existing public-entry discovery/content tests are extended for the ten previously uncovered commands and corrected operational caveats. Expanded main-entry tripwires add filesystem/socket/stdin/subprocess and nonexact-dispatch protection. The single new launcher-entry test adds distinct all-command prepared-cache integration and missing-runtime discovery coverage; it does not replace the seam it verifies. Existing runtime cases retain script, repair, isolation and concurrency protection. Release-pin update reuses existing parity/history tests; no new release harness.",
+        "refactoring": "PASS — Keeps the existing small dispatcher and command-specific text mapping; the explicit original hint population is necessary to preserve non-help stderr compatibility as help coverage expands. No speculative extraction or duplicated implementation was introduced.",
+        "cross-task-coherence": "PASS — Confirmed help-only intent, requirements, task entries, implementation and release packet agree. Integrated 3.75.0 preserves main's 3.74.0/3.73.0/3.72.1 history and unrelated upstream behavior; no deferred JSON capability is shipped.",
+        "external-surface-grounding": "PASS — The runtime delta adds text rather than external calls or flags passed to tools. Help descriptions were checked against owned existing handlers and their Git/gh grounding comments; no new ungrounded external invocation exists.",
+        "principles-conformance": "PASS — Preserves ratified principles' authorization, data/worktree preservation and separation of claimed verification from evidence. Help executes no new mutation and explicitly describes existing destructive modes, bypass limits and partial completion. Prior review history and failed evidence remain retained.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the reviewed checkout.",
+        "deliberate-simplification": "PASS — Exact-only help and ready-runtime scope are explicit ceilings with supported recovery through exact invocation or conscious runtime repair. No unexplained deferred mechanism or shortcut was added.",
+        "deletion-first": "PASS — Adds only explicitly requested missing help pages and necessary operational corrections within the existing mapping. Tests extend existing entry coverage except the distinct launcher integration case; no forwarding module, extension point, flag or framework offers a smaller equivalent deletion."
       },
       "findings": [],
       "notes": [
-        "Same reviewer help_release_code_review, terminal Round 3 of the existing episode. The single Round-2 finding is fixed at both plan.md:40 and :50 by 4e6e2d4dac8e904c527e15e425c8ea337a4769b7; no unresolved findings remain. Prior YAML reports are preserved.",
-        "Verified source/tests/hooks/contract bytes are unchanged in e244a5f..2c751bca. Existing functional_content_digest independently returns 43a4dd189fae2330c996a23bd4c655144596a489 for both acceptance-tested 4e6e2d4 and target 2c751bca; only acceptance/build evidence follows the tested fix.",
-        "Reviewed only the supplied fix delta and prior finding. No full suite, adversarial program, new probe, paid outside CLI, live writer or repository edit was performed. Supplied Round-3 adversarial output was read for the confirmation below."
+        "Focused command: /Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_loom_python_runtime.py loom-code/tests/test_write_plan_station_text.py -q -rs; result: 92 passed in 17.78s. Initial uv attempts failed on cache permission and unavailable DNS; no package installation occurred.",
+        "Full help/runtime source and corresponding test files are byte-identical to published 4854ad23c; reviewed the cumulative main-base delta independently and retained the earlier review rounds as history. This verdict does not reset their accounting or replace their findings.",
+        "Did not run the complete suite, adversarial programs, remote writers or outside CLI review. Supplied full-suite/adversarial logs are contextual evidence; this verdict contains no new probe confirmation or claim of a live mutation."
       ],
-      "reviewer": "help_release_code_review",
+      "reviewer": "help_integrated_code_review",
       "vendor": "openai",
       "model": "inherited-unobserved"
     },
     {
       "verdict": "PASS_WITH_NOTES",
       "lens": "docs",
-      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
-      "review_target_sha": "2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90",
+      "reviewed_sha": "7c137958db0f78af4d50b99e43d96e17225c8cce",
+      "review_target_sha": "212b999753de52eb4052af867c270c4664744ca3",
       "dimension_scores": {
-        "omission": "PASS — Both corrected task blocks retain their Files and Test inputs, and the revised Risk lines now supply the applicable verification and provenance constraints.",
-        "ambiguity": "PASS — The correction and current acceptance distinguish unchanged scope, carried checks, new observations and pending finalization without inventing consent or success.",
-        "inconsistency": "PASS — The prior important finding is fixed: plan line 40 now directs bounded adversarial/full-suite verification and line 50 directs canonical-confirmation and equivalent-identity verification. Both agree with their own task blocks.",
-        "incorrect-fact": "PASS_WITH_NOTES — The bounded fix and evidence agree with the actual diff and the unchanged source facts reviewed earlier. The inherited limitation remains that unchanged external historical research citations were not independently reopened upstream; this is not a new finding.",
-        "missing-population": "PASS — The new acceptance section explicitly enumerates sixteen commands and thirty-two exact forms, names carried checks and distinguishes supplied Build totals with six skips from its own execution.",
-        "deletion-first": "PASS — The fix replaces exactly two incorrect Risk lines and appends disposition evidence, introducing no runtime mechanism or unrelated change."
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES — Current local claims were checked against the help, handlers, release files and supplied execution records. Historical external research attribution was not independently re-fetched in this integration review.",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "Round-2 important inconsistency at plan.md:40 and :50: fixed. Read both full task blocks and e244a5f34e6f8fc3297828901cad018b3bc4c9b0..2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90; no new defect caused by the fix was identified. Historical findings and failed evidence remain preserved.",
-        "Read the dated 4e6e2d4 acceptance rerun and Round-3 Build/provenance updates. After tested commit 4e6e2d4dac8e904c527e15e425c8ea337a4769b7, the target changes only acceptance/build evidence. No full suite, adversarial program, paid CLI or live writer was run by this reviewer.",
-        "Same reviewer help_release_docs_review, terminal Round 3; family openai, inherited model unobservable. No unresolved finding remains; prior focused 92-test verification and unchanged source boundaries carry forward."
+        "Reviewed the cumulative help-only delivery against the confirmed four Acceptance lines, current spec/plan, sixteen help pages, corresponding command sources, README discovery boundaries and historical checkpoint/acceptance records. Exact help, ordinary invocation, ready-runtime startup, repair and authority are distinguished. No new runtime skill/agent prose or development-record citation was introduced. Local Markdown links in the changed prose resolve.",
+        "Recomputed the supplied current package log: 4,276 passed across 15 pytest sessions, with no skipped summary; the shell/Mermaid completion records and supplied 39-case adversarial output agree with the current Build evidence. Older 4,269/6 records identify their historical revisions. The current acceptance report identifies its clean-copy revision and explicitly labels semantic source-readback carry-over, focused compatibility execution and pending formal finalization. Neither this review nor those records establish remote CI or live-writer behavior.",
+        "The four code manifests agree on 3.75.0; upstream 3.74.0/3.73.0/3.72.1 changelog history and workflow 5.22.0 remain present. The original three review rounds and failures remain historical evidence; continued work is expressly recorded as the parent's interpretation of the user's post-disclosure continuation, without inventing a literal waiver or resetting the counter. No full suite, adversarial program, live mutation or paid external review was executed by this reviewer. The prior attestation is historical pending replacement."
       ],
-      "reviewer": "help_release_docs_review",
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_loom_checker_cli.py",
+          "reviewed_sha": "212b999753de52eb4052af867c270c4664744ca3",
+          "quote": "loom-code/tests/test_loom_checker_cli.py ............................... [ 79%]"
+        }
+      ],
+      "reviewer": "help_integrated_docs_review",
       "vendor": "openai",
       "model": "inherited-unobserved"
     }
@@ -75,8 +82,8 @@
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "66583a51db46",
-  "tested_commit": "4e6e2d4dac8e904c527e15e425c8ea337a4769b7",
-  "reviewed_commit": "2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90",
+  "tested_commit": "0efb5f2e651746509fc5a592f9276e37fc8cdb68",
+  "reviewed_commit": "212b999753de52eb4052af867c270c4664744ca3",
   "acceptance_status": [
     {
       "acceptance": 1,
