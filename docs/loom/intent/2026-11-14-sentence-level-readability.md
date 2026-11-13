@@ -3,7 +3,7 @@ originator: kouko
 kind: engineering
 needs-design: no — 僅在既有的寫作說明與每則訊息的提醒文字內增補規則文字，未新增介面或工作流程。
 evidence: [https://arxiv.org/abs/2610.29162]
-status: confirmed 2026-11-14 — 2026-11-14 使用者將範圍由白話指引擴大為三個外掛
+status: confirmed 2026-11-14
 publication: automatic — authorized 2026-11-14 by kouko
 intent_confirmed_sha: 9e855dea9d098933390e5a0c047f2fcc5eb0fe23
 
