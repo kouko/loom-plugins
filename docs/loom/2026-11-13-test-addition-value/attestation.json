@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-13-test-addition-value",
-  "content_digest": "f9acee2b725796c70a11e793fec912a9c61b3bd8",
+  "content_digest": "9fd7c3af64101866acf9cdd5d3a8b9df5af18cab",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,8 +22,8 @@
     {
       "verdict": "PASS",
       "lens": "skill",
-      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
-      "review_target_sha": "8515001c8f00bb4aa3be6e7fd0582020abce4b05",
+      "reviewed_sha": "3f369c8d2c86ecf17328435b5602f99b4c1366dd",
+      "review_target_sha": "9567992d0ce1ab7ed00db620a84a62f20c9b7025",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -35,9 +35,9 @@
       },
       "findings": [],
       "notes": [
-        "Terminal Round 3 of the same episode. Round 1 implementer DONE finding remains fixed; the Round 3 delta changes no guidance, executable code or test. No regression introduced by the confirmation-history repair was found.",
-        "Read the complete fix delta, current acceptance report/evidence, actual intent-version checker and canonical confirmation commit. Independently verified byte-identical Acceptance sections, the recomputed current intent pin and canonical/current intent equality. The plan references that confirmation; no new authorization, review reset or spending reset is inferred.",
-        "Historical executions and limitations remain identified, with explicit carryover reasons for all four acceptance rows. No package suite, adversarial program or external model call was run by this reviewer; no finalization success is inferred."
+        "User-authorized single additional Round 4 in the same episode; prior three digests and exhausted CLI allocation remain counted. The prior DONE inconsistency remains fixed. All three feature guidance files are unchanged from the previously reviewed target.",
+        "Reviewed integration delta and cumulative delta against current main, updated plan and acceptance evidence. Current main is an ancestor; upstream external-review controls and workflow 5.22.0 remain intact. The 3.74.0 release preserves upstream 3.73.0 history. Manifest synchronization passed; the changed version-test file independently passed all 43 tests.",
+        "No integration regression found: outside authorization reuse grants no retry or verdict reuse and does not weaken test-value, boundary or probe-retention guidance. Acceptance carryovers retain their scope and historical evidence; the canceled suite is explicitly not counted as passing. No full suite, adversarial program or external call was run by this reviewer."
       ],
       "reviewer": "/root/closing_test_value_skill",
       "vendor": "openai",
@@ -46,8 +46,8 @@
     {
       "verdict": "PASS",
       "lens": "code",
-      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
-      "review_target_sha": "8515001c8f00bb4aa3be6e7fd0582020abce4b05",
+      "reviewed_sha": "3f369c8d2c86ecf17328435b5602f99b4c1366dd",
+      "review_target_sha": "9567992d0ce1ab7ed00db620a84a62f20c9b7025",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
@@ -64,9 +64,9 @@
       },
       "findings": [],
       "notes": [
-        "Terminal Round 3 reviewed only 34fabd063bdf1eb04251147f86a3ba91def0347d..8515001c8f00bb4aa3be6e7fd0582020abce4b05 and resulting regressions. This reviewer's prior findings list was empty. Read the canonical confirmation commit and existing intent-version rule; independently verified Acceptance byte equality and the recomputed confirmation pin.",
-        "No loom-code guidance, executable code or tests changed since Round 2. The changed test file passed independently in Round 1: 43 passed, no skips. No complete package suite, adversarial program or external model CLI was run by this reviewer.",
-        "The repaired confirmation records previously granted continuation and conditional merge authorization while preserving all four Acceptance conditions, the review episode and spent allocation. Updated acceptance evidence explicitly carries results over and preserves historical execution identities; it does not assert a fresh actor run or finalization success."
+        "User-authorized additional Round 4 examined accepted-head integration changes and cumulative coherence against current main. Prior three digests and the spent 65-attempt allocation remain counted. Feature guidance is byte-identical to Round 3; integration preserves upstream external-review authorization requirements, owner validation, refusal handling and mandatory probe retention.",
+        "Independently executed test_write_plan_station_text.py: 43 passed, no skips; upstream review-convergence and independent-advisor README checks: 30 passed, no skips. Diff whitespace checks passed. No complete package suite, adversarial program or external model CLI was run by this reviewer.",
+        "The 3.74.0 release packet is consistent and retains upstream 3.73.0 history and workflow 5.22.0. Acceptance evidence explicitly carries bounded prior actor results forward with upstream-interaction reasons; it credits neither the canceled package run nor fresh actor or installed-host success."
       ],
       "reviewer": "/root/closing_test_value_code",
       "vendor": "openai",
@@ -76,8 +76,8 @@
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "7619afaa087574d41f2cffe92e5084c421819852",
-  "tested_commit": "a85b8775ee63cd874a3a61e92b1975027f917977",
-  "reviewed_commit": "8515001c8f00bb4aa3be6e7fd0582020abce4b05",
+  "tested_commit": "7b3945b58709f89e50abe3d99d9ee49d937ce029",
+  "reviewed_commit": "9567992d0ce1ab7ed00db620a84a62f20c9b7025",
   "acceptance_status": [
     {
       "acceptance": 1,
