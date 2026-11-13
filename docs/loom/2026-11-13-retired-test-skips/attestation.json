@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-13-retired-test-skips",
-  "content_digest": "f39f462c1b81536213c4d8c76cd55299aaf012b7",
+  "content_digest": "8705831c9255b2ba3b0f84d55cb2310831cc3a4e",
   "executions": [
     {
       "kind": "package-tests",
@@ -23,28 +23,35 @@
       "verdict": "PASS",
       "lens": "code",
       "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
-      "review_target_sha": "e270b585b1ccc1a5eac8facfbe472e1a5cea4907",
+      "review_target_sha": "814a15fb43340caa079f6b1e8a49fb2ec48fdf8a",
       "dimension_scores": {
-        "security": "PASS — Only test maintenance and release metadata change; subprocess arguments are explicit arrays and temporary fixtures contain no external data.",
-        "architecture": "PASS — Continuing assertions remain with existing release, collection and migration owners; runtime module boundaries are unchanged.",
-        "correctness": "PASS — Six expired preconditions are retired with explicit coverage ownership; fixture output is compared with independent input metadata, body bytes, charter and captured introducing SHA.",
-        "naming": "PASS — Existing test names and local fixture names describe their assertions; removed historical helpers have no remaining callers.",
-        "tests": "PASS — Independently ran all four remaining changed test modules in three isolated plugin invocations: 59, 3 and 17 passed, zero skipped. Read retained RED and copied-production mutation evidence; the strengthened oracle does not call transformation helpers for its expectations.",
-        "refactoring": "PASS — Removes obsolete tests and orphaned historical helpers without new abstractions or unrelated cleanup.",
-        "cross-task-coherence": "PASS — Test maintenance, disposition and coherent 3.72.1 release packet agree; all formerly active migration cases and no-write guards remain.",
-        "external-surface-grounding": "PASS — No new external API or dependency surface; Git fixture operations use the existing repository fixture conventions and unchanged supported CLI syntax.",
-        "principles-conformance": "PASS — No new mechanism or user-data operation; historical proof limits are explicit and independent review, acceptance and adversarial evidence remain distinct.",
-        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md is present.",
-        "deliberate-simplification": "PASS — The small temporary corpus explicitly replaces supported transformation checks, without claiming to replay the retired historical 293-file corpus.",
-        "deletion-first": "PASS — Deletes obsolete proof and helpers, extends an existing public-entry fixture and current-release guard, and adds no harness or exception list."
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "Reviewed the full changed test modules, deleted originals through git show, unchanged production migration entry and helpers, ground truth, disposition and verification records; working tree remained clean after tests.",
-        "Negative-case review checked description/type/body/origin/provenance/charter sensitivity, heading ownership and collision rejection. The later unrelated fixture commit independently distinguishes introducing SHA from latest SHA. No probe or complete package suite was run by this reviewer.",
-        "Native reviewer family: openai; exact inherited model and effort are not observable."
+        "Independently ran every surviving changed test module in its own plugin configuration: root environment module 5 passed; code dependency, coldread and release modules 61 passed; design collection module 3 passed; migration module 17 passed. Total 86 passed, zero skipped. Initial sandbox cache-lock errors occurred before collection; approved existing-cache access succeeded. Repository status remained clean.",
+        "Read confirmed AC1–6, retained plan, dispositions, complete changed functions and workflow setup. Verified the live official Linux amd64 agy manifest exactly matches the pinned 1.5.8 URL and SHA512; inspected official installer extraction member antigravity and published uv 0.13.1 Python 3.11 support. Release guards validate synchronized 3.72.1 metadata and retained 1.5.1 changelog coverage.",
+        "Linux GitHub readiness and credential-free Linux agy execution remain explicitly pending publication; these are required subsequent runtime observations, not claimed passing results here. Full package suite and adversarial programs were not rerun in this reviewer role; handed Build evidence was read. Exact inherited model identity is not observable and is not asserted."
       ],
-      "reviewer": "retired_skips_code_review",
+      "probe_confirmations": [
+        {
+          "artifact": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+          "reviewed_sha": "814a15fb43340caa079f6b1e8a49fb2ec48fdf8a",
+          "quote": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py ........... [ 64%]\n......                                                                   [100%]\n============================== 17 passed in 1.19s ==============================\n"
+        }
+      ],
+      "reviewer": "ci_environment_code_review",
       "vendor": "openai",
       "model": "inherited-unobserved"
     },
@@ -52,31 +59,38 @@
       "verdict": "PASS",
       "lens": "docs",
       "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
-      "review_target_sha": "e270b585b1ccc1a5eac8facfbe472e1a5cea4907",
+      "review_target_sha": "814a15fb43340caa079f6b1e8a49fb2ec48fdf8a",
       "dimension_scores": {
-        "omission": "PASS — All four confirmed acceptance obligations have dispositions, continuing coverage owners and recorded verification; no spec is required for the confirmed internal-test-only scope.",
-        "ambiguity": "PASS — The records distinguish retired historical proofs from executed current checks, temporary-fixture fidelity from historical corpus replay, and Build observations from pending finalization.",
-        "inconsistency": "PASS — The baseline observations, implementation disposition, release packet and independent acceptance evidence reconcile with the actual delta; runtime behavior and archives remain unchanged.",
-        "incorrect-fact": "PASS — Checked the six removed conditions and their current owners against source, release versions against all changed manifests/readme pins, confirmation commit against canonical intent, and reported execution totals against supplied raw output.",
-        "missing-population": "PASS — Counts identify their populations: six retired cases, seventeen retained migration cases, seventy-nine fresh-copy targeted passes, eight adversarial attack points, and 4268 passes across fifteen pytest invocations plus shell/Mermaid groups.",
-        "deletion-first": "PASS — Deletes obsolete historical tests/helpers and strengthens an existing public-entry fixture; adds no runtime mechanism, guard exception or new test harness."
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "Read ground truth before the delta. No repository changes, new probes, paid review, live writes, full-suite rerun or adversarial-program execution were performed by this reviewer.",
-        "Raw package output independently sums to 4268 passes with no skipped summary; the historical 293-file migration is explicitly retired rather than claimed passed. Fresh-clone acceptance records 59 + 3 + 17 targeted passes and a rejected production description mutation.",
-        "The supplied adversarial rerun output is for the reused ordinary repository test module; the functional tree is unchanged between its recorded candidate and the review target (only evidence/report markdown follows)."
+        "Historical AC1-4 results are revision-scoped; cumulative acceptance records 87 focused passes and inspected 4273 full-suite passes across 15 pytest sessions plus shell/Mermaid results. Retired proofs are not counted as passes.",
+        "AC5/6 correctly remain partly pending actual GitHub Linux installation, readiness, scheduler outcomes and skip inventory. Local controlled shell failures and agy 1.3.3 validation do not claim Linux agy 1.5.8 success. The old attestation is historical and awaits replacement.",
+        "Verified release 3.72.1 consistency, retained proof ownership and reconfirmed extension; official live agy manifest matches the versioned URL/SHA512, publisher uv metadata supports Python 3.11, and installer snapshot/plugin documentation support the installation layout and shell validation claims. No suite or adversarial program was rerun; native reviewer model/profile was inherited and not independently observed."
       ],
-      "reviewer": "retired_skips_docs_review",
+      "probe_confirmations": [
+        {
+          "artifact": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+          "reviewed_sha": "814a15fb43340caa079f6b1e8a49fb2ec48fdf8a",
+          "quote": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py ........... [ 64%]\n......                                                                   [100%]\n\n============================== 17 passed in 1.19s ==============================\n"
+        }
+      ],
+      "reviewer": "ci_environment_docs_review",
       "vendor": "openai",
       "model": "inherited-unobserved"
     }
   ],
   "findings": [],
   "selection": null,
-  "intent_confirmed_sha": "2a30271e94a7dabd61c00db549a97fe577c1e001",
-  "tested_commit": "fca52f217",
-  "reviewed_commit": "e270b585b1ccc1a5eac8facfbe472e1a5cea4907",
+  "intent_confirmed_sha": "1318ed54c5fc612cf860ce91026aa4941acf7788",
+  "tested_commit": "daf2adf33",
+  "reviewed_commit": "814a15fb43340caa079f6b1e8a49fb2ec48fdf8a",
   "acceptance_status": [
     {
       "acceptance": 1,
@@ -93,6 +107,14 @@
     {
       "acceptance": 4,
       "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "partly"
+    },
+    {
+      "acceptance": 6,
+      "status": "partly"
     }
   ]
 }
