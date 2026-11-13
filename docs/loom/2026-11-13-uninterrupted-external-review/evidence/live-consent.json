@@ -1,0 +1,22 @@
+{
+  "approved": true,
+  "authorization_source": {
+    "kind": "accepted-selection",
+    "selection": "claude",
+    "target": "2026-11-13-uninterrupted-external-review scoped skill contract and tests",
+    "user_reply": "確認",
+    "accepted_proposal": "One live Claude Code review of this repair code/tests to Anthropic, no histories, secrets or unrelated documents; cost unknown."
+  },
+  "executor": "claude",
+  "review_root": "/private/tmp/loom-uninterrupted-review-cxqq_wnu",
+  "model": "sonnet",
+  "effort": "medium",
+  "family": "anthropic",
+  "disclosures": {
+    "cost": true,
+    "vendor_egress": true,
+    "local_execution": true,
+    "filesystem_access_outside_root": true,
+    "filesystem_write_not_guaranteed": true
+  }
+}

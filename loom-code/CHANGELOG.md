@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.73.0] — 2026-11-13 — continue explicitly authorized external reviews
+
+- Continue a clear named external-review request in the same active turn after nonblocking disclosure, using its existing bounded authorization through execution and owner validation.
+- Keep user authorization separate from host execution approval. Carry the original request, review target, receiving vendor and minimized packet scope into any required host request; report refusal as incomplete without bypass, and a required second user answer as failed uninterrupted execution.
+- Preserve cancellation, scope, model-selection and fresh-authorization retry requirements; local contract checks do not establish host acceptance for future requests.
+
 ## [3.72.0] — 2026-11-13 — pilot optional JSON preparation results
 
 - Add an optional final `--json` selector to `plan` and `intake`, with a versioned result object for passed checks, ordered rule blockers, notices and usage/internal errors. Rule diagnostics are serialized directly rather than recovered from human output.

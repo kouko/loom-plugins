@@ -4,6 +4,13 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.22.0] — 2026-11-13 — continue named outside reviews after disclosure
+
+- Continue an explicit named independent review in the same active turn after disclosure, keeping its existing authorization, owning review criteria and result validation.
+- Distinguish the consent record from host execution approval and carry the original request, target, receiving vendor and minimized packet scope into any required host request. Report a refusal as incomplete without bypass; a required second user answer fails uninterrupted execution.
+- Keep cancellation, ambiguous targets, material scope expansion and retry boundaries intact; add bounded continuation, cancellation and host-refusal prompt cases without changing skill triggering.
+- For explicit artifact reviews without an owning skill, derive the audit packet from the real request and inspected target; mark unavailable rejected-options history factually and disclose it without blocking on optional design history. Keep open-ended consultation completeness requirements.
+
 ## [5.21.0] — 2026-11-11 — count known retrospective projects
 
 - Preserve invocation directories and resolve current Git common directories so sessions, subdirectories and linked worktrees in one repository count as one project; independent repositories stay distinct.

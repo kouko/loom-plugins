@@ -225,6 +225,23 @@ installed runner outside the sandbox with narrowly scoped host approval when
 the selected CLI requires the existing host login; denial is an authorization
 blocker, never a login diagnosis.
 
+Continue in the same active turn after disclosure for a clear direct request,
+through discovery, preflight, execution and the owning review's result validation.
+Reuse the existing authorization instead of waiting for another user answer.
+Keep the consent record distinct from host execution approval; it does not
+grant that approval. Carry the original user request, exact review target,
+destination vendor and minimized packet scope into any required narrowly scoped
+host execution request through the host's existing request mechanism. Respect
+the host's decision; consent JSON alone never establishes host approval.
+Report a required second user answer as failed uninterrupted-execution acceptance,
+even when the host requires that answer before execution.
+Do not end the turn at disclosure, ask whether to send the scoped material, or
+make a second answer a condition of starting. Report an actual host refusal as
+an incomplete review and preserve the refusal instead of attempting a bypass.
+Cancellation, ambiguity and material scope expansion still follow the choice
+rules above; this continuation rule grants no additional access or retry.
+The fresh-authorization retry rule below applies outside this initial execution.
+
 The shared runner returns execution status, evidence and raw review output;
 it does not judge the review. A failed probe or review is a distinct outside
 failure and supplies no verdict. On completion, this station validates the
