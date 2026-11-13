@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.72.1] — 2026-11-13 — retire obsolete historical test preconditions
+
+- Retire six obsolete historical test preconditions while preserving the historical changelog heading and existing release, collection, collision and migration failure guards.
+- Strengthen deterministic temporary-Git migration fixtures to verify exact lesson inventory, metadata, body bytes, provenance, complete charter preservation and regenerated index validity.
+- Keep production behavior and archived historical evidence unchanged.
+
 ## [3.72.0] — 2026-11-13 — pilot optional JSON preparation results
 
 - Add an optional final `--json` selector to `plan` and `intake`, with a versioned result object for passed checks, ordered rule blockers, notices and usage/internal errors. Rule diagnostics are serialized directly rather than recovered from human output.

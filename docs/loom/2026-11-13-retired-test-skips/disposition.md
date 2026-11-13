@@ -17,9 +17,9 @@ The temporary Git fixture must not query the enclosing worktree's trunk or histo
 
 Implementation source readback found that the existing graduated-copy guard compares the old changelog probe byte-for-byte with its archived source. Agent-decided: move the still-valid heading assertion to its current-release owner and retire the live historical copy, rather than add a named exception to that guard. Keep the archive and the remaining comparison logic unchanged; only update its population wording where needed. This preserves proof ownership without introducing an allowlist. W1-01 includes the current-release test file for this assertion; W2-02 later changes only its release pin.
 
-## Verification to append during Build
+## Verification evidence ownership
 
-Retain the original skip observations already captured by the parent task. Append actual focused `pytest -rs` output for the four affected test modules plus current release guard; run plugin suites separately to respect their pytest configurations. Append the configured full package-suite result and enough pytest `-rs` evidence to identify every remaining skip. Explicitly distinguish passed, failed and skipped outcomes, and retain any failed attempts. The complete package runner remains the final inventory; focused results alone cannot establish Acceptance 4.
+The focused observations below retain the original skips and actual `pytest -rs` outcomes, with plugin configurations run separately. Subsequent complete package-suite, independent adversarial and acceptance observations belong in `evidence/build-verification.md`, not appended to this functional disposition after verification. Those records must identify every remaining skip, distinguish passed, failed and skipped outcomes, and retain failed attempts. The complete package runner remains the final inventory; focused results alone cannot establish Acceptance 4.
 
 ## W1-01 implementation and focused verification
 
@@ -78,6 +78,21 @@ the test oracle. Each was restored with `apply_patch` before the next mutation:
 
 These are implementer sensitivity checks, not the mandatory independent Build
 adversarial pass or independent acceptance testing. Full-suite acceptance remains
-pending Wave 2 and end-of-Build verification; these focused runs do not establish
-Acceptance 4 by themselves. Historical 293-file migration execution is not
+pending end-of-Build verification in `evidence/build-verification.md`; these
+focused runs do not establish Acceptance 4 by themselves. Historical 293-file migration execution is not
 reclaimed as a current passing result.
+
+
+## W2 release packet
+
+The coherent maintenance release is loom-code 3.72.1, dated 2026-11-13. The
+Claude manifest is the source; `scripts/sync_codex_manifests.py --all` derives
+its Codex, Antigravity and OpenCode mirrors. Only version strings change in
+the four README files, and only `CURRENT_VERSION` changes further in the release
+test; its historical 1.5.1 assertion remains. Loom-design and loom-workflow
+versions remain unchanged. The separate help PR/worktree is untouched.
+
+The new release pin was run before updating metadata and failed against 3.72.0,
+as expected (`/private/tmp/loom-retired-skips-release-red.txt`). Actual complete
+release-guard and manifest-sync results are retained by the parent in
+`evidence/build-verification.md` with the later Build verification observations.
