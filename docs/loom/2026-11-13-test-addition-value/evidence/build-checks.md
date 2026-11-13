@@ -119,3 +119,22 @@ The portable reused adversarial artifact also passed, 2 passed. Independent
 acceptance loaded a fresh clone of `a85b8775e`, verified all four Acceptance
 lines byte-for-byte unchanged and all three guidance hashes unchanged from
 the prior fix, and carried over the four results with explicit reasons.
+
+## User-authorized extra verification after upstream release
+
+After publication and acceptance, main advanced to
+`3f369c8d2c86ecf17328435b5602f99b4c1366dd` (PR #152), already releasing
+loom-code 3.73.0 and loom-workflow 5.22.0. A non-working-tree merge preview
+identified real README and changelog conflicts. The user explicitly accepted
+one additional verification round for integration, 3.74.0 and direct merge
+after successful checks; the plan retains this single exception and all prior
+rounds, without renewing the exhausted 65-attempt CLI allocation.
+
+The implementer resolved those two conflicts and synchronized the ten-file
+release packet to 3.74.0. Upstream 3.73.0 changelog history and workflow 5.22.0
+remain intact. All three feature guidance files are byte-identical to the
+previously reviewed version; the existing test file changes only its release
+constant. Manifest synchronization checks and 60 focused tests passed before
+and after; these checks did not detect Markdown conflict markers, so no false
+semantic RED is claimed. The actual conflicted index and markers established
+the integration problem. New integrated-content checks follow below.

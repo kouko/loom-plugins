@@ -30,9 +30,25 @@ Every dispatch carries these four sections, written out in this order:
 4. `incumbent proposal` — the current answer being challenged. The `proposer`
    leg's packet is assembled without this section; see `SKILL.md`.
 
+### Explicit artifact reviews without an owner
+
+For an explicit review of a readable, unambiguous artifact with no applicable
+owner, derive `decision statement` from the actual review request,
+`incumbent proposal` from the real target, and `evidence paths` from the inspected target.
+Keep all four sections. If rejected-options history was not supplied, write
+`unavailable: not supplied for this artifact review` in `rejected options`;
+this records missing history, not an empty history or invented options.
+Continue with one audit leg and the audit report despite unavailable optional design history.
+Disclose that limitation in the packet and report instead of holding the request
+or asking for design history alone. An unreadable or ambiguous target still
+blocks dispatch, as do missing authorization and cancellation.
+
+Open-ended consultations retain strict packet completeness under the rules
+below; this exception applies only to explicit unowned artifact reviews.
+
 ### A missing section holds the request
 
-While any of the four sections is absent, **hold the request**, and
+Outside the explicit artifact-review exception above, while any of the four sections is absent, **hold the request**, and
 **name the missing section** to the user, and dispatch nothing. Write
 **no empty placeholder** in its place, and do not infer its content from the
 surrounding material.
@@ -53,7 +69,7 @@ and dispatch the rest.
 
 ### A packet that cannot be completed
 
-When the material to complete a section does not exist, state the gap to the
+Outside the explicit artifact-review exception above, when the material to complete a section does not exist, state the gap to the
 user. The run then **ends without entering any spending path** — no probe, no
 dispatch — and **the partial packet is retained** so the user can complete it
 later rather than starting over.

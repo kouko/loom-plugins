@@ -28,6 +28,8 @@ Re-run closing review after the functional fixes changed the reviewed content.
 - Functional fixes return to Build. Review proceeds within a bounded episode and stops with a non-convergence report when that limit is reached.
 - The checker re-executes the package suite and adversarial programs during finalization. Agents never hand-edit the attestation.
 - An authorized skip of required verification is disclosed as verification absent; it is not reported as a passing review.
+- A clear request naming an outside reviewer continues in the same active turn after disclosure, through execution and verdict validation. A host refusal is reported as incomplete and is never bypassed.
+- User authorization does not grant host execution approval; any required host request carries the original request, target, receiving vendor and minimized packet scope. Requiring a second user answer fails uninterrupted execution.
 
 ## Related skills
 

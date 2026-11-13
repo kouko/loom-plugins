@@ -1,0 +1,39 @@
+{
+  "review_root": "/private/tmp/loom-uninterrupted-review-cxqq_wnu",
+  "files": [
+    {
+      "path": "change.diff",
+      "bytes": 13673
+    },
+    {
+      "path": "closing-review-external-excerpt.md",
+      "bytes": 5352
+    },
+    {
+      "path": "loom-code/skills/external-review/SKILL.md",
+      "bytes": 11366
+    },
+    {
+      "path": "loom-workflow/skills/independent-advisor/SKILL.md",
+      "bytes": 18394
+    },
+    {
+      "path": "loom-workflow/skills/independent-advisor/references/executor-detection.md",
+      "bytes": 3941
+    },
+    {
+      "path": "loom-workflow/skills/independent-advisor/test-prompts.json",
+      "bytes": 10526
+    },
+    {
+      "path": "loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py",
+      "bytes": 10658
+    },
+    {
+      "path": "review-packet.md",
+      "bytes": 827
+    }
+  ],
+  "history_included": false,
+  "privacy_scan": "all files clean; not a host-wide access guarantee"
+}

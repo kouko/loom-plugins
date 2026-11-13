@@ -36,6 +36,12 @@ run the outside leg after authorization and disclosure, and report it
 separately from the incumbent.
 This is not a formal owner verdict; do not invent an owning skill or claim its
 formal review checks ran.
+For this explicit unowned artifact review, follow the bounded packet derivation
+and unavailable-history rule in `references/dispatch-protocol.md`: retain the
+rejected-options section with its factual unavailable marker, disclose the
+limitation and continue with one audit leg. Optional design history alone does
+not require a question or hold; unreadable or ambiguous targets and incomplete
+authorization still block execution.
 
 When an owner exists, it assembles the review packet with its requirements and
 validates the returned verdict against its own format and checks. Keep the
@@ -152,6 +158,22 @@ the executor set or material scope changes, renew authorization and repeat
 cost estimation and disclosure. Never carry a previous observation or cost
 figure into the changed set.
 
+Continue in the same active turn after disclosure for a clear direct request,
+through discovery, preflight, execution and the owning review's result validation.
+Reuse the existing authorization instead of waiting for another user answer.
+Keep the consent record distinct from host execution approval; it does not
+grant that approval. Carry the original user request, exact review target,
+destination vendor and minimized packet scope into any required narrowly scoped
+host execution request through the host's existing request mechanism. Respect
+the host's decision; consent JSON alone never establishes host approval.
+Report a required second user answer as failed uninterrupted-execution acceptance,
+even when the host requires that answer before execution.
+Do not end the turn at disclosure, ask whether to send the scoped material, or
+make a second answer a condition of starting. Report an actual host refusal as
+an incomplete review and preserve the refusal instead of attempting a bypass.
+Cancellation, ambiguity and material scope expansion still follow the choice
+rules above; this continuation rule grants no additional access or retry.
+
 ### The egress disclosure
 
 For every leg, name **the vendor that receives material** (or every permitted
@@ -204,7 +226,9 @@ In `explore`, use three distinct roles:
 - `blind judge`: compares the anonymized cards without origin labels.
 
 The exact packet sections and shared-card template live in
-`references/dispatch-protocol.md`; load and follow it before dispatch. **Hold the request until every required section is present**, naming each missing section
+`references/dispatch-protocol.md`; load and follow it before dispatch, including
+its explicit unowned artifact-review exception for unavailable history.
+For open-ended consultations, **hold the request until every required section is present**, naming each missing section
 rather than filling it in. An unreadable evidence path **counts as a missing section**; never infer or silently drop it. Mark genuinely empty sections. If
 the material cannot exist, the run **ends before any spending path** and retains
 the partial packet.

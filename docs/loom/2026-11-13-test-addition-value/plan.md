@@ -33,7 +33,7 @@ charter: 1.1
 **W2-01 Synchronize the loom-code release packet** after: W1-03 acceptance: 1, 2, 3, 4
 - Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/CHANGELOG.md, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py
 - Test: A1 positive: release-parity; negative: stale-manifest. A2 positive: release-parity; negative: stale-version-pin. A3 positive: package-suite; negative: inconsistent-release. A4 positive: preserved-regressions; boundary: unique-risk-retained.
-- Risk: agent-decided — target 3.73.0 from 3.72.0; re-evaluate against trunk before implementation. Add CHANGELOG entry and rewrite CURRENT_VERSION only; preserve test_write_plan_station_text.py cases. Generate derived manifests with scripts/sync_codex_manifests.py --all; do not hand-edit generated fields.
+- Risk: agent-decided — target 3.74.0 from trunk 3.73.0 after PR #152; preserve both releases. Add CHANGELOG entry and rewrite CURRENT_VERSION only; preserve test_write_plan_station_text.py cases. Generate derived manifests with scripts/sync_codex_manifests.py --all; do not hand-edit generated fields.
 
 ## Simplicity check
 - none found
@@ -50,3 +50,4 @@ charter: 1.1
 6. agent-decided — scope is three functional prose files plus ten release files; initial estimate: zero new production functions/modules and at most 120 added English guidance words. Prefer replacing redundant wording; estimates exclude release strings and workflow evidence.
 7. agent-decided — ordinary-test consolidation suggestions identify surviving defect detection; they do not exempt mandatory probe retention or authorize broad cleanup. No claim of lower case count, shorter suite time, or installed-host improvement precedes measurement.
 8. agent-decided — same-host plan review passed; one separately authorized Claude plan review completed with an inconsistent formal verdict and incomplete release context. It does not authorize further Claude calls. Private research inventory and outside-review raw records remain local, unpublished.
+9. user-decided — on 2026-11-14, the user answered "同意" to one additional verification round for integrating newer main and releasing 3.74.0, followed directly by merge after successful verification. This is a single exception to the three-digest limit, not a new episode or reset: three prior digests remain consumed, one additional digest is authorized, and the 65-attempt model CLI allocation remains exhausted. No requirements or feature-guidance changes are authorized by this exception.

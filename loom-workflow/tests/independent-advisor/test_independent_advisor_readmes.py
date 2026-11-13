@@ -1,3 +1,4 @@
+# concern: External-review continuation must preserve packet, authorization and host-refusal boundaries.
 """Tests for loom-workflow/skills/independent-advisor tri-language READMEs — Task 8.
 
 Assertions:
@@ -166,6 +167,13 @@ def test_unowned_code_plan_or_decision_uses_advisor_audit_without_formal_verdict
     assert "not a formal owner verdict" in skill
     assert "code, plan, or decision" in dispatch
     assert "advisor's `audit` consultation report contract" in dispatch
+    assert "unavailable: not supplied for this artifact review" in dispatch
+    assert affirms(" ".join(dispatch.split()), "Continue", "one audit leg", "optional design history")
+    assert "Open-ended consultations retain strict packet completeness" in dispatch
+    assert "unreadable or ambiguous target" in dispatch
+    assert "unavailable rejected-options history" in REPORT.read_text(encoding="utf-8")
+    assert affirms("Continue with one audit leg despite optional design history.", "Continue", "one audit leg", "optional design history")
+    assert not affirms("Never Continue with one audit leg despite optional design history.", "Continue", "one audit leg", "optional design history")
 
 
 def test_coverage_disclaimer_does_not_claim_unobserved_file_access():
@@ -219,6 +227,23 @@ def test_outside_authorization_is_refreshed_at_each_external_boundary():
     for verb, literal, *extras in pins:
         assert affirms(positive, verb, literal, *extras)
         assert not affirms(negated, verb, literal, *extras)
+
+
+def test_named_review_continues_after_disclosure_and_respects_host_refusal():
+    pins = (("Continue", "in the same active turn", "after disclosure"),
+            ("Reuse", "existing authorization", "waiting for another user answer"),
+            ("Report", "host refusal", "incomplete", "bypass"),
+            ("Keep", "consent record", "distinct from host execution approval"),
+            ("Carry", "original user request", "target", "destination", "packet scope", "host execution request"),
+            ("Report", "second user answer", "failed uninterrupted-execution acceptance"))
+    for path in (SKILL, DETECTION, EXTERNAL_REVIEW, CLOSING_REVIEW):
+        prose = " ".join(path.read_text(encoding="utf-8").split())
+        for verb, *literals in pins:
+            assert affirms(prose, verb, *literals), (path, literals)
+    for verb, *literals in pins:
+        sentence = f"{verb} {' '.join(literals)}."
+        assert affirms(sentence, verb, *literals)
+        assert not affirms(f"Never {sentence}", verb, *literals)
 
 
 def test_readmes_describe_direct_request_and_nonblocking_disclosure():

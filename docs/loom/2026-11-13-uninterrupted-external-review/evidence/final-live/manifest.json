@@ -1,0 +1,13 @@
+{
+  "target": "target.py",
+  "bytes": 30835,
+  "sha256": "66490ab8c9ea6d7a496b4660d46b867a768daa6063471cbde8d5ee0c10c57487",
+  "source": "loom-code/scripts/external_review.py",
+  "source_head": "712196710c54e3c7a5dc5b7beb436403ccd63772",
+  "history_included": false,
+  "total_authorized_real_reviews": 2,
+  "prior_real_reviews_completed": 1,
+  "this_execution_limit": 1,
+  "probe_timeout_seconds": 45,
+  "review_timeout_seconds": 600
+}
