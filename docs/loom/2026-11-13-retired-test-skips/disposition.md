@@ -96,3 +96,29 @@ The new release pin was run before updating metadata and failed against 3.72.0,
 as expected (`/private/tmp/loom-retired-skips-release-red.txt`). Actual complete
 release-guard and manifest-sync results are retained by the parent in
 `evidence/build-verification.md` with the later Build verification observations.
+
+## W3 CI environment preparation
+
+The confirmed extension adds AC5/6: prepare each CI test job before testing and
+expose setup failures. The code, design and workflow Python jobs now install the
+same hash-verified package lock used locally. The code job explicitly installs
+zsh and uv, verifies Python 3.11, and installs the pinned official agy payload
+after SHA512 verification. It checks the executable version and all three local
+plugin validators before exporting the executable for the test step. The workflow
+Python job prepares Node and Mermaid dependencies in its own workspace; the
+separate Mermaid job cannot supply those dependencies across job boundaries.
+Both event filters in all three consuming workflows include the requirements
+source and lock. Existing job names and suite inventory remain unchanged.
+
+The installation steps retain native Actions failure ordering: no setup or suite
+step ignores errors or overrides the default success condition. A regression
+test executes the actual agy installation shell with a corrupt download and
+checks that checksum failure prevents extraction and PATH publication. It does
+not emulate the Actions scheduler or replace a live agy validation result.
+
+The prior AC1–4 observations remain historical evidence at their recorded
+commits. New local focused observations and honest pending Linux execution are
+recorded in `evidence/ci-environment-verification.md`; independent Build, full
+package execution, acceptance and closing review must cover the cumulative tree.
+The existing 3.72.1 release packet includes this CI maintenance extension; no
+runtime tool behavior, platform matrix or other worktree changed.
