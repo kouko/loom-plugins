@@ -1,3 +1,4 @@
+# concern: External-review continuation must preserve packet, authorization and host-refusal boundaries.
 """Tests for loom-workflow/skills/independent-advisor tri-language READMEs — Task 8.
 
 Assertions:
