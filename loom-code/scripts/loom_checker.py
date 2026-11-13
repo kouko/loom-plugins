@@ -136,7 +136,9 @@ Usage: push --hook
        push --install-git-hooks
        push --remove-git-hooks
 Only --hook reads PreToolUse JSON from stdin; invalid ordinary calls do not.
-The hook refuses direct git commit/merge/push on main/master with exit 2.
+The hook refuses direct git commit/merge/push on main/master with exit 2
+unless repository-local loom.protectMain=false explicitly allows those commands.
+This opt-out affects the host hook, not the separate native hooks below.
 Malformed/missing payload also exits 2. Publication reminders may emit a host
 JSON systemMessage on stdout and a diagnostic on stderr; reminder failures and
 unexpected top-level hook exceptions allow exit 0. It performs no publication.
@@ -165,7 +167,10 @@ the change worktree and local/remote branch. Cleanup targets a named merged
 change. Sweep computes candidates and a confirmation token; even without a
 token it fetches/prunes refs. A matching revalidated token enables deletion.
 Do not run cleanup when worktree preservation was requested.
-Exit 0 completes the requested operation (including listing); Exit 1 reports
+Exit 0 can follow successful merge/cleanup even when best-effort trunk sync
+was skipped or failed and stdout says "trunk not updated". Read the trunk
+result; preserve work before independently resolving local trunk conditions.
+Named cleanup never syncs trunk. Sweep listing also returns exit 0. Exit 1 reports
 refusal or failed stage with BLOCK stderr, Exit 2 reports usage/internal errors.
 Progress/results appear on stdout. Merge can succeed before verification or
 cleanup fails: inspect remote merge and preserved work before corrective action;

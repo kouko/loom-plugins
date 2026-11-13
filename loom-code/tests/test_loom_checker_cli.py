@@ -532,12 +532,16 @@ def test_help_explains_outcomes_and_authority(tmp_path: Path) -> None:
     finalize = run_checker("finalize-review", "--help", cwd=tmp_path).stdout
     publish = run_checker("publish", "--help", cwd=tmp_path).stdout
     delivery = run_checker("delivery", "--help", cwd=tmp_path).stdout
+    push = run_checker("push", "--help", cwd=tmp_path).stdout
+    land = run_checker("land", "--help", cwd=tmp_path).stdout
     assert "original verdict" in finalize and "clean" in finalize
     assert "stage" in finalize and "overall" in finalize
     assert "authorization" in publish and "legacy" in publish
     assert "No required checks registered" in publish
     assert "remote write" in publish and "delivery" in publish
     assert "complete: false" in delivery and "exit 1" in delivery and "exit 2" in delivery
+    assert "loom.protectMain=false" in push and "allows" in push
+    assert "trunk not updated" in land and "exit 0" in land
 
 
 def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
