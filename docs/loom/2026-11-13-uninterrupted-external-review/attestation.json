@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-13-uninterrupted-external-review",
-  "content_digest": "5000e15f7883d0202a68306e83d011c4432ec7ac",
+  "content_digest": "d9231c5c0310c42ad1dcf2ec03365a0f359ade9e",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,8 +22,8 @@
     {
       "verdict": "PASS_WITH_NOTES",
       "lens": "skill",
-      "reviewed_sha": "fbdc29af3",
-      "review_target_sha": "8a14f06c6ae4b3584976f9ce96b795718a07b1ae",
+      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
+      "review_target_sha": "eb51a9d3737b3a9c24e9521dcdb2c05868176e02",
       "dimension_scores": {
         "omission": "PASS_WITH_NOTES",
         "ambiguity": "PASS",
@@ -38,14 +38,14 @@
           "severity": "important",
           "dimension": "omission",
           "anchor": "docs/loom/2026-11-13-uninterrupted-external-review/acceptance-test-report.md:10",
-          "text": "issue (blocking): The previous final-live evidence gap is fixed for Acceptance 2-3 by the separately authorized scoped Claude execution and qualified usable caller result. The narrower Acceptance 1 gap remains: this accepted-selection test does not establish uninterrupted host approval from the natural named request alone, and other supported reviewers were not exercised.",
+          "text": "issue: The previous final-live evidence gap remains fixed for Acceptance 2-3, but the narrower Acceptance 1 gap remains unchanged through integration: the accepted-selection Claude test does not establish uninterrupted host approval from the natural named request alone, and other supported reviewers were not exercised. The user-authorized merge does not make this remaining acceptance condition pass.",
           "fix": "Retain Acceptance 1 as partly and disclose that the overall original outcome remains incompletely verified. To close this residual, obtain separately authorized independent evidence for the named-request-only host approval boundary and relevant supported-reviewer coverage, then update the acceptance report; do not reuse either consumed execution authorization or infer these guarantees from the scoped Claude result."
         }
       ],
       "notes": [
-        "Evidence-only reconciliation; no skill/code/test changes since the previous reviewed content. No new functional review round, suite run or outside call was performed. All other dimension scores carry over. One important residual yields PASS_WITH_NOTES and does not establish complete acceptance.",
-        "Independently verified final live source SHA-256 and raw review-output SHA-256, and all four preserved original observation hashes. Trajectory records one 2-second preflight, one 94-second review, zero retry/substitution and no further user answer; observed claude-sonnet-5-5, accepted medium setting rather than observed effective effort.",
-        "Original rejection remains intact. The unchanged rubric permits the reconciled source-grounded conditional-risk audit with explicit qualifications; the raw categorical environment statement establishes neither actual secret presence nor remote egress. Acceptance 2-3 now works only for the separately authorized scoped real Claude call; Acceptance 4 is carried over unchanged."
+        "Terminal integration review in the same bounded episode. Read the cumulative skill diff against current main and independently confirmed zero changes from 92ee78348 to HEAD in runtime skill contracts, external_review.py, intent, plan and final-live evidence. One important residual yields PASS_WITH_NOTES; user-authorized merge does not establish complete acceptance.",
+        "The refreshed report names clean integration commit bb8f8f486b1a6802c9ffc693b771b8ef7d7578d6 and preserves A1 partly/A2-4 works. Independent integration evidence reports 18 loader passes and unchanged reviewed target and original observation hashes. Full package/adversarial results were supplied by Build; this reviewer made no outside call or suite rerun.",
+        "Original rejection and qualified reconciliation remain intact. Runtime authorization, cancellation, host approval and refusal boundaries are unchanged. Scoped real Claude execution remains evidence for A2-3 only within its disclosed scope; no actual secret incident, observed effective effort, additional live execution or broad host-approval guarantee is asserted."
       ],
       "reviewer": "/root/closing_skill",
       "vendor": "openai",
@@ -54,14 +54,14 @@
     {
       "verdict": "PASS_WITH_NOTES",
       "lens": "code",
-      "reviewed_sha": "fbdc29af3",
-      "review_target_sha": "8a14f06c6ae4b3584976f9ce96b795718a07b1ae",
+      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
+      "review_target_sha": "eb51a9d3737b3a9c24e9521dcdb2c05868176e02",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
         "correctness": "PASS_WITH_NOTES — Final-source scoped live review and usable qualified output are established; bare-request host approval and other supported services remain unverified.",
         "naming": "PASS",
-        "tests": "PASS — Unchanged changed-test files passed 87 tests in the original review; independent acceptance now corroborates A2 and A3 for the final-source scoped live execution.",
+        "tests": "PASS — Independently reran all four changed test files after integration; 87 passed with no skips. Independent clean integration acceptance carries A2/A3 for identical final-source scoped live execution.",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
@@ -80,9 +80,9 @@
         }
       ],
       "notes": [
-        "Evidence-only confirmation: no code, skills or tests changed since the original review; reuse of that code inspection and its 87 passing changed-file tests is explicit. No new outside call, adversarial run or full-suite run performed.",
-        "Independently recomputed the target and raw review hashes and all four preserved original observation hashes; they match the committed reconciliation. Raw secret-exposure phrasing remains qualified as conditional risk, with actual secret presence and remote egress unverified.",
-        "Reconciled audit is usable under the unchanged rubric, not a formal owner verdict or endorsement of every vendor suggestion. A2/A3 work for this scoped real call, A4 carries over unchanged failure-path evidence, and A1 remains partial."
+        "Terminal integration review: inspected cumulative delta against updated main and merge resolution. Relevant runtime, skills, report contracts and failure tests are byte-identical to previously reviewed 8a14f06; incoming main CI/test changes introduce no branch delta. Release 3.73.0 preserves main 3.72.1 history and historical 1.5.1 assertion; manifest synchronization and diff checks pass.",
+        "Independently reran test_review_convergence_contract.py, test_write_plan_station_text.py, independent-advisor/test_independent_advisor_readmes.py and scripts/test_release_metadata.py: 87 passed in 0.28s, no skips. No outside call, adversarial run or full-suite run performed by this reviewer.",
+        "Clean integration acceptance at bb8f8f486 preserves original live evidence and its hashes; qualified audit remains usable under unchanged rubric. A2/A3 work for the scoped real call, A4 carries unchanged failure evidence, A1 remains partial; explicit merge acceptance does not establish universal host or cross-service behavior."
       ],
       "reviewer": "/root/closing_code",
       "vendor": "openai",
@@ -92,8 +92,8 @@
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "7f3bf253b686281a11f62553a0cd89fe859fd115",
-  "tested_commit": "8a14f06c6ae4b3584976f9ce96b795718a07b1ae",
-  "reviewed_commit": "cac5f8c589dc8b442cbc831ecb41d54ede9f73b5",
+  "tested_commit": "bb8f8f486b1a6802c9ffc693b771b8ef7d7578d6",
+  "reviewed_commit": "eb51a9d3737b3a9c24e9521dcdb2c05868176e02",
   "acceptance_status": [
     {
       "acceptance": 1,
