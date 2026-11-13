@@ -1,0 +1,101 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-12-cli-json-pilot",
+  "content_digest": "b5fce53bb1f804b23ab13f8206a149af2afddc3f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_preparation_json.py",
+      "artifact": "loom-code/tests/test_preparation_json.py",
+      "result": "pass",
+      "command_digest": "8b6f24b9d5c959db5a41163be5d02413860310444e7474fdb77a8b69abb2bc2a"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "b9ebc787dc4e3c73d1ab0257302b1516b2be3550",
+      "review_target_sha": "47b8788eb337310265e3f4ac84e7f63a961fb18c",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "N/A — No newly called external API, SDK, MCP surface, external CLI flag or sibling-team contract; added serialization uses the Python standard library.",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Read the intent, spec, plan, cumulative diff, complete changed handlers and rendering helper, affected callers, ratified principles, RED/GREEN logs, integrated Build logs and acceptance report. JSON selection remains confined to plan/intake; ordered diagnostics and notices originate directly in existing check paths.",
+        "Independently ran the changed test files plus the public CLI and dispatcher tests with the canonical locked uv environment: 91 passed in 10.03s, no skips. The initial sandbox cache-lock denial was resolved by an approved escalation; neither the full package suite nor stored probes was run.",
+        "The integrated adversarial log records 4 passed; the separate 18 temporary trials are described as held observations, not 18 committed adversarial programs. Historical comparison evidence remains identified with its actual pre-integration candidate rather than relabeled as a new run."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_preparation_json.py",
+          "reviewed_sha": "47b8788eb337310265e3f4ac84e7f63a961fb18c",
+          "quote": "loom-code/tests/test_preparation_json.py ....                            [100%]\n\n============================== 4 passed in 2.12s ==============================="
+        }
+      ],
+      "reviewer": "json_code_review",
+      "vendor": "codex",
+      "model": "inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "b9ebc787dc4e3c73d1ab0257302b1516b2be3550",
+      "review_target_sha": "47b8788eb337310265e3f4ac84e7f63a961fb18c",
+      "dimension_scores": {
+        "omission": "PASS — Intent, spec, plan, public command help, release documentation, comparison protocol and acceptance records cover all three acceptance obligations and the bounded JSON contract.",
+        "ambiguity": "PASS — Final-position selection, exact text help, duplicate selection, status scope, stream guarantees and startup/process exclusions are explicit and agree with dispatch and rendering.",
+        "inconsistency": "PASS — R1 incomplete capture, original-record recovery and supplemental R2 remain separately identified; integrated 3.72.0 preserves upstream 3.71.0 and design 2.25.0 while historical candidate 2cef4016 remains correctly labeled.",
+        "incorrect-fact": "PASS — Recomputed all 85 R1 and 98 R2 embedded stream lengths/hashes, all R2 task/native-call associations and check totals; source implementation agrees with the six-field help contract and comparison runtime bytes are unchanged.",
+        "missing-population": "PASS — Both rounds identify two operators, six tasks and 24 mode/task observations, informed carryover, prescribed corrections, separate bootstrap/reporting costs and the absence of efficiency or population claims.",
+        "deletion-first": "PASS — The optional representation is explicitly requested; public guidance documents its necessary contract, while additional comparison material preserves observed capture failures rather than introducing runtime mechanisms."
+      },
+      "findings": [],
+      "notes": [
+        "R2 independently recomputes to 31 native task calls, 20 checks and eight corrections per mode; check output is 3074 text bytes versus 4446 JSON bytes (+44.6%). Both operators retain complete separately captured bootstrap help; original R1 merged bootstrap streams remain unknown and were not backfilled.",
+        "Read cumulative changed-path inventory and ground truth; checked live launcher plan help and intake JSON usage output. Recomputed integrated supplied package log totals as 4268 passed and six skipped; supplied adversarial log records four passes. Did not rerun full package suite or adversarial program, edit repository artifacts, or dispatch externally.",
+        "Acceptance is independently recorded at 84297c3adff32f822810365e110895aea9905617 with all three outcomes works; later review/report metadata is not relabeled as another functional execution. Native-session provenance was read from the embedded inventory, not independently re-audited against original session files in this docs review."
+      ],
+      "reviewer": "json_docs_review",
+      "vendor": "codex",
+      "model": "inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "dd4c59806261556d67cdf4d750e63d0ddfc4922d",
+  "tested_commit": "84297c3adff32f822810365e110895aea9905617",
+  "reviewed_commit": "47b8788eb337310265e3f4ac84e7f63a961fb18c",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}

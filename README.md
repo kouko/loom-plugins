@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.71.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.72.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.21.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.71.0. Five stations carry one change from plan to PR with
+Version 3.72.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -263,6 +263,7 @@ preserving their existing results and exit behavior. The first rollout is bounde
 | `publish` | Flushed, newline-delimited stderr reports CI observation, registration/pending transitions, and elapsed waiting at the first polling opportunity after each 60-second interval. Terminal states distinguish passed, no required checks, and failed/unconfirmed observations. Existing polling, timeout, stdout and authorization behavior remain unchanged. |
 | `finalize-review` | Flushed stderr names each probe/package-suite stage before execution and reports its result after evidence validation. Child exit 0 alone is insufficient; a passed stage is not final attestation success. Child logs remain captured, with no heartbeat inside a subprocess. |
 | `delivery --json` and dispatch JSON | Existing machine-readable payloads are preserved; the first rollout adds no global JSON envelope. |
+| `plan <path> --json` and `intake <station> <change-id> --json` | Optional preparation-result pilot: one stdout object with schema version, command, status, ordered diagnostics, notices and usage/internal error. Default text remains unchanged; these statuses do not establish full verification or authority. |
 
 Progress is advisory: never parse it for gate decisions. It contains stage/state
 labels, not operands, credentials or raw child logs. Progress-only write failures
@@ -276,7 +277,7 @@ For command discovery and input recovery, run
 `finalize-review`, `publish`, `delivery`, `plan`, `intake` or `reviewer-count`.
 These commands also accept exact
 `<command> -h` calls. Help describes inputs, authentic evidence, authorization
-and outcomes without validation or publication; covered failures retain their
+and outcomes without validation or publication; covered text-mode failures retain their
 diagnostics and exit status and add a help hint. Hook and internal-error behavior
 are unchanged.
 

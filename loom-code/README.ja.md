@@ -12,7 +12,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.71.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.72.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -121,6 +121,13 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 このパッケージを読みません。
 
 ## checker
+
+`plan <path> --json` と `intake <station> <change-id> --json` は、準備検査の
+バージョン 1 の結果を stdout に出力します。`--json` は末尾に置き、既定の
+テキスト出力と終了コードは変わりません。成功、ルールによる拒否、使用／内部
+エラーを区別し、診断と通知の順序を保持しますが、ワークフロー全体の完了は
+意味しません。六つのフィールドと起動／プロセス失敗の制限は、各コマンドの
+正確な `--help` で確認できます。
 
 `scripts/loom_checker.py` が決定的な層です。どのルールも宣言を信じずに
 リポジトリから再計算し、ルール一覧は `--list-rules` が正です。終了コードは

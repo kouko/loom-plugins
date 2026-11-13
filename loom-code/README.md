@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.71.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.72.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -122,6 +122,13 @@ repository test keeps them equal) and declares `requires-contract`; neither
 sibling reads this package at runtime.
 
 ## The checker
+
+`plan <path> --json` and `intake <station> <change-id> --json` opt into a
+version-1 preparation result on stdout. The final selector preserves default
+text behavior and exit codes. Results distinguish passed checks, blockers and
+usage/internal errors, retain ordered diagnostics and notices, and do not
+claim whole-workflow completion. Use either command's exact `--help` for the
+six-field contract and startup/process limitations.
 
 `scripts/loom_checker.py` is the deterministic layer: every rule recomputes
 from the repository instead of trusting a claim, and `--list-rules` is the

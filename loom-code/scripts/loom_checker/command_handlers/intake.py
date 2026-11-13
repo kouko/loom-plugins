@@ -5,7 +5,7 @@ from loom_checker.helpers import artifact_path
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import read_text
 from loom_checker.helpers import repo_root
-from loom_checker.helpers import report
+from loom_checker.preparation_output import report_result
 from loom_checker.intent_state import CHANGE_ID
 from loom_checker.intent_state import INTAKE_STATIONS
 from loom_checker.parsing import parse_document
@@ -25,7 +25,7 @@ import re
 import sys
 
 
-def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
+def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr, *, result=None) -> int:
     if len(args) < 2:
         raise UsageError("intake needs a station and a change-id.")
     station, change_id = args[0], args[1]
@@ -45,7 +45,7 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     repo = repo_root(Path.cwd())
     failures = check_confirmed(manifest, repo, change_id, station)
     if failures:
-        return report(failures, err)
+        return report_result(failures, err, result)
     intent_path = artifact_path(manifest, "intent", change_id, repo)
     front, sections = parse_document(read_text(intent_path))
     skipped: set[str] = set()
@@ -72,7 +72,10 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
 
     touched: list[str] = []
     if kind == "engineering" or yes_at_write_plan:
-        touched = touched_interface_surfaces(repo, manifest, out)
+        if result is None:
+            touched = touched_interface_surfaces(repo, manifest, out)
+        else:
+            touched = touched_interface_surfaces(repo, manifest, out, notices=result["notices"])
     if kind == "engineering":
         failures += check_kind_recompute(touched)
 
@@ -98,4 +101,4 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         # Note: attestation-based checks (coverage, commit-identity, intent-version)
         # are deferred to finalize-review since attestation doesn't exist at intake time
 
-    return report(failures, err)
+    return report_result(failures, err, result)

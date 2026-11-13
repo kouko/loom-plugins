@@ -1,0 +1,115 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+___________ test_preparation_json_passes_and_preserves_real_notices ____________
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6215/test_preparation_json_passes_a0')
+
+    def test_preparation_json_passes_and_preserves_real_notices(tmp_path: Path) -> None:
+        repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+        plan = tmp_path / "plan.md"
+        plan.write_text("")
+        for args in (("plan", str(plan)), ("intake", "write-plan", "2026-09-09-example")):
+            text = run_checker(*args, cwd=repo)
+            result = run_checker(*args, "--json", cwd=repo)
+>           assert result.returncode == text.returncode == 0
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['/Users/kouko/.cache/uv/builds-v0/.tmpDxjFAK/bin/python', '/private/tmp/loom-cli-json-pilot/loo...code>/scripts/loom-python" --ready plan --help (replace <loom-code> with the installed loom-code plugin directory).\n').returncode
+E            +  and   0 = CompletedProcess(args=['/Users/kouko/.cache/uv/builds-v0/.tmpDxjFAK/bin/python', '/private/tmp/loom-cli-json-pilot/loo...z2480000gn/T/pytest-of-kouko/pytest-6215/test_preparation_json_passes_a0/plan.md'], returncode=0, stdout='', stderr='').returncode
+
+loom-code/tests/test_preparation_json.py:19: AssertionError
+_________ test_preparation_json_blockers_usage_and_selector_boundaries _________
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6215/test_preparation_json_blockers0')
+
+    def test_preparation_json_blockers_usage_and_selector_boundaries(tmp_path: Path) -> None:
+        repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+        plan = repo / "docs/loom/2026-09-09-example/plan.md"
+        plan.parent.mkdir(parents=True)
+        plan.write_text("charter: 1.1\n")
+        for args in (("plan", str(plan)), ("intake", "write-plan", "2026-09-09-example")):
+            text = run_checker(*args, cwd=repo)
+            result = run_checker(*args, "--json", cwd=repo)
+>           payload = json.loads(result.stdout)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+loom-code/tests/test_preparation_json.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x10550f4d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/json/decoder.py:363: JSONDecodeError
+____ test_preparation_json_checks_once_and_keeps_notices_on_internal_error _____
+
+tmp_path = PosixPath('/private/var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/pytest-of-kouko/pytest-6215/test_preparation_json_checks_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107068fc0>
+
+    def test_preparation_json_checks_once_and_keeps_notices_on_internal_error(tmp_path: Path, monkeypatch) -> None:
+        entry = runpy.run_path(str(CHECKER), run_name="_json_entry")
+        import loom_checker.command_handlers.intake as intake
+        repo, _ = make_intent_state_repo(tmp_path, delivered=False)
+        monkeypatch.chdir(repo)
+        calls = []
+        def crash(*args, **kwargs):
+            calls.append(1)
+            raise RuntimeError("after notice")
+        monkeypatch.setattr(intake, "check_kind_recompute", crash)
+        out, err = io.StringIO(), io.StringIO()
+        assert entry["main"](["intake", "write-spec", "2026-09-09-example", "--json"], out, err) == 2
+>       payload = json.loads(out.getvalue())
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/private/tmp/loom-cli-json-pilot/loom-code/tests/test_preparation_json.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x10550f4d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/json/decoder.py:363: JSONDecodeError
+=========================== short test summary info ============================
+FAILED loom-code/tests/test_preparation_json.py::test_preparation_json_passes_and_preserves_real_notices
+FAILED loom-code/tests/test_preparation_json.py::test_preparation_json_blockers_usage_and_selector_boundaries
+FAILED loom-code/tests/test_preparation_json.py::test_preparation_json_checks_once_and_keeps_notices_on_internal_error
+3 failed, 1 passed in 0.83s

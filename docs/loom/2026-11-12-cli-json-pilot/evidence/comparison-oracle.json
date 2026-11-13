@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "purpose": "Private preregistered scoring answers; do not give to operators before both finish.",
+  "registered_on": "2026-11-13",
+  "candidate_sha": null,
+  "candidate_binding": "Append to comparison-protocol.md after W2 and before either operator starts.",
+  "artifact_repo_sha": "c2bab0811a1ba1083e2452d84375d9c02c79bc3a",
+  "historical_main_sha": "21cdc28d0044f642c6b8409b166ed510e24d3a12",
+  "change_id": "2026-11-12-cli-guidance-consistency",
+  "source_artifacts": {
+    "intent": {
+      "path": "docs/loom/intent/2026-11-12-cli-guidance-consistency.md",
+      "sha256": "18653326aaa996d6453007ba58e39a71c489a02bf7a60efa64229c9d36807c02",
+      "bytes": 1251,
+      "original_status": "status: confirmed 2026-11-12",
+      "mutated_sha256": "2b362de4d7d37afac59fc989cdfd4528c6aff0e131cf55d63b5cd0fa425e8c18"
+    },
+    "spec": {
+      "path": "docs/loom/2026-11-12-cli-guidance-consistency/spec.md",
+      "sha256": "ca49d006fb67b4ec79d763ee81f222f455a7fb27bf56461243fd17d939c05bc6",
+      "bytes": 11285
+    },
+    "plan": {
+      "path": "docs/loom/2026-11-12-cli-guidance-consistency/plan.md",
+      "sha256": "f47f7ac1b8f707b9cc1c99077cf8adc3b075ba9b948275d7b678edc5a2cf0bd4",
+      "bytes": 4303,
+      "mutated_sha256": "c87a2f6fa138e636e6a269ef3df508b97a648457dcb650111ac8b7124570d646"
+    }
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "mutation": null,
+      "initial_status": "passed",
+      "initial_exit": 0,
+      "required_cause": "No implemented plan field-cap rule failed.",
+      "advisory_means_success": false,
+      "correction": null,
+      "final_status": "passed",
+      "final_exit": 0
+    },
+    {
+      "id": "T2",
+      "mutation": "Rename the sole plan Simplicity check heading in comparison-plan.md.",
+      "initial_status": "blocked",
+      "initial_exit": 1,
+      "required_rule_ids": [
+        "plan.field-caps"
+      ],
+      "required_cause": "The required Simplicity check record is missing.",
+      "advisory_means_success": false,
+      "correction": "Restore the original heading from the supplied genuine plan.",
+      "final_status": "passed",
+      "final_exit": 0
+    },
+    {
+      "id": "T3",
+      "mutation": null,
+      "initial_status": "error",
+      "initial_exit": 2,
+      "required_error_kind": "usage",
+      "required_cause": "The plan path operand is missing.",
+      "advisory_means_success": false,
+      "correction": "Supply the genuine canonical plan path.",
+      "final_status": "passed",
+      "final_exit": 0
+    },
+    {
+      "id": "T4",
+      "mutation": null,
+      "initial_status": "passed",
+      "initial_exit": 0,
+      "required_cause": "The implemented write-plan prerequisites pass; this is not full verification or publication authority.",
+      "notice_expected": true,
+      "advisory_means_success": false,
+      "correction": null,
+      "final_status": "passed",
+      "final_exit": 0
+    },
+    {
+      "id": "T5",
+      "mutation": "Change only the historical intent status to open.",
+      "initial_status": "blocked",
+      "initial_exit": 1,
+      "required_rule_ids": [
+        "intake.confirmed"
+      ],
+      "required_cause": "The intent is not confirmed.",
+      "notice_expected": false,
+      "advisory_means_success": false,
+      "correction": "Restore the original confirmed status line, preserving every other byte.",
+      "final_status": "passed",
+      "final_exit": 0
+    },
+    {
+      "id": "T6",
+      "mutation": "Rename the sole canonical plan Simplicity check heading.",
+      "initial_status": "blocked",
+      "initial_exit": 1,
+      "required_rule_ids": [
+        "plan.field-caps"
+      ],
+      "required_cause": "The canonical plan lacks the required Simplicity check record; the interface advisory does not override the blocker.",
+      "notice_expected": true,
+      "advisory_means_success": false,
+      "correction": "Restore the original canonical plan heading.",
+      "final_status": "passed",
+      "final_exit": 0
+    }
+  ],
+  "scoring": {
+    "initial_interpretation_error_cap_per_task": 1,
+    "final_answers_scored_separately": true,
+    "missing_answer": "incomplete",
+    "improvement_threshold": null,
+    "operator_orders": {
+      "A": [
+        "text",
+        "json"
+      ],
+      "B": [
+        "json",
+        "text"
+      ]
+    },
+    "task_order": [
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6"
+    ]
+  }
+}

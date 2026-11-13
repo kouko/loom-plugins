@@ -12,7 +12,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py --help
     loom_checker.py intent <path> [--commit-msg <file>]
     loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]
-    loom_checker.py intake <station> <change-id>
+    loom_checker.py intake <station> <change-id> [--json]
     loom_checker.py push --hook
     loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>
     loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>
@@ -28,7 +28,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py standing <path-to-intent>
     loom_checker.py contract --require <major.minor>
     loom_checker.py charter [--manifest <path>]
-    loom_checker.py plan <path-to-plan.md>
+    loom_checker.py plan <path-to-plan.md> [--json]
 
 With the launcher, the checker is selected automatically; omit loom_checker.py:
     "<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"
@@ -36,6 +36,7 @@ With the launcher, the checker is selected automatically; omit loom_checker.py:
 Replace <loom-code> with the installed plugin directory and <path-to-plan.md>
 with your plan file path.
 Plan takes a file path; intake takes a station and a change-id.
+Plan and intake accept an optional final --json selector; text remains default.
 Detailed help: finalize-review --help, publish --help, delivery --help
               plan --help, intake --help, reviewer-count --help
 (each also accepts -h). Only these exact command-plus-help forms are help.
@@ -71,15 +72,35 @@ from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
 from loom_checker.command_handlers.standing import cmd_standing
 from loom_checker.command_handlers.sync import cmd_sync_trunk
 from loom_checker.helpers import UsageError
+from loom_checker.preparation_output import new_result, error_result, write_result
 from loom_checker.rules import list_rules
 
 
 USAGE = __doc__.split("Sub-commands (the CLI contract other stations depend on):", 1)[1]
 
 
+PREPARATION_JSON_HELP = """Optional JSON: append --json as the final argument only. Exact --help/-h
+remains text; help combined with --json is checked as an ordinary invocation.
+Duplicate selectors are usage errors. Earlier --json tokens without a final
+selector retain their existing operand meaning; ./--json names a literal file.
+
+JSON stdout is one object plus newline; checker stderr is empty. Fields:
+schema_version: 1; command: plan|intake; status: passed|blocked|error;
+diagnostics: ordered [{rule_id, message}]; notices: ordered strings;
+error: null or {kind: usage|internal, message}. Empty arrays are [], not null.
+Exit 0 means passed, 1 blocked, 2 error. Blocked includes rule diagnostics;
+error has empty diagnostics. Notices may precede a blocker or internal error
+and never imply success. Status covers only this invocation's checks, not
+workflow completion or authority. Do not depend on key order or message prose.
+Launcher/startup failures, termination and broken pipes are outside this
+in-process result guarantee. Read the actual process result; do not retry
+automatically. Without --json, existing text streams and exits are unchanged.
+"""
+
+
 COMMAND_HELP = {
     "plan": """plan — check the implemented field caps on one named file
-Usage: plan <path-to-plan.md>
+Usage: plan <path-to-plan.md> [--json]
 Supply a readable file path, relative to the working directory or absolute;
 this command does not resolve a change-id or select a canonical plan.
 
@@ -88,7 +109,7 @@ key. Charter 1.1 or later also requires a valid Simplicity check record.
 A file without that key, including an empty file, may pass. Passing does not
 approve the plan, prove its requirements are complete or verify the change.
 
-Results: exit 0 has no success payload on stdout; the implemented checks on
+Text results: exit 0 has no success payload on stdout; the implemented checks on
 the named file passed. Exit 1 reports BLOCK plan.field-caps on stderr;
 correct the reported field and rerun. Exit 2 means a missing/unreadable file,
 invalid invocation or internal failure; correct the path, access or invocation
@@ -96,12 +117,12 @@ from the diagnostic. No artifact is rewritten and no later station runs.
 Planning guidance: <loom-code>/skills/write-plan/SKILL.md.
 """,
     "intake": """intake — check the selected station's current prerequisites
-Usage: intake <write-spec|write-plan> <change-id>
+Usage: intake <write-spec|write-plan> <change-id> [--json]
 Run inside the selected repository. Supply a change-id, not a file path;
 accepted identifiers contain only letters, digits, dots, underscores and
 hyphens. Canonical artifacts are resolved through the bundled contract.
 
-Results: exit 0 means the applicable prerequisites passed for this snapshot;
+Text results: exit 0 means the applicable prerequisites passed for this snapshot;
 it does not perform the station, authorize publication or verify the change.
 Conditional interface-surfaces (...) information may appear on stdout for
 engineering intents or applicable needs-design=yes write-plan intake.
@@ -290,34 +311,54 @@ COMMANDS = {
 
 
 def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
+    preparation = new_result(argv[0]) if len(argv) >= 2 and argv[0] in {"plan", "intake"} and argv[-1] == "--json" else None
+    if preparation is not None:
+        argv = argv[:-1]
     hint = ""
     if argv and argv[0] in COMMAND_HELP and not (argv[0] == "delivery" and "--hook" in argv[1:]):
         hint = (f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
                 '(replace <loom-code> with the installed loom-code plugin directory).\n')
     try:
+        if preparation is not None and "--json" in argv[1:]:
+            raise UsageError("duplicate --json selector.")
         if not argv:
             raise UsageError("no sub-command given." + USAGE)
         if argv in (["--help"], ["-h"]):
             out.write(USAGE)
             return 0
-        if len(argv) == 2 and argv[0] in COMMAND_HELP and argv[1] in {"--help", "-h"}:
-            out.write(COMMAND_HELP[argv[0]] + HELP_NOTICE)
+        if preparation is None and len(argv) == 2 and argv[0] in COMMAND_HELP and argv[1] in {"--help", "-h"}:
+            out.write(COMMAND_HELP[argv[0]])
+            if argv[0] in {"plan", "intake"}:
+                out.write(PREPARATION_JSON_HELP)
+            out.write(HELP_NOTICE)
             return 0
         if argv[0] == "--list-rules":
             return list_rules(out)
         command = COMMANDS.get(argv[0])
         if command is None:
             raise UsageError(f"unknown sub-command {argv[0]!r}." + USAGE)
+        if preparation is not None:
+            result = command(argv[1:], out, err, result=preparation)
+            write_result(preparation, out)
+            return result
         result = command(argv[1:], out, err)
         if result != 0 and hint:
             err.write(hint)
         return result
     except UsageError as exc:
+        if preparation is not None:
+            error_result(preparation, "usage", str(exc))
+            write_result(preparation, out)
+            return 2
         err.write(f"{exc}\n")
         if hint:
             err.write(hint)
         return 2
     except Exception as exc:
+        if preparation is not None:
+            error_result(preparation, "internal", f"loom_checker internal error: {type(exc).__name__}: {exc}")
+            write_result(preparation, out)
+            return 2
         if argv[:2] == ["push", "--hook"]:  # the publication hook never refuses on a crash (REQ-4)
             err.write(f"loom: publication hook failed ({type(exc).__name__}: {exc}); allowing.\n")
             return 0

@@ -359,7 +359,7 @@ def check_needs_design_reason(
 TEMPLATES_GLOB = "**/templates/**"
 
 
-def touched_interface_surfaces(repo: Path, manifest, out) -> list[str]:
+def touched_interface_surfaces(repo: Path, manifest, out, *, notices: list[str] | None = None) -> list[str]:
     """The changed paths that land on a declared interface surface, and a
     printed line saying which globs were used -- the answer to "why did it
     say that" is never a mystery. Both `intent.needs-design-recompute` and
@@ -392,10 +392,14 @@ def touched_interface_surfaces(repo: Path, manifest, out) -> list[str]:
             for pattern, matcher in matchers
         )
     )
-    out.write(
+    notice = (
         f"interface-surfaces ({source}): {', '.join(globs)} "
-        f"(non-code paths under {TEMPLATES_GLOB} excluded)\n"
+        f"(non-code paths under {TEMPLATES_GLOB} excluded)"
     )
+    if notices is None:
+        out.write(notice + "\n")
+    else:
+        notices.append(notice)
     return touched
 
 
