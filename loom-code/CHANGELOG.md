@@ -6,6 +6,13 @@
 - Keep user authorization separate from host execution approval. Carry the original request, review target, receiving vendor and minimized packet scope into any required host request; report refusal as incomplete without bypass, and a required second user answer as failed uninterrupted execution.
 - Preserve cancellation, scope, model-selection and fresh-authorization retry requirements; local contract checks do not establish host acceptance for future requests.
 
+## [3.72.1] — 2026-11-13 — retire obsolete test preconditions and prepare CI environments
+
+- Retire six obsolete historical test preconditions while preserving the historical changelog heading and existing release, collection, collision and migration failure guards.
+- Strengthen deterministic temporary-Git migration fixtures to verify exact lesson inventory, metadata, body bytes, provenance, complete charter preservation and regenerated index validity.
+- Prepare each Python CI suite from the shared hash-verified package lock, install the code suite's zsh, uv and pinned Antigravity CLI tools, and prepare Mermaid dependencies in the workflow Python job before testing. Dependency changes trigger their consuming workflows; setup failures remain fatal and `PYTEST_ADDOPTS` enables pytest skip-reason logs through the unchanged suite runner.
+- Keep production behavior and archived historical evidence unchanged.
+
 ## [3.72.0] — 2026-11-13 — pilot optional JSON preparation results
 
 - Add an optional final `--json` selector to `plan` and `intake`, with a versioned result object for passed checks, ordered rule blockers, notices and usage/internal errors. Rule diagnostics are serialized directly rather than recovered from human output.

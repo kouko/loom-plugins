@@ -1,14 +1,4 @@
-"""W0-01 — dev requirements declared once; CI installs from them.
-
-Before this task, the CI workflow's `Install test deps` step hardcoded
-its dependency list inline (`pip install pytest pyyaml`) and repo-root
-`requirements-dev.txt` did not exist. That meant a local run of the
-same suite (e.g. one that needs `pytest-xdist` for `-n auto`, added in
-W0-02) had no single declared source to install from. This test
-recomputes both halves: the requirements file actually declares
-`pytest-xdist`, and the CI workflow's install step actually installs
-from that file rather than a separate hardcoded list.
-"""
+"""Development requirements feed one hash-verified lock for CI and local runs."""
 from __future__ import annotations
 
 import re
@@ -36,7 +26,10 @@ def test_dev_requirements_declare_xdist_and_ci_installs_from_them() -> None:
         for line in workflow_text[install_step_start:].splitlines()
         if "run:" in line
     )
-    assert "-r requirements-dev.txt" in install_step_run_line
+    assert "--require-hashes -r requirements-package-tests.lock" in install_step_run_line
+    lock_text = (REPO / "requirements-package-tests.lock").read_text(encoding="utf-8")
+    assert "uv pip compile requirements-dev.txt" in lock_text
+    assert "pytest-xdist==" in lock_text
 
 
 KICKOFF_DEFAULTS = REPO / "docs" / "loom" / "KICKOFF-DEFAULTS.md"
