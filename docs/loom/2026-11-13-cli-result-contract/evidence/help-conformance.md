@@ -49,3 +49,25 @@ is authorized by these probes. Retain authentic failed results before fixes.
 
 After this checkpoint passes independently, the two-command JSON work can begin.
 This ordering is a delivery boundary, not a new checker rule or runtime gate.
+
+## W1-01 implementation evidence
+
+All sixteen dedicated pages now use the existing exact dispatcher help path.
+The six prior pages retain their substantive examples and cautions; additions
+clarify finalization execution/writes, publication snapshots and delivery hook
+forms. The overview now includes native push modes and command-specific exit
+limits. Shared discovery distinguishes ready-runtime help from provisioning.
+Ordinary failure hints remain limited to the original six commands: adding
+help does not authorize changes to other commands' existing error streams.
+
+Focused public-entry tests first failed on the missing native synopsis,
+ten-command discovery, handler bypass and ready-runtime discovery (4 failed,
+45 passed). Raw RED output is retained outside the repository for the build
+orchestrator. Tests exercise both spellings for all sixteen commands outside
+a repository, with handler, stdin, subprocess, socket and artifact-access
+tripwires; non-exact forms still reach ordinary dispatch. Runtime tests use
+an isolated prepared cache, unavailable installer/network command paths, and
+retain missing-ready-runtime exit 86 without provisioning.
+
+These implementation checks do not establish the independent semantic
+help-content checkpoint; W1-02 still owes source readback for every page.

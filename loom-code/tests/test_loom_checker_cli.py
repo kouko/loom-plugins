@@ -11,6 +11,7 @@ from __future__ import annotations
 import io
 import json
 import runpy
+import socket
 import subprocess
 import sys
 from pathlib import Path
@@ -238,6 +239,8 @@ def test_help_covers_commands_without_claiming_validation() -> None:
         assert "No validation" in result.stdout
         assert '"<loom-code>/scripts/loom-python" --repair plan "<path-to-plan.md>"' in result.stdout
         assert "Replace <loom-code>" in result.stdout
+        assert "push --install-git-hooks" in result.stdout
+        assert "push --remove-git-hooks" in result.stdout
         assert run_checker(flag, "plan", "missing.md").returncode == 2
 
 
@@ -446,6 +449,16 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
         "intake": ["write-spec", "write-plan", "change-id", "interface-surfaces",
                    "stdout", "BLOCK", "Exit 1", "Exit 2"],
         "reviewer-count": ["change-id", "clean", "committed", "floor", "two", "Exit 2"],
+        "intent": ["--commit-msg", "stdout", "stderr", "Exit 1", "Exit 2"],
+        "intents": ["--remote", "origin", "--metadata", "committer", "indeterminate"],
+        "push": ["--hook", "--install-git-hooks", "--remove-git-hooks", "core.hooksPath", "three"],
+        "land": ["--accepted-by", "--cleanup", "--sweep", "--confirm", "fetch", "merge"],
+        "sync-trunk": ["fetch", "rebase", "merge", "WARN", "Exit 1", "Exit 2"],
+        "github-rules": ["--print-setup", "advisory", "unconfirmed", "Exit 2"],
+        "pr-floor": ["--body-file", "--base", "--head", "--branch", "GITHUB_STEP_SUMMARY"],
+        "standing": ["PRINCIPLES.md", "DESIGN.md", "ARCHITECTURE.md", "stderr", "Exit 1"],
+        "contract": ["--require", "major", "minor", "manifest", "Exit 1", "Exit 2"],
+        "charter": ["--manifest", "table", "stdout", "BLOCK", "Exit 2"],
     }
     for command, words in required.items():
         assert f"{command} --help" in overall
@@ -458,16 +471,27 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
     assert not list(tmp_path.iterdir())
 
 
-def test_exact_help_never_dispatches_handlers(monkeypatch) -> None:
+def test_exact_help_never_dispatches_handlers(monkeypatch, tmp_path: Path) -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
-    def forbidden(*args):
-        raise AssertionError("help dispatched a handler")
-    for command in ("finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"):
+    def forbidden(*args, **kwargs):
+        raise AssertionError("help performed work")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sys, "stdin", type("Unreadable", (), {"read": forbidden})())
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    monkeypatch.setattr(socket, "socket", forbidden)
+    monkeypatch.setattr(Path, "read_text", forbidden)
+    monkeypatch.setattr(Path, "write_text", forbidden)
+    monkeypatch.setattr(Path, "open", forbidden)
+    for command in entry["COMMANDS"]:
         monkeypatch.setitem(entry["COMMANDS"], command, forbidden)
         for flag in ("--help", "-h"):
             out, err = io.StringIO(), io.StringIO()
             assert entry["main"]([command, flag], out, err) == 0
             assert out.getvalue() and not err.getvalue()
+        out, err = io.StringIO(), io.StringIO()
+        assert entry["main"]([command, "--help", "extra"], out, err) == 2
+        assert not out.getvalue() and "help performed work" in err.getvalue()
+    assert not list(tmp_path.iterdir())
 
 
 def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_path: Path) -> None:

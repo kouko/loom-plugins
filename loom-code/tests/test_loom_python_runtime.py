@@ -46,7 +46,8 @@ def run_launcher(tmp_path: Path, *args: str, tools: Path | None = None) -> subpr
     env["XDG_CACHE_HOME"] = str(tmp_path / "cache")
     env["FAKE_UV_LOG"] = str(tmp_path / "uv.log")
     env["PATH"] = f"{tools}:/usr/bin:/bin" if tools else "/usr/bin:/bin"
-    return subprocess.run(["/bin/sh", str(LAUNCHER), *args], env=env, text=True, capture_output=True)
+    return subprocess.run(["/bin/sh", str(LAUNCHER), *args], env=env, cwd=tmp_path,
+                          text=True, capture_output=True)
 
 
 def test_repair_then_ready_offline_uses_cached_interpreter(tmp_path: Path) -> None:
@@ -149,6 +150,24 @@ def test_checker_help_recovers_to_plan_validation(tmp_path: Path) -> None:
     invalid = run_launcher(tmp_path, "--ready", "plan", str(plan))
     assert invalid.returncode == 1 and "BLOCK plan.field-caps" in invalid.stderr
     assert run_launcher(tmp_path, "--ready", "plan", str(plan), "extra").returncode == 2
+
+
+def test_all_command_help_uses_ready_runtime_without_repair(tmp_path: Path) -> None:
+    tools = fake_uv(tmp_path)
+    assert run_launcher(tmp_path, "--repair", "--list-rules", tools=tools).returncode == 0
+    log = (tmp_path / "uv.log").read_text()
+    commands = ("intent", "intents", "intake", "push", "publish", "delivery", "land",
+                "sync-trunk", "github-rules", "pr-floor", "standing", "contract",
+                "charter", "plan", "reviewer-count", "finalize-review")
+    for command in commands:
+        for flag in ("--help", "-h"):
+            result = run_launcher(tmp_path, "--ready", command, flag)
+            assert (result.returncode, result.stderr) == (0, ""), (command, flag, result)
+            assert result.stdout.startswith(command + " — ")
+    assert (tmp_path / "uv.log").read_text() == log
+    shutil.rmtree(tmp_path / "cache")
+    result = run_launcher(tmp_path, "--ready", "push", "--help")
+    assert result.returncode == 86 and not (tmp_path / "cache").exists()
 
 
 def test_launcher_resolves_its_directory_when_called_by_path_name(tmp_path: Path) -> None:
