@@ -32,7 +32,7 @@ The required ten-file release packet is synchronized to loom-code 3.73.0.
 - Read-only GitHub protection check confirmed main requires a PR and
   `loom-pr-floor / PR floor`, including for administrators. No rules were changed.
 
-## Remaining evidence and boundary
+## Historical checkpoint before dogfood consent
 
 Actual behavioral dogfood has not started. Automatic approval rejected the
 initial native Codex harness call before execution because explicit consent
@@ -49,3 +49,18 @@ Independent acceptance testing, final content reviews, finalization, publication
 and merge remain pending. The local checks above do not establish actual agent
 behavior, installed-host behavior, or the user's conditional merge prerequisite.
 No attestation or dogfood-pass claim is made here.
+
+## Subsequent progress
+
+The user subsequently consented to the bounded OpenAI dogfood allocation.
+All 65 CLI attempts, including environment and argument failures, are accounted
+for in `dogfood.md`; no additional Claude review ran. That report distinguishes
+observable behavior, unverified narratives and incomplete station boundaries.
+
+Main advanced to `01fa41b35` during dogfood. Its 3.72.1 test-environment fixes
+were merged in `07c8b75b1`, preserving both changelog sections and the feature's
+3.73.0 version packet. All ten conflicts were version strings except the
+changelog, where both entries were retained. The three behavior-guidance
+files were unchanged. The portable reused adversarial command passed again
+(2 passed) after integration. The full package suite is being rerun on that
+integrated content before independent acceptance and closing review.
