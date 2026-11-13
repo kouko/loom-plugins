@@ -58,6 +58,33 @@ literal sentence is still missing; write that sentence instead.
 |---|---|
 | "Think of the hook as a doorbell for the agent." | "Each time you send a message, the hook adds a short reminder to what the agent reads." |
 
+A sentence with no metaphor can still be hard to read. Five sentence shapes
+make the user read the sentence twice to find who did what. Rewrite each
+one, and keep every fact.
+
+| Sentence shape | Hard to read | Plain |
+|---|---|---|
+| A thing does what only a person does | "`is_file()` swallows the error." | "`is_file()` returns False when the read fails and reports no error." |
+| A thing does what only a person does | 「這支函式吞掉了錯誤。」 | 「讀取失敗時，這支函式回傳 False，不回報錯誤。」 |
+| The subject is far from its verb | "The test that the reviewer who joined last week asked for after the second failure passes." | "The test passes. The reviewer who joined last week asked for it after the second failure." |
+| The subject is far from its verb | 「上週加入的審查者在第二次失敗後要求補上的那個測試通過了。」 | 「那個測試通過了。它是上週加入的審查者在第二次失敗後要求補上的。」 |
+| Three or more nouns in a row | "the release metadata sync test failure" | "the failure of the test that checks that the version numbers match" |
+| Three or more nouns in a row | 「版號同步檢查測試失敗」 | 「檢查版號是否一致的那個測試失敗了」 |
+| A noun used as a verb | "I will calendar the review." | "I will put the review on the calendar." |
+| A dropped connecting word | "The file the script wrote failed the check." | "The file that the script wrote failed the check." |
+| A dropped connecting word | 「測試失敗，版號沒改。」 | 「測試失敗，因為版號沒改。」 |
+
+Why: Clark, Martin and Mahowald (2026) compared text from nine frontier and
+near-frontier models with text from human writers
+([arXiv 2610.29162](https://arxiv.org/abs/2610.29162)). All nine models put
+a thing as the subject of a verb that only a person does more often than
+the human writers did. Most of the models also wrote longer distances
+between subject and verb, more nouns in a row, and more clauses with the
+connecting word dropped. The study has three limits: it ran no human reading
+experiment, it measured English only, and it did not test whether
+instructing a model reduces these shapes. The Traditional Chinese pairs are
+this guide's own extension, not a finding of the study.
+
 ### 4. Turn abstract nouns into what the user does and sees
 
 Replace an abstract noun with "you do X, you see Y".
@@ -125,6 +152,10 @@ changes go into a table or diagram, following loom-visualization's
 
 Leave out process detail unless the user asks for it.
 
+Being concise means leaving out content that the user does not need. It
+never means dropping the words that connect a sentence: keep "that",
+"because", "so", 「因為」 and 「所以」.
+
 | Hard to read | Plain |
 |---|---|
 | "First I grepped the repo, then I read four files, then I ran the tests twice..." | "The tests pass. Ask if you want the steps I took." |
@@ -153,7 +184,7 @@ this order:
 2. Replace every internal term with what it does, and turn each abstraction into who does what and what the user sees.
 3. Keep the facts: rewriting changes wording, never what happened; keep every fact, number, name and outcome from the original, and keep its lead news. Translate a term by saying what it does instead of substituting a different thing: a review stays a review, and an agent is not a person; never refer to something the original did not say.
 4. Cut process detail the user's decision does not need; never cut the lead news or an outcome.
-5. Check for metaphor words ("like", "imagine", "think of it as", analogies) before sending, and replace each with the literal statement.
+5. Check for metaphor words ("like", "imagine", "think of it as", analogies) and for the five sentence shapes of rule 3 before sending, and replace each with the literal statement.
 
 ## Before and after examples
 
@@ -404,3 +435,4 @@ it departs from NN/g when there are more than three options.
 - Paul Nutt, 400 decisions: https://news.osu.edu/half-of-business-decisions-fail-because-of-managements-blunders-new-study-finds/
 - Nutt, P. C. (1999), "Surprising but true: Half the decisions in organizations fail", Academy of Management Executive 13(4): https://journals.aom.org/doi/10.5465/AME.1999.2570556
 - Chernev et al. (2015), choice overload: https://www.sciencedirect.com/science/article/abs/pii/S1057740814000916
+- Clark, Martin and Mahowald (2026), "Why is AI-generated language so hard to understand?": https://arxiv.org/abs/2610.29162

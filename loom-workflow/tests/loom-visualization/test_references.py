@@ -93,6 +93,67 @@ def test_guide_has_seven_rules_and_rewrite_steps():
     assert "Internal terms" in sections(text)
 
 
+SHAPES = {
+    # first cell of a rule 3 row: whether the shape also needs a Traditional Chinese pair
+    "A thing does what only a person does": True,
+    "The subject is far from its verb": True,
+    "Three or more nouns in a row": True,
+    "A noun used as a verb": False,
+    "A dropped connecting word": True,
+}
+STUDY_URL = "https://arxiv.org/abs/2610.29162"
+STUDY_LIMITS = ("human reading experiment", "English only", "instructing a model")
+CJK = re.compile(r"[一-鿿]")
+
+
+def sentence_shape_errors(text):
+    """Return errors in the sentence-shape guidance (rules 3 and 7, last rewrite step); empty = valid."""
+    errors = []
+    rules = rule_titles(text)
+    rule3 = rules.get(3, "")
+    rows = re.findall(r"^\| ([^|\n]+) \| ([^|\n]+) \| ([^|\n]+) \|$", rule3, flags=re.MULTILINE)
+    for shape, chinese in SHAPES.items():
+        pairs = [(hard, plain) for name, hard, plain in rows if name == shape and hard != plain]
+        if not any(not CJK.search(hard + plain) for hard, plain in pairs):
+            errors.append(f"{shape}: no English pair")
+        if chinese and not any(CJK.search(hard) and CJK.search(plain) for hard, plain in pairs):
+            errors.append(f"{shape}: no Traditional Chinese pair")
+    flat3 = " ".join(rule3.split())
+    if STUDY_URL not in flat3 or STUDY_URL not in sections(text).get("Sources", ""):
+        errors.append("study not cited in both rule 3 and Sources")
+    errors += [f"rule 3 misses study limit: {limit}" for limit in STUDY_LIMITS if limit not in flat3]
+    flat7 = " ".join(rules.get(7, "").split())
+    if "concise" not in flat7.lower() or "connect" not in flat7 or "因為" not in flat7:
+        errors.append("rule 7 does not say concise keeps connecting words")
+    steps = numbered(sections(text).get("Rewrite steps", ""))
+    last = steps[-1] if steps else ""
+    if "sentence shapes" not in last or "rule 3" not in last:
+        errors.append("last rewrite step does not check the sentence shapes of rule 3")
+    return errors
+
+
+def test_sentence_shape_guidance_present():
+    """A1 pattern-pairs, A2 concise-rule, A3 step-checks-shape, A6 source-limits."""
+    assert sentence_shape_errors(_text()) == []
+
+
+def test_broken_sentence_shape_guidance_rejected():
+    """A1 pair-missing, A2 concise-absent, A3 step without shapes, A6 limits-absent."""
+    text = _text()
+    rule7 = rule_titles(text)[7]
+    step5 = numbered(sections(text)["Rewrite steps"])[-1]
+    broken = re.sub(r"^\| A noun used as a verb \|.*\n", "", text, flags=re.MULTILINE)
+    broken = broken.replace(rule7, rule7.replace("connect", "join"))
+    broken = broken.replace(step5, "Check for metaphor words before sending.")
+    broken = re.sub(r"human\s+reading\s+experiment", "experiment", broken)
+    assert sorted(sentence_shape_errors(broken)) == [
+        "A noun used as a verb: no English pair",
+        "last rewrite step does not check the sentence shapes of rule 3",
+        "rule 3 misses study limit: human reading experiment",
+        "rule 7 does not say concise keeps connecting words",
+    ]
+
+
 DECISION_HEADERS = SITUATIONS["Decision consequences"]
 LETTERED_OPTION = re.compile(r"\((?:[A-C])(?:,[^)]*)?\)")
 
