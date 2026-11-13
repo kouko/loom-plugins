@@ -14,7 +14,7 @@ charter: 1.1
 ### Wave 1 — Test maintenance
 
 **W1-01 Retire expired proofs and preserve live coverage** after: none acceptance: 1, 2, 3, 4
-- Files: `loom-code/tests/test_probes_coldread_changelog_carries_1_5_1.py`, `loom-code/tests/test_probes_coldread_abuse_coldread_branch_end.py`, `loom-design/tests/test_unified_pytest_root.py`, `loom-workflow/tests/loom-memory/test_migrate_legacy_store.py`, `docs/loom/2026-11-13-retired-test-skips/disposition.md`
+- Files: `loom-code/tests/test_probes_coldread_changelog_carries_1_5_1.py`, `loom-code/tests/test_probes_coldread_abuse_coldread_branch_end.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-design/tests/test_unified_pytest_root.py`, `loom-workflow/tests/loom-memory/test_migrate_legacy_store.py`, `docs/loom/2026-11-13-retired-test-skips/disposition.md`
 - Test: A1 positive: six-dispositions; boundary: historical-proof-limits. A2 positive: temp-git-migration; negative: invalid-migration-no-writes. A3 positive: preserved-metadata-body-charter; boundary: empty-conflicts-current-release. A4 positive: focused-pytest-rs; boundary: remaining-skips-explained.
 - Risk: agent-decided — Listed test files preserve applicable coverage through current guards and strengthened synthetic migration; retire only obsolete proof, retain the historical changelog assertion, and remove helpers made unused by these deletions.
 
