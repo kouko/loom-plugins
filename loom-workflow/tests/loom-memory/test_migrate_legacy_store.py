@@ -1,3 +1,4 @@
+# concern: retiring historical migration proofs must retain independent fidelity and failure guards.
 """Migration fidelity and failure protection using temporary Git stores.
 
 The completed real-corpus migration proofs are retired; these tests exercise
