@@ -67,6 +67,8 @@ on:
       # a PR editing only loom-design-ci.yml (or adding a brand-new
       # workflow with a per-station job) would never run it.
       - '.github/workflows/**'
+      - 'requirements-dev.txt'
+      - 'requirements-package-tests.lock'
       - '.github/workflows/loom-code-ci.yml'
   push:
     branches: [main]
@@ -84,6 +86,8 @@ on:
       - 'loom-workflow/**'
       # Same fail-open rationale as the pull_request trigger above.
       - '.github/workflows/**'
+      - 'requirements-dev.txt'
+      - 'requirements-package-tests.lock'
 
 permissions:
   contents: read
@@ -109,12 +113,37 @@ jobs:
           python-version: '3.11'
 
       - name: Install test deps
-        # pytest = test runner. The drift + sync scripts are pure stdlib (P1-E).
-        # pyyaml = the contract manifest and mechanisms.yaml parser; test
-        # modules fail at COLLECTION without it, which takes the whole suite
-        # down rather than one test. markdown-it-py went with adjudication_render.
-        # Dependency list see requirements-dev.txt.
-        run: python3 -m pip install --quiet -r requirements-dev.txt
+        # Install the same hash-verified environment used by local package tests.
+        run: python3 -m pip install --quiet --require-hashes -r requirements-package-tests.lock
+
+      - name: Install shell and Python replay tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes zsh
+          python3 -m pip install --quiet uv==0.13.1
+          zsh --version
+          uv --version
+          python3.11 --version
+
+      - name: Install Antigravity CLI
+        # Fixed official Linux x64 release; verify before extracting or running.
+        # Local plugin validation does not open an agent/model session.
+        run: |
+          agy_archive="$RUNNER_TEMP/agy.tar.gz"
+          agy_bin="$RUNNER_TEMP/agy-bin"
+          curl --fail --silent --show-error --location --output "$agy_archive" https://storage.googleapis.com/antigravity-public/antigravity-cli/1.5.8-4602374149505024/linux-x64/cli_linux_x64.tar.gz
+          printf '%s  %s\n' f08faaee588327dba8722bdc60f26a14f6915a8f2d756ed7959cde0a706d4e62fd9f831ab1a077dace5f947caaa6e851457df5023180bb8d3f54386804a3787f "$agy_archive" | sha512sum -c -
+          mkdir -p "$agy_bin"
+          tar -xzf "$agy_archive" -C "$agy_bin" antigravity
+          mv "$agy_bin/antigravity" "$agy_bin/agy"
+          chmod +x "$agy_bin/agy"
+          export PATH="$agy_bin:$PATH"
+          test "$(agy --version)" = '1.5.8'
+          agy --version
+          agy plugin validate ./loom-code
+          agy plugin validate ./loom-design
+          agy plugin validate ./loom-workflow
+          printf '%s\n' "$agy_bin" >> "$GITHUB_PATH"
 
       - name: Set up Node
         # loom-code/tests/test_opencode_loader.py runs each plugin's OpenCode
@@ -126,7 +155,7 @@ jobs:
       - name: Run pytest suites (loom-code + codex-compat engine + hook)
         env:
           PYTHONDONTWRITEBYTECODE: "1"
-        run: python3 scripts/run_package_tests.py --loom-family --only code -v
+        run: python3 scripts/run_package_tests.py --loom-family --only code -v -rs
 
       - name: Verify standalone plugin filesystem boundaries
         run: |
