@@ -2,6 +2,289 @@
 
 Tried on 2026-11-13, in a clean copy of the project at 1ccb7f514ec63aaf2d02d90108ea5b67d65fe4b7.
 
+## Re-run on 2026-11-13, at 34143f6cc4a1aa349ba5672caaaf0de95487de8d
+
+This dated section supersedes only the current verdicts; the original run, its partly result, original captures and failed setup attempts below are preserved unchanged. Original canonical report was committed at b824c462 before the documentation fix. The new canonical report names the actual new tested commit.
+
+### Clean setup repeated
+
+`git clone --no-hardlinks /private/tmp/loom-cli-result-contract /private/tmp/loom-help-acceptance-rerun-34143f6` succeeded. `git rev-parse HEAD` returned 34143f6cc4a1aa349ba5672caaaf0de95487de8d.
+
+Followed plugin README startup again:
+`/bin/sh /private/tmp/loom-help-acceptance-rerun-34143f6/loom-code/scripts/loom-python --repair contract --require 2.3`.
+Exit 0, stdout `contract 2.3.1 satisfies requires-contract >=2.3`, empty stderr. As on the first run, this reuses the actual existing valid cached runtime; clean first-time downloading/installing is not claimed.
+
+### Fix diff and carried-over checks
+
+Read full `git diff b824c462 34143f6`: only README.md, the research guide and plan W3-03 changed. README now documents all sixteen exact-help forms, ordinary parsing outside those forms, ready exit86, repair provisioning, unchanged six-command failure hints and no new JSON. Research intro now says pre-implementation study, links current conformance evidence and narrowed intent; inventory is explicitly historical fbdc29a/3.72.0. Historical rows were preserved, not changed into current implementation data. W3-03 records those bounded changes and no skip.
+
+`git diff 1ccb7f5 34143f6 --name-only -- loom-code/scripts loom-code/tests loom-code/hooks loom-code/contract` produced no output. The full fix diff also shows no schema/consumer/runtime change elsewhere. Carry-over reasons were checked against both the named fix range and original tested content; the source-to-help comparison and ordinary compatibility conclusions remain applicable.
+
+- **1: re-tested**, in full. Revisited current sixteen-command inventory against all sixteen actual help pages; each new page is byte-identical to the original fully captured/readback version, and all sixteen handler sources are unchanged. Rechecked current README discovery, research historical inventory, baseline labels/current-conformance link and plan W3-03. The original source anchors/outcome boundaries and prior actual ordinary outputs under section1 remain accurate; the documentation now clearly distinguishes present coverage from historical availability.
+- **2: carried over —** only documentation changed; all sixteen handler implementations, actual help strings and source-accuracy evidence remain unchanged. Actual new 32 help subprocess outputs also match the original complete captures byte-for-byte. No source/content uncertainty calls for broader retesting.
+- **3: carried over —** no programs, tests, hook adapters, preparation-v1 or delivery contracts/consumers changed. The original 25 complete base-equality tuples and 45 preparation/delivery/Stop consumer passes remain applicable. README now describes the already-existing no-new-JSON boundary. This carry-over does not claim another full consumer-suite execution.
+- **4: re-tested**, in full. Actual ready-launcher --help and -h calls for intent, intents, intake, push, publish, delivery, land, sync-trunk, github-rules, pr-floor, standing, contract, charter, plan, reviewer-count and finalize-review: 32 calls outside a repository, all exit0/empty stderr and identical to the original output. Overall --help lists all16. Re-read fixed current guidance and historical snapshot distinction against the actual pages. Cold-ready with isolated nonexistent cache and PATH=/usr/bin:/bin returned86, prescribed diagnostic and no cache created. Candidate remained clean.
+
+### Actual rerun commands and results
+
+`/Users/kouko/.conda/envs/dbt-redshift/bin/python3 /private/tmp/loom-help-acceptance-rerun-probe.py`: exit0, output:
+`32 ready exact-help calls identical to initial captures; overall discovery lists16; README current and research historical boundaries correct; coldready86no-cache; clean tree`.
+
+`/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_loom_python_runtime.py -q` from new clean clone: exit0, **49 passed in19.02s**. This reruns all16 handler/stdin/subprocess/socket/artifact tripwires, non-exact ordinary dispatch, ready/missing-runtime startup cases and public CLI/runtime coverage. It is focused coverage, not the complete package suite.
+
+No complete package suite was run by this tester. Station supplies a fixed-HEAD Build result of4269passed/6skipped, exit0, plus declared adversarial39passed; those are supplied Build evidence, not an independent acceptance rerun result. No step is skipped; finalize-review still executes and blocks on the complete suite. No live writer, paid call or provisioning download occurred.
+
+### Findings disposition
+
+A4-1 important current README contradiction: **fixed and independently re-tested**, not dismissed.
+A4-2 nit research present-versus-historical ambiguity: **fixed and independently re-read**, original snapshot preserved.
+No new finding; no important-or-worse dismissal. Current verdicts:1works,2works(carried),3works(carried),4works.
+
+### Rerun captures
+
+Each stdout_identity flag compares the complete actual stdout to the initial full capture below; stderr and exit are actual results. Overall help and missing-runtime diagnostic are captured here.
+
+```json
+{
+  "tested_sha": "34143f6cc4a1aa349ba5672caaaf0de95487de8d",
+  "help": [
+    {
+      "command": "intent",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "intent",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "intents",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "intents",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "intake",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "intake",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "push",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "push",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "publish",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "publish",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "delivery",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "delivery",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "land",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "land",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "sync-trunk",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "sync-trunk",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "github-rules",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "github-rules",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "pr-floor",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "pr-floor",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "standing",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "standing",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "contract",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "contract",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "charter",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "charter",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "plan",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "plan",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "reviewer-count",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "reviewer-count",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "finalize-review",
+      "flag": "--help",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    },
+    {
+      "command": "finalize-review",
+      "flag": "-h",
+      "exit": 0,
+      "stdout_identical_to_initial_capture": true,
+      "stderr": ""
+    }
+  ],
+  "overview": "\n\n    loom_checker.py --list-rules\n    loom_checker.py --help\n    loom_checker.py intent <path> [--commit-msg <file>]\n    loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]\n    loom_checker.py intake <station> <change-id> [--json]\n    loom_checker.py push --hook\n    loom_checker.py push --install-git-hooks\n    loom_checker.py push --remove-git-hooks\n    loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>\n    loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>\n    loom_checker.py delivery [--goal local|published|merged] [--intent <path>] [--json]\n    loom_checker.py land --accepted-by <name>\n    loom_checker.py land --cleanup <branch>\n    loom_checker.py land --sweep [--confirm <token>]\n    loom_checker.py sync-trunk\n    loom_checker.py github-rules [--print-setup]\n    loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha> [--branch <name>]\n    loom_checker.py reviewer-count <change-id>\n    loom_checker.py finalize-review <change-id> --input <review-input.json>\n    loom_checker.py standing <path-to-intent>\n    loom_checker.py contract --require <major.minor>\n    loom_checker.py charter [--manifest <path>]\n    loom_checker.py plan <path-to-plan.md> [--json]\n\nWith the launcher, the checker is selected automatically; omit loom_checker.py:\n    \"<loom-code>/scripts/loom-python\" --repair plan \"<path-to-plan.md>\"\n    \"<loom-code>/scripts/loom-python\" --ready intake <station> <change-id>\nReplace <loom-code> with the installed plugin directory and <path-to-plan.md>\nwith your plan file path.\nPlan takes a file path; intake takes a station and a change-id.\nPlan and intake accept an optional final --json selector; text remains default.\nDetailed help: finalize-review --help, publish --help, delivery --help\n              plan --help, intake --help, reviewer-count --help\n              intent --help, intents --help, push --help, land --help\n              sync-trunk --help, github-rules --help, pr-floor --help\n              standing --help, contract --help, charter --help\nEvery listed sub-command supports <command> --help or <command> -h.\nOnly exact command-plus-help forms are help.\nNo validation runs for --help or -h alone.\n\nExit codes depend on the command: 0 may include advisory or unsynced results;\n1 means a failed check or incomplete operation; 2 means usage/internal error\nor a hook refusal. See each command's help for its completion limits.\nThe publication hook allows on unexpected exceptions; other commands exit 2.\n\nSchemas are not restated here: the required frontmatter fields, sections,\nstation names, interface-surface defaults and artifact paths are read\nfrom `loom-code/contract/manifest.yaml`, which is the versioned contract\npackage this checker ships with.\n",
+  "cold": {
+    "exit": 86,
+    "stderr": "loom-python: checker runtime is missing or invalid; run loom-python --repair with the same arguments in an agent station.\n",
+    "cache_created": false
+  },
+  "readme_current_coverage": true,
+  "research_snapshot_label": true,
+  "clean": true
+}
+```
+
 ## Setup and limits
 
 Fresh clones: `git clone --no-hardlinks /private/tmp/loom-cli-result-contract /private/tmp/loom-help-acceptance-clean` and an independent base clone `/private/tmp/loom-help-acceptance-base`, detached at fbdc29af358413bc9d55b599231b2a6cbcb4524d. Both succeeded; candidate HEAD is the SHA above. No existing worktree was removed. Candidate git status remained empty after execution.

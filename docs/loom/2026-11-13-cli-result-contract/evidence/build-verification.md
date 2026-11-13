@@ -55,3 +55,27 @@ Build functional checks pass, subject to the explicitly recorded six skips.
 Independent clean-copy acceptance, branch-end reviews and generated
 attestation remain required. Earlier help checkpoints and the Claude audit
 are retained historical evidence, not substitutes for final-content reviews.
+
+## Reverification after acceptance document findings
+
+The first clean-copy acceptance at `1ccb7f514ec63aaf2d02d90108ea5b67d65fe4b7`
+found stale current README discovery guidance and a research snapshot labeling
+clarification. The original partly result is committed at `b824c462`.
+The bounded fix `34143f6cc4a1aa349ba5672caaaf0de95487de8d` updates README,
+research context and the retained plan only; dispatcher, handlers and tests
+are unchanged. The prior adversary's program remains applicable and passed,
+so no adversary redispatch or new green program was needed.
+
+At the fixed commit, `sync-trunk` fetched and reported up to date against the
+same origin/main `fbdc29af358413bc9d55b599231b2a6cbcb4524d`. The complete suite
+command above ran again: **exit 0, 4269 passed, 6 skipped**, with every shell
+and Mermaid group successful. All five earlier visualization dependency skips
+now executed. Raw output:
+`/private/tmp/loom-help-release-package-tests-final-build.txt`.
+
+The same declared adversarial command then reran: **exit 0, 39 passed in
+9.29s**. Raw output:
+`/private/tmp/loom-help-release-adversarial-final-build.txt`.
+The original Build result remains above; these are new observations rather
+than edits to the earlier numbers. Clean-copy acceptance is being rerun for
+the document fix before branch-end reviewers are dispatched.
