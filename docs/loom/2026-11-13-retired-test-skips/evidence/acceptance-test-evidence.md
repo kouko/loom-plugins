@@ -1,5 +1,7 @@
 # Retired historical skips — acceptance test evidence
 
+Historical observations below are preserved at their original revision. Current cumulative acceptance is recorded in the final dated re-run section; it supersedes the old report verdicts without rewriting those observations.
+
 Tried on 2026-11-13, in a clean copy of the project at fca52f217b451b28313f24f1eb9bcb4f544e9645.
 
 ## Setup and scope
@@ -54,3 +56,47 @@ Configured command: `uv run --isolated --with-requirements requirements-package-
 Independently read `/private/tmp/loom-retired-skips-package-tests.txt` and summed its fifteen pytest summary counts: 2837 + 211 + 53 + 264 + 64 + 22 + 13 + 12 + 58 + 125 + 253 + 12 + 19 + 163 + 162 = 4268. No skipped summaries. Shell groups report pass, Mermaid reports `13/13 mermaid blocks parsed` and its negative validator exit check passes. Build-verification records runner exit 0; this tester verified the retained output, not the past process exit independently. The log contains npm audit's dependency vulnerability notice; no package upgrade was attempted in this test-only scope.
 
 `git diff 00c41f4bc774dc71dd66d0f96ae8db23db11ecf4 HEAD --stat` shows only the Build evidence markdown added after the recorded candidate; tested functional code is unchanged. This main-based branch excludes PR #150's additional help test, so 4268 versus that branch's 4269 is not a regression comparison. Historical skip records remain intact and are not live collection. Finalize-review's new full-suite result is still pending this committed acceptance report.
+
+## Re-run on 2026-11-13, at daf2adf33a68d06fd7b1bde17e962e01c9d67224
+
+### Setup and limits
+
+Fresh independent tester; no implementation changes. `git clone --no-hardlinks /private/tmp/loom-retired-test-skips /private/tmp/loom-ci-acceptance-clean` succeeded; exact HEAD above and initial/final `git status --porcelain` were empty. Initial `git clone --local` failed because hardlinks were forbidden; the fallback retained a fresh clone and history. README's locked isolated dependency command was used for focused checks only. Initial uv execution failed before collection because its cache lock was not writable; approved existing-cache access succeeded, without installing into conda base.
+
+README setup checks `python3 scripts/sync_codex_manifests.py --check --all`, `python3 scripts/check_plugin_boundaries.py loom-code`, the corresponding loom-design command, and `python3 loom-code/scripts/check-skill-crossrefs.py` all exited 0. Boundaries and relative cross-reference outputs were OK. This proves repository readiness, not live host installation. No containers/VMs installed, credentials provided, or model requests made. No important dismissed findings or user-instructed skips were supplied or found. No spec applies. Package-tests and finalize-review will run and are not skipped.
+
+All pytest commands below use `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest` in the clean clone. Results are direct tool-captured stdout/exit statuses from this independent run, not inferred from source.
+
+### 1. Six dispositions and continuing owners — re-tested
+
+Read all six disposition rows against the actual retained tests and earlier evidence. The current release owner keeps the historical 1.5.1 heading; retired integrity CLI responsibility is current-store validity and retirement checks; removed collision has no winner to preserve but collection/pythonpath/empty-conflict checks remain; three historical corpus checks are replaced by independent synthetic inventory, exact metadata/body/provenance and full charter fidelity. The historical 293-file proof remains retired, not counted as passing. Executed continuing owners under rows 2/3. The fca52f217..daf2adf33 diff does not alter these three focused test modules.
+
+### 2. Clean execution — re-tested
+
+| Arguments | Exit and actual result |
+|---|---|
+| `loom-code/tests/test_probes_coldread_abuse_coldread_branch_end.py loom-code/tests/test_write_plan_station_text.py -q -rs` | 0; 59 passed in 0.21s |
+| `loom-design/tests/test_unified_pytest_root.py -q -rs` | 0; 3 passed in 0.20s |
+| `loom-workflow/tests/loom-memory/test_migrate_legacy_store.py -q -rs` | 0; 17 passed in 1.21s |
+
+79 actually passed, zero skips. Fixture migration owns a temporary Git repo; no historical corpus or retired CLI was supplied.
+
+### 3. Preserved safeguards — re-tested
+
+The 79 checks above cover release metadata, complete module collection/conflict protection and all 17 migration/validation cases, including failed migration no-write boundaries and metadata/body/guide preservation. Read the fix range to establish unchanged assertions; the earlier independent description-corruption failure/restoration remains historical sensitivity evidence, not a mutation repeated by this tester. No production/test repair or real-store operation was performed.
+
+### 4. Full suite and skips — re-tested
+
+Did not run the full package suite, as required by the tester contract. Independently inspected `/private/tmp/loom-ci-environment-package-tests.txt`: fifteen actual pytest summaries sum to 2842 + 211 + 53 + 264 + 64 + 22 + 13 + 12 + 58 + 125 + 253 + 12 + 19 + 163 + 162 = 4273; zero skipped summaries. Shell groups pass; Mermaid reports `13/13 mermaid blocks parsed` and intentional invalid input exits 1. Parent recorded exit 0; this tester witnessed the retained log, not that earlier process. The automated full suite runs before acceptance and blocks on failure through finalize-review. Configured command remains `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. Linux results are pending and are not represented by these macOS results.
+
+### 5. Per-job preparation and real external tool — re-tested, partly
+
+`tests/test_ci_environment_preparation.py -q -rs`: exit 0, `5 passed in 0.72s`. This executes parsed job ordering/dependency/trigger checks and actual corrupt-download shell; it is not Linux execution. Read all three consuming workflows and the retained official-installation research. Python jobs install the hash-verified lock before their runner; code prepares zsh, uv, Python 3.11 and official pinned agy; workflow Python prepares Node/Mermaid inside its own job. Existing shell/Mermaid jobs retain their setup and suite inventory. Path filters include both requirements sources.
+
+`agy --version`: exit 0, `1.3.3`. `tests/test_sync_codex_manifests.py -k agy_plugin_validate -q -rs`: exit 0, `3 passed, 32 deselected in 0.19s`. These use real local agy to validate all three plugins without credentials or model calls; they do not establish the pinned Linux 1.5.8 payload's success. No real Linux runner is available before publication. AC5 remains partly until actual GitHub logs show installation, readiness, and formerly skipped checks executing.
+
+### 6. Failure boundaries and explicit limits — re-tested, partly
+
+The executed named check `test_ci_agy_corrupt_download_stops_before_extraction` runs the workflow's actual install script under `bash --noprofile --norc -eo pipefail` with corrupt download bytes and an extraction trap. Passing means checksum rejects it, extraction never occurs, and GITHUB_PATH is not published. Other four checks verify dependencies precede suites, no continue-on-error/if override, and trigger coverage. This establishes local step failure and the configured native Actions success dependency; it does not simulate or observe the GitHub scheduler. There is no claim of Linux success or a failed real GitHub job.
+
+Actual current execution: 79 historical-owner checks + 5 CI checks + 3 real local validator checks = 87 passed, zero skips; 32 deselected are selection exclusions, not passes. External full-suite log: 4273 passed, zero skips, plus shell and Mermaid passes. Linux actual executions/skips: not yet observed. Retained Ubuntu restrictions cover case-insensitive paths and macOS /var-alias behavior; only actual Linux -rs output can establish their final counts/reasons. AC6 remains partly until those logs identify the actual executed/skipped inventory and job outcome. Old failures/skips above remain historical facts.
