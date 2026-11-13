@@ -1,0 +1,98 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-cli-result-contract",
+  "content_digest": "43a4dd189fae2330c996a23bd4c655144596a489",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "ff135d4f79324ce09e1a6ef714373280a7ae7072edcc0734dcb9c93c0548195f"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
+      "review_target_sha": "2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90",
+      "dimension_scores": {
+        "security": "PASS — Prior conclusion retained; the bounded Round-3 delta adds no executable, hook, authorization or external-call change.",
+        "architecture": "PASS — Prior conclusion retained; no production module or dependency boundary changed.",
+        "correctness": "PASS — The two task Risk corrections match their respective Files/Test/purpose. Existing intent-version functions independently retain canonical confirmation 2f29db8ab63a49c5b69decf2973d201112e63f59, identity 66583a51db46b4517f692cab4dcf61318fc19b21 and an empty check_intent_version failure list at this target.",
+        "naming": "PASS — Prior conclusion retained; corrected task guidance uses its actual verification/provenance responsibilities, and no production identifiers changed.",
+        "tests": "PASS — No test or production executable changed in this fix delta; the independently run 92 Round-1 cases remain applicable. Fresh acceptance records actual setup, plan/intake and 32 help calls separately from carried-over source/consumer tests and supplied Build execution.",
+        "refactoring": "PASS — The fix replaces only the two incorrect Risk lines and appends their evidence; no unrelated refactor was introduced.",
+        "cross-task-coherence": "PASS — Previous important finding fixed: plan.md:40 now specifies adversarial/full-suite verification, failure preservation and no live writers/paid calls; plan.md:50 now specifies existing-consent canonical provenance, equivalent identity, references/ancestry and preserved history. Both match their own task blocks.",
+        "external-surface-grounding": "PASS — Prior conclusion retained; no external integration or call shape changed.",
+        "principles-conformance": "PASS — Existing-consent and unchanged-scope boundaries remain intact; the actual prior refusal and important documentation finding remain disclosed rather than dismissed or overwritten.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists; unchanged from prior rounds.",
+        "deliberate-simplification": "PASS — The fix uses two task-specific lines without introducing another checker, exception or instruction mechanism.",
+        "deletion-first": "PASS — The two copied instructions were replaced in place; no new runtime abstraction, flag, configuration or extension point was added."
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer help_release_code_review, terminal Round 3 of the existing episode. The single Round-2 finding is fixed at both plan.md:40 and :50 by 4e6e2d4dac8e904c527e15e425c8ea337a4769b7; no unresolved findings remain. Prior YAML reports are preserved.",
+        "Verified source/tests/hooks/contract bytes are unchanged in e244a5f..2c751bca. Existing functional_content_digest independently returns 43a4dd189fae2330c996a23bd4c655144596a489 for both acceptance-tested 4e6e2d4 and target 2c751bca; only acceptance/build evidence follows the tested fix.",
+        "Reviewed only the supplied fix delta and prior finding. No full suite, adversarial program, new probe, paid outside CLI, live writer or repository edit was performed. Supplied Round-3 adversarial output was read for the confirmation below."
+      ],
+      "reviewer": "help_release_code_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    },
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "docs",
+      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
+      "review_target_sha": "2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90",
+      "dimension_scores": {
+        "omission": "PASS — Both corrected task blocks retain their Files and Test inputs, and the revised Risk lines now supply the applicable verification and provenance constraints.",
+        "ambiguity": "PASS — The correction and current acceptance distinguish unchanged scope, carried checks, new observations and pending finalization without inventing consent or success.",
+        "inconsistency": "PASS — The prior important finding is fixed: plan line 40 now directs bounded adversarial/full-suite verification and line 50 directs canonical-confirmation and equivalent-identity verification. Both agree with their own task blocks.",
+        "incorrect-fact": "PASS_WITH_NOTES — The bounded fix and evidence agree with the actual diff and the unchanged source facts reviewed earlier. The inherited limitation remains that unchanged external historical research citations were not independently reopened upstream; this is not a new finding.",
+        "missing-population": "PASS — The new acceptance section explicitly enumerates sixteen commands and thirty-two exact forms, names carried checks and distinguishes supplied Build totals with six skips from its own execution.",
+        "deletion-first": "PASS — The fix replaces exactly two incorrect Risk lines and appends disposition evidence, introducing no runtime mechanism or unrelated change."
+      },
+      "findings": [],
+      "notes": [
+        "Round-2 important inconsistency at plan.md:40 and :50: fixed. Read both full task blocks and e244a5f34e6f8fc3297828901cad018b3bc4c9b0..2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90; no new defect caused by the fix was identified. Historical findings and failed evidence remain preserved.",
+        "Read the dated 4e6e2d4 acceptance rerun and Round-3 Build/provenance updates. After tested commit 4e6e2d4dac8e904c527e15e425c8ea337a4769b7, the target changes only acceptance/build evidence. No full suite, adversarial program, paid CLI or live writer was run by this reviewer.",
+        "Same reviewer help_release_docs_review, terminal Round 3; family openai, inherited model unobservable. No unresolved finding remains; prior focused 92-test verification and unchanged source boundaries carry forward."
+      ],
+      "reviewer": "help_release_docs_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "66583a51db46",
+  "tested_commit": "4e6e2d4dac8e904c527e15e425c8ea337a4769b7",
+  "reviewed_commit": "2c751bca5fd9a3005f8f2302ad8a2fa3aaf0cb90",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
