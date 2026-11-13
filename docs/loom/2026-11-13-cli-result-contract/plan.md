@@ -30,9 +30,9 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 ### Wave 3 — Release packet and branch-end verification
 
 **W3-01 Complete minor release metadata packet**  after: W1-02  acceptance: 3
-- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A3 positive: release-metadata-synchronized; negative: stale-release-pin-detected.
-- Risk: REQ-3 compatibility decision; agent-decided bump loom-code to 3.73.0 in final fix before attestation. Add dated CHANGELOG section describing all-command help and compatibility, sync derived manifests with scripts/sync_codex_manifests.py --all, rewrite version-pin test and README strings.
+- Risk: REQ-3 compatibility decision; agent-decided bump loom-code to 3.73.0 in final fix before attestation. Add dated CHANGELOG section describing all-command help and compatibility, sync derived manifests with scripts/sync_codex_manifests.py --all, rewrite version-pin test and README strings. Existing test_readme_version_matches_manifest checks all three language READMEs, so Japanese and Traditional Chinese version strings are included for release parity; their other content stays unchanged.
 
 **W3-02 Adversarial and integration evidence**  after: W3-01  acceptance: 1, 2, 3, 4
 - Files: `docs/loom/2026-11-13-cli-result-contract/evidence/probes/`, `docs/loom/2026-11-13-cli-result-contract/evidence/build-verification.md`
