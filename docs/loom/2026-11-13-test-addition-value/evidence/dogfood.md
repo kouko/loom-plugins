@@ -103,3 +103,18 @@ was observed in these bounded trials. Continue to independent acceptance
 testing and closing review; this document is not an installed-host certification
 or a blanket dogfood-pass stamp. Existing tests were not deleted. No product
 guidance fix was made on the strength of unverified ancillary narratives.
+
+## Closing review follow-up
+
+Independent closing review subsequently found a contract inconsistency:
+implementer's Role item 2 accepts an existing reproducing case as RED,
+but its unchanged DONE definition still required "new focused tests".
+This was a confirmed review finding, distinct from the unverified actor
+commit narratives and dismissed public-help interpretation above. Build
+aligned that existing status definition without adding a test or field.
+The existing focused checks passed before and after the edit (45 each);
+they are mechanical compatibility checks, not a semantic RED assertion.
+Required full mechanical checks and independent affected-row acceptance
+are repeated before the same reviewers verify the fix.
+The earlier actor executions remain historical observations against their
+recorded resource hashes; they are not relabeled as executions of the fix.

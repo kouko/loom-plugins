@@ -128,7 +128,8 @@ open_questions:               # NEEDS_CONTEXT only
 unblock_step:                 # BLOCKED only — the action the orchestrator must take
 ```
 
-- **`DONE`** — new focused tests went RED then GREEN.
+- **`DONE`** — required focused verification passed; changed executable behaviour
+  went RED then GREEN using existing or new cases.
 - **`DONE_WITH_CONCERNS`** — complete, but something wants a reviewer's
   eye, or the focused verification is incomplete.
 - **`NEEDS_CONTEXT`** — a specific question blocks you.

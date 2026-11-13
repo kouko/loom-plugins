@@ -21,7 +21,7 @@ charter: 1.1
 **W1-02 Apply reuse before adding tests** after: W1-01 acceptance: 1, 2
 - Files: loom-code/agents/implementer.md
 - Test: A1 positive: existing-failing-case-reproduces-fix; negative: redundant-file-for-existing-obligation. A2 positive: minimal-existing-table-extension; boundary: independent-risk-still-requires-coverage.
-- Risk: agent-decided — extend Role contract item 2; preserve its numeric budget, RED-before-fix, fixture reuse, no-weakening rule and net_test_lines report. Reuse cannot substitute a passing unrelated case for defect reproduction; no new report field.
+- Risk: agent-decided — align existing reuse and completion wording; preserve the numeric budget, RED-before-fix, fixture reuse, no-weakening rule and net_test_lines report. Reuse cannot substitute a passing unrelated case for defect reproduction; no new report field.
 
 **W1-03 Judge incremental protection and replacement evidence** after: W1-02 acceptance: 3, 4
 - Files: loom-code/skills/closing-review/references/lenses.md
