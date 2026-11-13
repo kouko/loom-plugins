@@ -1,0 +1,98 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-retired-test-skips",
+  "content_digest": "f39f462c1b81536213c4d8c76cd55299aaf012b7",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+      "artifact": "loom-workflow/tests/loom-memory/test_migrate_legacy_store.py",
+      "result": "pass",
+      "command_digest": "5efa28671c4b6fdb9eba46675cb8b72c679e281a9faa821a36cf644ba21bf2c0"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
+      "review_target_sha": "e270b585b1ccc1a5eac8facfbe472e1a5cea4907",
+      "dimension_scores": {
+        "security": "PASS — Only test maintenance and release metadata change; subprocess arguments are explicit arrays and temporary fixtures contain no external data.",
+        "architecture": "PASS — Continuing assertions remain with existing release, collection and migration owners; runtime module boundaries are unchanged.",
+        "correctness": "PASS — Six expired preconditions are retired with explicit coverage ownership; fixture output is compared with independent input metadata, body bytes, charter and captured introducing SHA.",
+        "naming": "PASS — Existing test names and local fixture names describe their assertions; removed historical helpers have no remaining callers.",
+        "tests": "PASS — Independently ran all four remaining changed test modules in three isolated plugin invocations: 59, 3 and 17 passed, zero skipped. Read retained RED and copied-production mutation evidence; the strengthened oracle does not call transformation helpers for its expectations.",
+        "refactoring": "PASS — Removes obsolete tests and orphaned historical helpers without new abstractions or unrelated cleanup.",
+        "cross-task-coherence": "PASS — Test maintenance, disposition and coherent 3.72.1 release packet agree; all formerly active migration cases and no-write guards remain.",
+        "external-surface-grounding": "PASS — No new external API or dependency surface; Git fixture operations use the existing repository fixture conventions and unchanged supported CLI syntax.",
+        "principles-conformance": "PASS — No new mechanism or user-data operation; historical proof limits are explicit and independent review, acceptance and adversarial evidence remain distinct.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md is present.",
+        "deliberate-simplification": "PASS — The small temporary corpus explicitly replaces supported transformation checks, without claiming to replay the retired historical 293-file corpus.",
+        "deletion-first": "PASS — Deletes obsolete proof and helpers, extends an existing public-entry fixture and current-release guard, and adds no harness or exception list."
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the full changed test modules, deleted originals through git show, unchanged production migration entry and helpers, ground truth, disposition and verification records; working tree remained clean after tests.",
+        "Negative-case review checked description/type/body/origin/provenance/charter sensitivity, heading ownership and collision rejection. The later unrelated fixture commit independently distinguishes introducing SHA from latest SHA. No probe or complete package suite was run by this reviewer.",
+        "Native reviewer family: openai; exact inherited model and effort are not observable."
+      ],
+      "reviewer": "retired_skips_code_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "fbdc29af358413bc9d55b599231b2a6cbcb4524d",
+      "review_target_sha": "e270b585b1ccc1a5eac8facfbe472e1a5cea4907",
+      "dimension_scores": {
+        "omission": "PASS — All four confirmed acceptance obligations have dispositions, continuing coverage owners and recorded verification; no spec is required for the confirmed internal-test-only scope.",
+        "ambiguity": "PASS — The records distinguish retired historical proofs from executed current checks, temporary-fixture fidelity from historical corpus replay, and Build observations from pending finalization.",
+        "inconsistency": "PASS — The baseline observations, implementation disposition, release packet and independent acceptance evidence reconcile with the actual delta; runtime behavior and archives remain unchanged.",
+        "incorrect-fact": "PASS — Checked the six removed conditions and their current owners against source, release versions against all changed manifests/readme pins, confirmation commit against canonical intent, and reported execution totals against supplied raw output.",
+        "missing-population": "PASS — Counts identify their populations: six retired cases, seventeen retained migration cases, seventy-nine fresh-copy targeted passes, eight adversarial attack points, and 4268 passes across fifteen pytest invocations plus shell/Mermaid groups.",
+        "deletion-first": "PASS — Deletes obsolete historical tests/helpers and strengthens an existing public-entry fixture; adds no runtime mechanism, guard exception or new test harness."
+      },
+      "findings": [],
+      "notes": [
+        "Read ground truth before the delta. No repository changes, new probes, paid review, live writes, full-suite rerun or adversarial-program execution were performed by this reviewer.",
+        "Raw package output independently sums to 4268 passes with no skipped summary; the historical 293-file migration is explicitly retired rather than claimed passed. Fresh-clone acceptance records 59 + 3 + 17 targeted passes and a rejected production description mutation.",
+        "The supplied adversarial rerun output is for the reused ordinary repository test module; the functional tree is unchanged between its recorded candidate and the review target (only evidence/report markdown follows)."
+      ],
+      "reviewer": "retired_skips_docs_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "2a30271e94a7dabd61c00db549a97fe577c1e001",
+  "tested_commit": "fca52f217",
+  "reviewed_commit": "e270b585b1ccc1a5eac8facfbe472e1a5cea4907",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
