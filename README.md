@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.75.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.76.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.22.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.75.0. Five stations carry one change from plan to PR with
+Version 3.76.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -264,6 +264,13 @@ preserving their existing results and exit behavior. The first rollout is bounde
 | `finalize-review` | Flushed stderr names each probe/package-suite stage before execution and reports its result after evidence validation. Child exit 0 alone is insufficient; a passed stage is not final attestation success. Child logs remain captured, with no heartbeat inside a subprocess. |
 | `delivery --json` and dispatch JSON | Existing machine-readable payloads are preserved; the first rollout adds no global JSON envelope. |
 | `plan <path> --json` and `intake <station> <change-id> --json` | Optional preparation-result pilot: one stdout object with schema version, command, status, ordered diagnostics, notices and usage/internal error. Default text remains unchanged; these statuses do not establish full verification or authority. |
+| `contract --require <major.minor> --json` and `reviewer-count <change-id> --json` | Optional read-only results use the preparation envelope plus typed `data`: compatibility versions/boolean or unchanged change-id/integer reviewer floor. Errors set every data value to null. |
+
+Five commands support JSON: `plan`, `intake`, `contract`, `reviewer-count` and
+`delivery`. The first four require a final `--json`; delivery preserves its
+distinct `{state, reason, next, evidence, complete}` shape. See the
+[checker examples](loom-code/README.md#the-checker) for typed consumers and
+startup limitations. Dispatch JSON remains a separate existing interface.
 
 Progress is advisory: never parse it for gate decisions. It contains stage/state
 labels, not operands, credentials or raw child logs. Progress-only write failures
@@ -295,10 +302,9 @@ does not run its station or establish completed review or verification.
 Intake's conditional `interface-surfaces (...)` stdout remains advisory and
 can precede a later failure; inspect the exit status and diagnostics too.
 
-Typed error categories and additional JSON modes remain future migrations
-requiring compatibility checks; this release adds no JSON interface. Exit 2 still conflates usage errors
-and internal faults. Host hook protocols, review, acceptance and failure-blocking
-rules remain unchanged.
+The four bounded result modes distinguish usage/internal errors in `error.kind`;
+both retain exit 2. Other JSON migrations require compatibility checks. Host hook
+protocols, review, acceptance and failure-blocking rules remain unchanged.
 
 Graduated probe discovery now checks the concern marker before test collection;
 marked, moved and unavailable-collection handling retain the existing policy.

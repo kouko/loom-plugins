@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.76.0] — 2026-11-14 — expose typed read-only CLI JSON observations
+
+- Add optional final `--json` selectors to `contract` and `reviewer-count`, reusing the bounded version-1 result envelope with typed compatibility and reviewer-floor data. Preserve existing text streams, exits, checks and preparation/delivery JSON shapes.
+- Reject invalid selectors and arguments before domain work; caught usage/internal failures return unavailable data as null, one JSON object and empty checker stderr, including late failures after partial handler output.
+- Document all five JSON commands, their distinct contracts and real field-consumer examples. Reviewer floor two remains a conservative requirement rather than completed classification or review; launcher failures remain outside the loaded-checker guarantee.
+
 ## [3.75.0] — 2026-11-14 — complete safe help for all sixteen CLI commands
 
 - Provide dedicated exact `<command> --help` and `<command> -h` discovery for all sixteen principal commands before handler execution, stdin reads or repository/network work. Update overall discovery, including native Git hook modes.
