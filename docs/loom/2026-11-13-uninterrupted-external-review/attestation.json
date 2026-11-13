@@ -1,0 +1,115 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-uninterrupted-external-review",
+  "content_digest": "d9231c5c0310c42ad1dcf2ec03365a0f359ade9e",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py",
+      "artifact": "loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py",
+      "result": "pass",
+      "command_digest": "0fff9181f9092d183e67e3a2a23174584851407e998cb1a590a92067128e5a64"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "skill",
+      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
+      "review_target_sha": "eb51a9d3737b3a9c24e9521dcdb2c05868176e02",
+      "dimension_scores": {
+        "omission": "PASS_WITH_NOTES",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "omission",
+          "anchor": "docs/loom/2026-11-13-uninterrupted-external-review/acceptance-test-report.md:10",
+          "text": "issue: The previous final-live evidence gap remains fixed for Acceptance 2-3, but the narrower Acceptance 1 gap remains unchanged through integration: the accepted-selection Claude test does not establish uninterrupted host approval from the natural named request alone, and other supported reviewers were not exercised. The user-authorized merge does not make this remaining acceptance condition pass.",
+          "fix": "Retain Acceptance 1 as partly and disclose that the overall original outcome remains incompletely verified. To close this residual, obtain separately authorized independent evidence for the named-request-only host approval boundary and relevant supported-reviewer coverage, then update the acceptance report; do not reuse either consumed execution authorization or infer these guarantees from the scoped Claude result."
+        }
+      ],
+      "notes": [
+        "Terminal integration review in the same bounded episode. Read the cumulative skill diff against current main and independently confirmed zero changes from 92ee78348 to HEAD in runtime skill contracts, external_review.py, intent, plan and final-live evidence. One important residual yields PASS_WITH_NOTES; user-authorized merge does not establish complete acceptance.",
+        "The refreshed report names clean integration commit bb8f8f486b1a6802c9ffc693b771b8ef7d7578d6 and preserves A1 partly/A2-4 works. Independent integration evidence reports 18 loader passes and unchanged reviewed target and original observation hashes. Full package/adversarial results were supplied by Build; this reviewer made no outside call or suite rerun.",
+        "Original rejection and qualified reconciliation remain intact. Runtime authorization, cancellation, host approval and refusal boundaries are unchanged. Scoped real Claude execution remains evidence for A2-3 only within its disclosed scope; no actual secret incident, observed effective effort, additional live execution or broad host-approval guarantee is asserted."
+      ],
+      "reviewer": "/root/closing_skill",
+      "vendor": "openai",
+      "model": "inherited-unverified"
+    },
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "code",
+      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
+      "review_target_sha": "eb51a9d3737b3a9c24e9521dcdb2c05868176e02",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES — Final-source scoped live review and usable qualified output are established; bare-request host approval and other supported services remain unverified.",
+        "naming": "PASS",
+        "tests": "PASS — Independently reran all four changed test files after integration; 87 passed with no skips. Independent clean integration acceptance carries A2/A3 for identical final-source scoped live execution.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "correctness",
+          "anchor": "docs/loom/2026-11-13-uninterrupted-external-review/acceptance-test-report.md:31",
+          "text": "issue (acceptance limit): The previous absence of a final-source live review and usable output is resolved: one real scoped Claude review completed without another answer and its qualified audit is now delivered. Acceptance 1 nevertheless remains partial because bare-request-only host approval and other supported services have not been demonstrated; the accepted-selection test must not become a universal uninterrupted-execution claim.",
+          "fix": "Keep A1 partial and the explicit residual limitation in publication. To close this remaining coverage finding, obtain bounded authorization for the missing scenarios, retain their actual caller/host/result evidence, and have independent acceptance re-evaluate A1; do not make another call under the consumed test authorization."
+        }
+      ],
+      "notes": [
+        "Terminal integration review: inspected cumulative delta against updated main and merge resolution. Relevant runtime, skills, report contracts and failure tests are byte-identical to previously reviewed 8a14f06; incoming main CI/test changes introduce no branch delta. Release 3.73.0 preserves main 3.72.1 history and historical 1.5.1 assertion; manifest synchronization and diff checks pass.",
+        "Independently reran test_review_convergence_contract.py, test_write_plan_station_text.py, independent-advisor/test_independent_advisor_readmes.py and scripts/test_release_metadata.py: 87 passed in 0.28s, no skips. No outside call, adversarial run or full-suite run performed by this reviewer.",
+        "Clean integration acceptance at bb8f8f486 preserves original live evidence and its hashes; qualified audit remains usable under unchanged rubric. A2/A3 work for the scoped real call, A4 carries unchanged failure evidence, A1 remains partial; explicit merge acceptance does not establish universal host or cross-service behavior."
+      ],
+      "reviewer": "/root/closing_code",
+      "vendor": "openai",
+      "model": "inherited-unverified"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "7f3bf253b686281a11f62553a0cd89fe859fd115",
+  "tested_commit": "bb8f8f486b1a6802c9ffc693b771b8ef7d7578d6",
+  "reviewed_commit": "eb51a9d3737b3a9c24e9521dcdb2c05868176e02",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "partly"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}

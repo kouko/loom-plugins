@@ -25,6 +25,8 @@ Use loom-code:external-review for this authorized packet, executor and review ro
 
 - A direct request naming the outside agent and an unambiguous target can authorize one bounded review; a suggestion alone cannot.
 - Cost, vendor data transfer, local execution and filesystem limits are disclosed before network-backed discovery or review.
+- After disclosure, a clear named request continues in the same active turn through execution and owner validation, using its existing authorization. A host refusal is reported as incomplete and is never bypassed.
+- The consent record does not grant host execution approval. Any required host request carries the original request, target, receiving vendor and minimized packet scope; requiring a second user answer fails uninterrupted execution.
 - The starting directory is not a general filesystem sandbox. Claude’s restricted model file tools have a narrower boundary; startup and caches can still write elsewhere.
 - A completed process is not an accepted review verdict. The owner validates the result, and a failed leg is reported separately without a silent retry or provider switch.
 

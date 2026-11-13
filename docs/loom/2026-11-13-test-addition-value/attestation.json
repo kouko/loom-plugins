@@ -1,0 +1,99 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-test-addition-value",
+  "content_digest": "9fd7c3af64101866acf9cdd5d3a8b9df5af18cab",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_test_budget_text.py -q",
+      "artifact": "loom-code/tests/test_test_budget_text.py",
+      "result": "pass",
+      "command_digest": "3325274d0f893da1e6846f21ded4d6f0d81fae31d5fae2586613736586795664"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "3f369c8d2c86ecf17328435b5602f99b4c1366dd",
+      "review_target_sha": "9567992d0ce1ab7ed00db620a84a62f20c9b7025",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "User-authorized single additional Round 4 in the same episode; prior three digests and exhausted CLI allocation remain counted. The prior DONE inconsistency remains fixed. All three feature guidance files are unchanged from the previously reviewed target.",
+        "Reviewed integration delta and cumulative delta against current main, updated plan and acceptance evidence. Current main is an ancestor; upstream external-review controls and workflow 5.22.0 remain intact. The 3.74.0 release preserves upstream 3.73.0 history. Manifest synchronization passed; the changed version-test file independently passed all 43 tests.",
+        "No integration regression found: outside authorization reuse grants no retry or verdict reuse and does not weaken test-value, boundary or probe-retention guidance. Acceptance carryovers retain their scope and historical evidence; the canceled suite is explicitly not counted as passing. No full suite, adversarial program or external call was run by this reviewer."
+      ],
+      "reviewer": "/root/closing_test_value_skill",
+      "vendor": "openai",
+      "model": "host-inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "3f369c8d2c86ecf17328435b5602f99b4c1366dd",
+      "review_target_sha": "9567992d0ce1ab7ed00db620a84a62f20c9b7025",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "User-authorized additional Round 4 examined accepted-head integration changes and cumulative coherence against current main. Prior three digests and the spent 65-attempt allocation remain counted. Feature guidance is byte-identical to Round 3; integration preserves upstream external-review authorization requirements, owner validation, refusal handling and mandatory probe retention.",
+        "Independently executed test_write_plan_station_text.py: 43 passed, no skips; upstream review-convergence and independent-advisor README checks: 30 passed, no skips. Diff whitespace checks passed. No complete package suite, adversarial program or external model CLI was run by this reviewer.",
+        "The 3.74.0 release packet is consistent and retains upstream 3.73.0 history and workflow 5.22.0. Acceptance evidence explicitly carries bounded prior actor results forward with upstream-interaction reasons; it credits neither the canceled package run nor fresh actor or installed-host success."
+      ],
+      "reviewer": "/root/closing_test_value_code",
+      "vendor": "openai",
+      "model": "host-inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "7619afaa087574d41f2cffe92e5084c421819852",
+  "tested_commit": "7b3945b58709f89e50abe3d99d9ee49d937ce029",
+  "reviewed_commit": "9567992d0ce1ab7ed00db620a84a62f20c9b7025",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}

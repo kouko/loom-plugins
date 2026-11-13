@@ -1,10 +1,29 @@
 # Changelog
 
-## [3.73.0] — 2026-11-13 — complete safe help for all sixteen CLI commands
+## [3.75.0] — 2026-11-14 — complete safe help for all sixteen CLI commands
 
 - Provide dedicated exact `<command> --help` and `<command> -h` discovery for all sixteen principal commands before handler execution, stdin reads or repository/network work. Update overall discovery, including native Git hook modes.
 - Align guidance with actual inputs, prerequisites, output states, advisory exits, partial writes, protection limits and recovery actions. Explain ready-runtime discovery separately from runtime repair that may provision dependencies.
 - Preserve ordinary parsing, default text streams, exits, authorization and existing preparation/delivery JSON interfaces. Non-exact help combinations retain ordinary command behavior; this release adds no JSON interface.
+
+## [3.74.0] — 2026-11-14 — identify the added protection before adding tests
+
+- Reuse sufficient existing coverage during planning and implementation; identify the distinct defect or uncovered behavior when extending permanent tests, while preserving defect reproduction, test-first work and independent boundary coverage.
+- Compare duplicate tests by the protection they provide, preserving unique integration and environment risks and requiring replacement evidence before recommending removal.
+- Keep existing test budgets, required adversarial probe graduation and quality checks unchanged; add no test inventory, deletion mechanism or new report field.
+
+## [3.73.0] — 2026-11-13 — continue explicitly authorized external reviews
+
+- Continue a clear named external-review request in the same active turn after nonblocking disclosure, using its existing bounded authorization through execution and owner validation.
+- Keep user authorization separate from host execution approval. Carry the original request, review target, receiving vendor and minimized packet scope into any required host request; report refusal as incomplete without bypass, and a required second user answer as failed uninterrupted execution.
+- Preserve cancellation, scope, model-selection and fresh-authorization retry requirements; local contract checks do not establish host acceptance for future requests.
+
+## [3.72.1] — 2026-11-13 — retire obsolete test preconditions and prepare CI environments
+
+- Retire six obsolete historical test preconditions while preserving the historical changelog heading and existing release, collection, collision and migration failure guards.
+- Strengthen deterministic temporary-Git migration fixtures to verify exact lesson inventory, metadata, body bytes, provenance, complete charter preservation and regenerated index validity.
+- Prepare each Python CI suite from the shared hash-verified package lock, install the code suite's zsh, uv and pinned Antigravity CLI tools, and prepare Mermaid dependencies in the workflow Python job before testing. Dependency changes trigger their consuming workflows; setup failures remain fatal and `PYTEST_ADDOPTS` enables pytest skip-reason logs through the unchanged suite runner.
+- Keep production behavior and archived historical evidence unchanged.
 
 ## [3.72.0] — 2026-11-13 — pilot optional JSON preparation results
 

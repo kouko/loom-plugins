@@ -123,3 +123,60 @@ The declared reused adversarial artifact reran afterwards: **exit 0,
 The program and covered production behavior did not change, so no new
 adversary dispatch or program was justified. Fresh clean-copy acceptance and
 the same two reviewers' terminal Round 3 follow on this corrected content.
+
+## Main integration after user-directed continuation, 2026-11-14
+
+The agent disclosed that the original episode had completed Round 3 and that
+the installed rule said "never dispatch Round 4". The user then said
+“遠端有新版本” and “請繼續”. The parent agent's recorded interpretation is
+that this informed continuation authorizes finishing the existing integration
+and verification work. Preserve Rounds 1–3 and their failures; this is not a
+requirements change, a counter reset or a skipped reviewer/test/acceptance step.
+
+Before integration, published help HEAD was
+`4854ad23c62956666abd2a9ebd445580bdf5626a`; main had advanced to
+`7c137958db0f78af4d50b99e43d96e17225c8cce` (loom-code 3.74.0 and
+loom-workflow 5.22.0). The adapted existing plan was independently checked
+for a smaller shape, passed plan and intake checks, and was committed as
+`2fc46d9b1`. The confirmed help-only Acceptance lines remain unchanged.
+
+Defect class: release metadata divergence after main advancement. The bounded
+search read every cumulative changed file and the release-guard surfaces.
+Actual conflicts affected ten paths: root README; the four loom-code manifests;
+loom-code CHANGELOG; the three localized loom-code READMEs; and the current
+release pin in `test_write_plan_station_text.py`. No production help entry or
+handler conflict occurred. Integration uses a merge, preserving published
+history rather than rebasing it.
+
+The release is now loom-code 3.75.0. Its help entry retains the unmerged help
+release notes under the new version/date, while main's distinct 3.74.0, 3.73.0
+and 3.72.1 changelog sections remain intact. The Claude manifest is the SSOT;
+`python3 scripts/sync_codex_manifests.py --all` regenerated its three mirrors.
+The Codex target's conflict was first restored to main's valid metadata so
+the existing synchronizer could read it; version propagation then came from
+the SSOT. Workflow remains 5.22.0 and design remains 2.25.0.
+
+Main's historical `## [1.5.1]` release guard is retained. Main-side CI
+preparation, explicit external-review continuation and incremental-test
+protection files were compared against main and remain byte-identical.
+The help dispatcher and its CLI/runtime test files were compared against
+the previously published help HEAD and remain byte-identical. AST inspection
+confirms both main and help expose the same sixteen command names; the
+integrated tree has all sixteen help entries. No new permanent test or test
+case was added for this metadata-only integration. The earlier help test
+additions and their failing/passing evidence remain available for review.
+
+Focused RED reused the existing release consistency guard while its pin still
+read main's 3.74.0: one failed, reporting actual 3.75.0 versus expected 3.74.0.
+Raw output: `/private/tmp/loom-help-main-release-red.txt`. After synchronizing
+the pin, the resolved focused command was:
+
+`uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_loom_python_runtime.py loom-code/tests/test_write_plan_station_text.py -q -rs`
+
+It exited zero with **92 passed, zero skipped**; raw output:
+`/private/tmp/loom-help-main-focused-green.txt`. The generated-manifest check
+also exited zero (`/private/tmp/loom-help-main-manifest-check.txt`). The existing
+offline adversarial declaration above remains unchanged. Complete integration,
+its adversarial rerun, clean-copy acceptance and content-matched closing review
+remain the parent's next verification boundaries; these focused results do not
+claim them complete or establish CI at a new remote HEAD.

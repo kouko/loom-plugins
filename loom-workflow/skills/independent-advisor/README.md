@@ -74,6 +74,17 @@ you separately acknowledged each disclosure. The starting directory does not
 limit file reads, and startup, plugins or caches may write. A missing provider
 or target, a broader scope or a changed executor requires a new choice. An
 ordinary second-vendor suggestion does not start a review.
+After disclosure, the clear named request continues in the same active turn
+through execution and result validation using its existing authorization. The
+advisor does not wait for another answer; a host refusal is reported as
+incomplete and is never bypassed.
+The consent record does not grant host execution approval. Any required host
+request includes the original request, target, receiving vendor and minimized
+packet scope; requiring a second user answer fails uninterrupted execution.
+For an explicit artifact review without an owning skill, one audit leg reviews
+the inspected target even when prior rejected-options history was not supplied.
+The packet marks that history unavailable and the report discloses the limit;
+open-ended consultations still require their complete decision context.
 
 ---
 
