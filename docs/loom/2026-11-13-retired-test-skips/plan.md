@@ -33,7 +33,7 @@ charter: 1.1
 Build verification uses the configured `package-tests` command in `docs/loom/KICKOFF-DEFAULTS.md`, the relevant focused pytest invocations with `-rs`, and the mandatory independent adversarial pass. Keep positive runs distinct from skipped cases. Record outputs and any remaining skip explanations in the disposition evidence before closing review; no production tool changes are authorized.
 
 ## Simplicity check
-- none found — Independent fresh-context plan review found no smaller equivalent shape; the existing migration test is extended and both release tasks share one commit.
+- none found
 
 ## Questions asked
 ① — what — 按這個範圍進行嗎？
