@@ -69,3 +69,25 @@ parsed and the deliberate invalid block was rejected. Local combined output:
 `/private/tmp/loom-test-addition-package-after-sync.log` (not a portable dependency).
 The subsequent `sync-trunk` observation was up to date at origin/main
 `01fa41b35501644637262639517e7cb54e5d5e7b`; write-plan intake also passed.
+
+## Closing review fix
+
+One independent reviewer found the old implementer DONE definition still
+required new tests despite Role item 2 accepting existing reproducing cases.
+The other reviewer found no issues. Build searched the three guidance files
+and Build station for the same completion-demand class and found no second
+instance. Commit `df1e8c0ce352fe99cb095ee8fc78c11ebfe4736a` aligns only the
+existing DONE definition: focused verification must pass and changed executable
+behavior still requires RED/GREEN, using existing or new cases.
+
+The net guidance addition is now 118 words (59 + 29 + 30), within the 120-word
+plan limit. Existing focused checks passed before and after the edit, 45 each;
+the portable adversarial replay passed again, 2 passed. No permanent test,
+report field or executable production function was added. The complete package
+command again exited zero: 4,273 passed across 15 pytest sessions, no skips
+reported, with discovered shell suites and Mermaid checks passing. Local log:
+`/private/tmp/loom-test-addition-package-fix.log`. Independent acceptance used
+a fresh clone of the fix, replayed the unchanged five-variant synthetic case
+to observe two RED failures followed by GREEN, and reran 70 focused checks.
+Affected rows were retested and unaffected rows carried over with reasons;
+old actor hashes and incomplete station boundaries remain historical.
