@@ -1,0 +1,84 @@
+{
+  "decision": "accepted-with-explicit-limitations",
+  "usable_leg": true,
+  "rejection_key": null,
+  "rubric_changed": false,
+  "new_external_calls": 0,
+  "original_observation_files_unchanged": {
+    "report.md": "5a1c3210d77116f25f1ffcc632600404a547f10930801a3aaad43f057a73e30d",
+    "validation.json": "8e95e5b7ec7d2b88426374a0d9dd7344915d965927f9bacc8d9dc781f09c0350",
+    "trajectory.json": "ad37ef9038c1c09e59f3746f8aaee8c6abde1ea2c23bcd54a0fbcdc458137cf9",
+    "result.json": "a15b1f8b177baa4eb07128a562384cb675744ecd72e3b801715c34cd820aea5a"
+  },
+  "initial_rationale_exact": "External text states other vendors API keys and tokens reach every CLI and secrets in environment leak to vendor CLI; actual presence or egress of such secrets was not established. Inheritance is source-confirmed; actual-secret exposure remains an unchecked claim.",
+  "reason_for_change": "Initial adjudication interpreted a conditional failure-mode discussion as an observed secret incident. Original review explicitly bounds itself to pasted code and says it ran no commands; it does not assert observed secrets or remote egress. The source-grounded inheritance mechanism supports the narrower risk. Categorical phrasing is ambiguous and must be qualified, but no false concrete incident fact was established that meets the stated rejection key.",
+  "required_fields_present": true,
+  "nonempty": true,
+  "not_refusal": true,
+  "adds_analysis": true,
+  "reasoning_present": true,
+  "per_claim_checks": [
+    {
+      "claim": "Consent has no expiry or packet digest",
+      "confidence": "high for absence; severity a design judgement",
+      "source": "target.py:70-111,526",
+      "limit": "Caller owns semantic consent and final-choice refresh; runner absence is not proof an unauthorized dispatch occurred."
+    },
+    {
+      "claim": "Antigravity prompt is passed on argv",
+      "confidence": "high for argv construction",
+      "source": "target.py:488-491,558",
+      "limit": "Visibility to anyone on host and ARG_MAX behavior depend on OS/CLI; no actual disclosure or E2BIG demonstrated."
+    },
+    {
+      "claim": "Child inherits environment",
+      "confidence": "high for default inheritance; medium for mitigation judgement",
+      "source": "target.py:151-153",
+      "limit": "Only exported parent environment variables are inherited. Actual other-vendor secrets, child use and remote egress unverified. Raw categorical sentence must not be repeated as an incident claim."
+    },
+    {
+      "claim": "Output lists have no byte cap",
+      "confidence": "high for mechanism; medium for severity",
+      "source": "target.py:155-186",
+      "limit": "No runaway child or memory exhaustion observed."
+    },
+    {
+      "claim": "Claude/non-Anthropic profile can launch probe before mismatch rejection",
+      "confidence": "high",
+      "source": "target.py:530-558; local fake-runner observation in original validation",
+      "limit": "Fake-runner check proves control flow, not that real Claude accepts a gpt model; no additional real probe made."
+    },
+    {
+      "claim": "Explicit Claude IDs may fail on different modelUsage keys",
+      "confidence": "high for exact comparison; low to medium for hypothetical CLI occurrence",
+      "source": "target.py:406-409; claude_model_matches",
+      "limit": "Actual helper/background/suffix behavior unverified; fail-closed rejection may be intentional."
+    },
+    {
+      "claim": "Codex stderr echo could affect observation matching",
+      "confidence": "high for parser sensitivity; low for actual CLI scenario",
+      "source": "target.py:383-390",
+      "limit": "No prompt echo or exploit demonstrated; explicitly conditional in vendor output."
+    },
+    {
+      "claim": "killpg follows wait/reaping; theoretical PID reuse",
+      "confidence": "high for ordering; low for practical hazard",
+      "source": "target.py:210,226,245",
+      "limit": "No PID reuse observed; vendor explicitly calls this theoretical and optional."
+    },
+    {
+      "claim": "Reader grace could truncate output",
+      "confidence": "medium for possible grace consequence",
+      "source": "target.py:221-222,229-230,249-261",
+      "limit": "No truncation observed; depends on child/descendant scheduling."
+    },
+    {
+      "claim": "is_error with exit zero loses specific diagnostic classification",
+      "confidence": "high for control flow",
+      "source": "target.py:400-401,568-586,595,613-622",
+      "limit": "No actual such CLI response occurred; this is a synthetic failure-path observation."
+    }
+  ],
+  "formal_owner_verdict": false,
+  "actual_secret_incident_asserted": false
+}

@@ -1,0 +1,22 @@
+{
+  "approved": true,
+  "authorization_source": {
+    "kind": "accepted-selection",
+    "selection": "claude",
+    "target": "Final raw-skill caller review of isolated target.py copied from loom-code/scripts/external_review.py at 712196710",
+    "user_reply": "好",
+    "accepted_proposal": "One additional final live Claude Code Sonnet/medium review; only about 30KB code copy and minimal prompt to Anthropic, cost unknown, startup/config/cache access may occur."
+  },
+  "executor": "claude",
+  "review_root": "/private/tmp/loom-uninterrupted-final-live",
+  "model": "sonnet",
+  "effort": "medium",
+  "family": "anthropic",
+  "disclosures": {
+    "cost": true,
+    "vendor_egress": true,
+    "local_execution": true,
+    "filesystem_access_outside_root": true,
+    "filesystem_write_not_guaranteed": true
+  }
+}

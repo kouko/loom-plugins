@@ -1,4 +1,4 @@
-# Prepared final live continuation test (not executed)
+# Final live continuation test — executed
 
 ## Question
 
@@ -18,4 +18,6 @@ The fresh caller emits nonblocking disclosure, prepares the bounded authorizatio
 
 ## Authorization status
 
-Prepared only. The previous one-call execution has been consumed; this additional real vendor execution has not been authorized or attempted. No approval setting or installed cache is changed.
+The user approved this additional bounded execution with 好 after the scoped proposal. It was executed once: one 2-second preflight and one 94-second review, with no further user answer, retry or provider substitution. This is the second real review overall; the earlier diagnostic review remains preserved. No approval setting or installed cache changed.
+
+The initial caller rejected the output; independent source-based adjudication found its incident reading was stronger than the raw conditional-risk text. The caller appended a qualified audit acceptance without rewriting any original observation. See final-live/reconciliation.md, reconciled-validation.json and output-adjudication.md. Actual secret presence, remote egress and OS/CLI-dependent failure modes remain unverified. Independent acceptance is recorded separately.

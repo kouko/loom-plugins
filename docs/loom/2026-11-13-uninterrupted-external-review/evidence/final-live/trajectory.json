@@ -1,0 +1,30 @@
+{
+  "caller": "raw working-tree independent-advisor",
+  "shared_boundary": "loom-code:external-review",
+  "mode": "audit",
+  "mode_basis": "可以用 claude code 獨立 review 嗎？",
+  "mode_basis_status": "natural testcase; not authorization evidence",
+  "authorization": "consent.json accepted-selection from actual parent user reply 好",
+  "owner": null,
+  "leg_count": 1,
+  "target_bytes": 30835,
+  "target_sha256": "66490ab8c9ea6d7a496b4660d46b867a768daa6063471cbde8d5ee0c10c57487",
+  "further_user_answer_needed": false,
+  "effective_inherited_overrides": null,
+  "dispatch_packet": "/Users/kouko/.herdr/worktrees/loom-plugins/autoprove-send-data-to-thirdparty-reviewer/docs/loom/2026-11-13-uninterrupted-external-review/evidence/final-live/packet.txt",
+  "host_execution": "approved by host mechanism; no extra user answer",
+  "runner_exit_code": 0,
+  "probe_seconds": 2,
+  "review_seconds": 94,
+  "progress": [
+    "probe exited 0 after 2s; longest silence 1s",
+    "review still running; 60s elapsed; no output yet",
+    "review exited 0 after 94s; longest silence 94s"
+  ],
+  "actual_preflight_count": 1,
+  "actual_review_count": 1,
+  "retry_count": 0,
+  "provider_substitution": false,
+  "output_validation": "rejected",
+  "rejection_key": "unbacked-claim"
+}
