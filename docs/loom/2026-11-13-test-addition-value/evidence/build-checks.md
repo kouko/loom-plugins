@@ -62,5 +62,10 @@ were merged in `07c8b75b1`, preserving both changelog sections and the feature's
 3.73.0 version packet. All ten conflicts were version strings except the
 changelog, where both entries were retained. The three behavior-guidance
 files were unchanged. The portable reused adversarial command passed again
-(2 passed) after integration. The full package suite is being rerun on that
-integrated content before independent acceptance and closing review.
+(2 passed) after integration. The complete package command then exited zero
+on that integrated content: 15 pytest sessions totaled 4,273 passed, with
+no skips reported; the discovered shell suites passed, all 13 Mermaid blocks
+parsed and the deliberate invalid block was rejected. Local combined output:
+`/private/tmp/loom-test-addition-package-after-sync.log` (not a portable dependency).
+The subsequent `sync-trunk` observation was up to date at origin/main
+`01fa41b35501644637262639517e7cb54e5d5e7b`; write-plan intake also passed.
