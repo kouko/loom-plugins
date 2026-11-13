@@ -1,0 +1,99 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-test-addition-value",
+  "content_digest": "f9acee2b725796c70a11e793fec912a9c61b3bd8",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_test_budget_text.py -q",
+      "artifact": "loom-code/tests/test_test_budget_text.py",
+      "result": "pass",
+      "command_digest": "3325274d0f893da1e6846f21ded4d6f0d81fae31d5fae2586613736586795664"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
+      "review_target_sha": "8515001c8f00bb4aa3be6e7fd0582020abce4b05",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Terminal Round 3 of the same episode. Round 1 implementer DONE finding remains fixed; the Round 3 delta changes no guidance, executable code or test. No regression introduced by the confirmation-history repair was found.",
+        "Read the complete fix delta, current acceptance report/evidence, actual intent-version checker and canonical confirmation commit. Independently verified byte-identical Acceptance sections, the recomputed current intent pin and canonical/current intent equality. The plan references that confirmation; no new authorization, review reset or spending reset is inferred.",
+        "Historical executions and limitations remain identified, with explicit carryover reasons for all four acceptance rows. No package suite, adversarial program or external model call was run by this reviewer; no finalization success is inferred."
+      ],
+      "reviewer": "/root/closing_test_value_skill",
+      "vendor": "openai",
+      "model": "host-inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "01fa41b35501644637262639517e7cb54e5d5e7b",
+      "review_target_sha": "8515001c8f00bb4aa3be6e7fd0582020abce4b05",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Terminal Round 3 reviewed only 34fabd063bdf1eb04251147f86a3ba91def0347d..8515001c8f00bb4aa3be6e7fd0582020abce4b05 and resulting regressions. This reviewer's prior findings list was empty. Read the canonical confirmation commit and existing intent-version rule; independently verified Acceptance byte equality and the recomputed confirmation pin.",
+        "No loom-code guidance, executable code or tests changed since Round 2. The changed test file passed independently in Round 1: 43 passed, no skips. No complete package suite, adversarial program or external model CLI was run by this reviewer.",
+        "The repaired confirmation records previously granted continuation and conditional merge authorization while preserving all four Acceptance conditions, the review episode and spent allocation. Updated acceptance evidence explicitly carries results over and preserves historical execution identities; it does not assert a fresh actor run or finalization success."
+      ],
+      "reviewer": "/root/closing_test_value_code",
+      "vendor": "openai",
+      "model": "host-inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "7619afaa087574d41f2cffe92e5084c421819852",
+  "tested_commit": "a85b8775ee63cd874a3a61e92b1975027f917977",
+  "reviewed_commit": "8515001c8f00bb4aa3be6e7fd0582020abce4b05",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
