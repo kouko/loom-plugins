@@ -2,7 +2,7 @@
 originator: kouko
 kind: engineering
 needs-design: yes — 涉及全部主要命令的公開說明與安全探索介面
-intent_confirmed_sha: 66583a51db46b4517f692cab4dcf61318fc19b21
+intent_confirmed_sha: 66583a51db46
 status: confirmed 2026-11-13
 publication: automatic — authorized 2026-11-13 by kouko
 
