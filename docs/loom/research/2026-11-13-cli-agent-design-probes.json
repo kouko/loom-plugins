@@ -1,0 +1,97 @@
+[
+  {
+    "case": "overview",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "--help"
+    ],
+    "exit": 0,
+    "stdout": "\n\n    loom_checker.py --list-rules\n    loom_checker.py --help\n    loom_checker.py intent <path> [--commit-msg <file>]\n    loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]\n    loom_checker.py intake <station> <change-id> [--json]\n    loom_checker.py push --hook\n    loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>\n    loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>\n    loom_checker.py delivery [--goal local|published|merged] [--intent <path>] [--json]\n    loom_checker.py land --accepted-by <name>\n    loom_checker.py land --cleanup <branch>\n    loom_checker.py land --sweep [--confirm <token>]\n    loom_checker.py sync-trunk\n    loom_checker.py github-rules [--print-setup]\n    loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha> [--branch <name>]\n    loom_checker.py reviewer-count <change-id>\n    loom_checker.py finalize-review <change-id> --input <review-input.json>\n    loom_checker.py standing <path-to-intent>\n    loom_checker.py contract --require <major.minor>\n    loom_checker.py charter [--manifest <path>]\n    loom_checker.py plan <path-to-plan.md> [--json]\n\nWith the launcher, the checker is selected automatically; omit loom_checker.py:\n    \"<loom-code>/scripts/loom-python\" --repair plan \"<path-to-plan.md>\"\n    \"<loom-code>/scripts/loom-python\" --ready intake <station> <change-id>\nReplace <loom-code> with the installed plugin directory and <path-to-plan.md>\nwith your plan file path.\nPlan takes a file path; intake takes a station and a change-id.\nPlan and intake accept an optional final --json selector; text remains default.\nDetailed help: finalize-review --help, publish --help, delivery --help\n              plan --help, intake --help, reviewer-count --help\n(each also accepts -h). Only these exact command-plus-help forms are help.\nNo validation runs for --help or -h alone.\n\nExit codes: 0 pass (or help displayed), 1 a rule failed (`BLOCK <rule.id>: <reason>` on\nstderr), 2 usage or internal error. Any unexpected exception fails\nclosed as exit 2 -- a checker that cannot decide never says \"fine\".\n\nSchemas are not restated here: the required frontmatter fields, sections,\nstation names, interface-surface defaults and artifact paths are read\nfrom `loom-code/contract/manifest.yaml`, which is the versioned contract\npackage this checker ships with.\n",
+    "stderr": ""
+  },
+  {
+    "case": "plan-help",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "plan",
+      "--help"
+    ],
+    "exit": 0,
+    "stdout": "plan \u2014 check the implemented field caps on one named file\nUsage: plan <path-to-plan.md> [--json]\nSupply a readable file path, relative to the working directory or absolute;\nthis command does not resolve a change-id or select a canonical plan.\n\nThe check applies field caps only when the file has a charter: frontmatter\nkey. Charter 1.1 or later also requires a valid Simplicity check record.\nA file without that key, including an empty file, may pass. Passing does not\napprove the plan, prove its requirements are complete or verify the change.\n\nText results: exit 0 has no success payload on stdout; the implemented checks on\nthe named file passed. Exit 1 reports BLOCK plan.field-caps on stderr;\ncorrect the reported field and rerun. Exit 2 means a missing/unreadable file,\ninvalid invocation or internal failure; correct the path, access or invocation\nfrom the diagnostic. No artifact is rewritten and no later station runs.\nPlanning guidance: <loom-code>/skills/write-plan/SKILL.md.\nOptional JSON: append --json as the final argument only. Exact --help/-h\nremains text; help combined with --json is checked as an ordinary invocation.\nDuplicate selectors are usage errors. Earlier --json tokens without a final\nselector retain their existing operand meaning; ./--json names a literal file.\n\nJSON stdout is one object plus newline; checker stderr is empty. Fields:\nschema_version: 1; command: plan|intake; status: passed|blocked|error;\ndiagnostics: ordered [{rule_id, message}]; notices: ordered strings;\nerror: null or {kind: usage|internal, message}. Empty arrays are [], not null.\nExit 0 means passed, 1 blocked, 2 error. Blocked includes rule diagnostics;\nerror has empty diagnostics. Notices may precede a blocker or internal error\nand never imply success. Status covers only this invocation's checks, not\nworkflow completion or authority. Do not depend on key order or message prose.\nLauncher/startup failures, termination and broken pipes are outside this\nin-process result guarantee. Read the actual process result; do not retry\nautomatically. Without --json, existing text streams and exits are unchanged.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+    "stderr": ""
+  },
+  {
+    "case": "intake-help",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "intake",
+      "--help"
+    ],
+    "exit": 0,
+    "stdout": "intake \u2014 check the selected station's current prerequisites\nUsage: intake <write-spec|write-plan> <change-id> [--json]\nRun inside the selected repository. Supply a change-id, not a file path;\naccepted identifiers contain only letters, digits, dots, underscores and\nhyphens. Canonical artifacts are resolved through the bundled contract.\n\nText results: exit 0 means the applicable prerequisites passed for this snapshot;\nit does not perform the station, authorize publication or verify the change.\nConditional interface-surfaces (...) information may appear on stdout for\nengineering intents or applicable needs-design=yes write-plan intake.\nThat information is advisory and may precede a later BLOCK; it is not a\nsuccess result. Other intake paths have no stdout payload.\n\nExit 1 reports BLOCK <rule>: <reason> on stderr. Supply or correct authentic\nrequired artifacts through their owning workflow, then rerun. Exit 2 means\ninvalid station/change-id/arguments or an internal failure; correct the\ninvocation or repository/environment from the diagnostic. These checks are\nread-only and synchronous; no previous pass waives the next check.\nStation and prerequisite guidance: <loom-code>/skills/write-plan/SKILL.md.\nOptional JSON: append --json as the final argument only. Exact --help/-h\nremains text; help combined with --json is checked as an ordinary invocation.\nDuplicate selectors are usage errors. Earlier --json tokens without a final\nselector retain their existing operand meaning; ./--json names a literal file.\n\nJSON stdout is one object plus newline; checker stderr is empty. Fields:\nschema_version: 1; command: plan|intake; status: passed|blocked|error;\ndiagnostics: ordered [{rule_id, message}]; notices: ordered strings;\nerror: null or {kind: usage|internal, message}. Empty arrays are [], not null.\nExit 0 means passed, 1 blocked, 2 error. Blocked includes rule diagnostics;\nerror has empty diagnostics. Notices may precede a blocker or internal error\nand never imply success. Status covers only this invocation's checks, not\nworkflow completion or authority. Do not depend on key order or message prose.\nLauncher/startup failures, termination and broken pipes are outside this\nin-process result guarantee. Read the actual process result; do not retry\nautomatically. Without --json, existing text streams and exits are unchanged.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+    "stderr": ""
+  },
+  {
+    "case": "contract-help",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "contract",
+      "--help"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "unexpected argument '--help'.\n"
+  },
+  {
+    "case": "charter-help",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "charter",
+      "--help"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "unexpected argument '--help'.\n"
+  },
+  {
+    "case": "reviewer-help",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "reviewer-count",
+      "--help"
+    ],
+    "exit": 0,
+    "stdout": "reviewer-count \u2014 compute the required independent reviewer floor\nUsage: reviewer-count <change-id>\nRun inside the selected repository with a clean tree and committed functional\ncontent. Supply one nonblank change-id operand. Preserve work and finish and\ncommit the change before requesting the floor; do not discard files to pass.\n\nResults: exit 0 prints the integer floor and newline on stdout. Obtain that\nmany independent reviewers; the number is not a verdict or proof of review,\nacceptance, finalization or completed verification. The policy conservatively\nrequires two when it cannot classify the complete committed delta.\nExit 2 means missing/extra operands, a dirty tree or an internal failure;\nuse the diagnostic to correct the invocation or repository condition, then\nrerun. This read-only command neither dispatches reviewers nor writes evidence.\nReview guidance: <loom-code>/skills/closing-review/SKILL.md.\n\nNo validation or publication occurred: help only, exit 0.\nUse \"<loom-code>/scripts/loom-python\" --ready <command> <arguments>.\nReplace <loom-code> with the installed loom-code plugin directory; launcher\nruntime readiness is still required. Bundled paths above are plugin-relative.\n",
+    "stderr": ""
+  },
+  {
+    "case": "plan-json-usage",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "plan",
+      "--json"
+    ],
+    "exit": 2,
+    "stdout": "{\"schema_version\": 1, \"command\": \"plan\", \"status\": \"error\", \"diagnostics\": [], \"notices\": [], \"error\": {\"kind\": \"usage\", \"message\": \"plan needs a path.\"}}\n",
+    "stderr": ""
+  },
+  {
+    "case": "intake-json-usage",
+    "argv": [
+      "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.72.0/scripts/loom-python",
+      "--ready",
+      "intake",
+      "--json"
+    ],
+    "exit": 2,
+    "stdout": "{\"schema_version\": 1, \"command\": \"intake\", \"status\": \"error\", \"diagnostics\": [], \"notices\": [], \"error\": {\"kind\": \"usage\", \"message\": \"intake needs a station and a change-id.\"}}\n",
+    "stderr": ""
+  }
+]

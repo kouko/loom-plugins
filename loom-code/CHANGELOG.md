@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.75.0] — 2026-11-14 — complete safe help for all sixteen CLI commands
+
+- Provide dedicated exact `<command> --help` and `<command> -h` discovery for all sixteen principal commands before handler execution, stdin reads or repository/network work. Update overall discovery, including native Git hook modes.
+- Align guidance with actual inputs, prerequisites, output states, advisory exits, partial writes, protection limits and recovery actions. Explain ready-runtime discovery separately from runtime repair that may provision dependencies.
+- Preserve ordinary parsing, default text streams, exits, authorization and existing preparation/delivery JSON interfaces. Non-exact help combinations retain ordinary command behavior; this release adds no JSON interface.
+
 ## [3.74.0] — 2026-11-14 — identify the added protection before adding tests
 
 - Reuse sufficient existing coverage during planning and implementation; identify the distinct defect or uncovered behavior when extending permanent tests, while preserving defect reproduction, test-first work and independent boundary coverage.

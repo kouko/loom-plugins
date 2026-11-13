@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.74.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.75.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.22.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.74.0. Five stations carry one change from plan to PR with
+Version 3.75.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -273,13 +273,19 @@ retrying a potentially completed mutation. No automatic retry is added.
 
 For command discovery and input recovery, run
 `"<loom-code>/scripts/loom-python" --ready <command> --help`, replacing
-`<loom-code>` with the installed plugin directory and `<command>` with
-`finalize-review`, `publish`, `delivery`, `plan`, `intake` or `reviewer-count`.
-These commands also accept exact
-`<command> -h` calls. Help describes inputs, authentic evidence, authorization
-and outcomes without validation or publication; covered text-mode failures retain their
-diagnostics and exit status and add a help hint. Hook and internal-error behavior
-are unchanged.
+`<loom-code>` with the installed plugin directory. All sixteen principal
+subcommands listed by the overall checker help support exact `<command> --help`
+and `<command> -h` calls. Help describes inputs, prerequisites, results and
+operational consequences without running the handler or reading stdin. Only
+these exact forms are safe discovery; adding other arguments retains ordinary
+command parsing. `--ready` needs a valid cached runtime and exits 86 when it is
+missing or invalid; `--repair` may download dependencies and write runtime
+caches before showing checker help.
+
+Failure hints remain limited to `finalize-review`, `publish`, `delivery`, `plan`,
+`intake` and `reviewer-count`; their covered text-mode failures retain diagnostics
+and exit status. Help coverage does not add hints to other commands. Hook and
+internal-error behavior are unchanged.
 
 The preparatory checks keep their limited scope: `plan <path>` checks the
 named file's implemented field caps, `intake <station> <change-id>` checks
@@ -289,8 +295,8 @@ does not run its station or establish completed review or verification.
 Intake's conditional `interface-surfaces (...)` stdout remains advisory and
 can precede a later failure; inspect the exit status and diagnostics too.
 
-Help for other commands, typed error categories and additional JSON modes remain
-future migrations requiring compatibility checks. Exit 2 still conflates usage errors
+Typed error categories and additional JSON modes remain future migrations
+requiring compatibility checks; this release adds no JSON interface. Exit 2 still conflates usage errors
 and internal faults. Host hook protocols, review, acceptance and failure-blocking
 rules remain unchanged.
 
