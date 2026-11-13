@@ -45,7 +45,15 @@ stdin operand. The shared `sha512sum -c -` invocation then exercised actual
 checksum failure and passed the regression case. These were portability
 corrections in the setup command, not skipped or successful checksum tests.
 
-## Pending boundaries
+## Build integration observed at daf2adf33
+
+The configured complete command `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` exited zero: 4,273 pytest cases passed across 15 sessions, zero skipped; all shell and Mermaid commands passed. Raw output: `/private/tmp/loom-ci-environment-package-tests.txt`.
+
+The retained adversarial declaration `uv run --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-memory/test_migrate_legacy_store.py` exited zero with 17 passed. Raw output: `/private/tmp/loom-ci-environment-adversarial-rerun.txt`. New CI failure injections are recorded separately in `ci-adversarial-report.md`; they earned no new program because none exposed a defect.
+
+Both Build and pre-acceptance `sync-trunk` observations reported up to date against origin/main fbdc29af358413bc9d55b599231b2a6cbcb4524d. These local executions do not establish Linux runtime readiness.
+
+## Remaining remote boundary
 
 No Linux container or VM was started. Local tests establish parsed preparation
 order and failure propagation inside the actual installation shell; they do not
