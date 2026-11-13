@@ -62,3 +62,57 @@ Linux plugin validation. Actual GitHub execution, skip counts, complete package
 execution and independent verification belong to the subsequent Build/Ship
 observations. The macOS `/var` alias and case-insensitive-filesystem checks can
 remain platform skips on Ubuntu; they must be reported separately from passes.
+
+## Round 2 correction — propagate pytest skip diagnostics
+
+This is a Round 2 repair in the same CI-extension review episode, under the
+existing W3 AC6 obligation. It changes neither confirmed scope nor the episode
+or same-task retry budget; no new confirmation or review episode is claimed.
+
+The first remote run at `e98b17f0aea026899e7980a9cfbbae58665cd3ed` supersedes the preceding pending-Linux
+boundary for that revision: all CI checks succeeded. Code run `43444813208`
+reported 2,842 passed and zero skipped; design run `43444813139` reported 211
+passed and zero skipped; workflow run `43444812907` reported 1,218 passed and
+two skipped across its sessions. Combined pytest results were 4,271 passed and
+two skipped. The real Linux setup printed agy 1.5.8 and successfully validated
+all three plugins (8, 7 and 14 skills). Raw logs are
+`/private/tmp/loom-ci-code-remote.txt`, `/private/tmp/loom-ci-design-remote.txt`
+and `/private/tmp/loom-ci-workflow-remote.txt`. This confirms real installation
+and local validation without model credentials at that revision. It does not
+prove this diagnostic fix or establish printed skip reasons; that fix requires
+a new remote observation.
+
+Remote provenance: [code run](https://github.com/kouko/loom-plugins/actions/runs/43444813208),
+[design run](https://github.com/kouko/loom-plugins/actions/runs/43444813139),
+and [workflow run](https://github.com/kouko/loom-plugins/actions/runs/43444812907),
+all at the first published revision identified above.
+
+The first published CI execution exposed a diagnostic propagation defect.
+Although the three workflow runner commands included `-rs`, the runner's
+`--loom-family` path forwards only its supported verbosity selection, not
+arbitrary pytest arguments. The earlier statement that the selectors requested
+diagnostics described their command text; it did not establish that pytest
+received the option. Existing passing environment checks asserted that same
+text and therefore missed this defect. Preserve those observations as historical
+results, not proof of skip-reason output.
+
+Defect class: pytest diagnostic options not propagated. The search covered
+all cumulative changed paths plus AC6 diagnostic surfaces. The actual instances
+were the three Python suite commands in the code, design and workflow workflows,
+the command-text assertion in the environment regression test, and this
+evidence's diagnostics claim. Other recorded `-rs` commands invoke pytest
+directly and remain valid. The disposition and release prose describe the
+intended diagnostic outcome and are clarified with the actual environment path.
+
+The three suite steps now set `PYTEST_ADDOPTS: '-rs'`, which pytest reads from
+its inherited environment, and omit the ignored runner argument. The existing
+parameterized environment case checks the actual step environment and executes
+a tiny real pytest test using that environment, verifying the printed skip
+reason. No runner API or inventory changes are made.
+
+The strengthened regression was run before changing the workflows: 3 failed
+and 2 passed because each suite environment lacked the option. Raw output:
+`/private/tmp/loom-ci-diagnostics-red.txt`. The corrected environment and
+unified-design focused run reported 10 passed, zero skipped, retained at
+`/private/tmp/loom-ci-diagnostics-green.txt`; later integration and remote
+observations must establish the cumulative result.

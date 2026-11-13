@@ -83,4 +83,5 @@ jobs:
         # the fan-out in the first place.
         env:
           PYTHONDONTWRITEBYTECODE: "1"
-        run: python3 scripts/run_package_tests.py --loom-family --only design -q -rs
+          PYTEST_ADDOPTS: '-rs'
+        run: python3 scripts/run_package_tests.py --loom-family --only design -q

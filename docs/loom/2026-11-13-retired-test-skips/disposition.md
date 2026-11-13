@@ -122,3 +122,11 @@ recorded in `evidence/ci-environment-verification.md`; independent Build, full
 package execution, acceptance and closing review must cover the cumulative tree.
 The existing 3.72.1 release packet includes this CI maintenance extension; no
 runtime tool behavior, platform matrix or other worktree changed.
+
+The first published CI observation found that the family runner ignored the
+trailing pytest `-rs` arguments. The corrected three Python suite steps provide
+`PYTEST_ADDOPTS: '-rs'` in their environment instead. The environment guard now
+runs real pytest with that exact configured environment and checks the printed
+reason; previous command-text checks alone did not prove diagnostics reached
+pytest. Detailed RED/GREEN evidence and the scoped defect search are retained
+in `evidence/ci-environment-verification.md`.

@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import subprocess
+import sys
 
 import pytest
 import yaml
@@ -18,7 +19,7 @@ PYTHON_JOBS = (
 
 
 @pytest.mark.parametrize("filename,job,group", PYTHON_JOBS)
-def test_ci_job_dependencies_precede_its_suite(filename, job, group):
+def test_ci_job_dependencies_precede_its_suite(filename, job, group, tmp_path):
     data = yaml.safe_load((WORKFLOWS / filename).read_text())
     steps = data["jobs"][job]["steps"]
     suite_index = next(i for i, step in enumerate(steps)
@@ -26,7 +27,18 @@ def test_ci_job_dependencies_precede_its_suite(filename, job, group):
     preparation = steps[:suite_index]
     commands = "\n".join(step.get("run", "") for step in preparation)
     assert "--require-hashes -r requirements-package-tests.lock" in commands
-    assert "-rs" in steps[suite_index]["run"]
+    suite_env = steps[suite_index].get("env", {})
+    assert suite_env.get("PYTEST_ADDOPTS") == "-rs"
+    skip_case = tmp_path / "test_diagnostic.py"
+    skip_case.write_text('import pytest\ndef test_skip():\n    pytest.skip("CI diagnostic reason is visible")\n')
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-c", os.devnull, str(skip_case)],
+        env=dict(os.environ, **suite_env, PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"),
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "SKIPPED [1]" in result.stdout
+    assert "CI diagnostic reason is visible" in result.stdout
     if group == "code":
         assert "apt-get install --yes zsh" in commands
         assert "uv==" in commands and "uv --version" in commands

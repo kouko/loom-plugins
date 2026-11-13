@@ -110,7 +110,8 @@ jobs:
       - name: Run loom-visualization page script tests
         env:
           PYTHONDONTWRITEBYTECODE: '1'
-        run: python3 scripts/run_package_tests.py --loom-family --only workflow-python -v -rs
+          PYTEST_ADDOPTS: '-rs'
+        run: python3 scripts/run_package_tests.py --loom-family --only workflow-python -v
 
   # Every mermaid block in loom-visualization's templates/ and references/
   # must parse under Mermaid's own parser (pinned in the committed lockfile).
