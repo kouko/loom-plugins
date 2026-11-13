@@ -1,5 +1,5 @@
 # Test-addition value — plan
-intent: 2026-11-13-test-addition-value@f5efe195
+intent: 2026-11-13-test-addition-value@ad9d3b40
 charter: 1.1
 
 ## Current State Evidence

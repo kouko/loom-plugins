@@ -91,3 +91,23 @@ a fresh clone of the fix, replayed the unchanged five-variant synthetic case
 to observe two RED failures followed by GREEN, and reran 70 focused checks.
 Affected rows were retested and unaffected rows carried over with reasons;
 old actor hashes and incomplete station boundaries remain historical.
+
+## Confirmation-history repair after finalization refusal
+
+The first finalization executed and passed both package-tests and adversarial,
+then refused `intake.intent-version`: the later authorization edit had updated
+the current pin but not the canonical confirmation commit, which still held
+the original planning-only intent. Its output is retained locally at
+`/private/tmp/loom-test-addition-finalize.log`; no attestation was generated.
+
+The user had already authorized continuation and conditional merge. Canonical
+confirmation commit `ad9d3b402` records that existing authorization, retaining
+all four Acceptance lines verbatim, the existing review episode and the spent
+65-attempt allocation. The plan's intent reference follows that commit. This
+is provenance repair, not new requirements or permission inferred from a gate.
+
+Directly replayed the existing `check_intent_version` function against the
+historical reviewed commit and its actual pin: it reproduced the same blocking
+diagnostic. Against the new canonical confirmation and its recomputed pin,
+it returned no diagnostics. No checker rule or permanent test was changed.
+The same final review episode continues; earlier round history is retained.
