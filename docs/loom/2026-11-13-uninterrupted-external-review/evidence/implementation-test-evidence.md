@@ -32,3 +32,15 @@ A fresh caller actor with a readable single-file target and a natural named revi
 Command: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
 
 The first code group returned 1 failed, 2836 passed, 2 skipped in 115.95s. Failure: `test_review_convergence_contract.py::test_earlier_verdicts_not_reused` treated the affirmative reuse of existing request authorization as prohibited reuse of an earlier review verdict. The runner stopped before subsequent groups. This failure is retained; it is not a completed package pass. The repair must preserve whole-document detection of affirmative verdict reuse while excluding authorization reuse.
+
+## Build integration after guard correction
+
+The verdict-reuse guard was repaired with affirmative active/passive verdict self-tests and an authorization-reuse negative control. Focused convergence plus advisor checks: 30 passed. No runtime authorization semantics were relaxed.
+
+The second complete locked package-suite invocation exited 0: 15 pytest groups summed to 4,265 passed and 11 skipped, plus the runner's shell checks. The first failed log remains separate. The reused adversarial artifact was then re-executed: 13 passed in 0.17s. Trunk sync reported up to date with origin/main fbdc29af3 at tested HEAD 862088abd.
+
+Commands:
+- `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+- `python3 -m pytest loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py -q`
+
+Full second-run log: /private/tmp/loom-uninterrupted-package-tests-r2.log. This integration result is not itself semantic acceptance of the user's uninterrupted-review goal.
