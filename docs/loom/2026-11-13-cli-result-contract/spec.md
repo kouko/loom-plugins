@@ -1,5 +1,5 @@
 # Help-first CLI result consistency — spec
-intent: 2026-11-13-cli-result-contract@16d9157b027c53df8b82c4b5707024f19bc9a1ee
+intent: 2026-11-13-cli-result-contract@2f29db8ab63a49c5b69decf2973d201112e63f59
 pre-build-review: required — extends the public CLI discovery contract
 
 ## Requirements

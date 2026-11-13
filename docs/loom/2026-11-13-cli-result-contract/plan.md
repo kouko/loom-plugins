@@ -1,5 +1,5 @@
 # Help-first CLI result consistency — plan
-intent: 2026-11-13-cli-result-contract@16d9157b027c53df8b82c4b5707024f19bc9a1ee
+intent: 2026-11-13-cli-result-contract@2f29db8ab63a49c5b69decf2973d201112e63f59
 spec: docs/loom/2026-11-13-cli-result-contract/spec.md (current narrowed revision)
 charter: 1.1
 
@@ -30,19 +30,34 @@ scope, not completed or skipped verification. No replacement JSON task exists.
 ### Wave 3 — Release packet and branch-end verification
 
 **W3-01 Complete minor release metadata packet**  after: W1-02  acceptance: 3
-- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A3 positive: release-metadata-synchronized; negative: stale-release-pin-detected.
-- Risk: REQ-3 compatibility decision; agent-decided bump loom-code to 3.73.0 in final fix before attestation. Add dated CHANGELOG section describing all-command help and compatibility, sync derived manifests with scripts/sync_codex_manifests.py --all, rewrite version-pin test and README strings. Existing test_readme_version_matches_manifest checks all three language READMEs, so Japanese and Traditional Chinese version strings are included for release parity; their other content stays unchanged.
+- Risk: REQ-3 compatibility; agent-decided release 3.73.0 before attestation. Update dated CHANGELOG, sync derived manifests via scripts/sync_codex_manifests.py --all, rewrite version pin and root plus three-language README versions. Preserve other localized content; test_readme_version_matches_manifest covers language parity.
 
 **W3-02 Adversarial and integration evidence**  after: W3-01  acceptance: 1, 2, 3, 4
 - Files: `docs/loom/2026-11-13-cli-result-contract/evidence/probes/`, `docs/loom/2026-11-13-cli-result-contract/evidence/build-verification.md`
 - Test: A1 positive: inventory-current; boundary: effects-caveats. A2 positive: help-source-accuracy; negative: operational-overclaim. A3 positive: package-suite; negative: legacy-regression. A4 positive: safe-discovery; negative: execution-tripwire.
-- Risk: REQ-1/2/3/4 verification decision; independent adversary writes and executes bounded probes, respecting five-program ceiling and concern headers. Run complete scripts/run_package_tests.py --loom-family after final fixes; no live writer/cleanup or paid calls. Finalization reruns declared checks later.
+- Risk: REQ-3 compatibility; agent-decided release 3.73.0 before attestation. Update dated CHANGELOG, sync derived manifests via scripts/sync_codex_manifests.py --all, rewrite version pin and root plus three-language README versions. Preserve other localized content; test_readme_version_matches_manifest covers language parity.
 
 **W3-03 Correct superseded discovery documentation**  after: W3-02  acceptance: 1, 4
 - Files: `README.md`, `docs/loom/research/2026-11-13-cli-agent-design-guidelines.md`, `docs/loom/2026-11-13-cli-result-contract/plan.md`
 - Test: A1 positive: historical-inventory-labelled; boundary: current-versus-retained-snapshot. A4 positive: all-command-help-discovery; negative: superseded-six-help-guidance.
-- Risk: REQ-1/4 acceptance finding; agent-decided update current README discovery to all sixteen exact-help pairs while keeping the original six failure hints and runtime-readiness boundary. Label the research's retained pre-implementation snapshot and narrowed confirmed intent without rewriting historical rows or prior acceptance reports. Parent reruns integration checks and independent acceptance after this prose-only fix.
+- Risk: REQ-1/4 acceptance finding; agent-decided advertise all sixteen exact-help pairs while preserving six failure hints and readiness limits. Label historical research snapshots without rewriting original rows or acceptance reports. Rerun integration and independent acceptance after correction.
+
+**W3-04 Repair canonical confirmation provenance**  after: W3-03  acceptance: 1, 2, 3, 4
+- Files: `docs/loom/intent/2026-11-13-cli-result-contract.md`, `docs/loom/2026-11-13-cli-result-contract/spec.md`, `docs/loom/2026-11-13-cli-result-contract/plan.md`, `docs/loom/2026-11-13-cli-result-contract/evidence/confirmation-provenance-fix.md`
+- Test: A1 positive: canonical-scope-resolution; boundary: historical-baseline-preserved. A2 positive: unchanged-help-requirements; negative: superseded-json-scope. A3 positive: identical-intent-identity; boundary: pin-prefix-equivalence. A4 positive: current-scope-check; negative: stale-confirmation-selection.
+- Risk: REQ-1/4 acceptance finding; agent-decided advertise all sixteen exact-help pairs while preserving six failure hints and readiness limits. Label historical research snapshots without rewriting original rows or acceptance reports. Rerun integration and independent acceptance after correction.
+
+**W3-05 Retained localized release-version parity**  after: W3-01  acceptance: 3
+- Files: `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`
+- Test: A3 positive: localized-release-version-parity; negative: stale-localized-version.
+- Risk: REQ-3 retained completed release work; agent-decided split localized README ownership from W3-01 to keep exact file inventory within field caps. Existing test_readme_version_matches_manifest covers parity; preserve non-version localized text.
+
+W3-01, W3-02, W3-03 and W3-05 describe already implemented release,
+verification and documentation work retained in history. W3-04 is the current
+provenance repair. The complete suite/adversary and acceptance/review must run
+again on this corrected content; prior success is not finalization success.
 
 Implementer dispatch applies to every implementation task. Shared dispatcher,
 tests and mirrored documentation keep the tasks sequential. W1-02 uses an
