@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-14-post-merge-delivery-guidance",
-  "content_digest": "9fc7595f48c5ce3f4a0b50812aee7fbb9aa6c69f",
+  "content_digest": "894b4a09e35c3bdb2317a073abab89ab8e66fb53",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,27 +22,27 @@
     {
       "verdict": "PASS",
       "lens": "code",
-      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
-      "review_target_sha": "42aeacc7891d8665d6f877d9ebbb9074ecc8beb7",
+      "reviewed_sha": "cb737ec3ee13b7670857b65a7c874774a4d3340a",
+      "review_target_sha": "852416d60d67be2c63b0bbb6d665ab6b621afe55",
       "dimension_scores": {
-        "security": "PASS — Round-one assessment retained; repair changes no runtime, authorization or remote surface.",
-        "architecture": "PASS — Round-one assessment retained; bookkeeping repair introduces no mechanism.",
-        "correctness": "PASS — Independently recomputed canonical bytes equal to original aa0f50acf, pin 56acccd13debac07366685edc4ee850e40bbde61, and check_intent_version returned []. Acceptance tested and target functional digests both equal 9fc7595f48c5ce3f4a0b50812aee7fbb9aa6c69f.",
-        "naming": "PASS — Round-one assessment retained; W4 accurately names confirmation bookkeeping repair.",
-        "tests": "PASS — Round-one independent changed-file run remains applicable: 55 passed, zero skipped. No tests or runtime changed in repair. Independently executed canonical comparison, intent-version check and tested/target digest computation; all agreed.",
-        "refactoring": "PASS — Round-one assessment retained; no executable changes.",
-        "cross-task-coherence": "PASS — Plan references corrected confirmation commit; W4 is limited to affected Acceptance 3. Refused finalization remains documented and report distinguishes A2 retest from four carried-over scenarios.",
-        "external-surface-grounding": "PASS — Round-one assessment retained; no new external surface.",
-        "principles-conformance": "PASS — Original user-confirmed content and publication authorization are byte-identical after canonical exclusions; repair neither changes requirements nor creates new consent. Failed evidence remains visible.",
+        "security": "PASS — Prior assessment retained; integration changes no own authorization or runtime surface.",
+        "architecture": "PASS — README conflict resolution preserves both plugin releases; no new mechanism.",
+        "correctness": "PASS — Independently verified code 3.80.0 and workflow 5.24.0 against manifests and resolved README; own intent and delivery runtime diff is empty. Intent-version check returns []; tested and target functional digests both equal 894b4a09e35c3bdb2317a073abab89ab8e66fb53.",
+        "naming": "PASS — W5 accurately identifies accepted merge integration and version preservation.",
+        "tests": "PASS — Prior independent 55-pass changed-file run remains applicable; own tests unchanged. Independently executed intent-version and tested/target digest checks successfully; handed Build logs record full suite and delivery program success after integration.",
+        "refactoring": "PASS — No new executable abstraction or own runtime modification.",
+        "cross-task-coherence": "PASS — New base excludes inherited recap implementation; diff against cb737ec3e contains no workflow changes. W5 Files/Test/Risk matches README-only resolution and acceptance 3; report distinguishes fresh A2 execution from justified carry-over.",
+        "external-surface-grounding": "PASS — Prior assessment retained; integration adds no external call or command surface.",
+        "principles-conformance": "PASS — Confirmed intent and accepted behavior unchanged; refusal evidence preserved, no merge success falsely claimed, and fresh independent acceptance loading/diagnostic evidence retained.",
         "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
-        "deliberate-simplification": "PASS — Round-one scope and limitation assessment retained; repair only corrects invalid bookkeeping.",
-        "deletion-first": "PASS — No new abstraction or mechanism; bounded pin/reference repair and necessary evidence only."
+        "deliberate-simplification": "PASS — Existing scope limitations retained; adjacent README conflict resolved without expanding implementation.",
+        "deletion-first": "PASS — Existing metadata tests reused; no new mechanism, harness, flag or test added for integration."
       },
       "findings": [],
       "notes": [
-        "Same reviewer /root/review_code_r1, round two; previous findings empty. Inspected only e51626a7d..42aeacc78 and connected checker sources. No full-suite, store-probe or unchanged-test rerun.",
-        "Independent locked-environment metadata command exited 0: canonical bytes equal True; canonical blob 56acccd13debac07366685edc4ee850e40bbde61; intent version findings []; tested and target digests 9fc7595f48c5ce3f4a0b50812aee7fbb9aa6c69f. System Python lacked yaml before retry with existing locked dependencies.",
-        "Native provider openai, inherited exact model unexposed; oracle dispatch, overrides null, effective_profile inherited, reason unobservable-main-profile, task_class complex, completed_redispatches 0, requested_profile null, uncertainty null. Final Build logs handed by orchestrator inspected; adversarial log names test_delivery.py and 12 passed in 6.90s."
+        "Terminal round three of same episode, reviewer /root/review_code_r1; prior findings empty. Reviewed integration delta and connected identities only; upstream recap implementation not re-reviewed. No full-suite, store-probe or unchanged-test rerun.",
+        "Independent metadata command exited 0: tested a14b6656d and target 852416d60 functional digests equal 894b4a09e35c3bdb2317a073abab89ab8e66fb53; intent-version findings []; manifests code 3.80.0 and workflow 5.24.0. Own runtime/tests/intent diff empty and inherited workflow diff against new base empty.",
+        "Handed adversarial log names test_delivery.py and 12 passed in 7.58s; Build log ends with successful Mermaid checks. Old attestation awaits finalization as declared. Native openai exact model inherited/unexposed; oracle dispatch, overrides null, effective_profile inherited, reason unobservable-main-profile, task_class complex, completed_redispatches 0, requested_profile null, uncertainty null."
       ],
       "reviewer": "/root/review_code_r1",
       "vendor": "openai",
@@ -51,22 +51,22 @@
     {
       "verdict": "PASS",
       "lens": "skill",
-      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
-      "review_target_sha": "42aeacc7891d8665d6f877d9ebbb9074ecc8beb7",
+      "reviewed_sha": "cb737ec3ee13b7670857b65a7c874774a4d3340a",
+      "review_target_sha": "852416d60d67be2c63b0bbb6d665ab6b621afe55",
       "dimension_scores": {
-        "omission": "PASS — Round-one obligations remain satisfied; repair W4 names affected Acceptance 3, concrete files, positive/negative identity cases and its bounded risk.",
-        "ambiguity": "PASS — Refreshed report explicitly distinguishes re-tested A2 from carried-over A1/A3/A4/A5 and states the specific unchanged surfaces supporting each carry-over.",
-        "inconsistency": "PASS — Fix delta changes only pin, plan bookkeeping and evidence; runtime guidance and all confirmed requirements remain unchanged. Original refusal and historical test results remain labeled historical.",
-        "incorrect-fact": "PASS — Independently read canonical identity implementation and recomputed original-versus-target content equality and blob 56acccd13debac07366685edc4ee850e40bbde61; repaired pin matches. Acceptance source-to-target delta contains evidence changes only.",
-        "missing-population": "PASS — Refreshed evidence identifies exact clean source revisions, actual setup/diagnostic executions, six historical synthetic decisions, carried-over results and exclusions without implying a new behavioral benchmark.",
-        "user-judgment-leak": "PASS — Repair preserves byte-identical canonical requirements and publication authorization; it introduces no user technical decision or repeated preference request.",
-        "deletion-first": "PASS — Added W4 and evidence record the observed finalizer refusal and bounded repair; no runtime abstraction, flag, state, lookup or extra delivery mechanism was added."
+        "omission": "PASS — W5 names the bounded README repair, Acceptance 3, existing release checks and paired positive/negative cases; refreshed acceptance supplies specific carry-over reasons and a new clean-source diagnostic.",
+        "ambiguity": "PASS — Integration evidence explicitly identifies the refusal as before merge and does not confuse retained acceptance/authorization with observed delivery success.",
+        "inconsistency": "PASS — Direct diffs confirm all owned loom-code surfaces and intent unchanged since round two; inherited loom-workflow is byte-identical to current upstream. README retains both code 3.80.0 and workflow 5.24.0.",
+        "incorrect-fact": "PASS — Read current manifests, README resolution, W5, refreshed report/evidence and provided build/adversarial logs; version claims agree, adversarial output shows 12 passed in 7.58s, and a14b6656-to-target changes only evidence/report files.",
+        "missing-population": "PASS — New clean-source execution is attributed to a14b6656; A2 is re-tested and four other rows are explicitly carried over from unchanged surfaces and historical six-scenario evidence. Live-host enforcement and actual remote cleanup remain excluded.",
+        "user-judgment-leak": "PASS — The integration introduces no new user decision or changed outcome. Retained explicit merge authorization applies to the same unchanged intent and acceptance criteria; it is not represented as merge evidence.",
+        "deletion-first": "PASS — W5 and refreshed evidence address an observed adjacent-release README conflict without adding runtime policy or mechanisms; independently merged recap functionality is inherited unchanged."
       },
       "findings": [],
       "notes": [
-        "Same reviewer, bounded round two: original findings were empty. Reviewed only e51626a7d38fab2195c4021401989a08ccfaa3d4..42aeacc7891d8665d6f877d9ebbb9074ecc8beb7 and applicable grounding; no runtime/code/test changes and no new repair issue found. Round-one substantive review remains applicable.",
-        "Read intent-version canonicalization and independently compared aa0f50acf versus target after excluding status/pin lines: canonical bytes equal True and hash matches repaired pin. Read updated report/evidence and d67ebb14-to-target evidence-only diff. Read final suite log ending in successful Mermaid validation and declared delivery output showing 12 passed in 6.90s; those are observed supplied logs, not reviewer executions.",
-        "No unchanged tests, full suite, store probes, remote actions or installed-host checks were executed this round. No repository artifact edited; status was clean. Earlier 55-test independent pass remains historical round-one evidence. Acceptance limitations continue to exclude live-host enforcement and actual remote merge/cleanup."
+        "Same reviewer and episode, terminal round three; previous findings were empty. Reviewed integration/fix delta since 42aeacc7891d8665d6f877d9ebbb9074ecc8beb7 against current base cb737ec3ee13b7670857b65a7c874774a4d3340a; did not reopen independently merged recap behavior.",
+        "Read applicable plan charter and W5, report and evidence changes. git diff --exit-code confirms loom-code and intent unchanged since prior verdict, and loom-workflow unchanged versus upstream. Target versus tested a14b6656d0a40bc7ff585e6db61b53aea1621318 differs only in report/evidence. Read supplied suite log through successful final validation and the 12-pass adversarial log; no unchanged test, full suite or probe rerun.",
+        "No repair issue found and no repository edits; status clean. Existing stale attestation is awaiting renewed finalization and is not claimed as current proof. Acceptance evidence remains bounded source execution plus historical synthetic decisions, without live-host enforcement or actual merge/cleanup proof."
       ],
       "reviewer": "/root/review_skill_r1",
       "vendor": "openai",
@@ -76,8 +76,8 @@
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "56acccd13debac07366685edc4ee850e40bbde61",
-  "tested_commit": "d67ebb14defe50bc26734ba6297879c6926d67c0",
-  "reviewed_commit": "42aeacc7891d8665d6f877d9ebbb9074ecc8beb7",
+  "tested_commit": "a14b6656d0a40bc7ff585e6db61b53aea1621318",
+  "reviewed_commit": "852416d60d67be2c63b0bbb6d665ab6b621afe55",
   "acceptance_status": [
     {
       "acceptance": 1,
