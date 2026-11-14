@@ -97,3 +97,16 @@ The correct canonical identity is `56acccd13debac07366685edc4ee850e40bbde61`.
 It also compared the original confirmation and repaired intent with both
 excluded lines removed: the bytes were identical. Commit `eeecea327` updates
 the plan reference and records the bounded bookkeeping task.
+
+## Build revalidation after bookkeeping repair
+
+At `4d282d7ab801be9ba95b004afa7eb5873437500d`, Build reran the exact complete
+package command above and then the exact declared delivery adversarial command.
+The ordered process exited 0. The full suite passed again (including 2,859 code
+tests and all remaining family groups); the adversarial program collected and
+passed all 12 tests in 7.15s. Captured logs are
+`/private/tmp/loom-post-merge-build-suite-r2.log` and
+`/private/tmp/loom-post-merge-build-adversarial-r2.log`.
+The subsequent sync-trunk observation was up to date with `3bf50711f`.
+The earlier passing results and refused finalization remain historical evidence;
+neither substitutes for this revalidation or the next finalization.
