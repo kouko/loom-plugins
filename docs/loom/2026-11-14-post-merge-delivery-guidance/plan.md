@@ -46,6 +46,13 @@ charter: 1.1
 - Test: A3 positive: coherent-family-release-versions; negative: dropped-release-entry. Reuse the existing release metadata tests and manifest synchronization check.
 - Risk: agent-decided — land refused DIRTY after upstream cb737ec3e. Preserve code 3.80.0 and workflow 5.24.0 entries, upstream recap changes and this change's runtime. Existing release tests preserve version coverage.
 
+### Wave 6 — Explicitly requested merge continuation
+
+**W6-01 Integrate upstream research release and advance delivery version** after: W5-01 acceptance: 3
+- Files: `README.md`, `loom-code/README*.md`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/package.json`, `loom-code/plugin.json`, `loom-code/tests/test_write_plan_station_text.py`
+- Test: A3 positive: synchronized-3.81-release; negative: stale-3.80-version. Reuse the existing release consistency case and manifest synchronization check.
+- Risk: agent-decided — upstream fb9223ba2 used 3.80.0 during CI. Preserve its research changes and release entry; publish this unchanged delivery fix as 3.81.0. No existing delivery requirement or runtime behavior changes.
+
 ## Simplicity check
 - none found
 
@@ -62,3 +69,4 @@ charter: 1.1
 6. agent-decided — W3 is upstream integration, not changed requirements or a retry-budget reset. Upstream 3.79.0 adds advisory fields; keep them and release this station-guidance change as 3.80.0, including translated README versions.
 7. agent-decided — W4 corrects a status-inclusive confirmation hash. Canonical content, requirements, scope and authorization remain unchanged. Preserve the failed finalization evidence; refresh acceptance and the same reviewers without resetting the episode.
 8. agent-decided — W5 integrates upstream after explicit merge acceptance. The conflict is adjacent README version entries; requirements and accepted behavior remain unchanged. Preserve the existing merge authorization and review episode, and refresh evidence before retrying land.
+9. user-decided — “請合併”, after the cap blocker was disclosed; continue necessary integration and verification toward the accepted merge. Agent interpretation: retain the same episode and prior counts; waive only its stopping cap.

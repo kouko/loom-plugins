@@ -136,3 +136,27 @@ declared delivery adversarial command both passed after integration. Raw logs:
 all 12 tests in 7.58s. The subsequent sync-trunk observation was up to date with
 `cb737ec3e`. This preserves the earlier refusal rather than claiming land had
 already merged the PR.
+
+## Explicit continuation after second upstream release conflict
+
+After renewed verification and CI passed, land again refused DIRTY before any
+merge. Fetching main showed `fb9223ba2` (PR #161) had published code 3.80.0 while
+this change's CI ran. A merge-tree diagnostic found only CHANGELOG.md conflicting;
+no branch or working-tree merge was performed by that diagnostic.
+The user was told the prior three-digest cap had been reached and then instructed
+“請合併”. The orchestrator interprets that direct continuation, after the cap was
+disclosed, as permission to finish necessary upstream integration and validation
+beyond that stopping cap. The same episode, prior counts, refused attempts and
+all verification obligations are retained; this is not a requirements reset or
+an instruction to skip reviews, testing or acceptance evidence.
+W6 preserves the upstream 3.80.0 research release and advances this delivery fix
+to 3.81.0, without changing the accepted delivery behavior.
+
+Integration commit `bd6807edf` resolves the sole CHANGELOG conflict, keeps the
+upstream research release unchanged and synchronizes code 3.81.0 metadata.
+The worker observed the existing release case RED at 3.80.0 versus its 3.81.0
+pin, then GREEN; manifest synchronization and the delta-versus-main whitespace
+check passed. Inherited research evidence has pre-existing trailing whitespace;
+its bytes match main and were preserved. Git's configured automatic autostash
+restored the orchestrator's pending plan/evidence successfully; no manual stash
+or discard was used.
