@@ -93,6 +93,7 @@ def test_guide_has_seven_rules_and_rewrite_steps():
     assert "Internal terms" in sections(text)
 
 
+# Accepted limits: a Plain equal to its Hard plus a trailing space, swapped columns, and Simplified read as Traditional.
 SHAPES = {
     # first cell of a rule 3 row: whether the shape also needs a Traditional Chinese pair
     "A thing does what only a person does": True,
@@ -104,7 +105,8 @@ SHAPES = {
 STUDY_URL = "https://arxiv.org/abs/2610.29162"
 CJK = re.compile(r"[一-鿿]")
 CAUSE = re.compile(r"\bbecause\b|因為|所以")
-# Same negation words as NEGATION_RE in the sibling test_templates.py.
+# Same negation words as NEGATION_RE in the sibling test_templates.py. Copied, not imported:
+# the adversarial programs run this file alone in a temp tree.
 NEGATION = re.compile(r"\b(?:not|never|no|none|without|unless|except|avoid)\b|n't", re.IGNORECASE)
 # Governing sentences whose polarity matters: (label, where, phrase that locates the
 # sentence, wording it must carry). Outside that wording the sentence holds no negation.
@@ -163,6 +165,9 @@ def test_broken_sentence_shape_guidance_rejected():
     """A1 pair-missing; A2, A3, A5, A6 and the connecting-word guard each inverted."""
     broken = re.sub(r"^\| A noun used as a verb \|.*\n", "", _text(), flags=re.MULTILINE)
     for old, new in (
+        (r"(?m)^\| Three or more nouns in a row \| 「.*\n", ""),
+        (r"\(\[arXiv 2610\.29162\]\([^)]*\)\)", ""),
+        (r"Being concise", "Being brief"),
         (r"版號沒有改。」", "因為版號沒有改。」"),
         (r"It never covers files you write", "It also covers files you write"),
         (r"Add a connecting word only when", "Add a connecting word even when"),
@@ -175,12 +180,15 @@ def test_broken_sentence_shape_guidance_rejected():
     assert sorted(sentence_shape_errors(broken)) == [
         "A dropped connecting word: a Plain cell adds a cause",
         "A noun used as a verb: no English pair",
+        "Three or more nouns in a row: no Traditional Chinese pair",
         "last rewrite step checks the sentence shapes: missing or inverted",
         "rule 3 connecting-word guard: missing or inverted",
         "rule 3 no guessed cause: missing or inverted",
         "rule 3 study limits: missing or inverted",
+        "rule 7 does not name concise",
         "rule 7 keeps connecting words: missing or inverted",
         "scope excludes files you write: missing or inverted",
+        "study not cited in both rule 3 and Sources",
     ]
 
 

@@ -59,8 +59,8 @@ literal sentence is still missing; write that sentence instead.
 | "Think of the hook as a doorbell for the agent." | "Each time you send a message, the hook adds a short reminder to what the agent reads." |
 
 A sentence with no metaphor can still be hard to read. Five sentence shapes
-make the user read the sentence twice to find who did what. Rewrite each
-one, and keep every fact.
+can make the user read the sentence twice to find who did what. Rewrite
+each one, and keep every fact.
 
 | Sentence shape | Hard to read | Plain |
 |---|---|---|
@@ -83,11 +83,14 @@ near-frontier models with text from human writers
 ([arXiv 2610.29162](https://arxiv.org/abs/2610.29162)). All nine models put
 a thing as the subject of a verb that only a person does more often than
 the human writers did. In conversation, most of the models also wrote
-longer distances between subject and verb, more nouns in a row, and more
-clauses with the connecting word dropped. The study has three limits: it ran no human reading
-experiment, it measured English only, and it did not test whether
-instructing a model reduces these shapes. The Traditional Chinese pairs are
-this guide's own extension, not a finding of the study.
+longer distances between words that depend on each other, such as a subject
+and its verb, more nouns in a row, and more clauses with the connecting
+word dropped. Against paraphrases with the same meaning, almost all of the
+models also used more nouns as verbs. Three limits of the study matter for
+this guide: it ran no human reading experiment, it measured English only,
+and it did not test whether instructing a model reduces these shapes. The
+Traditional Chinese pairs are this guide's own extension, not a finding of
+the study.
 
 ### 4. Turn abstract nouns into what the user does and sees
 
@@ -189,7 +192,7 @@ this order:
 2. Replace every internal term with what it does, and turn each abstraction into who does what and what the user sees.
 3. Keep the facts: rewriting changes wording, never what happened; keep every fact, number, name and outcome from the original, and keep its lead news. Translate a term by saying what it does instead of substituting a different thing: a review stays a review, and an agent is not a person; never refer to something the original did not say.
 4. Cut process detail the user's decision does not need; never cut the lead news or an outcome.
-5. Check for metaphor words ("like", "imagine", "think of it as", analogies) and for the five sentence shapes of rule 3 before sending, and replace each with the literal statement.
+5. Check for metaphor words ("like", "imagine", "think of it as", analogies) and for the five sentence shapes of rule 3 before sending; replace each metaphor with the literal statement and rewrite each shape as rule 3 shows.
 
 ## Before and after examples
 
