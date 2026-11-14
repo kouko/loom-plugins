@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-14-research-evidence-acceptance",
-  "content_digest": "675ea7a5d32f06cd0be81a9e5177e203096b01cf",
+  "content_digest": "03df7370a1f90a5cd6453fc9c080b37ae6446eb9",
   "executions": [
     {
       "kind": "package-tests",
@@ -25,27 +25,27 @@
       "model": "gpt-6.1-sol",
       "verdict": "PASS_WITH_NOTES",
       "lens": "code",
-      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
-      "review_target_sha": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+      "reviewed_sha": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+      "review_target_sha": "5e426e8172617d88ba9a4c7aaa1e383d9039b095",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
-        "correctness": "PASS_WITH_NOTES — Requirements 1–6 have bounded supporting observations; Acceptance 7 remains explicitly partial. External-source, external-service privacy, no-write and broader research behavior were not independently exercised.",
+        "correctness": "PASS_WITH_NOTES — Integration preserves the reviewed research behavior. Acceptance 7 remains explicitly partial; external-source handling, external-service privacy, no-write responses and broad research behavior remain unobserved.",
         "naming": "PASS",
-        "tests": "PASS — Ran loom-code/tests/test_write_plan_station_text.py: 43 passed, none skipped. Reviewed retained behavioral and Build evidence without rerunning the complete suite or adversarial program.",
+        "tests": "PASS — Ran both changed ordinary test files: recap-state/test_skill_md.py yielded 12 passed; scripts/test_release_metadata.py yielded 14 passed, with no skips. Inspected handed integration-suite and adversarial output without rerunning either.",
         "refactoring": "PASS",
-        "cross-task-coherence": "PASS — All seven requirements are represented across instructions, template, case evidence and acceptance reporting; partial validation is disclosed rather than promoted to full success.",
-        "external-surface-grounding": "PASS — No new production API, SDK, tool or CLI integration is introduced. Historical command observations and proposed interfaces remain explicitly distinguished.",
+        "cross-task-coherence": "PASS — Upstream workflow content matches cb737ec3 exactly. README correctly retains loom-code 3.80.0 alongside loom-workflow 5.24.0. Acceptance carryovers identify unchanged artifacts and preserve their original observation limits.",
+        "external-surface-grounding": "PASS — Integration introduces no research API, SDK, tool or CLI dependency. Repeated local package validation is distinguished from installation or new model execution.",
         "principles-conformance": "PASS",
         "architecture-conformance": "N/A — No ratified ARCHITECTURE.md applies.",
         "deliberate-simplification": "PASS",
-        "deletion-first": "PASS — Reuses the existing entry, guidance and template without a new runner, classification schema, dependency or gate. Archived Python files are historical source and trial evidence."
+        "deletion-first": "PASS — Integrates upstream without adding research mechanisms or repeating unchanged efficacy trials."
       },
       "findings": [],
       "notes": [
-        "Independently verified all eight delivered skill-file hashes against candidate-skill-hashes.json; the 36 primary archived source files contain three distinct source bodies.",
-        "Inspected actual candidate records, source/helper boundaries, timing receipts and R08 continuation evidence. Recommendations distinguish supported source behavior, bounded observations and unimplemented proposals.",
-        "Release 3.80.0 metadata, generated manifest versions, changelog and README versions are synchronized. Acceptance 7's partial result is a material validation limit, not evidence of a demonstrated regression."
+        "Previous findings were empty; no integration defect was found within the fix delta.",
+        "Verified no changes to engineering-research skill resources or the upstream workflow subtree relative to their respective reviewed sources.",
+        "Acceptance 1–6 carry over with explicit reasons; Acceptance 7 was rechecked and remains partly observed. Passing integration checks do not extend semantic coverage."
       ]
     },
     {
@@ -54,30 +54,30 @@
       "model": "gpt-6.1-sol",
       "verdict": "PASS_WITH_NOTES",
       "lens": "skill",
-      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
-      "review_target_sha": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+      "reviewed_sha": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+      "review_target_sha": "5e426e8172617d88ba9a4c7aaa1e383d9039b095",
       "dimension_scores": {
-        "omission": "PASS_WITH_NOTES — REQ-1–6 are implemented across the existing entry, selection guidance and template. REQ-7 has actual retained cases and independent judgments, but external-source, privacy, no-write and broader research behavior remain unobserved as explicitly reported.",
-        "ambiguity": "PASS — Evidence conditions, unresolved completion and proportionate methods have executable meanings without mandatory categories, matrices or additional confirmation.",
-        "inconsistency": "PASS — Changed polarity preserves the base's stopping, source, authorization, readback and record-preservation boundaries. Recommendation changes require evidence or correction and consistent retained records.",
-        "incorrect-fact": "PASS_WITH_NOTES — No contradiction was found between the runtime delta and examined evidence. Historical execution receipts and external method-reference contents were not independently re-executed or exhaustively verified.",
-        "missing-population": "PASS — Evidence reports identify six cases per arm, their shared fixture and observational limits; neither baseline success nor candidate observations are presented as causal improvement.",
-        "user-judgment-leak": "PASS — The change adds no technical approval question, paid-service obligation, external-data transfer or repeated user decision.",
-        "deletion-first": "PASS — The changes replace overlapping instructions within three existing resources and reuse existing sections; no new runtime mechanism, classification field, dependency or checkpoint is introduced."
+        "omission": "PASS_WITH_NOTES — The integration preserves all engineering-research resources and prior coverage. Acceptance #7 remains explicitly partial for external-source, privacy, no-write and broader research behavior.",
+        "ambiguity": "PASS — Updated reports distinguish carried-over behavioral observations from repeated package validation and preserve unresolved limits.",
+        "inconsistency": "PASS — The README retains code 3.80.0 and upstream workflow 5.24.0. Imported workflow content matches fetched main; research behavior and evidence remain unchanged.",
+        "incorrect-fact": "PASS_WITH_NOTES — Examined integration claims agree with the diff and retained outputs. Historical model executions and unobserved behavioral surfaces were not independently re-executed.",
+        "missing-population": "PASS — Six-case scope and shared-fixture limitations remain explicit; repeated integration checks introduce no efficacy or population claim.",
+        "user-judgment-leak": "PASS — The integration introduces no technical approval question, new obligation or repeated user decision.",
+        "deletion-first": "PASS — Conflict resolution and refreshed evidence add no research mechanism, dependency, classification field or checkpoint."
       },
       "findings": [],
       "notes": [
-        "Independently ran the changed ordinary test file loom-code/tests/test_write_plan_station_text.py: 43 passed.",
-        "Acceptance #7 remains partial; this verdict does not convert unobserved preservation behavior into demonstrated success.",
-        "Did not run the complete package suite or the reused adversarial program, as required by the review contract."
+        "No previous findings required repair; this round examined only the integration delta and its effects.",
+        "Independently ran both imported changed ordinary test files: 26 passed. Did not run the complete suite or reused adversarial program.",
+        "Acceptance #7 remains partial; carried-over observations and green package checks do not establish unobserved behavior or causal improvement."
       ]
     }
   ],
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "e49e156c2656ea8c81ba7f5d4fb80993724bf43e",
-  "tested_commit": "e85c18651eee5b4d7ba853850ba61bd7462001c5",
-  "reviewed_commit": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+  "tested_commit": "3501694d82c9e8221a09908f14264d00284b4c57",
+  "reviewed_commit": "5e426e8172617d88ba9a4c7aaa1e383d9039b095",
   "acceptance_status": [
     {
       "acceptance": 1,
