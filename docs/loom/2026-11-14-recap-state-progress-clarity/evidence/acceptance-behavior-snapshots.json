@@ -1,0 +1,199 @@
+{
+  "inputs": {
+    "unknown-purpose": {
+      "id": "unknown-purpose",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "assistant",
+          "text": "先前的輸出只留下『收到』，目前可見對話沒有原始目的、工作內容或待辦。"
+        }
+      ],
+      "request": "我跟丟了，幫我回顧。"
+    },
+    "long-session": {
+      "id": "long-session",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "user",
+          "text": "我要把匯出功能做好，讓同事拿到的檔案保留原始名稱與副檔名。先不要合併。"
+        },
+        {
+          "role": "assistant",
+          "text": "原本曾考慮把所有輸出改名為 export.csv；那會失去來源名稱，已放棄。"
+        },
+        {
+          "role": "user",
+          "text": "用來源檔名。不同資料夾撞名時，在檔名加上來源資料夾，不能覆寫。"
+        },
+        {
+          "role": "assistant",
+          "text": "名稱與撞名處理已在本機實作並提交 cde1234，碰撞測試9項通過；這些是單元測試，完整流程尚未測。"
+        },
+        {
+          "role": "user",
+          "text": "檔名中的日文要保留，不要轉羅馬字。輸出也保留原副檔名。"
+        },
+        {
+          "role": "assistant",
+          "text": "日文與副檔名處理完成，提交改為 efg5678；尚未在該提交重跑完整套件。"
+        },
+        {
+          "role": "user",
+          "text": "其他團隊上週的排序 PR 已經合併，與這次匯出不同。"
+        },
+        {
+          "role": "assistant",
+          "text": "已另加入唯讀的預覽，顯示將輸出的檔名，還沒驗證真實資料。沒有合併或發佈匯出功能。"
+        },
+        {
+          "role": "user",
+          "text": "先驗證真實資料，再做最後審查；要保留不能覆寫的限制。"
+        },
+        {
+          "role": "assistant",
+          "text": "目前沒有真實資料測試結果。最後審查也還沒開始。預覽功能可能有特殊字元邊界待確認，是否有問題尚未知。"
+        }
+      ],
+      "request": "我跟丟了，請把原本目的、重要決定與理由、已完成和還缺什麼，以及下一步說清楚。"
+    },
+    "unknown-delivery": {
+      "id": "unknown-delivery",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "user",
+          "text": "我想知道新的搜尋修正目前做到哪裡。"
+        },
+        {
+          "role": "assistant",
+          "text": "先前的排序修正已合併。新的搜尋修正在本機已完成；目前對話沒有搜尋修正的合併、發佈或測試結果。"
+        }
+      ],
+      "request": "請用一小段話回顧現在的位置。"
+    },
+    "known-purpose-language": {
+      "id": "known-purpose-language",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "system",
+          "text": "The recap skill instructions are loaded in English; the current conversation below is Traditional Chinese."
+        },
+        {
+          "role": "user",
+          "text": "我要讓搜尋結果依更新時間排序。"
+        },
+        {
+          "role": "assistant",
+          "text": "目的已確認。實作完成，現在還需要決定先驗證邊界案例，還是先整理說明。"
+        }
+      ],
+      "request": "我們剛剛在幹嘛？"
+    },
+    "implemented-unmerged": {
+      "id": "implemented-unmerged",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "user",
+          "text": "我要讓匯出功能保留原始檔名。先不要合併。"
+        },
+        {
+          "role": "assistant",
+          "text": "已在本機完成實作並提交 abc1234；該提交的匯出測試 12 項通過。最終審查尚未完成，沒有合併或發佈。"
+        },
+        {
+          "role": "user",
+          "text": "保留檔名的決定不變。下一步先做最終審查。"
+        },
+        {
+          "role": "assistant",
+          "text": "目前仍在同一分支，尚未開始最終審查。"
+        }
+      ],
+      "request": "我跟丟了，請回顧目的、已完成與還沒完成的事，以及下一步。"
+    },
+    "scoped-tests": {
+      "id": "scoped-tests",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "user",
+          "text": "這次目標是發佈後匯出功能能正常用。"
+        },
+        {
+          "role": "assistant",
+          "text": "在提交 def5678 上，匯出單元測試 8 項通過；完整套件、實際安裝環境與發佈後流程尚未驗證。"
+        }
+      ],
+      "request": "回顧一下目前結果，讓我知道離發佈還差什麼。"
+    },
+    "resumed-date": {
+      "id": "resumed-date",
+      "current_date": "2026-11-14",
+      "messages": [
+        {
+          "role": "user",
+          "timestamp": "2026-11-07T09:00:00+08:00",
+          "text": "我要修正匯入時漏掉空白列的問題。"
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-11-07T10:00:00+08:00",
+          "text": "修正已合併。接下來仍需驗證使用者的範例檔案。"
+        },
+        {
+          "role": "assistant",
+          "text": "另一份補充說明已更新，但這則訊息沒有可靠日期。"
+        }
+      ],
+      "request": "剛剛講到哪？"
+    }
+  },
+  "outputs": {
+    "unknown-purpose": {
+      "case": "unknown-purpose",
+      "response": "目前可見對話只留下「收到」，沒有原始目的、工作內容或待辦，因此無法確認我們做到哪裡。你原本想完成什麼？",
+      "source_commit": "94be76fda82fb8eaeec948a1f26f4e6868a9e6e5",
+      "execution": "fresh native agent; clean source copy; checks withheld; stopped at final question"
+    },
+    "long-session": {
+      "case": "long-session",
+      "response": "```text\n┌──────────────────┐\n│ ■ 目的與目前位置 │\n└──────────────────┘\n```\n\n原本目的是讓同事拿到的匯出檔保留原始名稱與副檔名，且不覆寫檔案。目前已在本機實作，還缺真實資料驗證與最後審查；匯出功能尚未合併或發佈，「先不要合併」仍有效。\n\n　\n\n```text\n┌──────────────────┐\n│ ■ 重要決定與理由 │\n└──────────────────┘\n```\n\n- 放棄全部改名為 `export.csv`，因為會失去來源名稱；你指定「用來源檔名」。\n- 撞名時依你要求：「不同資料夾撞名時，在檔名加上來源資料夾，不能覆寫。」用來源資料夾區分，保留不能覆寫的限制。\n- 名稱保留規則是：「檔名中的日文要保留，不要轉羅馬字。輸出也保留原副檔名。」\n- 驗證順序依你要求：「先驗證真實資料，再做最後審查；要保留不能覆寫的限制。」\n\n　\n\n```text\n┌────────────────────┐\n│ ■ 已完成與還缺什麼 │\n└────────────────────┘\n```\n\n已做的功能與驗證證據範圍不同，目前狀況如下。\n\n| 項目 | 已完成 | 還缺什麼 |\n|---|---|---|\n| 來源名稱與撞名處理 | 本機實作；`cde1234` 的碰撞單元測試 9 項通過 | 尚未測完整流程 |\n| 日文與原副檔名 | 已完成，提交改為 `efg5678` | 尚未在該提交重跑完整套件 |\n| 唯讀預覽 | 已加入，可顯示將匯出的檔名 | 尚未用真實資料驗證；特殊字元是否有問題仍未知 |\n| 最後審查 | 尚未開始 | 要先取得真實資料驗證結果 |\n\n因此，9 項通過只支持先前提交的碰撞處理，還不能證明目前整個匯出功能已完成。其他團隊已合併的排序 PR 與這次匯出無關。\n\n　\n\n```text\n┌──────────────┐\n│ ■ 下一步確認 │\n└──────────────┘\n```\n\n下一步先用真實資料跑完整匯出流程，核對來源名稱、日文、原副檔名、撞名不覆寫，以及預覽與實際輸出是否一致，並補跑目前版本的完整套件；通過後再做最後審查，維持「先不要合併」。照這個方向接續嗎？",
+      "source_commit": "94be76fda82fb8eaeec948a1f26f4e6868a9e6e5",
+      "execution": "fresh native agent; clean source copy; checks withheld; stopped after final question"
+    },
+    "unknown-delivery": {
+      "case": "unknown-delivery",
+      "response": "新的搜尋修正已在本機完成，但測試、合併與發佈狀態仍未知；先前已合併的是排序修正，不能據此判定搜尋修正也已交付。這段對話尚未說明搜尋修正原本要解決的問題：你最初希望搜尋改善成什麼樣子？",
+      "source_commit": "2b1cdcd57bedc4545aa591ae00609e7f3fd50636",
+      "execution": "fresh native agent; checks withheld; no subsequent task action in final response"
+    },
+    "known-purpose-language": {
+      "case": "known-purpose-language",
+      "response": "我們在做「讓搜尋結果依更新時間排序」。前面已回報實作完成，但還沒提供驗證結果；目前停在決定先驗證邊界案例，還是先整理說明。我建議先檢查特殊情況下排序是否正確，再整理說明，這樣繼續可以嗎？",
+      "source_commit": "94be76fda82fb8eaeec948a1f26f4e6868a9e6e5",
+      "execution": "fresh native agent; clean source copy; checks withheld; final response ended at alignment question"
+    },
+    "implemented-unmerged": {
+      "case": "implemented-unmerged",
+      "response": "目的是讓匯出功能保留原始檔名；目前本機實作已完成並提交為 `abc1234`，該提交的 12 項匯出測試通過。你已確認「保留檔名的決定不變」，並要求「先不要合併」。目前仍在同一分支，最終審查尚未開始，也沒有合併或發佈。下一步依你指定的「下一步先做最終審查」進行，這仍符合你的方向嗎？",
+      "source_commit": "2b1cdcd57bedc4545aa591ae00609e7f3fd50636",
+      "execution": "fresh native agent; checks withheld; no subsequent task action in final response"
+    },
+    "scoped-tests": {
+      "case": "scoped-tests",
+      "response": "目標是「發佈後匯出功能能正常用」。目前只確認提交 `def5678` 的匯出單元測試 8 項通過，也就是匯出程式的個別測試通過；尚不能據此判定發佈後可正常使用。還缺完整套件測試、實際安裝環境驗證，以及發佈後的完整匯出流程驗證；目前是否已發佈也未知。下一步先補完整套件與實際安裝環境的驗證，再確認發佈後匯出結果，這符合你的方向嗎？",
+      "source_commit": "94be76fda82fb8eaeec948a1f26f4e6868a9e6e5",
+      "execution": "fresh native agent; clean source copy; checks withheld; final response ended at alignment question"
+    },
+    "resumed-date": {
+      "case": "resumed-date",
+      "response": "你要修正「匯入時漏掉空白列的問題」。依 2026-11-07 的對話，修正已合併，但仍需用你的範例檔案驗證是否解決問題；補充說明也已更新，但那則訊息沒有可靠日期。下一步先驗證你的範例檔案，確認空白列能完整匯入，這符合你的方向嗎？",
+      "source_commit": "94be76fda82fb8eaeec948a1f26f4e6868a9e6e5",
+      "execution": "fresh native agent; clean source copy; checks withheld; stopped at final question"
+    }
+  }
+}
