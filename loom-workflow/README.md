@@ -108,9 +108,10 @@ Fifteen skills: fourteen tools and one optional router.
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
 | [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
-Loom's contract counts nine of these tools. `goal-create` and
-`dbt-model-style`, `project-retro` and `whats-next` are standalone skills outside the Loom flow, and
-`loom-memory` and the router stay outside the contract.
+Loom's contract counts nine of these tools. It marks `goal-create`,
+`dbt-model-style` and `project-retro` as `standalone: true`, outside the Loom
+flow. Independent `whats-next` advice, `loom-memory` and the router stay
+outside the contract; their skill files still count in the mechanism census.
 
 ## Repository structure
 

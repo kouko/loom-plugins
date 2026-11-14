@@ -102,8 +102,10 @@ flowchart TD
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | 在 Loom 變更或獨立討論中建立、驗證可編輯的 draw.io 圖表；每次編輯既有外部圖表前，先確認是否複製進專案。 |
 | [`goal-create`](skills/goal-create/README.zh-TW.md) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
-Loom 的契約計入其中九個工具。`goal-create` 與 `dbt-model-style` 是 Loom
-流程之外的 standalone skill；`project-retro` 與 `whats-next` 也是獨立工具，`loom-memory` 與入口路由則維持在契約之外。
+Loom 的契約計入其中九個工具。`goal-create`、`dbt-model-style` 與
+`project-retro` 標記為 `standalone: true`，位於 Loom 流程之外。
+獨立提供建議的 `whats-next`、`loom-memory` 與入口路由不列入契約，
+但其 skill 檔案仍計入機制總數。
 
 ## Repository 結構
 

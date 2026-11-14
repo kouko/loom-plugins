@@ -109,8 +109,10 @@ flowchart TD
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Loom の変更や単独の議論で、外部エディタで編集できる draw.io 図を作成・検証する。既存の外部図を編集する前に、プロジェクトへコピーするか確認する。 |
 | [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
-Loom の契約で数えるツールはこのうち 9 個です。`goal-create` と `dbt-model-style`
-と `project-retro`、`whats-next` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
+Loom の契約で数えるツールはこのうち 9 個です。`goal-create`、`dbt-model-style`、
+`project-retro` は `standalone: true` と記され、Loom フローの対象外です。
+独立した助言用の `whats-next`、`loom-memory`、ルーターは契約に含まれませんが、
+その skill ファイルは機構の総数に数えられます。
 
 ## Repository 構成
 
