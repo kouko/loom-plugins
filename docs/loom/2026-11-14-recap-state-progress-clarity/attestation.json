@@ -1,0 +1,111 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-recap-state-progress-clarity",
+  "content_digest": "494e7b6dfa0d0869fa12741fa94b108ecebb1b83",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/recap-state/test_skill_md.py",
+      "artifact": "loom-workflow/tests/recap-state/test_skill_md.py",
+      "result": "pass",
+      "command_digest": "b481c55a1b3acf0b62ee92b68c8515582ceb7268e20ab17af869b3333c2b3733"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/recap_review_code",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
+      "review_target_sha": "e60fd7c909ce33c296e383442e3795bd2715cff5",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran the recap suite and changed release-metadata module with read-only Python and bytecode/cache writing disabled: 37 passed in 0.11s; no skips.",
+        "The affirmative prose guards satisfy engineering-baseline §5 item 8, including affirmative and negated synthetic checks. They protect wording obligations; seven separately recorded native outputs provide bounded behavioral evidence.",
+        "Read all seven behavioral snapshots against their inputs and acceptance requirements. Installed-host behavior and subsequent-turn continuation remain explicitly unverified; no complete package suite or evidence probe was rerun."
+      ]
+    },
+    {
+      "reviewer": "/root/recap_review_skill",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
+      "review_target_sha": "e60fd7c909ce33c296e383442e3795bd2715cff5",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-11-14-recap-state-progress-clarity/plan.md:23",
+          "text": "chore (non-blocking): The final sentence records a completed test failure and integration fix. This is verification diary content, which artifacts.plan.charter.must_not assigns to attestation; it does not affect the executable task instructions.",
+          "fix": "Delete the sentence beginning 'The complete suite exposed'; retain the prospective release-pin instruction and the existing build-verification evidence."
+        }
+      ],
+      "notes": [
+        "Read the intent, plan, complete recap runtime sources and three skill READMEs, changed tests, release delta, acceptance report and all seven retained input/output snapshots. The conditional guidance addresses all five acceptance lines without adding mandatory repository inspection or changing the confirmation boundary.",
+        "Independently ran the two changed ordinary test files with the existing Python environment and caching disabled: 26 passed in 0.11s. Did not run the complete package suite.",
+        "The seven synthetic outputs support the bounded acceptance claims. Installed-host loading and later-turn waiting behavior remain explicitly unverified; no installed-host or before/after superiority claim is made."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "88c641ab48859f30f60f7d0eee5b4325a231448b",
+  "tested_commit": "be34122e8106f595d6b01a0dae033b2fa2162c9a",
+  "reviewed_commit": "e60fd7c909ce33c296e383442e3795bd2715cff5",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}

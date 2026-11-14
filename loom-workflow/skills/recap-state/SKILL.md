@@ -21,7 +21,9 @@ This is **in-session re-orientation**. The built-in `/recap` is an
 2. Keep planning internal. In a long conversation, find the original purpose
    when available, current position, decisions that brought the work here,
    completed work, remaining gap, and, only when the purpose is grounded, a
-   proposed next step. Ground each in the conversation; label unavailable facts
+   proposed next step. Apply the reference's progress-evidence guidance when
+   completion, test scope or event dates affect that position.
+   Ground each in the conversation; label unavailable facts
    unknown. Before calling something a historical decision, identify the user
    turn or prior action that establishes it; omit an unsupported claim. A
    formatting choice made for this recap is not a historical decision. In a
