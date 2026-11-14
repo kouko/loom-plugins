@@ -1,5 +1,6 @@
 """Read-only delivery evidence, using the existing publication fixtures."""
 # concern: Removing an unused result state must not make delivery require publication authorization.
+# concern: Lost branch identity or an explicit intent must not fabricate completed delivery or perform remote writes.
 import json
 import subprocess
 from io import StringIO
