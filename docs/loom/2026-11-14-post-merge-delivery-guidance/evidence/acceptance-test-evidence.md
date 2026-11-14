@@ -1,6 +1,26 @@
 # Post-merge delivery guidance — acceptance test evidence
 
-Tried on 2026-11-14, in a clean copy of the project at a14b6656d0a40bc7ff585e6db61b53aea1621318.
+Tried on 2026-11-14, in a clean copy of the project at 442725d82755d9b231735a5e0d4f5090da7f5fc6.
+
+## Re-run on 2026-11-14, at 442725d82755d9b231735a5e0d4f5090da7f5fc6
+
+Inspected `git diff --stat 852416d60..442725d82755d9b231735a5e0d4f5090da7f5fc6` and `git diff --stat origin/main...442725d82755d9b231735a5e0d4f5090da7f5fc6`: inherited engineering-research implementation/evidence is in the first but absent from the PR delta. The direct integration diff for own session-start, Ship, publish handler and intent is empty. Own release metadata and its pin test advance to 3.81.0; upstream research's changelog section remains separately preserved. User's repeated merge instruction continues the same accepted task; no new scope/consent is inferred. Historical refusals, previous runs and original acceptance remain preserved below.
+
+NEW clean copy commands: `git archive 442725d82755d9b231735a5e0d4f5090da7f5fc6 -o /private/tmp/acceptance-post-merge-w6.tar`; `mkdir -p /private/tmp/acceptance-post-merge-w6`; `tar -xf /private/tmp/acceptance-post-merge-w6.tar -C /private/tmp/acceptance-post-merge-w6`. From that copy read setup with `sed -n '258,287p' loom-code/README.md` and executed `bash loom-code/hooks/session-start </dev/null > /private/tmp/acceptance-post-merge-w6-startup.json` (exit 0). Actual decoded additionalContext retains same-change full land result, preserving verification/cleanup failure, surviving-repository recovery, and rejection of another change's success. This loads the delivered source without altering installed plugins.
+
+- 1: carried over — own two completion instruction surfaces have empty integration diffs; original independent full-success exercise remains applicable. Setup emitted successfully again.
+- 2: re-tested — after `git init -b main /private/tmp/acceptance-post-merge-w6`, executed clean source `loom-code/scripts/loom-python --repair delivery --json`. Actual exit 1; state unconfirmed, reason cannot identify a committed change, complete false. Actual next text still conditionally addresses active change branch/intent, then same-change full post-land execution evidence, excludes a merge line/directory hint alone, gives surviving-repository cleanup recovery, and preserves unconfirmed without evidence. Full requested diagnostic scopes exercised.
+- 3: re-tested — affected release metadata plus all prior focused delivery/Stop checks executed using the command below. Actual exit 0: `87 passed in 103.39s (0:01:43)`. This includes current release synchronization and README/manifest tests as well as retained branch delivery, missing authorization/evidence, and Stop cases. No full package suite is run here; finalization must run its acceptance-blocking full suite.
+- 4: carried over — own failure/recovery prose and intent unchanged; prior independent verification-failure and removed-worktree/branch-deletion-failure exercises remain applicable to every named surface.
+- 5: carried over — own same-change restriction and intent unchanged; original unrelated-success scenario remains applicable.
+
+Exact new focused command (approved uv cache access):
+
+```sh
+uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q -p no:cacheprovider loom-code/tests/test_delivery.py loom-code/tests/test_delivery_stop.py loom-code/tests/test_write_plan_station_text.py
+```
+
+No installation, publication, cleanup, live merge or GitHub write executed by this witness. No live-host enforcement claimed. No important dismissed findings supplied. Prior result provenance follows below unchanged.
 
 ## Re-run on 2026-11-14, at a14b6656d0a40bc7ff585e6db61b53aea1621318
 

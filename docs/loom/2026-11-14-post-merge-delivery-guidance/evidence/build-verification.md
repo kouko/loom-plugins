@@ -160,3 +160,10 @@ check passed. Inherited research evidence has pre-existing trailing whitespace;
 its bytes match main and were preserved. Git's configured automatic autostash
 restored the orchestrator's pending plan/evidence successfully; no manual stash
 or discard was used.
+
+At `442725d82755d9b231735a5e0d4f5090da7f5fc6`, the exact full package command
+and declared delivery adversarial command both passed for code 3.81.0. Logs:
+`/private/tmp/loom-pr160-w6-build.log` and
+`/private/tmp/loom-pr160-w6-adversarial.log`; the latter collected and passed
+all 12 tests in 7.40s. The following sync-trunk observed main `fb9223ba2`
+already contained in the branch, with no new commit or outstanding work.
