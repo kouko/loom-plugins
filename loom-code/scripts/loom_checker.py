@@ -597,10 +597,10 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         result = command(argv[1:], out, err)
         if result != 0 and hint:
             err.write(hint)
-        if not protected and argv[0] != "delivery":
+        if not protected and (argv[0] != "delivery" or result not in (0, 1)):
             category = {0: "passed", 1: "blocked"}.get(result, "unclassified")
-            if argv[0] == "plan" and result == 2:
-                category = "usage"  # missing/unreadable plan returns usage directly
+            if argv[0] in {"plan", "delivery"} and result == 2:
+                category = "usage"  # file/argument errors return usage directly
             write_suggestion(suggested_next(argv[0], category), err)
         return result
     except UsageError as exc:

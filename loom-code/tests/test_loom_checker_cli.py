@@ -522,6 +522,16 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
         assert result.returncode == code and not result.stdout
         assert result.stderr.startswith(diagnostic)
         assert result.stderr.count(f'--ready {argv[0]} --help') == 1
+    for operands, diagnostic in ((["--goal", "invalid"], "delivery: --goal must be local, published or merged"),
+                                 (["--unexpected"], "delivery: unexpected or repeated argument"),
+                                 (["--intent"], "delivery: --intent needs a value")):
+        for selector in ([], ["--json"]):
+            result = run_checker("delivery", *operands, *selector, cwd=repo)
+            assert result.returncode == 2 and not result.stdout
+            assert result.stderr.startswith(diagnostic)
+            assert result.stderr.count("--ready delivery --help") == 1
+            assert result.stderr.count("Suggested next step:") == 1
+            assert "command help" in result.stderr
     malformed.write_text("{}", encoding="utf-8")
     result = run_checker(*cases[1][0], cwd=repo)
     assert result.returncode == 1 and not result.stdout
@@ -630,7 +640,7 @@ def test_all_ordinary_commands_offer_advice_without_repeating_handlers(monkeypat
             assert entry["main"]([command], out, err) == code
             assert calls == [[]] and out.getvalue() == "original payload\n"
             assert err.getvalue().startswith("original diagnostic\n")
-            expected = command != "delivery" and (code != 0 or command in {"publish", "finalize-review"})
+            expected = (command != "delivery" or code == 2) and (code != 0 or command in {"publish", "finalize-review"})
             assert err.getvalue().count("Suggested next step:") == int(expected), (command, code)
     for argv in ([], ["unknown-operand"]):
         out, err = io.StringIO(), io.StringIO()
