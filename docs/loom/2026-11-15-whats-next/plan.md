@@ -29,7 +29,7 @@ charter: 1.1
 - Risk: agent-decided — REQ-5; missing navigation class searched across every changed guide and catalog; preserve all existing link checks.
 
 **W3-02 Account for the admitted skill in measured budgets** after: W3-01 acceptance: 5
-- Files: `docs/loom/evidence/mechanisms.yaml`, `loom-code/scripts/check_mechanisms.py`, `tests/test_loom_skill_description_catalog.py`, `loom-workflow/CHANGELOG.md`, `loom-code/.claude-plugin/plugin.json` and derived release mirrors, `loom-code/CHANGELOG.md`, root and plugin README version pins
+- Files: `docs/loom/evidence/mechanisms.yaml`, `loom-code/scripts/check_mechanisms.py`, `tests/test_loom_skill_description_catalog.py` and `loom-workflow/tests/scripts/test_skill_count.py`, `loom-workflow/CHANGELOG.md`, `loom-code/.claude-plugin/plugin.json` and derived release mirrors, `loom-code/CHANGELOG.md`, root and plugin README inventory/version pins
 - Test: A5 positive: registered-skill; negative: undeclared-admission. Reuse `loom-code/tests/test_check_mechanisms.py` and catalog tests; preserve the frozen baseline and unrelated skill accounting.
 - Risk: agent-decided — REQ-5; incomplete new-skill admission affects registry, count ceiling and catalog. Explicit exception admits one skill; patch-bump code measurement metadata, no new checker rule or hook.
 
