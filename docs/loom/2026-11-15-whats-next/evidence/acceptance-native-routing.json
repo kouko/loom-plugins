@@ -1,0 +1,26 @@
+{
+  "evidence_kind": "body-informed native selection",
+  "limitation": "The whats-next skill body was read before selection. This is not description-only evidence, installed-host triggering evidence, or a comparative improvement test. No expected labels or existing selection outputs were read. The fixture has query fields and no separate context fields; only id and query values were exposed for judgment.",
+  "selections": [
+    {"id":"P1","selected_skill":"whats-next"},
+    {"id":"P2","selected_skill":"whats-next"},
+    {"id":"P3","selected_skill":"whats-next"},
+    {"id":"P4","selected_skill":"whats-next"},
+    {"id":"P5","selected_skill":"whats-next"},
+    {"id":"P6","selected_skill":"whats-next"},
+    {"id":"P7","selected_skill":"whats-next"},
+    {"id":"P8","selected_skill":"whats-next"},
+    {"id":"P9","selected_skill":"whats-next"},
+    {"id":"P10","selected_skill":"whats-next"},
+    {"id":"N1","selected_skill":"recap-state"},
+    {"id":"N2","selected_skill":"recap-state"},
+    {"id":"N3","selected_skill":"recap-state"},
+    {"id":"N4","selected_skill":null},
+    {"id":"N5","selected_skill":null},
+    {"id":"N6","selected_skill":null},
+    {"id":"N7","selected_skill":null},
+    {"id":"N8","selected_skill":null},
+    {"id":"N9","selected_skill":null},
+    {"id":"N10","selected_skill":null}
+  ]
+}
