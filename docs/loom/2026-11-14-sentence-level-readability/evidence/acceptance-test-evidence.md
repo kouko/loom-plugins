@@ -229,3 +229,199 @@ I approved ticket 3172 without checking it.
   is not checked here.
 - Evidence: `plain-language.md:81-90` and the last Sources line; the "rule 3
   study limits" pin and the study-cited-twice check passed.
+
+## Re-run on 2026-11-14, at 95a6e265
+
+Fix range checked: `git diff 323ececb 95a6e265` (one commit). It changes the
+guide's rule 3 lead sentence ("make" became "can make"), the rule 3 "Why"
+paragraph, and rewrite step 5; adds one sentence and rewords one in
+`loom-workflow/CHANGELOG.md`; and adds three negative substitutions and two
+comments to `loom-workflow/tests/loom-visualization/test_references.py`.
+
+Setup, repeated on this run:
+
+- Clean copy: `git worktree add --detach <scratch>/at-rerun 95a6e2650671f9b3e3d588cdf48ae0b37b3ad0bc`;
+  the old guide again from a clean copy at `adcd4cbf` (`<scratch>/at-base2`).
+- `claude plugin validate <scratch>/at-rerun/loom-workflow`: `Validation passed
+  with warnings`, the same two warnings as the first run, in files this change
+  did not touch.
+- Focused tests in the clean copy, same command as the first run with
+  `--directory <scratch>/at-rerun`: `44 passed in 1.96s`. The complete suite
+  was not run (skipped by instruction).
+
+Line numbers below are from the clean copy at 95a6e265.
+
+- 1: re-tested — read the rule 3 table again (`plain-language.md:65-75`). The
+  fix changed no table row: English pairs for all five shapes, Traditional
+  Chinese pairs for four, "A noun used as a verb" English only. The lead
+  sentence above the table now reads "Five sentence shapes can make the user
+  read the sentence twice". `test_sentence_shape_guidance_present` passed, and
+  `test_broken_sentence_shape_guidance_rejected` now also rejects a guide whose
+  Chinese pair for the noun-stack shape is removed.
+- 2: re-tested — rule 7 (`plain-language.md:162-165`) is word for word as in
+  the first run. The fix added a negative case for it: a guide that says
+  "Being brief" in place of "Being concise" is now rejected ("rule 7 does not
+  name concise"). Both tests passed.
+- 3: re-tested — step 5 (`plain-language.md:195`) now reads "Check for
+  metaphor words ("like", "imagine", "think of it as", analogies) and for the
+  five sentence shapes of rule 3 before sending; replace each metaphor with
+  the literal statement and rewrite each shape as rule 3 shows." The section
+  still has five steps. The "last rewrite step checks the sentence shapes" pin
+  and `test_guide_has_seven_rules_and_rewrite_steps` passed. A fresh agent
+  given only this guide and the samples, asked to follow the rewrite steps,
+  took the 38 occurrences down to 5 (set X2 below).
+- 4: re-tested — in full, because step 5 is the instruction the rewriters
+  follow. Two fresh agents with no context, same prompt as the first run:
+  agent X2 read the guide at 95a6e265, agent Y2 read the guide at adcd4cbf.
+  Counted by me with the rules in `heldout-verdict-final.md`; not blind.
+
+  | Set | Guide | Residual shapes | Changed facts | Guessed causes |
+  |---|---|---|---|---|
+  | Y2 | before the change | 6 | 0 | 1 (one more borderline) |
+  | X2 | after the change, with the fix | 5 | 0 | 0 |
+
+  Y2 residue: EN1 "the orders model the dashboard reads" (connecting word
+  dropped); EN1 "The analyst who rebuilt the weekly revenue report in October
+  rewrote" (8 words); EN1 "the check on whether the daily revenue snapshot is
+  up to date has" (10 words); EN3 "The log the agent attached" (connecting
+  word dropped); EN3 "worker pool size"; ZH3 「工作程序池大小上限」.
+  X2 residue: EN1 "The analyst who rebuilt the weekly revenue report in
+  October rewrote" (8 words); EN1 "The check of how fresh the daily revenue
+  snapshot is has" (8 words); EN2 "The rate at which vendor invoices are
+  matched as duplicates fell" (8 words); EN3 "the change to the size limit of
+  the worker pool is released" (8 words); ZH3 「工作程序池大小上限」.
+  Guessed causes: Y2 ZH1 writes 「原因是」 where the Chinese original states
+  no relation (the same guess the recorded old-guide set made). Borderline,
+  not counted: Y2 ZH2 「因為它依賴的日期解析器處理不了這種年份」 adds a
+  「因為」 between two restatements of one original clause. X2 adds none.
+  Facts: every number and name (214, 9, 3, 28th, 7%, 2%, 4, 17, 15, 500,
+  3172, October, August) is in both sets. Noted, not counted as changed: Y2
+  ZH4 writes 「最長 15 分鐘」 for 「長達 15 分鐘」; Y2 adds glosses for
+  "join", "is not done yet", and the framings 「目前有兩個問題」 and
+  「另外三件事」.
+
+  All three paired trials so far:
+
+  | Trial | Before the change | After the change |
+  |---|---|---|
+  | Recorded, guide at f35f7430, blind judge | 5 | 4 |
+  | My first run, guide at f35f7430 | 4 | 2 |
+  | This re-run, guide at 95a6e265 | 6 | 5 |
+
+  Reading: in each pair the changed guide leaves fewer, by one or two out of
+  38, and no fact changed in any set. The spread between runs of the same
+  guide (2 to 5 after the change, 4 to 6 before) is as large as the gap
+  between the guides, so the gap is not distinguishable from chance on this
+  evidence. The steadier difference is the guessed cause: the old guide's
+  rewriter added one in two of three trials, the changed guide's in none.
+- 5: carried over — the fix diff has no hunk in the guide's Scope section
+  (`plain-language.md:11-14` is unchanged) and touches no other skill file,
+  hook or card; nothing in the fix can widen or narrow what the guide covers.
+- 6: re-tested — the "Why" paragraph (`plain-language.md:81-93`) still names
+  Clark, Martin and Mahowald (2026) with https://arxiv.org/abs/2610.29162, and
+  the same link is the Sources entry at line 446. The fix reworded the
+  findings: "longer distances between words that depend on each other, such
+  as a subject and its verb"; a new sentence "Against paraphrases with the
+  same meaning, almost all of the models also used more nouns as verbs"; and
+  the limits are now introduced as "Three limits of the study matter for this
+  guide" in place of "The study has three limits". All three limits the
+  Acceptance line names are still stated. The "rule 3 study limits" pin
+  passed, and the negative test now rejects a guide with the rule 3 citation
+  removed ("study not cited in both rule 3 and Sources").
+  Checked against the paper by the independent reviewer of this change, not
+  by me: the reviewer read the abstract and the HTML page of arXiv 2610.29162
+  (the first 100,000 of 114,759 characters) and reported that the citation,
+  the nine-model count, the all-nine finding on things as subjects of
+  person-only verbs, and the English-only limit match the paper, and that the
+  guide wording that was narrower or stronger than the paper is what this fix
+  corrected. The last 14,759 characters of the page were not read. I did not
+  open the paper myself.
+
+### Set X2 — rewrites under the guide at 95a6e265 (after the change, with the fix)
+
+#### EN1
+The join leaves out 214 rows, because the orders model that the dashboard reads does not accept null store ids. The analyst who rebuilt the weekly revenue report in October rewrote that join after the audit, so that it uses the new calendar table. I will put the null handling on the backlog. The check of how fresh the daily revenue snapshot is has a latency of 9 minutes.
+
+#### EN2
+The date parser that the importer relies on cannot handle two-digit years. The export ran in 3 minutes. The finance team, which owns the tax ledger, asked for that export before the quarter close on the 28th. The rate at which vendor invoices are matched as duplicates fell from 7% to 2%.
+
+#### EN3
+After a restart, the scheduler no longer has its jobs, and the 4 slow workers get no jobs from the queue. I will shut down the legacy cron bridge once the change to the size limit of the worker pool is released. The log that the agent attached shows 17 timeouts.
+
+#### EN4
+For 15 minutes, the cache treats out-of-date prices as current. The alert for refunds larger than 500 dollars never fires at night. The on-call engineer who inherited the pricing service set up that alert after the August outage. I approved ticket 3172 without checking it.
+
+#### ZH1
+那個關聯查詢少了 214 筆資料。這個查詢是十月重做每週營收報表的分析師在稽核後重寫的，重寫是為了改用新日曆表。儀表板讀取的訂單模型不接受空的門市編號。檢查每日營收快照是否夠新的那項檢查，延遲是 9 分鐘。報表晚出。排程重跑了。
+
+#### ZH2
+匯入程式依賴的日期解析器無法處理兩位數年份。那份匯出跑了 3 分鐘。它是負責稅務帳本的財務團隊在 28 日季結前要求的。廠商發票被比對為重複的比率從 7% 降到 2%。比對變快。索引重建了。
+
+#### ZH3
+排程器重啟後，不再保有原本的工作。4 個慢速工作程序從佇列拿不到工作。變更工作程序池大小上限的那項修改，上線流程還沒走完。記錄檔顯示 17 次逾時。舊橋接停用。
+
+#### ZH4
+快取把過期的價格當成有效的價格，長達 15 分鐘。針對超過 500 元退款的那個警示，在夜間從來不會觸發。它是八月當機後接手定價服務的值班工程師設定的。寄送退款通知用的範本裡，欄位對應錯了。工單 3172 沒關閉。
+
+### Set Y2 — rewrites under the guide at adcd4cbf (before the change)
+
+#### EN1
+A join (the query step that matches rows between tables) drops 214 rows, because the orders model the dashboard reads cannot handle rows whose store id is empty. This is the join that was rewritten after the audit to use the new calendar table. The analyst who rebuilt the weekly revenue report in October rewrote it.
+
+I will handle the empty store ids later; that work is now on the to-do list and is not done yet.
+
+Separately, the check on whether the daily revenue snapshot is up to date has a delay of 9 minutes.
+
+#### EN2
+The importer cannot read dates whose year is written with two digits. It relies on a date parser, and the parser fails on those years.
+
+The export ran in 3 minutes. This is the export requested by the finance team that owns the tax ledger, which they asked for before the quarter close on the 28th.
+
+The share of vendor invoices matched as duplicates fell from 7% to 2%.
+
+#### EN3
+There are two problems: after a restart the scheduler no longer has the jobs it had before, and the queue gives no work to the 4 slow workers.
+
+The log the agent attached shows 17 timeouts.
+
+I will stop using the old cron bridge once the change to the limit on worker pool size is released.
+
+#### EN4
+The cache keeps using out-of-date prices for 15 minutes.
+
+The alert for refunds larger than 500 dollars never fires at night. The on-call engineer who inherited the pricing service set it up after the August outage.
+
+I approved ticket 3172 without checking it.
+
+#### ZH1
+有一個關聯查詢（把不同資料表的資料對起來的那一步）少了 214 筆資料，原因是儀表板讀取的訂單模型處理不了門市編號是空的資料。這個查詢是稽核後為了改用新日曆表而重寫的，重寫的人是十月重做每週營收報表的那位分析師。
+
+另外三件事：
+
+- 檢查「每日營收快照是不是最新」的那項檢查，延遲是 9 分鐘。
+- 報表比較晚才出來。
+- 排程重新跑過了。
+
+#### ZH2
+匯入程式讀不了年份只寫兩位數的日期，因為它依賴的日期解析器處理不了這種年份。
+
+那份匯出跑了 3 分鐘。它是負責稅務帳本的財務團隊在 28 日季結前要求的。
+
+廠商發票被比對為重複的比率從 7% 降到 2%。比對變快了，索引也重建了。
+
+#### ZH3
+目前有兩個問題：排程器重啟後，重啟前的工作沒有留下來；佇列沒有把工作分給 4 個慢速工作程序。
+
+- 記錄檔顯示 17 次逾時。
+- 「調整工作程序池大小上限」這項變更，上線流程還沒走完。
+- 舊橋接停用。
+
+#### ZH4
+快取會繼續使用過期的價格，最長 15 分鐘。
+
+針對超過 500 元退款的那個警示，在夜間從來不會觸發。這個警示是八月當機後接手定價服務的值班工程師設定的。
+
+另外兩件事：
+
+- 寄送退款通知用的範本，欄位對應錯了。
+- 工單 3172 沒有關閉。
