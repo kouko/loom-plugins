@@ -1,6 +1,38 @@
 # Post-merge delivery guidance — acceptance test evidence
 
-Tried on 2026-11-14, in a clean copy of the project at 7de6f54ef6eb7a983d564403c49a151e1ebcd78a.
+Tried on 2026-11-14, in a clean copy of the project at d67ebb14defe50bc26734ba6297879c6926d67c0.
+
+## Re-run on 2026-11-14, at d67ebb14defe50bc26734ba6297879c6926d67c0
+
+Independently inspected `git diff 4d282d7ab801be9ba95b004afa7eb5873437500d..d67ebb14d`: only plan W4 acceptance linkage, test-pair wording, risk wording and build evidence changed. Combined with the preceding inspected fix range, no runtime source, instructions, tests, README or canonical intent content changed.
+
+Exact clean-copy commands: `git archive d67ebb14d -o /private/tmp/acceptance-post-merge-final.tar`; `mkdir -p /private/tmp/acceptance-post-merge-final`; `tar -xf /private/tmp/acceptance-post-merge-final.tar -C /private/tmp/acceptance-post-merge-final`. Read README setup at lines 258–287. From that copy, executed `bash loom-code/hooks/session-start </dev/null > /private/tmp/acceptance-post-merge-final-startup.json`, exit 0, and decoded `hookSpecificOutput.additionalContext`. It again emitted full-result same-change completion, preservation of verification/cleanup failures, surviving-repository recovery and rejection of prior-change success. No installed plugin changes.
+
+Repeated canonical byte comparison via `git show aa0f50acf:docs/loom/intent/2026-11-14-post-merge-delivery-guidance.md` and `git show d67ebb14d:docs/loom/intent/2026-11-14-post-merge-delivery-guidance.md`, removing entire status/pin lines as recorded in the preceding run. Output: `canonical bytes equal: True`; `git hash-object --stdin` gives `56acccd13debac07366685edc4ee850e40bbde61`, equal to the repaired pin. This verifies original requirements and publication authorization, not a new user confirmation.
+
+- 1: carried over — emitted context and Ship unchanged across both fix ranges; earlier full-success scenario remains applicable. Setup emission repeated successfully.
+- 2: re-tested — ran `git init -b main /private/tmp/acceptance-post-merge-final`, then clean-source `loom-code/scripts/loom-python --repair delivery --json`. Exit 1; `state: unconfirmed`, `reason: cannot identify a committed change`, `complete: false`. Actual next text: `For an active change, use its <type>/<change-id> feature branch and committed confirmed intent. After land removes that identity, report the same change's full land execution result, including exit status, verification and cleanup outcomes. Preserve failures and pending work; a merge line or next-directory hint alone cannot establish completion. If cleanup is partial, use the existing land --cleanup recovery from a surviving repository. Without that evidence, delivery remains unconfirmed.` Both requested scopes observed in full.
+- 3: carried over — confirmed canonical content/authorization equal; delivery, Stop, publication and merge implementations/tests untouched. Prior `44 passed in 107.97s` is specifically the first run at 7de6f54, not a fresh test result. Mandatory full suite remains for finalization. The new actual diagnostic also preserves absent-evidence failure.
+- 4: carried over — no failure/recovery runtime prose changed; original two synthetic failure exercises retain coverage of all named surfaces.
+- 5: carried over — same-change restriction and Acceptance unchanged; prior independent rejection of unrelated success remains applicable.
+
+No new tests were started, no full suite claimed, no live GitHub actions or installed-plugin edits. No findings; no important dismissed findings supplied. Historical 4d and first-run evidence follows unchanged.
+
+## Re-run on 2026-11-14, at 4d282d7ab801be9ba95b004afa7eb5873437500d
+
+Earlier sections below preserve the first run at 7de6f54ef6eb7a983d564403c49a151e1ebcd78a, including its test result and synthetic actor decisions; none is claimed as a new test execution. Independently inspected `git diff e51626a7d38fab2195c4021401989a08ccfaa3d4..4d282d7ab801be9ba95b004afa7eb5873437500d`: only the intent confirmation pin, plan reference/W4 bookkeeping and build evidence changed. No runtime instruction, CLI source, authorization logic, tests, README or Acceptance text changed.
+
+Created another clean archive with `git archive 4d282d7ab801be9ba95b004afa7eb5873437500d -o /private/tmp/acceptance-post-merge-rerun.tar`, `mkdir -p /private/tmp/acceptance-post-merge-rerun`, `tar -xf /private/tmp/acceptance-post-merge-rerun.tar -C /private/tmp/acceptance-post-merge-rerun`. Re-read this copy's README setup and executed `bash loom-code/hooks/session-start </dev/null > /private/tmp/acceptance-post-merge-rerun-startup.json` (exit 0), then decoded its actual additionalContext: the full same-change completion, verification/cleanup failures, surviving-repository recovery and unrelated-success exclusions were emitted. As before, tested source loading without modifying installed plugins.
+
+Independently read original `aa0f50acf` and new target intent bytes using `git show`, removed entire `status:` and `intent_confirmed_sha:` lines with `re.sub(rb"^(?:status|intent_confirmed_sha):.*\n?",b"",raw,flags=re.M)`, compared canonical bytes and computed `git hash-object --stdin`. Output: `canonical bytes equal: True`; blob `56acccd13debac07366685edc4ee850e40bbde61`; new pin `56acccd13debac07366685edc4ee850e40bbde61`. Requirements and publication authorization are byte-identical; no new confirmation is implied or requested.
+
+- 1: carried over — no change to either emitted instruction or Ship; the prior independent full-success exercise remains applicable. Setup emission was repeated, not a new semantic exercise.
+- 2: re-tested — after `git init -b main /private/tmp/acceptance-post-merge-rerun`, ran this new copy's `loom-code/scripts/loom-python --repair delivery --json`. Exit 1, state `unconfirmed`, reason `cannot identify a committed change`, complete false. Actual next text again conditions feature-branch/confirmed-intent advice on active work, then allows the same change's full land result after identity removal, rejects a merge line/directory hint alone, and offers surviving-repository cleanup recovery. Both scope and post-land evidence guidance were observed in full.
+- 3: carried over — canonical confirmation bytes and authorization are independently verified unchanged; delivery/Stop/publication/merge implementation and focused tests are untouched. Prior 44-test result at 7de6f54 is retained, not rerun; actual missing-evidence diagnostic was additionally observed during setup. The full suite remains the finalizer's responsibility.
+- 4: carried over — no runtime or recovery prose changed; both earlier verification-failure and partial-cleanup scenario decisions retain their full surface coverage.
+- 5: carried over — no same-change exclusion or Acceptance text changed; prior unrelated-success exercise remains applicable.
+
+No important dismissed findings were supplied. No new findings. No full suite, live GitHub action or installation performed.
 
 ## Environment and provenance
 

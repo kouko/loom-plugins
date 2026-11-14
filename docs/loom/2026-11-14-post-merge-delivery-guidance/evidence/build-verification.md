@@ -110,3 +110,9 @@ passed all 12 tests in 7.15s. Captured logs are
 The subsequent sync-trunk observation was up to date with `3bf50711f`.
 The earlier passing results and refused finalization remain historical evidence;
 neither substitutes for this revalidation or the next finalization.
+
+The planning checks then rejected the repair note's word count and missing
+positive/negative case pairs. The note was shortened and W4 was assigned only
+to its affected Acceptance 3, with the observed identity cases. Both the plan
+command and write-plan intake exited 0 before the final Build rerun. These
+edits change no runtime source or confirmed requirement.
