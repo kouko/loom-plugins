@@ -1,47 +1,45 @@
 # CLI result consumption
 
-The first checked consumers let planning establish compatibility and review
-obtain its reviewer count from validated fields. This is a two-consumer
-migration, not a migration of all sixteen checker commands. Existing direct
-text and JSON interfaces remain available.
+All sixteen checker commands define advisory next-step behavior. Five expose
+direct JSON, and only two have checked station consumers: compatibility in
+planning and reviewer count in closing review. Advisory coverage adds no JSON
+modes or checked consumers to the other commands.
 
-## Current inventory and delivery order
+## Command coverage and executable evidence
 
 The command registry and exact per-command help in
 [`../scripts/loom_checker.py`](../scripts/loom_checker.py) own operand grammar
 and result details. Five commands provide direct JSON; two of those have checked
 station consumers. The helper is a script, not a seventeenth checker command.
-Only `contract` and `reviewer-count` have migrated to `suggested_next` advice.
-Their checked consumer also supplies local fault advice. The other fourteen
-commands retain their interfaces: preparation `plan`/`intake` has no new field,
-delivery keeps its existing `next` string, and publish/land/launcher remedies
-remain existing guidance rather than migrated advice. This is not an all-command
-advice migration.
+The shared [CLI entry checks](../tests/test_loom_checker_cli.py) exercise every
+registered command's ordinary result handling, exact discovery, unknown input,
+protected-mode suppression and advice-only write failures. The command-specific
+checks below exercise actual outcome semantics and protocol boundaries; a
+coverage row alone is not a test result. Complete-suite execution and independent
+clean-copy acceptance remain separate release evidence.
 
-| Checker command | Current result/modes | Checked station consumer and remaining work |
+| Checker command | Advice and preserved modes | Executable evidence |
 |---|---|---|
-| `intent` | Text checks; optional `--commit-msg` evidence | None; future read-only result design |
-| `intents` | Text local-ref states; selected ID and `--metadata` differ | None; future read-only result design |
-| `intake` | Text or final `--json` preparation envelope | None; direct JSON exists, consumer migration deferred |
-| `push` | Host `--hook` feedback; explicit native hook install/remove modes | None; host protocol and configuration writes stay separate |
-| `publish` | Text/progress; authorized remote writes and CI observation | None; future operation-result design must preserve reconciliation |
-| `delivery` | Text or `--json` delivery object; separate host hook modes | None; existing observation/reconciliation remains in use |
-| `land` | Text/progress; accepted merge, named cleanup, or sweep/confirmation | None; future operation-result design must preserve acceptance and cleanup boundaries |
-| `sync-trunk` | Text with WARN/BLOCK; fetch and possible rebase/merge | None; future operation-result design; exit 0 can be unsynced |
-| `github-rules` | Advisory text; `--print-setup` prints without executing setup | None; future read-only result design; exit 0 can be unconfirmed |
-| `pr-floor` | CI annotations and diagnostics; optional step-summary write | None; future CI result design, retain summary side effect |
-| `standing` | Text diagnostics/advisories | None; future read-only result design |
-| `contract` | Text or final `--json` preparation envelope plus `data` | Checked compatibility in write-plan, including Codex first contact |
-| `charter` | Markdown table plus diagnostics; optional manifest override | None; future read-only result design; table can accompany failure |
-| `plan` | Text or final `--json` preparation envelope | None; direct JSON exists, consumer migration deferred |
-| `reviewer-count` | Text integer or final `--json` preparation envelope plus `data` | Checked reviewer floor in closing-review |
-| `finalize-review` | Text/progress; executes checks and writes attestation | None; future operation-result design must retain evidence verification |
+| `intent` | Refusals refer to the artifact owner and authentic confirmation; preserve `--commit-msg` and notices. Passing checks need no filler. | [Intent entry cases](../tests/test_loom_checker_intent.py) |
+| `intents` | Indeterminate exit 1 requires remote-default evidence; keep empty lists, selected IDs, `--remote` and `--metadata` columns. | [CLI local-ref cases](../tests/test_loom_checker_cli.py) |
+| `intake` | Version-1 JSON or text advice addresses station prerequisites; retain notices and skipped-artifact semantics. | [Intake cases](../tests/test_loom_checker_intake.py), [JSON parity](../tests/test_preparation_json.py) |
+| `push` | Ordinary native install/remove errors retain ownership/origin remedies; host `--hook` and installed native-hook bytes stay separate. | [Native ownership](../tests/test_native_git_protection.py), [host framing](../tests/test_hooks_json.py) |
+| `publish` | Refusals retain prerequisites and reconciliation; success suggests inspecting evidence and awaiting acceptance. Progress and write/poll counts remain unchanged. | [Controlled publication cases](../tests/test_loom_publish.py) |
+| `delivery` | JSON `suggested_next` aliases legacy `next`; text keeps its legacy lines and adds the same advice. Pre-result usage errors retain text diagnostics; incomplete/unconfirmed stays incomplete. | [Delivery states/parity](../tests/test_delivery.py), [Stop protocol](../tests/test_delivery_stop.py), [CLI usage](../tests/test_loom_checker_cli.py) |
+| `land` | Refusals preserve accepted-merge versus cleanup remedies; a removable sweep list requests review and approval before token use. Preserve `next: cd`, freshness and no-repeat-merge behavior. | [Merge](../tests/test_land_merge.py), [cleanup](../tests/test_land_cleanup.py), [sweep](../tests/test_land_sweep.py) |
+| `sync-trunk` | Fetch WARN remains exit 0 and explicitly unsynced; refusals preserve work and normal Build recovery. No extra fetch or method switch. | [Real temporary Git cases](../tests/test_sync_trunk.py) |
+| `github-rules` | Missing/unconfirmed normal reports use the canonical label on stdout without granting admin authorization; confirmed protection needs no filler. Preserve `--print-setup`. | [Read-only probes/setup](../tests/test_github_rules.py) |
+| `pr-floor` | Absent/stale verification at exit 0 gets separate stderr advice without becoming a gate; preserve escaped annotations and summary writes. | [CI outcomes/stream faults](../tests/test_pr_floor.py), [workflow](../tests/test_pr_floor_workflow.py) |
+| `standing` | Emitted warnings get nonblocking guidance; waivers and principle refusals remain authoritative. No automatic document changes. | [Standing policy cases](../tests/test_loom_checker_standing.py) |
+| `contract` | Version-1 JSON plus typed `data`; blocked advice follows the diagnostic's indicated plugin. Checked compatibility in write-plan. | [Compatibility CLI](../tests/test_loom_checker_cli.py), [JSON](../tests/test_preparation_json.py), [consumer](../tests/test_checked_readonly.py) |
+| `charter` | Refusal advice refers to the reported manifest/row; preserve Markdown table output, row order and `--manifest`. | [Charter cases](../tests/test_contract_charter.py) |
+| `plan` | Version-1 JSON or text; missing/unreadable-file errors keep usage advice matching JSON, not an asserted internal failure. | [Field caps](../tests/test_plan_field_caps.py), [JSON parity](../tests/test_preparation_json.py) |
+| `reviewer-count` | Version-1 JSON plus typed `data`, or text integer; errors preserve the real floor policy without a default. Checked in closing-review. | [JSON](../tests/test_preparation_json.py), [consumer boundaries](../tests/test_checked_readonly.py) |
+| `finalize-review` | Refusals require authentic evidence through its owner; success suggests committing generated evidence before authorized publication. Preserve execution/progress/attestation rules. | [CLI failures](../tests/test_loom_checker_cli.py), [finalization](../tests/test_probe_confirmation_finalize.py) |
 
-Delivery order is deliberately bounded: this release adopts the two read-only
-consumers; later work can design remaining read-only/CI observations, then
-operation results around their real completion and recovery needs. No dates or
-additional migrations are promised. Help, `--list-rules`, launcher modes and
-host hooks are discovery or separate protocols, not extra checker commands.
+Help, `--list-rules`, launcher modes, standalone dispatch scripts and host hooks
+are discovery or separate protocols, not extra checker commands. The remaining
+eleven commands retain text interfaces; this change adds no JSON mode.
 
 ## Common consumption principles
 
@@ -62,11 +60,24 @@ host hooks are discovery or separate protocols, not extra checker commands.
 
 Structured result facts determine whether a prerequisite is established;
 `suggested_next` is prose inside a JSON string, not a machine decision or an
-executable action. The two migrated producers emit a nonblank English string
-for blocked/error results and null for passed results. Direct text refusals and
-errors append one `Suggested next step:` line on stderr, retaining original
-diagnostics and Help hints; successful text stays unchanged. JSON-mode advice
-stays inside the single stdout object with empty checker stderr.
+executable action. The four version-1 producers (`plan`, `intake`, `contract`,
+`reviewer-count`) emit a nonblank English string for blocked/error results and
+null for passed results. `contract`/`reviewer-count` additionally retain typed
+`data`. `delivery` retains its distinct five legacy fields and adds
+`suggested_next` equal to `next`; it has no preparation envelope or new schema
+version. Ordinary delivery text keeps its original state/next lines and emits
+that same advice on stderr. Existing delivery Help/error stderr and pre-result
+text failures remain possible even with `--json`; do not generalize the four
+envelopes' empty-checker-stderr contract to delivery.
+
+Ordinary text refusals/errors use `Suggested next step:` on stderr while
+retaining diagnostics and existing Help hints. Useful success follow-up is
+allowed, such as committing generated verification or awaiting acceptance after
+publication. Successful checks and empty lists need no invented follow-up.
+State owners retain uncertainty at exit zero: a fetch failure is unsynced,
+unreadable GitHub protection is unconfirmed, standing WARNs are nonblocking and
+absent/stale PR verification is a notice, not a new body-floor failure. GitHub
+rules' normal human report keeps its existing stdout location.
 
 After accepting the core observation, read `suggested_next` only when it is a
 string whose trimmed value is nonblank. Present applicable advice as advisory
@@ -79,7 +90,14 @@ fields does not make arbitrary advice trustworthy or executable.
 Advice never grants authorization to continue, publish, merge or bypass host
 trust. Its presence, absence or contents must not trigger automatic execution,
 retry or text fallback. An unknown observation cannot establish a prerequisite
-through its suggestion. No useful suggestion is a valid state.
+through its suggestion. Absence of a useful suggestion is a valid state.
+
+Text advice is best-effort: an OSError or UnicodeError while writing only the
+advisory line cannot change the original result/exit or repeat an operation.
+Primary output/diagnostic failures, JSON stream failures, process termination
+and pre-Python startup retain their existing limits. The shared formatter is
+standard-library-only, preserving checked-readonly's standalone help/startup
+boundary without importing the checker's PyYAML dependency.
 
 For contract refusals, follow the actual diagnostic's indicated plugin: either
 the consuming plugin or loom-code can be outdated. Usage advice directs input
@@ -93,6 +111,24 @@ output-contract investigation. Never derive recovery commands from malformed
 child stdout or unexpected stderr. Existing launcher readiness/repair ownership
 and remote-operation reconciliation remain in force. No improvement in agent
 resolution rate, time, tokens or cost has been measured.
+
+## Preserved protocol boundaries
+
+| Surface | Preservation rule and executable checks |
+|---|---|
+| Exact help and `--list-rules` | Discovery performs no handler work; no suggestion is manufactured. [CLI](../tests/test_loom_checker_cli.py), [runtime isolation](../tests/test_loom_python_runtime.py). |
+| Push and delivery hooks | Keep host payload framing, streams and fail-open/refusal decisions, including mixed/invalid hook forms; ordinary CLI advice and aliases are excluded. [Host payloads](../tests/test_hooks_json.py), [Stop](../tests/test_delivery_stop.py), [dispatcher](../tests/test_loom_checker_cli.py). |
+| Installed native Git hooks | Keep exact embedded bytes, including legacy Next text: ownership checks compare bytes, so changing that text would make existing installations foreign. [Native ownership](../tests/test_native_git_protection.py). |
+| `github-rules --print-setup` | Keep executable setup content and existing failure/template output unchanged; no new advice is inserted. Printing setup never authorizes applying it. [Setup/probe cases](../tests/test_github_rules.py). |
+| PR-floor CI | Keep stdout annotation escaping and existing step-summary contents/write count; added advice is separate stderr. [CI cases](../tests/test_pr_floor.py). |
+| Land cleanup and sweep | Keep the mandatory literal `next: cd` handoff and stdout list/token; advice does not supply approval or repeat an accepted merge. [Sweep](../tests/test_land_sweep.py), [merge](../tests/test_land_merge.py), [cleanup](../tests/test_land_cleanup.py). |
+| Progress and launcher readiness | Keep existing cadence, flush, polling and mutation counts. Launcher repair/startup messages and standalone tools are separate interfaces. [Publication](../tests/test_loom_publish.py), [runtime](../tests/test_loom_python_runtime.py). |
+
+Remote-operation tests use controlled Git/gh responses and temporary repositories;
+the GitHub-rules server-enforcement case is a local simulation. These checks do
+not establish installed-host/model compliance, live GitHub enforcement or
+unconsented publication/merge/cleanup on user repositories. Independent acceptance
+and full release checks are reported separately, not inferred from this map.
 
 ## Checked read-only calls
 

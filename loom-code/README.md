@@ -124,17 +124,22 @@ sibling reads this package at runtime.
 ## The checker
 
 `plan <path> --json` and `intake <station> <change-id> --json` opt into a
-version-1 preparation result on stdout. The final selector preserves default
-text behavior and exit codes. Results distinguish passed checks, blockers and
+version-1 preparation result on stdout. The final selector preserves the
+existing checks and exit codes. Results distinguish passed checks, blockers and
 usage/internal errors, retain ordered diagnostics and notices, and do not
 claim whole-workflow completion. Use either command's exact `--help` for the
-six-field contract and startup/process limitations.
+result fields and startup/process limitations.
 
 Five checker commands support JSON: `plan`, `intake`, `contract`,
 `reviewer-count`, and `delivery`. The first four select JSON only with a final
 `--json`; duplicate selectors are usage errors. Exact command `--help`/`-h`
-remains text; mixed help and final JSON is a usage error. Delivery retains its
-distinct `{state, reason, next, evidence, complete}` object.
+remains text. Mixed help and final JSON is a usage error for the two read-only
+modes; plan/intake validate mixed forms as ordinary inputs. Delivery retains its
+distinct `{state, reason, next, evidence, complete}` fields and adds
+`suggested_next` equal to `next`; no common envelope or schema version is added.
+Ordinary text preserves its state/next lines and adds the same advice on stderr.
+Delivery may retain Help/error stderr, including pre-result text failures with
+`--json`; the preparation modes' empty-stderr contract does not apply to it.
 
 The two read-only modes add `data` to the preparation envelope:
 
@@ -146,8 +151,8 @@ The two read-only modes add `data` to the preparation envelope:
 Each emits exactly one stdout object plus newline and empty checker stderr:
 `schema_version: 1`, `command`, `status`, ordered `diagnostics` objects
 (`rule_id`, `message`), ordered string `notices`, `error`, and `data`.
-These two modes also emit advisory `suggested_next`: a nonblank English string
-for blocked/error, null for passed. Text refusals/errors append
+All four version-1 modes also emit advisory `suggested_next`: a nonblank English
+string for blocked/error, null for passed. Text refusals/errors append
 `Suggested next step:` on stderr; original diagnostics and Help hints remain.
 Passed means exit 0, empty diagnostics and null error; blocked means exit 1,
 rule diagnostics and null error; error means exit 2, empty diagnostics and
@@ -189,13 +194,18 @@ timeout and preserves startup exit 86. It neither writes artifacts, installs
 runtime nor changes policy, authority or host trust; the outer launcher's
 `--repair` can prepare caches, while `--ready` reuses them. Structural checking
 does not prove computational truth or whole-workflow completion. Existing
-text, preparation/delivery JSON and remote-operation reconciliation remain.
-The [CLI result guide](references/cli-results.md) inventories all sixteen
-commands, their special modes and remaining migration work: five direct JSON
-commands, two checked station consumers, no claim of full migration.
-Only those two commands adopt the new advice field; delivery's existing `next`
-and publish/land/launcher remedies remain unchanged. No gain in resolution rate,
-time, tokens or cost has been measured.
+result classifications, required fields and remote-operation reconciliation
+remain. All sixteen checker commands now define advisory behavior, with five
+direct JSON modes and two checked station consumers. Ordinary text uses
+`Suggested next step:` on stderr; GitHub rules' normal report retains stdout.
+Advice-only OSError/UnicodeError does not alter the result or repeat an action.
+Unknown or unsynced exit-zero results stay unknown or unsynced; successful
+checks need no filler. Hook payloads/native-hook bytes, setup, CI annotations,
+progress and mandatory cleanup cwd handoffs preserve their protocols. The
+[CLI result guide](references/cli-results.md) maps each command/mode to its
+executable checks and explains the exceptions. No additional JSON modes,
+checked consumers or automatic actions are introduced. No gain in resolution
+rate, time, tokens or cost has been measured.
 
 `scripts/loom_checker.py` is the deterministic layer: every rule recomputes
 from the repository instead of trusting a claim, and `--list-rules` is the
