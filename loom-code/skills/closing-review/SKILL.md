@@ -133,11 +133,20 @@ dispatching the first reviewers. After Build commits completed functional
 content, run:
 
 ```text
-"<loom-code>/scripts/loom-python" --repair reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py reviewer-count <change-id>
 ```
 
-The output is the computed reviewer floor: dispatch that many
-fresh-context reviewers with distinct agent identities. The checker derives the
+Use only accepted JSON with exit 0 and `status: passed`: its positive integer
+`data.reviewer_floor`, tied to the unchanged `data.change_id`, determines how
+many fresh-context reviewers with distinct agent identities to dispatch. The
+consumer validates these fields before emitting them and adds `--json` itself;
+do not parse success prose. Valid usage/internal errors, invalid observations
+or startup failures dispatch no reviewers and supply no default floor. Report
+the diagnostic and stop this prerequisite; no automatic retry or text fallback.
+This ready-mode call reuses the runtime prepared above; a readiness failure
+retains the launcher's repair guidance. See the shared
+[CLI result guide](../../references/cli-results.md).
+The checker derives the
 floor from the cumulative branch delta and fails closed to two when it cannot
 classify the whole change. `finalize-review` recomputes the same policy, and
 the PR's verification status reports a mismatch as `stale`; the orchestrator
