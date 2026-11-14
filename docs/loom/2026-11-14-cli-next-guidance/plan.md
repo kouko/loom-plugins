@@ -8,7 +8,7 @@ charter: 1.1
 ### Wave 1 — Producer and consumer advice
 
 **W1-01 Add bounded advisory output** after: none acceptance: 2, 3, 4, 5
-- Files: `loom-code/scripts/loom_checker.py` (entry: main), `loom-code/scripts/loom_checker/preparation_output.py` (entries: new_result/report_result/error_result), `loom-code/scripts/checked_readonly.py` (entry: main), `loom-code/tests/test_preparation_json.py`, `loom-code/tests/test_checked_readonly.py`, `loom-code/tests/test_loom_checker_cli.py`
+- Files: `loom-code/scripts/loom_checker.py` (entry: main), `loom-code/scripts/loom_checker/preparation_output.py` (entries: new_result/report_result/error_result/suggested_next), `loom-code/scripts/checked_readonly.py` (entry: main), `loom-code/tests/test_preparation_json.py`, `loom-code/tests/test_checked_readonly.py`, `loom-code/tests/test_loom_checker_cli.py`
 - Test: Existing: test_preparation_json.py, test_checked_readonly.py, test_loom_checker_cli.py. A2 positive: known-advice; boundary: unknown-failure. A3 positive: advisory-only; negative: bad-hint-controls-result. A4 positive: direct-parity; negative: legacy-drift. A5 positive: accurate-help; boundary: startup-timeout. Extend existing entry cases; no new test module.
 - Risk: REQ-2/3/4/5; agent-decided shared renderer and public entries. Widen existing advice/error cases without losing malformed-result, precision, isolation or policy coverage; keep legacy Help hints and direct successful text. Do not alter domain handlers or policy.
 
