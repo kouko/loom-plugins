@@ -28,5 +28,35 @@
     "case": "C08",
     "arm": "baseline",
     "path": "/private/tmp/loom-research-acceptance-eval/runs/R06"
+  },
+  "R07": {
+    "case": "C01",
+    "arm": "candidate",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R07"
+  },
+  "R08": {
+    "case": "C02",
+    "arm": "candidate",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R08"
+  },
+  "R09": {
+    "case": "C04",
+    "arm": "candidate",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R09"
+  },
+  "R10": {
+    "case": "C06",
+    "arm": "candidate",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R10"
+  },
+  "R11": {
+    "case": "C07",
+    "arm": "candidate",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R11"
+  },
+  "R12": {
+    "case": "C08",
+    "arm": "candidate",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R12"
   }
 }

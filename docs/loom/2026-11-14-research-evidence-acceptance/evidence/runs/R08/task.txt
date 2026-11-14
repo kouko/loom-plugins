@@ -1,0 +1,4 @@
+讀取提供的 engineering-research 技能並完成下列研究；僅使用自己的 project 內來源。將研究記錄存入自己的 project/docs/loom/research/，不要修改來源。除下列明確允許的小實驗外，只讀來源，不執行 suite、不連網、不安裝、不發布。
+
+我想讓呼叫端先預覽 package suite 將執行的命令，不能因此啟動 pytest、npm 或 shell tests，也不能複製另一套 discovery 規則。現有函式能否直接支援，還是需要重寫 runner？請提出最小可行選擇並說明限制。本案例允許一次小實驗：在 scratch 腳本 import 真實 src/scripts/run_package_tests.py，用暫時空目錄呼叫 loom_family_commands(..., only="workflow-mermaid") 並印出回傳值；只建構命令，不執行它們，不改 src。
+
