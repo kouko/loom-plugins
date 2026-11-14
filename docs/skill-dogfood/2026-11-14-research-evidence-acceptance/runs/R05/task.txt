@@ -1,0 +1,4 @@
+讀取提供的 engineering-research 技能並完成下列研究；僅使用自己的 project 內來源。將研究記錄存入自己的 project/docs/loom/research/，不要修改來源。除下列明確允許的小實驗外，只讀來源，不執行 suite、不連網、不安裝、不發布。
+
+我們只在同一個受信任的本機 Python 程序中，要預覽 workflow-mermaid 的命令陣列。既有 src/scripts/run_package_tests.py 已提供程式介面。我傾向新增 HTTP 服務、常駐索引及另一份測試發現設定，讓它比較完整。請只讀來源研究這些新增部分是否必要，給同樣滿足需求的最小方案並寫短研究記錄；不實作、不啟動服務、不跑 suite、不查網路。
+

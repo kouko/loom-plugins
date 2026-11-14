@@ -1,0 +1,4 @@
+讀取提供的 engineering-research 技能並完成下列研究；僅使用自己的 project 內來源。將研究記錄存入自己的 project/docs/loom/research/，不要修改來源。除下列明確允許的小實驗外，只讀來源，不執行 suite、不連網、不安裝、不發布。
+
+必要條件是：不能 import Python 的獨立程序，要透過命令拿到 JSON 格式的 suite 命令陣列，絕不可執行測試，也不可重複 discovery。有人為了最簡單，建議直接執行 src/scripts/run_package_tests.py --loom-family --only workflow-mermaid，或只叫外部程序 import 函式即可。請只讀真實來源判斷這兩案能否滿足必要條件，和最小可行替代方案；不實作、不執行 runner、不跑 suite、不查網路，寫短研究記錄。
+

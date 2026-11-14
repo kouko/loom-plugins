@@ -8,7 +8,8 @@ Equivalent methods are valid when their fit and evidence are explained.
 ## Frame the decision
 
 Identify the object, applicable version/environment, pending decision, and
-uncertainty that could change it. Preserve the user's established constraints.
+concrete unknowns that could change it. State what evidence would sufficiently
+answer each before selecting a method, preserving established constraints.
 A fact or completion claim can be settled by direct applicable evidence without
 a named framework. Reuse adequate evidence; do not turn every lookup into a
 trade study or force a method label, matrix, diagram or new experiment.
@@ -30,17 +31,22 @@ do not claim ISO compliance from using a few labels or an adapted procedure.
 Choose a primary approach per independently answerable question. Add a
 complementary method only for a distinct consequential gap. A mixed question
 may need more than one method; unrelated questions retain separate records.
+The questions below are optional prompts, not a closed classification or a
+checklist to complete. Facts, causes or past reasons, recommendations,
+feasibility, prospective risks, magnitude, causal effects and checking claims
+can need different evidence. Source location and research object do not choose
+the method: the same code or receipt may answer several of these questions.
 
 | Question | Appropriate starting approach | Evidence and limits |
 |---|---|---|
-| Is a premise, capability or completion claim true here? | Direct source/configuration/artifact inspection | Match version and conditions; historical success needs actual historical results. No named framework is required. |
+| What exists, how does it work, or is a claim true here? | Direct source/configuration/artifact/history inspection | Match scope, version and conditions; historical success needs actual historical results. A bounded inventory is not proof of completeness or prevalence. No named framework is required. |
 | Can an integration work under the constraints? | Time-bounded feasibility experiment | Define the exact unknown, minimal permitted test, observation and stopping point. Success answers that bounded question, not production readiness. |
 | Which design, library or implementation fits best? | Lightweight trade study | Compare credible alternatives against common relevant criteria and actual evidence. Consider the current approach, a smaller change, postponement or combination when viable; use a short rationale for a clear choice. |
 | Do architecture decisions conflict under important conditions? | Concrete quality scenarios informed by ATAM | State the condition/event, affected parts, expected measurable response and tradeoffs. A few scenarios are not a completed ATAM; major cross-team decisions may need the full facilitated process. |
 | Is this code/change understandable, correct and testable? | Focused design/code-health inspection | Inspect actual call paths, edge/concurrency behavior, complexity, tests and change impact. Respect existing project criteria; this research does not replace the owning review station. |
-| Why does observed behavior differ from expectations? | Hypothesis-driven troubleshooting | Use competing explanations, distinguishing observations and negative results. Separate symptom mitigation from causal explanation; one successful retry is not proof of cause. |
+| Why did this happen or why was a design chosen? | Hypothesis-driven troubleshooting or contemporaneous decision/history inspection | Use competing explanations, distinguishing observations and negative results for failures; use recorded reasoning for past decisions. Symptom relief or one successful retry is not proof of cause; current code or commit timing does not establish author intent. |
 | Which resource limits a workload? | Utilization, saturation and errors (USE), with relevant profiling/wait analysis | Inspect resource use, queues/errors and the actual workload/time window. Missing metrics stay unknown; USE does not explain every application or cache problem. |
-| Is A faster or cheaper for our workload? | Representative controlled benchmark plus analysis while it runs | Match work/configuration, verify correctness and the true limiting factor, retain versions and variation. Unmatched timings or statistically precise measurements of the wrong work are inconclusive. |
+| How much, how fast or how costly; is A better for our workload? | Defined quantity and estimation model, or representative controlled measurement with analysis while it runs | Retain scope/denominator, workload, versions, assumptions and uncertainty; distinguish estimates from observations. For benchmarks, match work/configuration, verify correctness and the limiting factor. Unmatched timings or precise measurements of the wrong work are inconclusive. |
 | Did a change cause an improvement? | Appropriate controlled comparison; randomized A/B where justified | Define baseline, effect and guardrail measures, allocation unit, exposure/data validity and uncertainty. Offline repeated cases are not independent population evidence. Sample-ratio checks apply to suitable allocated experiments, not arbitrary case counts. |
 | Can actors misuse trust, permissions or data flows? | Threat modeling; STRIDE prompts for technical security | Model assets, actors, flows and trust boundaries; identify concrete threats, controls and validation. STRIDE addresses identity, integrity, accountability, confidentiality, availability and authorization; privacy harms or valid-workflow abuse can need different prompts. Plausible threats are not verified vulnerabilities. |
 | What if dependencies fail, slow down or overload? | Failure-mode/resilience analysis | Trace user impact, propagation, detection, containment and recovery. AWS's SEEMS prompts cover single points of failure, excessive load/latency, misconfiguration/bugs and shared fate; use relevant questions rather than rigid categories. An untested mitigation stays unverified. |
@@ -56,10 +62,13 @@ scales/weights, preserve unknown inputs, and check whether plausible assumptions
 or weight changes reverse the recommendation. A framework name is not evidence
 quality or certainty.
 
-Explain material tradeoffs and what new evidence or changed conditions would
-alter the recommendation. Stop once the bounded decision is sufficiently
-supported; if access, cost or uncertainty prevents resolution, retain an
-inconclusive result and identify the missing observation. Do not search or run
+Relate each material evidence condition to supported, unsupported or unresolved
+findings and its actual evidence and limits. Explain tradeoffs and what would
+alter the recommendation. Stop with sufficient support; otherwise identify the
+missing observation and affected decision without weakening conditions or
+treating completed investigation as fulfilled evidence. Revise conditions or
+recommendations only with an explained evidentiary basis or correction, keeping
+the delivered conclusion and retained record consistent. Do not search or run
 experiments merely to fill all cells.
 
 Keep the existing question-based record, metadata, source policy and optional

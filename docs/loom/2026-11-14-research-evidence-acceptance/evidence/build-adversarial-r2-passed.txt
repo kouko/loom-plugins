@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: /private/tmp/loom-research-evidence-acceptance
+plugins: xdist-3.8.0
+collected 5 items
+
+loom-code/tests/engineering-research/test_package.py .....               [100%]
+
+============================== 5 passed in 0.04s ===============================

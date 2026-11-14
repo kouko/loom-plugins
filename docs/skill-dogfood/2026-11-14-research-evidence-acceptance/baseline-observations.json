@@ -1,0 +1,45 @@
+{
+  "status": "observed-not-independently-graded",
+  "profile": "Native turn_context records gpt-6.1-sol / low in all baseline turns; provider-side immutable model not attested.",
+  "cases": [
+    {
+      "run": "R01",
+      "record_files": [
+        "docs/loom/research/2026-11-14-package-runner-test-roots.md"
+      ]
+    },
+    {
+      "run": "R02",
+      "record_files": [
+        "docs/loom/research/2026-11-14-package-suite-command-preview.md",
+        "docs/loom/research/2026-11-14-package-suite-json-process-preview.md"
+      ]
+    },
+    {
+      "run": "R03",
+      "record_files": [
+        "docs/loom/research/2026-11-14-timing-workflow-claim.md"
+      ]
+    },
+    {
+      "run": "R04",
+      "record_files": [
+        "docs/loom/research/2026-11-14-ci-release-evidence.md"
+      ]
+    },
+    {
+      "run": "R05",
+      "record_files": [
+        "docs/loom/research/2026-11-14-workflow-mermaid-preview.md"
+      ]
+    },
+    {
+      "run": "R06",
+      "record_files": [
+        "docs/loom/research/2026-11-14-suite-json-command-interface.md"
+      ]
+    }
+  ],
+  "source_inputs_unchanged": true,
+  "trace_limit": "Actual tool calls/results and final messages extracted from native child logs; reasoning and bootstrap excluded. Readback and boundary claims require independent trajectory assessment."
+}

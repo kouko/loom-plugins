@@ -1,0 +1,4 @@
+讀取提供的 engineering-research 技能並完成下列研究；僅使用自己的 project 內來源。將研究記錄存入自己的 project/docs/loom/research/，不要修改來源。除下列明確允許的小實驗外，只讀來源，不執行 suite、不連網、不安裝、不發布。
+
+請確認 package runner 的 TEST_ROOTS 精確包含哪些目錄。我只需要這個事實，先不討論新增 plugin 或改 runner；不要實驗或畫圖，短筆記即可。
+

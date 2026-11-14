@@ -15,11 +15,13 @@ Use evidence proportionate to the engineering question.
    the work's direction or requires a user preference or authorization;
    continue independent work while waiting. Do not invent a new goal.
 
-2. Check whether the evidence answers this question. Before relying on a
-   claim to recommend or take action, check its basis and relevance: the same
-   behavior, project context, version, and conditions where they matter.
-   Recheck relevance when the question changes. Similar terminology or an
-   earlier research report alone does not establish equivalence.
+2. Set evidence conditions before choosing methods. Identify the concrete
+   unknowns that could change the pending decision and what evidence would
+   sufficiently answer each under the established outcome and constraints.
+   Check existing support for the same behavior, project context, version and
+   conditions. A simple question can state its unknown and sufficient evidence
+   in one sentence. Recheck applicability when the question changes; similar
+   terminology or an earlier report alone does not establish equivalence.
 
 3. Fill consequential gaps. Gather evidence when a factual uncertainty,
    contradiction, repeated failed attempt, or unverified assumption could
@@ -35,13 +37,14 @@ Use evidence proportionate to the engineering question.
    still warrants research when its unresolved premise could change the
    decision; once invoked, retain the bounded research record required below.
 
-4. Stop when the decision has sufficient support. Do not broaden research
-   merely because more sources may exist. If accessible evidence cannot
-   settle a consequential uncertainty, report that limitation rather than
-   search indefinitely or claim certainty. Distinguish observed behavior,
-   source-supported claims, inference, and what remains untested. Report the
-   evidence and material limitations concisely in the research record. Its
-   length follows the question; a short investigation can have a short record.
+4. Conclude against those conditions. Relate each material condition to what
+   the actual evidence supports, does not support or leaves unresolved, keeping
+   observed behavior, source-supported claims, inference and untested behavior
+   distinct. Stop with sufficient support; do not broaden research merely
+   because more sources exist. If permitted investigation cannot settle a
+   condition, retain the missing evidence and affected decision without counting
+   it as met or lowering the requirement to claim completion. Keep the record
+   proportionate; a short investigation can have a short record.
 
 5. Verify this research's claims and records. Before declaring a finding,
    experiment or research document complete, inspect the actual evidence and
@@ -94,10 +97,13 @@ decision-critical unverified context before recommending. If a preference
 reverses with an unknown condition, give conditional alternatives or leave it
 unresolved; investigation tools do not establish the target caller, workflow or
 runtime. Missing comparison evidence does not prove an option better.
-Explain the smaller shape and engineering or operating burden removed, or the
-concrete reason complexity remains necessary, in the retained findings and
-decision impact. Revisit inquiry only when a consequential unresolved premise
-could change this comparison; stop with sufficient support or return the
+For important additions, explain the concrete need each serves, the evidence
+that a credible smaller option cannot adequately serve it, and consequential
+maintenance, operating, failure or reversal burdens. Retain necessary complexity
+when a smaller option fails a mandatory condition; fewer components alone is not better.
+Keep this comparison in the retained findings and decision impact. Revisit
+inquiry only when a consequential unresolved premise could change this
+comparison; stop with sufficient support or return the
 explicit unknown when permitted investigation cannot settle it. No fixed rounds
 are required; routine facts and reuse of adequate evidence still return directly.
 
@@ -136,11 +142,14 @@ ordinary URLs for external sources; paths must resolve from the record.
   replace the evidence on which an earlier decision depended. Respect frozen
   trial records and explicit no-edit boundaries.
 - **Keep the current conclusion consistent.** A follow-up challenge calls for
-  reassessing support, not agreement or invented new evidence. Before delivering
-  a changed recommendation, update the matching record's conclusion, evidence,
-  limitations and date, explaining what changed. Explicitly withdraw an earlier
-  unsupported recommendation when necessary. If saving is prohibited or
-  unavailable, identify the unsaved update rather than claiming synchronization.
+  reassessing support, not agreement or invented new evidence. Change evidence
+  conditions or recommendations only on an explained evidentiary basis or
+  correction, not the challenge alone. Before delivering the revision, update
+  the matching record's question/conditions, findings, evidence, decision impact,
+  limitations and date as affected. Explicitly withdraw an unsupported earlier
+  recommendation when necessary. Preserve separately scoped and frozen records
+  as above. If saving is prohibited or unavailable, identify the unsaved update
+  rather than claiming synchronization.
 - **Use the active change.** Save under
   `docs/loom/<change-id>/research/<sequence>-<topic>.md`. Read existing records
   before allocating the next unused sequence; a matching filename alone is not
