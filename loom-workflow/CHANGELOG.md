@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.24.0] — 2026-11-14 — ground recap progress, test scope and dates
+
+- Clarify recap-state guidance conditionally: distinguish implementation, validation and delivery when relevant; retain unknown status instead of claiming completion, and identify the content and scope covered by relevant test results.
+- Ground relative dates in available evidence when resuming across days, while preserving the current conversation language, known purpose, flexible recap length and the existing direction-confirmation pause.
+- Add synthetic behavioral cases for progress, language, purpose, test scope, cross-day timing and confirmation boundaries. These cases do not establish installed-host validation.
+
 ## [5.23.0] — 2026-11-14 — name hard-to-read sentence shapes in the plain-language guide
 
 - Name five hard-to-read sentence shapes in rule 3 of the chat plain-language guide, each with a Hard to read / Plain rewrite pair that keeps every fact: English pairs for all five, Traditional Chinese pairs for four.
