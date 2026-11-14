@@ -1,6 +1,6 @@
 # Evidence conditions for engineering research — plan
-intent: 2026-11-14-research-evidence-acceptance@4dc4d7daf
-spec: docs/loom/2026-11-14-research-evidence-acceptance/spec.md@dbff5bb0d
+intent: 2026-11-14-research-evidence-acceptance@f1e9299c4
+spec: docs/loom/2026-11-14-research-evidence-acceptance/spec.md@c0a2c26f3
 charter: 1.1
 
 Current-state evidence and agent decisions are in the [spec](spec.md). Its

@@ -1,0 +1,32 @@
+{
+  "R01": {
+    "case": "C01",
+    "arm": "baseline",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R01"
+  },
+  "R02": {
+    "case": "C02",
+    "arm": "baseline",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R02"
+  },
+  "R03": {
+    "case": "C04",
+    "arm": "baseline",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R03"
+  },
+  "R04": {
+    "case": "C06",
+    "arm": "baseline",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R04"
+  },
+  "R05": {
+    "case": "C07",
+    "arm": "baseline",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R05"
+  },
+  "R06": {
+    "case": "C08",
+    "arm": "baseline",
+    "path": "/private/tmp/loom-research-acceptance-eval/runs/R06"
+  }
+}
