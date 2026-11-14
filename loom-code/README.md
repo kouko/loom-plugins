@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.76.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.77.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -88,8 +88,8 @@ The stations dispatch these agents; none reviews its own work.
 | [`acceptance-tester`](agents/acceptance-tester.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/acceptance-test-report.md`. |
 | [`adversary`](agents/adversary.md) | `build` | Tries to make the change fail — mutation or fuzz tooling, or executable abuse and boundary cases — and records every attempt as a probe. |
 
-The number of reviewers is not chosen by the agent: `loom_checker.py
-reviewer-count` computes it from the whole branch delta — one for a narrow,
+The checker computes the reviewer count from the whole branch delta; closing
+review uses its checked `reviewer-count` observation — one for a narrow,
 low-risk change, two otherwise or when it cannot tell. Acceptance testing happens
 only when an Acceptance line cannot be settled mechanically.
 
@@ -153,55 +153,35 @@ Reviewer-count has no blocker result; missing/dirty repositories are usage
 errors. Empty arrays remain `[]`. Use fields and types rather than key order
 or human message prose.
 
-These Python examples consume actual fields without invoking writers. Set
-`plugin` to the installed loom-code directory and run the reviewer example
-inside the selected clean repository. Runtime must already be ready.
+Planning and closing review use a shared checked consumer rather than parsing
+success prose or duplicating validators. Replace `<loom-code>` with the
+installed plugin directory; run the reviewer call inside the selected clean
+repository after committing functional work.
 
-```python
-import json
-import subprocess
-from pathlib import Path
-
-plugin = Path("/absolute/path/to/loom-code")
-
-def observe(*args):
-    process = subprocess.run(
-        [str(plugin / "scripts/loom-python"), "--ready", *args, "--json"],
-        capture_output=True, text=True,
-    )
-    try:
-        result = json.loads(process.stdout)
-    except ValueError:
-        raise RuntimeError(f"No parseable JSON; process exit {process.returncode}")
-    if not isinstance(result, dict):
-        raise RuntimeError("Expected a result object")
-    if (process.returncode != 0 or result.get("status") != "passed"
-            or result.get("error") is not None):
-        raise RuntimeError(f"Observation rejected; process exit {process.returncode}")
-    return result["data"]
-
-compatibility = observe("contract", "--require", "2.0")
-if compatibility["compatible"] is not True:
-    raise RuntimeError("Compatibility not established")
-print("Compatible: simulated next step permitted")
-
-reviewers = observe("reviewer-count", "2026-11-14-example")
-floor = reviewers["reviewer_floor"]
-if type(floor) is not int or floor not in (1, 2):
-    raise RuntimeError("Unexpected reviewer floor")
-print(f"Require {floor} distinct reviewers for the simulated review")
+```sh
+"<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py --help
 ```
 
-An incompatible requirement (for example `2.99`) blocks the simulated next
-step; malformed `bad` errors. Floor two can follow ordinary policy,
-outside-review selection or an unclassifiable delta; it proves neither
-complete classification nor completed review. Floor one does not waive review.
-Neither command writes artifacts, installs runtime, dispatches reviewers,
-changes authority or retries. Correct inputs/repository conditions and rerun
-deliberately. The JSON guarantee starts in the loaded checker: launcher/import
-failures, unavailable runtime (`--ready` exit 86), termination and broken pipes
-are outside it. Inspect both process exit and parseability before consumption.
-Existing text behavior and preparation/delivery JSON contracts are preserved.
+The consumer adds `--json`, validates version/command, required types, unchanged
+request identity and exit/status agreement, and preserves compatible extra
+fields. Only accepted passed/true compatibility permits planning to continue;
+only an accepted passed positive integer `data.reviewer_floor` determines
+reviewer dispatch. An incompatible `2.99` is a blocked observation; malformed
+`bad` is a valid usage error. Invalid output has empty stdout, a
+`checked-readonly:` diagnostic and exit 2. Neither errors nor invalid results
+permit continuation, reviewer defaults, text fallback or automatic retries.
+
+This helper executes the checker once with a configured 30-second subprocess
+timeout and preserves startup exit 86. It neither writes artifacts, installs
+runtime nor changes policy, authority or host trust; the outer launcher's
+`--repair` can prepare caches, while `--ready` reuses them. Structural checking
+does not prove computational truth or whole-workflow completion. Existing
+text, preparation/delivery JSON and remote-operation reconciliation remain.
+The [CLI result guide](references/cli-results.md) inventories all sixteen
+commands, their special modes and remaining migration work: five direct JSON
+commands, two checked station consumers, no claim of full migration.
 
 `scripts/loom_checker.py` is the deterministic layer: every rule recomputes
 from the repository instead of trusting a claim, and `--list-rules` is the

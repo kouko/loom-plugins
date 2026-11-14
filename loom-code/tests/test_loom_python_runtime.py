@@ -164,10 +164,15 @@ def test_all_command_help_uses_ready_runtime_without_repair(tmp_path: Path) -> N
             result = run_launcher(tmp_path, "--ready", command, flag)
             assert (result.returncode, result.stderr) == (0, ""), (command, flag, result)
             assert result.stdout.startswith(command + " — ")
+    checked_help = run_launcher(tmp_path, "--ready", "--script", "checked_readonly.py", "--help")
+    assert (checked_help.returncode, checked_help.stderr) == (0, "")
+    assert checked_help.stdout.startswith("checked-readonly — ")
     assert (tmp_path / "uv.log").read_text() == log
     shutil.rmtree(tmp_path / "cache")
     result = run_launcher(tmp_path, "--ready", "push", "--help")
     assert result.returncode == 86 and not (tmp_path / "cache").exists()
+    checked_missing = run_launcher(tmp_path, "--ready", "--script", "checked_readonly.py", "--help")
+    assert checked_missing.returncode == 86 and not (tmp_path / "cache").exists()
 
 
 def test_launcher_resolves_its_directory_when_called_by_path_name(tmp_path: Path) -> None:
@@ -205,6 +210,12 @@ def test_script_keeps_project_environment_without_importing_project_modules(tmp_
         env=env, text=True, capture_output=True,
     )
     assert (result.returncode, result.stdout) == (0, "isolated with project environment intact\n"), result.stderr
+    checked = subprocess.run(
+        ["/bin/sh", str(LAUNCHER), "--ready", "--script", "checked_readonly.py",
+         "contract", "--require", "2.0"],
+        env=env, text=True, capture_output=True,
+    )
+    assert (checked.returncode, checked.stderr) == (0, ""), checked.stderr
 
 
 def test_concurrent_repair_publishes_one_complete_runtime(tmp_path: Path) -> None:

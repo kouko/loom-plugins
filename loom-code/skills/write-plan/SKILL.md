@@ -118,13 +118,19 @@ authorisation (step 0b) permits execution; it is not a work decision.
 ## Step 0 — Check the contract version
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair contract --require 2.1
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
 ```
 
-Exit 0: continue. Only a `contract.requires` result means the plugin contract is outdated:
-print what the checker printed, tell the user to update `loom-code`, and
-**stop**. For a launcher repair failure, report its printed obstacle and remedy
-and stop; do not label it a contract-version failure or work around it.
+Continue only for accepted JSON with exit 0, `status: passed` and
+`data.compatible: true`. The consumer validates the observation before emitting
+it; do not parse success prose or add `--json`. Only an accepted blocked result
+whose `diagnostics` includes `rule_id: contract.requires` establishes the
+existing outdated-contract response: report that diagnostic, tell the user to
+update `loom-code`, and **stop**. Valid `error.kind: usage|internal` results,
+invalid observations and launcher/startup failures stop this prerequisite with
+their own diagnostics; do not label them version incompatibility, retry
+automatically or fall back to text. See the shared
+[CLI result guide](../../references/cli-results.md) for fields and boundaries.
 
 ## Step 0b — Codex only: installed hook check
 
