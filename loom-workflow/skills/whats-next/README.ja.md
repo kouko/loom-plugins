@@ -1,6 +1,6 @@
 # 次の一手
 
-[loom-workflow](../../README.ja.md) / whats-next
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / whats-next
 
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
