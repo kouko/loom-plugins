@@ -2,7 +2,7 @@
 originator: kouko
 kind: engineering
 needs-design: no — 僅修正既有交付介面的收尾指示與診斷文字；既有交付規格已涵蓋無法辨認變更及合併後回報，不新增介面或狀態
-intent_confirmed_sha: a2261900262a0107eebc3e5894659c5e35d2080c
+intent_confirmed_sha: 56acccd13debac07366685edc4ee850e40bbde61
 status: confirmed 2026-11-14
 publication: automatic — authorized 2026-11-14 by kouko
 
