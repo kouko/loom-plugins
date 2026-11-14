@@ -24,6 +24,12 @@ you to confirm it, and waits for your answer before continuing.
 
 It writes nothing to disk. The recap appears in chat and nowhere else.
 
+When software progress needs clarification, it distinguishes implemented work
+from verification, merge and publication. Relevant test results retain their
+scope and revision or artifact, and relative dates stay grounded in dated
+events. Unknown states remain unknown; this adds no
+mandatory status table or repository audit.
+
 ## Goal-Grounded Alignment Loop
 
 The recap treats purpose as the anchor. Relevant history appears when it helps
@@ -100,8 +106,9 @@ These are deliberate omissions from v0.1:
   without separate task-specific formats.
 - **Auto-trigger** — detecting confusion without the user saying so.
   v0.1 requires explicit invocation.
-- **`test-prompts.json`** — eval prompts for testing recap quality.
-  Coming once real-session dogfood establishes a baseline.
+- **Installed-host coverage** — [synthetic behavior cases](../../tests/recap-state/behavior_cases.json)
+  support independent output evaluation; they do not establish behavior in
+  every installed host or version.
 - **Slash command** — `/recap` as a registered skill command.
   Deferred until dogfood signals clear demand; the phrase triggers
   already work.

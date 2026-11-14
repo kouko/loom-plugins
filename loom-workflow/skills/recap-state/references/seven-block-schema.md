@@ -20,6 +20,20 @@ infer a purpose or completed work from silence.
 Before reporting a historical decision, identify the user turn or prior action
 that establishes it. A formatting choice made for this recap is not a
 historical decision; omit unsupported decision claims.
+
+Distinguish local implementation from verification, merge and publication when
+their states differ. Lead with a brief concrete distinction, such as "The code
+is implemented; final review and merge are still pending," rather than only a
+workflow label. Report only relevant states supported by the conversation;
+unknown delivery stays unknown, and an older merged change says nothing about
+a newer change's completion. Identify the tested scope and corresponding
+revision or artifact when results support an acceptance or release decision.
+Keep untested work explicit; a successful isolated check does not establish
+that the original outcome is complete. Anchor relative dates to the dated
+conversation events and the recap's known date. Use the event date or omit
+relative timing when dates are unavailable. These distinctions require neither
+a fixed status table nor fresh Git or remote inspection on every recap.
+
 If the original purpose is unknown, ask only for the purpose. Do not invent a
 proposed work step when the purpose is unknown. When the original purpose is
 grounded, ask about the proposed next step. If asking for purpose, wait for the
