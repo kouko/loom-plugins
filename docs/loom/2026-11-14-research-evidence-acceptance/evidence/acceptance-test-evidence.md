@@ -1,6 +1,8 @@
 # Engineering research evidence conditions — acceptance test evidence
 
-Tried on 2026-11-14, in a clean copy of the project at e85c18651eee5b4d7ba853850ba61bd7462001c5.
+Tried on 2026-11-14, in a clean copy of the project at 3501694d82c9e8221a09908f14264d00284b4c57.
+
+## Initial run on 2026-11-14, at e85c18651eee5b4d7ba853850ba61bd7462001c5
 
 ## Setup and scope
 
@@ -60,3 +62,17 @@ Tried on 2026-11-14, in a clean copy of the project at e85c18651eee5b4d7ba853850
 - SHA-256 comparison over all eight candidate skill files returned True. Independent AST check of the actual frozen runner confirmed four TEST_ROOTS, builder-only construction and main's subprocess.call. Link walk over candidate records found 26 relative targets and zero broken targets; it does not validate prose claims by itself.
 - A7 partial is a validation limit. No important-or-worse dismissed findings were supplied; no demonstrated source contradiction or authorization breach was found in examined candidate cases. Broader general research, external privacy and no-write behavior require additional actual observations if full behavioral coverage is demanded. Automatic activation and cross-host parity are outside the intent's guarantees.
 
+
+## Re-run on 2026-11-14, at 3501694d82c9e8221a09908f14264d00284b4c57
+
+- Clean detached checkout `/private/tmp/loom-research-acceptance-clean-r2`: initial status empty; exact HEAD verified. Compared full changed-path inventory and runtime diffs for `2f715430704f847d4b99d4b52d3b053a795c0ce0..3501694d82c9e8221a09908f14264d00284b4c57`. Upstream changes affect recap-state guidance, its tests/documentation and workflow release metadata, plus development records. Root README changes only workflow version 5.23.0 to 5.24.0 in two places; code remains 3.80.0. No engineering-research skill, intent, package tests, frozen behavioral archive, dependencies, runner or code manifests changed. No code repair performed.
+- Re-read README installation/setup instructions, including the local `agy plugin validate` path. Ran `agy plugin validate ./loom-code` again: exit 0, 8 skills, 4 agents, 1 hooks processed. No install or model session. Setup is tested on every run even when behavioral rows carry over.
+- Re-ran `UV_CACHE_DIR=/private/tmp/loom-uv-research uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/engineering-research/test_package.py -q`: exit 0, `5 passed in 0.03s`. Full suite remains for finalize-review, not claimed as run by this tester and not user-skipped.
+- 1: carried over — condition-setting instructions, confirmed goals, exact-root/caller fixtures and original receipt evidence are byte-unchanged; recap guidance has no execution dependency in these research cases.
+- 2: carried over — method-selection resources, allowed actions and simple/source-plus-observation cases are byte-unchanged; upstream recap is independently invoked and does not alter research methods.
+- 3: carried over — condition-linked conclusions, source snapshots, timing JSON and applicability limitations are byte-unchanged; no research source or source-selection dependency changed.
+- 4: carried over — unknowns, missing evidence and conditional process/release decisions are byte-unchanged; upstream changes create no additional evidence satisfying those conditions.
+- 5: carried over — both local and cross-process complexity fixtures, mandatory constraints, runner boundary and saved recommendations are byte-unchanged; recap changes neither interface nor comparison.
+- 6: carried over — three-turn prompts/answers, intermediate snapshots, saved withdrawal and linked revalidation are byte-unchanged; no changed synchronization rule or record.
+- 7: re-tested — exercised whole existing observation surface: local validation and all five package resource/routing checks above; recomputed all eight candidate skill SHA-256 comparisons (all match); re-read candidate records during independent link traversal (26 targets, all resolve); confirmed no archive diff, preserving original actor receipts, both independent assessments, failures and provenance. Reviewed upstream runtime changes for new coupling and found none. Original substantive findings remain bounded to their actual local cases. Result remains partly: external-source handling, external-service privacy, no-write responses and broad general research still lack actual observations. Unchanged instructions, hashes and green tests are not semantic proof for these unobserved surfaces.
+- No user-directed skipped steps or dismissed important-or-worse findings supplied. No new behavioral/model executions, installations, source changes or efficacy claims. Earlier evidence above is retained verbatim; the top Tried-on line identifies the latest tested integration.
