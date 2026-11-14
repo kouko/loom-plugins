@@ -70,3 +70,30 @@ Observed process exit: 0; collected 12 items and 12 passed in 10.77s.
 Raw output: `/private/tmp/loom-post-merge-build-adversarial.log`.
 No unresolved adversarial findings. Finalization must rerun both the suite
 and this program; this note does not substitute for those executions.
+
+## Finalization refusal and bookkeeping repair
+
+The first finalization attempt ran the complete suite and declared adversarial
+program successfully, then refused to generate an attestation:
+
+```text
+finalize-review: package-tests passed
+finalize-review: adversarial passed
+BLOCK intake.intent-version: confirmation commit aa0f50a has an invalid intent pin; re-confirm the intent
+```
+
+The initial orchestrator computation incorrectly included the status line in
+the confirmation hash. The canonical contract excludes both status and the pin
+line. Repair retains the user's already confirmed content and publication
+authorization, changes only bookkeeping and its plan reference, and preserves
+the original failed evidence. The requirements and implementation do not change.
+Build must rerun its checks; the same reviewers must read the repair delta before
+finalization is attempted again. No attestation or publication success is claimed
+from this refused attempt.
+
+The repair worker observed the same intent-version check RED before repair and
+GREEN (`[]`) after commit `dbec38f577f3ff009ea7a90991508e9f0b7b2bbf`.
+The correct canonical identity is `56acccd13debac07366685edc4ee850e40bbde61`.
+It also compared the original confirmation and repaired intent with both
+excluded lines removed: the bytes were identical. Commit `eeecea327` updates
+the plan reference and records the bounded bookkeeping task.
