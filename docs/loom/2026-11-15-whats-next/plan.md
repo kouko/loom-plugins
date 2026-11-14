@@ -34,7 +34,7 @@ charter: 1.1
 - Risk: agent-decided — REQ-5; incomplete new-skill admission affects registry, count ceiling and catalog. Explicit exception admits one skill; patch-bump code measurement metadata, no new checker rule or hook.
 
 **W3-03 Align OpenCode invocation inventory** after: W3-02 acceptance: 1,5
-- Files: `loom-code/tests/test_opencode_loader.py`, `docs/loom/2026-11-15-whats-next/evidence/`
+- Files: `loom-code/tests/test_opencode_loader.py`, `loom-workflow/README*`, `docs/loom/2026-11-15-whats-next/evidence/`
 - Test: A1 positive: loader-generates-invocation; negative: extra-command. A5 positive: measured-command-inventory; negative: unsupported-host-claim. Reuse the existing actual-loader inventory test; retain exact command comparison.
 - Risk: agent-decided — REQ-1, REQ-5; user-invocable metadata intentionally exposes the skill through the loader; no separate wrapper is required.
 
