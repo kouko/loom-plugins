@@ -34,9 +34,9 @@ charter: 1.1
 
 ### Wave 4 — Confirmation bookkeeping repair
 
-**W4-01 Correct confirmation bookkeeping identity** after: W3-01 acceptance: 1, 2, 3, 4, 5
+**W4-01 Correct confirmation bookkeeping identity** after: W3-01 acceptance: 3
 - Files: `docs/loom/intent/2026-11-14-post-merge-delivery-guidance.md`, `docs/loom/2026-11-14-post-merge-delivery-guidance/plan.md`
-- Test: existing finalizer refusal and direct `check_intent_version` RED/GREEN; assert canonical intent bytes equal the original user-confirmed aa0f50acf content after excluding entire status and intent_confirmed_sha lines.
+- Test: A3 positive: unchanged-canonical-identity; negative: invalid-confirmation-pin. Direct check_intent_version reproduces the recorded refusal, then accepts the repaired pin; canonical bytes match the original confirmation.
 - Risk: agent-decided — correct only the pin and this plan reference; preserve all Acceptance surfaces, original user confirmation and historical evidence.
 
 ## Simplicity check
