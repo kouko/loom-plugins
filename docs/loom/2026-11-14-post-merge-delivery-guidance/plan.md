@@ -39,6 +39,13 @@ charter: 1.1
 - Test: A3 positive: unchanged-canonical-identity; negative: invalid-confirmation-pin. Direct check_intent_version reproduces the recorded refusal, then accepts the repaired pin; canonical bytes match the original confirmation.
 - Risk: agent-decided — correct only the pin and this plan reference; preserve all Acceptance surfaces, original user confirmation and historical evidence.
 
+### Wave 5 — Accepted merge integration
+
+**W5-01 Preserve both plugin versions after upstream recap release** after: W4-01 acceptance: 3
+- Files: `README.md`
+- Test: A3 positive: coherent-family-release-versions; negative: dropped-release-entry. Reuse the existing release metadata tests and manifest synchronization check.
+- Risk: agent-decided — land refused DIRTY after upstream cb737ec3e. Preserve code 3.80.0 and workflow 5.24.0 entries, upstream recap changes and this change's runtime. Existing release tests preserve version coverage.
+
 ## Simplicity check
 - none found
 
@@ -54,3 +61,4 @@ charter: 1.1
 5. agent-decided — preserve existing required full package suite and native independent review. second-vendor remains suggest; no outside executor has been authorized.
 6. agent-decided — W3 is upstream integration, not changed requirements or a retry-budget reset. Upstream 3.79.0 adds advisory fields; keep them and release this station-guidance change as 3.80.0, including translated README versions.
 7. agent-decided — W4 corrects a status-inclusive confirmation hash. Canonical content, requirements, scope and authorization remain unchanged. Preserve the failed finalization evidence; refresh acceptance and the same reviewers without resetting the episode.
+8. agent-decided — W5 integrates upstream after explicit merge acceptance. The conflict is adjacent README version entries; requirements and accepted behavior remain unchanged. Preserve the existing merge authorization and review episode, and refresh evidence before retrying land.

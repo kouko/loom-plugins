@@ -116,3 +116,15 @@ positive/negative case pairs. The note was shortened and W4 was assigned only
 to its affected Acceptance 3, with the observed identity cases. Both the plan
 command and write-plan intake exited 0 before the final Build rerun. These
 edits change no runtime source or confirmed requirement.
+
+## Accepted merge conflict with upstream recap release
+
+After the user accepted the five-row report and explicitly authorized merge,
+land checked all registered CI as passed but refused `PR #160 is DIRTY` before
+merging. Fetching main revealed upstream `cb737ec3e` (PR #159, workflow 5.24.0).
+The only conflict was adjacent plugin-version rows in the root README.
+Integration commit `7b10bd75b` preserves code 3.80.0, workflow 5.24.0, all upstream
+recap changes and this change's unchanged runtime, tests and intent.
+The release-consistency case passed; manifest synchronization and diff checks
+passed. Existing acceptance and merge authorization remain applicable; evidence
+and the same reviewers must be refreshed before publication and retrying land.
