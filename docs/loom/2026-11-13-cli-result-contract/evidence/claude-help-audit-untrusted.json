@@ -1,0 +1,348 @@
+{
+  "divergence_points": [
+    {
+      "id": "DP-1",
+      "kind": "factual-error",
+      "confidence": "0.70",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:372",
+        "loom-code/scripts/loom_checker.py:393-396",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:149-150",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:774-781",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:829-907",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:363"
+      ],
+      "reasoning": "[Externally authored untrusted content] The publish page says 'Existing body snapshots, origin/HEAD reconciliation and branch/title checks still apply' and 'keep the existing branch/title policy'. Tracing `cmd_publish` and `_cmd_publish_trusted` does not support those named checks. The only title check is non-empty (publish.py:149-150). The default base comes from `gh repo view ... defaultBranchRef` (publish.py:866-877), not from origin/HEAD. refs/remotes/origin/HEAD is read only in `observe_delivery` (publish.py:363), for path attribution, not in publish. The 'body snapshot' is a TemporaryDirectory deleted on return (publish.py:774-781), so it is not a persisted record. A grep for 'reconcil' and 'branch/title' across loom-code/scripts matches only the help text. The Conventional-Commits title rule is in skills/ship/SKILL.md (around line 205) and is not enforced by this checker. An agent could believe publish validates its title or branch policy, or reconciles origin/HEAD, when it does not. The checks that actually run are: exactly one literal origin URL with no redirect/pushurl/insteadOf/proxy config, a safe symbolic branch, the server default base, a remote branch that is not diverged (ancestor check), and re-verification of HEAD and origin between steps. This is legacy text that was retained, so the prior 'previously passed' verdict does not cover it.",
+      "proposed_change": "Replace the sentence with checker-true statements: publish refuses a non-literal or redirected origin, a detached or unsafe branch, a diverged or unknown remote branch, and a HEAD or origin that changes mid-run; the base is the server default branch. Say the title is only checked for non-empty text here, and that the Conventional Commits title policy is workflow guidance in the ship skill, not enforced by this command.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "DP-2",
+      "kind": "judgement-call",
+      "confidence": "0.65",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:375-386",
+        "loom-code/scripts/loom_checker/rule_checks/publish.py:127-142",
+        "loom-code/scripts/loom_checker/rule_checks/publish.py:145-153",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:749-751",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:1035-1037",
+        "loom-code/scripts/loom_checker/command_handlers/pr_floor.py:47"
+      ],
+      "reasoning": "[Externally authored untrusted content] Publish help says 'Include each of these nine headings exactly once, with substantive content'. `_heading_fault` also requires the nine to appear in the listed order ('out of order') and rejects any other `## ` heading ('is not one of the nine contextual headings'). `_empty` treats a section as empty when it has fewer than 8 alphanumeric characters, is one ASCII token, or is a template placeholder, except 'None' under Follow-ups. The same validator gates `publish`, `land --accepted-by` and `pr-floor`. An agent that adds a '## Testing' heading or reorders sections is refused. Publish refuses before any remote write, so the harm is low and recoverable; the page still omits a condition that changes how the body is written.",
+      "proposed_change": "Add: 'exactly these nine `##` headings, in this order, once each, and no other `##` headings (use ### for sub-structure); each needs at least 8 alphanumeric characters of visible content except Follow-ups: None.'",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "DP-3",
+      "kind": "judgement-call",
+      "confidence": "0.60",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:427-431",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:273-276",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:326-497"
+      ],
+      "reasoning": "[Externally authored untrusted content] Delivery help tells the reader 'Pending means wait and observe again; blocked means resolve the stated condition; unconfirmed means evidence is unavailable'. `DeliveryResult.state` is a closed set: local, uncommitted, unpublished, missing_pr, mismatched_pr, pending, failed, cancelled, action_required, published, merged, unconfirmed. No 'blocked' state exists, and eight real states are never named. An agent branching on the JSON `state` value, as the help invites ('Use state, reason, next and evidence together'), will not find 'blocked'. 'blocked' reads as generic prose but sits next to two real state names. `pending` and `unconfirmed` are real.",
+      "proposed_change": "List the actual state values and map them: local/published/merged (goal-dependent, complete may be true); uncommitted, unpublished, missing_pr, mismatched_pr, failed, cancelled, action_required (resolve the stated condition); pending (wait and re-observe); unconfirmed (evidence unavailable). Drop the word 'blocked' or define it as a group label.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "DP-4",
+      "kind": "judgement-call",
+      "confidence": "0.55",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:139-141",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:29",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:184-189",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:202-210",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:32-33"
+      ],
+      "reasoning": "[Externally authored untrusted content] The incumbent's loom.protectMain=false correction is accurate (push.py:202-210 reads `--local --bool`, and returns False only when the value is 'false'). The page still presents the host-hook refusal as 'direct git commit/merge/push on main/master'. The matcher is `^\\s*git[ \\t]+(merge|commit|push)` on the command string, and the branch is `current_branch` of the payload cwd. Commands such as `git -C dir push`, `git -c k=v commit`, `env X=1 git push`, or `cd x && git push` do not match, so they are not refused. The source docstring says 'A literal Git verb at the start'. The native-hook text also says 'Native hooks protect main, master and the origin default branch' without the code comment's own limit (push.py:32-33): hooks do not intercept fast-forward merges or reset/rebase, and --no-verify skips them. 'Not a security boundary' partly mitigates this, but the host-hook scope is undisclosed.",
+      "proposed_change": "State that the host hook refuses only commands whose text begins with the literal verbs `git commit|merge|push` while the payload cwd is on main or master. Other spellings, such as global options before the verb or a verb after `&&`, are not refused. For native hooks add that fast-forward merges and `--no-verify` bypass them.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "DP-5",
+      "kind": "judgement-call",
+      "confidence": "0.55",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:162-178",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:939-1049",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:957-961",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:1052-1096",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:1099-1124",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:470-474",
+        "loom-code/scripts/loom_checker/command_handlers/land.py:975-976"
+      ],
+      "reasoning": "[Externally authored untrusted content] The land page's behaviour statements are accurate: trunk sync is nonfatal (land.py:201-205, 315-347); named cleanup never syncs (612-640); sweep fetches and prunes even without a token (654); a matching token is revalidated per branch (742-749). The prerequisites are summarized only as 'eligible change branch/PR and live evidence/checks', which omits conditions that change agent behaviour. (a) `--accepted-by` must equal the committed intent's originator or its automatic-publication authorizer (land.py:900-961). The tool checks only that name, not an actual acceptance. (b) The merge waits on ALL PR checks, not just required ones. It polls up to 360x10s (60 minutes) and blocks on any failed, cancelled or action-required check (land.py:1052-1096). (c) The live PR body must pass the nine-heading validator, HEAD must equal the PR head, and the PR must be exactly one open PR against the default branch (land.py:994-1037). (d) A non-valid local verification status does not block; it prints 'merged anyway' after the merge (land.py:192-195, 975-976). (e) Removing the invoking worktree prints `next: cd '<anchor>'` on stdout because the shell's cwd disappears (land.py:470-474, 497-525). The page names neither this line nor the shell-cwd consequence. Omitting (b) risks an agent interrupting a long wait; omitting (d) risks assuming land enforces attestation validity.",
+      "proposed_change": "Add one short paragraph: the name must match the intent originator or authorizer; all checks are awaited for up to 60 minutes (stdout 'Waiting for checks'); body, head and open-PR identity are enforced; missing or stale verification is disclosed after the merge, not a gate; after worktree removal follow the printed `next: cd` line.",
+      "corroborated_by": [],
+      "resolution": "open"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-1",
+      "kind": "judgement-call",
+      "confidence": "0.80",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:485-493",
+        "loom-code/scripts/loom_checker.py:473-482",
+        "loom-code/tests/test_loom_checker_cli.py:474-494",
+        "loom-code/tests/test_loom_checker_cli.py:581-589",
+        "loom-code/scripts/loom-python:22-24",
+        "loom-code/scripts/loom-python:63-70"
+      ],
+      "reasoning": "[Externally authored untrusted content] Exact-help bypass is safe as implemented. `main` returns help only when preparation is None, len(argv)==2, argv[0] is in COMMAND_HELP and argv[1] is --help or -h. This happens before the `--list-rules` branch, the `COMMANDS` lookup and any handler, so no stdin read, Git, network or file access runs. Module imports run first, and a grep of loom-code/scripts finds no module-level git, subprocess or file calls. The only import-time effect found is the env read at probes.py:674. `plan|intake <cmd> --help --json` is deliberately not help; it reaches the handler and gives a JSON usage error (PREPARATION_JSON_HELP says so). `delivery --hook --help` stays a hook-argument error (exit 2, no stdin read). The tests give real tripwires: monkeypatched Popen, socket, Path.read_text/write_text/open, stdin and the handlers. I did not run them. Legacy compatibility: before this change, a sole `--help` or `-h` operand was a usage error or a literal operand, such as the path '--help' for plan/intent/standing. The only displaced legitimate use is a file literally named `-h` or `--help` passed bare. That use is undocumented for --help (PREPARATION_JSON_HELP documents ./--json only).",
+      "proposed_change": "Optional: add to the shared notice that a literal file named -h or --help must be written ./-h or ./--help.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-2",
+      "kind": "judgement-call",
+      "confidence": "0.85",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:442-449",
+        "loom-code/scripts/loom-python:22-24",
+        "loom-code/scripts/loom-python:53-58",
+        "loom-code/scripts/loom-python:67-71",
+        "loom-code/scripts/loom-python:72-129",
+        "loom-code/tests/test_loom_python_runtime.py:155-170"
+      ],
+      "reasoning": "[Externally authored untrusted content] The shared HELP_NOTICE is accurate. `--ready` with a missing or invalid runtime prints a message and exits 86, and mkdir/uv run only under `--repair` (loom-python:67-129). Unset HOME or XDG_CACHE_HOME also gives 86 under --ready (54-57), which is a superset of the notice's 'missing runtime'. `--repair` may call `uv python install`, `uv venv` and `uv pip install`, so it uses the network and writes the cache and lock, as the notice says. A bare `loom-python --help` is launcher usage, not checker help, and needs no runtime. The notice is correct that checker help needs `--ready --help` or `--repair --help`.",
+      "proposed_change": "None required.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-3",
+      "kind": "judgement-call",
+      "confidence": "0.90",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:134-157",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:172-199",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:83-150",
+        "loom-code/scripts/loom_checker/command_handlers/push.py:202-226"
+      ],
+      "reasoning": "[Externally authored untrusted content] Push help otherwise traces correctly. Only --hook reads stdin, and an empty or tty stdin becomes UsageError (exit 2). Malformed or non-object JSON exits 2. `_emit` writes the systemMessage JSON to stdout and the line to stderr. A reminder exception is allowed (exit 0, push.py:195-196). Any other exception on `push --hook` is allowed by `main` (loom_checker.py:521-523). Native modes: refuse core.hooksPath unless `git config --get-all` returns 1; refuse symlinked common-dir parents or hooks dir; refuse foreign or edited hooks and hardlinks; install checks local origin/HEAD and a live `ls-remote --symref` (network, 10s timeout); roll back created files on failure; stderr has 'loom: ... Next: ...' with exit 2 and no BLOCK. Unstated but not contradicting: install is idempotent for byte-identical hooks, and hooks go into the shared git-common-dir, so every worktree is affected.",
+      "proposed_change": "Optional: say the install target is the repository's shared Git common directory (all worktrees) and that re-running over identical owned hooks is accepted.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-4",
+      "kind": "judgement-call",
+      "confidence": "0.65",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:193-203",
+        "loom-code/scripts/loom_checker/command_handlers/github_rules.py:221-252",
+        "loom-code/scripts/loom_checker/command_handlers/github_rules.py:204-210",
+        "loom-code/scripts/loom_checker/command_handlers/github_rules.py:255-292"
+      ],
+      "reasoning": "[Externally authored untrusted content] The github-rules page says it reports 'present, absent or unconfirmed rules'. Before any rule is read, `_probe` requires `.github/workflows/loom-pr-floor.yml` on the trunk head with a pull_request_target trigger and a `loom-pr-floor` job. If it is missing, the output is only the 'template not on <trunk>' copy-and-land instruction (exit 0) and no rule state is evaluated. `--print-setup` also stops at that gate and prints the setup command without reading existing rules. The default (no flag) output also prints the setup command when rules are missing (lines 280-283), so printing is not limited to --print-setup. The page's authorization caution covers this second point. Exit codes (always 0 except UsageError at parse → 2) and 'never changes GitHub rules' are accurate: `gh api` calls are GET only.",
+      "proposed_change": "Mention the fourth outcome (template not on trunk: no rule evaluation yet) and that the setup command may also appear without --print-setup.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-5",
+      "kind": "judgement-call",
+      "confidence": "0.60",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:109-120",
+        "loom-code/scripts/loom_checker.py:267-286",
+        "loom-code/scripts/loom_checker/command_handlers/intent.py:52-58",
+        "loom-code/scripts/loom_checker/rule_checks/intent.py:362-403",
+        "loom-code/scripts/loom_checker/helpers.py:331-368",
+        "loom-code/scripts/loom_checker/command_handlers/intake.py:64-77",
+        "loom-code/scripts/loom_checker/rule_checks/intake.py:802-832"
+      ],
+      "reasoning": "[Externally authored untrusted content] intent and intake help are otherwise accurate: interface-surfaces notice on stdout, advisory preceding BLOCK, read-only Git use, and the exit mapping. Two omitted conditions can change action. (1) When `needs-design: no` or `kind: engineering` applies (intent), or kind engineering / needs-design yes at write-plan (intake), the check calls `changed_paths` -> `branch_base`. `branch_base` raises UsageError when HEAD is on main/master or no trunk resolves, so the command exits 2 with an on-a-branch remedy. The pages describe exit 2 as 'arguments, files or internal failure' and never state the feature-branch / resolvable-trunk prerequisite. (2) `intake` first requires `status: confirmed <date>` and refuses closed intents and legacy closes in history. It also refuses delivered intents and 'indeterminate' delivery with 'refresh the selected remote-default ref before intake'. The page says only 'applicable prerequisites'. The `intents` page already carries the refresh advice, so the omission is local to intake.",
+      "proposed_change": "Intent/intake: add 'run on a feature branch with a resolvable trunk when interface recomputation applies; trunk or unresolved base exits 2'. Intake: add 'requires status: confirmed; closed, delivered or indeterminate-delivery intents are refused (refresh the remote-default ref, then retry)'.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-6",
+      "kind": "judgement-call",
+      "confidence": "0.55",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:229-238",
+        "loom-code/scripts/loom_checker/rule_checks/contract.py:17-43",
+        "loom-code/scripts/loom_checker/command_handlers/contract.py:26-33"
+      ],
+      "reasoning": "[Externally authored untrusted content] The contract page says 'Follow the diagnostic to update the applicable consuming plugin or loom-code requirement'. The checker gives two different remedies. If the requested major is lower than the shipped major, the consuming plugin's `requires-contract` is stale and must be raised to a supported major. Otherwise loom-code itself is too old ('請更新 loom-code'). 'loom-code requirement' can be misread as editing a requirement downward, which would bypass the compatibility check. The rest checks out: exit 0 prints 'contract <version> satisfies requires-contract >=<required>' on stdout; exit 1 is BLOCK contract.requires; malformed requirement, unreadable manifest version or arguments exit 2; the manifest in effect honours LOOM_MANIFEST_PATH.",
+      "proposed_change": "Reword to: 'If the requirement names an older major, update the consuming plugin's requires-contract to a supported major; if it names a newer major or minor than shipped, update loom-code. Do not lower a requirement to pass.'",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-7",
+      "kind": "judgement-call",
+      "confidence": "0.50",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:217-228",
+        "loom-code/scripts/loom_checker/command_handlers/standing.py:23-33",
+        "loom-code/scripts/loom_checker/rule_checks/standing.py:13-35",
+        "loom-code/scripts/loom_checker/rule_checks/standing.py:38-53",
+        "loom-code/scripts/loom_checker/rule_checks/standing.py:149-154"
+      ],
+      "reasoning": "[Externally authored untrusted content] Standing help says it 'Reads applicable PRINCIPLES.md, DESIGN.md and root ARCHITECTURE.md'. DESIGN.md and ARCHITECTURE.md are only tested for existence, to compose the WARN lines. PRINCIPLES.md content is read only when the intent has `kind: product`. `docs/loom/KICKOFF-DEFAULTS.md` is read for `standing-docs: waived` and `second-vendor: none`. Discovery looks at the repo root first, then docs/loom/ for PRINCIPLES.md and DESIGN.md, but only the root for ARCHITECTURE.md. The page's cautions stand: exit 0 is not semantic certification; exit 1 is only second-vendor or product-principles; stderr WARN can coexist with exit 0. 'Reads' slightly overstates what is validated.",
+      "proposed_change": "Optional: 'Checks existence of DESIGN.md and ARCHITECTURE.md (warning only) and reads PRINCIPLES.md only for kind: product intents.'",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-8",
+      "kind": "judgement-call",
+      "confidence": "0.55",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:410-439",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:590-648",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:480-495",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:622-636",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:61-67"
+      ],
+      "reasoning": "[Externally authored untrusted content] Delivery help is accurate on syntax, duplicates, hook forms and exit mapping: 0 complete, 1 otherwise, 2 only for malformed args. Redirect env or missing trusted git gives an `unconfirmed` result (exit 1), not exit 2. Omitted prerequisites for published/merged goals: trusted git and gh are resolved from fixed host dirs (/usr/bin, /usr/local/bin, /opt/homebrew/bin, linuxbrew), not PATH; the origin must be one literal GitHub URL; gh must be authenticated; there are live network reads (`ls-remote`, `gh api`, `gh pr checks`). Also, `published` can be complete (exit 0) with state 'published' when 'no required checks registered' (`classify_checks` state empty, publish.py:492-495), as publish help warns. The delivery page lacks that same warning. 'Without writes' is accurate for the ordinary and hook paths.",
+      "proposed_change": "Add one line: published/merged use trusted git/gh from host roots plus network and gh auth; exit 0 may mean no required checks registered, not that tests passed.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-9",
+      "kind": "judgement-call",
+      "confidence": "0.45",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:358-408",
+        "loom-code/scripts/loom_checker/rule_checks/push.py:112",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:906-915",
+        "loom-code/scripts/loom_checker/command_handlers/publish.py:845-849",
+        "loom-code/scripts/loom_checker/command_handlers/sync.py:169-180",
+        "loom-code/scripts/loom_checker/command_handlers/finalize.py:458-467"
+      ],
+      "reasoning": "[Externally authored untrusted content] Optional wording only. Publish's push uses CANONICAL_PUSH_FLAGS `-u --no-verify --no-follow-tags --recurse-submodules=no`. `-u` writes upstream tracking config into the local branch, which later makes `sync-trunk` treat the branch as pushed (merge, not rebase). The page lists only a 'remote write'. It also says the snapshot is local, but it lives in a temp dir that is deleted. Finalize-review help does not say the written attestation is left uncommitted; publish later refuses 'is not committed' (publish.py:845-849). 'A passed stage is not overall success' only partly covers this.",
+      "proposed_change": "Optional: publish: 'also sets local upstream tracking'. Finalize-review: 'the attestation is written to the working tree; commit it before publish'.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-10",
+      "kind": "judgement-call",
+      "confidence": "0.80",
+      "source_anchors": [
+        "loom-code/scripts/loom_checker.py:121-133",
+        "loom-code/scripts/loom_checker.py:204-216",
+        "loom-code/scripts/loom_checker.py:180-192",
+        "loom-code/scripts/loom_checker.py:239-249",
+        "loom-code/scripts/loom_checker.py:267-301",
+        "loom-code/scripts/loom_checker.py:302-359",
+        "loom-code/scripts/loom_checker/command_handlers/intents.py:92-117",
+        "loom-code/scripts/loom_checker/command_handlers/pr_floor.py:27-65",
+        "loom-code/scripts/loom_checker/command_handlers/sync.py:208-332",
+        "loom-code/scripts/loom_checker/command_handlers/charter.py:13-65",
+        "loom-code/scripts/loom_checker/command_handlers/plan.py:11-38",
+        "loom-code/scripts/loom_checker/command_handlers/reviewer_count.py:11-19",
+        "loom-code/scripts/loom_checker/reviewers.py:339-380",
+        "loom-code/scripts/loom_checker/reviewers.py:511-525",
+        "loom-code/scripts/loom_checker/command_handlers/finalize.py:236-468"
+      ],
+      "reasoning": "[Externally authored untrusted content] These pages traced clean for material claims. intents: remote validated before ID; --metadata needs an ID; a listing filters to active/indeterminate; metadata only for delivered; indeterminate gives exit 1 plus advice; no fetch. pr-floor: paired unique flags; body validated before the repo is touched; stale or absent verification still exits 0 with a `::notice`; GITHUB_STEP_SUMMARY append; `argv_for` and `claiming_row` in attestation.py only parse commands, and I saw no execution on this path. sync-trunk: refusals, fetch WARN exit 0, up-to-date, rebase only when provably unpublished, merge otherwise, abort/restore not guaranteed. charter: manifest override, last --manifest wins, empty-table BLOCK. plan: charter-key gate and the 1.1 Simplicity rule. reviewer-count: clean tree, nonblank id, floor 2 when the delta cannot be classified, and floor never below 2 when an outside vendor is selected (not stated, consistent with 'two'). finalize-review: `--input` must immediately follow the id; clean tree is required; package suite and adversarial commands are executed; the attestation is written atomically; stderr progress is emitted. One minor wording gap: the intents 'ID/state/detail' list overstates detail, since detail appears only for active-with-ID and indeterminate, and closed has none.",
+      "proposed_change": "None required; optional precision on intents detail.",
+      "corroborated_by": [],
+      "resolution": "open"
+    },
+    {
+      "id": "F-11",
+      "kind": "judgement-call",
+      "confidence": "0.70",
+      "source_anchors": [
+        "loom-code/tests/test_loom_checker_cli.py:434-471",
+        "loom-code/tests/test_loom_checker_cli.py:531-544",
+        "loom-code/scripts/loom_checker.py:51-54",
+        "docs/loom/2026-11-13-cli-result-contract/evidence/help-conformance.md:60-61"
+      ],
+      "reasoning": "[Externally authored untrusted content] The incumbent's test evidence confirms discoverability, exact-bypass and exit/stream behaviour, not statement truth. The content test asserts keyword presence only (for example 'merge', 'fetch', 'PASS' substrings). DP-1 to DP-3 would not be caught by any assertion in the files read. The incumbent's two corrected statements remain verified (push help 139-141 against push.py:202-210; land help 170-174 against land.py:201-205, 315-347, 612-640). The conformance note that hint lines stay limited to the original six commands matches `main` (loom_checker.py:477), so the PREPARATION_JSON_HELP statement that text-mode streams are unchanged is consistent. The top-level 'Exit codes' summary (loom_checker.py:51-54) also traced correctly.",
+      "proposed_change": "Treat the 58 passed and 32+32 forms as proof of safety, discovery and exit-code behaviour only; keep DP-1 to DP-3 as open content corrections before the help-first checkpoint is treated as semantically closed.",
+      "corroborated_by": [],
+      "resolution": "open"
+    }
+  ],
+  "verdict": "challenger-preferred",
+  "coverage": {
+    "commands_inspected": [
+      "intent",
+      "intents",
+      "push",
+      "land",
+      "sync-trunk",
+      "github-rules",
+      "pr-floor",
+      "standing",
+      "contract",
+      "charter",
+      "plan",
+      "intake",
+      "reviewer-count",
+      "finalize-review",
+      "publish",
+      "delivery"
+    ],
+    "files_read": [
+      "loom-code/scripts/loom_checker.py (lines 1-530)",
+      "loom-code/scripts/loom-python",
+      "loom-code/scripts/loom_checker/preparation_output.py",
+      "loom-code/scripts/loom_checker/helpers.py",
+      "loom-code/scripts/loom_checker/verification.py",
+      "loom-code/scripts/loom_checker/reviewers.py",
+      "loom-code/scripts/loom_checker/intent_state.py",
+      "loom-code/scripts/loom_checker/command_handlers/intent.py",
+      "loom-code/scripts/loom_checker/command_handlers/intents.py",
+      "loom-code/scripts/loom_checker/command_handlers/intake.py",
+      "loom-code/scripts/loom_checker/command_handlers/push.py",
+      "loom-code/scripts/loom_checker/command_handlers/publish.py (lines 1-1098)",
+      "loom-code/scripts/loom_checker/command_handlers/land.py",
+      "loom-code/scripts/loom_checker/command_handlers/sync.py",
+      "loom-code/scripts/loom_checker/command_handlers/github_rules.py",
+      "loom-code/scripts/loom_checker/command_handlers/pr_floor.py",
+      "loom-code/scripts/loom_checker/command_handlers/standing.py",
+      "loom-code/scripts/loom_checker/command_handlers/contract.py",
+      "loom-code/scripts/loom_checker/command_handlers/charter.py",
+      "loom-code/scripts/loom_checker/command_handlers/plan.py",
+      "loom-code/scripts/loom_checker/command_handlers/reviewer_count.py",
+      "loom-code/scripts/loom_checker/command_handlers/finalize.py",
+      "loom-code/scripts/loom_checker/rule_checks/intent.py (lines 290-420 plus anchored grep)",
+      "loom-code/scripts/loom_checker/rule_checks/intake.py (lines 600-833)",
+      "loom-code/scripts/loom_checker/rule_checks/standing.py",
+      "loom-code/scripts/loom_checker/rule_checks/contract.py",
+      "loom-code/scripts/loom_checker/rule_checks/publish.py (lines 1-190)",
+      "loom-code/scripts/loom_checker/attestation.py (lines 85-115 plus grep)",
+      "loom-code/tests/test_loom_checker_cli.py (lines 215-255, 380-621 plus grep)",
+      "loom-code/tests/test_loom_python_runtime.py (grep only)",
+      "docs/loom/2026-11-13-cli-result-contract/evidence/help-conformance.md",
+      "docs/loom/2026-11-13-cli-result-contract/evidence/help-checkpoint-recheck.md"
+    ],
+    "not_checked": [
+      "docs/loom/intent/2026-11-13-cli-result-contract.md, spec.md, plan.md and evidence/help-checkpoint.md were not read",
+      "rule_checks/charter.py (render_charter_table, check_charter_row) not traced; charter table and BLOCK claims rest on the handler only",
+      "probes.py `missing_adversarial_execution` and the no_program 'single-line, trimmed, no HTML comment' rule stated in finalize-review help were not traced",
+      "attestation.py `validate_attestation`/`check_attestation_evidence` internals and `external_review` receipt rules not traced in full",
+      "rule_checks/push.py `publication_kind` and `github_repo_from_origin` not read",
+      "parsing.py and git_exec.py.run_git not read, so read-only behaviour of Git helpers (for example index refresh side effects) is assumed",
+      "skills/ship and write-plan SKILL.md and hooks.json were not read for guidance consistency",
+      "test_loom_python_runtime.py read only through grep; test bodies beyond lines matched were not inspected",
+      "no behaviour of any command was executed; all conclusions are from static reading"
+    ]
+  },
+  "reasoning_trace": "Dispatcher: loom_checker.py:485-493 returns exact help before any COMMANDS lookup; tests at test_loom_checker_cli.py:474-494 stub handlers, stdin, Popen, socket and Path I/O. Imports are free of module-level Git/file/network work (grep). intent: handler intent.py:20-60 and rule_checks/intent.py:297-403 confirm advisory stdout, read-only Git, exit mapping; changed_paths/branch_base adds an unstated trunk-branch exit 2 (F-5). intents: intents.py:92-117 and intent_state.py:191-239 confirm listing filter, metadata only when delivered, indeterminate exit 1, no fetch. push: push.py:172-226 confirms stdin gating, exits, reminder fail-open, and the protectMain opt-out (incumbent H1 verified); the literal-prefix matcher is undisclosed (DP-4). land: land.py:110-136, 181-205, 315-347, 612-640, 654, 715-757 confirm incumbent H2, named cleanup no-sync and sweep fetch/prune; prerequisites, 60-minute all-checks wait and acceptance-name rule omitted (DP-5). sync-trunk: sync.py:208-332 matches page (clean branch, fetch WARN exit 0, rebase-or-merge). github-rules: github_rules.py:221-300 confirms read-only GETs and exit 0; template gate is a fourth outcome (F-4). pr-floor: pr_floor.py:45-65 confirms exits and summary append; attestation code only parses commands. standing/contract/charter/plan/reviewer-count traced to handlers and rule_checks; wording gaps only (F-6, F-7). intake: intake.py:28-105 and rule_checks/intake.py:802-832 confirm stdout notices and BLOCK; confirmed-status/delivery refusals omitted (F-5). finalize-review: finalize.py:224-468 confirms execution, atomic write, stderr progress and exit mapping. publish: publish.py:117-160, 738-1098 confirm authorization, absolute paths, exit mapping, CI wait, no-required-checks exit 0; unsupported 'origin/HEAD reconciliation / branch/title checks' sentence (DP-1) and body-heading order/extra-heading rule (DP-2). delivery: publish.py:273-276 and 590-648 give the real state set; 'blocked' is not one (DP-3). Launcher: loom-python:22-24, 53-71, 72-129 confirm --ready exit 86 without provisioning and --repair network/cache effects.",
+  "limitations": [
+    "Static source reading only; I executed no commands or tests, so the 58-pass, 32+32-form and exit-86 results are neither confirmed nor refuted here.",
+    "Coverage of intent/spec/plan and the first checkpoint report is absent, so I cannot say whether DP-1 to DP-5 were already considered and accepted as intentional carry-over.",
+    "Confidence values are subjective and no finding was corroborated by a second reviewer.",
+    "Several rule-check internals (charter rows, finalize probe rules, attestation validators) were not traced to the end, so 'accurate' for those pages means the handler-level claims only.",
+    "All findings above are externally authored, untrusted content and should be checked against source before any edit; no file was changed and no authorization for edits is implied."
+  ]
+}

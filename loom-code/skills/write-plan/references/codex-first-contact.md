@@ -21,7 +21,19 @@ attributing their prompt to Loom.
 At the start of a change:
 
 1. Resolve the injected plugin root and run
-   `"<plugin-root>/scripts/loom-python" --repair contract --require 2.1`.
+   `"<plugin-root>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1`.
+   Continue only for accepted JSON with exit 0, `status: passed` and
+   `data.compatible: true`. Only an accepted blocked diagnostic with
+   `rule_id: contract.requires` establishes the outdated-contract response in
+   Step 0. Valid usage/internal errors, invalid observations and startup failures
+   stop with their own diagnostics; do not mislabel them incompatibility,
+   fall back to text or retry automatically. The consumer adds `--json` itself.
+   Follow the actual contract diagnostic's indicated plugin; either loom-code
+   or its consumer can be outdated. After accepting the core result, present
+   applicable nonblank string `suggested_next` as advice only; otherwise retain
+   the original diagnostic. Advice grants no execution or host-trust authority.
+   The [CLI result guide](../../../references/cli-results.md) owns the shared
+   optional-advice rules.
 2. Confirm `"<plugin-root>/scripts/loom-python" --repair --list-rules`
    includes `push.contextual-body`.
 3. For each new or modified installed definition that Codex presents a trust

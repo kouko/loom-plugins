@@ -1,0 +1,110 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-cli-next-guidance",
+  "content_digest": "c887261b6459f047f01b35fa861d4be57632b1e2",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_checked_readonly.py",
+      "artifact": "loom-code/tests/test_checked_readonly.py",
+      "result": "pass",
+      "command_digest": "22d9c9d26c63022a4ba366adace9c8ba48b9fa4b8532825b29c9a0830232e868"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "c271cc43d2bff6b34cd7012e260e58eeb42f0eaf",
+      "review_target_sha": "b40f369478ec56674b1ad96d1d06e3493debe85d",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran all four changed test files in the offline isolated locked environment: 91 passed in 15.56s, with no skipped tests. Existing uv cache access required sandbox escalation; the initial cache-lock error was not counted as test execution.",
+        "Reconciled Acceptance 1–5 against producer rendering, checked-consumer validation, domain callers, station instructions and retained acceptance evidence. Optional advice preserves core classification, raw JSON, exits and authority; contract refusal advice follows the actual indicated producer or consumer. Legacy preparation and delivery shapes remain unchanged.",
+        "No complete package suite or adversarial programs were rerun, and no repository artifact was edited. Installed-host compliance and performance improvements remain explicitly unverified rather than claimed."
+      ],
+      "reviewer": "/root/next_guidance_code_review",
+      "vendor": "openai",
+      "model": "host-inherited"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "c271cc43d2bff6b34cd7012e260e58eeb42f0eaf",
+      "review_target_sha": "b40f369478ec56674b1ad96d1d06e3493debe85d",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "README.md:306",
+          "text": "nitpick (non-blocking): The retained development paragraph says internal-error behavior is unchanged, although contract and reviewer-count internal-error text now appends advisory output and their JSON gains suggested_next. The earlier bounded-rollout paragraph and detailed CLI guide describe the new output correctly, so this does not change the reader's operational decision.",
+          "fix": "Qualify this sentence to say hook behavior and internal-error classification/exits remain unchanged, while the two migrated commands add advisory output."
+        }
+      ],
+      "notes": [
+        "Independently ran all four changed test files through the offline isolated locked environment: 91 passed in 15.57s, no skips. Initial sandbox uv-cache lock failure was environmental; authorized existing-cache execution passed.",
+        "Reconciled the two migrated interfaces, sixteen-command/five-JSON inventory, exact advisory naming, unchanged required validation and legacy shapes, diagnostic-specific plugin updates, and preserved authorization against source and base polarity.",
+        "Read independent acceptance evidence and retained execution logs, worker RED/GREEN records, and release metadata. Host compliance, installed-plugin parity, live remote operations, and efficiency improvements remain explicitly unverified; did not run the complete suite or adversarial programs."
+      ],
+      "reviewer": "/root/next_guidance_docs_review",
+      "vendor": "openai",
+      "model": "host-inherited"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "d5a0fb480d47ddd5eaadcd2937a06ac461503da2",
+  "tested_commit": "32b5ce84f2fbebeda3d7726b72bb8010c9e5cc99",
+  "reviewed_commit": "b40f369478ec56674b1ad96d1d06e3493debe85d",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}

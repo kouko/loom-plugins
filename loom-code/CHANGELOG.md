@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.78.0] — 2026-11-14 — add advisory next steps to two CLI results
+
+- Add optional `suggested_next` advice to existing `contract` and `reviewer-count` JSON: nonblank English advice for blocked/error results, null for passed. Text refusals/errors append `Suggested next step:` while retaining original diagnostics and Help hints.
+- Add locally generated advice to checked-consumer faults without changing authoritative validation, exits, raw numeric precision, single execution, runtime repair ownership or authorization. Missing or unusable advice never changes classification or permits automatic execution, retries or text fallback.
+- Document optional advisory consumption and the bounded migration: sixteen checker commands, five JSON modes, two migrated advice interfaces. Preserve preparation shapes, delivery's legacy `next`, existing operation recovery and installed plugin state; no efficiency improvement is claimed.
+
+## [3.77.0] — 2026-11-14 — validate and adopt read-only CLI observations
+
+- Add one bounded checked consumer for `contract` and `reviewer-count`: validate the published envelope, required types, unchanged request identity and exit/status agreement, preserving compatible extra fields and numeric precision. Reject malformed or contradictory results without fallback, retry or fabricated success.
+- Use checked compatibility in write-plan and its Codex first-contact guidance, and checked reviewer floors in closing-review. Preserve usage/internal/startup distinctions, domain policy, authority, host trust and existing operation reconciliation.
+- Publish the sixteen-command result inventory and remaining migration direction: five direct JSON commands and two checked station consumers. Keep runtime preparation separate from the read-only helper, preserve Python import isolation, and configure a 30-second child timeout without claiming full migration or efficiency gains.
+
+## [3.76.0] — 2026-11-14 — expose typed read-only CLI JSON observations
+
+- Add optional final `--json` selectors to `contract` and `reviewer-count`, reusing the bounded version-1 result envelope with typed compatibility and reviewer-floor data. Preserve existing text streams, exits, checks and preparation/delivery JSON shapes.
+- Reject invalid selectors and arguments before domain work; caught usage/internal failures return unavailable data as null, one JSON object and empty checker stderr, including late failures after partial handler output.
+- Document all five JSON commands, their distinct contracts and real field-consumer examples. Reviewer floor two remains a conservative requirement rather than completed classification or review; launcher failures remain outside the loaded-checker guarantee.
+
+## [3.75.0] — 2026-11-14 — complete safe help for all sixteen CLI commands
+
+- Provide dedicated exact `<command> --help` and `<command> -h` discovery for all sixteen principal commands before handler execution, stdin reads or repository/network work. Update overall discovery, including native Git hook modes.
+- Align guidance with actual inputs, prerequisites, output states, advisory exits, partial writes, protection limits and recovery actions. Explain ready-runtime discovery separately from runtime repair that may provision dependencies.
+- Preserve ordinary parsing, default text streams, exits, authorization and existing preparation/delivery JSON interfaces. Non-exact help combinations retain ordinary command behavior; this release adds no JSON interface.
+
 ## [3.74.0] — 2026-11-14 — identify the added protection before adding tests
 
 - Reuse sufficient existing coverage during planning and implementation; identify the distinct defect or uncovered behavior when extending permanent tests, while preserving defect reproduction, test-first work and independent boundary coverage.

@@ -1,0 +1,110 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-consume-readonly-json",
+  "content_digest": "8978bdb6f83e02acb163ba408a2f08fb1a43c74f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_checked_readonly.py",
+      "artifact": "loom-code/tests/test_checked_readonly.py",
+      "result": "pass",
+      "command_digest": "22d9c9d26c63022a4ba366adace9c8ba48b9fa4b8532825b29c9a0830232e868"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "6fe61c99ea1981f238f8a8550abbd1e36e93cfab",
+      "review_target_sha": "321b398917d95b76d1655eb3ce5dacb0e2616007",
+      "dimension_scores": {
+        "security": "PASS — Bounded command selection, argument-list subprocess execution and isolated child imports preserve the existing trust boundary; malformed observations never become usable stdout.",
+        "architecture": "PASS — One private validator behind the public main entry serves the two actual station consumers without changing producer ownership or adding policy evaluation.",
+        "correctness": "PASS — Required envelope/data checks, request identity, exit agreement, compatible additions, original numeric precision and failure distinctions agree with REQ-1 through REQ-5 and Acceptance 1 through 5.",
+        "naming": "PASS — checked_readonly, the public main entry and private parsing/validation helpers describe their bounded responsibilities.",
+        "tests": "PASS — Independently ran all four changed test files in full: 58 passed in 11.74s with no skips. Public-entry injection covers malformed observations and execution arguments; real subprocess and launcher cases cover producer parity and import isolation. The build record retains behavior-level RED/GREEN evidence.",
+        "refactoring": "PASS — The shared bounded validator replaces the README inline-parser example and avoids per-station validation duplication; no unrelated extraction or refactor.",
+        "cross-task-coherence": "PASS — Script, two station consumers, Codex duplicate, sixteen-command inventory, release metadata and acceptance evidence agree on the first-batch boundary and error semantics.",
+        "external-surface-grounding": "PASS — The spec grounds subprocess and JSON APIs in Python documentation; sibling producer handlers, result renderer and launcher were inspected directly for their existing contracts.",
+        "principles-conformance": "PASS — The declared mechanism-budget exception covers one bounded script for two consumers; reviewer policy, authorization, existing data and machine verification remain owned by existing mechanisms.",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md or ratified architecture contract exists.",
+        "deliberate-simplification": "PASS — Documentation explicitly limits this batch to two consumers and structural validation, with remaining command migrations and arbitrary recovery deferred rather than promised.",
+        "deletion-first": "PASS — One script for two present callers is smaller than duplicated station parsers; no new checker command, schema registry, retry framework, fallback path or pass-through module was added."
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative branch delta and reconciled the retained intent/spec/plan, producer contracts, station callers, inventory and committed acceptance artifacts against target HEAD.",
+        "The first offline test attempt hit the existing uv cache lock sandbox boundary; authorized escalation reused that offline cache and all four complete changed test files passed.",
+        "Did not run the complete package suite or adversarial programs, create probes, edit repository artifacts, invoke paid models, install, publish or merge. Installed-host parity and computational truth remain explicitly outside the structural validator guarantee."
+      ],
+      "reviewer": "/root/consume_json_code_review",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "6fe61c99ea1981f238f8a8550abbd1e36e93cfab",
+      "review_target_sha": "321b398917d95b76d1655eb3ce5dacb0e2616007",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-11-14-consume-readonly-json/plan.md:6",
+          "text": "note (non-blocking): The checkpoint-passed sentence records a verification outcome inside the plan. loom-code/contract/manifest.yaml:186 (artifacts.plan.charter.must_not, verification diary, goes_to: attestation) routes this content to attestation; the redundant placement does not change executable task instructions.",
+          "fix": "Delete the checkpoint outcome sentence from the plan and retain that outcome in its existing verification evidence or generated attestation."
+        }
+      ],
+      "notes": [
+        "Independently ran all four changed test files with the locked offline uv environment: 58 passed in 11.52s, with no skipped tests. The initial cache-lock sandbox failure was resolved by approved cache access. No full suite or store adversarial program was run by this reviewer.",
+        "Reconciled current intent/spec/plan, both station consumers, producer contracts, the sixteen-command inventory, release metadata, and acceptance/build evidence; compared rewritten polarity clauses against the base. The historical recovery-first proposal is explicitly superseded and creates no current fallback obligation.",
+        "Five direct JSON producers, two checked station consumers and sixteen inventoried commands remain distinct. Source-copy and injected-producer evidence does not claim installed-host parity, arbitrary recovery, computational truth, or efficiency gains."
+      ],
+      "reviewer": "/root/consume_json_docs_review",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "3998130614cfa91e2eb9afda565e63ebff3ef480",
+  "tested_commit": "3056014736016d39d1a8690cbe03d45fee86873e",
+  "reviewed_commit": "321b398917d95b76d1655eb3ce5dacb0e2616007",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}

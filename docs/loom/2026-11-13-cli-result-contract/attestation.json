@@ -1,0 +1,105 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-13-cli-result-contract",
+  "content_digest": "3541b65b14018c85e13fd2f0db874fe5bb0ff571",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "ff135d4f79324ce09e1a6ef714373280a7ae7072edcc0734dcb9c93c0548195f"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "7c137958db0f78af4d50b99e43d96e17225c8cce",
+      "review_target_sha": "212b999753de52eb4052af867c270c4664744ca3",
+      "dimension_scores": {
+        "security": "PASS — Exact two-argument discovery returns before handlers, stdin, subprocesses or artifact access; ordinary authorization and writer handlers are unchanged. Native-hook, repair and partial-write limitations are disclosed without granting permission.",
+        "architecture": "PASS — Reuses the existing COMMAND_HELP dispatcher boundary and COMMANDS inventory; adds no handler parser, registry, dependency or execution mechanism.",
+        "correctness": "PASS — Reconciled all sixteen pages and the overview with their command handlers and applicable rule/result implementations. Existing preparation/delivery selectors and six failure hints retain their boundaries. Reviewed retained RED and correction evidence; changed test files passed independently.",
+        "naming": "PASS — Existing command and helper names remain precise; no new function or abstraction obscures responsibilities. Command-specific caveats distinguish advisory process success from operational completion.",
+        "tests": "PASS — Independently ran all three changed test files: 92 passed, zero skipped. Existing public-entry discovery/content tests are extended for the ten previously uncovered commands and corrected operational caveats. Expanded main-entry tripwires add filesystem/socket/stdin/subprocess and nonexact-dispatch protection. The single new launcher-entry test adds distinct all-command prepared-cache integration and missing-runtime discovery coverage; it does not replace the seam it verifies. Existing runtime cases retain script, repair, isolation and concurrency protection. Release-pin update reuses existing parity/history tests; no new release harness.",
+        "refactoring": "PASS — Keeps the existing small dispatcher and command-specific text mapping; the explicit original hint population is necessary to preserve non-help stderr compatibility as help coverage expands. No speculative extraction or duplicated implementation was introduced.",
+        "cross-task-coherence": "PASS — Confirmed help-only intent, requirements, task entries, implementation and release packet agree. Integrated 3.75.0 preserves main's 3.74.0/3.73.0/3.72.1 history and unrelated upstream behavior; no deferred JSON capability is shipped.",
+        "external-surface-grounding": "PASS — The runtime delta adds text rather than external calls or flags passed to tools. Help descriptions were checked against owned existing handlers and their Git/gh grounding comments; no new ungrounded external invocation exists.",
+        "principles-conformance": "PASS — Preserves ratified principles' authorization, data/worktree preservation and separation of claimed verification from evidence. Help executes no new mutation and explicitly describes existing destructive modes, bypass limits and partial completion. Prior review history and failed evidence remain retained.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the reviewed checkout.",
+        "deliberate-simplification": "PASS — Exact-only help and ready-runtime scope are explicit ceilings with supported recovery through exact invocation or conscious runtime repair. No unexplained deferred mechanism or shortcut was added.",
+        "deletion-first": "PASS — Adds only explicitly requested missing help pages and necessary operational corrections within the existing mapping. Tests extend existing entry coverage except the distinct launcher integration case; no forwarding module, extension point, flag or framework offers a smaller equivalent deletion."
+      },
+      "findings": [],
+      "notes": [
+        "Focused command: /Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_loom_python_runtime.py loom-code/tests/test_write_plan_station_text.py -q -rs; result: 92 passed in 17.78s. Initial uv attempts failed on cache permission and unavailable DNS; no package installation occurred.",
+        "Full help/runtime source and corresponding test files are byte-identical to published 4854ad23c; reviewed the cumulative main-base delta independently and retained the earlier review rounds as history. This verdict does not reset their accounting or replace their findings.",
+        "Did not run the complete suite, adversarial programs, remote writers or outside CLI review. Supplied full-suite/adversarial logs are contextual evidence; this verdict contains no new probe confirmation or claim of a live mutation."
+      ],
+      "reviewer": "help_integrated_code_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    },
+    {
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "docs",
+      "reviewed_sha": "7c137958db0f78af4d50b99e43d96e17225c8cce",
+      "review_target_sha": "212b999753de52eb4052af867c270c4664744ca3",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES — Current local claims were checked against the help, handlers, release files and supplied execution records. Historical external research attribution was not independently re-fetched in this integration review.",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative help-only delivery against the confirmed four Acceptance lines, current spec/plan, sixteen help pages, corresponding command sources, README discovery boundaries and historical checkpoint/acceptance records. Exact help, ordinary invocation, ready-runtime startup, repair and authority are distinguished. No new runtime skill/agent prose or development-record citation was introduced. Local Markdown links in the changed prose resolve.",
+        "Recomputed the supplied current package log: 4,276 passed across 15 pytest sessions, with no skipped summary; the shell/Mermaid completion records and supplied 39-case adversarial output agree with the current Build evidence. Older 4,269/6 records identify their historical revisions. The current acceptance report identifies its clean-copy revision and explicitly labels semantic source-readback carry-over, focused compatibility execution and pending formal finalization. Neither this review nor those records establish remote CI or live-writer behavior.",
+        "The four code manifests agree on 3.75.0; upstream 3.74.0/3.73.0/3.72.1 changelog history and workflow 5.22.0 remain present. The original three review rounds and failures remain historical evidence; continued work is expressly recorded as the parent's interpretation of the user's post-disclosure continuation, without inventing a literal waiver or resetting the counter. No full suite, adversarial program, live mutation or paid external review was executed by this reviewer. The prior attestation is historical pending replacement."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_loom_checker_cli.py",
+          "reviewed_sha": "212b999753de52eb4052af867c270c4664744ca3",
+          "quote": "loom-code/tests/test_loom_checker_cli.py ............................... [ 79%]"
+        }
+      ],
+      "reviewer": "help_integrated_docs_review",
+      "vendor": "openai",
+      "model": "inherited-unobserved"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "66583a51db46",
+  "tested_commit": "0efb5f2e651746509fc5a592f9276e37fc8cdb68",
+  "reviewed_commit": "212b999753de52eb4052af867c270c4664744ca3",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}

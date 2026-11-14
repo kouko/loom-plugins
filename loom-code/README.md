@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.74.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.78.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -88,8 +88,8 @@ The stations dispatch these agents; none reviews its own work.
 | [`acceptance-tester`](agents/acceptance-tester.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/acceptance-test-report.md`. |
 | [`adversary`](agents/adversary.md) | `build` | Tries to make the change fail — mutation or fuzz tooling, or executable abuse and boundary cases — and records every attempt as a probe. |
 
-The number of reviewers is not chosen by the agent: `loom_checker.py
-reviewer-count` computes it from the whole branch delta — one for a narrow,
+The checker computes the reviewer count from the whole branch delta; closing
+review uses its checked `reviewer-count` observation — one for a narrow,
 low-risk change, two otherwise or when it cannot tell. Acceptance testing happens
 only when an Acceptance line cannot be settled mechanically.
 
@@ -129,6 +129,73 @@ text behavior and exit codes. Results distinguish passed checks, blockers and
 usage/internal errors, retain ordered diagnostics and notices, and do not
 claim whole-workflow completion. Use either command's exact `--help` for the
 six-field contract and startup/process limitations.
+
+Five checker commands support JSON: `plan`, `intake`, `contract`,
+`reviewer-count`, and `delivery`. The first four select JSON only with a final
+`--json`; duplicate selectors are usage errors. Exact command `--help`/`-h`
+remains text; mixed help and final JSON is a usage error. Delivery retains its
+distinct `{state, reason, next, evidence, complete}` object.
+
+The two read-only modes add `data` to the preparation envelope:
+
+| Command | Typed data on a completed observation |
+|---|---|
+| `contract --require <major.minor> --json` | `contract_version` and `required_version` strings, `compatible` boolean; last `--require` wins. The supplied requirement string is preserved, and the manifest version is stripped. |
+| `reviewer-count <change-id> --json` | Unchanged `change_id` string and integer `reviewer_floor` (currently 1 or 2); requires a clean repository and one nonblank operand. |
+
+Each emits exactly one stdout object plus newline and empty checker stderr:
+`schema_version: 1`, `command`, `status`, ordered `diagnostics` objects
+(`rule_id`, `message`), ordered string `notices`, `error`, and `data`.
+These two modes also emit advisory `suggested_next`: a nonblank English string
+for blocked/error, null for passed. Text refusals/errors append
+`Suggested next step:` on stderr; original diagnostics and Help hints remain.
+Passed means exit 0, empty diagnostics and null error; blocked means exit 1,
+rule diagnostics and null error; error means exit 2, empty diagnostics and
+`error: {kind: usage|internal, message}`. Every error data value is null.
+Reviewer-count has no blocker result; missing/dirty repositories are usage
+errors. Empty arrays remain `[]`. Use fields and types rather than key order
+or human message prose.
+
+Planning and closing review use a shared checked consumer rather than parsing
+success prose or duplicating validators. Replace `<loom-code>` with the
+installed plugin directory; run the reviewer call inside the selected clean
+repository after committing functional work.
+
+```sh
+"<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py --help
+```
+
+The consumer adds `--json`, validates version/command, required types, unchanged
+request identity and exit/status agreement, and preserves compatible extra
+fields. Only accepted passed/true compatibility permits planning to continue;
+only an accepted passed positive integer `data.reviewer_floor` determines
+reviewer dispatch. An incompatible `2.99` is a blocked observation; malformed
+`bad` is a valid usage error. Invalid output has empty stdout, a
+`checked-readonly:` diagnostic and exit 2. Neither errors nor invalid results
+permit continuation, reviewer defaults, text fallback or automatic retries.
+After accepting the core observation, present applicable `suggested_next` only
+when it is a nonblank string; ignore missing, null, blank or non-string advice
+and retain the original diagnostic. Accepted raw JSON may contain unusable
+advice: core validation does not make arbitrary advice trustworthy or executable.
+Advice grants no authorization and triggers no automatic action. For contract
+refusals, follow the diagnostic's indicated plugin; either loom-code or the
+consuming plugin can be outdated. Consumer faults add locally generated advice
+on stderr while retaining their original diagnostic and exit distinction.
+
+This helper executes the checker once with a configured 30-second subprocess
+timeout and preserves startup exit 86. It neither writes artifacts, installs
+runtime nor changes policy, authority or host trust; the outer launcher's
+`--repair` can prepare caches, while `--ready` reuses them. Structural checking
+does not prove computational truth or whole-workflow completion. Existing
+text, preparation/delivery JSON and remote-operation reconciliation remain.
+The [CLI result guide](references/cli-results.md) inventories all sixteen
+commands, their special modes and remaining migration work: five direct JSON
+commands, two checked station consumers, no claim of full migration.
+Only those two commands adopt the new advice field; delivery's existing `next`
+and publish/land/launcher remedies remain unchanged. No gain in resolution rate,
+time, tokens or cost has been measured.
 
 `scripts/loom_checker.py` is the deterministic layer: every rule recomputes
 from the repository instead of trusting a claim, and `--list-rules` is the

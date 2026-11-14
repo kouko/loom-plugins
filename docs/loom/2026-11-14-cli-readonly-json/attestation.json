@@ -1,0 +1,102 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-cli-readonly-json",
+  "content_digest": "b193080e816a45092d3b47fb25357ec041259d5f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_preparation_json.py",
+      "artifact": "loom-code/tests/test_preparation_json.py",
+      "result": "pass",
+      "command_digest": "3751363a84b62fdb8e77173705fd996e84ab5416ee798d58d58d5928711f0b3b"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "80c8a2744bb8f9a5087bd9ef8e47d73ec6d9ca47",
+      "review_target_sha": "11f35a1589b621ec1cc13a743758122e987521b2",
+      "dimension_scores": {
+        "security": "PASS — JSON serialization escapes supplied strings; selected modes retain existing safe manifest loading and argument-list Git execution, with no new write, network, authorization or deserialization surface.",
+        "architecture": "PASS — main owns mode selection and rendering; existing handlers own argument validation and observations; preparation_output extends the existing bounded envelope without a registry or dependency.",
+        "correctness": "PASS — Checked REQ-1 through REQ-5 against handlers, dispatcher, unchanged compatibility/reviewer policy and recorded consumer evidence; independently ran all three changed test files successfully. Final-selector parsing, last requirement wins, conservative floors and all-null error data match the spec.",
+        "naming": "PASS — Existing command and result names retain their meanings; new help and data keys identify the observations directly. No unrelated responsibility was introduced into a changed function.",
+        "tests": "PASS — Whole test_preparation_json.py, test_loom_checker_cli.py and test_write_plan_station_text.py ran: 89 passed, zero skipped. New cases enter through main or the real CLI and distinguish typed compatibility, floors, operand validation before reads, repository failures and late stream/data cleanup. RED evidence records the three new cases failing before implementation.",
+        "refactoring": "PASS — Reuses report_result and existing policy functions; the two small data branches do not justify a generic abstraction. Existing preparation result shape and text report delegation remain intact.",
+        "cross-task-coherence": "PASS — The planned main entry, handlers, result helper, focused tests, documentation and synchronized 3.76.0 release packet agree; no missing REQ or policy expansion found across the cumulative delta.",
+        "external-surface-grounding": "PASS — No new external service or CLI flag is called by production code. Existing Git and manifest interfaces remain unchanged; spec Current state evidence identifies their owning implementations and the real consumers.",
+        "principles-conformance": "PASS — PRINCIPLES.md guarantees remain intact: observations do not bypass review or authorize publication, no existing user data is modified, new result behavior has regression coverage, and the explicitly requested bounded extension adds no universal mechanism.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the repository.",
+        "deliberate-simplification": "PASS — The deliberately bounded two-command pilot states its limits and future migrations explicitly; startup, import, termination and broken-pipe boundaries remain disclosed rather than silently claimed.",
+        "deletion-first": "PASS — Both new selectors and typed data were explicitly requested. Existing helpers are extended in place, with no forwarding-only module, new consumer harness, dependency, registry or speculative extension point."
+      },
+      "findings": [],
+      "notes": [
+        "Independent changed-file command: uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_preparation_json.py loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_write_plan_station_text.py -q -rs; 89 passed in 12.56s. Initial cache-lock permission failure was resolved using authorized existing host-cache access.",
+        "Read full changed production functions, main callers, unchanged contract numeric matching, report/manifest/repository helpers and reviewer floor computation; no policy changes found. Reviewed acceptance report and embedded real-consumer evidence against the requirements.",
+        "Did not run the complete package suite or store probes, as required by the reviewer contract. Installed-plugin refresh and live-host/writer execution remain outside this change's tested scope."
+      ],
+      "reviewer": "/root/readonly_json_code_review",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "80c8a2744bb8f9a5087bd9ef8e47d73ec6d9ca47",
+      "review_target_sha": "11f35a1589b621ec1cc13a743758122e987521b2",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran the three changed test modules: 89 passed in 12.23s, no skips. Existing uv cache access required host permission after the first sandbox lock failure; the successful run was offline. Manifest synchronization and git diff whitespace checks also passed.",
+        "Checked REQ-1 through REQ-5 against the dispatcher, handlers, result renderer, version parser, reviewer policy, help, consumer source and captured evidence. Final-selector grammar, all-null error data, conservative reviewer floors, five principal JSON commands versus separate dispatch APIs, startup exclusions and 3.76.0 release mirrors agree.",
+        "Acceptance evidence ran at 49653681266bc049fafdd4014983a4412fd0f91c; the delta to the review target contains only its report and evidence. Historical verification records retain their original pending scope. No full package suite or store adversarial probe was rerun, and no live-host or installed-plugin verification is claimed."
+      ],
+      "reviewer": "/root/readonly_json_docs_review",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "496b642094663a227fabe0d864e1ae7f7b2ef446",
+  "tested_commit": "49653681266bc049fafdd4014983a4412fd0f91c",
+  "reviewed_commit": "11f35a1589b621ec1cc13a743758122e987521b2",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}
