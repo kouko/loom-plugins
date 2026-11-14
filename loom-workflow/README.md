@@ -8,7 +8,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.24.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.25.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -52,6 +52,7 @@ These tools are selected by need; the rows are not steps to execute in order.
 | The route to the outcome is still unclear | `decision-map` | Investigate unknowns and deliver a ready slice as an intent. |
 | A proposal needs a critical check | `critique` | Judge whether the proposed work is necessary or can be simpler. |
 | You lose track during a session | `recap-state` | Explain the current position and wait for your confirmation. |
+| You need advice on what is worth doing next | `whats-next` | Recommend a concrete first choice and necessary alternatives from current evidence. |
 | A prior lesson matters, or a new one should be kept | `loom-memory` | Recall on demand; record durable lessons before the branch closes, on request or by agent judgment. No station calls it. |
 | You write, edit or review a dbt model | `dbt-model-style` | Apply model style and structure; calculation logic stays out of scope. |
 | You commit, create a PR or merge | `git-memory` | Classify memory before every commit at any station, at PR creation and before merge. |
@@ -87,7 +88,7 @@ acceptance criteria met, fog empty, and every ticket closed or withdrawn.
 
 ## Skills
 
-Fourteen skills: thirteen tools and one optional router.
+Fifteen skills: fourteen tools and one optional router.
 
 | Skill | Role |
 |---|---|
@@ -95,6 +96,7 @@ Fourteen skills: thirteen tools and one optional router.
 | [`decision-map`](skills/decision-map/README.md) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
 | [`critique`](skills/critique/README.md) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
 | [`recap-state`](skills/recap-state/README.md) | In-session recap of where the work stands, then a pause for confirmation. Not the built-in `/recap` away-summary. |
+| [`whats-next`](skills/whats-next/README.md) | Recommend one grounded next action plus necessary alternatives; preserve the current task's authorization. |
 | [`loom-memory`](skills/loom-memory/README.md) | Recall, record, reconcile or retire durable repository lessons in the committed memory store. |
 | [`dbt-model-style`](skills/dbt-model-style/README.md) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
 | [`git-memory`](skills/git-memory/README.md) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
@@ -107,7 +109,7 @@ Fourteen skills: thirteen tools and one optional router.
 | [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts nine of these tools. `goal-create` and
-`dbt-model-style` and `project-retro` are standalone skills outside the Loom flow, and
+`dbt-model-style`, `project-retro` and `whats-next` are standalone skills outside the Loom flow, and
 `loom-memory` and the router stay outside the contract.
 
 ## Repository structure
@@ -137,7 +139,8 @@ loom-workflow/
 │   ├── project-retro/
 │   ├── recap-state/
 │   ├── skill-retro/
-│   └── using-loom-workflow/
+│   ├── using-loom-workflow/
+│   └── whats-next/
 ├── tests/                 git-memory, loom-memory, loom-visualization and retro tests
 ├── CHANGELOG.md
 ├── README.md              (this file)
@@ -235,6 +238,13 @@ reach:
 - an install of `loom-code` without `loom-workflow`: the card ships only in `loom-workflow`.
 
 ## Usage
+
+Invoke `whats-next` by name or ask “what should we do next?”. It can also be
+selected when a blocker or new evidence invalidates the direction. A viable,
+authorized plan continues without repeated advice interruptions. Advice grants
+no new permission; the original workflow owns execution and required consent.
+Unlike `recap-state`, it does not require a pause for orientation. Selection
+eligibility is not a guarantee of automatic triggering on an installed host.
 
 `loom-workflow` ships no slash commands. Ask in natural language, or name a
 skill; `goal-create` runs only when named. For example:

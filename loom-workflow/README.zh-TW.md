@@ -8,7 +8,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.24.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.25.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名稱遷移
 
@@ -48,6 +48,7 @@ plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。�
 | 還不清楚如何達成目標 | `decision-map` | 調查未知事項，將準備好的部分交付為 intent。 |
 | 想先檢查提案是否合理 | `critique` | 判斷工作是否必要，以及能否更簡單。 |
 | 對話中跟不上目前進度 | `recap-state` | 說明現在的位置，等待你確認。 |
+| 想知道接下來最值得做什麼 | `whats-next` | 根據目前證據推薦首選與必要替代方案。 |
 | 需要過去的教訓，或有新教訓值得保留 | `loom-memory` | 按需查詢；關閉分支前，依要求或 agent 判斷記錄持久教訓。沒有站點固定呼叫它。 |
 | 撰寫、編輯或審查 dbt model | `dbt-model-style` | 套用模型寫法與結構規則，不處理計算邏輯。 |
 | commit、建立 PR 或 merge | `git-memory` | 任何站的每次 commit 前、建立 PR 時與 merge 前分類記憶。 |
@@ -81,7 +82,7 @@ flowchart TD
 
 ## Skills
 
-共 14 個 skills：13 個工具與 1 個可選入口。
+共 15 個 skills：14 個工具與 1 個可選入口。
 
 | Skill | 角色 |
 |---|---|
@@ -89,6 +90,7 @@ flowchart TD
 | [`decision-map`](skills/decision-map/README.md) | 在 `docs/loom/maps/<map-id>/` 開一張持久化的 Outcome Map 並持續推進：Destination、fog、分型的 ticket 與 Decisions-so-far 紀錄；delivery 步驟會寫出 intent。 |
 | [`critique`](skills/critique/README.zh-TW.md) | 在動手做之前裁決提案：`mode: proposal` 把清單或計畫分成 KEEP / DEFER / DROP；`mode: complexity` 用 deletion-first 量一個具體改動。 |
 | [`recap-state`](skills/recap-state/README.zh-TW.md) | 在 session 內 recap 工作目前的位置，然後停下來等確認。不是內建的 `/recap`（away-summary）。 |
+| [`whats-next`](skills/whats-next/README.zh-TW.md) | 推薦有依據的下一步首選與必要替代方案，保留目前工作的授權範圍。 |
 | [`loom-memory`](skills/loom-memory/README.md) | 查詢、記錄、核對或淘汰 commit 進 memory store 的持久 repository 教訓。 |
 | [`dbt-model-style`](skills/dbt-model-style/README.md) | 撰寫、編輯或 review dbt model 時，套用 dbt + Redshift 的 style 與 structure（CTE 角色、zero-logic 的 final CTE、命名、註解）；計算邏輯不在範圍內。 |
 | [`git-memory`](skills/git-memory/README.md) | 在每次 `git commit`、`gh pr create`、`gh pr merge` 之前分類 Decision、Learning、Gotcha memory；也能找回過去某個 Git 決策的理由。 |
@@ -101,7 +103,7 @@ flowchart TD
 | [`goal-create`](skills/goal-create/README.zh-TW.md) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
 Loom 的契約計入其中九個工具。`goal-create` 與 `dbt-model-style` 是 Loom
-流程之外的 standalone skill；`project-retro` 也是獨立工具，`loom-memory` 與入口路由則維持在契約之外。
+流程之外的 standalone skill；`project-retro` 與 `whats-next` 也是獨立工具，`loom-memory` 與入口路由則維持在契約之外。
 
 ## Repository 結構
 
@@ -130,7 +132,8 @@ loom-workflow/
 │   ├── project-retro/
 │   ├── recap-state/
 │   ├── skill-retro/
-│   └── using-loom-workflow/
+│   ├── using-loom-workflow/
+│   └── whats-next/
 ├── tests/                 git-memory、loom-memory、loom-visualization 與 retro 的測試
 ├── CHANGELOG.md
 ├── README.md
@@ -220,6 +223,11 @@ OpenCode 的限制：
 - 只裝 `loom-code`、沒裝 `loom-workflow`：卡片只放在 `loom-workflow` 裡
 
 ## 使用
+
+直接指定 `whats-next`，或問「接下來該做什麼？」。工作受阻或新證據使方向需要
+重判時也可以選用；已授權的計畫仍可正常推進時，不反覆插入建議。建議不授予
+新權限，執行與必要授權仍由原流程負責。它不要求像 `recap-state` 一樣停下來
+確認目前位置。可被選用不代表已安裝 host 能可靠自動觸發。
 
 `loom-workflow` 沒有內附 slash command。用自然語言提出，或直接指名 skill；
 `goal-create` 只在指名時執行。例如：

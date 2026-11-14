@@ -8,7 +8,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.24.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.25.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -53,6 +53,7 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 | 目標までの進め方が不明 | `decision-map` | 未知の点を調べ、準備できた部分を intent として引き渡す。 |
 | 提案を実行する前に検討したい | `critique` | 必要な作業か、もっと単純にできるかを判断する。 |
 | 会話の途中で現在地を見失った | `recap-state` | 現状を説明し、ユーザーの確認を待つ。 |
+| 次に何をする価値があるか相談したい | `whats-next` | 現在の根拠から第一候補と必要な代替案を勧める。 |
 | 過去の教訓が必要、または新しい教訓を残したい | `loom-memory` | 必要時に参照し、branch を閉じる前に依頼または agent の判断で記録する。station からの固定呼び出しはない。 |
 | dbt model を書く・編集・レビューする | `dbt-model-style` | 書式と構造を整える。計算ロジックは対象外。 |
 | commit・PR 作成・merge を行う | `git-memory` | どの station でも毎回の commit 前、PR 作成時、merge 前に記憶を分類する。 |
@@ -88,7 +89,7 @@ flowchart TD
 
 ## Skills
 
-14 skills：13 個のツールと任意のルーター 1 個。
+15 skills：14 個のツールと任意のルーター 1 個。
 
 | Skill | 役割 |
 |---|---|
@@ -96,6 +97,7 @@ flowchart TD
 | [`decision-map`](skills/decision-map/README.md) | `docs/loom/maps/<map-id>/` にある永続的な Outcome Map を作成・推進する：Destination、fog、種類付きの ticket、Decisions-so-far ログ。delivery ステップは intent を書く。 |
 | [`critique`](skills/critique/README.ja.md) | 作る前に提案を裁く：`mode: proposal` は list や plan を KEEP / DEFER / DROP に振り分け、`mode: complexity` は 1 つの具体的変更を deletion-first で量る。 |
 | [`recap-state`](skills/recap-state/README.ja.md) | 作業が今どこにあるかを session 内で recap し、確認のために一度止まる。組み込みの `/recap`（away-summary）とは別物。 |
+| [`whats-next`](skills/whats-next/README.ja.md) | 根拠のある次の行動を 1 つ勧め、必要な代替案を示す。現在の作業の承認範囲を保つ。 |
 | [`loom-memory`](skills/loom-memory/README.md) | commit された memory store 内の、リポジトリの永続的な教訓を参照・記録・照合・廃止する。 |
 | [`dbt-model-style`](skills/dbt-model-style/README.md) | dbt model を書く・編集する・review する時に、dbt + Redshift の style と structure（CTE の役割、zero-logic な final CTE、命名、comment）を適用する。計算ロジックは対象外。 |
 | [`git-memory`](skills/git-memory/README.md) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
@@ -108,7 +110,7 @@ flowchart TD
 | [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
 Loom の契約で数えるツールはこのうち 9 個です。`goal-create` と `dbt-model-style`
-と `project-retro` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
+と `project-retro`、`whats-next` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
 
 ## Repository 構成
 
@@ -137,7 +139,8 @@ loom-workflow/
 │   ├── project-retro/
 │   ├── recap-state/
 │   ├── skill-retro/
-│   └── using-loom-workflow/
+│   ├── using-loom-workflow/
+│   └── whats-next/
 ├── tests/                 git-memory・loom-memory・loom-visualization・retro のテスト
 ├── CHANGELOG.md
 ├── README.md
@@ -229,6 +232,12 @@ UserPromptSubmit hook で、メッセージを送るたびに agent に届ける
 - `loom-workflow` なしで `loom-code` だけをインストールした場合：カードは `loom-workflow` にしか入っていない
 
 ## 使い方
+
+`whats-next` を名前で呼ぶか、「次は何をすべき？」と相談します。障害や新しい
+根拠で方針を見直す必要がある時も選択できます。承認済みの計画が有効なら、
+助言のために繰り返し中断しません。助言は新たな権限を与えず、実行と必要な
+承認は元のフローが担当します。`recap-state` のような現状確認の停止は必須では
+ありません。選択可能であることは、インストール済み host での自動起動保証ではありません。
 
 `loom-workflow` は slash command を同梱していません。自然言語で依頼するか、skill
 を名前で指定してください。`goal-create` は名前で呼んだ時だけ動きます。例：

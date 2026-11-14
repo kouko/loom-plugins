@@ -4,6 +4,13 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.25.0] — 2026-11-15 — grounded next-action advice
+
+- Add the independent `whats-next` skill for explicit and natural-language advice requests, with one evidence-grounded recommendation plus necessary alternatives, including stopping when no useful follow-up remains.
+- Permit contextual selection when blockers or new evidence require reconsideration; preserve normal authorized progress and existing execution/consent owners. No per-turn hook, dispatcher or command wrapper is added.
+- Add synthetic routing and behavior evidence with a matched ordinary-answer comparison. The single-run pilot passed 8/8 loaded-skill cases versus 7/8 ordinary cases: the 12.5 percentage-point difference falls below the 15-point comparison threshold and establishes neither stable superiority nor installed-host triggering reliability.
+- Publish a sanitized research summary and synchronized discovery metadata and documentation.
+
 ## [5.24.0] — 2026-11-14 — ground recap progress, test scope and dates
 
 - Clarify recap-state guidance conditionally: distinguish implementation, validation and delivery when relevant; retain unknown status instead of claiming completion, and identify the content and scope covered by relevant test results.

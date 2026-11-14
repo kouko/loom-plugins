@@ -16,7 +16,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.24.0"
+CURRENT = "5.25.0"
 
 
 @pytest.mark.parametrize(
@@ -87,3 +87,20 @@ def test_readmes_explain_direct_name_migration(readme: str) -> None:
     text = (PLUGIN / readme).read_text(encoding="utf-8")
     assert "`retro` | `project-retro`" in text
     assert "`distill-sessions` | `skill-retro`" in text
+
+
+def test_next_action_advice_is_discoverable() -> None:
+    for manifest in ("plugin.json", ".claude-plugin/plugin.json",
+                     ".codex-plugin/plugin.json", "package.json"):
+        data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
+        assert "whats-next" in data["description"], manifest
+    for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"):
+        data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
+        assert "whats-next" in data["keywords"], manifest
+    codex = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    assert "whats-next" in codex["interface"]["longDescription"]
+    for readme in ("README.md", "README.ja.md", "README.zh-TW.md"):
+        text = (PLUGIN / readme).read_text(encoding="utf-8")
+        assert "[`whats-next`](skills/whats-next/README" in text, readme
+        assert "whats-next/" in text, readme
+    assert "whats-next" in (REPO / "README.md").read_text(encoding="utf-8")
