@@ -1,5 +1,5 @@
 # Post-merge delivery guidance — plan
-intent: 2026-11-14-post-merge-delivery-guidance@aa0f50acf
+intent: 2026-11-14-post-merge-delivery-guidance@dbec38f57
 charter: 1.1
 
 ## Current State Evidence
@@ -32,6 +32,13 @@ charter: 1.1
 - Test: A1 positive: cleaned-completion; negative: incomplete-work. A2 positive: unidentified-guidance; negative: no-evidence. A3 positive: synchronized-release; boundary: retained-advice. A4 positive: partial-cleanup; negative: merge-line-only. A5 positive: same-change; negative: unrelated-success.
 - Risk: agent-decided — sync-trunk fetched upstream 3bf50711f after W2 and refused overlapping release updates without changing work. Preserve upstream CLI advice and all prior acceptance obligations; existing test_delivery.py covers the retained observer entry and tests remain unchanged.
 
+### Wave 4 — Confirmation bookkeeping repair
+
+**W4-01 Correct confirmation bookkeeping identity** after: W3-01 acceptance: 1, 2, 3, 4, 5
+- Files: `docs/loom/intent/2026-11-14-post-merge-delivery-guidance.md`, `docs/loom/2026-11-14-post-merge-delivery-guidance/plan.md`
+- Test: existing finalizer refusal and direct `check_intent_version` RED/GREEN; assert canonical intent bytes equal the original user-confirmed aa0f50acf content after excluding entire status and intent_confirmed_sha lines.
+- Risk: agent-decided — correct only the pin and this plan reference; preserve all Acceptance surfaces, original user confirmation and historical evidence.
+
 ## Simplicity check
 - none found
 
@@ -46,3 +53,4 @@ charter: 1.1
 4. agent-decided — guidance semantics require independent acceptance testing; text guards alone cannot prove agent behavior. Use fresh clean-environment scenarios at closing review, including partial failures and unrelated prior success.
 5. agent-decided — preserve existing required full package suite and native independent review. second-vendor remains suggest; no outside executor has been authorized.
 6. agent-decided — W3 is upstream integration, not changed requirements or a retry-budget reset. Upstream 3.79.0 adds advisory fields; keep them and release this station-guidance change as 3.80.0, including translated README versions.
+7. agent-decided — W4 repairs an incorrectly computed confirmation pin that included status. Canonical content remains byte-identical to the original user-confirmed intent; requirements, scope and authorization do not change, the review episode does not reset, and no mechanism is added. Preserve the original refusal as evidence and refresh review evidence against the corrected committed target.
