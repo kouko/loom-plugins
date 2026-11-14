@@ -109,7 +109,8 @@ def test_preparation_json_passes_and_preserves_real_notices(tmp_path: Path) -> N
         assert result.returncode == text.returncode == 0
         assert result.stderr == "" and result.stdout.endswith("\n")
         payload = json.loads(result.stdout)
-        assert set(payload) == {"schema_version", "command", "status", "diagnostics", "notices", "error"}
+        assert set(payload) == {"schema_version", "command", "status", "diagnostics", "notices", "error", "suggested_next"}
+        assert payload["suggested_next"] is None
         assert payload["schema_version"] == 1 and payload["command"] == args[0]
         assert payload["status"] == "passed" and payload["diagnostics"] == [] and payload["error"] is None
         assert payload["notices"] == text.stdout.splitlines()
@@ -127,6 +128,8 @@ def test_preparation_json_blockers_usage_and_selector_boundaries(tmp_path: Path)
         payload = json.loads(result.stdout)
         assert result.returncode == text.returncode == 1 and result.stderr == ""
         assert payload["status"] == "blocked" and payload["error"] is None
+        assert payload["suggested_next"].strip()
+        assert f"Suggested next step: {payload['suggested_next']}\n" in text.stderr
         assert payload["diagnostics"]
         for diagnostic in payload["diagnostics"]:
             assert f"BLOCK {diagnostic['rule_id']}: {diagnostic['message']}\n" in text.stderr
@@ -138,6 +141,10 @@ def test_preparation_json_blockers_usage_and_selector_boundaries(tmp_path: Path)
         payload = json.loads(result.stdout)
         assert result.returncode == 2 and result.stderr == ""
         assert payload["status"] == "error" and payload["error"]["kind"] == "usage"
+        assert payload["suggested_next"].strip()
+        if args != ("plan", "--json"):
+            text = run_checker(*args, cwd=repo)
+            assert f"Suggested next step: {payload['suggested_next']}\n" in text.stderr
         assert payload["diagnostics"] == []
     literal = repo / "--json"
     literal.write_text("")
@@ -163,6 +170,7 @@ def test_preparation_json_checks_once_and_keeps_notices_on_internal_error(tmp_pa
     assert payload["status"] == "error" and payload["diagnostics"] == []
     assert payload["notices"][0].startswith("interface-surfaces (")
     assert payload["error"] == {"kind": "internal", "message": "loom_checker internal error: RuntimeError: after notice"}
+    assert "no reliable repair is known" in payload["suggested_next"]
 
 
 def test_preparation_text_errors_hooks_and_other_commands_stay_unchanged(tmp_path: Path, monkeypatch) -> None:

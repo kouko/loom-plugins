@@ -597,8 +597,7 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
         out, err = io.StringIO(), io.StringIO()
         assert entry["main"]([command], out, err) == 2
         expected = "loom_checker internal error: RuntimeError: fixture crash\n"
-        if command == "reviewer-count":
-            expected += "Suggested next step: Investigate the reported failure and preserve outstanding work; no reliable repair is known.\n"
+        expected += "Suggested next step: Investigate the reported failure and preserve outstanding work; no reliable repair is known.\n"
         assert err.getvalue() == expected
         if command == "push":
             assert entry["main"]([command, "--hook"], io.StringIO(), io.StringIO()) == 0
@@ -613,6 +612,78 @@ def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
     hook = run_checker("delivery", "--hook", "--help", cwd=tmp_path)
     assert (hook.returncode, hook.stdout, hook.stderr) == (
         2, "", "delivery: use --hook alone or --hook --host claude|codex\n")
+
+
+def test_all_ordinary_commands_offer_advice_without_repeating_handlers(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_advice_entry")
+    for command in entry["COMMANDS"]:
+        for code in (0, 1, 2):
+            calls = []
+            def handler(args, out, err):
+                calls.append(args)
+                out.write("original payload\n")
+                err.write("original diagnostic\n")
+                return code
+            monkeypatch.setitem(entry["COMMANDS"], command, handler)
+            out, err = io.StringIO(), io.StringIO()
+            assert entry["main"]([command], out, err) == code
+            assert calls == [[]] and out.getvalue() == "original payload\n"
+            assert err.getvalue().startswith("original diagnostic\n")
+            expected = command != "delivery" and (code != 0 or command in {"publish", "finalize-review"})
+            assert err.getvalue().count("Suggested next step:") == int(expected), (command, code)
+    for argv in ([], ["unknown-operand"]):
+        out, err = io.StringIO(), io.StringIO()
+        assert entry["main"](argv, out, err) == 2
+        assert err.getvalue().count("Suggested next step:") == 1
+        assert err.getvalue().split("Suggested next step:")[1] == " Inspect global --help and select a supported command before deliberately rerunning.\n"
+
+
+def test_advice_write_failure_preserves_result_and_primary_output_errors(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_advice_entry")
+    class AdviceFailure(io.StringIO):
+        def write(self, text):
+            if text.startswith("Suggested next step:"):
+                raise UnicodeError("advice unavailable")
+            return super().write(text)
+    for code in (0, 1, 2):
+        calls = []
+        def handler(args, out, err):
+            calls.append(1)
+            out.write("receipt\n")
+            return code
+        monkeypatch.setitem(entry["COMMANDS"], "publish", handler)
+        out, err = io.StringIO(), AdviceFailure()
+        assert entry["main"](["publish"], out, err) == code
+        assert calls == [1] and out.getvalue() == "receipt\n"
+    class PrimaryFailure(io.StringIO):
+        def write(self, text):
+            raise OSError("primary output unavailable")
+    err = io.StringIO()
+    assert entry["main"](["publish"], PrimaryFailure(), err) == 2
+    assert "internal error: OSError: primary output unavailable" in err.getvalue()
+
+
+def test_special_protocol_modes_never_receive_dispatcher_advice(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_advice_entry")
+    from loom_checker.helpers import UsageError
+    for command, operands in (("push", ["extra", "--hook"]), ("push", ["--hook"]),
+                              ("delivery", ["--hook", "--help"]),
+                              ("github-rules", ["--print-setup"])):
+        for outcome in (0, 1, 2, UsageError("original usage"), RuntimeError("original crash")):
+            def handler(args, out, err):
+                if isinstance(outcome, Exception):
+                    raise outcome
+                out.write("protocol payload\n")
+                return outcome
+            monkeypatch.setitem(entry["COMMANDS"], command, handler)
+            out, err = io.StringIO(), io.StringIO()
+            code = entry["main"]([command, *operands], out, err)
+            assert "Suggested next step:" not in err.getvalue()
+            if isinstance(outcome, Exception):
+                assert not out.getvalue()
+                assert code == (0 if command == "push" and operands == ["--hook"] and isinstance(outcome, RuntimeError) else 2)
+            else:
+                assert code == outcome and out.getvalue() == "protocol payload\n"
 
 
 def test_planning_checks_preserve_real_success_and_conditional_stdout(tmp_path: Path, monkeypatch) -> None:

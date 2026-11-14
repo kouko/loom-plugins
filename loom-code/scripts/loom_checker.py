@@ -81,7 +81,8 @@ from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
 from loom_checker.command_handlers.standing import cmd_standing
 from loom_checker.command_handlers.sync import cmd_sync_trunk
 from loom_checker.helpers import UsageError
-from loom_checker.preparation_output import new_result, error_result, write_result, suggested_next
+from loom_checker.preparation_output import new_result, error_result, write_result
+from loom_checker.cli_advice import suggested_next, write_suggestion
 from loom_checker.rules import list_rules
 
 
@@ -97,13 +98,16 @@ JSON stdout is one object plus newline; checker stderr is empty. Fields:
 schema_version: 1; command: plan|intake; status: passed|blocked|error;
 diagnostics: ordered [{rule_id, message}]; notices: ordered strings;
 error: null or {kind: usage|internal, message}. Empty arrays are [], not null.
+suggested_next: optional advisory string for blocked/error, null for passed.
+Ignore missing, blank or non-string advice; it grants no execution authority.
+Text refusal/error results append Suggested next step: on stderr.
 Exit 0 means passed, 1 blocked, 2 error. Blocked includes rule diagnostics;
 error has empty diagnostics. Notices may precede a blocker or internal error
 and never imply success. Status covers only this invocation's checks, not
 workflow completion or authority. Do not depend on key order or message prose.
 Launcher/startup failures, termination and broken pipes are outside this
 in-process result guarantee. Read the actual process result; do not retry
-automatically. Without --json, existing text streams and exits are unchanged.
+automatically. Advice does not change result classification or exits.
 """
 
 
@@ -555,6 +559,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
     preparation = new_result(argv[0]) if len(argv) >= 2 and argv[0] in {"plan", "intake", "contract", "reviewer-count"} and argv[-1] == "--json" else None
     if preparation is not None:
         argv = argv[:-1]
+    protected = bool(argv) and ((argv[0] in {"push", "delivery"} and "--hook" in argv[1:])
+                               or (argv[0] == "github-rules" and "--print-setup" in argv[1:]))
     hint = ""
     if argv and argv[0] in {"finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"} and not (argv[0] == "delivery" and "--hook" in argv[1:]):
         hint = (f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
@@ -591,9 +597,11 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         result = command(argv[1:], out, err)
         if result != 0 and hint:
             err.write(hint)
-        advice = suggested_next(argv[0], "blocked" if result == 1 else "internal") if result else None
-        if advice:
-            err.write(f"Suggested next step: {advice}\n")
+        if not protected and argv[0] != "delivery":
+            category = {0: "passed", 1: "blocked"}.get(result, "unclassified")
+            if argv[0] == "plan" and result == 2:
+                category = "usage"  # missing/unreadable plan returns usage directly
+            write_suggestion(suggested_next(argv[0], category), err)
         return result
     except UsageError as exc:
         if preparation is not None:
@@ -603,9 +611,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         err.write(f"{exc}\n")
         if hint:
             err.write(hint)
-        advice = suggested_next(argv[0], "usage") if argv else None
-        if advice:
-            err.write(f"Suggested next step: {advice}\n")
+        if not protected:
+            write_suggestion(suggested_next(argv[0] if argv else "", "usage" if argv and argv[0] in COMMANDS else "global"), err)
         return 2
     except Exception as exc:
         if preparation is not None:
@@ -616,9 +623,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
             err.write(f"loom: publication hook failed ({type(exc).__name__}: {exc}); allowing.\n")
             return 0
         err.write(f"loom_checker internal error: {type(exc).__name__}: {exc}\n")
-        advice = suggested_next(argv[0], "internal") if argv else None
-        if advice:
-            err.write(f"Suggested next step: {advice}\n")
+        if not protected:
+            write_suggestion(suggested_next(argv[0] if argv else "", "internal"), err)
         return 2
 
 
