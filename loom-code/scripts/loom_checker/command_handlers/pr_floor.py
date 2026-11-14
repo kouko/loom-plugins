@@ -12,6 +12,7 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import read_text
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
+from loom_checker.cli_advice import write_suggestion
 from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.verification import identify_change
 from loom_checker.verification import verification_status
@@ -62,4 +63,6 @@ def cmd_pr_floor(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         with open(summary, "a", encoding="utf-8") as handle:
             handle.write(f"verification: {status}\n")
     out.write(f"::notice title=verification::{_escaped(status)}\n")
+    if status != "valid":
+        write_suggestion("Body structure passed, but verification is not valid; inspect the verification notice and restore the required evidence through its owning workflow before claiming verification. This notice does not fail the PR body floor.", err)
     return 0

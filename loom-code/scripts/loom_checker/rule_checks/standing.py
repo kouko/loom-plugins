@@ -10,7 +10,7 @@ def check_standing_silence(repo: Path) -> bool:
     return kickoff_defaults(repo).get("standing-docs", "").strip() == "waived"
 
 
-def check_standing_warn(principles, design, architecture, waived: bool, err) -> None:
+def check_standing_warn(principles, design, architecture, waived: bool, err) -> bool:
     missing = [
         name
         for name, path in (
@@ -23,6 +23,8 @@ def check_standing_warn(principles, design, architecture, waived: bool, err) -> 
     if missing and not waived:
         for line in STANDING_WARN:
             err.write(line.format(missing=" or ".join(missing)) + "\n")
+        return True
+    return False
 
 
 def check_second_vendor(repo: Path) -> list[tuple[str, str]]:
