@@ -14,7 +14,7 @@ charter: 1.1
 ### Wave 1 — Guidance and diagnostic
 
 **W1-01 Align completion guidance and unidentified-change diagnostics** after: none acceptance: 1, 2, 3, 4, 5
-- Files: `loom-code/hooks/session-start`, `loom-code/skills/ship/SKILL.md`, `loom-code/scripts/loom_checker/command_handlers/publish.py`, `loom-code/tests/test_delivery.py`, `loom-code/tests/test_delivery_stop.py`, `loom-code/tests/test_ship_station_text.py`
+- Files: `loom-code/hooks/session-start`, `loom-code/skills/ship/SKILL.md`, `loom-code/scripts/loom_checker/command_handlers/publish.py` (entry: cmd_delivery), `loom-code/tests/test_delivery.py`, `loom-code/tests/test_delivery_stop.py`, `loom-code/tests/test_ship_station_text.py`
 - Test: A1 positive: cleaned-completion; negative: incomplete-work. A2 positive: unidentified-guidance; negative: no-evidence. A3 positive: retained-branch; boundary: silent-stop. A4 positive: partial-cleanup; negative: merge-line-only. A5 positive: same-change; negative: unrelated-success.
 - Risk: agent-decided — replace guidance only, preserving observer state and authorization. Existing test_delivery.py and test_delivery_stop.py coverage remains unchanged; added cases cover main, missing evidence, and conditional completion guidance without inventing historical lookup.
 
