@@ -25,6 +25,13 @@ charter: 1.1
 - Test: A3 positive: synchronized-release; negative: stale-version.
 - Risk: agent-decided — minor bump for station guidance; generate derived manifests with scripts/sync_codex_manifests.py, and preserve unrelated metadata.
 
+### Wave 3 — Build integration
+
+**W3-01 Integrate upstream CLI release without losing completion guidance** after: W2-01 acceptance: 1, 2, 3, 4, 5
+- Files: `README.md`, `loom-code/README*.md`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/package.json`, `loom-code/plugin.json`, `loom-code/tests/test_write_plan_station_text.py`
+- Test: A1 positive: cleaned-completion; negative: incomplete-work. A2 positive: unidentified-guidance; negative: no-evidence. A3 positive: synchronized-release; boundary: retained-advice. A4 positive: partial-cleanup; negative: merge-line-only. A5 positive: same-change; negative: unrelated-success.
+- Risk: agent-decided — sync-trunk fetched upstream 3bf50711f after W2 and refused overlapping release updates without changing work. Preserve upstream CLI advice and all prior acceptance obligations; existing test_delivery.py covers the retained observer entry and tests remain unchanged.
+
 ## Simplicity check
 - none found
 
@@ -38,3 +45,4 @@ charter: 1.1
 3. user-decided — the confirmed minimal scope excludes historical PR lookup, merging changes, installed plugin edits, and Obsidian project edits.
 4. agent-decided — guidance semantics require independent acceptance testing; text guards alone cannot prove agent behavior. Use fresh clean-environment scenarios at closing review, including partial failures and unrelated prior success.
 5. agent-decided — preserve existing required full package suite and native independent review. second-vendor remains suggest; no outside executor has been authorized.
+6. agent-decided — W3 is upstream integration, not changed requirements or a retry-budget reset. Upstream 3.79.0 adds advisory fields; keep them and release this station-guidance change as 3.80.0, including translated README versions.
