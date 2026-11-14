@@ -151,4 +151,7 @@ def test_cli_other_subcommand_crash_keeps_exit_two(monkeypatch):
     err = StringIO()
 
     assert cli.main(["intent"], StringIO(), err) == 2
-    assert err.getvalue() == "loom_checker internal error: RuntimeError: boom\n"
+    diagnostic, advice = err.getvalue().splitlines(keepends=True)
+    assert diagnostic == "loom_checker internal error: RuntimeError: boom\n"
+    assert advice.startswith("Suggested next step: ") and advice.removeprefix("Suggested next step: ").strip()
+    assert err.getvalue().count("Suggested next step:") == 1

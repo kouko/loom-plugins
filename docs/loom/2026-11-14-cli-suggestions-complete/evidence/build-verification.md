@@ -81,3 +81,26 @@ Production Python counts include embedded help text. One production module was a
 - A W5 one-off verification assertion incorrectly assumed empty stderr for every JSON family. The actual delivery result retained its expected Help stderr. The assertion was corrected, without product changes, to check the documented family-specific boundary. Initial partial validation log: `/private/tmp/loom-all-w5-replays-initial.txt`; raw delivery streams remain retained.
 - Complete configured package suite, fresh adversary and its programs, independent clean-copy all-command acceptance, closing reviewers, generated finalization, publication and CI are **pending** at this worker handoff. The parent owns these later stations and must not infer their success from focused tests.
 - No installed plugin was updated, no paid outside reviewer was invoked, and no live user-repository publication, merge or cleanup was performed. Remote operations used existing controlled runners and temporary repositories; local server-enforcement tests are simulations. Installed-host/model compliance and live remote enforcement remain unverified. No success-rate, latency, token or cost gain is claimed.
+
+## Integration follow-up — preserve exact diagnostics beside advice
+
+After the release-packet handoff, the required complete-suite command ran at `49e93dff` and stopped on its first failing group: **7 failed, 2850 passed in 110.12s**. This was not a completed full-suite pass, and later groups were not established by that invocation. Raw failure evidence remains in `/private/tmp/loom-all-build-suite.txt`.
+
+Defect class: stale whole-stderr expectations omitted newly authorized optional advice. The parent searched the full contents of all 37 then-changed paths and all four test roots (`tests/`, `loom-code/tests/`, `loom-design/tests/`, `loom-workflow/tests/`) across Acceptance 4/5/6 stderr, progress, BLOCK-only and protocol surfaces. The affected instances were:
+
+- `test_adversarial_blocked_publish_routes.py`: `_blocks` and its three ordinary-land call sites, producing four parameterized failures.
+- `test_legacy_contract_removed.py`: the removed push-flag usage diagnostic.
+- `test_publish_command_detection.py`: the ordinary intent-crash diagnostic.
+- `test_selection_finalize.py`: the four-record finalization progress expectation.
+
+The bounded fix changes only these existing assertions and this evidence record. `_blocks` remains strict by default; only the explicitly marked ordinary-land calls admit one trailing nonblank canonical suggestion, while every original BLOCK line and reason remains exact. The usage/crash cases retain their exact original diagnostic and exit, and the progress case retains all four original records in their original order and before-completion observation. Each separately requires exactly one nonblank `Suggested next step:` line. Strict hook/provider/JSON/help/success checks remain unchanged. No production source, invocation count or current-adversary-owned artifact changed; no test function or harness was added.
+
+The four complete affected modules then passed: **112 passed in 82.93s, zero skips**. Command:
+
+```sh
+uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_blocked_publish_routes.py loom-code/tests/test_legacy_contract_removed.py loom-code/tests/test_publish_command_detection.py loom-code/tests/test_selection_finalize.py -q -rs
+```
+
+GREEN log: `/private/tmp/loom-all-integration-stderr-green.txt`. The earlier release-packet growth table remains its historical checkpoint. Current cumulative test growth against the same base is **270 added / 22 removed, net +248 physical lines in 16 existing modules**, including the independent adversary's one-line concern annotation and this fix's net +16 expectation lines. Raw measurements: `/private/tmp/loom-all-integration-test-growth.tsv` and `/private/tmp/loom-all-integration-test-growth.txt`. Production Python remains net +80 lines; this fix adds no product mechanism.
+
+The parent still owes the complete-suite rerun and existing adversarial programs before dependent acceptance/review. This focused GREEN does not replace those checks or erase the retained full-suite RED.
