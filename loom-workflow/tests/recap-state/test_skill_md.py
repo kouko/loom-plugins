@@ -1,3 +1,4 @@
+# concern: Recap guidance can lose distinct completion, test-scope or event-date obligations.
 """Tests for loom-workflow/skills/recap-state/SKILL.md — T2 RED assertions (renamed v0.1.1).
 
 Assertions (a-f) per plan T2 Acceptance.RED:
