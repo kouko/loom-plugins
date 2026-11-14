@@ -1,0 +1,111 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-research-evidence-acceptance",
+  "content_digest": "675ea7a5d32f06cd0be81a9e5177e203096b01cf",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/engineering-research/test_package.py",
+      "artifact": "loom-code/tests/engineering-research/test_package.py",
+      "result": "pass",
+      "command_digest": "bdad07059b3da7e31fb1eb3ec2a2ddc76a7ffc7bb5722e6692e241c51afddee7"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/final_code_reviewer",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "code",
+      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
+      "review_target_sha": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES — Requirements 1–6 have bounded supporting observations; Acceptance 7 remains explicitly partial. External-source, external-service privacy, no-write and broader research behavior were not independently exercised.",
+        "naming": "PASS",
+        "tests": "PASS — Ran loom-code/tests/test_write_plan_station_text.py: 43 passed, none skipped. Reviewed retained behavioral and Build evidence without rerunning the complete suite or adversarial program.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS — All seven requirements are represented across instructions, template, case evidence and acceptance reporting; partial validation is disclosed rather than promoted to full success.",
+        "external-surface-grounding": "PASS — No new production API, SDK, tool or CLI integration is introduced. Historical command observations and proposed interfaces remain explicitly distinguished.",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md applies.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS — Reuses the existing entry, guidance and template without a new runner, classification schema, dependency or gate. Archived Python files are historical source and trial evidence."
+      },
+      "findings": [],
+      "notes": [
+        "Independently verified all eight delivered skill-file hashes against candidate-skill-hashes.json; the 36 primary archived source files contain three distinct source bodies.",
+        "Inspected actual candidate records, source/helper boundaries, timing receipts and R08 continuation evidence. Recommendations distinguish supported source behavior, bounded observations and unimplemented proposals.",
+        "Release 3.80.0 metadata, generated manifest versions, changelog and README versions are synchronized. Acceptance 7's partial result is a material validation limit, not evidence of a demonstrated regression."
+      ]
+    },
+    {
+      "reviewer": "/root/final_skill_reviewer",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "skill",
+      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
+      "review_target_sha": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+      "dimension_scores": {
+        "omission": "PASS_WITH_NOTES — REQ-1–6 are implemented across the existing entry, selection guidance and template. REQ-7 has actual retained cases and independent judgments, but external-source, privacy, no-write and broader research behavior remain unobserved as explicitly reported.",
+        "ambiguity": "PASS — Evidence conditions, unresolved completion and proportionate methods have executable meanings without mandatory categories, matrices or additional confirmation.",
+        "inconsistency": "PASS — Changed polarity preserves the base's stopping, source, authorization, readback and record-preservation boundaries. Recommendation changes require evidence or correction and consistent retained records.",
+        "incorrect-fact": "PASS_WITH_NOTES — No contradiction was found between the runtime delta and examined evidence. Historical execution receipts and external method-reference contents were not independently re-executed or exhaustively verified.",
+        "missing-population": "PASS — Evidence reports identify six cases per arm, their shared fixture and observational limits; neither baseline success nor candidate observations are presented as causal improvement.",
+        "user-judgment-leak": "PASS — The change adds no technical approval question, paid-service obligation, external-data transfer or repeated user decision.",
+        "deletion-first": "PASS — The changes replace overlapping instructions within three existing resources and reuse existing sections; no new runtime mechanism, classification field, dependency or checkpoint is introduced."
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran the changed ordinary test file loom-code/tests/test_write_plan_station_text.py: 43 passed.",
+        "Acceptance #7 remains partial; this verdict does not convert unobserved preservation behavior into demonstrated success.",
+        "Did not run the complete package suite or the reused adversarial program, as required by the review contract."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "e49e156c2656ea8c81ba7f5d4fb80993724bf43e",
+  "tested_commit": "e85c18651eee5b4d7ba853850ba61bd7462001c5",
+  "reviewed_commit": "2f715430704f847d4b99d4b52d3b053a795c0ce0",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "partly"
+    }
+  ]
+}
