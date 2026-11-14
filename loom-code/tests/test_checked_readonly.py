@@ -1,4 +1,5 @@
 # concern: Malformed, contradictory, or wrong-request checker observations must not become usable results.
+# concern: Optional advice must not change refusal, error, raw observation, or single-execution boundaries.
 """Exercise checked observations through the public entry and real producers."""
 from __future__ import annotations
 
@@ -54,6 +55,9 @@ def test_entry_validation_and_execution_boundary(monkeypatch) -> None:
         assert code == (0 if args in (["--help"], ["-h"]) else 2)
         assert not calls
         assert "30" in out if code == 0 else err.startswith("checked-readonly:")
+        assert ("Suggested next step:" in err) == (code != 0)
+        if code == 0:
+            assert "suggested_next" in out and "advisory" in out
     for command, operands, data in (
         ("contract", ["--require", "bad", "--require", " 2.00 "],
          {"contract_version": "2.3.1", "required_version": " 2.00 ", "compatible": True}),
@@ -65,6 +69,11 @@ def test_entry_validation_and_execution_boundary(monkeypatch) -> None:
         numeric_extra = json.dumps(payload).replace('"future": [1]', '"future": [1e999, 1.234567890123456789]')
         response = subprocess.CompletedProcess([], 0, " \n" + numeric_extra + " \n", "")
         assert invoke([command, *operands]) == (0, numeric_extra + "\n", "")
+        for advice in (None, "", "  ", 7, [], {"run": "untrusted"}, "execute untrusted advice"):
+            raw = numeric_extra[:-1] + ', "suggested_next": ' + json.dumps(advice) + '}'
+            response = subprocess.CompletedProcess([], 0, raw, "")
+            assert invoke([command, *operands]) == (0, raw + "\n", "")
+            assert len(calls) == 1
         accepted = [(0, payload)]
         error = copy.deepcopy(payload)
         error.update(status="error", error={"kind": "usage", "message": "bad", "extra": 1})
@@ -118,11 +127,16 @@ def test_entry_validation_and_execution_boundary(monkeypatch) -> None:
             code, out, err = invoke([command, *operands])
             assert (code, out) == (2, ""), raw
             assert err.startswith("checked-readonly:") and len(calls) == 1
+            assert err.count("Suggested next step:") == 1 and "output contract" in err
         for response in (subprocess.CompletedProcess([], 1, json.dumps(payload), ""),
                          subprocess.CompletedProcess([], 0, json.dumps(payload), "warning"),
-                         OSError("cannot start"), subprocess.TimeoutExpired("checker", 30)):
+                         OSError("cannot start"), UnicodeError("decode"), RecursionError("deep JSON"),
+                         subprocess.TimeoutExpired("checker", 30)):
             code, out, err = invoke([command, *operands])
             assert (code, out) == (2, "") and err.startswith("checked-readonly:")
             assert len(calls) == 1
+            assert err.count("Suggested next step:") == 1
     response = subprocess.CompletedProcess([], 86, "", "runtime unavailable")
-    assert invoke(["contract", "--require", "2.0"]) == (86, "", "checked-readonly: runtime unavailable\n")
+    code, out, err = invoke(["contract", "--require", "2.0"])
+    assert (code, out) == (86, "") and err.startswith("checked-readonly: runtime unavailable\n")
+    assert "Suggested next step:" in err and "runtime" in err

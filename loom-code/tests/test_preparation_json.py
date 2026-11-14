@@ -20,7 +20,10 @@ def test_readonly_json_typed_observations_and_text_parity(tmp_path: Path) -> Non
         payload = json.loads(result.stdout)
         assert result.returncode == text.returncode == (0 if compatible else 1)
         assert result.stderr == "" and result.stdout.endswith("\n")
-        assert set(payload) == {"schema_version", "command", "status", "diagnostics", "notices", "error", "data"}
+        assert set(payload) == {"schema_version", "command", "status", "diagnostics", "notices", "error", "data", "suggested_next"}
+        assert payload["suggested_next"] is None if compatible else payload["suggested_next"].strip()
+        if not compatible:
+            assert f"Suggested next step: {payload['suggested_next']}\n" in text.stderr
         assert payload["schema_version"] == 1 and payload["command"] == "contract"
         assert payload["data"] == {"contract_version": "2.3.1", "required_version": required, "compatible": compatible}
         assert payload["status"] == ("passed" if compatible else "blocked")
@@ -40,6 +43,7 @@ def test_readonly_json_typed_observations_and_text_parity(tmp_path: Path) -> Non
         assert type(payload["data"]["reviewer_floor"]) is int
         assert payload["status"] == "passed" and payload["diagnostics"] == []
         assert payload["notices"] == [] and payload["error"] is None
+        assert payload["suggested_next"] is None
         assert run_checker("reviewer-count", " odd id ", cwd=repo).stdout == f"{floor}\n"
 
 
@@ -60,6 +64,7 @@ def test_readonly_json_usage_and_selectors_before_domain_work(tmp_path: Path, mo
             payload = json.loads(out.getvalue())
             assert err.getvalue() == "" and out.getvalue().endswith("\n")
             assert payload["status"] == "error" and payload["error"]["kind"] == "usage"
+            assert "help" in payload["suggested_next"]
             assert payload["diagnostics"] == [] and all(value is None for value in payload["data"].values())
 
 
@@ -71,6 +76,7 @@ def test_readonly_json_repository_errors_and_late_failure_cleanup(tmp_path: Path
         payload = json.loads(result.stdout)
         assert (result.returncode, result.stderr) == (2, "")
         assert payload["error"]["kind"] == "usage" and payload["data"] == {"change_id": None, "reviewer_floor": None}
+        assert "preserve" in payload["suggested_next"] and "repository" in payload["suggested_next"]
     entry = runpy.run_path(str(CHECKER), run_name="_readonly_entry")
     from loom_checker.helpers import UsageError
     for command, data in (("contract", {"contract_version": "2.0", "required_version": "2.0", "compatible": True}),
@@ -89,6 +95,7 @@ def test_readonly_json_repository_errors_and_late_failure_cleanup(tmp_path: Path
             payload = json.loads(out.getvalue())
             assert calls == [["operand"]] and err.getvalue() == ""
             assert payload["error"]["kind"] == kind and payload["diagnostics"] == []
+            assert ("Investigate" if kind == "internal" else "help") in payload["suggested_next"]
             assert all(value is None for value in payload["data"].values())
 
 

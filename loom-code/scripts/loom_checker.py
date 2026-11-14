@@ -81,7 +81,7 @@ from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
 from loom_checker.command_handlers.standing import cmd_standing
 from loom_checker.command_handlers.sync import cmd_sync_trunk
 from loom_checker.helpers import UsageError
-from loom_checker.preparation_output import new_result, error_result, write_result
+from loom_checker.preparation_output import new_result, error_result, write_result, suggested_next
 from loom_checker.rules import list_rules
 
 
@@ -115,6 +115,10 @@ JSON stdout is one object plus newline; checker stderr is empty. Fields:
 schema_version: 1; command: contract|reviewer-count; status: passed|blocked|error;
 diagnostics: ordered [{rule_id, message}]; notices: ordered strings;
 error: null or {kind: usage|internal, message}; data: the command object above.
+suggested_next: advisory string for blocked/error, null for passed. Advice is
+optional for consumers; ignore missing, blank or non-string advice. It changes
+neither the result nor authorization and must not trigger automatic execution.
+Text refusal/error results append Suggested next step: on stderr.
 Exit 0 means passed with empty diagnostics and null error; Exit 1 means blocked
 with rule diagnostics and null error; Exit 2 means error with empty diagnostics.
 Empty arrays are []. Use keys and types, not key order or message prose.
@@ -123,7 +127,7 @@ installs runtime, dispatches reviewers, requests authorization or retries.
 Correct inputs or repository conditions before deliberately rerunning.
 The guarantee begins in the loaded checker: launcher/import failures, unavailable
 runtime (--ready exit 86), termination and broken pipes remain outside it.
-Inspect process exit and parseability before consuming JSON. Text is unchanged
+Inspect process exit and parseability before consuming JSON. Successful text is unchanged
 without --json; these observations do not grant authority or prove completion.
 """
 
@@ -587,6 +591,9 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         result = command(argv[1:], out, err)
         if result != 0 and hint:
             err.write(hint)
+        advice = suggested_next(argv[0], "blocked" if result == 1 else "internal") if result else None
+        if advice:
+            err.write(f"Suggested next step: {advice}\n")
         return result
     except UsageError as exc:
         if preparation is not None:
@@ -596,6 +603,9 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         err.write(f"{exc}\n")
         if hint:
             err.write(hint)
+        advice = suggested_next(argv[0], "usage") if argv else None
+        if advice:
+            err.write(f"Suggested next step: {advice}\n")
         return 2
     except Exception as exc:
         if preparation is not None:
@@ -606,6 +616,9 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
             err.write(f"loom: publication hook failed ({type(exc).__name__}: {exc}); allowing.\n")
             return 0
         err.write(f"loom_checker internal error: {type(exc).__name__}: {exc}\n")
+        advice = suggested_next(argv[0], "internal") if argv else None
+        if advice:
+            err.write(f"Suggested next step: {advice}\n")
         return 2
 
 

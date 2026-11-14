@@ -17,6 +17,9 @@ JSON retains exits 0/1/2. Invalid results exit 2 with no stdout; startup exit 86
 is preserved. The checker subprocess has a configured 30-second timeout.
 The outer launcher owns readiness and repair. No writes, retries, text fallback
 or change to checker policy, authorization or host trust is introduced.
+Optional suggested_next is advisory: missing or unusable advice does not change
+validation. Accepted JSON is preserved; advice grants no execution authority.
+Local faults append Suggested next step: on stderr, generated locally.
 """
 
 
@@ -90,22 +93,28 @@ def main(argv=None, out=None, err=None):
     if argv in (["--help"], ["-h"]):
         out.write(HELP)
         return 0
+    advice = "Inspect --help and correct the command input before deliberately rerunning."
     try:
         _require(argv and argv[0] in ("contract", "reviewer-count"),
                  "choose contract or reviewer-count; use --help")
         _require("--json" not in argv, "omit --json; the consumer adds it")
+        advice = "Investigate the checker runtime and preserve outstanding work before deliberate re-execution; the outer launcher owns readiness and repair."
         child = subprocess.run([sys.executable, "-E", "-s", str(Path(__file__).with_name("loom_checker.py")),
                                 *argv, "--json"], text=True, capture_output=True, timeout=30)
         if child.returncode == 86:
             err.write("checked-readonly: " + (child.stderr.strip() or "checker runtime unavailable") + "\n")
+            err.write(f"Suggested next step: {advice}\n")
             return 86
+        advice = "Investigate the checker output contract and original diagnostic; preserve outstanding work and do not act on unvalidated output."
         _require(not child.stderr, "unexpected checker stderr")
         _validate(child.stdout, argv[0], argv[1:], child.returncode)
     except subprocess.TimeoutExpired:
         err.write("checked-readonly: checker timed out after 30 seconds; investigate before rerunning\n")
+        err.write("Suggested next step: Investigate the checker runtime and preserve outstanding work before deliberate re-execution.\n")
         return 2
     except (ValueError, OSError, UnicodeError, RecursionError) as exc:
         err.write(f"checked-readonly: {exc}\n")
+        err.write(f"Suggested next step: {advice}\n")
         return 2
     out.write(child.stdout.strip() + "\n")
     return child.returncode
