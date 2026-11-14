@@ -985,25 +985,25 @@ class TestMeasureFailsClosed:
         assert cm.measure_skill_count(repo) == 24
         assert cm.run_measure(repo) == 0
 
-    def test_twenty_six_counted_skills_fit_declared_research_budget(self, tmp_path, capsys):
+    def test_twenty_seven_counted_skills_fit_declared_advice_budget(self, tmp_path, capsys):
         repo = _measure_repo(tmp_path, words=10,
                              baseline_line="- session-start-baseline: <sha> 10 — measured")
-        for number in range(24):
+        for number in range(25):
             skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
             skill.parent.mkdir(parents=True, exist_ok=True)
             skill.write_text("# Skill\n")
         assert cm.main(["--repo", str(repo), "--measure"]) == 0
-        assert "skill count (counted): 26" in capsys.readouterr().out
+        assert "skill count (counted): 27" in capsys.readouterr().out
 
-    def test_twenty_seventh_counted_skill_exceeds_budget(self, tmp_path, capsys):
+    def test_twenty_eighth_counted_skill_exceeds_budget(self, tmp_path, capsys):
         repo = _measure_repo(tmp_path, words=10,
                              baseline_line="- session-start-baseline: <sha> 10 — measured")
         # The fixture already contains two counted skills.
-        for number in range(25):
+        for number in range(26):
             skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
             skill.parent.mkdir(parents=True, exist_ok=True)
             skill.write_text("# Skill\n")
         assert cm.main(["--repo", str(repo), "--measure"]) == 1
         output = capsys.readouterr().out
-        assert "skill count (counted): 27" in output
-        assert "skill count 27 exceeds the loom budget of 26" in output
+        assert "skill count (counted): 28" in output
+        assert "skill count 28 exceeds the loom budget of 27" in output

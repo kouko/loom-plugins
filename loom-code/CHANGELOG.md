@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.81.1] — 2026-11-15 — complete next-action skill admission
+
+- budget-exception: whats-next — admit the counted advice skill released in loom-workflow 5.25.0, raising the measured skill ceiling from 26 to 27 while rejecting 28.
+- Register its regression evaluation and account for its 308-character description separately from the unchanged frozen catalog and its 60% limit.
+
 ## [3.81.0] — 2026-11-14 — clarify post-merge delivery completion
 
 - Align completion guidance with Ship: after the same change's land execution confirms merge, verification and complete cleanup, report from that full result without repeating a delivery observation that depends on the cleaned branch.

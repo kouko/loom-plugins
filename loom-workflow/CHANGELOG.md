@@ -6,6 +6,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [5.25.0] — 2026-11-15 — grounded next-action advice
 
+- budget-exception: whats-next — admit one counted advice skill and its 308-character discovery description while retaining the frozen catalog and its 60% description limit.
 - Add the independent `whats-next` skill for explicit and natural-language advice requests, with one evidence-grounded recommendation plus necessary alternatives, including stopping when no useful follow-up remains.
 - Permit contextual selection when blockers or new evidence require reconsideration; preserve normal authorized progress and existing execution/consent owners. No per-turn hook, dispatcher or command wrapper is added.
 - Add synthetic routing and behavior evidence with a matched ordinary-answer comparison. The single-run pilot passed 8/8 loaded-skill cases versus 7/8 ordinary cases: the 12.5 percentage-point difference falls below the 15-point comparison threshold and establishes neither stable superiority nor installed-host triggering reliability.
