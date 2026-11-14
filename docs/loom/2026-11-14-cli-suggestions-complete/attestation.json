@@ -1,0 +1,114 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-cli-suggestions-complete",
+  "content_digest": "4e4717c064ba25cb32e242105e4f4233599730a6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py -q -rs",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "26829feda0b50ae45b07fd25549f4d6e692a692699a8bcd4294ce110201174f8"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "all_suggestions_code_review",
+      "vendor": "openai",
+      "model": "host-inherited",
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "adcd4cbfa468b374b5f8e0b9363adf0304b53e33",
+      "review_target_sha": "bb2e65a95ec30013a7611c26e7c49be6803bed8a",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "All 16 changed test modules ran whole without deselection: 364 passed in 67.54s, zero skips; output: /private/tmp/loom-all-code-review-tests.txt. The initial sandbox cache-lock denial was followed by an authorized offline existing-cache run.",
+        "Read the intent, spec, plan, acceptance report/evidence, all source changes and changed functions with their callers, all changed-test deltas, CLI guide/help, release metadata and applicable PRINCIPLES.md; checked retained RED logs. git diff --check and sync_codex_manifests.py --all --check passed.",
+        "No repository edits, full package suite, store probe programs, external models or live remote mutations were performed by this reviewer. Controlled remote fixtures and source tests do not establish installed-host parity or live server enforcement."
+      ]
+    },
+    {
+      "reviewer": "all_suggestions_docs_review",
+      "vendor": "openai",
+      "model": "host-inherited",
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "adcd4cbfa468b374b5f8e0b9363adf0304b53e33",
+      "review_target_sha": "bb2e65a95ec30013a7611c26e7c49be6803bed8a",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "anchor": "loom-code/README.ja.md:129",
+          "text": "nitpick (non-blocking): The localized checker paragraphs still describe six preparation fields and unchanged default text, while this release adds suggested_next and refusal/error stderr advice. The same stale statements appear at loom-code/README.zh-TW.md:113-115; both still direct readers to accurate command help, so this does not change the required action.",
+          "fix": "Replace the fixed six-field wording with a link to the current help, and say that original diagnostics/exits remain while refusal/error text gains optional advice, in both localized checker paragraphs."
+        }
+      ],
+      "notes": [
+        "Reconciled the complete changed-path inventory against intent/spec/plan, shipping guide/help/release prose and the independent acceptance evidence. Sixteen advisory commands, five existing JSON producers and two checked consumers remain distinct; preserved protocols and simulation/live-host limits are explicit.",
+        "Independently reran 17 focused existing whole modules: 158 passed in 5.27s and 290 passed in 61.38s, total 448 passed with zero skips/failures. Initial sandbox uv cache-lock denial was followed by an approved existing offline-cache invocation. Did not run the complete package suite or current evidence-store adversarial programs.",
+        "The acceptance report explicitly leaves full-suite/finalization and formal-review success to subsequent blocking checks; its works row does not establish that those future checks have already passed. No important or fatal finding was dismissed."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "63eab4ef80f13fa45da52965b56604a2efd9645b",
+  "tested_commit": "64b49d3",
+  "reviewed_commit": "bb2e65a95ec30013a7611c26e7c49be6803bed8a",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}
