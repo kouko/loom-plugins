@@ -1,5 +1,5 @@
 # Evidence conditions for engineering research — spec
-intent: 2026-11-14-research-evidence-acceptance@4dc4d7daf
+intent: 2026-11-14-research-evidence-acceptance@f1e9299c4
 pre-build-review: required — Changes the portable runtime research contract and its retained-record template; proportionality and evidence-sufficiency behavior need an independent check before implementation.
 
 ## Requirements
