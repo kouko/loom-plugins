@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-14-cli-suggestions-complete",
-  "content_digest": "4e4717c064ba25cb32e242105e4f4233599730a6",
+  "content_digest": "8f4db5e6ac5af7402697cfd8fc1b44c47130becb",
   "executions": [
     {
       "kind": "package-tests",
@@ -25,8 +25,8 @@
       "model": "host-inherited",
       "verdict": "PASS",
       "lens": "code",
-      "reviewed_sha": "adcd4cbfa468b374b5f8e0b9363adf0304b53e33",
-      "review_target_sha": "bb2e65a95ec30013a7611c26e7c49be6803bed8a",
+      "reviewed_sha": "5191fb4a93791e3bfb73ef8b1370e4f697613250",
+      "review_target_sha": "4a4bc42a00904dbc76167533ec6fbe5ab755bb2b",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
@@ -43,9 +43,9 @@
       },
       "findings": [],
       "notes": [
-        "All 16 changed test modules ran whole without deselection: 364 passed in 67.54s, zero skips; output: /private/tmp/loom-all-code-review-tests.txt. The initial sandbox cache-lock denial was followed by an authorized offline existing-cache run.",
-        "Read the intent, spec, plan, acceptance report/evidence, all source changes and changed functions with their callers, all changed-test deltas, CLI guide/help, release metadata and applicable PRINCIPLES.md; checked retained RED logs. git diff --check and sync_codex_manifests.py --all --check passed.",
-        "No repository edits, full package suite, store probe programs, external models or live remote mutations were performed by this reviewer. Controlled remote fixtures and source tests do not establish installed-host parity or live server enforcement."
+        "Same reviewer, round 2 of the bounded episode; prior findings were empty. Reviewed only the merge/fix delta, preserving the previous code judgment. Independently confirmed loom-code is byte-unchanged from the fix base and imported workflow/development paths match main 3b1a9972644517911454530dc1876f88525b1f37 exactly.",
+        "README projection independently passed: feature content is preserved except the two upstream workflow-version substitutions, retaining code 3.79.0 and workflow 5.23.0. Intent/spec/plan and CLI/test/guide continuity checks passed. Acceptance rows 1–5 legitimately carry over; row 6 records 865 passing focused tests and 41 source captures, with simulation/live-read limits and retained failed setup disclosed.",
+        "Both changed whole test modules ran independently: 40 passed in 0.58s, zero skips; output /private/tmp/loom-all-code-review-round2-tests.txt. git diff --check and manifest --all --check passed. No repository edits, full package suite, store probes, external models or remote mutations were performed by this reviewer."
       ]
     },
     {
@@ -54,8 +54,8 @@
       "model": "host-inherited",
       "verdict": "PASS",
       "lens": "docs",
-      "reviewed_sha": "adcd4cbfa468b374b5f8e0b9363adf0304b53e33",
-      "review_target_sha": "bb2e65a95ec30013a7611c26e7c49be6803bed8a",
+      "reviewed_sha": "5191fb4a93791e3bfb73ef8b1370e4f697613250",
+      "review_target_sha": "4a4bc42a00904dbc76167533ec6fbe5ab755bb2b",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -69,22 +69,22 @@
           "severity": "nit",
           "dimension": "incorrect-fact",
           "anchor": "loom-code/README.ja.md:129",
-          "text": "nitpick (non-blocking): The localized checker paragraphs still describe six preparation fields and unchanged default text, while this release adds suggested_next and refusal/error stderr advice. The same stale statements appear at loom-code/README.zh-TW.md:113-115; both still direct readers to accurate command help, so this does not change the required action.",
+          "text": "nitpick (non-blocking): The previous localized-checker finding remains unfixed, with no resolution claimed: the paragraphs still describe six preparation fields and unchanged default text, while this release adds suggested_next and refusal/error stderr advice. The same statements remain at loom-code/README.zh-TW.md:113-115; both still direct readers to accurate command help, so the required action remains correct.",
           "fix": "Replace the fixed six-field wording with a link to the current help, and say that original diagnostics/exits remain while refusal/error text gains optional advice, in both localized checker paragraphs."
         }
       ],
       "notes": [
-        "Reconciled the complete changed-path inventory against intent/spec/plan, shipping guide/help/release prose and the independent acceptance evidence. Sixteen advisory commands, five existing JSON producers and two checked consumers remain distinct; preserved protocols and simulation/live-host limits are explicit.",
-        "Independently reran 17 focused existing whole modules: 158 passed in 5.27s and 290 passed in 61.38s, total 448 passed with zero skips/failures. Initial sandbox uv cache-lock denial was followed by an approved existing offline-cache invocation. Did not run the complete package suite or current evidence-store adversarial programs.",
-        "The acceptance report explicitly leaves full-suite/finalization and formal-review success to subsequent blocking checks; its works row does not establish that those future checks have already passed. No important or fatal finding was dismissed."
+        "Same reviewer, bounded round 2. Independently confirmed empty loom-code delta and 38 imported workflow/development paths byte-identical to upstream 3b1a997; README delta contains only the two intended workflow-version substitutions, preserving CLI advice prose. No new delta finding.",
+        "Read the renewed report/evidence, original failure log and corrected raw test log (865 passed in 121.10s), and parsed the raw source capture file (41 calls, 16 help forms, all five JSON families). AC1-5 carryover is supported by source identity; AC6 rerun and live read-only rules observation are disclosed separately from simulated enforcement and future finalization.",
+        "Independently reran three complete release/documentation modules: 83 passed in 0.83s, zero skips/failures. No full package suite or current store probes were run. Future finalizer success is not claimed; previous nonblocking locale limitation is retained, with no important/fatal dismissal."
       ]
     }
   ],
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "63eab4ef80f13fa45da52965b56604a2efd9645b",
-  "tested_commit": "64b49d3",
-  "reviewed_commit": "bb2e65a95ec30013a7611c26e7c49be6803bed8a",
+  "tested_commit": "2c01206",
+  "reviewed_commit": "4a4bc42a00904dbc76167533ec6fbe5ab755bb2b",
   "acceptance_status": [
     {
       "acceptance": 1,
