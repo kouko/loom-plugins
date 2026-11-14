@@ -36,6 +36,7 @@ charter: 1.1
 ① — what — 上面的範圍與成功條件符合你要的嗎？回「是」代表：範圍與成功條件符合；審查與檢查通過後推送分支並開 PR；實際試用驗證成功後直接合併（若想先看過再合併，現在告訴我）。
 ① — what — 你選 1 還是 2？（選項 1：這次只改 loom-workflow 的指引與提醒卡；選項 2：三個外掛一起改）
 ① — what — 範圍縮回白話指引並合併，回「是」代表：提醒卡與另外兩個外掛的成功條件移除，接著跑完整測試、獨立審查、開 PR，通過後直接合併。
+build — consequence — 本機完整測試在這台機器的環境下通不過（主線同樣失敗 37 個），要略過本機完整測試、以 GitHub 上的 CI 為準嗎？選 1 的話請直接說「略過本機完整測試」。
 
 ## Risks
 1. The cited study ran no human reading experiment and never tested instructions; the dogfood comparison is the only evidence the rule changes agent output.
@@ -45,3 +46,5 @@ charter: 1.1
 5. agent-decided — guide iteration stopped after round two; held-out final comparison: old guide 5 residual shapes, new guide 4, no fact changed, guessed causes 1 against 0. The margin is one occurrence.
 6. user-decided — 2026-11-14 scope widened to cards and three plugins, then narrowed back. Wave 3 withdrawn before any file changed: card probe (12, 13, 14 shapes) and report probe (4 against 3, one guessed cause) showed no gain.
 7. The withdrawn probes' records stay in the evidence folder as the reason for the narrowing; they prove nothing about Acceptance 1-6.
+8. Local complete suite: 2806 passed, 37 failed; the same 37 loom-code runtime tests fail on untouched origin/main at 7c137958 because no local Python carries PyYAML in its base. GitHub CI is the deciding run.
+skipped-by-instruction: package-tests 2026-11-14
