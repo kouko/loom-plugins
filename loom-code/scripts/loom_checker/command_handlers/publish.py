@@ -331,7 +331,13 @@ def observe_delivery(
         change_id, _ = identify_change(repo)
         if not change_id:
             return result("unconfirmed", "cannot identify a committed change",
-                          "Name the feature branch <type>/<change-id> and commit its confirmed intent.")
+                          "For an active change, use its <type>/<change-id> feature branch and "
+                          "committed confirmed intent. After land removes that identity, report "
+                          "the same change's full land execution result, including exit status, "
+                          "verification and cleanup outcomes. Preserve failures and pending work; "
+                          "a merge line or next-directory hint alone cannot establish completion. "
+                          "If cleanup is partial, use the existing land --cleanup recovery from "
+                          "a surviving repository. Without that evidence, delivery remains unconfirmed.")
         canonical = artifact_path(load_manifest(), "intent", change_id, repo).resolve()
         if intent_file is not None and intent_file.resolve() != canonical:
             return result("unconfirmed", "intent path does not match the identified change",

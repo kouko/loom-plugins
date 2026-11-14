@@ -74,6 +74,19 @@ def test_newer_local_head(delivery):
     assert code == 1 and result["state"] == "unpublished" and not result["complete"]
 
 
+@pytest.mark.parametrize("explicit_intent", [False, True])
+def test_unidentified_change_keeps_unconfirmed_and_scopes_recovery(delivery, explicit_intent):
+    repo, intent, calls, _, observe = delivery
+    git(repo, "switch", "main")
+    code, result = observe(*(["--intent", str(intent)] if explicit_intent else []))
+    assert code == 1 and result["state"] == "unconfirmed" and not result["complete"]
+    assert result["evidence"] == {} and calls.calls == []
+    guidance = result["next"]
+    assert "active change" in guidance and "same change" in guidance
+    assert "full" in guidance and "land" in guidance and "exit" in guidance
+    assert "verification" in guidance and "cleanup" in guidance
+
+
 def test_local_without_network(delivery):
     repo, _, calls, _, observe = delivery
     (repo / "unrelated.txt").write_text("preserve me")
