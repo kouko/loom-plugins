@@ -154,7 +154,8 @@ def test_reviewer_count_cli_preserves_output_and_dirty_tree_error(tmp_path: Path
         "",
         "reviewer-count needs a clean tree with completed functional content.\n"
         'Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help '
-        '(replace <loom-code> with the installed loom-code plugin directory).\n',
+        '(replace <loom-code> with the installed loom-code plugin directory).\n'
+        'Suggested next step: Inspect the diagnostic and command help; select the intended repository, preserve outstanding work and establish a clean completed change before deliberately rerunning.\n',
     )
 
 
@@ -166,7 +167,8 @@ def test_reviewer_count_cli_preserves_argument_errors(tmp_path: Path) -> None:
             "",
             "reviewer-count needs one change-id.\n"
             'Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help '
-            '(replace <loom-code> with the installed loom-code plugin directory).\n',
+            '(replace <loom-code> with the installed loom-code plugin directory).\n'
+            'Suggested next step: Inspect the diagnostic and command help; select the intended repository, preserve outstanding work and establish a clean completed change before deliberately rerunning.\n',
         )
 
 
@@ -356,6 +358,7 @@ def test_contract_require_blocks_a_higher_minor() -> None:
     assert result.returncode == 1
     assert "BLOCK contract.requires:" in result.stderr
     assert "請更新 loom-code" in result.stderr
+    assert "Suggested next step: Update the plugin identified by the contract diagnostic" in result.stderr
 
 
 def test_contract_require_blocks_a_different_major() -> None:
@@ -384,6 +387,7 @@ def test_contract_require_lower_major_blames_the_consuming_plugin() -> None:
     assert "請更新 loom-code" not in result.stderr
     assert "consuming plugin" in result.stderr
     assert "old contract major" in result.stderr
+    assert "Suggested next step: Update the plugin identified by the contract diagnostic" in result.stderr
 
 
 def test_contract_require_rejects_a_malformed_floor() -> None:
@@ -592,7 +596,10 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
         monkeypatch.setitem(entry["COMMANDS"], command, crash)
         out, err = io.StringIO(), io.StringIO()
         assert entry["main"]([command], out, err) == 2
-        assert err.getvalue() == "loom_checker internal error: RuntimeError: fixture crash\n"
+        expected = "loom_checker internal error: RuntimeError: fixture crash\n"
+        if command == "reviewer-count":
+            expected += "Suggested next step: Investigate the reported failure and preserve outstanding work; no reliable repair is known.\n"
+        assert err.getvalue() == expected
         if command == "push":
             assert entry["main"]([command, "--hook"], io.StringIO(), io.StringIO()) == 0
 
