@@ -12,7 +12,7 @@ change is exempt from decision point ②. No ratified `ARCHITECTURE.md` exists.
 ### Wave 1 — Freeze comparison inputs and collect the unchanged baseline
 
 **W1-01 Freeze behavioral cases and run baseline actors**  after: none  acceptance: 7
-- Files: `docs/loom/2026-11-14-research-evidence-acceptance/evidence/`
+- Files: `docs/skill-dogfood/2026-11-14-research-evidence-acceptance/`
 - Test: A7 positive: baseline-actual-receipts; negative: missing-output-not-success.
 - Risk: REQ-7; agent-decided reuse framework C01/C02/C04/C06 and genuine artifacts, add only recommendation-follow-up and bidirectional-complexity cases. Freeze cases, rubric, baseline bytes and environment before actors. Existing package/routing cases remain unchanged; no activation benchmark.
 
@@ -22,7 +22,7 @@ and inspect the corresponding real `execution/X001/artifacts/src/` and
 `execution/X012/artifacts/samples/timing/` inputs. Do not assume an `input/`
 directory exists. The unchanged skill snapshot is at
 `/private/tmp/loom-research-acceptance-eval/baseline-skill`; preserve it and its
-hashes. A frozen change-local case packet references the existing cases by revision/hash
+hashes. A frozen case packet in the dated `docs/skill-dogfood/` archive references the existing cases by revision/hash
 and retains the added follow-up/complexity prompts and common assessment criteria.
 It is retained behavioral evidence, not an unused permanent test fixture or a
 test asserting that particular prose strings exist.
@@ -48,7 +48,7 @@ separately from case evidence and release metadata.
 ### Wave 3 — Observe candidate behavior and challenge conclusions independently
 
 **W3-01 Run matched candidate cases and independent assessments**  after: W2-01  acceptance: 1, 2, 3, 4, 5, 6, 7
-- Files: `docs/loom/2026-11-14-research-evidence-acceptance/evidence/`
+- Files: `docs/skill-dogfood/2026-11-14-research-evidence-acceptance/`, `docs/loom/2026-11-14-research-evidence-acceptance/evidence/behavioral-evidence.md`
 - Test: A1 positive: concrete-conditions; negative: generic-completion. A2 positive: simple-existing-evidence; negative: forced-eight-workflows. A3 positive: condition-support; negative: source-runtime-confusion. A4 positive: honest-unresolved; negative: lowered-standard. A5 positive: justified-complexity; negative: unsafe-simplification. A6 positive: supported-update; negative: unsupported-reversal. A7 positive: independent-assessment; negative: semantic-overclaim.
 - Risk: REQ-1–7; agent-decided match tasks/model/configuration/tools across arms where observable, preserve deviations, failures and partial results. Independent assessors inspect actual evidence and saved conclusions. No superiority, fixed improvement threshold, host parity or trigger-rate claim follows from case completion.
 
@@ -58,7 +58,17 @@ must check both refusal to reverse without support and a supported revision that
 updates the saved conclusion. Complexity cases cover unnecessary additions and a
 smaller option that fails a mandatory condition. Reuse adequate package checks;
 an independent adversary supplies and executes actual abuse/boundary programs
-before Build completes. Retain its program and results in the change evidence.
+before Build completes. Retain behavioral results in the dated dogfood archive;
+new change-store evidence programs belong under `evidence/probes/`.
+
+Agent-decided placement correction: the existing change-store guard rejected
+executable source/trial snapshots outside `evidence/probes/`. Move the complete
+behavioral packet byte-identically to the existing `docs/skill-dogfood/`
+convention, preserving inner links and historical scratch paths. The change-local
+[pointer](evidence/behavioral-evidence.md) maps the old locations to the archive.
+This corrects artifact placement only: requirements and observations are
+unchanged, with no evidence rerun. Acceptance reports and future acceptance-test
+evidence retain their canonical change-store paths.
 
 ### Wave 4 — Release packet and complete integration verification
 
@@ -78,7 +88,7 @@ final committed tree; generated attestation precedes the authorized Ready PR.
 
 ## Simplicity check
 
-- Keep the frozen case packet in change-local evidence, reusing historical case definitions instead of adding an unconsumed permanent test JSON — taken
+- Keep the frozen case packet in the dated dogfood archive, reusing historical case definitions instead of adding an unconsumed permanent test JSON — taken
 
 ## Questions asked
 
