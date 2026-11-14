@@ -1,0 +1,103 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-post-merge-delivery-guidance",
+  "content_digest": "9fc7595f48c5ce3f4a0b50812aee7fbb9aa6c69f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_delivery.py",
+      "artifact": "loom-code/tests/test_delivery.py",
+      "result": "pass",
+      "command_digest": "716e26633646ab34fc67f795ed1cd1a26a8737127334fcb04686cca168b2960d"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
+      "review_target_sha": "42aeacc7891d8665d6f877d9ebbb9074ecc8beb7",
+      "dimension_scores": {
+        "security": "PASS — Round-one assessment retained; repair changes no runtime, authorization or remote surface.",
+        "architecture": "PASS — Round-one assessment retained; bookkeeping repair introduces no mechanism.",
+        "correctness": "PASS — Independently recomputed canonical bytes equal to original aa0f50acf, pin 56acccd13debac07366685edc4ee850e40bbde61, and check_intent_version returned []. Acceptance tested and target functional digests both equal 9fc7595f48c5ce3f4a0b50812aee7fbb9aa6c69f.",
+        "naming": "PASS — Round-one assessment retained; W4 accurately names confirmation bookkeeping repair.",
+        "tests": "PASS — Round-one independent changed-file run remains applicable: 55 passed, zero skipped. No tests or runtime changed in repair. Independently executed canonical comparison, intent-version check and tested/target digest computation; all agreed.",
+        "refactoring": "PASS — Round-one assessment retained; no executable changes.",
+        "cross-task-coherence": "PASS — Plan references corrected confirmation commit; W4 is limited to affected Acceptance 3. Refused finalization remains documented and report distinguishes A2 retest from four carried-over scenarios.",
+        "external-surface-grounding": "PASS — Round-one assessment retained; no new external surface.",
+        "principles-conformance": "PASS — Original user-confirmed content and publication authorization are byte-identical after canonical exclusions; repair neither changes requirements nor creates new consent. Failed evidence remains visible.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS — Round-one scope and limitation assessment retained; repair only corrects invalid bookkeeping.",
+        "deletion-first": "PASS — No new abstraction or mechanism; bounded pin/reference repair and necessary evidence only."
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer /root/review_code_r1, round two; previous findings empty. Inspected only e51626a7d..42aeacc78 and connected checker sources. No full-suite, store-probe or unchanged-test rerun.",
+        "Independent locked-environment metadata command exited 0: canonical bytes equal True; canonical blob 56acccd13debac07366685edc4ee850e40bbde61; intent version findings []; tested and target digests 9fc7595f48c5ce3f4a0b50812aee7fbb9aa6c69f. System Python lacked yaml before retry with existing locked dependencies.",
+        "Native provider openai, inherited exact model unexposed; oracle dispatch, overrides null, effective_profile inherited, reason unobservable-main-profile, task_class complex, completed_redispatches 0, requested_profile null, uncertainty null. Final Build logs handed by orchestrator inspected; adversarial log names test_delivery.py and 12 passed in 6.90s."
+      ],
+      "reviewer": "/root/review_code_r1",
+      "vendor": "openai",
+      "model": "inherited-unexposed"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "3bf50711f983e12ac25b219c6340f5b164f5201c",
+      "review_target_sha": "42aeacc7891d8665d6f877d9ebbb9074ecc8beb7",
+      "dimension_scores": {
+        "omission": "PASS — Round-one obligations remain satisfied; repair W4 names affected Acceptance 3, concrete files, positive/negative identity cases and its bounded risk.",
+        "ambiguity": "PASS — Refreshed report explicitly distinguishes re-tested A2 from carried-over A1/A3/A4/A5 and states the specific unchanged surfaces supporting each carry-over.",
+        "inconsistency": "PASS — Fix delta changes only pin, plan bookkeeping and evidence; runtime guidance and all confirmed requirements remain unchanged. Original refusal and historical test results remain labeled historical.",
+        "incorrect-fact": "PASS — Independently read canonical identity implementation and recomputed original-versus-target content equality and blob 56acccd13debac07366685edc4ee850e40bbde61; repaired pin matches. Acceptance source-to-target delta contains evidence changes only.",
+        "missing-population": "PASS — Refreshed evidence identifies exact clean source revisions, actual setup/diagnostic executions, six historical synthetic decisions, carried-over results and exclusions without implying a new behavioral benchmark.",
+        "user-judgment-leak": "PASS — Repair preserves byte-identical canonical requirements and publication authorization; it introduces no user technical decision or repeated preference request.",
+        "deletion-first": "PASS — Added W4 and evidence record the observed finalizer refusal and bounded repair; no runtime abstraction, flag, state, lookup or extra delivery mechanism was added."
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer, bounded round two: original findings were empty. Reviewed only e51626a7d38fab2195c4021401989a08ccfaa3d4..42aeacc7891d8665d6f877d9ebbb9074ecc8beb7 and applicable grounding; no runtime/code/test changes and no new repair issue found. Round-one substantive review remains applicable.",
+        "Read intent-version canonicalization and independently compared aa0f50acf versus target after excluding status/pin lines: canonical bytes equal True and hash matches repaired pin. Read updated report/evidence and d67ebb14-to-target evidence-only diff. Read final suite log ending in successful Mermaid validation and declared delivery output showing 12 passed in 6.90s; those are observed supplied logs, not reviewer executions.",
+        "No unchanged tests, full suite, store probes, remote actions or installed-host checks were executed this round. No repository artifact edited; status was clean. Earlier 55-test independent pass remains historical round-one evidence. Acceptance limitations continue to exclude live-host enforcement and actual remote merge/cleanup."
+      ],
+      "reviewer": "/root/review_skill_r1",
+      "vendor": "openai",
+      "model": "inherited-unexposed"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "56acccd13debac07366685edc4ee850e40bbde61",
+  "tested_commit": "d67ebb14defe50bc26734ba6297879c6926d67c0",
+  "reviewed_commit": "42aeacc7891d8665d6f877d9ebbb9074ecc8beb7",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}
