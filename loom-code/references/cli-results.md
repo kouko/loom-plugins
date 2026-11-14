@@ -11,6 +11,12 @@ The command registry and exact per-command help in
 [`../scripts/loom_checker.py`](../scripts/loom_checker.py) own operand grammar
 and result details. Five commands provide direct JSON; two of those have checked
 station consumers. The helper is a script, not a seventeenth checker command.
+Only `contract` and `reviewer-count` have migrated to `suggested_next` advice.
+Their checked consumer also supplies local fault advice. The other fourteen
+commands retain their interfaces: preparation `plan`/`intake` has no new field,
+delivery keeps its existing `next` string, and publish/land/launcher remedies
+remain existing guidance rather than migrated advice. This is not an all-command
+advice migration.
 
 | Checker command | Current result/modes | Checked station consumer and remaining work |
 |---|---|---|
@@ -52,6 +58,42 @@ host hooks are discovery or separate protocols, not extra checker commands.
   For an ambiguous remote write, use the existing delivery observation before
   considering another write. Observation never authorizes publication or merge.
 
+## Suggested next steps
+
+Structured result facts determine whether a prerequisite is established;
+`suggested_next` is prose inside a JSON string, not a machine decision or an
+executable action. The two migrated producers emit a nonblank English string
+for blocked/error results and null for passed results. Direct text refusals and
+errors append one `Suggested next step:` line on stderr, retaining original
+diagnostics and Help hints; successful text stays unchanged. JSON-mode advice
+stays inside the single stdout object with empty checker stderr.
+
+After accepting the core observation, read `suggested_next` only when it is a
+string whose trimmed value is nonblank. Present applicable advice as advisory
+content alongside the original diagnostic. Ignore missing, null, blank or
+non-string advice and retain the original diagnostic. Those states never alter
+core validity or classification. The consumer preserves accepted raw JSON,
+including unusable advice and compatible numeric extensions; accepting core
+fields does not make arbitrary advice trustworthy or executable.
+
+Advice never grants authorization to continue, publish, merge or bypass host
+trust. Its presence, absence or contents must not trigger automatic execution,
+retry or text fallback. An unknown observation cannot establish a prerequisite
+through its suggestion. No useful suggestion is a valid state.
+
+For contract refusals, follow the actual diagnostic's indicated plugin: either
+the consuming plugin or loom-code can be outdated. Usage advice directs input
+or repository investigation while preserving work; it does not authorize
+discarding work, automatically committing unrelated changes or lowering the
+reviewer floor. Internal-error advice retains uncertainty and asks for
+investigation rather than inventing a repair or claiming a transient failure.
+Local consumer faults retain their own diagnostic and append locally generated
+`Suggested next step:` advice for input correction, runtime investigation or
+output-contract investigation. Never derive recovery commands from malformed
+child stdout or unexpected stderr. Existing launcher readiness/repair ownership
+and remote-operation reconciliation remain in force. No improvement in agent
+resolution rate, time, tokens or cost has been measured.
+
 ## Checked read-only calls
 
 Replace `<loom-code>` with the installed plugin directory. Planning may prepare
@@ -91,6 +133,8 @@ blocked requires false. Planning continues only on passed/true. Only an
 accepted `contract.requires` diagnostic establishes its outdated-contract
 response; other failures retain their own diagnostics. The consumer does not
 recompute compatibility or compare a separate manifest.
+For that response, report the diagnostic and stop; identify the plugin it
+names rather than always prescribing a loom-code update.
 
 Reviewer data contains the unchanged requested `change_id` and a positive
 integer `reviewer_floor` (a boolean is invalid). Only passed is usable; there

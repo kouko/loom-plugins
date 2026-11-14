@@ -146,6 +146,9 @@ The two read-only modes add `data` to the preparation envelope:
 Each emits exactly one stdout object plus newline and empty checker stderr:
 `schema_version: 1`, `command`, `status`, ordered `diagnostics` objects
 (`rule_id`, `message`), ordered string `notices`, `error`, and `data`.
+These two modes also emit advisory `suggested_next`: a nonblank English string
+for blocked/error, null for passed. Text refusals/errors append
+`Suggested next step:` on stderr; original diagnostics and Help hints remain.
 Passed means exit 0, empty diagnostics and null error; blocked means exit 1,
 rule diagnostics and null error; error means exit 2, empty diagnostics and
 `error: {kind: usage|internal, message}`. Every error data value is null.
@@ -172,6 +175,14 @@ reviewer dispatch. An incompatible `2.99` is a blocked observation; malformed
 `bad` is a valid usage error. Invalid output has empty stdout, a
 `checked-readonly:` diagnostic and exit 2. Neither errors nor invalid results
 permit continuation, reviewer defaults, text fallback or automatic retries.
+After accepting the core observation, present applicable `suggested_next` only
+when it is a nonblank string; ignore missing, null, blank or non-string advice
+and retain the original diagnostic. Accepted raw JSON may contain unusable
+advice: core validation does not make arbitrary advice trustworthy or executable.
+Advice grants no authorization and triggers no automatic action. For contract
+refusals, follow the diagnostic's indicated plugin; either loom-code or the
+consuming plugin can be outdated. Consumer faults add locally generated advice
+on stderr while retaining their original diagnostic and exit distinction.
 
 This helper executes the checker once with a configured 30-second subprocess
 timeout and preserves startup exit 86. It neither writes artifacts, installs
@@ -182,6 +193,9 @@ text, preparation/delivery JSON and remote-operation reconciliation remain.
 The [CLI result guide](references/cli-results.md) inventories all sixteen
 commands, their special modes and remaining migration work: five direct JSON
 commands, two checked station consumers, no claim of full migration.
+Only those two commands adopt the new advice field; delivery's existing `next`
+and publish/land/launcher remedies remain unchanged. No gain in resolution rate,
+time, tokens or cost has been measured.
 
 `scripts/loom_checker.py` is the deterministic layer: every rule recomputes
 from the repository instead of trusting a claim, and `--list-rules` is the

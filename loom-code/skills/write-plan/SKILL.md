@@ -125,12 +125,17 @@ Continue only for accepted JSON with exit 0, `status: passed` and
 `data.compatible: true`. The consumer validates the observation before emitting
 it; do not parse success prose or add `--json`. Only an accepted blocked result
 whose `diagnostics` includes `rule_id: contract.requires` establishes the
-existing outdated-contract response: report that diagnostic, tell the user to
-update `loom-code`, and **stop**. Valid `error.kind: usage|internal` results,
+existing outdated-contract response: report that diagnostic, identify the
+plugin it says needs updating (loom-code or the consuming plugin), and **stop**.
+Valid `error.kind: usage|internal` results,
 invalid observations and launcher/startup failures stop this prerequisite with
 their own diagnostics; do not label them version incompatibility, retry
 automatically or fall back to text. See the shared
 [CLI result guide](../../references/cli-results.md) for fields and boundaries.
+After accepting the core observation, present applicable `suggested_next` only
+when it is a nonblank string, as advisory content; otherwise retain the original
+diagnostic. This optional advice changes neither the prerequisite nor authority
+and permits no automatic execution, retry or text fallback.
 
 ## Step 0b — Codex only: installed hook check
 

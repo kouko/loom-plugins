@@ -146,6 +146,10 @@ the diagnostic and stop this prerequisite; no automatic retry or text fallback.
 This ready-mode call reuses the runtime prepared above; a readiness failure
 retains the launcher's repair guidance. See the shared
 [CLI result guide](../../references/cli-results.md).
+After accepting the core result, present applicable `suggested_next` only when
+it is a nonblank string, as advisory content; otherwise retain the original
+diagnostic. Advice does not set a reviewer floor, authorize dispatch or permit
+automatic execution, retry or text fallback.
 The checker derives the
 floor from the cumulative branch delta and fails closed to two when it cannot
 classify the whole change. `finalize-review` recomputes the same policy, and
