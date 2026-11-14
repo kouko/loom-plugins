@@ -703,3 +703,604 @@ uv run --offline --isolated --with-requirements requirements-package-tests.lock 
 - Product/test sources were unchanged. Only acceptance report and evidence are copied to the active feature branch for the authorized evidence commit; clean worktree and raw captures remain available under the temporary acceptance paths.
 - Git-memory classification: routine measurement record, no new reusable implementation decision/learning/gotcha, so no memory trailers. Exact commit message passed deterministic privacy scan (exit 0, empty findings); it contains no ambiguous private-party identifiers, so semantic judge is not required.
 - Retained setup denial and exploratory invocation mistakes are disclosed above. No failure was repaired, discarded or silently converted to a live success.
+
+## Re-run on 2026-11-14, at 2c01206
+
+Full tested HEAD: `2c012061e490742c00abbecb9a5fb887221d9749`. This re-run follows the authorized main merge/conflict resolution, not a new feature episode. Earlier measurements above remain intact.
+
+### Clean setup and inspected change boundary
+
+- Created a new clean detached worktree with `git worktree add --detach /private/tmp/loom-all-merge-acceptance-2c01206 2c012061e490742c00abbecb9a5fb887221d9749`; initial status was empty. The original clean acceptance worktree was preserved.
+- Read current README setup. Reused its isolated locked environment with `uv run --offline --isolated --with-requirements requirements-package-tests.lock`; no installed plugin or conda-base changes.
+- Inspected the actual `git diff 5191fb4a93791e3bfb73ef8b1370e4f697613250 2c012061e490742c00abbecb9a5fb887221d9749`: forty changed paths consist of upstream workflow readability documentation/tests/release metadata, its development evidence, the existing build verification record, and two root README workflow-version substitutions.
+- Root README retains code 3.79.0 and changes workflow 5.22.0 to 5.23.0 in its plugin table and workflow introduction. Inspected the imported plain-language guide: it adds sentence-shape guidance, not executable CLI logic.
+- `git diff --exit-code 5191fb4a93791e3bfb73ef8b1370e4f697613250 2c012061e490742c00abbecb9a5fb887221d9749 -- loom-code/scripts loom-code/tests loom-code/references loom-code/README.md loom-code/README.ja.md loom-code/README.zh-TW.md requirements-package-tests.lock scripts/run_package_tests.py` returned 0 with empty output. A whole `-- loom-code` diff was also empty.
+- Checked continuity from the original measured code: `git diff --exit-code 64b49d3d0d2e25d10618cfc43636f9fb20d81034 5191fb4a93791e3bfb73ef8b1370e4f697613250 -- loom-code/scripts loom-code/tests loom-code/references loom-code/README.md requirements-package-tests.lock scripts/run_package_tests.py` returned 0 with empty output.
+- The supplied merge-projection record says the README equals the feature parent except those two workflow-version changes and no merge-autostash remains; independently checked diff, rather than that declaration, controls the row decisions.
+
+### Acceptance rows, checked against the fix diff
+
+1. Carried over — all sixteen command implementations, mode handlers, CLI guide and executable tests are byte-unchanged across both inspected ranges. Earlier complete command/mode evidence remains applicable; the new full AC6 replay also exercises those interfaces.
+2. Carried over — result classification, uncertainty owners and advice generators are unchanged; no upstream executable code enters their call path.
+3. Carried over — all five JSON producers, preparation serialization and checked consumers/tests are unchanged.
+4. Carried over — policy, authority, trust, reconciliation, dispatch and advisory-write boundaries are unchanged; imported readability prose does not execute commands.
+5. Carried over — hook bytes/framing, CI/setup/progress/cwd handoffs, runtime launcher and data-operation implementations are unchanged.
+6. Re-tested in full — the merged root/plugin README versions and derived manifests were checked, all sixteen source CLI interfaces were replayed, and all applicable normal/refusal/error/special modes were exercised through whole existing public-entry modules. This also re-exercises the unchanged behavior without pretending that a partial docs-only sample settles the entire row.
+
+### Actual independent rerun results
+
+- **865 passed, zero skipped, zero failures**, exit 0, 121.10 seconds, in 33 whole focused modules. Four isolated workers shorten elapsed waiting; no claim about product efficiency follows.
+- An initial orchestration attempt had no available resumed in-memory module list and ran no tests: exit 5, `no tests ran in 0.23s`. This is retained at `/private/tmp/loom-all-merge-acceptance-tests.log`; it is not a product failure or counted as verification. The explicitly resolved command below then ran every listed module; no product/test changes were made to obtain a pass.
+- `python3 scripts/sync_codex_manifests.py --all --check` returned 0 with no output, confirming synchronized manifests for code/design/workflow.
+- Direct source replay completed **41 invocations** through the same isolated interpreter. Source help was loaded without installing user plugins.
+- The source `github-rules` ordinary probe performed a read-only live observation and printed confirmed required protections, exit 0. This one read is not proof that the server enforces every restriction. Ruleset/classic/unconfirmed/setup/error semantics remain covered by pre-existing controlled fixtures and local server simulation.
+- No external models, real publication/merge/cleanup/admin setup, user-data mutation or installed-host validation occurred. Publication refused before action without authorization; land refused without accepted-by; sync refused detached HEAD. Hook/native install/removal and cleanup are exercised only in temporary test repositories.
+- Prior nonblocking localized-README limitation remains: localized README version strings are synchronized, but the new English advice guide was not fully translated. No important/fatal dismissed finding was supplied.
+- The parent reports its 4291-Python/full-shell and 42-program results in separate logs; those are not substituted for these independent measurements. Package tests are not skipped: the later `finalize-review` run must execute the configured full suite/probes and block acceptance on failure. The full suite command remains `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. Formal fresh-context reviews follow this report, so this record does not claim that they have already passed.
+
+### Focused command and captured result
+
+```sh
+uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py loom-code/tests/test_preparation_json.py loom-code/tests/test_checked_readonly.py loom-code/tests/test_loom_checker_intent.py loom-code/tests/test_loom_checker_intake.py loom-code/tests/test_contract_charter.py loom-code/tests/test_plan_field_caps.py loom-code/tests/test_plan_skip_missing_files.py loom-code/tests/test_delivery.py loom-code/tests/test_delivery_stop.py loom-code/tests/test_sync_trunk.py loom-code/tests/test_github_rules.py loom-code/tests/test_pr_floor.py loom-code/tests/test_pr_floor_workflow.py loom-code/tests/test_loom_checker_standing.py loom-code/tests/test_land_sweep.py loom-code/tests/test_land_cleanup.py loom-code/tests/test_land_merge.py loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_probe_confirmation_finalize.py loom-code/tests/test_native_git_protection.py loom-code/tests/test_hooks_json.py loom-code/tests/test_publish_command_detection.py loom-code/tests/test_ship_worktree_merge.py loom-code/tests/test_loom_python_runtime.py loom-code/tests/test_adversarial_blocked_publish_routes.py loom-code/tests/test_legacy_contract_removed.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_runtime_skill_commands.py loom-code/tests/test_closing_review_recovery_rules.py loom-workflow/tests/scripts/test_release_metadata.py loom-workflow/tests/loom-visualization/test_references.py -n 4 -q -rs
+```
+
+```text
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 33%]
+........................................................................ [ 41%]
+........................................................................ [ 49%]
+........................................................................ [ 58%]
+........................................................................ [ 66%]
+........................................................................ [ 74%]
+........................................................................ [ 83%]
+........................................................................ [ 91%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+865 passed in 121.10s (0:02:01)
+```
+
+### Full-row command/mode evidence mapping
+
+The sixteen-command matrix and named cross-cutting tests in the initial evidence above remain the mapping for this re-run: every whole module named there is included again in the command above. Thus positive/refusal/error plus applicable JSON, host hook, native hook ownership, CI annotation/summary, setup, progress, sweep token, cleanup cwd, optional-advice/write-failure, zero-exit uncertainty and cold-start modes were executed at the new HEAD. Added documentation/release modules check help/guide references, station wording and both plugin releases after the merge. This is executable coverage, not inventory-only migration evidence.
+
+### Direct source captures at the new HEAD
+
+Each case runs `loom-code/scripts/loom_checker.py` from the clean merged tree. Help/list/table/listing outputs are trimmed for readability; ordinary diagnostics and JSON results are retained.
+
+#### `intent --help`
+
+Exit: 0
+
+```text
+stdout:
+intent — check one intent's implemented rules
+Usage: intent <path> [--commit-msg <file>]
+Supply readable relative-to-working-directory or absolute paths. Repository
+[remaining output omitted]
+
+stderr:
+```
+
+#### `intents --help`
+
+Exit: 0
+
+```text
+stdout:
+intents — inspect locally derived intent delivery states
+Usage: intents [<change-id>] [--remote <name>] [--metadata]
+Run in the repository. The remote defaults to origin and must be a safe literal.
+[remaining output omitted]
+
+stderr:
+```
+
+#### `intake --help`
+
+Exit: 0
+
+```text
+stdout:
+intake — check the selected station's current prerequisites
+Usage: intake <write-spec|write-plan> <change-id> [--json]
+Run inside the selected repository. Supply a change-id, not a file path;
+[remaining output omitted]
+
+stderr:
+```
+
+#### `push --help`
+
+Exit: 0
+
+```text
+stdout:
+push — provide host-hook feedback or install native branch protection
+Usage: push --hook
+       push --install-git-hooks
+[remaining output omitted]
+
+stderr:
+```
+
+#### `publish --help`
+
+Exit: 0
+
+```text
+stdout:
+publish — publish an authorized branch and observe required CI
+Usage: publish --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>
+Legacy: publish --confirm-authorized --title <text> --body-file <absolute-body-path>
+[remaining output omitted]
+
+stderr:
+```
+
+#### `delivery --help`
+
+Exit: 0
+
+```text
+stdout:
+delivery — observe the selected delivery goal without writes
+Usage: delivery [--goal local|published|merged] [--intent <path>] [--json]
+Run inside the selected repository on its identified feature branch.
+[remaining output omitted]
+
+stderr:
+```
+
+#### `land --help`
+
+Exit: 0
+
+```text
+stdout:
+land — merge an accepted PR or clean up merged changes
+Usage: land --accepted-by <name>
+       land --cleanup <branch>
+[remaining output omitted]
+
+stderr:
+```
+
+#### `sync-trunk --help`
+
+Exit: 0
+
+```text
+stdout:
+sync-trunk — bring a clean change branch onto fetched trunk
+Usage: sync-trunk
+Run on a clean attached change branch, not trunk, with trusted Git and resolvable
+[remaining output omitted]
+
+stderr:
+```
+
+#### `github-rules --help`
+
+Exit: 0
+
+```text
+stdout:
+github-rules — inspect GitHub trunk protection as advisory information
+Usage: github-rules [--print-setup]
+Run in the repository with origin metadata and authenticated gh read access.
+[remaining output omitted]
+
+stderr:
+```
+
+#### `pr-floor --help`
+
+Exit: 0
+
+```text
+stdout:
+pr-floor — validate a PR body and disclose verification in CI
+Usage: pr-floor --body-file <file> --base <sha> --head <sha> [--branch <name>]
+Supply unique paired flags, a readable body file (relative to the working
+[remaining output omitted]
+
+stderr:
+```
+
+#### `standing --help`
+
+Exit: 0
+
+```text
+stdout:
+standing — check applicable standing-document policy for one intent
+Usage: standing <path-to-intent>
+Supply one readable relative-to-working-directory or absolute intent path;
+[remaining output omitted]
+
+stderr:
+```
+
+#### `contract --help`
+
+Exit: 0
+
+```text
+stdout:
+contract — check compatibility with the bundled contract manifest
+Usage: contract --require <major.minor> [--json]
+Supply a numeric major.minor requirement. Reads the manifest in effect; a
+[remaining output omitted]
+
+stderr:
+```
+
+#### `charter --help`
+
+Exit: 0
+
+```text
+stdout:
+charter — render and validate artifact charter rows
+Usage: charter [--manifest <path>]
+Defaults to the contract manifest in effect. An override is a readable YAML
+[remaining output omitted]
+
+stderr:
+```
+
+#### `plan --help`
+
+Exit: 0
+
+```text
+stdout:
+plan — check the implemented field caps on one named file
+Usage: plan <path-to-plan.md> [--json]
+Supply a readable file path, relative to the working directory or absolute;
+[remaining output omitted]
+
+stderr:
+```
+
+#### `reviewer-count --help`
+
+Exit: 0
+
+```text
+stdout:
+reviewer-count — compute the required independent reviewer floor
+Usage: reviewer-count <change-id> [--json]
+Run inside the selected repository with a clean tree and committed functional
+[remaining output omitted]
+
+stderr:
+```
+
+#### `finalize-review --help`
+
+Exit: 0
+
+```text
+stdout:
+finalize-review — verify committed content and generate an attestation
+Usage: finalize-review <change-id> --input <review-input.json>
+<change-id> identifies the change; it is not a file path. --input names a
+[remaining output omitted]
+
+stderr:
+```
+
+#### `intent`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+intent needs a path to the intent file.
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `intents`
+
+Exit: 0
+
+```text
+stdout:
+2026-09-14-agents-claude-compatibility	active
+2026-09-14-land-merged-changes	active
+2026-09-14-loom-visualization-description-trigger	active
+[remaining output omitted]
+
+stderr:
+```
+
+#### `intake`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+intake needs a station and a change-id.
+Help: "<loom-code>/scripts/loom-python" --ready intake --help (replace <loom-code> with the installed loom-code plugin directory).
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `push`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+push expects --hook, --install-git-hooks or --remove-git-hooks.
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `publish`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+publish: --intent or --confirm-authorized is required for publication authorization
+Help: "<loom-code>/scripts/loom-python" --ready publish --help (replace <loom-code> with the installed loom-code plugin directory).
+Suggested next step: Inspect the original diagnostic and command help; preserve outstanding work and investigate the reported condition before deliberately rerunning.
+```
+
+#### `delivery`
+
+Exit: 1
+
+```text
+stdout:
+Delivery unconfirmed: a safe symbolic feature branch is required
+next: Preserve the current work on a named feature branch before continuing.
+
+stderr:
+Suggested next step: Preserve the current work on a named feature branch before continuing.
+Help: "<loom-code>/scripts/loom-python" --ready delivery --help (replace <loom-code> with the installed loom-code plugin directory).
+```
+
+#### `land`
+
+Exit: 1
+
+```text
+stdout:
+
+stderr:
+BLOCK land.merge: acceptance not recorded; pass --accepted-by <name> after the maintainer accepts; next: Inspect the merge diagnostics and resolve the named condition before retrying land; preserve work and do not switch merge routes.
+Suggested next step: Follow the reported merge or cleanup remedy, preserve work and existing acceptance, and reconcile remote effects before deliberately rerunning.
+```
+
+#### `sync-trunk`
+
+Exit: 1
+
+```text
+stdout:
+
+stderr:
+BLOCK review.sync: HEAD is detached; switch to the change branch before syncing.
+Suggested next step: Preserve outstanding work and resolve the reported trunk condition before deliberately rerunning the existing sync workflow.
+```
+
+#### `github-rules`
+
+Exit: 0
+
+```text
+stdout:
+loom: main requires a pull request (administrators included) and the check "loom-pr-floor / PR floor"
+
+stderr:
+```
+
+#### `pr-floor`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+usage: loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha> [--branch <name>]
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `standing`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+standing needs a path to the intent file.
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `contract`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+contract needs `--require <major>.<minor>`.
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `charter`
+
+Exit: 0
+
+```text
+stdout:
+| artifact | answers | readers | must | must not → goes to | sign-off | edits after |
+| --- | --- | --- | --- | --- | --- | --- |
+| intent | why this change exists, the value when needed, and which observable delivery outcomes prove it is done | user at decision point 1; every later station | Problem in the user's words; Proposed outcome; Acceptance lines each provable by acceptance testing; Constraints; Out of scope; Open questions; Material user-outcome or scope choices remain open; only non-material unsupported detail is deleted | requirement-level behaviour → spec; task split or file lists → plan; design rationale → spec; verification history → attestation | capture-intent | delivery-derived-from-default: delivery is derived from canonical evidence on the selected remote-default snapshot; the intent remains confirmed; maintain-appends-evidence: maintain appends an evidence path; other-change-starts-new-intent: any other change starts a new intent |
+[remaining output omitted]
+
+stderr:
+```
+
+#### `plan`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+plan needs a path.
+Help: "<loom-code>/scripts/loom-python" --ready plan --help (replace <loom-code> with the installed loom-code plugin directory).
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `reviewer-count`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+reviewer-count needs one change-id.
+Help: "<loom-code>/scripts/loom-python" --ready reviewer-count --help (replace <loom-code> with the installed loom-code plugin directory).
+Suggested next step: Inspect the diagnostic and command help; select the intended repository, preserve outstanding work and establish a clean completed change before deliberately rerunning.
+```
+
+#### `finalize-review`
+
+Exit: 2
+
+```text
+stdout:
+
+stderr:
+finalize-review needs a change-id.
+Help: "<loom-code>/scripts/loom-python" --ready finalize-review --help (replace <loom-code> with the installed loom-code plugin directory).
+Suggested next step: Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.
+```
+
+#### `contract --require 2.1 --json`
+
+Exit: 0
+
+```text
+stdout:
+{"schema_version": 1, "command": "contract", "status": "passed", "diagnostics": [], "notices": [], "error": null, "suggested_next": null, "data": {"contract_version": "2.3.1", "required_version": "2.1", "compatible": true}}
+
+stderr:
+```
+
+#### `contract --require 2.99 --json`
+
+Exit: 1
+
+```text
+stdout:
+{"schema_version": 1, "command": "contract", "status": "blocked", "diagnostics": [{"rule_id": "contract.requires", "message": "this repo ships loom contract 2.3.1, but >=2.99 is required \u2014 \u8acb\u66f4\u65b0 loom-code\u3002"}], "notices": [], "error": null, "suggested_next": "Update the plugin identified by the contract diagnostic, then recheck supported requirements.", "data": {"contract_version": "2.3.1", "required_version": "2.99", "compatible": false}}
+
+stderr:
+```
+
+#### `contract --require bad --json`
+
+Exit: 2
+
+```text
+stdout:
+{"schema_version": 1, "command": "contract", "status": "error", "diagnostics": [], "notices": [], "error": {"kind": "usage", "message": "`--require bad` is not <major>.<minor>."}, "suggested_next": "Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning.", "data": {"contract_version": null, "required_version": null, "compatible": null}}
+
+stderr:
+```
+
+#### `plan docs/loom/2026-11-14-cli-suggestions-complete/plan.md --json`
+
+Exit: 0
+
+```text
+stdout:
+{"schema_version": 1, "command": "plan", "status": "passed", "diagnostics": [], "notices": [], "error": null, "suggested_next": null}
+
+stderr:
+```
+
+#### `plan /missing-acceptance-plan --json`
+
+Exit: 2
+
+```text
+stdout:
+{"schema_version": 1, "command": "plan", "status": "error", "diagnostics": [], "notices": [], "error": {"kind": "usage", "message": "no such plan file: /missing-acceptance-plan"}, "suggested_next": "Inspect the reported operand or manifest issue and command help; correct it before deliberately rerunning."}
+
+stderr:
+```
+
+#### `intake write-plan 2026-11-14-cli-suggestions-complete --json`
+
+Exit: 0
+
+```text
+stdout:
+{"schema_version": 1, "command": "intake", "status": "passed", "diagnostics": [], "notices": ["interface-surfaces (manifest default (KICKOFF-DEFAULTS adds nothing new)): **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** (non-code paths under **/templates/** excluded)"], "error": null, "suggested_next": null}
+
+stderr:
+```
+
+#### `reviewer-count 2026-11-14-cli-suggestions-complete --json`
+
+Exit: 0
+
+```text
+stdout:
+{"schema_version": 1, "command": "reviewer-count", "status": "passed", "diagnostics": [], "notices": [], "error": null, "suggested_next": null, "data": {"change_id": "2026-11-14-cli-suggestions-complete", "reviewer_floor": 2}}
+
+stderr:
+```
+
+#### `delivery --json`
+
+Exit: 1
+
+```text
+stdout:
+{"state": "unconfirmed", "reason": "a safe symbolic feature branch is required", "next": "Preserve the current work on a named feature branch before continuing.", "evidence": {"change_id": "2026-11-14-cli-suggestions-complete", "head": "2c012061e490742c00abbecb9a5fb887221d9749", "branch": null}, "complete": false, "suggested_next": "Preserve the current work on a named feature branch before continuing."}
+
+stderr:
+Help: "<loom-code>/scripts/loom-python" --ready delivery --help (replace <loom-code> with the installed loom-code plugin directory).
+```
+
+#### `--list-rules`
+
+Exit: 0
+
+```text
+stdout:
+adversarial.proportionate	A change produces at most 5 adversarial probe programs, and every one of them carries a non-empty `concern:` line in its first lines naming the kind of defect it defends against. Both halves are recomputed at finalize-review over the union of three sets, because no one of them is the whole of what the step produced: the programs the selected commit holds anywhere in the change's store, whatever their extension; the programs finalize-review is about to execute; and the programs this branch adds straight into the package suite the repository declares, which the `concern:` line marks as the adversary's output rather than ordinary new tests. A graduated program therefore still spends against the ceiling, which reading the store alone could not see, since the graduation gate empties that directory first. A program committed elsewhere in the change's store, outside its `evidence/probes/` directory, is refused rather than left uncounted.
+ci.pr-floor	The pr-floor CI check fails only when the pull-request body lacks Ship's nine contextual headings in order, naming the heading; the verification status is recomputed from git and published as a notice, and every status passes.
+contract.charter-complete	Every artifact in the contract manifest carries a complete `charter:` block -- non-empty answers/readers/must/must_not/edits_after, a must_not goes_to naming another artifact in the table, and a signoff naming a real station.
+[remaining output omitted]
+
+stderr:
+```
+
+### Evidence commit integrity
+
+Only this report and its evidence are updated. Original measurements and raw temporary captures remain available. Git-memory 5.23 classifies this as routine evidence refresh with no new reusable implementation decision; no memory trailers. Exact commit message passed deterministic privacy scan, with no ambiguous private-party identifiers requiring a semantic judge. No product, test or attestation files are edited.
