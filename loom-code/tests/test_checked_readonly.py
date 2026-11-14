@@ -1,4 +1,5 @@
 # concern: Malformed, contradictory, or wrong-request checker observations must not become usable results.
+# concern: Optional advice must not change refusal, error, raw observation, or single-execution boundaries.
 """Exercise checked observations through the public entry and real producers."""
 from __future__ import annotations
 
