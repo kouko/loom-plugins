@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.80.0] — 2026-11-14 — ground engineering research in evidence conditions
+
+- Define decision-relevant unknowns and sufficient evidence before selecting proportionate research methods. Relate findings to supported, unsupported or unresolved conditions without weakening requirements to claim completion.
+- Compare credible smaller alternatives under the same mandatory constraints, explain important additions and their burdens, and preserve necessary complexity. Keep revised conditions and recommendations consistent with the retained record and their evidentiary basis.
+- Integrate optional question-purpose prompts into the existing guidance and template without new fields, tools or checkpoints. Retain bounded baseline/candidate case outputs and independent assessments; no general superiority, trigger-rate or installed-host improvement is claimed.
+
 ## [3.79.0] — 2026-11-14 — complete advisory next steps across the CLI
 
 - Cover all sixteen checker commands with optional `Suggested next step:` guidance while preserving diagnostics, classifications, exits and authority. Keep unsynced/unconfirmed exit-zero results explicit; standing warnings and PR verification notices remain nonblocking.

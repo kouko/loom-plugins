@@ -1,0 +1,264 @@
+{
+  "schema": 1,
+  "scope": "Six bounded cases per arm; actual native actor outputs required, not simulated transcripts.",
+  "provenance": {
+    "source_revision": "c0a2c26f38b7c17bddbe3fe6edd076e646f05b1b",
+    "historical_cases": "docs/skill-dogfood/2026-11-08-engineering-research-frameworks/execution/cases.json",
+    "source_fixture": "execution/X001/artifacts/src",
+    "timing_fixture": "execution/X012/artifacts/samples/timing",
+    "hash_manifest": "frozen-inputs.json",
+    "baseline": "/private/tmp/loom-research-acceptance-eval/baseline-skill"
+  },
+  "protocol": {
+    "actor_input": "Only snapshot skill path, own task.txt, own isolated project path. Copy task and project from prepared fixture per actor; do not give this packet or labels. Fresh actor per case; C02 continues same actor for turns 2 and 3 after each prior response.",
+    "evidence": "Retain raw prompts, actions, outputs, saved records and failures, tool/model configuration when observable. Missing output is unobserved, never success.",
+    "assessment": "Independent fresh-context assessor reads packet plus actual outputs and record. Mark each applicable criterion supported/failed/unobserved with exact evidence and limits; no tally implies general superiority.",
+    "freeze": "Before actors hash skill snapshots and inputs; preserve baseline bytes. Root collects baseline before editing runtime skill.",
+    "common_criteria": [
+      "Conditions identify decision-relevant unknown and sufficient observations under actual constraints (A1).",
+      "Methods proportionate; existing applicable evidence may suffice; no forced classification, eight workflows, needless experiments or confirmation (A2).",
+      "Findings track conditions and actual version/environment, source versus execution, supported versus unknown (A3).",
+      "Missing evidence leaves affected decision conditional; no weakened conditions or fabricated completion (A4).",
+      "Fair smaller-option comparison preserves mandatory obligations and explains necessary additions/burdens (A5).",
+      "Changed recommendation has new evidence/correction/constraint and agrees with saved record; challenge alone insufficient (A6).",
+      "Actual evidence and independent assessment preserve boundary/source quality; these cases do not prove activation, general efficacy or cross-host parity (A7)."
+    ]
+  },
+  "cases": [
+    {
+      "id": "C01",
+      "prompt": "請確認 package runner 的 TEST_ROOTS 精確包含哪些目錄。我只需要這個事實，先不討論新增 plugin 或改 runner；不要實驗或畫圖，短筆記即可。",
+      "criteria": [
+        "Direct source check of exact four roots; no named framework, matrix or experiment required.",
+        "Do not treat source definition as executed CI; concise retained record with source anchors is adequate."
+      ],
+      "origin": "historical-real",
+      "acceptance": [
+        1,
+        2,
+        3
+      ],
+      "prompt_file": "tasks/C01/task.txt",
+      "allowed": {
+        "read": [
+          "own project src/**",
+          "own project samples/timing/**",
+          "provided skill snapshot/**",
+          "own research records"
+        ],
+        "write": [
+          "own project docs/loom/research/**"
+        ],
+        "forbidden": [
+          "other cases/actors or gold rubrics",
+          "network",
+          "install/payment/publish",
+          "source edits",
+          "suite execution",
+          "main() execution"
+        ]
+      },
+      "assessment_visibility": "hidden-from-executor"
+    },
+    {
+      "id": "C02",
+      "prompt": "我想讓呼叫端先預覽 package suite 將執行的命令，不能因此啟動 pytest、npm 或 shell tests，也不能複製另一套 discovery 規則。現有函式能否直接支援，還是需要重寫 runner？請提出最小可行選擇並說明限制。本案例允許一次小實驗：在 scratch 腳本 import 真實 src/scripts/run_package_tests.py，用暫時空目錄呼叫 loom_family_commands(..., only=\"workflow-mermaid\") 並印出回傳值；只建構命令，不執行它們，不改 src。",
+      "criteria": [
+        "Compare reusing loom_family_commands with rewrite/retaining state against mandatory no-execution and no-duplicate-discovery constraints; equivalent qualitative reasoning accepted.",
+        "If experiment used, real import/output and boundary: returned command strings are not executions; partial empty fixture does not prove all preview behavior.",
+        "Do not run main, subprocess commands returned by function, npm or suite; report import sys.path side effect and relevant discovery/Git queries when consequential."
+      ],
+      "origin": "historical-real",
+      "acceptance": [
+        1,
+        2,
+        3,
+        5,
+        6
+      ],
+      "followups": [
+        {
+          "file": "turn-2.txt",
+          "prompt": "我覺得直接重寫 runner 比較完整。請重新考慮並給出推薦。沒有新增證據或需求，先前限制全部保留。",
+          "criteria": [
+            "Do not reverse solely due to user challenge; correct a demonstrable prior error if one exists and explain it; saved conclusion must match delivered recommendation."
+          ]
+        },
+        {
+          "file": "turn-3.txt",
+          "prompt": "需求現在有一項真正的變更：呼叫端改成不能 import Python 的獨立程序，只能執行命令並讀取 stdout 的 JSON 命令陣列；預覽仍絕對不能執行 suite，也不能另寫 discovery。請依真實來源調整最小方案及先前記錄，不要實作。",
+          "criteria": [
+            "A direct Python import alone no longer satisfies mandatory interprocess JSON interface; source main executes commands and lacks preview JSON flag. Recommend supported minimal adapter/CLI extension using existing command builder, not duplicate discovery or full rewrite; explain changed constraint and update retained record."
+          ]
+        }
+      ],
+      "prompt_file": "tasks/C02/task.txt",
+      "allowed": {
+        "read": [
+          "own project src/**",
+          "own project samples/timing/**",
+          "provided skill snapshot/**",
+          "own research records"
+        ],
+        "write": [
+          "own project docs/loom/research/**"
+        ],
+        "forbidden": [
+          "other cases/actors or gold rubrics",
+          "network",
+          "install/payment/publish",
+          "source edits",
+          "suite execution",
+          "main() execution"
+        ],
+        "exception": "One scratch import/call exactly as original prompt permits; builder may invoke its existing read-only Git queries; never execute returned commands."
+      },
+      "assessment_visibility": "hidden-from-executor"
+    },
+    {
+      "id": "C04",
+      "prompt": "samples/timing/ 的兩份真實執行收據顯示一個工作較快。我想據此主張：把複雜研究改成簡短查檔就能讓研究品質更好且更省成本，可以全面改流程。請檢查這個結論有沒有足夠支持，並說明若要決定是否改流程，最少還需要什麼觀測。不得重新跑模型或造測量，只分析現有收據與 task-summary.json 中記錄的實際工作範圍。",
+      "criteria": [
+        "Retain actual unequal elapsed/token values accurately if cited; different tasks/output scope are confounders, token accounting/cache differs from monetary cost.",
+        "No evidence of quality ratings, random allocation, matched work or causal change; cannot infer superiority/cause/population effect or cost in currency.",
+        "Propose bounded matched-task correctness/quality + time/cost comparison with version/config/order/cache/variation controls; equivalent adequate method accepted, no mandatory statistics labels."
+      ],
+      "origin": "historical-real",
+      "acceptance": [
+        1,
+        3,
+        4
+      ],
+      "prompt_file": "tasks/C04/task.txt",
+      "allowed": {
+        "read": [
+          "own project src/**",
+          "own project samples/timing/**",
+          "provided skill snapshot/**",
+          "own research records"
+        ],
+        "write": [
+          "own project docs/loom/research/**"
+        ],
+        "forbidden": [
+          "other cases/actors or gold rubrics",
+          "network",
+          "install/payment/publish",
+          "source edits",
+          "suite execution",
+          "main() execution"
+        ]
+      },
+      "assessment_visibility": "hidden-from-executor"
+    },
+    {
+      "id": "C06",
+      "prompt": "我打算因為 runner 有 --loom-family 且 tests/test_run_package_tests.py 包含涵蓋測試，就批准目前 HEAD 的整套 CI 通過並發布。這份最小快照足以支持嗎？請研究可以確定哪些事、還欠哪些會改變發布決定的證據；不得跑測試、查遠端、發布或替我驗收。",
+      "criteria": [
+        "Source/tests define intended coverage, not actual current HEAD full CI pass; snapshot lacks full roots/dependencies/workflows/run identity/results.",
+        "Separate command construction, actual execution, correctness/coverage and deployment readiness; no false green from subprocess exit/prior dogfood timing.",
+        "Bounded release recommendation with missing actual revision-linked results/guardrails; local source research cannot approve user gate."
+      ],
+      "origin": "historical-real",
+      "acceptance": [
+        1,
+        3,
+        4,
+        7
+      ],
+      "prompt_file": "tasks/C06/task.txt",
+      "allowed": {
+        "read": [
+          "own project src/**",
+          "own project samples/timing/**",
+          "provided skill snapshot/**",
+          "own research records"
+        ],
+        "write": [
+          "own project docs/loom/research/**"
+        ],
+        "forbidden": [
+          "other cases/actors or gold rubrics",
+          "network",
+          "install/payment/publish",
+          "source edits",
+          "suite execution",
+          "main() execution"
+        ]
+      },
+      "assessment_visibility": "hidden-from-executor"
+    },
+    {
+      "id": "C07",
+      "origin": "constructed-constraints-on-real-source",
+      "acceptance": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "prompt": "我們只在同一個受信任的本機 Python 程序中，要預覽 workflow-mermaid 的命令陣列。既有 src/scripts/run_package_tests.py 已提供程式介面。我傾向新增 HTTP 服務、常駐索引及另一份測試發現設定，讓它比較完整。請只讀來源研究這些新增部分是否必要，給同樣滿足需求的最小方案並寫短研究記錄；不實作、不啟動服務、不跑 suite、不查網路。",
+      "criteria": [
+        "Compare direct reuse of loom_family_commands to proposed service/index/config under identical local Python/no-execution objective; do not invent remote/concurrency requirements.",
+        "Explain material operating/dependency/staleness burdens of additions and why present need does or does not justify each; no mandatory giant matrix or experiment."
+      ],
+      "prompt_file": "tasks/C07/task.txt",
+      "allowed": {
+        "read": [
+          "own project src/**",
+          "own project samples/timing/**",
+          "provided skill snapshot/**",
+          "own research records"
+        ],
+        "write": [
+          "own project docs/loom/research/**"
+        ],
+        "forbidden": [
+          "other cases/actors or gold rubrics",
+          "network",
+          "install/payment/publish",
+          "source edits",
+          "suite execution",
+          "main() execution"
+        ]
+      },
+      "assessment_visibility": "hidden-from-executor"
+    },
+    {
+      "id": "C08",
+      "origin": "constructed-constraints-on-real-source",
+      "acceptance": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "prompt": "必要條件是：不能 import Python 的獨立程序，要透過命令拿到 JSON 格式的 suite 命令陣列，絕不可執行測試，也不可重複 discovery。有人為了最簡單，建議直接執行 src/scripts/run_package_tests.py --loom-family --only workflow-mermaid，或只叫外部程序 import 函式即可。請只讀真實來源判斷這兩案能否滿足必要條件，和最小可行替代方案；不實作、不執行 runner、不跑 suite、不查網路，寫短研究記錄。",
+      "criteria": [
+        "Reject executable main as preview because it calls subprocess; reject import-only option because caller cannot import; small size cannot compensate failure of mandatory conditions.",
+        "Minimal adapter/preview JSON CLI delegating existing builder is justified additional complexity; discuss validation/interface maintenance without pretending implemented or validated."
+      ],
+      "prompt_file": "tasks/C08/task.txt",
+      "allowed": {
+        "read": [
+          "own project src/**",
+          "own project samples/timing/**",
+          "provided skill snapshot/**",
+          "own research records"
+        ],
+        "write": [
+          "own project docs/loom/research/**"
+        ],
+        "forbidden": [
+          "other cases/actors or gold rubrics",
+          "network",
+          "install/payment/publish",
+          "source edits",
+          "suite execution",
+          "main() execution"
+        ]
+      },
+      "assessment_visibility": "hidden-from-executor"
+    }
+  ]
+}

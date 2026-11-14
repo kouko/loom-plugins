@@ -1,0 +1,12 @@
+{
+  "source_log": "/Users/kouko/.codex/sessions/2026/11/14/rollout-2026-11-14T21-56-53-01a1da58-c742-75f2-b057-2aa73f7d26e5.jsonl",
+  "source_sha256": "641ed1c60b1b47d900192db73e66cce04940c74878b043d41adbf383b4fb0d55",
+  "agent": "/root/r12",
+  "selection": "Actual tool calls/results and final answers only; all reasoning and bootstrap excluded",
+  "profiles": [
+    {
+      "model": "gpt-6.1-sol",
+      "effort": "low"
+    }
+  ]
+}

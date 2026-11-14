@@ -1,0 +1,16 @@
+{
+  "id": "B02",
+  "requested_model": "gpt-6.1-sol",
+  "requested_provider": "openai",
+  "requested_effort": "medium",
+  "elapsed_seconds": 42.637,
+  "exit_code": 0,
+  "timed_out": false,
+  "usage": {
+    "input_tokens": 116861,
+    "cached_input_tokens": 92544,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1359,
+    "reasoning_output_tokens": 15
+  }
+}

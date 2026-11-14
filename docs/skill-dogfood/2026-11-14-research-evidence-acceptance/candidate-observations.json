@@ -1,0 +1,54 @@
+{
+  "status": "observed-not-independently-graded",
+  "candidate_revision": "9b7f5f829",
+  "source_inputs_unchanged": true,
+  "instruction_lines": {
+    "before": 349,
+    "after": 374,
+    "net": 25
+  },
+  "cases": [
+    {
+      "run": "R07",
+      "record_files": [
+        "docs/loom/research/2026-11-14-package-runner-test-roots.md"
+      ]
+    },
+    {
+      "run": "R08",
+      "record_files": [
+        "docs/loom/research/2026-11-14-package-suite-preview.md",
+        "docs/loom/research/2026-11-14-package-suite-json-preview.md"
+      ]
+    },
+    {
+      "run": "R09",
+      "record_files": [
+        "docs/loom/research/2026-11-14-timing-process-claim.md"
+      ]
+    },
+    {
+      "run": "R10",
+      "record_files": [
+        "docs/loom/research/2026-11-14-ci-release-evidence.md"
+      ]
+    },
+    {
+      "run": "R11",
+      "record_files": [
+        "docs/loom/research/2026-11-14-workflow-mermaid-preview.md"
+      ]
+    },
+    {
+      "run": "R12",
+      "record_files": [
+        "docs/loom/research/2026-11-14-suite-command-json.md"
+      ]
+    }
+  ],
+  "limitations": [
+    "Six bounded cases per arm; no general superiority, activation or host-parity claim.",
+    "Native requested model/effort observable; provider-side immutable model not attested."
+  ],
+  "profile": "Native turn_context records gpt-6.1-sol / low in all eight candidate turns, matching baseline requested profiles; provider-side immutable model not attested."
+}
