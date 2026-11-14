@@ -314,16 +314,23 @@ answers yes to the printed list.
 
 ## Handoff
 
-Before reporting published delivery, run the shared read-only observation on
-every supported host:
+Before reporting published delivery while the change remains identifiable,
+run the shared read-only observation on every supported host:
 
 ```text
 "<loom-code>/scripts/loom-python" --repair delivery --goal published --intent <absolute-intent-path> --json
 ```
 
 Use `--goal merged` while the merged change remains identifiable on its retained
-feature branch; after land removes that branch/worktree, report land's observed
-merge result. Use `--goal local` only for an explicit local-only target.
+feature branch. After land confirms merge and completes cleanup for the same
+change being reported, use that execution's full result, including exit status,
+verification and cleanup outcomes, without rerunning a branch-dependent delivery
+check. Preserve verification failures, partial cleanup and pending work; a
+`Merged PR` line or `next: cd` hint alone is insufficient to establish completion.
+If the original branch/worktree is gone after partial cleanup, use the existing
+`land --cleanup <type>/<change-id>` recovery from a surviving repository.
+Earlier success for another change supplies no evidence for current work.
+Use `--goal local` only for an explicit local-only target.
 Report the observed state, reason, next action and evidence; PR existence,
 an agent's claim and stale remote-tracking refs cannot prove exact-head delivery.
 Incomplete or unavailable evidence remains incomplete or unconfirmed, never

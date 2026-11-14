@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.81.0] — 2026-11-14 — clarify post-merge delivery completion
+
+- Align completion guidance with Ship: after the same change's land execution confirms merge, verification and complete cleanup, report from that full result without repeating a delivery observation that depends on the cleaned branch.
+- Explain unidentified-change diagnostics and applicable post-merge evidence while preserving unconfirmed delivery, incomplete cleanup recovery, existing checks and publication authorization. A merge line, directory hint or prior change's success alone does not establish completion.
+
 ## [3.80.0] — 2026-11-14 — ground engineering research in evidence conditions
 
 - Define decision-relevant unknowns and sufficient evidence before selecting proportionate research methods. Relate findings to supported, unsupported or unresolved conditions without weakening requirements to claim completion.
