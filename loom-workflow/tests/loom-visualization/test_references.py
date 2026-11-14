@@ -93,6 +93,105 @@ def test_guide_has_seven_rules_and_rewrite_steps():
     assert "Internal terms" in sections(text)
 
 
+# Accepted limits: a Plain equal to its Hard plus a trailing space, swapped columns, and Simplified read as Traditional.
+SHAPES = {
+    # first cell of a rule 3 row: whether the shape also needs a Traditional Chinese pair
+    "A thing does what only a person does": True,
+    "The subject is far from its verb": True,
+    "Three or more nouns in a row": True,
+    "A noun used as a verb": False,
+    "A dropped connecting word": True,
+}
+STUDY_URL = "https://arxiv.org/abs/2610.29162"
+CJK = re.compile(r"[一-鿿]")
+CAUSE = re.compile(r"\bbecause\b|因為|所以")
+# Same negation words as NEGATION_RE in the sibling test_templates.py. Copied, not imported:
+# the adversarial programs run this file alone in a temp tree.
+NEGATION = re.compile(r"\b(?:not|never|no|none|without|unless|except|avoid)\b|n't", re.IGNORECASE)
+# Governing sentences whose polarity matters: (label, where, phrase that locates the
+# sentence, wording it must carry). Outside that wording the sentence holds no negation.
+POLARITY_PINS = (
+    ("scope excludes files you write", "scope", "files you write",
+     r"It never covers files you write"),
+    ("rule 3 connecting-word guard", "rule 3", "Add a connecting word",
+     r"only when you know how the two parts relate"),
+    ("rule 3 no guessed cause", "rule 3", "guess",
+     r"When you do not know, write two separate sentences and do not guess a cause"),
+    ("rule 3 study limits", "rule 3", "limits",
+     r"it ran no human reading experiment, it measured English only, and it did not test "
+     r"whether instructing a model"),
+    ("rule 7 keeps connecting words", "rule 7", "connect",
+     r"never means dropping the words that connect a sentence: keep .*因為"),
+    ("last rewrite step checks the sentence shapes", "last step", "sentence shapes",
+     r"and for the five sentence shapes of rule 3"),
+)
+
+
+def sentence_shape_errors(text):
+    """Return errors in the sentence-shape guidance (Scope, rules 3 and 7, last rewrite step); empty = valid."""
+    errors = []
+    rules = rule_titles(text)
+    rule3 = rules.get(3, "")
+    rows = re.findall(r"^\| ([^|\n]+) \| ([^|\n]+) \| ([^|\n]+) \|$", rule3, flags=re.MULTILINE)
+    for shape, chinese in SHAPES.items():
+        pairs = [(hard, plain) for name, hard, plain in rows if name == shape and hard != plain]
+        if not any(not CJK.search(hard + plain) for hard, plain in pairs):
+            errors.append(f"{shape}: no English pair")
+        if chinese and not any(CJK.search(hard) and CJK.search(plain) for hard, plain in pairs):
+            errors.append(f"{shape}: no Traditional Chinese pair")
+        if any(CAUSE.search(plain) and not CAUSE.search(hard) for hard, plain in pairs):
+            errors.append(f"{shape}: a Plain cell adds a cause")
+    if STUDY_URL not in rule3 or STUDY_URL not in sections(text).get("Sources", ""):
+        errors.append("study not cited in both rule 3 and Sources")
+    if "concise" not in rules.get(7, "").lower():
+        errors.append("rule 7 does not name concise")
+    steps = numbered(sections(text).get("Rewrite steps", ""))
+    where = {"scope": sections(text).get("Scope", ""), "rule 3": rule3, "rule 7": rules.get(7, ""),
+             "last step": steps[-1] if steps else ""}
+    for label, place, locator, wording in POLARITY_PINS:
+        hits = [s for s in re.split(r"(?<=[.!?])\s+", " ".join(where[place].split())) if locator in s]
+        if not hits or any(not re.search(wording, s) or NEGATION.search(re.sub(wording, "", s))
+                           for s in hits):
+            errors.append(f"{label}: missing or inverted")
+    return errors
+
+
+def test_sentence_shape_guidance_present():
+    """A1 pattern-pairs, A2 concise-rule, A3 step-checks-shape, A5 scope-kept, A6 source-limits."""
+    assert sentence_shape_errors(_text()) == []
+
+
+def test_broken_sentence_shape_guidance_rejected():
+    """A1 pair-missing; A2, A3, A5, A6 and the connecting-word guard each inverted."""
+    broken = re.sub(r"^\| A noun used as a verb \|.*\n", "", _text(), flags=re.MULTILINE)
+    for old, new in (
+        (r"(?m)^\| Three or more nouns in a row \| 「.*\n", ""),
+        (r"\(\[arXiv 2610\.29162\]\([^)]*\)\)", ""),
+        (r"Being concise", "Being brief"),
+        (r"版號沒有改。」", "因為版號沒有改。」"),
+        (r"It never covers files you write", "It also covers files you write"),
+        (r"Add a connecting word only when", "Add a connecting word even when"),
+        (r"and do not guess a cause", "and guess a cause"),
+        (r"it ran no human reading\s+experiment", "it ran a human reading experiment"),
+        (r"It\s+never means dropping", "It also means dropping"),
+        (r"and for the five sentence shapes", "but never for the five sentence shapes"),
+    ):
+        broken = re.sub(old, new, broken)
+    assert sorted(sentence_shape_errors(broken)) == [
+        "A dropped connecting word: a Plain cell adds a cause",
+        "A noun used as a verb: no English pair",
+        "Three or more nouns in a row: no Traditional Chinese pair",
+        "last rewrite step checks the sentence shapes: missing or inverted",
+        "rule 3 connecting-word guard: missing or inverted",
+        "rule 3 no guessed cause: missing or inverted",
+        "rule 3 study limits: missing or inverted",
+        "rule 7 does not name concise",
+        "rule 7 keeps connecting words: missing or inverted",
+        "scope excludes files you write: missing or inverted",
+        "study not cited in both rule 3 and Sources",
+    ]
+
+
 DECISION_HEADERS = SITUATIONS["Decision consequences"]
 LETTERED_OPTION = re.compile(r"\((?:[A-C])(?:,[^)]*)?\)")
 
