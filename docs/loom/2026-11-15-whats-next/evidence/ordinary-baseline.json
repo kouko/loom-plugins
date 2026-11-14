@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "phase": "ordinary-answer-before-candidate",
+  "date": "2026-11-15",
+  "synthetic": true,
+  "fixture": "loom-workflow/tests/whats-next/behavior_cases.json",
+  "design": {
+    "runs_per_case": 1,
+    "execution": "native collaboration.spawn_agent",
+    "fork_turns": "none",
+    "bounded_access": "No tools, files, external services or edits; answer only visible context; do not claim execution.",
+    "criteria_visible_to_execution_agents": false,
+    "profile_input": {
+      "event": "initial",
+      "main_profile": {
+        "model": null,
+        "effort": null
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0
+    },
+    "profile_result": {
+      "completed_redispatches": 0,
+      "effective_profile": "inherited",
+      "outcome": "dispatch",
+      "overrides": null,
+      "reason": "unobservable-main-profile",
+      "requested_profile": null,
+      "task_class": "ordinary",
+      "uncertainty": null
+    }
+  },
+  "runs": [
+    {
+      "case_id": "B1",
+      "agent_id": "/root/whats_baseline/b1",
+      "visible_state": "Goal: choose a parser repair that reduces import failures. The only visible result is '12 imports failed'; no failing samples or error categories are available.",
+      "permissions": "Read-only advice and local inspection are authorized; no edits, network or spend.",
+      "prompt": "What is the most useful next step?",
+      "status": "completed",
+      "output_text": "Inspect the 12 failed imports and group their error messages, with one representative input per group. That evidence will identify which parser repair would address the most failures; the failure count alone cannot.",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B2",
+      "agent_id": "/root/whats_baseline/b2",
+      "visible_state": "目標是讓離線匯入可靠。早期想法是新增雲端同步；使用者最新修正：產品必須全程離線。已知匯入失敗集中在非 UTF-8 檔案。",
+      "permissions": "可以提供建議、讀本機資料；未授權修改或外傳。",
+      "prompt": "接下來最值得做什麼？",
+      "status": "completed",
+      "output_text": "最值得先做的是確認非 UTF-8 檔案的編碼與失敗原因，再決定離線轉碼方式；這最直接改善目前的匯入可靠性。\n\n- 先唯讀檢查本機失敗樣本，確認常見編碼及錯誤模式。\n- 依結果提出本機解碼方案，並用成功與失敗樣本驗證文字是否正確，避免亂碼被當作匯入成功。\n- 全程離線；修改程式或檔案前再取得授權。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B3",
+      "agent_id": "/root/whats_baseline/b3",
+      "visible_state": "目的は検索待ち時間を減らすこと。計測では一部の検索が遅い。索引方式Aは高速だが更新が翌日、方式Bは更新即時だが速度改善は小さい。許容更新遅延は未確認。",
+      "permissions": "提案のみ。実装、外部サービス、費用は未承認。",
+      "prompt": "次は何をするのがよい？",
+      "status": "completed",
+      "output_text": "次は、検索結果に最新の変更がいつ反映される必要があるかを確認するのがよいです。翌日反映でよければ、速度改善の大きい方式Aが有力です。即時反映が必要なら方式Bが候補になります。\n\n更新の反映は翌日でも支障ありませんか？",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B4",
+      "agent_id": "/root/whats_baseline/b4",
+      "visible_state": "Goal: deliver a local CSV preview. The preview is delivered; all agreed acceptance checks passed; user confirmed satisfaction. No defects, follow-up requests or unfinished obligations are visible.",
+      "permissions": "Advice only; no new scope is authorized.",
+      "prompt": "What should we do next?",
+      "status": "completed",
+      "output_text": "Nothing further is needed—the CSV preview is delivered, all agreed checks passed, and you confirmed it meets your needs. We can close this task.",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B5",
+      "agent_id": "/root/whats_baseline/b5",
+      "visible_state": "目標是完成可重現的離線安裝。計畫原本依賴下載套件；新證據顯示部署環境完全斷網，下載方式不可用。目前尚未準備離線套件。",
+      "permissions": "已授權本機準備與檢查離線安裝方案；禁止外部連線與付費。",
+      "prompt": "這是執行中的工作；根據最新狀態決定下一步。",
+      "status": "completed",
+      "output_text": "下一步是先確認本機是否有完整的安裝套件與相依套件；部署環境完全斷網，原本的下載步驟已不可行。\n\n- 盤點本機快取與現有安裝檔，核對版本、平台及相依套件是否齊全。\n- 若齊全，整理成離線安裝包，附版本清單與校驗碼，再於停用網路的乾淨環境測試。\n- 若有缺件，列出缺件清單與取得來源，將安裝標為受阻；取得完整材料前不能宣稱可重現。\n\n以上是下一步判斷，尚未執行檢查或準備套件。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B6",
+      "agent_id": "/root/whats_baseline/b6",
+      "visible_state": "目的は既存テストで確認済みの小さな表示修正を完了すること。承認済み計画の次の作業はローカルのlint実行。新しい証拠や制約変更はない。",
+      "permissions": "実装とローカル検証は承認済み。公開やマージは未承認。",
+      "prompt": "これは進行中の作業です。今の状態から次の行動を決めてください。",
+      "status": "completed",
+      "output_text": "次は、承認済み計画どおりローカルの lint（コードの書き方の検査）を実行します。実装とローカル検証は承認済みなので、追加確認は不要です。\n\n問題があれば今回の表示修正に関係する範囲で直し、再検証します。公開・マージは別途承認が必要です。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B7",
+      "agent_id": "/root/whats_baseline/b7",
+      "visible_state": "Goal: fix a local date formatter. User approved the exact repair and local tests. The repair is done; the agreed focused test remains unrun. No new risk or scope is visible.",
+      "permissions": "The repair and focused local test are already authorized. Network, publish and merge are not authorized.",
+      "prompt": "I agreed to the fix. What now?",
+      "status": "completed",
+      "output_text": "Run the agreed focused local test next. The repair is done, and that test is already authorized. Then report the result.",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B8",
+      "agent_id": "/root/whats_baseline/b8",
+      "visible_state": "目標是修復本機報表排序。修復與本機測試已完成且通過。使用者問是否應合併；遠端檢查狀態未知。",
+      "permissions": "只授權修改與本機測試；未授權 push、開 PR 或 merge。",
+      "prompt": "下一步直接合併好嗎？",
+      "status": "completed",
+      "output_text": "先別直接合併：修復與本機測試已通過，但遠端檢查狀態仍未知，也尚未授權 push、開 PR 或 merge。\n\n下一步可先確認遠端檢查狀態；若仍需發布分支或開 PR，先取得你的授權，再完成檢查並確認是否合併。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    }
+  ],
+  "limitations": [
+    "Eight single native runs are a bounded pilot, not a statistical benchmark.",
+    "No candidate was loaded; these outputs alone establish no incremental improvement.",
+    "Timing and token fields were not exposed by the native execution tool and remain null.",
+    "Description-selection queries have been frozen but not executed in this task.",
+    "No installed-host trigger reliability, cross-vendor behavior or independent acceptance is claimed.",
+    "All observed outputs are retained without retries or grading by the fixture author."
+  ]
+}

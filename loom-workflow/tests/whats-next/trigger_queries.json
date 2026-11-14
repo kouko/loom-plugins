@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "scope": "Description-only selection; does not measure installed-host triggering.",
+  "queries": [
+    {
+      "id": "P1",
+      "language": "en",
+      "query": "/whats-next",
+      "expected_select": true
+    },
+    {
+      "id": "P2",
+      "language": "zh",
+      "query": "接下來最值得做什麼？",
+      "expected_select": true
+    },
+    {
+      "id": "P3",
+      "language": "ja",
+      "query": "次は何を優先すべき？",
+      "expected_select": true
+    },
+    {
+      "id": "P4",
+      "language": "en",
+      "query": "Given this blocker, reconsider the best next action.",
+      "expected_select": true
+    },
+    {
+      "id": "P5",
+      "language": "zh",
+      "query": "新證據推翻原方向，請推薦下一步。",
+      "expected_select": true
+    },
+    {
+      "id": "P6",
+      "language": "ja",
+      "query": "今の目標と制約に合う次の一手を提案して。",
+      "expected_select": true
+    },
+    {
+      "id": "P7",
+      "language": "en",
+      "query": "Should we stop now that the agreed goal is done?",
+      "expected_select": true
+    },
+    {
+      "id": "P8",
+      "language": "zh",
+      "query": "目前兩種方案怎麼選，首選是什麼？",
+      "expected_select": true
+    },
+    {
+      "id": "P9",
+      "language": "ja",
+      "query": "方針が行き詰まった。次の行動を判断して。",
+      "expected_select": true
+    },
+    {
+      "id": "P10",
+      "language": "en",
+      "query": "What should I work on next for this goal?",
+      "expected_select": true
+    },
+    {
+      "id": "N1",
+      "language": "en",
+      "query": "Where were we? Recap current progress.",
+      "expected_select": false
+    },
+    {
+      "id": "N2",
+      "language": "zh",
+      "query": "我們剛剛在幹嘛？請只整理現況。",
+      "expected_select": false
+    },
+    {
+      "id": "N3",
+      "language": "ja",
+      "query": "ここまでの進捗だけ振り返って。",
+      "expected_select": false
+    },
+    {
+      "id": "N4",
+      "language": "en",
+      "query": "Run the next approved lint step; the plan remains unchanged.",
+      "expected_select": false
+    },
+    {
+      "id": "N5",
+      "language": "zh",
+      "query": "照已核准計畫繼續跑測試，不需重新選方向。",
+      "expected_select": false
+    },
+    {
+      "id": "N6",
+      "language": "ja",
+      "query": "承認済みの修正をそのまま進めて。",
+      "expected_select": false
+    },
+    {
+      "id": "N7",
+      "language": "en",
+      "query": "Translate 'next step' into Japanese.",
+      "expected_select": false
+    },
+    {
+      "id": "N8",
+      "language": "zh",
+      "query": "修正 README 裡一個錯字。",
+      "expected_select": false
+    },
+    {
+      "id": "N9",
+      "language": "ja",
+      "query": "このJSONを整形して。",
+      "expected_select": false
+    },
+    {
+      "id": "N10",
+      "language": "en",
+      "query": "What is the current time?",
+      "expected_select": false
+    }
+  ]
+}
