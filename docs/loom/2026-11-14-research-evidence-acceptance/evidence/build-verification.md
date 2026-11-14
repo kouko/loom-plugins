@@ -22,3 +22,23 @@
 Closing Review's first sync attempt refused newly captured, uncommitted output
 files. They are retained in this commit before the deliberate sync retry; no
 trunk content or requirements changed.
+
+## Integration verification after merge acceptance
+
+The authorized merge first refused GitHub's DIRTY state. Main had advanced to
+`cb737ec3ee13b7670857b65a7c874774a4d3340a`; the sole conflict was adjacent
+release-version rows in README. Merge commit
+`36622c801faed3d6ae2f7c5ba2cb17b2b629ff73` retains code 3.80.0 and workflow
+5.24.0, with all eight engineering-research files byte-identical to the
+previously published tree. Requirements and the accepted partial validation
+limit are unchanged. This is the same bounded review episode's second digest.
+
+- Sync: up to date with the fetched main; no further commit added.
+- Focused release checks: code metadata 6 passed, workflow metadata 14 passed;
+  generated-manifest check passed.
+- Same complete suite command above: exit 0;
+  [actual integration output](build-suite-r2-passed.txt).
+- Same unchanged adversarial program and command above: exit 0, 5 passed;
+  [actual output](build-adversarial-r2-passed.txt).
+- No adversary redispatch: its existing program is unchanged and passes.
+- No efficacy trials were repeated or new coverage inferred from this merge.
