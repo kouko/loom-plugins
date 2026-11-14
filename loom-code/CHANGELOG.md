@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.78.0] — 2026-11-14 — add advisory next steps to two CLI results
+
+- Add optional `suggested_next` advice to existing `contract` and `reviewer-count` JSON: nonblank English advice for blocked/error results, null for passed. Text refusals/errors append `Suggested next step:` while retaining original diagnostics and Help hints.
+- Add locally generated advice to checked-consumer faults without changing authoritative validation, exits, raw numeric precision, single execution, runtime repair ownership or authorization. Missing or unusable advice never changes classification or permits automatic execution, retries or text fallback.
+- Document optional advisory consumption and the bounded migration: sixteen checker commands, five JSON modes, two migrated advice interfaces. Preserve preparation shapes, delivery's legacy `next`, existing operation recovery and installed plugin state; no efficiency improvement is claimed.
+
 ## [3.77.0] — 2026-11-14 — validate and adopt read-only CLI observations
 
 - Add one bounded checked consumer for `contract` and `reviewer-count`: validate the published envelope, required types, unchanged request identity and exit/status agreement, preserving compatible extra fields and numeric precision. Reject malformed or contradictory results without fallback, retry or fabricated success.
