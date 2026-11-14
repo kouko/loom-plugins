@@ -45,6 +45,8 @@ def delivery(tmp_path, monkeypatch):
         code = publish.cmd_delivery(["--json", *args], out, err)
         assert not err.getvalue()
         result = json.loads(out.getvalue())
+        assert set(result) == {"state", "reason", "next", "evidence", "complete", "suggested_next"}
+        assert result["suggested_next"] == result["next"]
         assert result["reason"] and result["next"] and isinstance(result["evidence"], dict)
         assert not any(set(call) & {"push", "create", "edit", "merge", "fetch"}
                        for call in calls.calls)
@@ -155,3 +157,33 @@ def test_unavailable_remote(delivery, monkeypatch):
     code, result = delivery[-1]()
     assert code == 1 and result["state"] == "unconfirmed" and not result["complete"]
     assert "diagnostic" in result["next"].lower()
+
+
+def test_text_advice_matches_json_without_second_observation(delivery, monkeypatch):
+    repo, _, calls, _, _ = delivery
+    original = publish.observe_delivery
+    observations = []
+    def observe(*args, **kwargs):
+        result = original(*args, **kwargs)
+        observations.append(result)
+        return result
+    monkeypatch.setattr(publish, "observe_delivery", observe)
+    for pending in (False, True):
+        if pending:
+            (repo / "delta.py").write_text("pending scoped work")
+        out, err = StringIO(), StringIO()
+        code = publish.cmd_delivery(["--goal", "local"], out, err)
+        observed = observations[-1]
+        assert code == int(pending) and len(observations) == 1
+        assert out.getvalue() == f"Delivery {observed.state}: {observed.reason}\nnext: {observed.next}\n"
+        assert err.getvalue() == f"Suggested next step: {observed.next}\n"
+        assert calls.calls == []
+        observations.clear()
+    class AdviceFailure(StringIO):
+        def write(self, text):
+            if text.startswith("Suggested next step:"):
+                raise OSError("advice unavailable")
+            return super().write(text)
+    out = StringIO()
+    assert publish.cmd_delivery(["--goal", "local"], out, AdviceFailure()) == 1
+    assert len(observations) == 1 and out.getvalue().startswith("Delivery uncommitted:")

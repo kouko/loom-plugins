@@ -153,7 +153,10 @@ def test_removed_package_replay_flag_is_rejected() -> None:
         capture_output=True,
     )
     assert result.returncode == 2
-    assert result.stderr == "push expects --hook, --install-git-hooks or --remove-git-hooks.\n"
+    diagnostic, advice = result.stderr.splitlines(keepends=True)
+    assert diagnostic == "push expects --hook, --install-git-hooks or --remove-git-hooks.\n"
+    assert advice.startswith("Suggested next step: ") and advice.removeprefix("Suggested next step: ").strip()
+    assert result.stderr.count("Suggested next step:") == 1
 
 
 def test_live_consumers_require_contract_two() -> None:

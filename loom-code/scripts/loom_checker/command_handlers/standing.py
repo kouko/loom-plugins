@@ -4,6 +4,7 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import read_text
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
+from loom_checker.cli_advice import write_suggestion
 from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.standing import check_standing_silence, check_standing_warn, check_second_vendor, check_product_principles
 from loom_checker.rule_checks.standing import find_standing_doc
@@ -27,7 +28,9 @@ def cmd_standing(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     architecture = repo / "ARCHITECTURE.md"  # root only: the only place its readers look
     architecture = architecture if architecture.is_file() else None
     waived = check_standing_silence(repo)
-    check_standing_warn(principles, design, architecture, waived, err)
+    warned = check_standing_warn(principles, design, architecture, waived, err)
     failures = check_second_vendor(repo)
     failures += check_product_principles(repo, front, principles)
+    if warned and not failures:
+        write_suggestion("The missing standing documents are a nonblocking warning; discuss them with their owner before creating documents or changing the existing waiver.", err)
     return report(failures, err)

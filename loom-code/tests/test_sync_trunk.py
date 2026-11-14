@@ -401,7 +401,8 @@ def test_control_character_conflict_path_cannot_forge_a_block_line(tmp_path: Pat
 
     assert result.returncode == 1, result.stdout + result.stderr
     lines = result.stderr.splitlines()
-    assert all(line.startswith("BLOCK review.sync: ") for line in lines), result.stderr
+    assert lines[-1].startswith("Suggested next step: ")
+    assert all(line.startswith("BLOCK review.sync: ") for line in lines[:-1]), result.stderr
     assert "BLOCK review.sync: forged.txt" not in lines
 
 
@@ -497,7 +498,8 @@ def test_control_character_untracked_path_cannot_forge_a_warn_line(tmp_path: Pat
 
     assert result.returncode == 1, result.stdout + result.stderr
     lines = result.stderr.splitlines()
-    assert len(lines) == 1 and lines[0].startswith("BLOCK review.sync: "), result.stderr
+    assert len(lines) == 2 and lines[0].startswith("BLOCK review.sync: "), result.stderr
+    assert lines[1].startswith("Suggested next step: ")
 
 
 # --- Acceptance 4: unreachable remote -------------------------------------
@@ -517,6 +519,8 @@ def test_unreachable_remote_warns_exit_zero(tmp_path: Path) -> None:
     assert result.returncode == 0
     assert "WARN review.sync:" in result.stderr
     assert "could not be checked against main" in result.stderr
+    assert result.stderr.count("Suggested next step:") == 1
+    assert "remains unsynced" in result.stderr
     assert "BLOCK" not in result.stderr
 
 
@@ -529,3 +533,4 @@ def test_unreachable_remote_creates_no_commit(tmp_path: Path) -> None:
 
     assert result.returncode == 0
     assert state(change) == before
+    assert "remains unsynced" in result.stderr

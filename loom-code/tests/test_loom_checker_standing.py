@@ -123,6 +123,8 @@ def test_missing_standing_docs_warn_in_exactly_three_lines(tmp_path: Path) -> No
     result = run_checker("standing", str(intent), cwd=repo)
     assert result.returncode == 0, result.stderr
     assert len(warn_lines(result)) == 3
+    assert result.stderr.count("Suggested next step:") == 1
+    assert "nonblocking" in result.stderr
 
 
 def test_the_warn_names_what_is_missing(tmp_path: Path) -> None:
@@ -156,6 +158,7 @@ def test_no_warn_when_all_documents_exist(tmp_path: Path) -> None:
     result = run_checker("standing", str(intent), cwd=repo)
     assert warn_lines(result) == []
     assert result.returncode == 0
+    assert result.stderr == ""
 
 
 def test_missing_architecture_is_named_in_the_warn(tmp_path: Path) -> None:
@@ -211,6 +214,8 @@ def test_product_without_principles_is_rejected(tmp_path: Path) -> None:
     result = run_checker("standing", str(intent), cwd=repo)
     assert result.returncode == 1
     assert "standing.product-principles-reject" in blocked_rules(result)
+    assert result.stderr.count("Suggested next step:") == 1
+    assert "nonblocking" not in result.stderr
 
 
 def test_product_with_unratified_principles_is_rejected(tmp_path: Path) -> None:
@@ -284,6 +289,7 @@ def test_waiver_silences_the_warn(tmp_path: Path) -> None:
     result = run_checker("standing", str(intent), cwd=repo)
     assert warn_lines(result) == []
     assert result.returncode == 0
+    assert result.stderr == ""
 
 
 def test_waiver_does_not_lift_the_product_rejection(tmp_path: Path) -> None:

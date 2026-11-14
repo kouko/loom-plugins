@@ -81,7 +81,8 @@ from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
 from loom_checker.command_handlers.standing import cmd_standing
 from loom_checker.command_handlers.sync import cmd_sync_trunk
 from loom_checker.helpers import UsageError
-from loom_checker.preparation_output import new_result, error_result, write_result, suggested_next
+from loom_checker.preparation_output import new_result, error_result, write_result
+from loom_checker.cli_advice import suggested_next, write_suggestion
 from loom_checker.rules import list_rules
 
 
@@ -97,13 +98,16 @@ JSON stdout is one object plus newline; checker stderr is empty. Fields:
 schema_version: 1; command: plan|intake; status: passed|blocked|error;
 diagnostics: ordered [{rule_id, message}]; notices: ordered strings;
 error: null or {kind: usage|internal, message}. Empty arrays are [], not null.
+suggested_next: optional advisory string for blocked/error, null for passed.
+Ignore missing, blank or non-string advice; it grants no execution authority.
+Text refusal/error results append Suggested next step: on stderr.
 Exit 0 means passed, 1 blocked, 2 error. Blocked includes rule diagnostics;
 error has empty diagnostics. Notices may precede a blocker or internal error
 and never imply success. Status covers only this invocation's checks, not
 workflow completion or authority. Do not depend on key order or message prose.
 Launcher/startup failures, termination and broken pipes are outside this
 in-process result guarantee. Read the actual process result; do not retry
-automatically. Without --json, existing text streams and exits are unchanged.
+automatically. Advice does not change result classification or exits.
 """
 
 
@@ -219,6 +223,8 @@ was skipped or failed and stdout says "trunk not updated". Read the trunk
 result; preserve work before independently resolving local trunk conditions.
 Named cleanup never syncs trunk. Sweep listing also returns exit 0. Exit 1 reports
 refusal or failed stage with BLOCK stderr, Exit 2 reports usage/internal errors.
+Removable sweep listings add Suggested next step: on stderr; review the list
+and obtain approval before deliberately using its token. Listing is not consent.
 Progress/results appear on stdout. Merge can succeed before verification or
 cleanup fails: inspect remote merge and preserved work before corrective action;
 use cleanup for an already merged change instead of blindly repeating a merge.
@@ -234,6 +240,7 @@ Fetches origin, then may rebase safe unpublished commits or merge trunk. Refuses
 preflight conflicts/collisions; abort/rollback is attempted after mutation failure,
 not guaranteed. Results appear on stdout; WARN/BLOCK diagnostics on stderr.
 Exit 0 includes fetch WARN with no sync, already-current and completed sync.
+Fetch WARN advice explicitly retains the unsynced state despite exit 0.
 Exit 1 means BLOCK review.sync; Exit 2 means arguments/internal error. Read the
 warning before assuming synchronization. Resolve origin/network or conflicts
 through normal Build and retry. Changed content needs full tests/probes again;
@@ -243,6 +250,8 @@ rebased commit identities require updating pinned references before review.
 Usage: github-rules [--print-setup]
 Run in the repository with origin metadata and authenticated gh read access.
 Uses network reads to report present, absent or unconfirmed rules on stdout.
+The normal human report keeps Suggested next step: advice on stdout; confirmed
+protection needs no filler. --print-setup retains its separate existing output.
 It first requires the PR-floor workflow template on trunk; "template not on"
 instructions can return before inspecting any rules. Setup text may also appear
 without --print-setup when missing rules are found.
@@ -260,6 +269,8 @@ directory or absolute), required base/head Git evidence and optional branch.
 Run in the repository. Emits CI error/notice annotations on stdout. Body
 structure failures also report BLOCK ci.pr-floor on stderr, exit 1. Exit 0
 means the body passed; recomputed verification may still be stale or absent.
+Absent/stale verification adds advisory stderr without changing the body-floor
+result, stdout annotations or the existing step-summary write.
 Exit 2 means invocation, unreadable file or internal failure. Correct named
 headings or Git context; never fabricate stronger verification status.
 Can append a verification line to GITHUB_STEP_SUMMARY when set, so it is not
@@ -276,6 +287,8 @@ intents and KICKOFF-DEFAULTS.md standing/second-vendor policy records. Principle
 and design discovery checks root first, then docs/loom; architecture is root-only.
 Warnings on stderr can coexist with passing checks and empty stdout. Exit 0
 means implemented policy checks passed, not semantic certification of documents.
+An emitted warning without a refusal adds nonblocking Suggested next step:
+guidance; existing waivers suppress warnings, never required policy refusals.
 Exit 1 reports BLOCK diagnostics for second-vendor/product-principles policy;
 Exit 2 means missing file, invalid arguments or internal failure. Correct the
 authentic policy/document record through its owning workflow, then rerun.
@@ -497,6 +510,10 @@ publication or merge, and does not perform either action.
 state: observed delivery condition; reason: why it was classified that way;
 next: suggested next action, subject to existing authorization;
 evidence: observations supporting the result; complete: whether the goal is met.
+suggested_next: optional advisory alias of next; all five legacy fields remain.
+No preparation envelope or schema version is added. Ordinary text keeps its
+state and legacy next line, adding the same Suggested next step: on stderr.
+Ignore missing, blank or non-string advice; it grants no authority to act.
 A JSON object by itself, especially complete: false, is not proof of delivery.
 Use state, reason, next and evidence together with the process exit status.
 Exit 0 means the selected goal was achieved; exit 1 means incomplete or
@@ -528,6 +545,11 @@ runtime readiness is still required. Bundled paths above are plugin-relative.
 --ready with missing runtime exits 86 without provisioning. --repair may use
 network and write runtime caches/locks before checker help; it is not offline.
 For a literal file operand named --help or -h, use ./--help or ./-h.
+Ordinary text guidance uses Suggested next step: on stderr, except the normal
+github-rules human report on stdout. Advice is optional and never authorizes
+execution, retry, publication, merge or bypassing trust. Advice-only write
+failures do not change results. Hooks, setup, CI annotations and mandatory cwd
+handoffs retain their separate protocols; help itself is discovery only.
 """
 
 
@@ -555,6 +577,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
     preparation = new_result(argv[0]) if len(argv) >= 2 and argv[0] in {"plan", "intake", "contract", "reviewer-count"} and argv[-1] == "--json" else None
     if preparation is not None:
         argv = argv[:-1]
+    protected = bool(argv) and ((argv[0] in {"push", "delivery"} and "--hook" in argv[1:])
+                               or (argv[0] == "github-rules" and "--print-setup" in argv[1:]))
     hint = ""
     if argv and argv[0] in {"finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"} and not (argv[0] == "delivery" and "--hook" in argv[1:]):
         hint = (f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
@@ -591,9 +615,11 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         result = command(argv[1:], out, err)
         if result != 0 and hint:
             err.write(hint)
-        advice = suggested_next(argv[0], "blocked" if result == 1 else "internal") if result else None
-        if advice:
-            err.write(f"Suggested next step: {advice}\n")
+        if not protected and (argv[0] != "delivery" or result not in (0, 1)):
+            category = {0: "passed", 1: "blocked"}.get(result, "unclassified")
+            if argv[0] in {"plan", "delivery"} and result == 2:
+                category = "usage"  # file/argument errors return usage directly
+            write_suggestion(suggested_next(argv[0], category), err)
         return result
     except UsageError as exc:
         if preparation is not None:
@@ -603,9 +629,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
         err.write(f"{exc}\n")
         if hint:
             err.write(hint)
-        advice = suggested_next(argv[0], "usage") if argv else None
-        if advice:
-            err.write(f"Suggested next step: {advice}\n")
+        if not protected:
+            write_suggestion(suggested_next(argv[0] if argv else "", "usage" if argv and argv[0] in COMMANDS else "global"), err)
         return 2
     except Exception as exc:
         if preparation is not None:
@@ -616,9 +641,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
             err.write(f"loom: publication hook failed ({type(exc).__name__}: {exc}); allowing.\n")
             return 0
         err.write(f"loom_checker internal error: {type(exc).__name__}: {exc}\n")
-        advice = suggested_next(argv[0], "internal") if argv else None
-        if advice:
-            err.write(f"Suggested next step: {advice}\n")
+        if not protected:
+            write_suggestion(suggested_next(argv[0] if argv else "", "internal"), err)
         return 2
 
 

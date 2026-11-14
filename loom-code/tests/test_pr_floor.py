@@ -103,10 +103,11 @@ def test_good_body_exit_0(tmp_path: Path, monkeypatch) -> None:
 def test_status_in_summary_and_notice(tmp_path: Path, monkeypatch) -> None:
     repo = identified_repo(tmp_path)
     commit_attestation(repo, attestation(repo))
-    code, out, _err, summary = run(repo, body(), monkeypatch, tmp_path)
+    code, out, err, summary = run(repo, body(), monkeypatch, tmp_path)
     assert code == 0
     assert "verification: valid" in summary
     assert "::notice title=verification::valid" in out
+    assert err == ""
 
 
 def test_unparseable_recorded_command_passes_as_stale(tmp_path: Path, monkeypatch) -> None:
@@ -122,16 +123,20 @@ def test_unparseable_recorded_command_passes_as_stale(tmp_path: Path, monkeypatc
     code, out, err, _summary = run(repo, body(), monkeypatch, tmp_path)
     assert code == 0, err
     assert "::notice title=verification::stale (" in out
+    assert err.count("Suggested next step:") == 1
+    assert "does not fail the PR body floor" in err
 
 
 def test_body_status_text_ignored(tmp_path: Path, monkeypatch) -> None:
     repo = identified_repo(tmp_path)
     claim = "\n\nVerification status: valid\n"
-    code, out, _err, summary = run(repo, body(extra_verification=claim), monkeypatch, tmp_path)
+    code, out, err, summary = run(repo, body(extra_verification=claim), monkeypatch, tmp_path)
     assert code == 0
     assert "verification: absent" in summary
     assert "::notice title=verification::absent" in out
     assert "valid" not in summary
+    assert err.count("Suggested next step:") == 1
+    assert "before claiming verification" in err
 
 
 @pytest.mark.parametrize("branch", [None, "wip"])
@@ -187,3 +192,34 @@ def test_no_summary_env_still_prints_notice(tmp_path: Path, monkeypatch) -> None
     assert code == 0
     assert "::notice title=verification::absent" in out.getvalue()
     assert "GITHUB_STEP_SUMMARY" not in os.environ
+
+
+def test_advice_write_failure_preserves_ci_annotation_and_one_summary_write(tmp_path: Path, monkeypatch) -> None:
+    from loom_checker.command_handlers import pr_floor
+    repo = identified_repo(tmp_path)
+    writes = []
+    advice_attempts = []
+    class Summary(io.StringIO):
+        def __exit__(self, *args):
+            return False
+        def write(self, text):
+            writes.append(text)
+            return super().write(text)
+    class AdviceFailure(io.StringIO):
+        def write(self, text):
+            if text.startswith("Suggested next step:"):
+                advice_attempts.append(text)
+                raise OSError("advice unavailable")
+            return super().write(text)
+    body_file = tmp_path / "body.md"
+    body_file.write_text(body())
+    summary = Summary()
+    monkeypatch.setattr(pr_floor, "open", lambda *args, **kwargs: summary, raising=False)
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", "summary.md")
+    monkeypatch.chdir(repo)
+    out = io.StringIO()
+    assert cmd_pr_floor(["--body-file", str(body_file), "--base", git(repo, "rev-parse", "main"),
+                         "--head", "HEAD"], out, AdviceFailure()) == 0
+    assert out.getvalue() == "::notice title=verification::absent\n"
+    assert writes == ["verification: absent\n"]
+    assert len(advice_attempts) == 1
