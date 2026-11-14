@@ -1,3 +1,4 @@
+# concern: Malformed, contradictory, or wrong-request checker observations must not become usable results.
 """Exercise checked observations through the public entry and real producers."""
 from __future__ import annotations
 
