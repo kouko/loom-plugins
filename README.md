@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.78.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.79.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.23.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,11 +109,12 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.78.0. Five stations carry one change from plan to PR with
+Version 3.79.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
-The two checked read-only CLI results provide optional advisory next steps;
-advice changes neither their decisions nor authorization. See the
-[CLI result guide](loom-code/references/cli-results.md) for the bounded migration.
+All sixteen CLI commands define optional advisory next steps; five have direct
+JSON modes and two have checked station consumers. Advice changes neither
+decisions nor authorization. See the
+[CLI result guide](loom-code/references/cli-results.md) for command coverage and protocol exceptions.
 
 | Skill | Role |
 | --- | --- |
@@ -265,13 +266,16 @@ preserving their existing results and exit behavior. The first rollout is bounde
 |---|---|
 | `publish` | Flushed, newline-delimited stderr reports CI observation, registration/pending transitions, and elapsed waiting at the first polling opportunity after each 60-second interval. Terminal states distinguish passed, no required checks, and failed/unconfirmed observations. Existing polling, timeout, stdout and authorization behavior remain unchanged. |
 | `finalize-review` | Flushed stderr names each probe/package-suite stage before execution and reports its result after evidence validation. Child exit 0 alone is insufficient; a passed stage is not final attestation success. Child logs remain captured, with no heartbeat inside a subprocess. |
-| `delivery --json` and dispatch JSON | Existing machine-readable payloads are preserved; the first rollout adds no global JSON envelope. |
-| `plan <path> --json` and `intake <station> <change-id> --json` | Optional preparation-result pilot: one stdout object with schema version, command, status, ordered diagnostics, notices and usage/internal error. Default text remains unchanged; these statuses do not establish full verification or authority. |
+| `delivery --json` and dispatch JSON | Delivery retains its five legacy fields and adds `suggested_next` equal to `next`; dispatch JSON remains separate. No global JSON envelope is added. |
+| `plan <path> --json` and `intake <station> <change-id> --json` | Optional preparation results: one stdout object with schema version, command, status, ordered diagnostics, notices, usage/internal error and optional advice. These statuses do not establish full verification or authority. |
 | `contract --require <major.minor> --json` and `reviewer-count <change-id> --json` | Optional read-only results use the preparation envelope plus typed `data`: compatibility versions/boolean or unchanged change-id/integer reviewer floor. Errors set every data value to null. |
 
 Five commands support JSON: `plan`, `intake`, `contract`, `reviewer-count` and
 `delivery`. The first four require a final `--json`; delivery preserves its
-distinct `{state, reason, next, evidence, complete}` shape. See the
+distinct `{state, reason, next, evidence, complete}` fields with an additive
+`suggested_next` alias of `next`. All four version-1 envelopes include optional
+advice; passed results carry null. Delivery can emit existing Help/error stderr
+and pre-result text errors even with `--json`. See the
 [checker examples](loom-code/README.md#the-checker) for typed consumers and
 startup limitations. Dispatch JSON remains a separate existing interface.
 
@@ -281,7 +285,8 @@ before acting. Invalid observations stop the prerequisite without default
 reviewer counts, text fallback or automatic retries. The
 [CLI result inventory](loom-code/references/cli-results.md) distinguishes all
 sixteen commands, the five direct JSON interfaces and these two checked
-consumers; the remaining commands have not been migrated.
+consumers. Advisory coverage spans all sixteen; it adds no JSON mode or checked
+consumer to the remaining commands.
 
 Progress is advisory: never parse it for gate decisions. It contains stage/state
 labels, not operands, credentials or raw child logs. Progress-only write failures
@@ -300,10 +305,16 @@ command parsing. `--ready` needs a valid cached runtime and exits 86 when it is
 missing or invalid; `--repair` may download dependencies and write runtime
 caches before showing checker help.
 
-Failure hints remain limited to `finalize-review`, `publish`, `delivery`, `plan`,
-`intake` and `reviewer-count`; their covered text-mode failures retain diagnostics
-and exit status. Help coverage does not add hints to other commands. Hook and
-internal-error behavior are unchanged.
+The existing command-Help hints remain limited to `finalize-review`, `publish`,
+`delivery`, `plan`, `intake` and `reviewer-count`. Ordinary refusals/errors also
+offer `Suggested next step:` advice while retaining their diagnostics, result
+classification and exit. Internal-error advice asks for investigation without
+claiming a repair. Advice-only write failures are best-effort; they cannot
+change the result or repeat an operation. Useful follow-up and unresolved
+exit-zero outcomes may carry advice, while successful checks need no filler.
+GitHub rules' normal human advice stays on stdout. Hook payloads/native-hook
+bytes, setup, CI annotations, progress and mandatory `next: cd` handoffs retain
+their protocols; see the result guide for exact exceptions and evidence.
 
 The preparatory checks keep their limited scope: `plan <path>` checks the
 named file's implemented field caps, `intake <station> <change-id>` checks

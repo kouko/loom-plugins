@@ -1,0 +1,114 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-14-cli-suggestions-complete",
+  "content_digest": "8f4db5e6ac5af7402697cfd8fc1b44c47130becb",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_cli.py -q -rs",
+      "artifact": "loom-code/tests/test_loom_checker_cli.py",
+      "result": "pass",
+      "command_digest": "26829feda0b50ae45b07fd25549f4d6e692a692699a8bcd4294ce110201174f8"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "all_suggestions_code_review",
+      "vendor": "openai",
+      "model": "host-inherited",
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "5191fb4a93791e3bfb73ef8b1370e4f697613250",
+      "review_target_sha": "4a4bc42a00904dbc76167533ec6fbe5ab755bb2b",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No root ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Same reviewer, round 2 of the bounded episode; prior findings were empty. Reviewed only the merge/fix delta, preserving the previous code judgment. Independently confirmed loom-code is byte-unchanged from the fix base and imported workflow/development paths match main 3b1a9972644517911454530dc1876f88525b1f37 exactly.",
+        "README projection independently passed: feature content is preserved except the two upstream workflow-version substitutions, retaining code 3.79.0 and workflow 5.23.0. Intent/spec/plan and CLI/test/guide continuity checks passed. Acceptance rows 1–5 legitimately carry over; row 6 records 865 passing focused tests and 41 source captures, with simulation/live-read limits and retained failed setup disclosed.",
+        "Both changed whole test modules ran independently: 40 passed in 0.58s, zero skips; output /private/tmp/loom-all-code-review-round2-tests.txt. git diff --check and manifest --all --check passed. No repository edits, full package suite, store probes, external models or remote mutations were performed by this reviewer."
+      ]
+    },
+    {
+      "reviewer": "all_suggestions_docs_review",
+      "vendor": "openai",
+      "model": "host-inherited",
+      "verdict": "PASS",
+      "lens": "docs",
+      "reviewed_sha": "5191fb4a93791e3bfb73ef8b1370e4f697613250",
+      "review_target_sha": "4a4bc42a00904dbc76167533ec6fbe5ab755bb2b",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "anchor": "loom-code/README.ja.md:129",
+          "text": "nitpick (non-blocking): The previous localized-checker finding remains unfixed, with no resolution claimed: the paragraphs still describe six preparation fields and unchanged default text, while this release adds suggested_next and refusal/error stderr advice. The same statements remain at loom-code/README.zh-TW.md:113-115; both still direct readers to accurate command help, so the required action remains correct.",
+          "fix": "Replace the fixed six-field wording with a link to the current help, and say that original diagnostics/exits remain while refusal/error text gains optional advice, in both localized checker paragraphs."
+        }
+      ],
+      "notes": [
+        "Same reviewer, bounded round 2. Independently confirmed empty loom-code delta and 38 imported workflow/development paths byte-identical to upstream 3b1a997; README delta contains only the two intended workflow-version substitutions, preserving CLI advice prose. No new delta finding.",
+        "Read the renewed report/evidence, original failure log and corrected raw test log (865 passed in 121.10s), and parsed the raw source capture file (41 calls, 16 help forms, all five JSON families). AC1-5 carryover is supported by source identity; AC6 rerun and live read-only rules observation are disclosed separately from simulated enforcement and future finalization.",
+        "Independently reran three complete release/documentation modules: 83 passed in 0.83s, zero skips/failures. No full package suite or current store probes were run. Future finalizer success is not claimed; previous nonblocking locale limitation is retained, with no important/fatal dismissal."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "63eab4ef80f13fa45da52965b56604a2efd9645b",
+  "tested_commit": "2c01206",
+  "reviewed_commit": "4a4bc42a00904dbc76167533ec6fbe5ab755bb2b",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}

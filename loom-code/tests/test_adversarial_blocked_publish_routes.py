@@ -111,9 +111,15 @@ def _repo(root: Path, name: str, change_ids: tuple[str, ...] = ()) -> Path:
     return repo
 
 
-def _blocks(stderr: str) -> list[tuple[str, str]]:
+def _blocks(stderr: str, *, advice: bool = False) -> list[tuple[str, str]]:
     out = []
-    for line in stderr.splitlines():
+    lines = stderr.splitlines()
+    if advice:
+        assert lines[-1].startswith("Suggested next step: ")
+        assert lines[-1].removeprefix("Suggested next step: ").strip()
+        assert stderr.count("Suggested next step:") == 1
+        lines = lines[:-1]
+    for line in lines:
         assert line.startswith("BLOCK "), f"stderr line is not a BLOCK line: {line!r}"
         rule, _sep, reason = line.removeprefix("BLOCK ").partition(": ")
         out.append((rule, reason))
@@ -134,14 +140,14 @@ def test_probe_land_refusal_keeps_rule_exit_and_reason_prefix(tmp_path, count) -
     result = _checker(_repo(tmp_path, f"land{count}", ids),
                       ["land", "--accepted-by", "kouko"])
     assert result.returncode == 1
-    assert _blocks(result.stderr) == [("land.merge", LAND_UNIDENTIFIED)]
+    assert _blocks(result.stderr, advice=True) == [("land.merge", LAND_UNIDENTIFIED)]
 
 
 def test_probe_routes_are_not_appended_twice(tmp_path) -> None:
     """Attack: `land` appends, then delegates to the push handler, which
     appends again. Neither appends now: the refusal carries no route at all."""
     result = _checker(_repo(tmp_path, "twice"), ["land", "--accepted-by", "kouko"])
-    (rule, reason), = _blocks(result.stderr)
+    (rule, reason), = _blocks(result.stderr, advice=True)
     assert rule == "land.merge", result.stderr
     assert reason == LAND_UNIDENTIFIED, result.stderr
     assert reason.count("two legal routes") == 0
@@ -383,7 +389,7 @@ def test_probe_land_always_reports_a_countable_attestation_count(tmp_path) -> No
         ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
         result = _checker(_repo(tmp_path, f"count{count}", ids),
                           ["land", "--accepted-by", "kouko"])
-        (rule, reason), = _blocks(result.stderr)
+        (rule, reason), = _blocks(result.stderr, advice=True)
         assert rule == "land.merge", result.stderr
         assert not reason.startswith("branch must carry exactly one attested change"), reason
         assert reason == LAND_UNIDENTIFIED, reason

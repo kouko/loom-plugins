@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Literal
 from git_exec import run_git
+from loom_checker.cli_advice import write_suggestion
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import current_branch
@@ -642,9 +643,10 @@ def cmd_delivery(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         else:
             os.environ["PATH"] = previous_path
     if as_json:
-        out.write(json.dumps(asdict(observed), ensure_ascii=False) + "\n")
+        out.write(json.dumps({**asdict(observed), "suggested_next": observed.next}, ensure_ascii=False) + "\n")
     else:
         out.write(f"Delivery {observed.state}: {observed.reason}\nnext: {observed.next}\n")
+        write_suggestion(observed.next, err)
     return 0 if observed.complete else 1
 
 

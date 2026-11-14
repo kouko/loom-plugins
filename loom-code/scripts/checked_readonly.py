@@ -6,6 +6,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+from loom_checker.cli_advice import write_suggestion
+
 
 HELP = """checked-readonly — validate read-only checker JSON
 Usage: loom-python --repair --script checked_readonly.py contract --require <version>
@@ -103,18 +105,18 @@ def main(argv=None, out=None, err=None):
                                 *argv, "--json"], text=True, capture_output=True, timeout=30)
         if child.returncode == 86:
             err.write("checked-readonly: " + (child.stderr.strip() or "checker runtime unavailable") + "\n")
-            err.write(f"Suggested next step: {advice}\n")
+            write_suggestion(advice, err)
             return 86
         advice = "Investigate the checker output contract and original diagnostic; preserve outstanding work and do not act on unvalidated output."
         _require(not child.stderr, "unexpected checker stderr")
         _validate(child.stdout, argv[0], argv[1:], child.returncode)
     except subprocess.TimeoutExpired:
         err.write("checked-readonly: checker timed out after 30 seconds; investigate before rerunning\n")
-        err.write("Suggested next step: Investigate the checker runtime and preserve outstanding work before deliberate re-execution.\n")
+        write_suggestion("Investigate the checker runtime and preserve outstanding work before deliberate re-execution.", err)
         return 2
     except (ValueError, OSError, UnicodeError, RecursionError) as exc:
         err.write(f"checked-readonly: {exc}\n")
-        err.write(f"Suggested next step: {advice}\n")
+        write_suggestion(advice, err)
         return 2
     out.write(child.stdout.strip() + "\n")
     return child.returncode

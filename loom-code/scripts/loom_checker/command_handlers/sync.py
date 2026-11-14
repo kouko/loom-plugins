@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from loom_checker.command_handlers.land import _git_reason
 from loom_checker.command_handlers.publish import resolve_publish_executable
+from loom_checker.cli_advice import write_suggestion
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import TRUNK_CANDIDATES
 from loom_checker.helpers import UsageError
@@ -244,6 +245,7 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             f"WARN {RULE}: could not fetch origin/{trunk}, so the branch could not be checked "
             f"against {trunk}: {reason}; continuing without syncing.\n"
         )
+        write_suggestion("The branch remains unsynced; inspect the fetch diagnostic and restore access before deliberately rerunning sync-trunk. Do not infer trunk freshness.", err)
         return 0
 
     head = _oid(git, repo, "HEAD")

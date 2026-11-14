@@ -246,6 +246,7 @@ def test_sweep_lists_then_confirm_removes(tmp_path: Path, monkeypatch) -> None:
     ]
     token = token_of(out)
     assert out.splitlines() == listed + [f"confirm with: land --sweep --confirm {token}"]
+    assert err == "Suggested next step: Review the listed removals and obtain approval before deliberately using the printed confirmation token; listing does not authorize cleanup.\n"
     assert layout.intact("feat/a", wt_a) and layout.intact("feat/b")
     assert ref_exists(layout.origin, "refs/heads/feat/r")
     assert not calls.argvs("worktree", "remove") and not calls.argvs("update-ref")
@@ -256,6 +257,7 @@ def test_sweep_lists_then_confirm_removes(tmp_path: Path, monkeypatch) -> None:
 
     assert rc == 0, err
     assert f"Removed worktree {wt_a}\n" in out
+    assert err == ""
     assert "Deleted local branch feat/b\n" in out
     assert "Deleted remote branch feat/r\n" in out
     assert out.endswith(f"next: cd '{layout.repo}'\n"), out
@@ -351,6 +353,7 @@ def test_sweep_no_candidates(tmp_path: Path, monkeypatch) -> None:
 
     assert rc == 0, err
     assert out == "No merged changes to clean up\n"
+    assert err == ""
     assert layout.intact("feat/x-2", wt)
 
 
@@ -365,6 +368,7 @@ def test_sweep_skips_invoking_worktree(tmp_path: Path, monkeypatch) -> None:
         "skip feat/x — current working directory",
         "No merged changes to clean up",
     ]
+    assert err == ""
     assert layout.intact("feat/x", wt)
 
 
