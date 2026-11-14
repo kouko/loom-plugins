@@ -18,9 +18,9 @@ charter: 1.1
 
 ### Wave 2
 **W2-01 Synchronize release metadata** after: W1-01 acceptance: 1,2,3,4,5
-- Files: `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`, `loom-workflow/plugin.json`, `loom-workflow/package.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README*.md`, `README.md`
+- Files: `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`, `loom-workflow/plugin.json`, `loom-workflow/package.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README*.md`, `README.md`, `loom-workflow/tests/scripts/test_release_metadata.py`
 - Test: A1 positive: synced-release; negative: stale-release. A2 positive: synced-release; negative: stale-release. A3 positive: synced-release; negative: stale-release. A4 positive: synced-release; negative: stale-release. A5 positive: synced-release; negative: stale-release. Manifest synchronization and complete package inventory.
-- Risk: agent-decided — minor bump 5.24.0 because station-facing skill guidance changes; derive mirrors through the existing sync script and add the changelog entry before finalization.
+- Risk: agent-decided — minor bump 5.24.0 for skill guidance; derive mirrors, add changelog and preserve every current-release pin assertion in `test_release_metadata.py`. The complete suite exposed the initially omitted pin; this is the same release task, first integration fix.
 
 ## Simplicity check
 - Extend existing contract tests instead of adding a separate prose test module — taken
