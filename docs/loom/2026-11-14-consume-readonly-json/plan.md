@@ -20,7 +20,7 @@ No ratified ARCHITECTURE.md exists. Coupled tasks run sequentially.
 ### Wave 2 — Real station adoption and common inventory
 
 **W2-01 Adopt checked results and publish the inventory** after: W1-01 acceptance: 1, 2, 4, 5
-- Files: `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/write-plan/references/codex-first-contact.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/references/cli-results.md`, `loom-code/README.md`
+- Files: `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/write-plan/references/codex-first-contact.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/references/cli-results.md`, `loom-code/README.md`, `loom-code/tests/test_loom_runtime_skill_commands.py` (align two existing superseded expectations found by end-of-Build suite)
 - Test: Existing: test_write_plan_station_text.py, test_simplified_station_text.py, test_closing_review_recovery_rules.py. A1 positive: sixteen-covered; negative: false-migrated. A2 positive: both-consumers; negative: text-parsing. A4 positive: authority-retained; negative: recovery-bypass. A5 positive: documented-command; boundary: invalid-observation. Replay actual consumer examples.
 - Risk: REQ-1/2/4/5; agent-decided replace calls and interpretation together. Preserve station tests' distinct safeguards; no new prose-only executable pins where review and dogfood suffice. Runtime references stay portable and never cite repository development records.
 

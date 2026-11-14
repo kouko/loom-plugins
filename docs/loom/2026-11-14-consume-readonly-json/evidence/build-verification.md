@@ -127,3 +127,40 @@ No paid outside CLI/model, plugin refresh, live-host parity validation,
 publication or merge was performed by these tasks. Five commands provide
 direct JSON and two station consumers are checked; the remaining migration
 work stays explicit in the portable CLI result inventory.
+
+## End-of-Build repair: stale runtime station expectations
+
+The subsequent complete-suite attempt failed, rather than establishing a full
+pass: its code group reported 2 failed and 2,847 passed, and the runner exited
+1 (`/private/tmp/loom-consume-json-build-suite.txt`). Both failures were in
+`test_loom_runtime_skill_commands.py`, lines 23 and 41 at that time. They still
+required the superseded direct contract invocation and old outdated-contract
+sentence after W2 adopted checked observations.
+
+Defect class: existing station expectations lagged the intended consumer
+migration. The orchestrator searched all cumulative changed paths and the
+Acceptance #2/#5 surfaces: all loom-code tests, write-plan/closing-review trees,
+CLI result reference, READMEs, intent/spec/plan/research/evidence/proposal. The
+search used old repair-contract/repair-reviewer invocations, the old Only
+sentence and `contract.requires`. Exactly these two stale actionable instances
+were found. Direct-producer runtime assertions and current valid rule references
+were intentionally retained.
+
+The worker reran the whole existing test file before editing: 2 failed, 1 passed
+(`/private/tmp/loom-consume-json-runtime-alignment-red.txt`). The minimal repair
+updates the launcher expectation and checks the accepted-blocked rule semantics
+instead of pinning the replacement paragraph verbatim. Its inline affirmative
+and negated synthetic examples protect the prose assertion's polarity, and
+startup failure diagnostics remain separate. No production or adversary-owned
+file changed; the W2 Files row records this discovered repair surface.
+
+The same whole-file command after repair reported 3 passed in 0.01 seconds
+(`/private/tmp/loom-consume-json-runtime-alignment-green.txt`):
+
+```sh
+uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_runtime_skill_commands.py -q -rs
+```
+
+This focused GREEN does not replace the failed complete-suite result. The
+orchestrator still owes a new complete-suite run and remaining independent
+verification on the repaired content.
