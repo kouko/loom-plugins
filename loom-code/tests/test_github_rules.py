@@ -10,6 +10,7 @@ write was attempted.
 from __future__ import annotations
 
 import json
+import io
 import os
 import shlex
 import subprocess
@@ -133,6 +134,8 @@ def setup_json(stdout: str) -> dict:
 def test_setup_json_requires_pr_with_empty_bypass(tmp_path):
     result, calls = probe(tmp_path, base_responses(), "--print-setup")
     assert result.returncode == 0, result.stderr
+    assert result.stderr == "" and "Suggested next step:" not in result.stdout
+    assert result.stdout.startswith("gh api -X POST ") and result.stdout.endswith("\nJSON\n")
     assert "gh api -X POST repos/o/r/rulesets --input -" in result.stdout
     payload = setup_json(result.stdout)
     assert payload["bypass_actors"] == []
@@ -204,7 +207,7 @@ def test_missing_rules_listed_with_command(tmp_path):
     assert "loom: main does not require a pull request (administrators included)" in result.stdout
     assert f'loom: main does not require the check "{CONTEXT}"' in result.stdout
     assert "gh api -X POST repos/o/r/rulesets --input -" in result.stdout
-    assert "Next:" in result.stdout
+    assert "Suggested next step:" in result.stdout
     assert "authorization" in result.stdout
     assert_read_only(calls)
 
@@ -217,6 +220,7 @@ def test_ruleset_with_empty_bypass_satisfies_both(tmp_path):
     assert result.returncode == 0, result.stderr
     assert "does not require" not in result.stdout
     assert "could not confirm" not in result.stdout
+    assert "Suggested next step:" not in result.stdout and result.stderr == ""
     assert any(f"{REPO}/rulesets/7" in argv for argv in calls)
 
 
@@ -240,9 +244,10 @@ def test_template_absent_withholds_ruleset(tmp_path):
         assert "loom: template not on main — land it first, then add the rules" in result.stdout
         assert "loom-pr-floor.yml" in result.stdout
         assert "gh api -X POST" not in result.stdout
+        assert ("Suggested next step:" in result.stdout) == (not args)
         assert_read_only(calls)
 
-        recovery = shlex.split(result.stdout.split("then run: ")[1].strip())
+        recovery = shlex.split(result.stdout.split("then run: ")[1].splitlines()[0].strip())
         env = _ready_env(sub)
         env.update(PATH=str(sub / "bin") + ":/usr/bin:/bin",
                    FAKE_GH_RESPONSES=str(sub / "responses.json"), FAKE_GH_LOG=str(sub / "gh.log"))
@@ -269,6 +274,7 @@ def test_unreadable_could_not_confirm(tmp_path):
     assert result.returncode == 0, result.stderr
     assert "loom: could not confirm GitHub rules for main (" in result.stdout
     assert "does not require" not in result.stdout
+    assert result.stdout.count("Suggested next step:") == 1 and result.stderr == ""
 
 
 def test_no_github_remote_could_not_confirm(tmp_path):
@@ -355,7 +361,7 @@ def test_malformed_shapes_could_not_confirm(tmp_path):
         assert result.returncode == 0, (name, result.stderr)
         assert "loom: could not confirm GitHub rules for main (" in result.stdout, name
         assert "does not require" not in result.stdout, name
-        assert "Next:" in result.stdout, name
+        assert "Suggested next step:" in result.stdout, name
 
 
 def test_unreadable_bypass_actors_could_not_confirm(tmp_path):
@@ -371,8 +377,23 @@ def test_unreadable_bypass_actors_could_not_confirm(tmp_path):
         }))
         assert "loom: could not confirm GitHub rules for main (" in result.stdout
         assert "does not require" not in result.stdout
-        assert "Next:" in result.stdout
+        assert "Suggested next step:" in result.stdout
         assert_read_only(calls)
+
+
+def test_unconfirmed_advice_write_failure_keeps_observation(monkeypatch):
+    from loom_checker.command_handlers import github_rules
+    class AdviceFailure(io.StringIO):
+        def write(self, text):
+            if text.startswith("Suggested next step:"):
+                raise UnicodeError("advice unavailable")
+            return super().write(text)
+    monkeypatch.setattr(github_rules, "github_repo_from_origin", lambda *args: None)
+    monkeypatch.setattr(github_rules, "repo_root", lambda *args: Path("."))
+    out, err = AdviceFailure(), io.StringIO()
+    assert github_rules.cmd_github_rules([], out, err) == 0
+    assert out.getvalue() == "loom: could not confirm GitHub rules for the trunk (no GitHub remote)\n"
+    assert not err.getvalue()
 
 
 # Isolated simulated server, not GitHub: only this subprocess can decide a
