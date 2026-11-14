@@ -12,7 +12,7 @@ REQ-3 — Bounded proactive use
 REQ-4 — Authority continuity
   The skill shall preserve existing task ownership and authorization, continue already authorized unfinished work without a generic extra confirmation, and route genuinely new scope or required consent to the original owner without granting authority through advice → Acceptance #4
 REQ-5 — Honest validation
-  The delivery shall include reproducible routing and output cases plus matched ordinary-answer comparisons, reporting their limits without claiming unmeasured native-host effectiveness → Acceptance #5
+  The delivery shall include reproducible explicit/natural-request, blocker/new-evidence proactive and must-not-select routing cases, output-quality and authority-boundary cases, plus matched ordinary-answer comparisons, reporting their limits without claiming unmeasured native-host effectiveness → Acceptance #5
 
 ## Design decision
 - user-decided — independent skill named whats-next; one recommendation plus necessary alternatives. Carried quotes: “我想要 獨立 whats-next”; “好 採用 首選＋必要替代方案”; “那就先用  whats-next 吧”.
