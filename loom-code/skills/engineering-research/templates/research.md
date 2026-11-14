@@ -12,8 +12,9 @@ tags:
 
 ## Question and scope
 
-State the pending question, project/version/environment conditions and relevant
-constraints. Add a flat `change` property above when an active change is known.
+State the pending decision, concrete unknowns and evidence sufficient to answer
+each under the relevant constraints and project/version/environment conditions.
+Add a flat `change` property above when an active change is known.
 
 ## Method and rationale
 
@@ -26,8 +27,9 @@ needs no framework label or evaluation matrix.
 
 ## Findings
 
-Separate observations, source-supported facts and inference. State when the
-question remains unresolved; do not infer certainty from a completed task.
+For each material evidence condition, state what is supported, unsupported or
+unresolved and why, distinguishing observations, source-supported facts and
+inference. Completed investigation does not mean every condition was met.
 
 ## Evidence
 
@@ -54,11 +56,16 @@ syntax/render checks and their limits; do not invent successful validation.
 ## Decision impact
 
 Explain what this evidence permits, rules out, or leaves dependent on more work.
-For a recommendation, state material tradeoffs and what evidence or changed
-conditions would alter it. An unresolved comparison is a valid result; do not
-hide missing evidence inside a score.
+For a recommendation, fairly compare credible smaller alternatives under the
+same outcomes and mandatory constraints; explain important additions, why they
+are needed and their consequential burdens. Retain necessary complexity when a
+smaller option fails a mandatory condition. State what would alter the choice.
+For revised conditions or recommendations, explain the evidentiary basis or
+correction and update affected sections consistently; a challenge alone is not
+new evidence. An unresolved comparison is valid; do not hide gaps in a score.
 Link a related spec, plan or earlier research only when the target exists.
 
 ## Limitations and open questions
 
-Record uncertainty and changes in conditions that would require revalidation.
+Record unmet conditions, missing evidence and affected decisions without lowering
+requirements to claim completion, plus changes that would require revalidation.
