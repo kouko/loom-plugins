@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from loom_checker.cli_advice import write_suggestion
 from loom_checker.command_handlers.publish import PUBLISH_CI_PENDING_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_CI_POLL_SECONDS
 from loom_checker.command_handlers.publish import PUBLISH_CI_REGISTRATION_WAITS
@@ -729,6 +730,7 @@ def _land_sweep(context: LandTarget, confirm: str | None, out, err) -> int:
             out.write("No merged changes to clean up\n")
         else:
             out.write(f"confirm with: land --sweep --confirm {token}\n")
+            write_suggestion("Review the listed removals and obtain approval before deliberately using the printed confirmation token; listing does not authorize cleanup.", err)
         return 0
 
     if confirm != token or not removable:
