@@ -1,6 +1,20 @@
 # Post-merge delivery guidance — acceptance test evidence
 
-Tried on 2026-11-14, in a clean copy of the project at d67ebb14defe50bc26734ba6297879c6926d67c0.
+Tried on 2026-11-14, in a clean copy of the project at a14b6656d0a40bc7ff585e6db61b53aea1621318.
+
+## Re-run on 2026-11-14, at a14b6656d0a40bc7ff585e6db61b53aea1621318
+
+Inspected `git diff --stat 42aeacc7891d8665d6f877d9ebbb9074ecc8beb7..a14b6656d0a40bc7ff585e6db61b53aea1621318` and `git diff --stat origin/main...a14b6656d0a40bc7ff585e6db61b53aea1621318`. The former includes upstream recap/workflow 5.24 changes plus this change's plan/build evidence/attestation; the latter excludes that inherited recap implementation and retains the original delivery guidance change. Direct diff across the integration for this change's session-start, Ship, publish handler and intent is empty. Root README integration preserves loom-code 3.80.0 and inherits workflow 5.24.0 and the upstream documentation link. No own behavioral surface changed. Existing acceptance and explicit merge authorization are retained; this rerun requests no new scope or consent. The reported pre-merge refusal is historical context, not evidence that merge happened.
+
+Created NEW source copy with exact commands `git archive a14b6656d0a40bc7ff585e6db61b53aea1621318 -o /private/tmp/acceptance-post-merge-integration.tar`; `mkdir -p /private/tmp/acceptance-post-merge-integration`; `tar -xf /private/tmp/acceptance-post-merge-integration.tar -C /private/tmp/acceptance-post-merge-integration`. In that copy, read README setup with `sed -n '258,287p' loom-code/README.md`; ran `bash loom-code/hooks/session-start </dev/null > /private/tmp/acceptance-post-merge-integration-startup.json` (exit 0). Decoded actual additionalContext: full same-change result after successful cleanup, preservation of failures, surviving-repository recovery and rejection of previous-change success all emitted unchanged. No installed plugin edits.
+
+- 1: carried over — integration diff is empty for both completion instruction surfaces; earlier same-change full-success exercise remains applicable. Actual startup loading repeated successfully.
+- 2: re-tested — `git init -b main /private/tmp/acceptance-post-merge-integration`, then current clean source's `loom-code/scripts/loom-python --repair delivery --json`. Actual exit 1; state unconfirmed, reason cannot identify a committed change, complete false. Actual next/suggested_next preserves: active changes use feature branch and confirmed intent; after identity removal use same change's full land result including exit/verification/cleanup; merge line or directory hint alone insufficient; partial cleanup uses surviving-repository recovery; no evidence remains unconfirmed. Both diagnostic scopes fully exercised.
+- 3: carried over — integration touches no own delivery, Stop, authorization or tests, and intent diff is empty; original 44-test result remains attributed only to 7de6f54. Actual diagnostic again preserves absent-evidence failure. The mandatory full package suite is still the finalizer's acceptance-blocking check, not a fresh result claimed here.
+- 4: carried over — own failure/partial-cleanup/recovery instructions and implementation unchanged; original two synthetic failure exercises still cover each named surface.
+- 5: carried over — own same-change restriction and intent unchanged; original unrelated-success exercise remains applicable.
+
+No full suite or unaffected focused tests rerun by acceptance executor. No installation, publication, merge or GitHub write. No important dismissed findings supplied; no findings. Prior run history remains below.
 
 ## Re-run on 2026-11-14, at d67ebb14defe50bc26734ba6297879c6926d67c0
 

@@ -128,3 +128,11 @@ recap changes and this change's unchanged runtime, tests and intent.
 The release-consistency case passed; manifest synchronization and diff checks
 passed. Existing acceptance and merge authorization remain applicable; evidence
 and the same reviewers must be refreshed before publication and retrying land.
+
+At `a14b6656d0a40bc7ff585e6db61b53aea1621318`, the complete package command and
+declared delivery adversarial command both passed after integration. Raw logs:
+`/private/tmp/loom-pr160-merge-build.log` and
+`/private/tmp/loom-pr160-merge-adversarial.log`; the latter collected and passed
+all 12 tests in 7.58s. The subsequent sync-trunk observation was up to date with
+`cb737ec3e`. This preserves the earlier refusal rather than claiming land had
+already merged the PR.
