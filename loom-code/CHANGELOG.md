@@ -5,6 +5,12 @@
 - Align completion guidance with Ship: after the same change's land execution confirms merge, verification and complete cleanup, report from that full result without repeating a delivery observation that depends on the cleaned branch.
 - Explain unidentified-change diagnostics and applicable post-merge evidence while preserving unconfirmed delivery, incomplete cleanup recovery, existing checks and publication authorization. A merge line, directory hint or prior change's success alone does not establish completion.
 
+## [3.79.0] — 2026-11-14 — complete advisory next steps across the CLI
+
+- Cover all sixteen checker commands with optional `Suggested next step:` guidance while preserving diagnostics, classifications, exits and authority. Keep unsynced/unconfirmed exit-zero results explicit; standing warnings and PR verification notices remain nonblocking.
+- Add `suggested_next` to existing plan/intake JSON and alias delivery's legacy `next` without removing its fields or introducing an envelope. Preserve the four version-1 contracts, two checked consumers and raw result validation; add no JSON mode or automatic execution, retry or repair.
+- Share a standard-library-only advice formatter with best-effort text writes. Preserve hook payloads/native-hook ownership bytes, setup scripts, CI annotations/summary writes, progress and mandatory cleanup cwd/token handoffs. Align help and the all-command executable coverage guide; no installed-host or efficiency improvement is claimed.
+
 ## [3.78.0] — 2026-11-14 — add advisory next steps to two CLI results
 
 - Add optional `suggested_next` advice to existing `contract` and `reviewer-count` JSON: nonblank English advice for blocked/error results, null for passed. Text refusals/errors append `Suggested next step:` while retaining original diagnostics and Help hints.

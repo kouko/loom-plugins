@@ -34,6 +34,7 @@ def stop(monkeypatch, repo, host=None, **payload):
     out, err = StringIO(), StringIO()
     code = publish.cmd_delivery(["--hook"] + (["--host", host] if host else []), out, err)
     assert code == 0
+    assert "suggested_next" not in out.getvalue() and "Suggested next step:" not in out.getvalue()
     return json.loads(out.getvalue() or "{}"), err.getvalue()
 
 

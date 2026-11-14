@@ -9,6 +9,7 @@ an unreadable or undecidable answer is "could not confirm", never "missing".
 from __future__ import annotations
 
 from loom_checker.helpers import UsageError
+from loom_checker.cli_advice import write_suggestion
 from loom_checker.helpers import repo_root
 from loom_checker.rule_checks.push import github_repo_from_origin
 from pathlib import Path
@@ -218,7 +219,7 @@ def _gh_knows_host(gh: str, host: str) -> bool:
         return False
 
 
-def _probe(print_setup: bool) -> str:
+def _probe(print_setup: bool, out) -> None:
     trunk = "the trunk"
     try:
         target = github_repo_from_origin(repo_root(Path.cwd()))
@@ -237,23 +238,32 @@ def _probe(print_setup: bool) -> str:
             trunk = "the trunk"
             raise Unconfirmed("no default branch")
         if not _template_on_trunk(gh, host, slug, trunk):
-            return template_step(trunk)
+            out.write(template_step(trunk))
+            if not print_setup:
+                write_suggestion("Land the reported workflow template first; obtain administrator authorization before adding rules. Protection has not been confirmed.", out)
+            return
         if print_setup:
-            return setup_command(host, slug, trunk)
+            out.write(setup_command(host, slug, trunk))
+            return
         rules = _json(gh, host, f"{slug}/rules/branches/{trunk}")
         if not isinstance(rules, list):
             raise Unconfirmed("unreadable rules response")
         pr_state, check = _ruleset_state(gh, host, slug, rules)
         classic = _classic_state(gh, host, slug, trunk)
     except (Unconfirmed, UsageError) as exc:
-        return (f"loom: could not confirm GitHub rules for {trunk} ({exc})\n"
-                "Next: verify the origin, gh authentication and read access to branch rules "
-                "and ruleset bypass actors; rerun github-rules. Do not infer protection.\n")
-    return _report(host, slug, trunk, pr_state, check, classic)
+        out.write(f"loom: could not confirm GitHub rules for {trunk} ({exc})\n")
+        advice = ("verify the origin, gh authentication and read access to branch rules "
+                  "and ruleset bypass actors; rerun github-rules. Do not infer protection.")
+        if print_setup:
+            out.write(f"Next: {advice}\n")  # preserve the setup mode's existing failure output
+        else:
+            write_suggestion(advice, out)
+        return
+    _report(host, slug, trunk, pr_state, check, classic, out)
 
 
 def _report(host: str, slug: str, trunk: str, pr_state: str, check: bool | None,
-            classic: tuple[bool, bool] | None) -> str:
+            classic: tuple[bool, bool] | None, out) -> None:
     """The probe's lines from the ruleset and classic protection states."""
     if classic is not None:
         if classic[0]:
@@ -277,24 +287,24 @@ def _report(host: str, slug: str, trunk: str, pr_state: str, check: bool | None,
     if check is False and classic is not None:
         lines.append(f'loom: {trunk} does not require the check "{REQUIRED_CONTEXT}"\n')
         missing = True
-    if missing:
-        lines.append("Next: obtain repository administrator authorization before applying "
-                     "the setup below; inspect existing bypass actors and rerun github-rules.\n")
-        lines.append(setup_command(host, slug, trunk))
-    if unconfirmed:
-        lines.append("Next: obtain read access to classic protection and ruleset bypass actors, "
-                     "then rerun github-rules; protection remains unconfirmed.\n")
     if not lines:
         lines.append(
             f'loom: {trunk} requires a pull request (administrators included) '
             f'and the check "{REQUIRED_CONTEXT}"\n'
         )
-    return "".join(lines)
+    out.write("".join(lines))
+    if missing:
+        write_suggestion("obtain repository administrator authorization before applying "
+                         "the setup below; inspect existing bypass actors and rerun github-rules.", out)
+        out.write(setup_command(host, slug, trunk))
+    if unconfirmed:
+        write_suggestion("obtain read access to classic protection and ruleset bypass actors, "
+                         "then rerun github-rules; protection remains unconfirmed.", out)
 
 
 def cmd_github_rules(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     """Advisory: print the trunk's rule state and setup; always exit 0."""
     if args not in ([], ["--print-setup"]):
         raise UsageError("usage: loom_checker.py github-rules [--print-setup]")
-    out.write(_probe(print_setup=bool(args)))
+    _probe(print_setup=bool(args), out=out)
     return 0

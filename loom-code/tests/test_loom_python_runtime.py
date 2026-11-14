@@ -184,6 +184,16 @@ def test_launcher_resolves_its_directory_when_called_by_path_name(tmp_path: Path
     assert "contract.requires\t" in result.stdout
 
 
+def test_checked_help_and_local_advice_need_only_standard_library(tmp_path: Path) -> None:
+    consumer = LAUNCHER.with_name("checked_readonly.py")
+    for args, code in ((["--help"], 0), (["plan"], 2)):
+        result = subprocess.run([sys.executable, "-E", "-s", "-S", str(consumer), *args],
+                                cwd=tmp_path, text=True, capture_output=True)
+        assert result.returncode == code
+        assert "No module named" not in result.stderr
+        assert ("Suggested next step:" in result.stderr) == (code == 2)
+
+
 def test_script_keeps_project_environment_without_importing_project_modules(tmp_path: Path) -> None:
     tools = fake_uv(tmp_path)
     assert run_launcher(tmp_path, "--repair", "--list-rules", tools=tools).returncode == 0

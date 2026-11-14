@@ -1,3 +1,4 @@
+# concern: Advisory output must not repeat handlers, reclassify outcomes, or contaminate protected protocols.
 # concern: Help routing must not bypass validation, alter result streams, or grant authority.
 # concern: Exact discovery must avoid handler, stdin, filesystem and subprocess work outside a repository.
 """Executable contract for `loom_checker.py`'s CLI surface (plan W0-02).
@@ -522,6 +523,16 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
         assert result.returncode == code and not result.stdout
         assert result.stderr.startswith(diagnostic)
         assert result.stderr.count(f'--ready {argv[0]} --help') == 1
+    for operands, diagnostic in ((["--goal", "invalid"], "delivery: --goal must be local, published or merged"),
+                                 (["--unexpected"], "delivery: unexpected or repeated argument"),
+                                 (["--intent"], "delivery: --intent needs a value")):
+        for selector in ([], ["--json"]):
+            result = run_checker("delivery", *operands, *selector, cwd=repo)
+            assert result.returncode == 2 and not result.stdout
+            assert result.stderr.startswith(diagnostic)
+            assert result.stderr.count("--ready delivery --help") == 1
+            assert result.stderr.count("Suggested next step:") == 1
+            assert "command help" in result.stderr
     malformed.write_text("{}", encoding="utf-8")
     result = run_checker(*cases[1][0], cwd=repo)
     assert result.returncode == 1 and not result.stdout
@@ -571,7 +582,8 @@ def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
     result = run_checker("delivery", "--goal", "local", "--json", cwd=tmp_path)
     assert result.returncode == 1
     observed = json.loads(result.stdout)
-    assert set(observed) == {"state", "reason", "next", "evidence", "complete"}
+    assert set(observed) == {"state", "reason", "next", "evidence", "complete", "suggested_next"}
+    assert observed["suggested_next"] == observed["next"]
     assert observed["complete"] is False and observed["state"] == "unconfirmed"
     assert result.stderr.count("--ready delivery --help") == 1
 
@@ -597,8 +609,7 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
         out, err = io.StringIO(), io.StringIO()
         assert entry["main"]([command], out, err) == 2
         expected = "loom_checker internal error: RuntimeError: fixture crash\n"
-        if command == "reviewer-count":
-            expected += "Suggested next step: Investigate the reported failure and preserve outstanding work; no reliable repair is known.\n"
+        expected += "Suggested next step: Investigate the reported failure and preserve outstanding work; no reliable repair is known.\n"
         assert err.getvalue() == expected
         if command == "push":
             assert entry["main"]([command, "--hook"], io.StringIO(), io.StringIO()) == 0
@@ -613,6 +624,78 @@ def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
     hook = run_checker("delivery", "--hook", "--help", cwd=tmp_path)
     assert (hook.returncode, hook.stdout, hook.stderr) == (
         2, "", "delivery: use --hook alone or --hook --host claude|codex\n")
+
+
+def test_all_ordinary_commands_offer_advice_without_repeating_handlers(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_advice_entry")
+    for command in entry["COMMANDS"]:
+        for code in (0, 1, 2):
+            calls = []
+            def handler(args, out, err):
+                calls.append(args)
+                out.write("original payload\n")
+                err.write("original diagnostic\n")
+                return code
+            monkeypatch.setitem(entry["COMMANDS"], command, handler)
+            out, err = io.StringIO(), io.StringIO()
+            assert entry["main"]([command], out, err) == code
+            assert calls == [[]] and out.getvalue() == "original payload\n"
+            assert err.getvalue().startswith("original diagnostic\n")
+            expected = (command != "delivery" or code == 2) and (code != 0 or command in {"publish", "finalize-review"})
+            assert err.getvalue().count("Suggested next step:") == int(expected), (command, code)
+    for argv in ([], ["unknown-operand"]):
+        out, err = io.StringIO(), io.StringIO()
+        assert entry["main"](argv, out, err) == 2
+        assert err.getvalue().count("Suggested next step:") == 1
+        assert err.getvalue().split("Suggested next step:")[1] == " Inspect global --help and select a supported command before deliberately rerunning.\n"
+
+
+def test_advice_write_failure_preserves_result_and_primary_output_errors(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_advice_entry")
+    class AdviceFailure(io.StringIO):
+        def write(self, text):
+            if text.startswith("Suggested next step:"):
+                raise UnicodeError("advice unavailable")
+            return super().write(text)
+    for code in (0, 1, 2):
+        calls = []
+        def handler(args, out, err):
+            calls.append(1)
+            out.write("receipt\n")
+            return code
+        monkeypatch.setitem(entry["COMMANDS"], "publish", handler)
+        out, err = io.StringIO(), AdviceFailure()
+        assert entry["main"](["publish"], out, err) == code
+        assert calls == [1] and out.getvalue() == "receipt\n"
+    class PrimaryFailure(io.StringIO):
+        def write(self, text):
+            raise OSError("primary output unavailable")
+    err = io.StringIO()
+    assert entry["main"](["publish"], PrimaryFailure(), err) == 2
+    assert "internal error: OSError: primary output unavailable" in err.getvalue()
+
+
+def test_special_protocol_modes_never_receive_dispatcher_advice(monkeypatch) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_advice_entry")
+    from loom_checker.helpers import UsageError
+    for command, operands in (("push", ["extra", "--hook"]), ("push", ["--hook"]),
+                              ("delivery", ["--hook", "--help"]),
+                              ("github-rules", ["--print-setup"])):
+        for outcome in (0, 1, 2, UsageError("original usage"), RuntimeError("original crash")):
+            def handler(args, out, err):
+                if isinstance(outcome, Exception):
+                    raise outcome
+                out.write("protocol payload\n")
+                return outcome
+            monkeypatch.setitem(entry["COMMANDS"], command, handler)
+            out, err = io.StringIO(), io.StringIO()
+            code = entry["main"]([command, *operands], out, err)
+            assert "Suggested next step:" not in err.getvalue()
+            if isinstance(outcome, Exception):
+                assert not out.getvalue()
+                assert code == (0 if command == "push" and operands == ["--hook"] and isinstance(outcome, RuntimeError) else 2)
+            else:
+                assert code == outcome and out.getvalue() == "protocol payload\n"
 
 
 def test_planning_checks_preserve_real_success_and_conditional_stdout(tmp_path: Path, monkeypatch) -> None:

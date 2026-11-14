@@ -148,10 +148,14 @@ def test_finalize_progress_before_child_exit(tmp_path: Path) -> None:
             process.kill()
             process.communicate(timeout=10)
     assert process.returncode == 0, stderr
-    assert (first + stderr).splitlines() == [
+    lines = (first + stderr).splitlines()
+    assert lines[:-1] == [
         f"finalize-review: {stage} {state}"
         for stage in ("package-tests", "adversarial") for state in ("started", "passed")
     ]
+    assert lines[-1].startswith("Suggested next step: ")
+    assert lines[-1].removeprefix("Suggested next step: ").strip()
+    assert (first + stderr).count("Suggested next step:") == 1
     assert stdout.startswith("wrote ")
 
 

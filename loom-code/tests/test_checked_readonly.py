@@ -140,3 +140,26 @@ def test_entry_validation_and_execution_boundary(monkeypatch) -> None:
     code, out, err = invoke(["contract", "--require", "2.0"])
     assert (code, out) == (86, "") and err.startswith("checked-readonly: runtime unavailable\n")
     assert "Suggested next step:" in err and "runtime" in err
+
+
+def test_advisory_write_failure_keeps_local_fault_exit_and_single_execution(monkeypatch) -> None:
+    entry = runpy.run_path(str(CONSUMER), run_name="_checked_advice_test")
+    calls = []
+    class AdviceFailure(io.StringIO):
+        def write(self, text):
+            if text.startswith("Suggested next step:"):
+                raise OSError("advice unavailable")
+            return super().write(text)
+    for response, expected in ((subprocess.CompletedProcess([], 86, "", "unavailable"), 86),
+                               (subprocess.CompletedProcess([], 0, "{}", ""), 2),
+                               (subprocess.TimeoutExpired("checker", 30), 2)):
+        calls.clear()
+        def child(*args, **kwargs):
+            calls.append(1)
+            if isinstance(response, Exception):
+                raise response
+            return response
+        monkeypatch.setattr(entry["subprocess"], "run", child)
+        out, err = io.StringIO(), AdviceFailure()
+        assert entry["main"](["contract", "--require", "2.0"], out, err) == expected
+        assert calls == [1] and not out.getvalue() and err.getvalue().startswith("checked-readonly:")
