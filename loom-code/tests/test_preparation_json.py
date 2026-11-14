@@ -186,4 +186,7 @@ def test_preparation_text_errors_hooks_and_other_commands_stay_unchanged(tmp_pat
     assert entry["main"](["push", "--hook"], out, err) == 0
     assert "allowing" in err.getvalue()
     result = run_checker("delivery", "--goal", "local", "--json", cwd=tmp_path)
-    assert set(json.loads(result.stdout)) == {"state", "reason", "next", "evidence", "complete"}
+    payload = json.loads(result.stdout)
+    assert set(payload) == {"state", "reason", "next", "evidence", "complete", "suggested_next"}
+    assert payload["suggested_next"] == payload["next"]
+    assert "Suggested next step:" not in result.stderr

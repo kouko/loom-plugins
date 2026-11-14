@@ -571,7 +571,8 @@ def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
     result = run_checker("delivery", "--goal", "local", "--json", cwd=tmp_path)
     assert result.returncode == 1
     observed = json.loads(result.stdout)
-    assert set(observed) == {"state", "reason", "next", "evidence", "complete"}
+    assert set(observed) == {"state", "reason", "next", "evidence", "complete", "suggested_next"}
+    assert observed["suggested_next"] == observed["next"]
     assert observed["complete"] is False and observed["state"] == "unconfirmed"
     assert result.stderr.count("--ready delivery --help") == 1
 
