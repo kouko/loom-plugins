@@ -147,3 +147,33 @@ def test_skill_requires_source_for_past_decisions() -> None:
     body = _parse_skill_md()[1].lower()
     for requirement in ("user turn", "prior action", "formatting choice", "historical decision"):
         assert requirement in body, f"Past-decision source check omits {requirement}"
+
+
+def _has_affirmative_sentence(text: str, verb: str, phrase: str) -> bool:
+    sentences = re.split(r"(?<=[.!?])\s+", " ".join(text.split()))
+    return any(
+        sentence.startswith(verb + " ")
+        and phrase in sentence
+        and not re.search(r"\b(?:no|not|never|without)\b|n't", sentence, re.I)
+        for sentence in sentences
+    )
+
+
+@pytest.mark.parametrize(
+    ("verb", "phrase"),
+    [
+        ("Distinguish", "local implementation from verification, merge and publication"),
+        ("Identify", "tested scope and corresponding revision or artifact"),
+        ("Anchor", "relative dates to the dated conversation events"),
+    ],
+)
+def test_reference_requires_progress_evidence(verb: str, phrase: str) -> None:
+    """Guard distinct grounding obligations; native cases separately test outputs."""
+    reference = SKILL_MD.parent / "references" / "seven-block-schema.md"
+    template = reference.read_text().split("## L3 user-visible template", 1)[1].split("## 1 —", 1)[0]
+    assert _has_affirmative_sentence(template, verb, phrase)
+
+
+def test_progress_evidence_pin_rejects_negated_guidance() -> None:
+    assert _has_affirmative_sentence("Identify tested scope.", "Identify", "tested scope")
+    assert not _has_affirmative_sentence("Identify no tested scope.", "Identify", "tested scope")

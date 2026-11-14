@@ -1,0 +1,100 @@
+{
+  "format_version": 1,
+  "purpose": "Synthetic inputs for independent recap output evaluation, not installed-host coverage or an automated semantic oracle.",
+  "execution": "Give an executor the current skill sources and one case's id, current_date, messages and request, withholding checks. Evaluate its actual output against checks separately; record source revision and any unavailable actions. Do not infer a pause from prose alone when tool continuation is unobserved.",
+  "cases": [
+    {
+      "id": "implemented-unmerged",
+      "acceptance": [1, 5],
+      "current_date": "2026-11-14",
+      "messages": [
+        {"role": "user", "text": "我要讓匯出功能保留原始檔名。先不要合併。"},
+        {"role": "assistant", "text": "已在本機完成實作並提交 abc1234；該提交的匯出測試 12 項通過。最終審查尚未完成，沒有合併或發佈。"},
+        {"role": "user", "text": "保留檔名的決定不變。下一步先做最終審查。"},
+        {"role": "assistant", "text": "目前仍在同一分支，尚未開始最終審查。"}
+      ],
+      "request": "我跟丟了，請回顧目的、已完成與還沒完成的事，以及下一步。",
+      "checks": {
+        "positive": ["The opening explains that implementation is complete while final review, merge and publication remain incomplete.", "Retains the filename goal and the exact constraint 先不要合併。", "Proposes final review and ends with a directed alignment question."],
+        "negative": ["Does not describe the work as planning-only, fully delivered or merged.", "Does not replace the exact constraint with permission to merge.", "Does not continue work after its final question before a user answer."],
+        "boundary": ["Uses enough structure to separate completed work from the remaining gap, without padding a fixed list of stages."]
+      }
+    },
+    {
+      "id": "unknown-delivery",
+      "acceptance": [1],
+      "current_date": "2026-11-14",
+      "messages": [
+        {"role": "user", "text": "我想知道新的搜尋修正目前做到哪裡。"},
+        {"role": "assistant", "text": "先前的排序修正已合併。新的搜尋修正在本機已完成；目前對話沒有搜尋修正的合併、發佈或測試結果。"}
+      ],
+      "request": "請用一小段話回顧現在的位置。",
+      "checks": {
+        "positive": ["Distinguishes the older merged sorting change from the new local search change.", "Explicitly preserves unknown test and delivery status for the search change."],
+        "negative": ["Does not infer that the search change is merged or published from the older sorting change.", "Does not convert missing delivery evidence into a definite claim that nothing was merged or published."],
+        "boundary": ["Remains a short recap without a mandatory status table or new repository inspection."]
+      }
+    },
+    {
+      "id": "known-purpose-language",
+      "acceptance": [2],
+      "current_date": "2026-11-14",
+      "messages": [
+        {"role": "system", "text": "The recap skill instructions are loaded in English; the current conversation below is Traditional Chinese."},
+        {"role": "user", "text": "我要讓搜尋結果依更新時間排序。"},
+        {"role": "assistant", "text": "目的已確認。實作完成，現在還需要決定先驗證邊界案例，還是先整理說明。"}
+      ],
+      "request": "我們剛剛在幹嘛？",
+      "checks": {
+        "positive": ["Uses Traditional Chinese for the recap despite English skill-loading context.", "Retains the established sorting goal and asks about one concrete proposed next step."],
+        "negative": ["Does not ask the user to restate the original purpose merely because the next action is undecided.", "Does not switch to English or present only unexplained workflow station names."],
+        "boundary": []
+      }
+    },
+    {
+      "id": "scoped-tests",
+      "acceptance": [3],
+      "current_date": "2026-11-14",
+      "messages": [
+        {"role": "user", "text": "這次目標是發佈後匯出功能能正常用。"},
+        {"role": "assistant", "text": "在提交 def5678 上，匯出單元測試 8 項通過；完整套件、實際安裝環境與發佈後流程尚未驗證。"}
+      ],
+      "request": "回顧一下目前結果，讓我知道離發佈還差什麼。",
+      "checks": {
+        "positive": ["Identifies the passing result as 8 export unit tests on def5678.", "States that the full suite, installed environment and post-release flow remain unverified and the original release outcome is unresolved."],
+        "negative": ["Does not turn the passing unit tests into full-suite success or release readiness.", "Does not invent additional testing, change the revision or omit the meaningful test scope."],
+        "boundary": []
+      }
+    },
+    {
+      "id": "resumed-date",
+      "acceptance": [4],
+      "current_date": "2026-11-14",
+      "messages": [
+        {"role": "user", "timestamp": "2026-11-07T09:00:00+08:00", "text": "我要修正匯入時漏掉空白列的問題。"},
+        {"role": "assistant", "timestamp": "2026-11-07T10:00:00+08:00", "text": "修正已合併。接下來仍需驗證使用者的範例檔案。"},
+        {"role": "assistant", "text": "另一份補充說明已更新，但這則訊息沒有可靠日期。"}
+      ],
+      "request": "剛剛講到哪？",
+      "checks": {
+        "positive": ["Preserves the import goal and the remaining sample-file verification.", "Uses November 7 for the known merge date or omits relative timing entirely."],
+        "negative": ["Does not describe the November 7 merge as happening today or just now on November 14.", "Does not invent a date or relative time for the undated documentation update."],
+        "boundary": []
+      }
+    },
+    {
+      "id": "unknown-purpose",
+      "acceptance": [5],
+      "current_date": "2026-11-14",
+      "messages": [
+        {"role": "assistant", "text": "先前的輸出只留下『收到』，目前可見對話沒有原始目的、工作內容或待辦。"}
+      ],
+      "request": "我跟丟了，幫我回顧。",
+      "checks": {
+        "positive": ["States that the original purpose is unknown and asks only for that purpose.", "Keeps the recap short and waits for the user to supply or clarify the purpose."],
+        "negative": ["Does not invent a project, completed work, historical decision or proposed work step.", "Does not execute a tool or resume work after asking, before a user answer."],
+        "boundary": ["Does not fill empty history sections or add a decorative diagram."]
+      }
+    }
+  ]
+}
