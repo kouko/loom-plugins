@@ -14,7 +14,7 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.76.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-code`](loom-code/README.md) | 3.77.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.22.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -109,7 +109,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.76.0. Five stations carry one change from plan to PR with
+Version 3.77.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -271,6 +271,14 @@ Five commands support JSON: `plan`, `intake`, `contract`, `reviewer-count` and
 distinct `{state, reason, next, evidence, complete}` shape. See the
 [checker examples](loom-code/README.md#the-checker) for typed consumers and
 startup limitations. Dispatch JSON remains a separate existing interface.
+
+Planning and closing review now use `checked_readonly.py` through the existing
+launcher `--script` mode to validate compatibility and reviewer-floor JSON
+before acting. Invalid observations stop the prerequisite without default
+reviewer counts, text fallback or automatic retries. The
+[CLI result inventory](loom-code/references/cli-results.md) distinguishes all
+sixteen commands, the five direct JSON interfaces and these two checked
+consumers; the remaining commands have not been migrated.
 
 Progress is advisory: never parse it for gate decisions. It contains stage/state
 labels, not operands, credentials or raw child logs. Progress-only write failures

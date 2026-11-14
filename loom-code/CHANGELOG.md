@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.77.0] — 2026-11-14 — validate and adopt read-only CLI observations
+
+- Add one bounded checked consumer for `contract` and `reviewer-count`: validate the published envelope, required types, unchanged request identity and exit/status agreement, preserving compatible extra fields and numeric precision. Reject malformed or contradictory results without fallback, retry or fabricated success.
+- Use checked compatibility in write-plan and its Codex first-contact guidance, and checked reviewer floors in closing-review. Preserve usage/internal/startup distinctions, domain policy, authority, host trust and existing operation reconciliation.
+- Publish the sixteen-command result inventory and remaining migration direction: five direct JSON commands and two checked station consumers. Keep runtime preparation separate from the read-only helper, preserve Python import isolation, and configure a 30-second child timeout without claiming full migration or efficiency gains.
+
 ## [3.76.0] — 2026-11-14 — expose typed read-only CLI JSON observations
 
 - Add optional final `--json` selectors to `contract` and `reviewer-count`, reusing the bounded version-1 result envelope with typed compatibility and reviewer-floor data. Preserve existing text streams, exits, checks and preparation/delivery JSON shapes.
