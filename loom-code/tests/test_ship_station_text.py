@@ -10,9 +10,38 @@ import ast
 import re
 from pathlib import Path
 
-from prose_pin import has_negation, split_sentences
+from prose_pin import affirms, has_negation, split_sentences
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
+
+
+def test_ship_bounds_execution_context_network_recovery() -> None:
+    text = " ".join(SHIP.read_text(encoding="utf-8").split())
+    start = text.index("### Execution-context connectivity recovery")
+    recovery = text[start:text.index("Repository protection is opt-in", start)]
+    for verb, literal, extras in (
+        ("Apply", "`github-rules`", ("`publish` (including CI checks), `land`, and `delivery`",)),
+        ("identifies", "known sandbox network restrictions", (
+            "policy permits recovery", "authorization applicable to that operation",
+            "retry the same authorized Loom command once",
+            "host's permitted execution or approval mechanism")),
+        ("ends", "recovery", ("Explicit platform denial", "unavailable permission mechanism", "failed retry")),
+        ("Preserve", "original and retry outputs", ("stop automatic retries",)),
+        ("Inspect", "partial publication state", ("canonical Loom route",)),
+    ):
+        assert affirms(recovery, verb, literal, *extras), literal
+        sample = f"{verb} {literal} {' '.join(extras)}."
+        assert affirms(sample, verb, literal, *extras)
+        assert not affirms(f"Do not {sample}", verb, literal, *extras)
+    # Prohibitions carry their own negation, rather than one elsewhere.
+    for rule in (
+        "A generic connection error alone proves neither DNS failure nor invalid credentials.",
+        "Authentication or repository-permission errors require their own remedy, not an execution-permission retry.",
+        "Never substitute raw Git push or GitHub CLI publication/merge commands, alter credentials, or bypass a denial.",
+    ):
+        assert rule in split_sentences(recovery)
+    assert "apply the recovery guidance above before stopping" in text
+    assert "Other observation errors stop immediately." not in text
 
 
 def _land_sentences() -> list[str]:
