@@ -1,3 +1,4 @@
+# concern: Sandbox recovery must retain evidence, operation consent, one retry, and denial boundaries.
 """Ship station text: headings, absences and gate-marker placement.
 
 The wording of ship's rules is read by closing review; what stays here is
