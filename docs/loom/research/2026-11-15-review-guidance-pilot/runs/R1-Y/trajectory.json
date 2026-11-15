@@ -1,0 +1,31 @@
+{
+  "case": "R1",
+  "variant": "Y",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/variants/Y.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/packet.json",
+    "loom-code/skills/closing-review/references/lenses.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/base.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/target.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/delta.diff",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/requirements.json",
+    "scripts/run_package_tests.py",
+    "loom-code/scripts/repo_files.py",
+    "tests/test_run_package_tests.py",
+    "requirements-package-tests.lock",
+    "loom-code/tests/local/test-superpowers-mode-on.sh"
+  ],
+  "actions": {
+    "source_read_commands": 3,
+    "unique_input_paths_read": 12,
+    "report_write_patch_calls": 2,
+    "report_verification_commands": 2,
+    "test_runs": 0,
+    "network_calls": 0,
+    "installations": 0,
+    "git_commands": 0,
+    "subagents": 0
+  },
+  "unavailable_telemetry": ["token usage", "internal reasoning", "historical execution telemetry"],
+  "verification": "Reports read back; JSON parsed and verdict fields checked without running tests."
+}

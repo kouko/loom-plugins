@@ -1,0 +1,60 @@
+{
+  "utc_start": "2026-11-14T17:06:22Z",
+  "start_note": "First measured UTC clock, after initial orientation read; exact initial timestamp unavailable",
+  "utc_end": "2026-11-14T17:08:08+00:00",
+  "revision": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+  "inspected_paths": [
+    "variants/X/SKILL.md",
+    "variants/X/references/research-methods.md",
+    "variants/X/references/source-policy.md",
+    "variants/X/references/evaluation-selection.md",
+    "variants/X/templates/research.md",
+    "cases/C3.json",
+    "docs/loom/research/2026-11-11-recursive-decision-models-for-loom.md",
+    "docs/loom/research/2026-11-11-mechanical-decision-input-evidence.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/comparison.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/acceptance-test-evidence.md",
+    "loom-code/scripts/loom_checker.py",
+    "loom-code/scripts/loom_checker/command_handlers/intake.py",
+    "loom-code/scripts/loom_checker/preparation_output.py",
+    "loom-code/scripts/loom_checker/helpers.py",
+    "loom-code/skills/write-plan/SKILL.md"
+  ],
+  "actual_commands_actions": [
+    "cat assigned skill and case",
+    "date -u; cat assigned methods/source/evaluation/template resources",
+    "cat starting research records; sed intake.py; git rev-parse HEAD",
+    "cat comparison.md and preparation_output.py; rg write-plan intake guidance",
+    "rg guessed cli.py failed: missing path; cat acceptance report | head -110; sed write-plan guidance; rg helpers report",
+    "rg intake/JSON package symbols; sed helpers report",
+    "rg actual loom_checker.py entry point",
+    "sed main dispatcher and intake help",
+    "mkdir exclusive output; Python write research.md",
+    "Python read/link check failed: source links had one excess parent traversal; corrected research-record links",
+    "Python correct source link traversal; full substantive readback; all local file targets verified; 2681-2236=445 recomputed; write trajectory",
+    "Final trajectory readback"
+  ],
+  "available_tool_call_count": {
+    "functions_exec": 12,
+    "nested_exec_command": 12,
+    "scope": "This worker, including final trajectory readback"
+  },
+  "unavailable_telemetry": [
+    "Model tokens",
+    "Model cost",
+    "Parent turns",
+    "Backend timing",
+    "Exact initial UTC timestamp"
+  ],
+  "network_used": false,
+  "models_or_checker_rerun": false,
+  "verification": [
+    "Full substantive research readback",
+    "All local Markdown target files resolve after correction",
+    "Historical arithmetic recomputed"
+  ],
+  "limitations": [
+    "Historical outcomes attributed to retained reports; full raw scoring inventory not inspected",
+    "Current JSON implementation inspected but not executed"
+  ]
+}

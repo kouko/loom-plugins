@@ -1,0 +1,23 @@
+{
+  "source_head": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+  "conditions": {
+    "X": "baseline",
+    "Y": "compact-review-method"
+  },
+  "order": [
+    "R1-Y",
+    "R1-X",
+    "R2-X",
+    "R2-Y",
+    "R3-Y",
+    "R3-X"
+  ],
+  "prior_execution_count": 6,
+  "prior_auditor_count": 2,
+  "new_execution_count": 6,
+  "new_auditor_count": 2,
+  "word_counts": {
+    "X": 1541,
+    "Y": 1327
+  }
+}

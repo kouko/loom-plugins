@@ -1,0 +1,8 @@
+{
+  "kind": "normalized observed fields, not complete stdout",
+  "command": "/Users/kouko/.codex/plugins/cache/loom/loom-code/3.81.0/scripts/loom-python --ready delivery --json",
+  "exit_code": 1,
+  "state": "unconfirmed",
+  "reason": "cannot identify a committed change",
+  "complete": false
+}

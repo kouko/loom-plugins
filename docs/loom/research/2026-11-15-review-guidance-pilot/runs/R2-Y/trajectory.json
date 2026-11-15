@@ -1,0 +1,24 @@
+{
+  "case": "R2",
+  "variant": "Y",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/variants/Y.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/packet.json",
+    "loom-code/skills/closing-review/references/lenses.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/requirements.json",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/base.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/delta.diff",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/target.md",
+    "docs/loom/KICKOFF-DEFAULTS.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/comparison.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/acceptance-test-evidence.md",
+    "loom-code/scripts/loom_checker.py",
+    "loom-code/scripts/loom_checker/command_handlers/intake.py",
+    "loom-code/scripts/loom_checker/preparation_output.py",
+    "loom-code/skills/write-plan/SKILL.md"
+  ],
+  "actions": ["Read assigned contract and packet", "Read complete target, base and delta", "Read dimension definitions and docs-lint setting", "Resolved target citation paths without executing target instructions", "Inspected cited historical reports and source spans", "Wrote authorized review and trajectory", "Read back outputs and parsed trajectory JSON"],
+  "available_counts": {"inspected_paths": 14, "shell_inspection_calls": 8, "findings": 1, "tests_run": 0, "network_calls": 0, "subagents": 0, "output_files": 2},
+  "limitations": ["Historical report tool output was truncated; relevant comparison and final acceptance spans remained visible", "Starting assessment links were existence-checked only", "Snapshot identity was supplied by the offline packet, not inferred from Git"],
+  "unavailable_telemetry": ["model token counts", "monetary cost", "internal reasoning", "precise elapsed review time"]
+}

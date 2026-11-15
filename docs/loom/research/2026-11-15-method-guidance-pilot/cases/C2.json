@@ -1,0 +1,10 @@
+{
+  "id": "C2",
+  "title": "Dispatch trust",
+  "question": "Does dispatch_profile.py independently establish that a task really has a trust-boundary risk, or does it accept caller-supplied classifications? Trace input validation and routing for contradictory task evidence. Explain what a successful resolver test would and would not prove.",
+  "starting_paths": [
+    "loom-code/scripts/dispatch_profile.py",
+    "loom-code/tests/test_dispatch_profile_resolver.py",
+    "loom-code/references/dispatch-profile.md"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "revision": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+  "mapping": {
+    "X": "baseline",
+    "Y": "compact-methods"
+  },
+  "case_order": [
+    "C1-X",
+    "C1-Y",
+    "C2-Y",
+    "C2-X",
+    "C3-X",
+    "C3-Y"
+  ],
+  "baseline_sha256": "bfada6dddb9ae104ddc3a7e48c3a701a1eb2ea3f0955cd1f3424a41e6a668ca5"
+}

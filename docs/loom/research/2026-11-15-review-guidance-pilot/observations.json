@@ -1,0 +1,65 @@
+{
+  "provenance": "Mechanical YAML/schema/snapshot-identity and finding-count threshold checks only. These do not validate whether dimension PASS claims are justified; qualification and semantic verdict consistency are adjudicated in independent audits. No inference of general accuracy, efficiency or complete action logs.",
+  "runs": [
+    {
+      "run": "R1-X",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/target.md:15"
+        }
+      ],
+      "output_words": 229
+    },
+    {
+      "run": "R1-Y",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/target.md:15"
+        }
+      ],
+      "output_words": 248
+    },
+    {
+      "run": "R2-X",
+      "verdict": "NEEDS_REVISION",
+      "findings": [
+        {
+          "severity": "fatal",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/target.md:38"
+        }
+      ],
+      "output_words": 233
+    },
+    {
+      "run": "R2-Y",
+      "verdict": "NEEDS_REVISION",
+      "findings": [
+        {
+          "severity": "fatal",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/target.md:38"
+        }
+      ],
+      "output_words": 204
+    },
+    {
+      "run": "R3-X",
+      "verdict": "PASS",
+      "findings": [],
+      "output_words": 174
+    },
+    {
+      "run": "R3-Y",
+      "verdict": "PASS",
+      "findings": [],
+      "output_words": 194
+    }
+  ]
+}

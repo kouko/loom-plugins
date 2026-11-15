@@ -1,0 +1,49 @@
+{
+  "case": "C1",
+  "variant": "Y",
+  "utc_start": "2026-11-14T17:01:57Z",
+  "utc_end": "2026-11-14T17:03:07.281071+00:00",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/SKILL.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/cases/C1.json",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/research-methods.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/source-policy.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/templates/research.md",
+    "scripts/run_package_tests.py",
+    "requirements-package-tests.lock (truncated output)",
+    "loom-code/scripts/repo_files.py (search and lines 73-147)",
+    "loom-code/tests/local/test-superpowers-mode-on.sh (lines 1-65)"
+  ],
+  "actions": [
+    "Read assigned skill and case using cat",
+    "Read research-methods.md, source-policy.md and template using cat",
+    "nl -ba scripts/run_package_tests.py",
+    "nl -ba requirements-package-tests.lock",
+    "rg -n function/Git definitions in loom-code/scripts/repo_files.py",
+    "git rev-parse HEAD",
+    "rg --files tests/local loom-code/tests/local loom-design/tests/local loom-workflow/tests/local -g test* -g *test.py (exit 2; missing directories retained)",
+    "sed -n 73,147p loom-code/scripts/repo_files.py",
+    "sed -n 1,65p loom-code/tests/local/test-superpowers-mode-on.sh",
+    "Create exclusive output directory; write research.md and trajectory.json with Python",
+    "Read back substantive saved record and verify relative link targets (following tool call)",
+    "Initial saved-record link check failed: paths resolved under docs/. Corrected link depth in exclusive research.md; repeated full read and link checks."
+  ],
+  "available_tool_call_count": {
+    "functions_exec_calls": 7,
+    "nested_exec_command_calls": 13,
+    "clock_calls": 1
+  },
+  "unavailable_telemetry": [
+    "token usage",
+    "model internal reasoning",
+    "per-action cost",
+    "tool latency beyond tool-returned metadata"
+  ],
+  "execution_limits": [
+    "no network",
+    "no installation",
+    "no suite or tests",
+    "project artifacts read-only except exclusive C1-Y output"
+  ],
+  "verification": "Read final research.md in full and resolved every source link; parsed and read final trajectory.json."
+}

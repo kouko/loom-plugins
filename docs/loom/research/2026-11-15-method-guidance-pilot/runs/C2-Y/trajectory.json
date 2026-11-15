@@ -1,0 +1,43 @@
+{
+  "case": "C2",
+  "variant": "Y",
+  "utc_start": "2026-11-14T17:03:25Z",
+  "utc_start_scope": "first clock reading after initial skill/case orientation; true task start was not instrumented",
+  "utc_end": "2026-11-14T17:04:39.199328+00:00",
+  "method": "bounded static source trace; no runtime experiment",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/SKILL.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/research-methods.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/source-policy.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/templates/research.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/cases/C2.json",
+    "loom-code/scripts/dispatch_profile.py",
+    "loom-code/tests/test_dispatch_profile_resolver.py",
+    "loom-code/references/dispatch-profile.md"
+  ],
+  "actual_commands_actions": [
+    "cat assigned SKILL.md and cases/C2.json",
+    "clock__curr_time",
+    "cat assigned research-methods.md, source-policy.md, templates/research.md and resolver source",
+    "git rev-parse HEAD",
+    "nl -ba resolver tests and contract; nl -ba resolver | sed -n 65,180p (combined output truncated; focused follow-up used)",
+    "rg -n trust|complex|contrad|unknown|boolean|CLI|cli|subprocess|malformed|inconsistent on resolver tests",
+    "sed -n 410,610p resolver tests; nl -ba resolver | sed -n 295,365p; sed -n 1,20p contract",
+    "Python writes research.md and trajectory.json exclusively in assigned run directory",
+    "Python read research.md in full; resolve every Markdown link and verify line anchors; read/update trajectory.json"
+  ],
+  "tool_call_count": {
+    "functions_exec_total": 6,
+    "nested_exec_command_total": 6,
+    "nested_clock_total": 1,
+    "collaboration_send_message_total": 1,
+    "count_scope": "agent-visible tool calls through final record verification; excludes parent and other agents"
+  },
+  "unavailable_telemetry": [
+    "token usage",
+    "internal reasoning steps",
+    "exact pre-orientation start time",
+    "parent/other-agent tool counts",
+    "runtime/test results (not executed)"
+  ]
+}

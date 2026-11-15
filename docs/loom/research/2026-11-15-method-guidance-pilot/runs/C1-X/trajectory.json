@@ -1,0 +1,38 @@
+{
+  "case": "C1",
+  "variant": "X",
+  "start_utc": "2026-11-14T17:00:34Z",
+  "end_utc": "2026-11-14T17:01:40.350026+00:00",
+  "method": "bounded source inspection",
+  "inspected_paths": [
+    "variants/X/SKILL.md",
+    "variants/X/references/research-methods.md",
+    "variants/X/references/source-policy.md",
+    "variants/X/templates/research.md",
+    "cases/C1.json",
+    "scripts/run_package_tests.py",
+    "requirements-package-tests.lock",
+    "loom-code/scripts/repo_files.py",
+    "tests/test_run_package_tests.py"
+  ],
+  "actions": [
+    "Read assigned skill and case with cat",
+    "Read required method/source references and template with cat",
+    "Read numbered runner and lock with nl -ba",
+    "git rev-parse HEAD",
+    "rg -n helper and test-discovery symbols; two guessed config paths absent",
+    "sed -n helper lines 73-147 and focused tests 210-360",
+    "rg --files four local test directories; three absent, loom-code local script paths found",
+    "Write research.md and trajectory.json within exclusive run directory",
+    "Read back research and verify relative link targets and trajectory JSON",
+    "Corrected link-count transcription from 11 to observed 10 and finalized tool-call count"
+  ],
+  "tool_calls": {
+    "functions_exec_total": 7,
+    "exec_command_total": 7,
+    "other_tools": 0,
+    "provider_token_latency_telemetry": "unavailable"
+  },
+  "execution_limits": "No network, installation, tests, commits or writes outside assigned run directory.",
+  "verification": "Read substantive research in full; all 10 relative links resolve to intended source files; trajectory JSON parsed."
+}

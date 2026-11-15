@@ -1,0 +1,59 @@
+{
+  "provenance": "Elapsed times use executor self-reported timestamps with inconsistent start boundaries; not suitable for version latency comparison. Word counts are whitespace splits, not tokens. Tool-call counts are heterogeneous self-reports, not complete independently captured transcripts. Cost and exact model snapshots unavailable.",
+  "runs": [
+    {
+      "run": "C1-X",
+      "research_words": 723,
+      "research_bytes": 5988,
+      "start_utc": "2026-11-14T17:00:34Z",
+      "end_utc": "2026-11-14T17:01:40.350026+00:00",
+      "elapsed_seconds": 66.35,
+      "timing_note": "Executor-reported task interval; boundaries not independently instrumented."
+    },
+    {
+      "run": "C1-Y",
+      "research_words": 681,
+      "research_bytes": 5486,
+      "start_utc": "2026-11-14T17:01:57Z",
+      "end_utc": "2026-11-14T17:03:07.281071+00:00",
+      "elapsed_seconds": 70.28,
+      "timing_note": "Executor-reported task interval; boundaries not independently instrumented."
+    },
+    {
+      "run": "C2-X",
+      "research_words": 789,
+      "research_bytes": 7004,
+      "start_utc": "2026-11-14T17:04:56Z",
+      "end_utc": "2026-11-14T17:05:56.934301+00:00",
+      "elapsed_seconds": 60.93,
+      "timing_note": "Executor-reported task interval; boundaries not independently instrumented."
+    },
+    {
+      "run": "C2-Y",
+      "research_words": 848,
+      "research_bytes": 7420,
+      "start_utc": "2026-11-14T17:03:25Z",
+      "end_utc": "2026-11-14T17:04:39.199328+00:00",
+      "elapsed_seconds": 74.2,
+      "timing_note": "first clock reading after initial skill/case orientation; true task start was not instrumented"
+    },
+    {
+      "run": "C3-X",
+      "research_words": 781,
+      "research_bytes": 6765,
+      "start_utc": "2026-11-14T17:06:22Z",
+      "end_utc": "2026-11-14T17:08:08+00:00",
+      "elapsed_seconds": 106.0,
+      "timing_note": "First measured UTC clock, after initial orientation read; exact initial timestamp unavailable"
+    },
+    {
+      "run": "C3-Y",
+      "research_words": 913,
+      "research_bytes": 7693,
+      "start_utc": "2026-11-14T17:08:27Z",
+      "end_utc": "2026-11-14T17:10:11.951871+00:00",
+      "elapsed_seconds": 104.95,
+      "timing_note": "Executor-reported task interval; boundaries not independently instrumented."
+    }
+  ]
+}

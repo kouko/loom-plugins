@@ -1,0 +1,36 @@
+{
+  "case": "R3",
+  "variant": "Y",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/variants/Y.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/packet.json",
+    "loom-code/skills/closing-review/references/lenses.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/base.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/delta.diff",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/requirements.json",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/target.md",
+    "docs/loom/KICKOFF-DEFAULTS.md",
+    "loom-code/scripts/dispatch_profile.py",
+    "loom-code/references/dispatch-profile.md",
+    "loom-code/tests/test_dispatch_profile_resolver.py"
+  ],
+  "actions": [
+    "Read assigned instructions, packet and lens definitions.",
+    "Read supplied base, empty delta, requirements, complete target and docs-lint defaults.",
+    "Read cited implementation, contract and test-definition spans without executing them.",
+    "Write only the authorized review and trajectory artifacts.",
+    "Read back output artifacts and validate trajectory JSON and report fields."
+  ],
+  "counts": {
+    "inspected_source_paths": 11,
+    "source_read_shell_calls": 3,
+    "artifact_write_patch_calls": 1,
+    "artifact_verification_shell_calls": 1,
+    "findings": 0,
+    "tests_executed": 0,
+    "network_calls": 0,
+    "subagents_spawned": 0
+  },
+  "unavailable_telemetry": ["token usage", "private model reasoning", "precise per-action wall-clock duration"],
+  "limitations": ["Offline source review only; no execution or Git identity authentication."]
+}
