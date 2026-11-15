@@ -1,0 +1,34 @@
+{
+  "case": "R3",
+  "variant": "X",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/variants/X.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/packet.json",
+    "loom-code/skills/closing-review/references/lenses.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/requirements.json",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/base.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/target.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R3/delta.diff",
+    "loom-code/scripts/dispatch_profile.py",
+    "loom-code/references/dispatch-profile.md",
+    "loom-code/tests/test_dispatch_profile_resolver.py"
+  ],
+  "actions": [
+    "Read assigned reviewer contract, packet and dimension definitions.",
+    "Read requirements before base, target and supplied empty delta.",
+    "Read cited resolver source and relevant contract and test definitions without executing them.",
+    "Write only the two authorized report artifacts.",
+    "Read back report artifacts and verify required fields and counts."
+  ],
+  "counts": {
+    "source_read_commands": 3,
+    "unique_input_paths_inspected": 10,
+    "output_artifacts": 2,
+    "findings": 0,
+    "tests_run": 0,
+    "network_calls": 0,
+    "subagents": 0
+  },
+  "unavailable_telemetry": ["token usage", "internal model timing", "private reasoning"],
+  "execution_limitations": ["No runtime behavior or historical Git identity authenticated."]
+}

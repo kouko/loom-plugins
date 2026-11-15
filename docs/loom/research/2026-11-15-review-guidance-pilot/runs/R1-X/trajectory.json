@@ -1,0 +1,38 @@
+{
+  "case": "R1",
+  "variant": "X",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/variants/X.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/packet.json",
+    "loom-code/skills/closing-review/references/lenses.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/requirements.json",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/base.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/target.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/delta.diff",
+    "docs/loom/KICKOFF-DEFAULTS.md",
+    "scripts/run_package_tests.py",
+    "loom-code/scripts/repo_files.py",
+    "tests/test_run_package_tests.py",
+    "requirements-package-tests.lock",
+    "loom-code/tests/local/test-superpowers-mode-on.sh",
+    "loom-code/tests/local/test-git-memory-delegation.sh"
+  ],
+  "inspection_notes": {
+    "tests/test_run_package_tests.py": "Read lines 222-298 only.",
+    "requirements-package-tests.lock": "Read lines 35-48 only.",
+    "loom-code/tests/local/test-git-memory-delegation.sh": "Checked path existence only; did not read contents."
+  },
+  "actions": {
+    "read_only_shell_calls": 4,
+    "report_write_patch_calls": 1,
+    "report_verification_shell_calls": 1,
+    "tests_executed": 0,
+    "network_calls": 0,
+    "installations": 0,
+    "commits": 0,
+    "subagents": 0,
+    "findings": 1
+  },
+  "unavailable_telemetry": ["token usage", "precise elapsed duration", "historical execution logs", "historical Git identity verification"],
+  "verification": "Read back both report files; checked all six docs dimensions, snapshot echo, finding anchor/fix and single-important verdict mapping. No executable tests were run."
+}

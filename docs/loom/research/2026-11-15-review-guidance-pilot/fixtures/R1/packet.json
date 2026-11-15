@@ -1,0 +1,16 @@
+{
+  "case": "R1",
+  "lens": "docs",
+  "reviewed_sha": "snapshot:9096cc43eeaf89718aab7897dd3a441284d649834f8c64cde33efb41e250d323",
+  "changed_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/target.md"
+  ],
+  "base_path": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/base.md",
+  "target_path": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/target.md",
+  "delta_path": "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/delta.diff",
+  "ground_truth": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R1/requirements.json"
+  ],
+  "dimensions": "loom-code/skills/closing-review/references/lenses.md",
+  "checkpoint": "offline-snapshot-research-only"
+}

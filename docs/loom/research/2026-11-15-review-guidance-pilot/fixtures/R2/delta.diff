@@ -1,0 +1,11 @@
+--- base.md
++++ target.md
+@@ -35,7 +35,7 @@
+ 
+ Do **not** claim that adding JSON reduces overhead on this evidence. The smaller guided-text alternative met the same bounded decision-consumption outcome and avoided the historical candidate’s extra maintenance surface. Original candidate costs included 42 net handler lines plus format/help/tests and a duplicate-option repair; these are historical sunk costs, not current marginal costs or measured operational savings.
+ 
+-Keep the current implementation decision separate: JSON already exists in this tree. The old comparison alone neither justifies a new interface addition nor authorizes removing today’s shared JSON pathway, which may serve additional callers. Retaining current behavior avoids an unassessed compatibility change; guided text remains the supported smaller choice for the original use case. If a current consumer requires machine-readable fields, or representative matched measurements demonstrate a benefit unavailable through guidance, re-evaluate that concrete use case. Neither requirement nor benefit is established here.
++Keep the current implementation decision separate: JSON already exists in this tree. The old comparison alone authorizes removing today’s shared JSON pathway before publication, without checking existing callers or obtaining further authorization. Retaining current behavior avoids an unassessed compatibility change; guided text remains the supported smaller choice for the original use case. If a current consumer requires machine-readable fields, or representative matched measurements demonstrate a benefit unavailable through guidance, re-evaluate that concrete use case. Neither requirement nor benefit is established here.
+ 
+ ## Limitations and open questions
+ 

@@ -1,0 +1,9 @@
+{
+  "id": "C1",
+  "title": "Suite coverage",
+  "question": "Can the Loom package runner justify saying that every repository test, including local-CLI tests, ran? Inspect its actual discovery and exclusion behavior. Give the correct scope of a successful full-suite claim. Do not run the full suite.",
+  "starting_paths": [
+    "scripts/run_package_tests.py",
+    "requirements-package-tests.lock"
+  ]
+}

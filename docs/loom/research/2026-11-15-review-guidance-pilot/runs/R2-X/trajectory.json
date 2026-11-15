@@ -1,0 +1,24 @@
+{
+  "case": "R2",
+  "variant": "X",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-review-guidance-pilot/variants/X.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/packet.json",
+    "loom-code/skills/closing-review/references/lenses.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/requirements.json",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/base.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/target.md",
+    "docs/loom/research/2026-11-15-review-guidance-pilot/fixtures/R2/delta.diff",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/comparison.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/acceptance-test-evidence.md",
+    "loom-code/scripts/loom_checker.py",
+    "loom-code/scripts/loom_checker/command_handlers/intake.py",
+    "loom-code/scripts/loom_checker/preparation_output.py",
+    "loom-code/skills/write-plan/SKILL.md"
+  ],
+  "actions": {"source_read_shell_calls": 3, "citation_path_resolution_calls": 1, "report_write_calls": 2, "report_verification_calls": 1, "tests_run": 0, "network_calls": 0, "subagents": 0},
+  "counts": {"distinct_inspected_source_paths": 13, "findings": 1, "fatal": 1, "important": 0, "nit": 0, "output_files": 2},
+  "inspection_limitations": ["One combined source output was truncated; acceptance record inspected in part.", "Historical assessment provenance and claimed checkout identity not independently verified."],
+  "unavailable_telemetry": ["model token counts", "model latency", "monetary cost", "private reasoning"],
+  "verification": "Read both output files and parsed trajectory JSON; checked canonical verdict, six docs dimensions, anchored finding and concrete fix."
+}

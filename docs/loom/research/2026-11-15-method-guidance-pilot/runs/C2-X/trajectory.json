@@ -1,0 +1,38 @@
+{
+  "case": "C2",
+  "variant": "X",
+  "start_utc": "2026-11-14T17:04:56Z",
+  "end_utc": "2026-11-14T17:05:56.934301+00:00",
+  "revision": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+  "method": "bounded source inspection",
+  "inspected_paths": [
+    "variants/X/SKILL.md",
+    "variants/X/references/research-methods.md",
+    "variants/X/references/source-policy.md",
+    "variants/X/templates/research.md",
+    "cases/C2.json",
+    "loom-code/scripts/dispatch_profile.py",
+    "loom-code/references/dispatch-profile.md",
+    "loom-code/tests/test_dispatch_profile_resolver.py"
+  ],
+  "actions": [
+    "cat assigned variant SKILL.md and cases/C2.json; UTC clock",
+    "cat assigned research-methods.md, source-policy.md, templates/research.md; sed resolver lines 1\u2013260",
+    "sed resolver 260\u2013380; cat dispatch contract; sed resolver tests 1\u2013240; git rev-parse HEAD",
+    "rg relevant test terms; nl source/contract/test excerpts",
+    "mkdir exclusive run; python write research.md and trajectory.json",
+    "python read saved research.md and resolve local links; read trajectory.json"
+  ],
+  "tool_call_count": {
+    "functions_exec": 6,
+    "exec_command": 6,
+    "clock_curr_time": 1,
+    "scope": "includes planned final verification call; counts actual exposed calls, not hidden backend actions"
+  },
+  "unavailable_telemetry": [
+    "token counts",
+    "model inference latency",
+    "hidden backend tool operations"
+  ],
+  "execution_tests_run": false
+}

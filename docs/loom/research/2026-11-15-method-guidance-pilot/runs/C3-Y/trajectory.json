@@ -1,0 +1,51 @@
+{
+  "case": "C3",
+  "variant": "Y",
+  "utc_start": "2026-11-14T17:08:27Z",
+  "utc_end": "2026-11-14T17:10:11.951871+00:00",
+  "revision": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+  "inspected_paths": [
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/SKILL.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/research-methods.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/source-policy.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/references/evaluation-selection.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/variants/Y/templates/research.md",
+    "docs/loom/research/2026-11-15-method-guidance-pilot/cases/C3.json",
+    "docs/loom/research/2026-11-11-recursive-decision-models-for-loom.md",
+    "docs/loom/research/2026-11-11-mechanical-decision-input-evidence.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/comparison.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/acceptance-test-evidence.md",
+    "docs/loom/2026-11-11-intake-observation-pilot/evidence/consumer-scoring.json",
+    "loom-code/scripts/loom_checker/command_handlers/intake.py",
+    "loom-code/scripts/loom_checker/preparation_output.py",
+    "loom-code/scripts/loom_checker.py",
+    "loom-code/skills/write-plan/SKILL.md"
+  ],
+  "actions": [
+    "cat assigned skill and case; clock UTC",
+    "cat methods/source/evaluation/template and starting artifacts",
+    "cat comparison and renderer; rg planning guidance; read architectural record; git rev-parse HEAD",
+    "rg CLI candidates (two missing paths); cat acceptance; sed planning guidance",
+    "sed CLI main; cat template and consumer scoring",
+    "write exclusive research.md and trajectory.json",
+    "read saved research and validate all local links and JSON",
+    "Two link verification attempts found incorrect relative depths; corrected source/research links, reread full research and verified every local target file. No Markdown renderer run."
+  ],
+  "tool_calls": {
+    "functions_exec": 9,
+    "nested_exec_command": 9,
+    "nested_clock_curr_time": 1,
+    "scope": "all agent tool calls through final verification; excludes collaboration messages"
+  },
+  "unavailable_telemetry": [
+    "model tokens",
+    "monetary cost",
+    "provider latency",
+    "internal reasoning tokens"
+  ],
+  "experiments_run": [],
+  "limitations": [
+    "Historical evidence reused, not replayed",
+    "Current optional JSON statically inspected only"
+  ]
+}

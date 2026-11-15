@@ -1,0 +1,10 @@
+{
+  "id": "C3",
+  "title": "Use existing comparison",
+  "question": "Should Loom add a JSON planning-intake interface to reduce orchestration overhead, given the existing recorded comparison? Reuse the existing evidence when sufficient, inspect relevant implementation if needed, and distinguish the bounded result from general performance claims. Do not rerun models or access external services.",
+  "starting_paths": [
+    "docs/loom/research/2026-11-11-recursive-decision-models-for-loom.md",
+    "docs/loom/research/2026-11-11-mechanical-decision-input-evidence.md",
+    "loom-code/scripts/loom_checker/command_handlers/intake.py"
+  ]
+}
