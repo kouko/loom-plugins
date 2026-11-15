@@ -176,6 +176,35 @@ agrees, as its own change and never inside the current change's PR, then run
 `github-rules` again for the rules. When it reports that the rules could not be
 confirmed, tell the user and continue publishing.
 
+### Execution-context connectivity recovery
+
+Apply this guidance to `github-rules`, `publish` (including CI checks), `land`,
+and `delivery` throughout Ship, before treating a connection failure as terminal
+or rules as unconfirmed. A generic connection error alone proves neither DNS
+failure nor invalid credentials. Authentication or repository-permission errors
+require their own remedy, not an execution-permission retry. Keep an unexplained
+failure unattributed; do not automatically retry it.
+
+When available evidence identifies known sandbox network restrictions as the
+cause, policy permits recovery, and the operation already has the required
+authorization applicable to that operation (publication or merge consent only
+when that operation requires it), retry the same authorized Loom command once
+through the host's permitted execution or approval mechanism. On Codex this can
+be the shell tool's supported permission request; use the current host's actual
+capability rather than assuming that mechanism exists everywhere. Request only
+the execution permission needed for that command; retain all Loom checks and
+human decision boundaries. This guidance grants no permissions or authorization.
+
+Explicit platform denial, an unavailable permission mechanism, or a failed retry
+ends recovery. Preserve the original and retry outputs, report the blocker and
+unfinished or unconfirmed state, and stop automatic retries. Inspect partial
+publication state through the canonical Loom route before any further mutation:
+use the read-only `delivery` observation in Handoff while the branch exists;
+after a confirmed merge use §5's `land --cleanup` recovery when appropriate,
+without replaying `--accepted-by`. Never substitute raw Git push or GitHub CLI
+publication/merge commands, alter credentials, or bypass a denial. A successful
+retry is evidence only for the result it actually reports.
+
 Repository protection is opt-in and affects ordinary human Git operations too.
 Only after explicit consent, run
 `"<loom-code>/scripts/loom-python" --repair push --install-git-hooks` in that
@@ -220,13 +249,15 @@ the line to carry), an attestation left uncommitted, and an unidentified
 change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; where a refusal names a
-remedy, take it, and where it names none, report the refusal and stop.
+remedy, take it, and where it names none, apply the recovery guidance above
+before stopping; otherwise report the refusal and stop.
 
 The installed plugin's `PreToolUse` hook gives early shell feedback and
 publication reminders; it cannot cover every shell spelling. Native Git
 protection is independent of that reminder and of workflow simplification.
 Preserve work on a feature branch/worktree when blocked; never recommend bypass
 or data discard. Follow a scoped failure's observed reason and safe next action;
+apply the recovery guidance above before stopping on connectivity failures;
 if automatic repair is unjustified, report the missing condition and stop.
 
 ## 4. Observe CI
@@ -244,7 +275,9 @@ report that a reliable terminal result could not be obtained. Treat an empty
 required-check snapshot, including GitHub CLI's explicit no-checks response,
 as registration delay. Check every 10 seconds for up to 60 seconds; if checks
 are still absent on the final observation, report that no required checks are
-registered and finish successfully. Other observation errors stop immediately.
+registered and finish successfully. For other observation errors, apply the
+recovery guidance above before stopping; errors without a justified recovery
+remain blockers.
 
 Observation belongs only to the active publication process. Do not create a
 scheduler, daemon, persistent polling record, or restart recovery mechanism.

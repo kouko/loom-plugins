@@ -1,3 +1,4 @@
+# concern: Sandbox recovery must retain evidence, operation consent, one retry, and denial boundaries.
 """Ship station text: headings, absences and gate-marker placement.
 
 The wording of ship's rules is read by closing review; what stays here is
@@ -10,9 +11,49 @@ import ast
 import re
 from pathlib import Path
 
-from prose_pin import has_negation, split_sentences
+from prose_pin import affirms, has_negation, split_sentences
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
+
+
+def test_ship_bounds_execution_context_network_recovery() -> None:
+    text = " ".join(SHIP.read_text(encoding="utf-8").split())
+    start = text.index("### Execution-context connectivity recovery")
+    recovery = text[start:text.index("Repository protection is opt-in", start)]
+    for verb, literal, extras in (
+        ("Apply", "`github-rules`", ("`publish` (including CI checks), `land`, and `delivery`",)),
+        ("identifies", "known sandbox network restrictions", (
+            "policy permits recovery", "authorization applicable to that operation",
+            "retry the same authorized Loom command once",
+            "host's permitted execution or approval mechanism")),
+        ("ends", "recovery", ("Explicit platform denial", "unavailable permission mechanism", "failed retry")),
+        ("Preserve", "original and retry outputs", ("stop automatic retries",)),
+        ("Inspect", "partial publication state", ("canonical Loom route",)),
+    ):
+        assert affirms(recovery, verb, literal, *extras), literal
+        sample = f"{verb} {literal} {' '.join(extras)}."
+        assert affirms(sample, verb, literal, *extras)
+        assert not affirms(f"Do not {sample}", verb, literal, *extras)
+    # Check the prohibited inference and actions in their own clauses;
+    # surrounding prose and conjunctions may change without changing the rule.
+    sentences = split_sentences(recovery)
+    assert any(
+        "connection" in s and re.search(r"\bproves neither\b.*\bDNS\b.*\bnor\b.*\bcredentials\b", s)
+        for s in sentences
+    )
+    assert any(
+        "Authentication" in s and "repository-permission" in s
+        and re.search(r"\brequire\b.*\bremedy\b.*\bnot\b.*\bexecution-permission retry\b", s)
+        for s in sentences
+    )
+    assert any(
+        re.match(r"Never substitute\b", s) and "raw Git push" in s
+        and "GitHub CLI" in s and "publication/merge" in s
+        and "alter credentials" in s and "bypass a denial" in s
+        for s in sentences
+    )
+    assert "apply the recovery guidance above before stopping" in text
+    assert "Other observation errors stop immediately." not in text
 
 
 def _land_sentences() -> list[str]:

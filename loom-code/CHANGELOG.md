@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.82.0] — 2026-11-16 — recover authorized sandbox network failures
+
+- Distinguish connectivity evidence from authentication and permission failures without treating every transport error as DNS failure.
+- Guide policy-permitted retries of the same authorized Loom command in the appropriate host execution context, preserving publication and merge checks.
+- Retain failure evidence and stop when permissions are unavailable, the platform denies the retry, or the retry still fails.
+
 ## [3.81.1] — 2026-11-15 — complete next-action skill admission
 
 - budget-exception: whats-next — admit the counted advice skill released in loom-workflow 5.25.0, raising the measured skill ceiling from 26 to 27 while rejecting 28.

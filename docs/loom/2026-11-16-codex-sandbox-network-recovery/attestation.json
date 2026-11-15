@@ -1,0 +1,99 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-16-codex-sandbox-network-recovery",
+  "content_digest": "f9197d14ce1d2b5e7935138c98c7364eeb7d5080",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_ship_station_text.py",
+      "artifact": "loom-code/tests/test_ship_station_text.py",
+      "result": "pass",
+      "command_digest": "7ac9e12b4475d33095b566c45546d8c1ec90a600b84edc78014f4df210be7b3d"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "f82b358fabe781dfa929fa6a9a43f2ece0346e97",
+      "review_target_sha": "94d92433c8e0ad36905c3776a05aa1e62864b0dc",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative changed paths, complete Ship guidance, intent, plan, acceptance report and evidence, release edits, and relevant publication source. The revised stop rules preserve the base prohibition on unsupported automatic repair while adding an evidenced, policy-permitted exception. No new prose gate or permission-granting mechanism is introduced.",
+        "Independently ran python3 -m pytest loom-code/tests/test_ship_station_text.py -q (11 passed) and python3 -m pytest loom-code/tests/test_write_plan_station_text.py -q (43 passed). Complete inventory and adversarial execution were not repeated, as the reviewer contract requires.",
+        "Evidence is adequate for this bounded guidance repair: independent synthetic decisions exercise the revised instructions, and attributed matched live github-rules observations support the execution-context premise. A2/A3 remain partly verified; actual publish/CI recovery, installed-host triggering, native platform denial and unavailable-host execution are not established. This verdict does not promote those limits to successful runtime delivery."
+      ],
+      "reviewer": "closing-skill",
+      "vendor": "codex",
+      "model": "inherited/unverified"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "f82b358fabe781dfa929fa6a9a43f2ece0346e97",
+      "review_target_sha": "94d92433c8e0ad36905c3776a05aa1e62864b0dc",
+      "dimension_scores": {
+        "security": "PASS — Recovery requires established environment evidence, applicable operation authorization and permitted host execution; explicit denial stops recovery without credentials changes or alternate publication routes.",
+        "architecture": "PASS — Host execution permission remains with the calling agent; the publisher and existing verification boundaries are unchanged.",
+        "correctness": "PASS — The guidance distinguishes transport uncertainty from authentication, bounds retry to one identical authorized command and retains partial-state recovery through existing canonical commands. Reviewed RED-to-GREEN evidence and independently ran both changed test modules.",
+        "naming": "PASS — The recovery section and focused regression test name the changed concern directly.",
+        "tests": "PASS — Both changed modules ran successfully: 54 passed in 0.44s, with no skipped tests. The added regression checks distinct recovery boundaries; existing Ship cases remain present. Affirmative and negated matcher examples follow engineering-baseline item 8. Independent scenario evidence and retained mutation results supplement the text guard without claiming live publication coverage.",
+        "refactoring": "PASS — The change reuses the existing prose matcher and publication routes and introduces no production abstraction or duplicated recovery implementations.",
+        "cross-task-coherence": "PASS — Intent, plan, station guidance, synchronized minor release metadata and bounded acceptance findings agree; acceptance limitations remain visible.",
+        "external-surface-grounding": "PASS — Codex permission capability is grounded in supplied host-tool policy and the matched read-only experiment recorded in the research evidence. Existing Loom command forms are retained; no new external API or CLI flag is introduced.",
+        "principles-conformance": "PASS — Ratified PRINCIPLES.md boundaries are preserved: no automatic privilege grant, no new prose gate, independent evaluation, regression evidence and explicit incomplete acceptance disclosures.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in this repository.",
+        "deliberate-simplification": "PASS — The plan explicitly bounds this repair to guidance using existing host mechanisms; any automated authorization subsystem requires separate design and validation.",
+        "deletion-first": "PASS — One recovery paragraph replaces the observed premature-stop behavior across existing Ship commands; no new service, flag, module or persistent retry mechanism is introduced."
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative base-to-target delta, complete Ship guidance and changed test modules, ratified principles, intent, plan, release metadata, research and acceptance/build evidence. No important or fatal finding was dismissed.",
+        "This verdict evaluates the guidance repair, not installed-host triggering, actual permission UI, remote publication or real denial execution. Acceptance A2 and A3 correctly remain partly verified; those limitations must remain in the user-facing acceptance decision.",
+        "Did not run the complete package suite or evidence probe programs, as required by the reviewer contract; inspected retained failed-build/repair evidence and reported complete-inventory results instead. No probe confirmation is asserted from summarized output."
+      ],
+      "reviewer": "closing-code",
+      "vendor": "codex",
+      "model": "inherited/unverified"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "7b9555dab7aeefecb50d1aae13d3de0d239d8e31",
+  "tested_commit": "a17daced",
+  "reviewed_commit": "94d92433c8e0ad36905c3776a05aa1e62864b0dc",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "partly"
+    },
+    {
+      "acceptance": 3,
+      "status": "partly"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
