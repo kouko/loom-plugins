@@ -59,7 +59,7 @@ mechanisms:
   - id: "Stop::loom-python@codex"
     class: hook
     eval: loom-code/tests/test_delivery_stop.py
-  # --- skill (26; 7 stations + 16 non-standalone tools + 3 optional routers;
+  # --- skill (27; 7 stations + 17 non-standalone tools + 3 optional routers;
   #     the 3 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
@@ -118,6 +118,9 @@ mechanisms:
   - id: recap-state
     class: skill
     eval: "loom-workflow/tests/scripts/test_recap_state_compaction.py"
+  - id: whats-next
+    class: skill
+    eval: loom-workflow/tests/whats-next/test_contract.py
   - id: loom-visualization
     class: skill
     eval: "loom-workflow/tests/scripts/test_loom_visualization_compaction.py"

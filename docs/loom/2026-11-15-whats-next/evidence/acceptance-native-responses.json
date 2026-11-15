@@ -1,0 +1,36 @@
+{
+  "responses": [
+    {
+      "id": "B1",
+      "response": "Inspect the local failure records and collect representative failing imports before choosing a parser repair. The count of 12 failures does not tell us whether they share a cause. Group the errors and samples by failure type; that should identify a repair target, or show that several fixes are needed. If no records or samples are available locally, obtaining them is the next dependency."
+    },
+    {
+      "id": "B2",
+      "response": "先查看本機失敗檔案的編碼與錯誤訊息，縮小離線匯入需要支援的編碼範圍。已知失敗集中在非 UTF-8 檔案，但還不能確定是編碼判讀、轉換，還是其他解析問題。這一步應產出可重現的失敗樣本與修復方向；雲端同步不符合全程離線的最新要求，應移出這次方案。目前先做本機檢查，不修改或外傳檔案。"
+    },
+    {
+      "id": "B3",
+      "response": "まず、検索結果への更新反映が翌日でもよいかを確認するのがよいです。これが、高速な方式Aを選べるかを左右します。翌日反映を許容できるならAが有力です。即時反映が必要ならBを候補にしますが、速度改善が目標に届くかは別途確認が必要です。更新はどの程度まで遅れても問題ありませんか？"
+    },
+    {
+      "id": "B4",
+      "response": "Stop here: the CSV preview is delivered, every agreed acceptance check passed, and you confirmed satisfaction. There is no remaining work within the agreed goal."
+    },
+    {
+      "id": "B5",
+      "response": "先盤點本機已有的套件、相依項目與安裝檔，確認能否組成完整的離線安裝包；原本依賴下載的步驟已不適用。這是已授權工作的下一步，無須重新確認。接著用本機隔離環境、停用網路，驗證安裝是否可重現。若缺少必要套件，就列出缺件及版本，說明取得來源仍待解決；不連外下載或付費。"
+    },
+    {
+      "id": "B6",
+      "response": "次は承認済みの計画どおり、ローカルのlintを実行します。方針を見直す新しい事情はありません。結果を確認し、今回の表示修正に関係する問題があれば対応します。公開やマージには進みません。"
+    },
+    {
+      "id": "B7",
+      "response": "The next step is to run the agreed focused local test and check that the date formatter behaves as intended. That test is already authorized; no additional confirmation is needed. The repair is done, but verification remains incomplete until the test runs."
+    },
+    {
+      "id": "B8",
+      "response": "先不要直接合併：本機修復與測試已通過，但遠端檢查仍未知，而且目前授權不包含合併。下一步先確認要送審的變更範圍與本機驗證結果，再取得發布與合併所需授權；需要查遠端狀態時，也要先取得連線授權。遠端檢查通過且你明確授權合併後，才具備合併條件。"
+    }
+  ]
+}

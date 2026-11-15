@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "phase": "description-only-selection",
+  "scope": "Single native selector sample; no full skill body, expected labels, or grading criteria visible. Does not measure installed-host triggering.",
+  "fixture": "loom-workflow/tests/whats-next/trigger_queries.json",
+  "agent_id": "/root/whats_contract/selection",
+  "fork_turns": "none",
+  "profile_result": {
+    "effective_profile": "inherited",
+    "overrides": null,
+    "reason": "unobservable-main-profile"
+  },
+  "catalog_paths": [
+    "loom-workflow/skills/whats-next/SKILL.md",
+    "loom-workflow/skills/recap-state/SKILL.md",
+    "loom-workflow/skills/critique/SKILL.md",
+    "loom-workflow/skills/handoff/SKILL.md"
+  ],
+  "catalog_fields": "description only, copied verbatim in dispatch; none available for ordinary tasks",
+  "decisions": [
+    {
+      "id": "P1",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P2",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P3",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P4",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P5",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P6",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P7",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P8",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P9",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "P10",
+      "selected_skill": "whats-next"
+    },
+    {
+      "id": "N1",
+      "selected_skill": "recap-state"
+    },
+    {
+      "id": "N2",
+      "selected_skill": "recap-state"
+    },
+    {
+      "id": "N3",
+      "selected_skill": "recap-state"
+    },
+    {
+      "id": "N4",
+      "selected_skill": "none"
+    },
+    {
+      "id": "N5",
+      "selected_skill": "none"
+    },
+    {
+      "id": "N6",
+      "selected_skill": "none"
+    },
+    {
+      "id": "N7",
+      "selected_skill": "none"
+    },
+    {
+      "id": "N8",
+      "selected_skill": "none"
+    },
+    {
+      "id": "N9",
+      "selected_skill": "none"
+    },
+    {
+      "id": "N10",
+      "selected_skill": "none"
+    }
+  ],
+  "grade": null
+}

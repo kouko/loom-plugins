@@ -1,0 +1,110 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-15-whats-next",
+  "content_digest": "6fa3f6a8bdef33d14d72aefd663179fc9514e67e",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --with pytest --with pyyaml python -m pytest loom-code/tests/test_check_mechanisms.py",
+      "artifact": "loom-code/tests/test_check_mechanisms.py",
+      "result": "pass",
+      "command_digest": "aa2e4b750ea97f6c66f4fc5435ab538ca7d29f1d06d8a6adebf948085039727d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/whats_review_code",
+      "vendor": "codex",
+      "model": "inherited/unverified",
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+      "review_target_sha": "c3f7af03c2c851e065c029a41040afdd74b53368",
+      "dimension_scores": {
+        "security": "PASS — The new contract preserves existing permissions, prohibits recommendation-derived authority, and uses synthetic rather than private historical fixtures.",
+        "architecture": "PASS — A single flat advice contract uses existing discovery and loader surfaces without adding execution machinery.",
+        "correctness": "PASS — The changed measurement branch admits 27 counted skills and rejects 28 through the existing CLI entry; recommendation and authority behavior agree with the confirmed requirements.",
+        "naming": "PASS — whats-next, the updated boundary-test names and admission metadata consistently name their responsibilities.",
+        "tests": "PASS — Independently ran all seven changed Python test files: 162 passed, with no skips. The new CLI boundary cases exercise actual counting and baseline recomputation; prose behavior has separate native evidence and independent acceptance reporting.",
+        "refactoring": "PASS — The implementation reuses existing measurement, loader and discovery mechanisms and introduces no unnecessary extraction.",
+        "cross-task-coherence": "PASS — Intent, spec, plan, skill, discovery route, inventory, manifests, admission exception and bounded comparison evidence agree.",
+        "external-surface-grounding": "PASS — No new external API, SDK, CLI flag or sibling execution call is introduced; existing OpenCode registration is exercised by the actual-loader test.",
+        "principles-conformance": "PASS — PRINCIPLES.md non-negotiable 4 is satisfied by explicit budget exceptions and evaluation; limitations remain visible in the acceptance report rather than being presented as comparative success.",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists in the reviewed repository.",
+        "deliberate-simplification": "PASS — The spec and runtime contract explicitly bound contextual selection and synthetic measurements, and identify installed-host validation as unproven rather than promising automatic triggering.",
+        "deletion-first": "PASS — The independent skill is explicitly user-requested, its scope is one flat contract, and the remaining changed surfaces are existing admission and publication requirements."
+      },
+      "findings": [],
+      "notes": [
+        "Read the confirmed intent, spec and plan before reviewing implementation; also opened the complete new skill, acceptance report and supporting acceptance/comparison evidence, PRINCIPLES.md, changed measurement entry and callers, and relevant changed test artifacts.",
+        "Changed-test command: uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_check_mechanisms.py loom-code/tests/test_opencode_loader.py loom-code/tests/test_write_plan_station_text.py loom-workflow/tests/scripts/test_release_metadata.py loom-workflow/tests/scripts/test_skill_count.py loom-workflow/tests/whats-next/test_contract.py tests/test_loom_skill_description_catalog.py; result: 162 passed in 6.83s. No complete package suite or evidence probe program was run by this reviewer.",
+        "comparison.md and acceptance-test-report.md accurately disclose ordinary 7/8 versus skill 8/8, a 12.5-point difference below the predefined 15-point threshold; REQ-5 requires reproducible comparison and honest limits, not a demonstrated superiority claim."
+      ],
+      "probe_confirmations": [
+        {
+          "artifact": "loom-code/tests/test_check_mechanisms.py",
+          "reviewed_sha": "c3f7af03c2c851e065c029a41040afdd74b53368",
+          "quote": "loom-code/tests/test_check_mechanisms.py ............................... [ 43%]\n........................................                                 [100%]\n============================== 71 passed in 2.97s ==============================\n"
+        }
+      ]
+    },
+    {
+      "reviewer": "/root/whats_review_skill",
+      "vendor": "codex",
+      "model": "inherited/unverified",
+      "verdict": "PASS_WITH_NOTES",
+      "lens": "skill",
+      "reviewed_sha": "4d44cd3ce2889c552d46ca4687596bc4f5298a17",
+      "review_target_sha": "c3f7af03c2c851e065c029a41040afdd74b53368",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES — Repository paths, inventories, output records and comparison arithmetic checked; external historical research citations were not independently verified because the pinned upstream fetches returned cache-miss errors.",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Read confirmed intent/spec/plan, complete runtime contract and adjacent owners, delivery documentation, synthetic fixtures and recorded responses/comparison. Existing authorization continues through its owner; advice-only stays advice-only; installed-host effects remain expressly unproven.",
+        "Independently ran every changed pytest file in two focused invocations: 30 passed and 132 passed. Did not run the complete package suite or evidence adversarial programs.",
+        "The eight-case single-run comparison is 7/8 ordinary versus 8/8 loaded skill, a 12.5-point difference below the stated 15-point threshold. Acceptance works denotes bounded synthetic verification and honest reporting, not proven superiority or installed-host activation."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "edc899174c85fc78f62212ea725c853baa523f11",
+  "tested_commit": "838c09d367f3d0b549ded9193e7d8fa3590391ba",
+  "reviewed_commit": "c3f7af03c2c851e065c029a41040afdd74b53368",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "phase": "with-skill-pilot",
+  "date": "2026-11-15",
+  "synthetic": true,
+  "fixture": "loom-workflow/tests/whats-next/behavior_cases.json",
+  "design": {
+    "runs_per_case": 1,
+    "execution": "native collaboration.spawn_agent",
+    "fork_turns": "none",
+    "bounded_access": "Read only target SKILL.md; no other tools/files/actions; answer only visible context.",
+    "criteria_visible_to_execution_agents": false,
+    "profile_input": {
+      "event": "initial",
+      "main_profile": {
+        "model": null,
+        "effort": null
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0
+    },
+    "profile_result": {
+      "completed_redispatches": 0,
+      "effective_profile": "inherited",
+      "outcome": "dispatch",
+      "overrides": null,
+      "reason": "unobservable-main-profile",
+      "requested_profile": null,
+      "task_class": "ordinary",
+      "uncertainty": null
+    }
+  },
+  "runs": [
+    {
+      "case_id": "B1",
+      "agent_id": "/root/whats_contract/b1",
+      "status": "completed",
+      "output_text": "Inspect the local error details and inputs for the 12 failed imports, then group them by failure type. That will show which parser repair could address the most failures; the count alone doesn’t identify a cause.",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B2",
+      "agent_id": "/root/whats_contract/b2",
+      "status": "completed",
+      "output_text": "接下來最值得做的是用本機的非 UTF-8 失敗檔案重現匯入問題，確認失敗環節，縮小修復範圍。\n\n- 已知失敗集中在這類檔案，但還不能斷定都是編碼造成；可搭配成功檔案比較，確認是否卡在解碼，以及錯誤是否清楚可辨。\n- 這一步應產出可重現案例與修復判斷依據，全程離線，不修改或外傳資料。\n- 早期的雲端同步方向應排除，因為它違反你最新確認的「產品必須全程離線」要求。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B3",
+      "agent_id": "/root/whats_contract/b3",
+      "status": "completed",
+      "output_text": "次は、検索結果への更新反映がどこまで遅れてよいかを確認するのがよいです。この条件で、高速化を優先できるかが決まります。\n\n- 翌日反映でよければ、速度改善が大きい方式Aが有力です。\n- 即時反映が必要なら、方式Bが候補ですが、改善幅が目的に十分かを確かめる必要があります。\n\n検索に使う情報は、更新から翌日まで反映されなくても支障ありませんか？",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B4",
+      "agent_id": "/root/whats_contract/b4",
+      "status": "completed",
+      "output_text": "Stop here: the CSV preview is delivered, all agreed checks passed, and you confirmed satisfaction. No further work is needed.",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B5",
+      "agent_id": "/root/whats_contract/b5",
+      "status": "completed",
+      "output_text": "下一步先盤點本機已有的套件、快取與相依版本，確認能否組成完整的離線安裝包。部署環境已確認完全斷網，原本依賴下載的計畫需要調整。\n\n我會在既有授權內進行本機準備與檢查，產出套件清單、缺件清單及離線安裝步驟；材料齊全後，再於隔離網路的乾淨環境驗證能否重現安裝。全程不連外、不付費；若缺件，會明確列出阻礙，不宣稱已完成離線安裝。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B6",
+      "agent_id": "/root/whats_contract/b6",
+      "status": "completed",
+      "output_text": "承認済みの計画どおり、次はローカルで lint を実行します。既存テストに加えてコードの静的な問題を確認し、表示修正の検証を進めます。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B7",
+      "agent_id": "/root/whats_contract/b7",
+      "status": "completed",
+      "output_text": "I’ll run the agreed focused local test next to check that the date formatter repair works. The repair is done; verification is still pending.",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    },
+    {
+      "case_id": "B8",
+      "agent_id": "/root/whats_contract/b8",
+      "status": "completed",
+      "output_text": "先確認遠端檢查結果，再決定是否合併。本機修復與測試已通過，但遠端狀態未知，還不足以判定可合併。\n\n目前授權只涵蓋修改與本機測試；push、開 PR 或 merge 都需要另外授權。",
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "grade": null
+    }
+  ]
+}
