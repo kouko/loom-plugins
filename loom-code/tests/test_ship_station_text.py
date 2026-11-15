@@ -34,13 +34,24 @@ def test_ship_bounds_execution_context_network_recovery() -> None:
         sample = f"{verb} {literal} {' '.join(extras)}."
         assert affirms(sample, verb, literal, *extras)
         assert not affirms(f"Do not {sample}", verb, literal, *extras)
-    # Prohibitions carry their own negation, rather than one elsewhere.
-    for rule in (
-        "A generic connection error alone proves neither DNS failure nor invalid credentials.",
-        "Authentication or repository-permission errors require their own remedy, not an execution-permission retry.",
-        "Never substitute raw Git push or GitHub CLI publication/merge commands, alter credentials, or bypass a denial.",
-    ):
-        assert rule in split_sentences(recovery)
+    # Check the prohibited inference and actions in their own clauses;
+    # surrounding prose and conjunctions may change without changing the rule.
+    sentences = split_sentences(recovery)
+    assert any(
+        "connection" in s and re.search(r"\bproves neither\b.*\bDNS\b.*\bnor\b.*\bcredentials\b", s)
+        for s in sentences
+    )
+    assert any(
+        "Authentication" in s and "repository-permission" in s
+        and re.search(r"\brequire\b.*\bremedy\b.*\bnot\b.*\bexecution-permission retry\b", s)
+        for s in sentences
+    )
+    assert any(
+        re.match(r"Never substitute\b", s) and "raw Git push" in s
+        and "GitHub CLI" in s and "publication/merge" in s
+        and "alter credentials" in s and "bypass a denial" in s
+        for s in sentences
+    )
     assert "apply the recovery guidance above before stopping" in text
     assert "Other observation errors stop immediately." not in text
 
