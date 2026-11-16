@@ -40,8 +40,8 @@ candidate is exempt (never a citation) when any of these hold:
     existing document (e.g. `docs/loom/specs/<date>-<topic>.md`,
     `docs/loom/discovery/<date>-<slug>/evidence.md`,
     `docs/loom/spec/<capability>/README.md`);
-  - its final path segment is one of the closed protocol filenames every
-    host repo owns: `PRINCIPLES.md`, `PURPOSE.md`, `KICKOFF-DEFAULTS.md`,
+  - its final path segment is one of the closed protocol filenames a
+    host repo owns, including legacy documents: `PRINCIPLES.md`, `PURPOSE.md`, `KICKOFF-DEFAULTS.md`,
     `INDEX.md`, `DESIGN.md`, `QUEUE.toml`, a store's own `README.md`,
     `ui-flows.md`, `queue-state.json` — or the path ends in the specific
     `spec/MODEL.md` (that literal parent+file pair only, not any
@@ -106,15 +106,15 @@ _TRAILING_LINE_RE = re.compile(r":\d+(?:-\d+)?$")
 # grammar SHAPE, not a citation of an existing document.
 _PLACEHOLDER_RE = re.compile(r"<[^>]+>")
 
-# The closed protocol-filename list — every host repo owns these,
-# whatever directory holds them. `README.md` covers a store's own
+# The closed protocol-filename list includes legacy host-owned documents;
+# membership does not require or scaffold a file. `README.md` covers a store's own
 # README (`docs/loom/backlog/README.md`, `docs/loom/memory/README.md`,
 # ...); `spec/MODEL.md` is handled separately below since it is a
 # specific parent+file pair, not a bare basename.
 _PROTOCOL_BASENAMES = frozenset(
     {
         "PRINCIPLES.md",
-        "PURPOSE.md",
+        "PURPOSE.md",  # Legacy host-owned file; new scaffolding is retired.
         "KICKOFF-DEFAULTS.md",
         # Mechanism population every adopting repo keeps at
         # `docs/loom/evidence/mechanisms.yaml` (concept-model §11) — a
