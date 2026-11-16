@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-16-roadmap-simplification",
-  "content_digest": "04baa9c40ead33f1416aa8e2bca41fd2a3ff2b4c",
+  "content_digest": "85ed429a151625d9704533696cae6148b8affcee",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,42 +20,39 @@
   ],
   "verdicts": [
     {
-      "reviewer": "closing_code",
-      "vendor": "codex",
-      "model": "inherited-unverified",
       "lens": "code",
       "verdict": "PASS",
       "reviewed_sha": "9bbab926b5224456a467fdfd7d8f1306b9cb54b9",
-      "review_target_sha": "2ba8a74a48f35c2d36fd556eea1b4bd959359aa5",
+      "review_target_sha": "429217fffa2eee227c7361be41bddb7f9a667226",
       "dimension_scores": {
-        "security": "PASS — New planning instructions grant no execution, spending, disclosure, publication or merge authority; no new executable or external surface is introduced. Retired map paths have no surviving runtime callers.",
-        "architecture": "PASS — One instruction-only roadmap owner replaces the map runtime; advice, intake and restart keep their existing responsibilities through short portable routing references.",
-        "correctness": "PASS — The command handler removes only the retired existence check; required intent schema, product-identifier, reason and interface-recomputation checks remain. The real checker entry test exercises inert legacy metadata and unchanged input bytes. RED/GREEN evidence is retained in w2-01.md and w2-02.md.",
-        "naming": "PASS — Roadmap, selected document and SESSION accurately name the retained responsibilities; no new code abstraction obscures behavior.",
-        "tests": "PASS — Independently ran all 17 surviving changed pytest files: 302 passed in 51.97s, no skips. Map-only runtime/test removal and ARC-only assertion retirement match the explicitly retired capabilities; distinct unrelated intent and SESSION protections survive. Structural tests claim packaging/routing seams only; separate independent semantic and acceptance evidence supports instruction behavior.",
-        "refactoring": "PASS — Removal includes dedicated runtime, tests, imports, schema field, producer guidance and active inventory references; no speculative replacement harness or forwarding abstraction appears.",
-        "cross-task-coherence": "PASS — Skill discovery, OpenCode entry inventory, contract tools, intent template copies, active mechanism census and release manifests consistently replace decision-map with roadmap. Three plugin minor bumps and corresponding changelog/README pins are synchronized.",
-        "external-surface-grounding": "PASS — No new HTTP, SDK, MCP or CLI surface is called by shipped code. Existing SESSION activation contracts and citations are preserved; sibling delegation uses skill identity or bundled relative links.",
-        "principles-conformance": "PASS — Existing project data remains outside automatic migration, roadmap entries confer no delivery authority, mechanism population decreases, and independent review/acceptance boundaries remain. Only the comparative 15-point gain condition is waived and no improvement is claimed.",
-        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the repository.",
-        "deliberate-simplification": "PASS — Ordinary Markdown intentionally gives up map operations and enforcement, with existing delivery workflows retaining verification. Scope and evidence ceilings are explicit; no deferred runtime promise or hidden upgrade dependency is introduced.",
-        "deletion-first": "PASS — The explicitly requested independent planning owner replaces approximately eleven thousand net lines with an 86-line instruction contract and packaging checks; no new runtime, parser, schema, scheduler or store is added."
+        "security": "PASS — Fix preserves advice-only and existing-permission boundaries; absent entry handling ends planning rather than inventing execution. No executable or disclosure surface was added.",
+        "architecture": "PASS — Existing planning ownership and sibling-skill boundaries remain; the fallback names available skill identities without filesystem dependencies or a new dispatch mechanism.",
+        "correctness": "PASS — Changed instructions preserve attributed prior results and explicit pending states, leave unsupported component status unknown, retain contradictory evidence handling and distinguish historical reports from fresh verification. Approved-step continuation and both available-entry branches have concrete behavior, including a planning-only stop when neither entry exists.",
+        "naming": "PASS — Continue authorized work and concrete implementation or review step replace the undefined owner terminology identified by dogfood.",
+        "tests": "PASS — No tests changed in this fix. Independently ran the two relevant packaging/description test files: 11 passed, no skips. Semantic RED and corrected genuine-case witnesses are retained, with independent clean acceptance re-testing A2/A5 rather than treating structural checks as behavioral proof.",
+        "refactoring": "PASS — Two existing instruction paragraphs and their heading are revised in place; no duplicate status protocol, runtime or harness is introduced.",
+        "cross-task-coherence": "PASS — Spec clarification, W4 plan, changelog and canonical acceptance report describe the same two A2/A5 repairs. Unchanged ordinary-document, retirement and installer behaviors are carried over with explicit reasons.",
+        "external-surface-grounding": "PASS — Fix introduces no HTTP, SDK, MCP or CLI call; named capture-intent and write-plan are the established sibling entry contracts.",
+        "principles-conformance": "PASS — Fix preserves data, verification and acceptance boundaries while correcting unsupported pending inference; historical failure and evidence limitations remain disclosed. No additional skip, external vendor or mechanism is introduced.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists; this fix adds no architecture document.",
+        "deliberate-simplification": "PASS — The absent-entry ceiling is explicit: disclose it and finish planning. Historical evidence remains attributed without requiring universal reruns; fresh verification is kept separate.",
+        "deletion-first": "PASS — Replaces the observed misleading paragraphs directly, without a schema, status ledger, parser, new skill or executable mechanism."
       },
       "findings": [],
       "notes": [
-        "Reviewed ground truth, changed runtime functions and their handler, complete changed skill entrypoints, coverage-retirement evidence, semantic trial grading and independent acceptance/update evidence. No repository edits or external calls were made.",
-        "Test selection: changed surviving Python tests from loom-code/tests (7), loom-design/tests/spec (1), loom-workflow/tests (7), and root tests (2). The complete package suite was not rerun; its 4031-test and shell success is handed Build evidence. The changed ordinary intent file was run as required, not as a separate adversarial command.",
-        "Behavior evidence remains bounded: nine matched semantic pairs show zero gain; the corrected unreadable trial is separate; B9 outputs do not prove dispatch/read order; isolated Codex upgrade proves controlled installation/data preservation rather than production activation or universal host behavior. These limits are disclosed and do not establish a shipped defect."
-      ]
+        "Same reviewer and same episode retained. Original findings list was empty; no finding was reset, dismissed or silently marked fixed. Review bounded to a09c4eeb..429217ff and touched dependencies; prior unchanged dimension evidence carries over.",
+        "Read unchanged intent, current spec/plan, PRINCIPLES, KICKOFF defaults, full canonical acceptance report, repair acceptance evidence, dogfood-repair-scope.md, w4-01.md and dogfood-repair-retest.md. The two identified dogfood defects are addressed without expanding execution authority.",
+        "4036 pytest plus shell success and 65 existing adversarial passes remain handed Build evidence, not independently rerun here. Genuine cases share one executor context, action traces are summaries and production activation is unverified; these limits are retained. No repository edit, private finance access, external call or subagent dispatch was performed."
+      ],
+      "reviewer": "/root/closing_code",
+      "vendor": "codex",
+      "model": "inherited-unverified"
     },
     {
-      "reviewer": "/root/closing_conformance",
-      "vendor": "codex",
-      "model": "inherited-unverified",
       "lens": "spec+adversarial",
       "verdict": "PASS",
       "reviewed_sha": "9bbab926b5224456a467fdfd7d8f1306b9cb54b9",
-      "review_target_sha": "2ba8a74a48f35c2d36fd556eea1b4bd959359aa5",
+      "review_target_sha": "429217fffa2eee227c7361be41bddb7f9a667226",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -64,23 +61,26 @@
         "missing-population": "PASS",
         "deletion-first": "PASS",
         "spec-conformance": "PASS",
-        "design-conformance": "N/A — no DESIGN.md applies; the spec explicitly has no user-interface flow",
+        "design-conformance": "N/A — no applicable DESIGN.md or new user-interface flow",
         "principles-conformance": "PASS",
         "user-judgment-leak": "PASS"
       },
       "findings": [],
       "notes": [
-        "REQ-1 through REQ-5 are represented by the thin roadmap owner, short neighboring ownership pointers, map/ARC retirement and preservation/authorization boundaries. Compared removed decision-map and ARC polarity against the base; removed operational guarantees belong to the explicitly retired runtime, while data and delivery boundaries survive. No new implementation, scheduling, migration or publication authority was found.",
-        "Independently ran six changed skill/entry-point test files: roadmap structure, SESSION instructions/readmes, handoff instructions, whats-next contract and capture-intent contract; 49 passed in 0.21s. Did not run the complete package suite or adversarial programs, per reviewer contract.",
-        "The supplied grading retains nine matched cases per arm (9/9 versus 9/9, zero gain), the invalid original permission case, separate corrected denial observation, and unverified dispatch/read-order traces. Acceptance evidence distinguishes source trials, isolated local Codex installation and four preserved scratch data files from production install or live-model activation. Historical evaluation snapshots remain scoped as snapshots; the numeric waiver does not conceal another waived quality step."
-      ]
+        "Same reviewer, Round2 fix verification of a09c4eeb..429217ff and touched dependencies; Round1 PASS at 2ba8a74a had no findings to reopen. REQ-2/REQ-5 refinement preserves source-attributed results and explicit pending states, separates component unknowns from stage status, continues concrete approved steps and provides available-entry/planning-only fallback. Existing advice-only, authorization, data-preservation and no-runtime boundaries survive.",
+        "Read repaired skill, spec decision, plan/evidence changes, repair scope, implementation/retest records and current acceptance report. Re-ran the focused roadmap structure and description-catalog files: 11 passed in 0.10s. No complete package suite, adversarial program, external CLI or new agent was run by this reviewer.",
+        "Acceptance evidence explicitly re-tests A2/A5 at clean 99404a2a4 and carries over unchanged A1/A3/A4. Retest records preserve original failures and auditor disagreement, disclose shared executor context and summarized action traces, and separate source trials from installed-host activation. The public repair evidence contains minimized classifications rather than private finance excerpts; numeric improvement remains unclaimed under the existing sole waiver."
+      ],
+      "reviewer": "/root/closing_conformance",
+      "vendor": "codex",
+      "model": "inherited-unverified"
     }
   ],
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "9ac72fefe0c392f87ea5e73f8a5323f21bb6b644",
-  "tested_commit": "de49933ac",
-  "reviewed_commit": "2ba8a74a48f35c2d36fd556eea1b4bd959359aa5",
+  "tested_commit": "99404a2a4",
+  "reviewed_commit": "429217fffa2eee227c7361be41bddb7f9a667226",
   "acceptance_status": [
     {
       "acceptance": 1,
