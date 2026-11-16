@@ -1,6 +1,6 @@
 # Optional project roadmap and planning-mechanism retirement — spec
 intent: 2026-11-16-roadmap-simplification@6c3b1663
-pre-build-review: required — retires distributed skill and document contracts across three plugins
+pre-build-review: required — replaces distributed skill and document contracts across three plugins; prior review of 872872ad does not cover this revision
 
 ## Requirements
 
@@ -8,7 +8,7 @@ REQ-1 — Optional ordinary project planning
   WHERE a project needs staged cross-session planning, Loom shall support an optional root ROADMAP.md containing current goals, completion conditions, status, next actions, unresolved questions and evidence links without the map runtime or a prescribed machine-readable schema → Acceptance #1
 
 REQ-2 — Contextual creation and maintenance
-  WHEN the user requests cross-session staged planning, resumes that work or asks for its next action, Loom shall create or read the applicable project planning document and update affected summary content when direction or verified results change → Acceptance #2
+  WHEN the user requests cross-session staged planning, resumes that work or asks for its next action, the roadmap skill shall provide the unified planning entry point, own creation and maintenance of the applicable project planning document, and update affected summary content when direction or verified results change → Acceptance #2
 
 REQ-3 — Retire overlapping capabilities only
   The released plugins shall remove decision-map and repository-purpose drafting while preserving ordinary delivery, research, handoff and goal-create session execution goals → Acceptance #3
@@ -22,7 +22,9 @@ REQ-5 — Preserve authorization and evidence boundaries
 ## Design decision
 
 - user-decided — Root ROADMAP.md is optional, used for projects needing long-term planning; it is a current summary with evidence links, not mandatory scaffolding for every repository.
-- agent-decided — Existing capture-intent, whats-next and handoff instructions carry the relevant contextual guidance; no roadmap skill, CLI, validator, ticket type, identifier grammar or background hook is added. These are already the owners of intake, next-action advice and continuation.
+- user-decided — Provide one independent loom-workflow:roadmap skill as the unified entry point and sole owner of durable planning-document maintenance. The user explicitly requested concentrated ownership after reviewing the distributed alternative.
+- agent-decided — Existing capture-intent, whats-next and handoff keep their intake, next-action advice and restart responsibilities and use short ownership pointers when roadmap maintenance is needed; they do not duplicate its authoring rules. No roadmap CLI, validator, ticket store, identifier grammar or background hook is added.
+- agent-decided — Roadmap handles request-driven creation, whole-plan review, evidence-backed summary updates and work ordering. Dependencies and milestone/date constraints remain plain language; distinguish user commitments from estimates, retain unknown effort as unknown, and do not invent dates. This does not introduce timed execution or an autonomous dispatch loop.
 - agent-decided — Follow an explicitly named existing planning document when one exists, rather than silently creating a competing root summary. Use root ROADMAP.md as the default for new project-wide planning. An existing detailed initiative document may remain the evidence/detail target; do not relocate or rewrite it simply to standardize filenames.
 - agent-decided — New document creation is limited to an actual request for staged planning. Asking for next-action advice or resuming work alone does not force creation of an absent roadmap. Continue from available intent, handoff and evidence and disclose a material gap.
 - agent-decided — Read the selected roadmap before recommending a new direction for its long-running work. A viable approved implementation continues through its existing station; roadmap advice does not interrupt it or reset intent interviews.
@@ -30,7 +32,7 @@ REQ-5 — Preserve authorization and evidence boundaries
 - agent-decided — If a document is missing, ambiguous, unreadable or contradicts authoritative delivery evidence, disclose the specific uncertainty and use existing evidence. Do not replace an unreadable document, guess which unrelated initiative owns the work, or silently overwrite a user change. Ask only for unresolved user outcomes or necessary authorization.
 - agent-decided — Remove the decision-map skill directory and its dedicated test directory. Remove its manifest/discovery entries, live guide references, map-origin intent validation and matching template guidance/tests. Preserve unrelated intent validation. Historical records under docs remain history, not advertised current operations.
 - agent-decided — Keep goal-create's skill identity and SESSION implementation; remove only ARC-specific runtime guidance, offers, examples and tests, plus the obsolete PURPOSE scaffold and its current contract references. Generic contextual reading of an existing purpose document is not itself a reason to delete that document.
-- agent-decided — Skill inventory changes by minus one in loom-workflow, zero in loom-code and loom-design; no replacement skill. Regenerate derived manifests through the existing sync command rather than editing generated inventories independently.
+- agent-decided — Replace decision-map with roadmap: loom-workflow remains at 15 skills and the three-plugin family remains at 30; loom-code and loom-design counts are unchanged. Regenerate derived manifests through the existing sync command rather than editing generated inventories independently.
 - user-decided — Existing maps remain readable documents but the upgraded plugin no longer manages them. Do not automatically close or migrate the old family-relocation map or modify other checkouts; this loss of operational support was disclosed at intent confirmation.
 - agent-decided — No new root roadmap is required in the Loom repository merely to implement this convention. Scope is instruction/contract retirement, not inventing a project backlog.
 - agent-decided — Release metadata must include the applicable minor bumps for changed station guidance/contracts, changelog entries and synchronized versions before final review; no installed-cache refresh is implied by a source change.
@@ -40,7 +42,8 @@ REQ-5 — Preserve authorization and evidence boundaries
 
 - Keep the map with better naming: retains the dedicated lifecycle and maintenance surface without demonstrated need for its enforcement in the finance-style use case.
 - Add a roadmap facade over maps: adds another representation and leaves the old runtime necessary.
-- Add a dedicated roadmap skill/schema: recreates the mechanism being removed; existing entry points can carry concise contextual guidance.
+- Distribute roadmap maintenance among existing skills: rejected after the user explicitly selected a unified entry point and concentrated ownership.
+- Recreate map under the roadmap name: reject specialized IDs, typed tickets, claim operations, terminal state machinery and automatic closure checks; independent skill ownership does not require those mechanisms.
 - Require ROADMAP.md in every project: forces maintenance even for a single bounded change and conflicts with the confirmed optional scope.
 - Delete all of goal-create: removes independent session-goal functionality outside the requested retirement.
 - Automatically convert old maps: rewrites user data and requires a migration not justified by actual current inputs; retain history instead.
@@ -56,8 +59,8 @@ REQ-5 — Preserve authorization and evidence boundaries
 
 ## UI flows
 
-N/A — No GUI, TUI, CLI command or API is introduced; existing conversational skills receive engineering guidance and retired capability references are removed.
+N/A — No GUI, TUI, CLI command or API is introduced; a conversational planning skill owns ordinary Markdown maintenance and retires the previous map runtime.
 
 ## Validation boundaries
 
-Use fresh-context behavioral cases to distinguish request-driven creation, existing-document resumption, next-action advice, verified-result updates and unchanged/failed/ambiguous inputs. Judge semantic results and unchanged user data, not exact explanatory sentences. Static inventory checks must show one skill removed and SESSION retained; focused tests must preserve unrelated intent and goal behavior. Preserve the existing package suite, independent review and acceptance-report requirements. No agent compliance, installed-host activation or adoption claim follows from prose alone.
+Use fresh-context behavioral cases to distinguish request-driven creation, existing-document resumption, next-action advice, verified-result updates and unchanged/failed/ambiguous inputs. Judge semantic results and unchanged user data, not exact explanatory sentences. Static inventory checks must show decision-map replaced by roadmap with unchanged total skill counts and SESSION retained; focused tests must preserve unrelated intent and goal behavior. Preserve the existing package suite, independent review and acceptance-report requirements. No agent compliance, installed-host activation or adoption claim follows from prose alone.
