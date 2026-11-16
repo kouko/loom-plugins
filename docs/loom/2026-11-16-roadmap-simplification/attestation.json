@@ -1,0 +1,106 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-16-roadmap-simplification",
+  "content_digest": "04baa9c40ead33f1416aa8e2bca41fd2a3ff2b4c",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_loom_checker_intent.py",
+      "artifact": "loom-code/tests/test_loom_checker_intent.py",
+      "result": "pass",
+      "command_digest": "20ada4790455c0c48b68b04c88fe52a7ab7586370932d8bb60e6222a86783d5a"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing_code",
+      "vendor": "codex",
+      "model": "inherited-unverified",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "9bbab926b5224456a467fdfd7d8f1306b9cb54b9",
+      "review_target_sha": "2ba8a74a48f35c2d36fd556eea1b4bd959359aa5",
+      "dimension_scores": {
+        "security": "PASS — New planning instructions grant no execution, spending, disclosure, publication or merge authority; no new executable or external surface is introduced. Retired map paths have no surviving runtime callers.",
+        "architecture": "PASS — One instruction-only roadmap owner replaces the map runtime; advice, intake and restart keep their existing responsibilities through short portable routing references.",
+        "correctness": "PASS — The command handler removes only the retired existence check; required intent schema, product-identifier, reason and interface-recomputation checks remain. The real checker entry test exercises inert legacy metadata and unchanged input bytes. RED/GREEN evidence is retained in w2-01.md and w2-02.md.",
+        "naming": "PASS — Roadmap, selected document and SESSION accurately name the retained responsibilities; no new code abstraction obscures behavior.",
+        "tests": "PASS — Independently ran all 17 surviving changed pytest files: 302 passed in 51.97s, no skips. Map-only runtime/test removal and ARC-only assertion retirement match the explicitly retired capabilities; distinct unrelated intent and SESSION protections survive. Structural tests claim packaging/routing seams only; separate independent semantic and acceptance evidence supports instruction behavior.",
+        "refactoring": "PASS — Removal includes dedicated runtime, tests, imports, schema field, producer guidance and active inventory references; no speculative replacement harness or forwarding abstraction appears.",
+        "cross-task-coherence": "PASS — Skill discovery, OpenCode entry inventory, contract tools, intent template copies, active mechanism census and release manifests consistently replace decision-map with roadmap. Three plugin minor bumps and corresponding changelog/README pins are synchronized.",
+        "external-surface-grounding": "PASS — No new HTTP, SDK, MCP or CLI surface is called by shipped code. Existing SESSION activation contracts and citations are preserved; sibling delegation uses skill identity or bundled relative links.",
+        "principles-conformance": "PASS — Existing project data remains outside automatic migration, roadmap entries confer no delivery authority, mechanism population decreases, and independent review/acceptance boundaries remain. Only the comparative 15-point gain condition is waived and no improvement is claimed.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the repository.",
+        "deliberate-simplification": "PASS — Ordinary Markdown intentionally gives up map operations and enforcement, with existing delivery workflows retaining verification. Scope and evidence ceilings are explicit; no deferred runtime promise or hidden upgrade dependency is introduced.",
+        "deletion-first": "PASS — The explicitly requested independent planning owner replaces approximately eleven thousand net lines with an 86-line instruction contract and packaging checks; no new runtime, parser, schema, scheduler or store is added."
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed ground truth, changed runtime functions and their handler, complete changed skill entrypoints, coverage-retirement evidence, semantic trial grading and independent acceptance/update evidence. No repository edits or external calls were made.",
+        "Test selection: changed surviving Python tests from loom-code/tests (7), loom-design/tests/spec (1), loom-workflow/tests (7), and root tests (2). The complete package suite was not rerun; its 4031-test and shell success is handed Build evidence. The changed ordinary intent file was run as required, not as a separate adversarial command.",
+        "Behavior evidence remains bounded: nine matched semantic pairs show zero gain; the corrected unreadable trial is separate; B9 outputs do not prove dispatch/read order; isolated Codex upgrade proves controlled installation/data preservation rather than production activation or universal host behavior. These limits are disclosed and do not establish a shipped defect."
+      ]
+    },
+    {
+      "reviewer": "/root/closing_conformance",
+      "vendor": "codex",
+      "model": "inherited-unverified",
+      "lens": "spec+adversarial",
+      "verdict": "PASS",
+      "reviewed_sha": "9bbab926b5224456a467fdfd7d8f1306b9cb54b9",
+      "review_target_sha": "2ba8a74a48f35c2d36fd556eea1b4bd959359aa5",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS",
+        "spec-conformance": "PASS",
+        "design-conformance": "N/A — no DESIGN.md applies; the spec explicitly has no user-interface flow",
+        "principles-conformance": "PASS",
+        "user-judgment-leak": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "REQ-1 through REQ-5 are represented by the thin roadmap owner, short neighboring ownership pointers, map/ARC retirement and preservation/authorization boundaries. Compared removed decision-map and ARC polarity against the base; removed operational guarantees belong to the explicitly retired runtime, while data and delivery boundaries survive. No new implementation, scheduling, migration or publication authority was found.",
+        "Independently ran six changed skill/entry-point test files: roadmap structure, SESSION instructions/readmes, handoff instructions, whats-next contract and capture-intent contract; 49 passed in 0.21s. Did not run the complete package suite or adversarial programs, per reviewer contract.",
+        "The supplied grading retains nine matched cases per arm (9/9 versus 9/9, zero gain), the invalid original permission case, separate corrected denial observation, and unverified dispatch/read-order traces. Acceptance evidence distinguishes source trials, isolated local Codex installation and four preserved scratch data files from production install or live-model activation. Historical evaluation snapshots remain scoped as snapshots; the numeric waiver does not conceal another waived quality step."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "9ac72fefe0c392f87ea5e73f8a5323f21bb6b644",
+  "tested_commit": "de49933ac",
+  "reviewed_commit": "2ba8a74a48f35c2d36fd556eea1b4bd959359aa5",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}
