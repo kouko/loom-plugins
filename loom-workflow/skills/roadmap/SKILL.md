@@ -1,6 +1,7 @@
 ---
 name: roadmap
-description: Create, resume or update staged project plans across sessions. Use for project roadmaps, 長期規劃 or 段階的な長期計画 and their next-stage decisions.
+description: |
+  Create, resume or update staged project plans across sessions. Use for project roadmaps, 長期規劃 or 段階的な長期計画 and their next-stage decisions.
 user-invocable: true
 ---
 

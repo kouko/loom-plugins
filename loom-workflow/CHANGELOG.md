@@ -4,6 +4,13 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
+
+- Add roadmap as the unified owner of optional ordinary project planning documents; retain selected existing documents, verified-result scope, unknowns and existing delivery authorization.
+- Retire decision-map runtime and dedicated tests without migrating or rewriting historical project data; skill count remains fifteen.
+- Retire goal-create ARC purpose drafting while retaining SESSION prompts, input-floor checks and native host activation/recovery.
+- Retain matched behavioral evidence and its failures. The user waived only the comparative 15-point gain threshold; no stable improvement or installed-host triggering claim follows.
+
 ## [5.25.0] — 2026-11-15 — grounded next-action advice
 
 - budget-exception: whats-next — admit one counted advice skill and its 308-character discovery description while retaining the frozen catalog and its 60% description limit.

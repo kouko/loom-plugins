@@ -48,6 +48,7 @@ CASE_BLOCK = re.compile(r"```json routing-cases\n(?P<body>.*?)\n```", re.DOTALL)
 # Leaves added after the baseline was frozen; they stay outside the frozen
 # hash but still count toward the rendered description budget.
 ADDED_LEAVES = {
+    "loom-workflow/skills/roadmap/SKILL.md",
     "loom-code/skills/external-review/SKILL.md",
     "loom-design/skills/architecture-design/SKILL.md",
     "loom-workflow/skills/project-retro/SKILL.md",
@@ -56,6 +57,9 @@ ADDED_LEAVES = {
     "loom-design/skills/design-research/SKILL.md",
     "loom-workflow/skills/whats-next/SKILL.md",
 }
+# The old frozen corpus stays historical; roadmap replaces a retired capability
+# rather than renaming the same behavior. Both sides count toward current total.
+RETIRED_LEAVES = {"loom-workflow/skills/decision-map/SKILL.md"}
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
     "loom-workflow/skills/distill-sessions/SKILL.md": "loom-workflow/skills/skill-retro/SKILL.md",
@@ -122,7 +126,9 @@ def test_frozen_leaf_baseline_is_accounted_before_router_edits() -> None:
     }
 
     baseline = _baseline()
-    assert leaf_paths - ADDED_LEAVES == {RENAMED_LEAVES.get(path, path) for path in baseline}
+    historical = {RENAMED_LEAVES.get(path, path) for path in baseline}
+    assert RETIRED_LEAVES <= historical
+    assert leaf_paths - ADDED_LEAVES == historical - RETIRED_LEAVES
     assert len(baseline) == BASELINE_LEAF_COUNT
     assert hashlib.sha256("\n".join(baseline.values()).encode()).hexdigest() == (
         "96d9cc72c5fa5e35e28ecd3596ff797bb430261ee209b82c5a52ceb793ffc275"
@@ -156,7 +162,7 @@ def test_candidate_has_exactly_one_router_per_loom_plugin() -> None:
     assert not missing, f"missing Loom routers: {', '.join(missing)}"
 
     assert sum(len(skill_map) for skill_map in skills.values()) == (
-        BASELINE_LEAF_COUNT + len(ADDED_LEAVES) + len(ROUTER_NAMES)
+        BASELINE_LEAF_COUNT - len(RETIRED_LEAVES) + len(ADDED_LEAVES) + len(ROUTER_NAMES)
     )
 
 

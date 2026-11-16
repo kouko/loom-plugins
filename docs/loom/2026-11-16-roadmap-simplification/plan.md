@@ -32,7 +32,7 @@ charter: 1.1
 ### Wave 3 — Release and verify
 
 **W3-01 Synchronize guides, inventories and release packet** after: W2-02 acceptance: 1,3
-- Files: README.md, loom-code/, loom-design/, loom-workflow/, .claude-plugin/marketplace.json, tests/test_loom_plugin_install_layout.py, docs/loom/memory/, docs/loom/README.md
+- Files: README.md, loom-code/, loom-design/, loom-workflow/, .claude-plugin/marketplace.json, tests/, docs/loom/memory/, docs/loom/README.md
 - Test: A1 positive: guide-ordinary-roadmap; negative: mandatory-roadmap-claim. A3 positive: thirty-skills; negative: stale-release-metadata.
 - Risk: REQ-1/REQ-3; agent-decided minor bump packet includes CHANGELOG entries, README versions and release-pin rewrites; sync generates derived manifests; no installed-cache or user-project update.
 

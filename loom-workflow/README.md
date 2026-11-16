@@ -6,9 +6,9 @@ Skill guides open in English unless a matching translation is available.
 
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
+> Workflow tools around the Loom stations for Claude Code and Codex: optional staged project roadmaps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.25.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.26.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -27,16 +27,14 @@ intent and spec, and `loom-code` plans, builds, reviews and ships it.
 themselves: each one attaches at a specific moment or runs on demand, and every
 tool can be invoked directly by name.
 
-Most tools work with `loom-workflow` installed alone. `decision-map`'s delivery
-step needs `loom-code` to write an intent from its contract template; charting
-a map and working its tickets do not. An explicitly requested outside code,
-plan or decision review also needs `loom-code:external-review` for execution.
+Most tools work with `loom-workflow` installed alone. An explicitly requested
+outside code, plan or decision review needs `loom-code:external-review` for execution.
 
 ## Admission rule
 
 A skill belongs here when it coordinates work across stations or carries state
-across sessions, not merely because several plugins use it. `decision-map` is
-the rule's first instance. The rule gates new admissions only; the utility
+across sessions, not merely because several plugins use it.
+The rule gates new admissions only; the utility
 skills already in the plugin stay.
 
 `project-retro` is an explicit, user-approved exception: an on-demand, read-only review
@@ -49,7 +47,7 @@ These tools are selected by need; the rows are not steps to execute in order.
 
 | When you need help | Tool | What it does |
 |---|---|---|
-| The route to the outcome is still unclear | `decision-map` | Investigate unknowns and deliver a ready slice as an intent. |
+| A project needs staged planning across sessions | `roadmap` | Create, resume or update an ordinary planning document. |
 | A proposal needs a critical check | `critique` | Judge whether the proposed work is necessary or can be simpler. |
 | You lose track during a session | `recap-state` | Explain the current position and wait for your confirmation. |
 | You need advice on what is worth doing next | `whats-next` | Recommend a concrete first choice and necessary alternatives from current evidence. |
@@ -60,31 +58,16 @@ These tools are selected by need; the rows are not steps to execute in order.
 | You want to learn from sessions | `project-retro`, `skill-retro` | Review one session for project improvements, or selected snapshots for recurring skill issues. Propose changes without applying them. |
 | You want another executor's review | `independent-advisor` | Get a second opinion with authorization for cost and material sent off the machine. |
 | A relationship needs a visual explanation | `loom-visualization`, `loom-interactive-diagram` | Show a chat table or diagram, or create an editable diagram. |
-| You explicitly ask for a goal | `goal-create` | Draft a session goal or repository purpose; runs only when named. |
+| You explicitly ask for a goal | `goal-create` | Draft a session goal; runs only when named. |
 | You are unsure which tool to use | `using-loom-workflow` | Route your request; each tool can also be invoked directly. |
 
-### Decision-map loop
+### Project planning
 
-Only `decision-map` has the exploration loop below. The map lives at
-`docs/loom/maps/<map-id>/` and persists across sessions. Charting and working
-its tickets do not require `loom-code`; delivering an intent does.
-
-```mermaid
-flowchart TD
-    dest["Define the outcome"] --> fog["Identify what is unknown"]
-    fog --> ticket["Investigate one unknown<br/>grill, research or prototype"]
-    ticket --> log["Record the answer and decisions"]
-    log --> ready{"A slice is ready to build?"}
-    ready -->|"No: investigate the next unknown"| fog
-    ready -->|"Yes"| intent["Write an intent<br/>requires loom-code"]
-    intent --> entry["Confirm the change<br/>loom-design:capture-intent<br/>or loom-code:write-plan"]
-```
-
-A grilling ticket hands its discussion to `loom-design:capture-intent` when
-available. Delivery writes an intent carrying `map:`; the entry station then
-owns that change and the map only reads its status. This loop is not the
-completion condition for the whole map: completion requires all Destination
-acceptance criteria met, fog empty, and every ticket closed or withdrawn.
+Use [roadmap](skills/roadmap/README.md) for an optional root ROADMAP.md or a selected
+existing document. Keep current goals, completion conditions, status, next actions,
+unknowns and evidence links. Advice or resumption alone does not force creation.
+Planning grants no implementation, background execution, publication or merge
+permission. Old maps remain readable without conversion, rewriting or closure.
 
 ## Skills
 
@@ -93,7 +76,7 @@ Fifteen skills: fourteen tools and one optional router.
 | Skill | Role |
 |---|---|
 | [`using-loom-workflow`](skills/using-loom-workflow/README.md) | Optional router: picks the matching tool for a broad or unclear request and loads its instructions. Every tool stays directly invocable. |
-| [`decision-map`](skills/decision-map/README.md) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
+| [`roadmap`](skills/roadmap/README.md) | Create, resume or update an ordinary planning document. |
 | [`critique`](skills/critique/README.md) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
 | [`recap-state`](skills/recap-state/README.md) | In-session recap of where the work stands, then a pause for confirmation. Not the built-in `/recap` away-summary. |
 | [`whats-next`](skills/whats-next/README.md) | Recommend one grounded next action plus necessary alternatives; preserve the current task's authorization. |
@@ -106,7 +89,7 @@ Fifteen skills: fourteen tools and one optional router.
 | [`independent-advisor`](skills/independent-advisor/README.md) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
 | [`loom-visualization`](skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
-| [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
+| [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. |
 
 Loom's contract counts nine of these tools. It marks `goal-create`,
 `dbt-model-style` and `project-retro` as `standalone: true`, outside the Loom
@@ -130,7 +113,7 @@ loom-workflow/
 ├── skills/
 │   ├── critique/
 │   ├── dbt-model-style/
-│   ├── decision-map/
+│   ├── roadmap/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
@@ -152,8 +135,7 @@ loom-workflow/
 ## Install
 
 This repository is a plugin marketplace named `loom`. `loom-workflow` installs
-on its own; add `loom-code` for `decision-map`'s delivery step or an explicitly
-requested outside code, plan or decision review.
+on its own; add `loom-code` for an explicitly requested outside code, plan or decision review.
 
 ### Claude Code
 
@@ -177,7 +159,7 @@ review and trust it again: its event changed.
 ### Antigravity CLI
 
 Install from a clone of the repository. Install `loom-code` first. `critique`,
-`decision-map` and `skill-retro` refer to it. Before installing, check
+`skill-retro` refer to it. Before installing, check
 `agy plugin list` for a plugin of the same name imported from Claude Code:
 installing replaces that imported copy, and a later `agy plugin uninstall`
 removes it.
@@ -213,7 +195,7 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `loom-workflow:<skill>`. Start loom with the command `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create`, `/loom-workflow:project-retro` and `/loom-workflow:whats-next` are also commands, and each of these stays a skill too.
+Skills are offered as `loom-workflow:<skill>`. Start loom with the command `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:roadmap`, `/loom-workflow:goal-create`, `/loom-workflow:project-retro` and `/loom-workflow:whats-next` are also commands, and each of these stays a skill too.
 
 On OpenCode, the visualization card and the skill-folder rule run through the plugin's v2 hooks.
 
@@ -254,7 +236,7 @@ skill; `goal-create` runs only when named. For example:
 "Critique this 12-item plan"                  → critique (proposal)
 "Should we build this?" / "over-engineered?"  → critique (complexity)
 "I'm about to commit"                         → git-memory
-"開地圖" / "chart a decision map"             → decision-map
+"Plan this project across sessions"          → roadmap
 "wrap up" / "save state"                      → handoff
 "where were we" / "我跟丟了"                  → recap-state
 "second opinion" / "ask another model"        → independent-advisor
