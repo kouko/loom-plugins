@@ -54,3 +54,22 @@ was retested. Numerical improvement remains unclaimed under the sole 15pp waiver
 Raw finance input/output and quotations remain local-only. This public record
 contains only minimized classifications. The original finance project file was
 not modified. Publication, production installation and merge remain separate.
+
+## End-of-Build checks
+
+- `sync-trunk`: up to date at 089f76a4 against origin/main 9bbab926; no
+  trunk content was added. No additional adversary dispatch was needed: scope
+  did not widen and the existing committed adversarial program still passes.
+- Complete locked package command from KICKOFF-DEFAULTS: exit 0, 4,036 pytest
+  cases across the runner's groups plus the discovered shell inventory.
+  This is the observed new run count; earlier reports retain their historical
+  counts. The heading-only follow-up also passed the 11 focused cases.
+- `python3 -m pytest loom-code/tests/test_loom_checker_intent.py -q`:
+  exit 0, 65 passed. No committed adversarial program was modified.
+- Direct checks: original finance source equals its recorded source commit;
+  replay input equals the original trial input; the public report's initial
+  and final bytes match. No unresolved product finding was returned.
+
+The complete suite will run again on the committed reviewed target during
+finalization. Logs are retained locally; this summary does not publish private
+executor inputs or claim automatic host behavior.
