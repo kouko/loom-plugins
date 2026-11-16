@@ -5,6 +5,7 @@ writes `needs-design: no` while its diff touches a declared interface
 surface must be blocked by the RECOMPUTED diff, not believed. Every
 fixture here is a real git repo under tmp_path for that reason.
 """
+# concern: Retiring map-origin checks must preserve unrelated intent validation and leave legacy metadata inert.
 from __future__ import annotations
 
 import subprocess

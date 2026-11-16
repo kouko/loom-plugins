@@ -103,9 +103,9 @@ mechanisms:
   - id: architecture-design
     class: skill
     eval: "loom-design/tests/architecture-design/test_architecture_skill.py"
-  - id: decision-map
+  - id: roadmap
     class: skill
-    eval: "loom-workflow/tests/decision-map/test_start_delivery.py::test_creates_intent_and_lists_it_under_the_criterion"
+    eval: "loom-workflow/tests/roadmap/test_skill_structure.py"
   - id: engineering-research
     class: skill
     eval: loom-code/tests/engineering-research/test_package.py
@@ -299,7 +299,7 @@ mechanisms:
   - {id: "tool:product-principles",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:design-system",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:architecture-design", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:decision-map",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:roadmap",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:engineering-research", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:design-research", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
@@ -328,7 +328,6 @@ mechanisms:
   - {id: "artifact:intent.originator",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.kind",                class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.needs-design",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.map",                 class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.evidence",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.status",              class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.intent_confirmed_sha", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
