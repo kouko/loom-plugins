@@ -41,11 +41,37 @@ next actions, unresolved questions and links to relevant evidence or detail.
 Choose the structure that fits; no required fields, identifiers or parser.
 Do not create a planning runtime, ticket store or duplicate task/PR/CI ledger.
 
-For a whole-plan review, check whether the proposed stages lead to the goal,
-what depends on what, and which unknown could change their order. Suggest the
-smallest useful next stage. Separate a user's committed milestone or date from
-an estimate; retain unknown dates and effort as unknown. Do not manufacture
-deadlines or convert an unconfirmed estimate into a commitment.
+Use planning judgment selectively for complex staged work, in software,
+research, learning or other domains. Reuse confirmed context; these are reasoning
+aids, not required steps, fields or interviews. A simple approved task continues
+directly; do not delay viable work to resolve an unknown that cannot change it.
+
+Frame the intended improvement: who has which problem, what becomes possible
+or better, and what observation would support success. Do not invent numerical
+targets. Split into small increments that can be used or verified independently,
+rather than separating layers until only the final stage yields a result.
+Foundational work or research can come first when it enables a concrete capability
+or resolves a consequential question; bound what would establish that result.
+
+Explain why the next stage precedes another or why an alternative is deferred.
+Consider contribution to the goal, evidence confidence, effort and real
+dependencies or constraints where relevant, without requiring scores. Identify
+a weakly supported premise only when its answer could change the next investment;
+suggest a bounded way to learn about it within existing authority. Name the
+evidence or changed condition that would justify continuing, changing scope,
+deferring or stopping, rather than advancing stages just because work occurred.
+
+Detail near-term work; keep distant stages provisional. Distinguish an agreed
+time/spending ceiling from an effort estimate or committed date. Keep unknown
+effort and dates unknown; expose a conflict with a real deadline rather than
+guaranteeing capacity. Reduce optional scope where needed, preserving mandatory
+safety and quality. Do not turn an estimate into a commitment.
+
+For software migrations, replacements or breaking changes only, consider affected
+consumers/data, actual prerequisites, feasible coexistence, limited exposure and
+recovery limits when relevant. Identify what must be decided before widening
+exposure or retiring the old path; do not promise reversible data changes or
+design/execute the migration in the roadmap. Other domains need no software intake.
 
 ## Maintain only what changed
 

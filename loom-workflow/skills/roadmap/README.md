@@ -13,6 +13,13 @@ link to detailed evidence, preserve unknowns and distinguish proposed work,
 verified results and acceptance. Advice or resuming work alone does not force
 creation of a document.
 
+For complex work, reason about intended improvement, independently useful or
+verifiable stages, consequential unknowns, ordering and evidence for changing
+direction. Detail the near term and respect real time/budget and quality limits.
+These judgments also fit research and learning; they add no required fields,
+scores or interviews to simple approved work. Software migration questions apply
+only when relevant, without promising that data changes can be undone.
+
 Planning does not authorize implementation, background execution, publication
 or merge. Existing delivery confirmation and verification still apply.
 Existing project documents and historical evidence are not migrated or
