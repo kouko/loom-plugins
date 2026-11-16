@@ -8,7 +8,6 @@ from loom_checker.helpers import report
 from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.intent import check_intent_schema
 from loom_checker.rule_checks.intent import check_kind_recompute
-from loom_checker.rule_checks.intent import check_map_exists
 from loom_checker.rule_checks.intent import check_needs_design_reason
 from loom_checker.rule_checks.intent import check_needs_design_recompute
 from loom_checker.rule_checks.intent import check_product_no_identifiers
@@ -41,7 +40,6 @@ def cmd_intent(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     failures: list[tuple[str, str]] = []
 
     failures += check_intent_schema(manifest, front, sections)
-    failures += check_map_exists(repo, front)
     failures += check_product_no_identifiers(front, sections)
 
     reason_failures, needs_design = check_needs_design_reason(

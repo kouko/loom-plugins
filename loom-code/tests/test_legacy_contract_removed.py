@@ -163,7 +163,7 @@ def test_live_consumers_require_contract_two() -> None:
     consumers = [
         ROOT / "loom-code/skills/write-plan/SKILL.md",
         *(ROOT / "loom-design/skills").glob("*/SKILL.md"),
-        ROOT / "loom-workflow/skills/decision-map/SKILL.md",
+        ROOT / "loom-workflow/skills/roadmap/SKILL.md",
     ]
     for path in consumers:
         text = path.read_text(encoding="utf-8")

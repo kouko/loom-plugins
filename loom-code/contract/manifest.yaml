@@ -30,7 +30,7 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: product-principles,  owner: loom-design,   produces: PRINCIPLES.md}
   - {name: design-system,       owner: loom-design,   produces: DESIGN.md}
   - {name: architecture-design,  owner: loom-design,   produces: ARCHITECTURE.md}
-  - {name: decision-map,        owner: loom-workflow}
+  - {name: roadmap,             owner: loom-workflow}
   - {name: engineering-research, owner: loom-code}
   - {name: design-research, owner: loom-design}
   - {name: handoff,             owner: loom-workflow}
@@ -123,7 +123,6 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: originator,   kind: frontmatter, required: true}
       - {name: kind,         kind: frontmatter, required: true, values: [product, engineering]}
       - {name: needs-design, kind: frontmatter, required: true, grammar: "yes | no — <reason>"}
-      - {name: map,          kind: frontmatter, required: false}
       - {name: evidence,     kind: frontmatter, required: false}
       - {name: status,       kind: frontmatter, required: false, grammar: "open | confirmed <date> | closed <date> — PR #<N> | withdrawn — <reason>"}
       - {name: intent_confirmed_sha, kind: frontmatter, required: false, grammar: "<intent-blob-sha>", note: "written on new confirmations after all frontmatter; hashes the intent excluding status and pin lines; a pinned canonical confirmation commit anchors the baseline, while confirmations predating pins remain exempt"}
