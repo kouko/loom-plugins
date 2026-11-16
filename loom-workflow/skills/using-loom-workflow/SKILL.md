@@ -15,7 +15,7 @@ The selected skill owns its procedure, permissions, and output contract.
 |---|---|
 | Judge a proposal, choose what to keep, or assess a simpler implementation | [critique](../critique/SKILL.md) |
 | Write, edit, or review dbt + Redshift model style and structure | [dbt-model-style](../dbt-model-style/SKILL.md) |
-| Open, advance, resume, or assess a persistent Outcome Map across sessions | [decision-map](../decision-map/SKILL.md) |
+| Create, resume, review or update staged project planning across sessions, including its next-stage decisions | [roadmap](../roadmap/SKILL.md) |
 | Review selected past or current session snapshots for recurring issues in a readable target skill or its related plugin integration | [skill-retro](../skill-retro/SKILL.md) |
 | Commit, create/merge a PR, or recall a decision bound to Git history | [git-memory](../git-memory/SKILL.md) |
 | Explicitly invoke `goal-create` by name for a session goal or repository purpose | [goal-create](../goal-create/SKILL.md) |
@@ -33,5 +33,5 @@ Changing a critique lens selects `critique`; changing who answers selects
 `independent-advisor`. A built-in `/recap` away-summary is not `recap-state`.
 Simple factual or function-state questions need no workflow skill. Diagrams in
 coding chat select `loom-visualization`; Obsidian notes do not. A single
-implementation change belongs to an available Loom lifecycle station, not `decision-map`; this toolbox
+implementation change belongs to an available Loom lifecycle station; this toolbox
 does not supply intent, spec, plan, build, review, or ship procedures.

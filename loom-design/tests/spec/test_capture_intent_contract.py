@@ -137,6 +137,13 @@ def test_critique_named_only_in_step_4() -> None:
     assert "loom-workflow/" not in text
 
 
+def test_planning_owner_reference_uses_portable_skill_identity() -> None:
+    """Cross-plugin routing is by skill identity, never checkout file paths."""
+    identities = set(re.findall(r"`(loom-[a-z]+:[a-z-]+)`", _text()))
+    assert "loom-workflow:roadmap" in identities
+    assert "loom-workflow/" not in _text()
+
+
 def test_skill_file_exists() -> None:
     assert SKILL.is_file(), f"{SKILL} does not exist"
 

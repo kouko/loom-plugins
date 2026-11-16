@@ -98,6 +98,9 @@ class TestFrontmatterAndRouting:
         assert "references/handoff-schema.md" in self.body, (
             "SKILL.md body must reference 'references/handoff-schema.md'"
         )
+        targets = re.findall(r"\]\(([^)]+)\)", self.body)
+        assert "../roadmap/SKILL.md" in targets
+        assert (SKILL_MD.parent / "../roadmap/SKILL.md").is_file()
 
     def test_e_token_budget(self):
         """(e) body token count ≤6500 (chars/4 proxy)."""

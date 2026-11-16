@@ -18,7 +18,8 @@ relative paths, quoted examples and incidental filenames.
 
 Ask only until the wanted outcome is clear, write
 `docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
-confirmed intent onward. Do not design, plan, or ask the user to judge quality.
+confirmed intent onward. Planning owner: `loom-workflow:roadmap`.
+Do not design, plan, or request user quality judgments.
 
 ## Artifact vocabulary
 

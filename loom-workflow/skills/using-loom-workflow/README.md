@@ -10,7 +10,7 @@ Use this when a request spans workflow tools or you are unsure which one fits. E
 
 ## What you get
 
-A handoff to the selected tool, which retains its own procedure, permissions and output. It can route memory, critique, retrospective, handoff, second-opinion and visualization requests.
+A handoff to the selected tool, which retains its own procedure, permissions and output. It can route project planning, memory, critique, retrospective, handoff, second-opinion and visualization requests.
 
 ## How to use
 
@@ -33,6 +33,6 @@ Use loom-workflow:using-loom-workflow to choose the right tool for this retrospe
 - [loom-workflow:critique](../critique/README.md)
 - [loom-workflow:handoff](../handoff/README.md)
 - [loom-workflow:project-retro](../project-retro/README.md)
-- [loom-workflow:decision-map](../decision-map/README.md)
+- [loom-workflow:roadmap](../roadmap/README.md)
 
 Runtime instructions: [SKILL.md](SKILL.md).
