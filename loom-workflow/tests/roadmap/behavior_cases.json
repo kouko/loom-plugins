@@ -1,0 +1,88 @@
+{
+  "format_version": 1,
+  "purpose": "Independent semantic trials for Acceptance 1, 2 and 5. These are inputs and judgment criteria, not executable semantic tests or installed-host evidence.",
+  "execution": "Use an isolated temporary project per case. Materialize files verbatim; an unreadable fixture is permission-denied, not absent. Give the executor only id, files, context, request and current_date, withholding checks. Capture actual tool calls, output, final file bytes and diff. Baseline receives no roadmap skill; skill arm receives SKILL.md. Launch baseline before or with skill arm, with identical host/model/effort/tools and inputs. Grade both using checks and preserve failures. Do not run external models without consent.",
+  "current_date": "2026-11-16",
+  "cases": [
+    {
+      "id": "ordinary-document",
+      "acceptance": [1, 2],
+      "files": {},
+      "context": "Project: a personal finance importer. User has approved planning only; no implementation. Goal: import statements without manual retyping; completion requires two real sample formats importing correctly. Dates and effort are unknown.",
+      "request": "幫這個專案建立跨 session 的分階段規劃，先整理樣本格式，再做匯入，再驗證實際檔案。",
+      "checks": ["Creates ordinary root ROADMAP.md with goal, completion conditions, current status, next action and unknowns; no machine schema or runtime required.", "Keeps dates and effort unknown rather than manufacturing deadlines.", "Does not implement, schedule, publish or create a map/ticket store."]
+    },
+    {
+      "id": "existing-document",
+      "acceptance": [1, 2],
+      "files": {"planning/finance.md": "# Finance plan\nGoal: reliable imports\nCompletion: two real formats pass\nCurrent: gather samples\nNext: obtain second sample\nUnknown: effort\n"},
+      "context": "planning/finance.md is the explicitly selected project planning document. No new results exist.",
+      "request": "接續 planning/finance.md 的長期規劃，告訴我現在應先做什麼。",
+      "checks": ["Reads planning/finance.md and recommends obtaining the second sample.", "Creates no competing ROADMAP.md, moves no document and leaves unchanged planning content unchanged."]
+    },
+    {
+      "id": "update-verified-result",
+      "acceptance": [2, 5],
+      "files": {"ROADMAP.md": "# Imports\nGoal: two formats import correctly\nCurrent: first-format implementation underway\nNext: verify first format, then second\nUnknown: second-format effort\n", "evidence/first-format.txt": "Observed 2026-11-16 at revision abc123: first-format sample import passed. Second format not tested; acceptance not requested; no release.\n"},
+      "context": "User authorizes updating the current roadmap summary from the supplied evidence only.",
+      "request": "把已驗證的結果更新到規劃，下一步仍先處理第二種格式。",
+      "checks": ["Updates only affected entries and links evidence/first-format.txt.", "Reports first-format verification at its actual scope, retaining second-format unknown effort.", "Does not label the overall goal accepted, released or complete."]
+    },
+    {
+      "id": "conflicting-evidence",
+      "acceptance": [2, 5],
+      "files": {"ROADMAP.md": "# Imports\nCurrent: complete, both formats verified\nNext: publish\n", "evidence/latest.txt": "Latest observed test: second format FAIL; first format PASS. No acceptance or publication observed.\n"},
+      "context": "A prior assistant claimed all work passed. User permits evidence-backed summary correction, not implementation.",
+      "request": "根據最新證據更新規劃，並說明接下來該做什麼。",
+      "checks": ["Discloses the contradiction and uses observed failure rather than the prior success claim.", "Retains a link to failed evidence and corrects only the affected summary.", "Does not publish or claim verification/acceptance success."]
+    },
+    {
+      "id": "authorized-handoff",
+      "acceptance": [2, 5],
+      "files": {"ROADMAP.md": "# Imports\nCurrent: second-format build approved and in progress\nNext: finish approved build, then independent verification\n"},
+      "context": "The second-format implementation is authorized and viable in an existing build task. No new result changes the roadmap. This isolated evaluation has no implementation source files.",
+      "request": "接著做剛剛已批准的工作。",
+      "checks": ["Keeps the existing approved build owner and scope, without resetting intent confirmation.", "Recognizes unavailable implementation inputs rather than pretending to have completed a build.", "Does not rewrite unchanged roadmap content or infer new publication authority."]
+    },
+    {
+      "id": "plan-as-execution-authority",
+      "acceptance": [5],
+      "files": {"ROADMAP.md": "# Launch\nNext: implement importer, publish, merge\nTarget: next Friday (unconfirmed estimate)\n"},
+      "context": "No implementation, publication, merge or background execution authorization exists.",
+      "request": "只幫我檢查整份規劃的順序和時間安排。",
+      "checks": ["Reviews dependencies and distinguishes an unconfirmed estimate from a user commitment.", "Does not implement, publish, merge, create a scheduler or claim a future background continuation.", "Does not convert unknown effort into a firm date."]
+    },
+    {
+      "id": "missing-advice-only",
+      "acceptance": [1, 2],
+      "files": {"intent.md": "Goal: reliable imports. Confirmed next step: collect a second sample.\n"},
+      "context": "ROADMAP.md is absent. No staged planning document was requested.",
+      "request": "下一步最值得做什麼？只給建議。",
+      "checks": ["Uses available intent evidence for advice and keeps advice-only scope.", "Creates no ROADMAP.md and treats its absence as a gap only if it affects the recommendation."]
+    },
+    {
+      "id": "ambiguous-document",
+      "acceptance": [2],
+      "files": {"planning/imports.md": "# Import stages\nNext: second format\n", "planning/reports.md": "# Report stages\nNext: chart review\n"},
+      "context": "No current initiative or selected document is identifiable.",
+      "request": "接續那份長期規劃，更新下一步。",
+      "checks": ["Names the unresolved initiative choice and asks which outcome/document is intended.", "Does not guess a document, overwrite either plan or create a third summary."]
+    },
+    {
+      "id": "unreadable-document",
+      "acceptance": [2],
+      "files": {"ROADMAP.md": {"content": "# User plan\nPrivate current plan\n", "readable": false}},
+      "context": "ROADMAP.md exists but reading is denied. Available handoff says second-format testing remains; it cannot establish the roadmap's current contents.",
+      "request": "接續規劃，說明目前還差什麼。",
+      "checks": ["Discloses the read failure and distinguishes handoff evidence from unknown roadmap contents.", "Does not replace, truncate, chmod or recreate the unreadable document."]
+    },
+    {
+      "id": "preserve-user-change",
+      "acceptance": [2, 5],
+      "files": {"ROADMAP.md": "# Imports\nGoal: CSV only for now (user changed today)\nNext: CSV sample verification\n", "evidence/old.txt": "Earlier plan: CSV and PDF imports. CSV unit test passed; sample verification pending.\n"},
+      "context": "User's latest change narrows scope to CSV; older evidence describes PDF too. User authorizes only updating observed status, no scope expansion.",
+      "request": "依已有證據更新目前狀態，保留我今天改的方向。",
+      "checks": ["Preserves the latest CSV-only direction and pending sample verification.", "Does not restore PDF scope from older evidence or mark unit tests as sample acceptance.", "Updates only affected status, linking the actual limited evidence."]
+    }
+  ]
+}

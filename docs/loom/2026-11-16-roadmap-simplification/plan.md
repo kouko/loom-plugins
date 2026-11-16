@@ -58,3 +58,5 @@ Clarification — what — 你說的「排程控制」主要指什麼？這會�
 5. Version targets are agent-decided at the last functional fix; include each changed plugin's minor bump, synchronized changelog/README pins and derived manifests before finalization.
 6. Engineering exemption applies to decision point ②; user selected unified ownership explicitly. Rewritten spec reviewed independently at ebd634a4; original review does not cover it.
 7. Publication remains authorized after checks; merge separate. Preserve GitHub connectivity failures; unavailable remote evidence is unconfirmed, not a delivery pass.
+
+8. user-decided — On 2026-11-16 the user explicitly waived only the skill-authoring 15-percentage-point improvement threshold; retain semantic evaluation, all tests, independent reviews and acceptance. No comparative improvement is claimed.
