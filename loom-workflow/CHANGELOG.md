@@ -7,6 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 
 - Add roadmap as the unified owner of optional ordinary project planning documents; retain selected existing documents, verified-result scope, unknowns and existing delivery authorization.
+- Preserve source-attributed prior status without inferring component incompleteness from requirements or a partly unfinished stage; clarify approved-step continuation and the missing software-entry fallback.
 - Retire decision-map runtime and dedicated tests without migrating or rewriting historical project data; skill count remains fifteen.
 - Retire goal-create ARC purpose drafting while retaining SESSION prompts, input-floor checks and native host activation/recovery.
 - Retain matched behavioral evidence and its failures. The user waived only the comparative 15-point gain threshold; no stable improvement or installed-host triggering claim follows.

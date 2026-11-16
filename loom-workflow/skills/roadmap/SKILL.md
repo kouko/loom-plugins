@@ -56,22 +56,29 @@ choices. Do not silently overwrite concurrent edits or restore an older scope.
 When a conflict cannot be resolved from evidence, name it and ask for the
 unresolved outcome; retain the existing document until resolved.
 
-Distinguish proposed work, observed implementation or test results, and user
-acceptance. Link the actual evidence and preserve its revision and scope when
-they matter. A claim that tests passed is not an observed result. Contradictory
-delivery evidence needs an explicit explanation and a bounded correction,
-not a silent status advance. Keep failed evidence and unknowns visible through
-links; formatting, unchanged evidence and partial tests do not prove completion.
+Distinguish proposed work, reported completion, observed implementation or test
+results, and user acceptance. Preserve explicit prior pending states and reported
+results with their source, revision and scope; retaining that attributed status
+does not require a fresh rerun. Assess each component from its own evidence:
+a missing result, an exit condition or a stage marked in progress does not prove
+that every component is unfinished. Keep unsupported status unknown without
+discarding supported prior status. A reported test pass is not fresh verification.
+Link the evidence. Contradictory delivery evidence needs an explicit explanation
+and a bounded correction, not a silent status advance. Keep failed evidence and
+unknowns visible through links; formatting, unchanged evidence and partial tests
+do not prove completion.
 Implementation, independent verification, acceptance, publication and merge
 remain separate states. Do not append operational transcripts to the summary.
 
 ## Continue through the existing owner
 
 A roadmap is planning context, never execution permission. It does not replace
-intent confirmation, independent review, verification or acceptance. Preserve
-the scope already authorized; a viable approved task continues at its existing
-station without a new planning interview. New implementation follows
-`loom-design:capture-intent`; delivery follows its established owner.
+intent confirmation, independent review, verification or acceptance. Continue
+the concrete implementation or review step already approved, within its existing
+scope, without a new planning interview. For a newly authorized software change,
+use `loom-design:capture-intent` when available, otherwise `loom-code:write-plan`.
+If neither entry is available, disclose that limitation and finish the planning
+response without inventing an execution route.
 
 Advice-only requests stay advice-only. Plan entries grant no authorization to
 implement, spend, disclose, delete, publish or merge. Do not schedule background

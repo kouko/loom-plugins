@@ -41,6 +41,18 @@ charter: 1.1
 - Test: A1 positive: fresh-plan; boundary: absent-plan. A2 positive: resume; negative: failed-progress. A3 positive: session-retained; negative: map-runtime-absent. A4 positive: preserved-data; boundary: conflicting-edits. A5 positive: evidence-linked; negative: unauthorized-execution.
 - Risk: REQ-1–REQ-5; agent-decided independent adversary and semantic trials complement structural checks; full package suite required; no installed-host success inferred from source evaluation.
 
+### Wave 4 — Dogfood repair under the same requirements
+
+**W4-01 Clarify status evidence and workflow continuation** after: W3-02 acceptance: 2,5
+- Files: loom-workflow/skills/roadmap/SKILL.md, loom-workflow/CHANGELOG.md, docs/loom/2026-11-16-roadmap-simplification/evidence/
+- Test: A2 positive: preserve-reported-status; boundary: requirement-status-unknown. A5 positive: continue-approved-work; negative: unavailable-entry-invented-execution.
+- Risk: REQ-2/REQ-5; existing dogfood outputs supply semantic RED; agent-decided replace two paragraphs without schema/runtime, preserve explicit prior results and permission boundaries.
+
+**W4-02 Revalidate the repaired instruction contract** after: W4-01 acceptance: 1,2,3,4,5
+- Files: docs/loom/2026-11-16-roadmap-simplification/evidence/, loom-workflow/tests/roadmap/
+- Test: A1 positive: selected-document; boundary: no-duplicate-plan. A2 positive: genuine-excerpt; negative: unsupported-pending. A3 positive: source-workflow-preserved; boundary: no-new-runtime. A4 positive: unchanged-original; boundary: no-migration. A5 positive: bounded-advice; negative: implicit-execution.
+- Risk: REQ-1–REQ-5; retain original failure/auditor disagreement; fresh semantic witnesses and cold reader, complete suite and existing adversarial rerun; Round2 of the original review episode.
+
 ## Simplicity check
 - Reuse the existing manifest generator without editing it — taken
 
@@ -60,3 +72,6 @@ Clarification — what — 你說的「排程控制」主要指什麼？這會�
 7. Publication remains authorized after checks; merge separate. Preserve GitHub connectivity failures; unavailable remote evidence is unconfirmed, not a delivery pass.
 
 8. user-decided — On 2026-11-16 the user explicitly waived only the skill-authoring 15-percentage-point improvement threshold; retain semantic evaluation, all tests, independent reviews and acceptance. No comparative improvement is claimed.
+
+9. User authorized both local wording repairs on 2026-11-16. These preserve existing Acceptance and continue W1-01 obligations; do not reset the review episode. Round1 target2ba8a74a/digest04baa9c40ead33f1416aa8e2bca41fd2a3ff2b4c remains historical; repaired content requires Round2 verification.
+10. Raw finance dogfood excerpts remain local-only; publish only a minimized finding/retest summary. The 15pp waiver remains the only waived condition.
