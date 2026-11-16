@@ -122,3 +122,59 @@ The first-pass Acceptance 4 was partly because no installer update had been trie
 - Acceptance 1, 2, 3 and 5 carry over: tested source unchanged, the additional trial only measures installation and scratch-data preservation.
 
 Reproducibility details supplied with captured results: Codex version output independently read as `codex-cli 0.169.0`. Sequential literal child argv used `/Users/kouko/.local/bin/codex plugin marketplace add /private/tmp/roadmap-local-upgrade-check/marketplace --json`, then `/Users/kouko/.local/bin/codex plugin add loom-workflow@loom --json` for old install; after replacing the controlled source using the de49933a Git archive (old source retained as marketplace-v5.25), the identical literal plugin-add argv installed the new version, then `/Users/kouko/.local/bin/codex plugin list --json`. Every child cwd was the scratch `project` directory; child environment set `CODEX_HOME=/private/tmp/roadmap-local-upgrade-check/codex-profile` while retaining only PATH/TMPDIR/LANG/LC_ALL/HOME/USER/SHELL from its process. This intended isolation did not modify production configuration. Raw seven-record bundle retained by the main agent: [local Codex update results](local-codex-upgrade.json).
+
+## Re-run on 2026-11-16, at 99404a2a4 — repair acceptance
+
+### Clean setup and retained failures
+
+`git rev-parse HEAD` in `/private/tmp/roadmap-repair-acceptance` returned `99404a2a47c5ac4e3289e2dd5820f86d067ae2e0`; initial and final `git status --short` returned empty. The main agent created this fresh clean tree. Later publication-evidence commit 641bfc08 was not substituted for the tested revision.
+
+Setup repeated this run: read clean root README Codex installation section, roadmap README and full repaired SKILL.md with `cat`. Loaded the instruction-only source directly under the same bounded authorization as the earlier trial and used a new scratch root `/private/tmp/roadmap-repair-trial.rgql3a`. This produced real ordinary-file edits and real executed checks below. No installation/host activation claim follows from this load. No setup dependency was needed for this instruction-only path.
+
+Compared `git diff --stat a09c4eeb..99404a2a`, `git diff --name-only` and the full roadmap diff. Production delta is two roadmap paragraphs plus their heading and changelog; other changes are spec clarification, plan and evidence. Read the added spec decision and public dogfood-repair-retest record. It retains the original genuine trial's unsupported component-pending generalization and unclear continuation terms; these failures are not relabeled as initial passes. No private finance input was read or copied into this report.
+
+### Acceptance 1 — carried over
+
+Checked against the fix diff: ordinary Markdown, optional root default, creation criteria and no-runtime format are unchanged. Prior actual creation result remains applicable. The current A2 re-test also creates a new ordinary document, but this carried-over row does not imply rerunning the full original packaging checks.
+
+### Acceptance 2 — re-tested in full
+
+- `test_roadmap_repaired_new_plan_creates_summary`: actual staged-planning source invocation created `new/ROADMAP.md` with goal, observable completion, proposed status, next step, unknown effort/date and evidence state. Read back its full text; it did not claim implementation or results.
+- `test_roadmap_repaired_selected_plan_preserves_component_status`: actual selected `selected/plan.md` was read with `prior.md` before editing. Prior evidence says Unicode reported complete at fixture-v1, empty input explicitly pending, no formatting result. The encompassing stage is in progress. Kept Unicode attributed completion without a rerun, kept explicit empty-input pending until its own check ran, and left formatting unknown rather than labeling every component unfinished. No duplicate root summary was created: `test ! -e selected/ROADMAP.md && echo NO_DUPLICATE` returned `NO_DUPLICATE`.
+- `test_roadmap_repaired_authorized_check_continues`: resumed the concrete already approved empty-input check with `python3 check.py`, no new intent interview. Actual output `PASS empty-input fixture only; review/acceptance not performed`, exit 0. This is actual continuation, not merely advice to continue.
+- `test_roadmap_repaired_failed_evidence_stays_visible`: `python3 fail.py` exited 1 with `AssertionError: Unicode not established by empty-input fixture`. This deliberately negative fixture tests evidence separation; it is not a production bug. Retained the failure in `results.md`, explained its limited scope, and linked both earlier and current evidence rather than erasing either.
+- Updated only the selected summary's empty-input result and next action. Verified result did not advance independent review or user acceptance. `Formatting: unknown; no supporting result.` and `Unicode: reported complete by earlier report at revision fixture-v1; not freshly verified.` remained intact.
+- `test_roadmap_repaired_direction_change_keeps_evidence`: under the synthetic request to prioritize empty files first, actually updated the goal/order in the selected document. Read the final document; preserved its old completion conditions, prior reported status, unknown formatting, evidence links and unrelated user-selected Japanese-label choice. No invented deadline or migration.
+- `test_roadmap_repaired_advice_resume_avoids_creation`: read `advice/intent.md`, whose existing authorization is inspection only and contains no staged-planning request. Wrote the actual bounded recommendation in `advice-response.md`; no implementation or planning file created. `test ! -e advice/ROADMAP.md && echo NO_ADVICE_ROADMAP` returned `NO_ADVICE_ROADMAP`.
+- `test_roadmap_repaired_missing_entry_stays_planning`: in the declared synthetic host inventory with neither implementation entry available, authored `no-entry-response.md` explaining the unavailable entry and ending with planning only. Also covered capture-intent-present and write-plan-only inventories: chose the respective existing entry, without executing a station or inventing a fallback. These are actual instruction-following response trials against controlled inventories, not claims about installed host capability discovery.
+
+### Acceptance 3 — carried over
+
+Compared the fix range: no retirement inventory, goal-create code, research/handoff runtime guidance or test was changed. Prior retirement checks, actual research retention, complete verified handoff source trial and valid/invalid SESSION CLI remain applicable. Continued-work wording was re-tested under A2/A5. No full delivery or installed-host activation is newly claimed.
+
+### Acceptance 4 — carried over
+
+Compared the fix range: no installer/loader/migration implementation, manifest inventory or data-handling mechanism changed. The source instruction still forbids converting or rewriting existing history solely due to plugin update. Prior actual isolated local Codex upgrade and independently checked four-data-file hashes remain applicable; no new upgrade was run. Repairs affect how an authorized planning summary is explained and edited, covered by selected-file scope checks in A2.
+
+### Acceptance 5 — re-tested in full
+
+Actual trial outputs distinguish four states: historical reported completion at fixture-v1, current empty-input pass, deliberate current negative-check failure, and unsupported formatting unknown. Neither a broad stage label nor an unmet exit condition was used to downgrade every component. Failure was retained with its explanation; reported prior success was not falsely called fresh verification. Completion still requires review and user acceptance, neither claimed performed.
+
+Already authorized checks actually ran; no intent reset occurred. Advice remained advice. A newly authorized change was directed only to the available entry in the controlled response trial; neither-entry case stopped at planning with the limitation disclosed. No new implementation, spend, disclosure, deletion, publication, merge or background dispatch was performed. The actual final selected summary was read back:
+
+```text
+Goal: prioritize empty-file reliability first; retain Unicode as the following stage.
+Done when: both fixtures pass, independent review completes and user accepts.
+Stage: in progress.
+Unicode: reported complete by earlier report at revision fixture-v1; not freshly verified.
+Empty input: observed check passed in this trial; earlier pending state superseded only for this fixture.
+Formatting: unknown; no supporting result.
+Next: inspect the failing Unicode check within approved scope; review and acceptance still pending.
+Direction: user-authorized ordering change in this synthetic trial; no deadline added.
+Unknowns: effort and date.
+Keep: user-selected Japanese labels.
+Evidence: [earlier report](prior.md).
+Evidence: [current checks](results.md); empty-input success does not freshly verify Unicode.
+```
+
+No product repair or test modification was made by this witness. No package suite was run by this witness. The station reports 4,036 pytest cases plus shell inventory passing for this repair and retained 65 existing adversarial checks; these are station-reported results, not this witness's fresh suite execution. Earlier 4,031/89 counts remain historical under their tested revisions. Finalization still reruns the full automated suite and blocks on failure; neither package testing nor finalization is skipped. No dismissed important findings were supplied. Only the pre-existing 15pp numerical improvement waiver applies.
