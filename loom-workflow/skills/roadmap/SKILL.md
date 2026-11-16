@@ -70,7 +70,7 @@ do not prove completion.
 Implementation, independent verification, acceptance, publication and merge
 remain separate states. Do not append operational transcripts to the summary.
 
-## Continue through the existing owner
+## Continue authorized work
 
 A roadmap is planning context, never execution permission. It does not replace
 intent confirmation, independent review, verification or acceptance. Continue
