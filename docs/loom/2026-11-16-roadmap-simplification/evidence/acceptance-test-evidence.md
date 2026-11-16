@@ -178,3 +178,53 @@ Evidence: [current checks](results.md); empty-input success does not freshly ver
 ```
 
 No product repair or test modification was made by this witness. No package suite was run by this witness. The station reports 4,036 pytest cases plus shell inventory passing for this repair and retained 65 existing adversarial checks; these are station-reported results, not this witness's fresh suite execution. Earlier 4,031/89 counts remain historical under their tested revisions. Finalization still reruns the full automated suite and blocks on failure; neither package testing nor finalization is skipped. No dismissed important findings were supplied. Only the pre-existing 15pp numerical improvement waiver applies.
+
+## Re-run on 2026-11-17, at bb145e5d — renewed planning acceptance
+
+### Clean setup and measurement boundary
+
+Independent witness, not implementer or blind grader. `git -C /private/tmp/roadmap-knowledge-acceptance rev-parse HEAD` returned `bb145e5df2c8b1696177469ce762d6cf48aa0b7b`; initial and final `git status --porcelain` were empty. Read clean root README Codex setup, roadmap README and full runtime SKILL.md. Used the authorized instruction-only source-loading path, as in prior acceptance: this witness actually followed the loaded source, edited controlled task files using apply_patch and ran the approved checks. No installation, automatic trigger, native goal activation, universal model-compliance or comparative quality gain is claimed. Reloaded the source before the planning and simple-continuation actions. No independent-grader answers or trial oracle were read.
+
+Scratch: `/private/tmp/roadmap-knowledge-trial`. All requests and historical evidence here are explicitly controlled fixtures. Detailed plans and responses were read back after editing. Original failures, earlier reports and comparison-run guard failures are retained; those comparison runs are not this witness's trials.
+
+### 1. Optional ordinary planning — re-tested
+
+`test_roadmap_complex_request_creates_plain_summary`: read `new/request.md`, then actually created `new/ROADMAP.md` with ordinary Markdown. It records operator benefit, observable done conditions, proposed status, next action, unknown effort/date, constraints and linked evidence. No dedicated format, identifiers, parser, runtime or ticket store was used. The next stage is synthetic consumer-compatibility evidence, then an independently useful empty-export slice, then provisional wider coverage. No production work is claimed.
+
+### 2. Creation, resumption, advice and maintenance — re-tested
+
+`test_roadmap_selected_plan_retains_scoped_evidence`: read selected `selected/initiative.md` and `prior.md`. The former is the selected existing plan, not root ROADMAP. Ran `python3 /private/tmp/roadmap-knowledge-trial/selected/check.py`: exit 0, `PASS empty CSV only; review and acceptance pending`. Ran `negative.py`: exit 1, `AssertionError: empty CSV does not establish Unicode compatibility`. Saved both observations in `results.md`, then updated only the selected summary's empty-input status, next action and authorized synthetic direction correction. Kept historical Unicode attribution to fixture-v1, formatting unknown, Japanese labels, prior evidence and pending review/acceptance. `test ! -e .../selected/ROADMAP.md` succeeded. No duplicate summary created.
+
+`test_roadmap_advice_without_staging_avoids_creation`: actual `advice-response.md` recommends the next existing diagnostic under check-only authority; no planning file or implementation created. `entry-response.md` exercises all three controlled entry inventories: capture-intent present, write-plan only, neither available. The last discloses the missing entry and stops at planning; no station or implementation was executed. `boundary-response.md` explicitly retains ambiguous/unreadable/conflicting documents and asks only for the unresolved selection/outcome; these response trials do not claim a live permission failure or concurrent-writer test.
+
+### 3. Capability retirement and retained workflows — carried over
+
+Checked full `git diff --name-only 087f5057..bb145e5d` and full runtime diff. Only roadmap runtime planning paragraphs, its README, changelog, case data and development records changed. No retirement inventory, SESSION implementation, ordinary development, research or handoff instructions changed. Earlier actual source research, verified handoff resume, SESSION CLI and retirement evidence therefore remain applicable. Continuation is freshly exercised in rows 2/5/8. No new installed-host claim.
+
+### 4. Existing data preserved on upgrade — carried over
+
+Same checked range changes no installer, loader, manifest inventory, migration or data-handling implementation. Prior isolated Codex upgrade and four-file preservation evidence remain applicable. This run modifies only its new controlled fixtures, not real project data. No upgrade was rerun and no previous failure is relabeled.
+
+### 5. Authorization, verification and acceptance — re-tested
+
+Actual selected-plan output retains these distinct states: Unicode reported complete at fixture-v1 without fresh rerun; empty CSV observed passing; negative check observed failing and linked; formatting unknown; independent review and user acceptance pending. The original `Done:` line remains an exit condition, not an assertion that all components passed. New plans explicitly say proposed and not implemented/accepted. Advice remains advice; controlled missing-entry response stops at planning. No implementation, migration, spending, outbound message, background task, publication or merge occurred. Failed evidence is not erased. Check results concern these fixtures only, not production export reliability.
+
+### 6. Complex planning quality — re-tested
+
+`test_roadmap_complex_plan_bounds_foundation_and_investment`: actual `new/ROADMAP.md` makes compatibility research a bounded foundation: one representative consumer, synthetic legacy-column/UTF-8 examples, reproducible decision, maximum two staff-days. It precedes a usable empty-export slice because rejection changes format investment. If no consumer can be checked within the ceiling, defer rather than promise delivery. Unicode expansion depends on compatibility evidence; later coverage is provisional. Six weeks remains a desired date, effort/date unknown; optional scope can shrink but access controls and data preservation cannot. Affected consumers/data, coexistence uncertainty, review before widening, and no assumed reversible data change are explicit. No migration design or execution is smuggled into the plan. These are observable output-quality results of this controlled source trial, not a blinded benchmark or proof of a numerical gain.
+
+### 7. Non-software staged work — re-tested
+
+`test_roadmap_learning_plan_stays_domain_neutral`: read `learning/request.md` and actually created `learning/ROADMAP.md`. Goal is ordering food unaided. First useful/verifiable result is a self-recorded order and reusable script; next is an unfamiliar variation/clarification; live practice remains conditional on partner access. Two hours weekly stays a ceiling, no purchased course authorized. First recording evidence can redirect vocabulary effort toward retrieval/pronunciation; unavailable partner leads to recording-based practice. No software intake, deployment, migration, application or engineering workflow was required. No invitation was actually sent.
+
+### 8. Simple approved continuation — re-tested
+
+`test_roadmap_simple_approved_check_continues_without_planning`: controlled request was simply to run the already approved sum check, with scope and next action fixed. Following the reloaded source, immediately ran `python3 /private/tmp/roadmap-knowledge-trial/simple/check.py`: exit 0, `PASS approved sum check; no planning required`. `find .../simple -type f` returned only the pre-existing `check.py`; no roadmap, interview, required fields or renewed goal confirmation added. `test ! -e .../simple/ROADMAP.md` succeeded. Selected-plan resumption also ran its approved empty-input check directly.
+
+### Commands, failures and limits
+
+Focused command attempted in the clean tree: `python3 -m pytest loom-workflow/tests/roadmap/test_skill_structure.py -q`; system Python exited with `No module named pytest`. This environment failure is retained, not called a test pass. Full package suite was not run by this witness. Finalization must run `python3 scripts/run_package_tests.py --loom-family` under the project's test environment and block acceptance on failure. Station-reported earlier 4,036 pytest plus shell checks and 65 adversarial checks are not this witness's fresh executions. Only the existing 15pp quantitative waiver applies; finalization and package tests remain required. No important dismissed findings supplied.
+
+Final scope check: clean source Git status empty; `NO_DUPLICATE_OR_SIMPLE_PLAN` observed. Current SHA-256: historical `selected/prior.md` = `0751e104a794fe17342c04e6c7fec95caad3066119ffa330e9fc74d0c3a2af98`; selected check = `7b9ab78379184e4ee9a6c418b3ba83c01009dc435c9a455089e2df5cec4154ea`; simple check = `004f088b141dd3372417593275082e6e035226f09d02e832e08617966096f029`. No pre-run hash was captured, so these hashes alone are not claimed as a before/after preservation test; the recorded apply_patch changes identify exactly what this witness edited.
+
+Focused environment recovery: supplied locked command `uv run --offline --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/roadmap/test_skill_structure.py tests/test_loom_skill_description_catalog.py -q` initially failed acquiring `/Users/kouko/.cache/uv` lock (`Operation not permitted`). Repeated the identical offline command with approved filesystem escalation, not a guard bypass or base installation: exit 0, `11 passed in 0.02s`. These focused tests supplement the actual behavioral trials; they do not replace their semantic evidence or the required finalizer suite. Two comparison cases elsewhere required assisted continuations after blocked inline-interpreter commands; those originals remain other-measurement limitations, not this witness's results or a proved absence of regression.
