@@ -19,7 +19,21 @@ REQ-4 — Preserve existing project data
 REQ-5 — Preserve authorization and evidence boundaries
   The roadmap guidance shall preserve existing implementation confirmation and delivery verification and shall distinguish proposed, observed and accepted results → Acceptance #5
 
+REQ-6 — Evidence-grounded stage planning
+  WHEN sufficient context exists for a complex staged project, the roadmap guidance shall support independently useful or verifiable increments, outcome-oriented completion observations, reasoned ordering and consequential uncertainty or conditions that warrant revising investment → Acceptance #6
+
+REQ-7 — Domain-neutral planning
+  WHERE staged work is outside software development, the roadmap guidance shall apply its general planning judgment without requiring software intake, deployment or migration procedures → Acceptance #7
+
+REQ-8 — Proportionate continuation
+  WHEN a simple task or continuation already has confirmed scope and a viable next action, the roadmap guidance shall preserve direct continuation without additional planning interviews, required fields, planning files or renewed goal confirmation caused by the planning heuristics → Acceptance #8
+
 ## Design decision
+
+- user-decided — On 2026-11-17, "ok go" accepted the immediately preceding recommendation: combine six general planning judgments with simplification limits, preserve conditional software-specific guidance, and compare complex software, non-software and simple-continuation behavior. Acceptance 6–8 are new required outcomes; earlier Acceptance 1–5 remain unchanged.
+- agent-decided — Refine the existing Create/review paragraph in place: intended improvement and observable success, useful/verifiable increments, consequential premises, ordering rationale, near/far detail and investment constraints, and evidence-triggered reconsideration. These are selective reasoning aids, not six required steps, fields or user questions. Reuse confirmed context; bounded foundational work can enable a capability or settle a consequential question.
+- agent-decided — Keep description and packaging unchanged. Keep one short inline software example only if it earns its size. For migrations/breaking changes, name affected consumers/data, prerequisites, coexistence/exposure and recovery limits when relevant; detailed architecture/execution stays with existing owners. Mandatory safety/quality is not optional scope.
+- agent-decided — Retain the scope and provenance of prior results and the unknown-versus-unfinished repair. Use the old 087f5057 skill as the comparison baseline; preserve unfavorable/equal results and claim no measured improvement without evidence. The existing numeric waiver does not waive comparison, review or acceptance.
 
 - user-decided — Root ROADMAP.md is optional, used for projects needing long-term planning; it is a current summary with evidence links, not mandatory scaffolding for every repository.
 - user-decided — Provide one independent loom-workflow:roadmap skill as the unified entry point and sole owner of durable planning-document maintenance. The user explicitly requested concentrated ownership after reviewing the distributed alternative.
