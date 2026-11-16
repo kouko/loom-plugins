@@ -1,6 +1,6 @@
 # Unified lightweight roadmap — plan
-intent: 2026-11-16-roadmap-simplification@6c3b1663
-spec: docs/loom/2026-11-16-roadmap-simplification/spec.md@ebd634a4
+intent: 2026-11-16-roadmap-simplification@486a3079
+spec: docs/loom/2026-11-16-roadmap-simplification/spec.md@4b25480c8
 charter: 1.1
 
 ## Task DAG
@@ -53,8 +53,25 @@ charter: 1.1
 - Test: A1 positive: selected-document; boundary: no-duplicate-plan. A2 positive: genuine-excerpt; negative: unsupported-pending. A3 positive: source-workflow-preserved; boundary: no-new-runtime. A4 positive: unchanged-original; boundary: no-migration. A5 positive: bounded-advice; negative: implicit-execution.
 - Risk: REQ-1–REQ-5; retain original failure/auditor disagreement; fresh semantic witnesses and cold reader, complete suite and existing adversarial rerun; Round2 of the original review episode.
 
+### Wave 5 — Add selective planning judgment
+
+**W5-01 Define matched planning-judgment trials** after: W4-02 acceptance: 6,7,8
+- Files: loom-workflow/tests/roadmap/planning_cases.json, docs/loom/2026-11-16-roadmap-simplification/evidence/
+- Test: A6 positive: useful-software-stages; boundary: justified-foundation. A7 positive: nonsoftware-research; negative: forced-software-intake. A8 positive: simple-approved-check; negative: planning-inflation.
+- Risk: REQ-6–REQ-8; agent-decided preserve the old skill snapshot before edits; four isolated matched cases, independent output grading and explicit model-observability limits; reuse earlier maintenance cases, no prose-pin tests.
+
+**W5-02 Integrate compact general planning knowledge** after: W5-01 acceptance: 2,5,6,7,8
+- Files: loom-workflow/skills/roadmap/SKILL.md, loom-workflow/skills/roadmap/README.md, loom-workflow/CHANGELOG.md
+- Test: A2 positive: selected-document; boundary: no-duplicate-plan. A5 positive: preserve-reported-status; negative: plan-as-execution-authority. A6 positive: useful-software-stages; boundary: justified-foundation. A7 positive: nonsoftware-research; negative: forced-software-intake. A8 positive: simple-approved-check; negative: planning-inflation.
+- Risk: REQ-2/REQ-5–REQ-8; agent-decided replace generic planning guidance in place, preserve description bytes and 5.26.0 unreleased version; no new skill, bundle, runtime, fields, formula or recurring ceremony.
+
+**W5-03 Verify new and retained obligations** after: W5-02 acceptance: 1,2,3,4,5,6,7,8
+- Files: docs/loom/2026-11-16-roadmap-simplification/evidence/, docs/loom/2026-11-16-roadmap-simplification/acceptance-test-report.md
+- Test: A1 positive: ordinary-document; boundary: existing-document. A2 positive: update-verified-result; negative: conflicting-evidence. A3 positive: session-retained; negative: map-runtime-absent. A4 positive: preserved-data; boundary: no-migration. A5 positive: bounded-advice; negative: implicit-execution. A6 positive: useful-software-stages; boundary: justified-foundation. A7 positive: nonsoftware-research; negative: forced-software-intake. A8 positive: simple-approved-check; negative: planning-inflation.
+- Risk: REQ-1–REQ-8; agent-decided native same-platform tests only; clean independent acceptance, scoped adversary, full locked suite and renewed closing review; no private finance excerpt publication or installed-host triggering claim.
+
 ## Simplicity check
-- Reuse the existing manifest generator without editing it — taken
+- none found
 
 ## Questions asked
 
@@ -75,3 +92,5 @@ Clarification — what — 你說的「排程控制」主要指什麼？這會�
 
 9. User authorized both local wording repairs on 2026-11-16. These preserve existing Acceptance and continue W1-01 obligations; do not reset the review episode. Round1 target2ba8a74a/digest04baa9c40ead33f1416aa8e2bca41fd2a3ff2b4c remains historical; repaired content requires Round2 verification.
 10. Raw finance dogfood excerpts remain local-only; publish only a minimized finding/retest summary. The 15pp waiver remains the only waived condition.
+11. User confirmed new Acceptance 6–8 on 2026-11-17. These substantive obligations support a new bounded episode; retain prior two-digest history and failed-task retries. Evidence/planning-knowledge-scope.md records the distinction from W4 repairs; pre-build review must challenge it.
+12. Commit the authorized research input. Existing passing evidence proves only its tested scope; changed content needs renewed acceptance and review before publication. No merge or production installation is authorized.
