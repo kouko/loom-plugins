@@ -1,0 +1,96 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  2%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+................................................F....................... [ 37%]
+........................................................................ [ 40%]
+.............................F.......................................... [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 98%]
+.................................................                        [100%]
+=================================== FAILURES ===================================
+__________________ TestChecks.test_real_repo_checks_are_green __________________
+[gw7] darwin -- Python 3.13.5 /Users/kouko/.cache/uv/builds-v0/.tmpeeiFL4/bin/python
+
+self = <test_check_mechanisms.TestChecks object at 0x1082c7820>
+
+    def test_real_repo_checks_are_green(self):
+        """W3-02 A10 positive: every recomputed mechanism in this repo is
+        registered with an eval, and nothing registered is stale."""
+        result = cm.run_checks(REPO)
+>       assert result.exit_code == 0, result.findings
+E       AssertionError: [Finding(rule='R1', mechanism_id='roadmap', detail='class skill: recomputed but not registered in mechanisms.yaml'), F...chanism_id='decision-map', detail='eval path does not exist: loom-workflow/tests/decision-map/test_start_delivery.py')]
+E       assert 1 == 0
+E        +  where 1 = CheckResult(exit_code=1, findings=[Finding(rule='R1', mechanism_id='roadmap', detail='class skill: recomputed but not ...uage-anchor.py', 'UserPromptSubmit::language-anchor.py', 'PostToolUse:Skill:language-anchor.py@opencode'], warnings=[]).exit_code
+
+loom-code/tests/test_check_mechanisms.py:386: AssertionError
+________ TestRealYaml.test_real_mechanisms_yaml_parses_and_evals_exist _________
+[gw7] darwin -- Python 3.13.5 /Users/kouko/.cache/uv/builds-v0/.tmpeeiFL4/bin/python
+
+self = <test_check_mechanisms.TestRealYaml object at 0x1082b87d0>
+
+    def test_real_mechanisms_yaml_parses_and_evals_exist(self):
+        path = REPO / "docs" / "loom" / "evidence" / "mechanisms.yaml"
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        assert data["version"]
+        assert data["counting"].strip()
+        mechs = data["mechanisms"]
+        assert mechs
+        ids = [m["id"] for m in mechs]
+        assert len(ids) == len(set(ids)), "duplicate mechanism id"
+        for m in mechs:
+            assert m.get("eval"), m["id"]
+            assert m["class"] in {"skill", "checker-rule", "hook", "contract", "prose-gate", "host-hygiene"}
+            ev = m["eval"]
+            if ev.startswith("pending"):
+                assert cm.PENDING_RE.match(ev), f"{m['id']}: malformed pending literal {ev!r}"
+                continue
+            if ev.startswith("cold-read:"):
+                p = ev.split("cold-read:", 1)[1].strip()
+                assert (REPO / p).is_file(), f"{m['id']}: cold-read path missing {p}"
+                continue
+            file_part = ev.split("::", 1)[0].strip()
+>           assert (REPO / file_part).is_file(), f"{m['id']}: eval path missing {file_part}"
+E           AssertionError: decision-map: eval path missing loom-workflow/tests/decision-map/test_start_delivery.py
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = (PosixPath('/Users/kouko/.herdr/worktrees/loom-plugins/roadmap') / 'loom-workflow/tests/decision-map/test_start_delivery.py').is_file
+
+loom-code/tests/test_check_mechanisms.py:743: AssertionError
+=========================== short test summary info ============================
+FAILED loom-code/tests/test_check_mechanisms.py::TestChecks::test_real_repo_checks_are_green
+FAILED loom-code/tests/test_check_mechanisms.py::TestRealYaml::test_real_mechanisms_yaml_parses_and_evals_exist
+2 failed, 2855 passed in 116.12s (0:01:56)
