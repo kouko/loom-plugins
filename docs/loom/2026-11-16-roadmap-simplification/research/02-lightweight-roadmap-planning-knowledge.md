@@ -17,9 +17,12 @@ Identify small, directly usable planning heuristics that could improve the
 quality of software roadmaps while preserving ordinary Markdown, selected
 existing documents, optional creation and existing delivery authorization.
 The user requested research, not implementation, publication or a new schema.
-This is a local research draft; the reviewed skill and existing PR are unchanged.
+This record initially described research-only scope before W5 authorization.
+The user subsequently accepted the bounded proposal; the current candidate and
+validation work are tracked in [the plan](../plan.md), not inferred from this research.
 
-Context: the 93-line [current skill](../../../../loom-workflow/skills/roadmap/SKILL.md)
+Context: the 93-line baseline skill at 087f5057 (the [skill path](../../../../loom-workflow/skills/roadmap/SKILL.md)
+now contains the subsequent candidate)
 already addresses goals, completion conditions, dependencies, minimum useful next
 stages, estimates, evidence scope and execution boundaries. [Earlier research](01-roadmap-skill-ownership.md)
 settled document ownership. This record does not reopen that decision.
@@ -128,13 +131,15 @@ its tested scope, not adoption, user benefit or whole-stage acceptance.
 
 ## Limitations and open questions
 
-- No variant has been implemented or behaviorally compared. The recommendation
-  is a source-backed design proposal, not an improved skill or dogfood result.
+- At research completion no variant had been implemented or compared. The
+  recommendation itself is a source-backed proposal, not an improvement result;
+  later implementation and trial evidence must be judged separately.
 - The proposed combination has not been established as universally superior;
   transfer from teams to individual coding agents remains unmeasured.
 - Six lenses are reasoning aids, not a universal priority ordering. Dependencies,
   required fixes and genuine constraints may override apparent impact/effort.
 - Quantitative outcome metrics may be unavailable. Describe observable success
   and unknown evidence rather than manufacturing baselines, targets or confidence.
-- This record is uncommitted research only. It does not change the confirmed
-  requirements, current reviewed content, acceptance, attestation or merge consent.
+- The subsequent accepted scope is recorded in the renewed intent and spec.
+  This research alone establishes neither implementation success, acceptance,
+  matching attestation nor merge consent.
