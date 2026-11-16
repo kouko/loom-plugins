@@ -1,5 +1,5 @@
 # Optional project roadmap and planning-mechanism retirement — spec
-intent: 2026-11-16-roadmap-simplification@6c3b1663
+intent: 2026-11-16-roadmap-simplification@486a3079
 pre-build-review: required — replaces distributed skill and document contracts across three plugins; prior review of 872872ad does not cover this revision
 
 ## Requirements
