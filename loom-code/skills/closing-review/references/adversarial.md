@@ -81,6 +81,19 @@ store, the programs it graduated and the programs supplied to
 `finalize-review`, so re-running a path already counted adds none, while a
 repository test named as this change's program is a path like any other.
 
+Automatic discovery excludes a prerequisite only when another change's
+canonical attestation, committed before this intent first appeared, validates
+at its historical tree and records a passing execution of that program. The
+same path, blob and file mode must persist through every relevant tree after
+that evidence; an unchanged merge preserves identity, while copying, changing
+or changing then restoring a program does not. Missing or invalid evidence
+grants no exclusion. Existing treatment of moves and renames is unchanged.
+Explicitly supplying a prerequisite to `finalize-review` still counts it in
+this change's union. Attribution changes only automatic counting: branch-wide
+review, required reviewers, automatic skips and full package testing retain
+their existing scope, and historical evidence remains unchanged rather than
+becoming this change's passing attestation.
+
 ## Reuse first, update with evidence
 
 Before writing any probe, the adversary checks what already covers the
