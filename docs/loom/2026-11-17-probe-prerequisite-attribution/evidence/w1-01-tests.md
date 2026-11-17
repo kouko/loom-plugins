@@ -84,3 +84,44 @@ Correction GREEN, using the complete focused command above:
 ```
 
 Both validator/discovery guards passed. `git diff --check` passed.
+
+## Integration correction: unchanged merge history
+
+Defect class: a merge appearing in full Git history does not establish that
+the path changed. The sole log-emptiness check in `probe_attribution.py` was
+replaced with identity comparisons at every relevant evidence-descended tree.
+The query retains full history and selects the evidence-to-HEAD ancestry path;
+each returned commit must preserve path, blob and mode. Linear and side-branch
+modification followed by restoration both remain ineligible.
+
+The existing positive fixture now merges an unrelated trunk commit whose tree
+does not yet contain the prerequisite paths. Before correction:
+
+```text
+AssertionError: Left contains 5 more items, first extra item: 'loom-code/tests/test_prior_0.py'
+1 failed in 2.34s
+```
+
+Read-only provenance verification on the paused source at `9de82a7`, selecting
+`2026-11-16-finance-research-continuation`, returned:
+
+```text
+proven_prerequisite_count: 5
+proven: test_fiscal_provenance.py, test_projection_type.py,
+        test_quarter_publication.py, test_sec_filing_identifier.py,
+        test_sec_source_identity.py
+remaining: test_research_continuation.py
+```
+
+These paths are under `obsidian-finance/tests/`. The check called only the
+attribution helper, which reads Git and JSON and validates recorded evidence;
+it did not execute finance tests or finalization or alter historical evidence.
+
+Merge correction GREEN, using the complete focused command above:
+
+```text
+84 passed in 87.97s (0:01:27)
+```
+
+The unchanged-merge positive and side-branch modify/revert negative both pass,
+alongside all original focused regressions. `git diff --check` passed.

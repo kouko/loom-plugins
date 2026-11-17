@@ -66,8 +66,14 @@ def prerequisite_probe_programs(
                 current = git_maybe(repo, "ls-tree", head_sha, "--", artifact)
                 if not old or old != current or not old.startswith(("100644 blob ", "100755 blob ")):
                     continue
-                changes = git_maybe(repo, "log", "--full-history", "--format=%H",
+                changes = git_maybe(repo, "log", "--full-history", "--ancestry-path", "--format=%H",
                                     f"{revision}..{head_sha}", "--", artifact)
-                if changes == "":
+                # A full-history log also lists merges whose other parent did
+                # not yet carry this path. Only actual tree identity changes
+                # on evidence-descended history invalidate provenance.
+                if changes is not None and all(
+                    git_maybe(repo, "ls-tree", commit, "--", artifact) == old
+                    for commit in changes.splitlines()
+                ):
                     proven.add(artifact)
     return proven

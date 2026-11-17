@@ -53,6 +53,11 @@ def prerequisite_repo(tmp_path, damage=None):
 
 def test_inherited_five_are_excluded_without_changing_scope_or_evidence(tmp_path, monkeypatch):
     repo, prior, current, evidence = prerequisite_repo(tmp_path)
+    git(repo, "checkout", "-q", "main")
+    (repo / "trunk.txt").write_text("unrelated trunk change\n")
+    commit_all(repo, "trunk changes without prerequisite paths")
+    git(repo, "checkout", "-q", "feature")
+    git(repo, "merge", "--no-edit", "main")
     # Later publication metadata is not a new prerequisite boundary. The old
     # canonical revision still validates at its own historical tree.
     evidence.write_text(json.dumps({"content_digest": "later malformed metadata"}))
@@ -93,7 +98,7 @@ def test_inherited_five_are_excluded_without_changing_scope_or_evidence(tmp_path
     assert graduated_probe_programs(repo, head, CHANGE) == []
 
 
-@pytest.mark.parametrize("damage", ["invalid", "malformed", "late", "changed", "copy", "revert", "mode"])
+@pytest.mark.parametrize("damage", ["invalid", "malformed", "late", "changed", "copy", "revert", "side-revert", "mode"])
 def test_unproven_or_changed_prerequisites_stay_counted(tmp_path, damage):
     repo, prior, current, evidence = prerequisite_repo(tmp_path, damage)
     if damage in {"invalid", "malformed", "late"}:
@@ -104,6 +109,8 @@ def test_unproven_or_changed_prerequisites_stay_counted(tmp_path, damage):
         current = str(copied.relative_to(repo))
         commit_all(repo, "copy")
     else:
+        if damage == "side-revert":
+            git(repo, "checkout", "-q", "-b", "side")
         path = repo / prior[0]
         original = path.read_text()
         if damage == "mode":
@@ -111,9 +118,12 @@ def test_unproven_or_changed_prerequisites_stay_counted(tmp_path, damage):
         else:
             path.write_text(original + "\n# changed\n")
         commit_all(repo, "modify prerequisite")
-        if damage == "revert":
+        if damage in {"revert", "side-revert"}:
             path.write_text(original)
             commit_all(repo, "revert prerequisite")
+        if damage == "side-revert":
+            git(repo, "checkout", "-q", "feature")
+            git(repo, "merge", "--no-ff", "--no-edit", "side")
     head = git(repo, "rev-parse", "HEAD")
     counted = graduated_probe_programs(repo, head, CHANGE)
     assert current in counted
