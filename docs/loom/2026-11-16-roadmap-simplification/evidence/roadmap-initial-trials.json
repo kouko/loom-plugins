@@ -1,0 +1,401 @@
+{
+  "scope": "One bounded initial run per case per arm; inherited native agents. Within-arm case contexts shared; separate project fixtures. No timing statistics or installed-host claims.",
+  "sequencing": "baseline spawned before candidate draft and candidate execution",
+  "arms": {
+    "baseline": {
+      "ordinary-document": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "created ROADMAP.md"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/ordinary-document/response.md",
+          "actual_files": {
+            "ROADMAP.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/ordinary-document/actual-files/ROADMAP.md",
+              "sha256": "90c8b9fc0635bf3ad76ce999cf4b7d2e18c902c24c7c5f4b14f73823c44be057"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/ordinary-document/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "已建立 ROADMAP.md，供後續 session 接續；本次僅完成規劃。\n\n- 順序：整理兩種真實樣本 → 確認實作授權後製作匯入 → 用實際檔案驗證。\n- 完成條件：兩種格式都能正確匯入。\n- 下一步：收集兩份樣本並寫下預期結果。工時與日期目前未知。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ actual/ROADMAP.md\n@@ -0,0 +1,17 @@\n+# 個人財務匯入規劃\n+\n+目標：匯入帳單，免去手動重新輸入。\n+完成條件：兩種真實樣本格式都能正確匯入。\n+範圍：本次僅規劃，尚未授權實作。\n+\n+## 階段\n+1. 整理樣本格式：收集兩種真實樣本，記錄欄位、日期與金額格式，以及預期匯入結果。完成依據：兩份樣本與對應結果可供實作及驗證。\n+2. 製作匯入功能：依樣本逐一支援兩種格式。開始前確認實作授權；完成後進入實際檔案驗證。\n+3. 驗證實際檔案：使用兩種真實樣本匯入並逐項對照預期結果；記錄通過與失敗，修正後重驗。兩種格式皆通過才達成完成條件。\n+\n+目前：尚無樣本或測試結果的證據。\n+下一步：收集並整理兩種真實樣本及預期結果。\n+未知：格式細節、工時與日期；取得樣本後再評估，不承諾完成日。\n+\n+## 跨 session 接續\n+接續時先讀本檔與已保存的樣本／驗證紀錄。每次有新證據才更新目前狀態、下一步與未知事項，附上證據位置；未完成的項目保留。\n"
+      },
+      "existing-document": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "no project file mutation"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/existing-document/response.md",
+          "actual_files": {
+            "planning/finance.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/existing-document/actual-files/planning/finance.md",
+              "sha256": "4bb6c23a62b6133f9380ed220a4f87d247a00903887628b1370688ca78347c02"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/existing-document/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "現在先取得第二種格式的真實樣本。planning/finance.md 的目前階段仍是整理樣本，沒有新結果可更新；工時仍未知。\n",
+        "diff": ""
+      },
+      "update-verified-result": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "updated ROADMAP.md"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/update-verified-result/response.md",
+          "actual_files": {
+            "ROADMAP.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/update-verified-result/actual-files/ROADMAP.md",
+              "sha256": "f29c3aea83adb0bf2d2ecf0bd9092a1f7da0113402841aa67f21798e057fef69"
+            },
+            "evidence/first-format.txt": {
+              "path": "/private/tmp/roadmap-eval-baseline/update-verified-result/actual-files/evidence/first-format.txt",
+              "sha256": "e8666d720dba35499408183b75bea2983d39915f4b07487450c297f807ee89d7"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/update-verified-result/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "已更新 ROADMAP.md：第一種格式的樣本匯入於 2026-11-16、版本 abc123 通過；第二種仍未測試。下一步先處理第二種格式，再驗證真實樣本。尚無驗收或發布結果。依據：evidence/first-format.txt。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ actual/ROADMAP.md\n@@ -1,5 +1,8 @@\n # Imports\n Goal: two formats import correctly\n-Current: first-format implementation underway\n-Next: verify first format, then second\n+Current: first-format sample import passed at revision abc123 on 2026-11-16; second format not tested\n+Next: handle second format, then verify its real sample\n Unknown: second-format effort\n+Evidence: evidence/first-format.txt\n+Acceptance: not requested\n+Release: none observed\n"
+      },
+      "conflicting-evidence": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "updated ROADMAP.md"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/conflicting-evidence/response.md",
+          "actual_files": {
+            "ROADMAP.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/conflicting-evidence/actual-files/ROADMAP.md",
+              "sha256": "6ad3f2734ea43cd13e8eabd5427b4846a533ef467a6acb5b55fb867744c4dc6d"
+            },
+            "evidence/latest.txt": {
+              "path": "/private/tmp/roadmap-eval-baseline/conflicting-evidence/actual-files/evidence/latest.txt",
+              "sha256": "f8bb9c0535fedd67b6fe5eec3794cc33b405c31f1b74f9e98793a6fa95955c06"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/conflicting-evidence/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "已更正 ROADMAP.md：第一種格式通過，第二種失敗，尚未完成；原先「兩種皆通過、接著發布」的說法不符最新證據。\n\n下一步先查明第二種格式的失敗原因，提出修正並在取得實作授權後處理，再重新測試。目前沒有驗收或發布的證據。依據：evidence/latest.txt。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ actual/ROADMAP.md\n@@ -1,3 +1,6 @@\n # Imports\n-Current: complete, both formats verified\n-Next: publish\n+Current: first format PASS; second format FAIL; completion not established\n+Next: investigate the second-format failure and plan its correction, then re-test; implementation requires authorization\n+Evidence: evidence/latest.txt (latest observed test overrides the prior completion claim)\n+Acceptance: none observed\n+Publication: none observed; not ready to publish\n"
+      },
+      "authorized-handoff": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "no project file mutation"
+          ],
+          "limitations": [
+            "Implementation source and build task unavailable in fixture; no implementation performed."
+          ],
+          "response_path": "/private/tmp/roadmap-eval-baseline/authorized-handoff/response.md",
+          "actual_files": {
+            "ROADMAP.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/authorized-handoff/actual-files/ROADMAP.md",
+              "sha256": "ec6e37c653370d3a50542ee2a4d1b29826ef1d157d7b00f7fe98ef4ec401d5bb"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/authorized-handoff/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "接續已批准的第二種格式實作，完成後交由獨立驗證。這個工作目錄只有 ROADMAP.md，沒有實作原始碼或既有 build 任務的執行資料，因此本次無法實際續做；未變更規劃或宣稱完成。請提供既有實作工作目錄或任務位置，我會沿用原授權接續。\n",
+        "diff": ""
+      },
+      "plan-as-execution-authority": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "no project file mutation"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/plan-as-execution-authority/response.md",
+          "actual_files": {
+            "ROADMAP.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/plan-as-execution-authority/actual-files/ROADMAP.md",
+              "sha256": "32e3b626bce5c53aa508041ed51aa11b3da0821a3132cb46c96072be9af058e1"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/plan-as-execution-authority/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "目前順序缺少驗證與驗收，日期也沒有估算依據。\n\n- 建議順序：確認樣本與完成條件 → 實作 → 實際檔案驗證 → 驗收 → 依專案發布流程安排合併與發布。合併和發布的先後需確認專案流程。\n- 「下週五」僅是未確認估計；應先釐清樣本、工作量與驗證所需時間，再給日期。\n\n本次只檢查規劃，未修改檔案，也未執行實作、發布或合併。\n",
+        "diff": ""
+      },
+      "missing-advice-only": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "no project file mutation"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/missing-advice-only/response.md",
+          "actual_files": {
+            "intent.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/missing-advice-only/actual-files/intent.md",
+              "sha256": "82b933609c0446d9abf7c9f62762a50f47261a4eb4325af6bc5f5c9e91abc6e5"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/missing-advice-only/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "先收集第二種格式的真實樣本，並記錄預期匯入結果；這是 intent.md 已確認的下一步，也能補齊後續實作與驗證所需資料。\n",
+        "diff": ""
+      },
+      "ambiguous-document": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "no project file mutation"
+          ],
+          "limitations": [
+            "Selected planning document unresolved; clarification requested."
+          ],
+          "response_path": "/private/tmp/roadmap-eval-baseline/ambiguous-document/response.md",
+          "actual_files": {
+            "planning/imports.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/ambiguous-document/actual-files/planning/imports.md",
+              "sha256": "3ed7388e196f79571ac991aafb3f5258509664ab0eb8264a0099834b5a2aba3d"
+            },
+            "planning/reports.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/ambiguous-document/actual-files/planning/reports.md",
+              "sha256": "04eab1f19e2de905f7023d30fc047897a24be60c24130a955aea4d7ca4f57e15"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/ambiguous-document/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "目前有 planning/imports.md 與 planning/reports.md，無法確定你指哪份。要接續匯入規劃，還是報表規劃？確認前未改動檔案。\n",
+        "diff": ""
+      },
+      "unreadable-document": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "no project file mutation"
+          ],
+          "limitations": [
+            "ROADMAP.md: actual read denied; original supplied bytes remain in initial.json; no byte snapshot or content diff asserted"
+          ],
+          "response_path": "/private/tmp/roadmap-eval-baseline/unreadable-document/response.md",
+          "actual_files": {},
+          "diff_path": "/private/tmp/roadmap-eval-baseline/unreadable-document/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "交接資訊指出第二種格式仍待測試；目前可確認的缺口只有這項。讀取 ROADMAP.md 實際遭到權限拒絕，因此無法核對完整進度或其他待辦，也沒有改寫檔案。請提供可讀版本或恢復讀取權限後，才能完整接續。\n",
+        "diff": ""
+      },
+      "preserve-user-change": {
+        "summary": {
+          "actions": [
+            "read supplied fixture context and request",
+            "updated ROADMAP.md"
+          ],
+          "limitations": [],
+          "response_path": "/private/tmp/roadmap-eval-baseline/preserve-user-change/response.md",
+          "actual_files": {
+            "ROADMAP.md": {
+              "path": "/private/tmp/roadmap-eval-baseline/preserve-user-change/actual-files/ROADMAP.md",
+              "sha256": "7f17076271a0ddf675ecfadfd3cee75950941437002a46bda7bdff6c6239539e"
+            },
+            "evidence/old.txt": {
+              "path": "/private/tmp/roadmap-eval-baseline/preserve-user-change/actual-files/evidence/old.txt",
+              "sha256": "a6e731d994a7040c19f77bde32ac4d2c984f1006d9078db0a89d0c98422117ab"
+            }
+          },
+          "diff_path": "/private/tmp/roadmap-eval-baseline/preserve-user-change/changes.diff",
+          "timing": "not observed"
+        },
+        "response": "已更新 ROADMAP.md，保留你今天改的「目前只做 CSV」。目前證據僅支持 CSV 單元測試通過，真實樣本驗證仍待完成；下一步維持 CSV 樣本驗證，未恢復舊有 PDF 範圍。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ actual/ROADMAP.md\n@@ -1,3 +1,5 @@\n # Imports\n Goal: CSV only for now (user changed today)\n+Current: CSV unit test passed according to evidence/old.txt; real sample verification pending\n Next: CSV sample verification\n+Evidence: evidence/old.txt; its earlier PDF scope is superseded by today's CSV-only goal\n"
+      }
+    },
+    "candidate": {
+      "unreadable-document": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "preserved all supplied files"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable. Simulated unreadable marker did not prevent actual read; no OS denial claimed.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/unreadable-document/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/unreadable-document/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/unreadable-document/ROADMAP.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "本次實際可讀取 ROADMAP.md，但它只有「Private current plan」，未記錄進度；因此無法從文件確認目前缺口。依提供的交接描述，第二種格式測試仍待完成，但這不足以證明其餘工作已完成。未改動或替換文件，也未變更權限。\n",
+        "diff": ""
+      },
+      "update-verified-result": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "updated ROADMAP.md"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/update-verified-result/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/update-verified-result/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/update-verified-result/ROADMAP.md",
+            "/private/tmp/roadmap-eval-candidate/update-verified-result/evidence/first-format.txt"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "已更新 ROADMAP.md：依 evidence/first-format.txt，2026-11-16、版本 abc123 的第一種格式樣本匯入通過。第二種格式尚未測試，下一步先處理它；尚未請求驗收，也未發布。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ final/ROADMAP.md\n@@ -1,5 +1,5 @@\n # Imports\n Goal: two formats import correctly\n-Current: first-format implementation underway\n-Next: verify first format, then second\n+Current: first-format sample import passed on 2026-11-16 at revision abc123 (see evidence/first-format.txt); second format not tested; acceptance not requested; no release\n+Next: handle second format, then verify it\n Unknown: second-format effort\n"
+      },
+      "existing-document": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "preserved all supplied files"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/existing-document/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/existing-document/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/existing-document/planning/finance.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "先取得第二種真實樣本，讓兩種格式的匯入需求都能被核對。依 planning/finance.md，目前仍在蒐集樣本，沒有新結果可更新；工時未知，原文件保留。\n",
+        "diff": ""
+      },
+      "preserve-user-change": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "updated ROADMAP.md"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/preserve-user-change/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/preserve-user-change/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/preserve-user-change/ROADMAP.md",
+            "/private/tmp/roadmap-eval-candidate/preserve-user-change/evidence/old.txt"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "已更新 ROADMAP.md：保留今天改為僅處理 CSV 的方向。依 evidence/old.txt，CSV 單元測試通過，但真實樣本驗證仍待完成；下一步維持 CSV 樣本驗證，沒有擴回 PDF，也未宣稱完成驗收。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ final/ROADMAP.md\n@@ -1,3 +1,4 @@\n # Imports\n Goal: CSV only for now (user changed today)\n+Current: CSV unit test passed; sample verification pending (see evidence/old.txt); older PDF scope does not override today's CSV-only choice\n Next: CSV sample verification\n"
+      },
+      "missing-advice-only": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "preserved all supplied files"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/missing-advice-only/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/missing-advice-only/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/missing-advice-only/intent.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "先蒐集第二種真實樣本。intent.md 已確認這是下一步；拿到樣本後才能核對兩種格式的需求與預期匯入結果。本次僅給建議，未建立規劃文件。\n",
+        "diff": ""
+      },
+      "authorized-handoff": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "preserved all supplied files"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/authorized-handoff/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/authorized-handoff/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/authorized-handoff/ROADMAP.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "接續既有 build 工作：完成已批准的第二種格式實作，再做獨立驗證。目前提供的工作區只有 ROADMAP.md，缺少原始碼與既有 build 任務內容，無法實際續作；請提供該工作目錄或任務檔路徑。無新結果，規劃保持原樣。\n",
+        "diff": ""
+      },
+      "conflicting-evidence": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "updated ROADMAP.md"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/conflicting-evidence/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/conflicting-evidence/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/conflicting-evidence/ROADMAP.md",
+            "/private/tmp/roadmap-eval-candidate/conflicting-evidence/evidence/latest.txt"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "已更正 ROADMAP.md：evidence/latest.txt 顯示第一種通過、第二種失敗，因此先前「全部完成」的說法不成立，下一步不能直接發布。建議先查看第二種格式的失敗輸出，確認修復範圍，再走實作授權與驗證流程；本次只修正規劃，未實作。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ final/ROADMAP.md\n@@ -1,3 +1,3 @@\n # Imports\n-Current: complete, both formats verified\n-Next: publish\n+Current: first format PASS; second format FAIL (see evidence/latest.txt). Earlier claim that both formats were verified is contradicted by latest observed testing; acceptance and publication not observed\n+Next: inspect second-format failure evidence and define repair scope; verification and user acceptance remain before publication\n"
+      },
+      "plan-as-execution-authority": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "preserved all supplied files"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/plan-as-execution-authority/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/plan-as-execution-authority/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/plan-as-execution-authority/ROADMAP.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "順序需要補上驗證與驗收：實作匯入 → 獨立驗證 → 使用者驗收 → 發布 → 合併；發布與合併若有專案既定依賴，應依其流程安排。ROADMAP.md 目前從實作直接跳到發布，沒有證據支持完成。「下週五」只是未確認估計，缺少範圍、工時與驗證安排，不能當承諾。本次僅檢查，未改檔或執行計畫。\n",
+        "diff": ""
+      },
+      "ambiguous-document": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "preserved all supplied files"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/ambiguous-document/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/ambiguous-document/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/ambiguous-document/planning/imports.md",
+            "/private/tmp/roadmap-eval-candidate/ambiguous-document/planning/reports.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "目前有兩份規劃，下一步不同：planning/imports.md 是第二種格式，planning/reports.md 是圖表檢查。請指定要接續哪一份，這會決定更新的目標與下一步；確認前保留兩份原文。\n",
+        "diff": ""
+      },
+      "ordinary-document": {
+        "summary": {
+          "actions": [
+            "read fixture context, request and supplied files",
+            "updated ROADMAP.md"
+          ],
+          "limits": "No implementation, external calls, commits, or user acceptance; timing unavailable.",
+          "response_path": "/private/tmp/roadmap-eval-candidate/ordinary-document/final-response.md",
+          "diff_path": "/private/tmp/roadmap-eval-candidate/ordinary-document/changes.diff",
+          "actual_files": [
+            "/private/tmp/roadmap-eval-candidate/ordinary-document/ROADMAP.md"
+          ],
+          "timing": "unavailable"
+        },
+        "response": "已建立 ROADMAP.md：整理兩種真實樣本 → 實作匯入 → 實檔驗證。完成條件是兩種格式都能正確匯入；下一步先蒐集樣本與預期結果。日期與工時仍未知，本次僅建立規劃。\n",
+        "diff": "--- initial/ROADMAP.md\n+++ final/ROADMAP.md\n@@ -0,0 +1,13 @@\n+# 個人財務匯入規劃\n+\n+目標：匯入帳單，免去手動重打。\n+完成條件：兩種真實樣本格式都能正確匯入；實作、測試結果與使用者驗收分開記錄。\n+目前：僅批准規劃，尚無樣本或實作完成證據。\n+\n+## 階段\n+1. 整理樣本格式：取得兩種真實樣本，記錄欄位及預期匯入結果。完成條件是兩種樣本與預期結果可供核對。\n+2. 實作匯入：依樣本格式實作；開始前依既有實作流程確認授權。完成條件是兩種格式皆具備匯入功能，待實檔驗證。\n+3. 驗證實際檔案：逐種核對匯入結果與樣本預期；保留失敗結果。完成條件是兩種真實格式均正確匯入，再交由使用者驗收。\n+\n+下一步：蒐集兩種格式的真實樣本並整理預期結果。\n+未知：樣本目前是否齊全、日期與工時；均未承諾。\n"
+      }
+    }
+  }
+}

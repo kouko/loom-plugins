@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.26.0] — 2026-11-16 — route project planning to its unified owner
+
+- Point project planning to loom-workflow:roadmap while preserving active-change continuation and intent confirmation.
+- Remove retired map-origin authoring guidance from capture-intent and its paired template.
+
 ## [2.25.0] — 2026-11-13 — bound design research and simplify important proposals
 
 - Limit new evidence acquisition to online research and dialogue with the current user; select only question-appropriate inquiry after reusing sufficient evidence.

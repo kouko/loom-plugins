@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.83.0] — 2026-11-16 — retire map-origin intent contracts
+
+- Replace decision-map with roadmap in the shared tool inventory and remove map-existence intent validation and its optional field.
+- Retire the PURPOSE scaffold while preserving ordinary intent schema checks, historical documents and passive citation recognition.
+
 ## [3.82.0] — 2026-11-16 — recover authorized sandbox network failures
 
 - Distinguish connectivity evidence from authentication and permission failures without treating every transport error as DNS failure.

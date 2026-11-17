@@ -1,0 +1,91 @@
+{
+  "old-marketplace-result.json": {
+    "exit_code": 0,
+    "stdout": "{\n  \"marketplaceName\": \"loom\",\n  \"installedRoot\": \"/private/tmp/roadmap-local-upgrade-check/marketplace\",\n  \"alreadyAdded\": false\n}\n",
+    "stderr": ""
+  },
+  "old-plugin-result.json": {
+    "exit_code": 0,
+    "stdout": "{\n  \"pluginId\": \"loom-workflow@loom\",\n  \"name\": \"loom-workflow\",\n  \"marketplaceName\": \"loom\",\n  \"version\": \"5.25.0\",\n  \"installedPath\": \"/private/tmp/roadmap-local-upgrade-check/codex-profile/plugins/cache/loom/loom-workflow/5.25.0\",\n  \"authPolicy\": \"ON_INSTALL\"\n}\n",
+    "stderr": ""
+  },
+  "old-installed-inventory.json": {
+    "version": "5.25.0",
+    "skill_names": [
+      "critique",
+      "dbt-model-style",
+      "decision-map",
+      "git-memory",
+      "goal-create",
+      "handoff",
+      "independent-advisor",
+      "loom-interactive-diagram",
+      "loom-memory",
+      "loom-visualization",
+      "project-retro",
+      "recap-state",
+      "skill-retro",
+      "using-loom-workflow",
+      "whats-next"
+    ],
+    "arc_present": true
+  },
+  "new-plugin-result.json": {
+    "exit_code": 0,
+    "stdout": "{\n  \"pluginId\": \"loom-workflow@loom\",\n  \"name\": \"loom-workflow\",\n  \"marketplaceName\": \"loom\",\n  \"version\": \"5.26.0\",\n  \"installedPath\": \"/private/tmp/roadmap-local-upgrade-check/codex-profile/plugins/cache/loom/loom-workflow/5.26.0\",\n  \"authPolicy\": \"ON_INSTALL\"\n}\n",
+    "stderr": ""
+  },
+  "new-plugin-list.json": {
+    "exit_code": 0,
+    "stdout": "{\n  \"installed\": [\n    {\n      \"pluginId\": \"loom-workflow@loom\",\n      \"name\": \"loom-workflow\",\n      \"marketplaceName\": \"loom\",\n      \"version\": \"5.26.0\",\n      \"installed\": true,\n      \"enabled\": true,\n      \"source\": {\n        \"source\": \"local\",\n        \"path\": \"/private/tmp/roadmap-local-upgrade-check/marketplace/loom-workflow\"\n      },\n      \"marketplaceSource\": {\n        \"sourceType\": \"local\",\n        \"source\": \"/private/tmp/roadmap-local-upgrade-check/marketplace\"\n      },\n      \"installPolicy\": \"AVAILABLE\",\n      \"authPolicy\": \"ON_INSTALL\"\n    }\n  ],\n  \"available\": []\n}\n",
+    "stderr": ""
+  },
+  "before-upgrade-data.json": {
+    "notes.txt": "35244a063da3ee005826a0e76dc5d7893fb688794289f9e741d0cb10b11adb2e",
+    "ROADMAP.md": "f48be6e6c900ec581c62f1b3430076ec396e80740f3ab336bb36704eaa0dc481",
+    "docs/loom/PURPOSE.md": "34d771ec227ca4a1588260f1d2b5325e7b97911e69672a227913b244f84204b7",
+    "docs/loom/maps/legacy/MAP.md": "7e2f3640fed05eb97d90fe556c88ec654165c6d3fc7cd90c04a6ced1484de43f"
+  },
+  "upgrade-observations.json": {
+    "installed_version": "5.26.0",
+    "skill_count": 15,
+    "skill_names": [
+      "critique",
+      "dbt-model-style",
+      "git-memory",
+      "goal-create",
+      "handoff",
+      "independent-advisor",
+      "loom-interactive-diagram",
+      "loom-memory",
+      "loom-visualization",
+      "project-retro",
+      "recap-state",
+      "roadmap",
+      "skill-retro",
+      "using-loom-workflow",
+      "whats-next"
+    ],
+    "arc_present": false,
+    "all_four_data_files_unchanged": true,
+    "before": {
+      "notes.txt": "35244a063da3ee005826a0e76dc5d7893fb688794289f9e741d0cb10b11adb2e",
+      "ROADMAP.md": "f48be6e6c900ec581c62f1b3430076ec396e80740f3ab336bb36704eaa0dc481",
+      "docs/loom/PURPOSE.md": "34d771ec227ca4a1588260f1d2b5325e7b97911e69672a227913b244f84204b7",
+      "docs/loom/maps/legacy/MAP.md": "7e2f3640fed05eb97d90fe556c88ec654165c6d3fc7cd90c04a6ced1484de43f"
+    },
+    "after": {
+      "notes.txt": "35244a063da3ee005826a0e76dc5d7893fb688794289f9e741d0cb10b11adb2e",
+      "ROADMAP.md": "f48be6e6c900ec581c62f1b3430076ec396e80740f3ab336bb36704eaa0dc481",
+      "docs/loom/PURPOSE.md": "34d771ec227ca4a1588260f1d2b5325e7b97911e69672a227913b244f84204b7",
+      "docs/loom/maps/legacy/MAP.md": "7e2f3640fed05eb97d90fe556c88ec654165c6d3fc7cd90c04a6ced1484de43f"
+    },
+    "list_exit": 0,
+    "limitations": [
+      "Local marketplace plus isolated Codex profile only; no live model activation or production-profile update."
+    ]
+  },
+  "scope": "Actual local-source installation/upgrade in isolated child Codex profile. No production install or live model invocation.",
+  "codex_version": "codex-cli 0.169.0",
+  "old_cache_after_upgrade": "Removed by the actual installer; old installation output and pre-upgrade inventory remain retained, old source backup remains."
+}

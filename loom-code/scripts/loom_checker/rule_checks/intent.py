@@ -37,36 +37,6 @@ def check_intent_schema(manifest, front, sections) -> list[tuple[str, str]]:
     return failures
 
 
-MAP_ORIGINATOR = re.compile(r"^map:\s*(\S+)$")
-
-
-def check_map_exists(repo: Path, front) -> list[tuple[str, str]]:
-    """A `map:` id names a Map that exists.
-
-    `start_delivery.py` writes both sides at once, but an intent written or
-    edited by hand carries free text, and a dangling id points the reader at
-    a Map that is not there while the change looks map-originated (W3
-    adversary P13). Both spellings of the same claim are resolved: the
-    `map:` field and an `originator: map:<id>`."""
-    failures = []
-    claims: list[tuple[str, str]] = []
-    map_id = front.get("map", "").strip()
-    if map_id:
-        claims.append(("map", map_id))
-    originator = front.get("originator", "").strip()
-    if (match := MAP_ORIGINATOR.match(originator)):
-        claims.append(("originator", match.group(1)))
-    for field, value in claims:
-        if not (repo / "docs" / "loom" / "maps" / value / "MAP.md").is_file():
-            failures.append((
-                "intent.schema",
-                f"`{field}: {'map:' if field == 'originator' else ''}{value}` names a "
-                f"Map that does not exist: no docs/loom/maps/{value}/MAP.md. An intent "
-                "cannot originate in a Map that is not there.",
-            ))
-    return failures
-
-
 IDENTIFIER_PATTERNS = [
     (
         re.compile(

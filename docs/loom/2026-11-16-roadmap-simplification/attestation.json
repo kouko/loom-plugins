@@ -1,0 +1,118 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-16-roadmap-simplification",
+  "content_digest": "66461d2b1db89b25d3b3b7c1393b840e5d8fd083",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_loom_checker_intent.py",
+      "artifact": "loom-code/tests/test_loom_checker_intent.py",
+      "result": "pass",
+      "command_digest": "20ada4790455c0c48b68b04c88fe52a7ab7586370932d8bb60e6222a86783d5a"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "9bbab926b5224456a467fdfd7d8f1306b9cb54b9",
+      "review_target_sha": "51e2755ae910190b7b7282e3c5e7fe3ca8de9e60",
+      "dimension_scores": {
+        "security": "PASS — Removed map-specific filesystem resolution; planning guidance preserves data and authority boundaries, and adds no execution surface.",
+        "architecture": "PASS — One ordinary-document owner replaces the map runtime; adjacent skills retain distinct intake, advice, restart and session-goal responsibilities.",
+        "correctness": "PASS — Cumulative retirement matches AC1–5, and selective planning guidance matches AC6–8 without mandatory intake or software-only routing. Earlier W4 status and continuation fixes remain present.",
+        "naming": "PASS — Roadmap names the remaining capability; deleted map and ARC operations are not presented as supported current operations.",
+        "tests": "PASS — Independently ran every surviving added/changed ordinary pytest file: 195 code, 79 workflow/root and 28 design tests passed (302 total). Read frozen cases, all 26 grade summaries and representative actual planning artifacts; no new prose-pin semantic test or empty executable is used.",
+        "refactoring": "PASS — The dedicated map runtime and its dedicated test population are deleted together; surviving generic intent and session-goal coverage remains.",
+        "cross-task-coherence": "PASS — Spec REQ1–8 map to implementation and verification; routing, templates, manifests and release references agree on roadmap replacement and SESSION preservation.",
+        "external-surface-grounding": "PASS — No new API, SDK, MCP or external CLI shape is introduced; guidance names existing skill entry contracts and local links resolve in executed packaging tests.",
+        "principles-conformance": "PASS — Optional plain Markdown, unchanged data, distinct authorization states and independent verification preserve the ratified principles; no new runtime mechanism or prose-only gate is introduced.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists at repository root.",
+        "deliberate-simplification": "PASS — No parser, automatic migration, ledger or scheduling is added; source-based semantic evidence explicitly excludes installed-host activation and universal behavior guarantees.",
+        "deletion-first": "PASS — AC6–8 are substantive user-confirmed new outcomes, not renamed W4 repairs. The 26-line net addition makes requested judgment explicit in place; retaining the older paragraph is a viable smaller alternative but does not explicitly carry the requested knowledge. No new abstraction is needed."
+      },
+      "findings": [],
+      "notes": [
+        "Recomputed originals from individual records: baseline 12/12 completed and 57/57 assertions; candidate 10/12 and 47/47. The ten complete matched pairs score 47/47 each; two assisted continuations remain separate. The -16.67-point first-attempt difference has unresolved attribution and is not a no-regression result.",
+        "The expanded AC6–8 support a new bounded episode while preserving prior Round1/Round2 and failed-task history. Controlled completed cases support conformance, not superiority; unobservable inherited models and partial traces prevent causal or installed-trigger conclusions.",
+        "Locked uv test invocations first failed before collection because the sandbox could not write its cache; system Python with pytest 9.1.1 then executed all 302 focused tests successfully. Did not run the complete package suite or a separate adversarial invocation."
+      ],
+      "reviewer": "/root/knowledge_closing_code",
+      "vendor": "codex",
+      "model": "inherited-unverified"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "spec+adversarial",
+      "reviewed_sha": "9bbab926b5224456a467fdfd7d8f1306b9cb54b9",
+      "review_target_sha": "51e2755ae910190b7b7282e3c5e7fe3ca8de9e60",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS",
+        "spec-conformance": "PASS",
+        "design-conformance": "N/A — No DESIGN.md applies; KICKOFF-DEFAULTS explicitly excludes it for this plugin repository and the spec introduces no interface flow.",
+        "principles-conformance": "PASS",
+        "user-judgment-leak": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Validated all 26 derived records against raw grading summaries and frozen per-case assertion wording/indexes; recomputed 12/12 versus 10/12 original completions, two boundary unknowns, two separate assisted continuations, 57+47+10 assertions, and ten completed matched pairs with 47/47 each. Read representative actual software, non-software and compatibility documents and checked embedded content hashes. These results establish neither measured improvement nor absence of execution regression; command attribution, backend model, effort, tokens and complete traces remain unknown.",
+        "Cumulative REQ-1–8 conformance includes optional ordinary-document ownership, retirement limited to map/ARC functionality, retained SESSION and workflow boundaries, preservation of history, conditional software foundations/migration constraints, and direct authorized continuation. New AC6–8 substantively expand the required outcomes and support the new episode; W4's previous digests, original failures, ambiguity and retry history remain retained rather than reset. Clean acceptance retests A1/2/5–8 and explicitly justifies A3/4 carryover.",
+        "No full package suite or adversarial program was run by this reviewer. Read the handed Build/adversarial records: mechanical success is scoped to preserved behavior; two fresh attack points found no success and yielded no new program. Neither those observations nor controlled acceptance prove production installation, automatic activation, cross-platform behavior or universal compliance. The sole 15pp waiver does not waive the remaining verification or acceptance requirements."
+      ],
+      "reviewer": "/root/knowledge_closing_conformance",
+      "vendor": "codex",
+      "model": "inherited-unverified"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "bce53ed0eeff16abddbcd73475b0e3b4541ad68c",
+  "tested_commit": "bb145e5d",
+  "reviewed_commit": "51e2755ae910190b7b7282e3c5e7fe3ca8de9e60",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    },
+    {
+      "acceptance": 8,
+      "status": "works"
+    }
+  ]
+}

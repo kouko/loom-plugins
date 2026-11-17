@@ -5,6 +5,7 @@ writes `needs-design: no` while its diff touches a declared interface
 surface must be blocked by the RECOMPUTED diff, not believed. Every
 fixture here is a real git repo under tmp_path for that reason.
 """
+# concern: Retiring map-origin checks must preserve unrelated intent validation and leave legacy metadata inert.
 from __future__ import annotations
 
 import subprocess
@@ -131,6 +132,21 @@ def test_complete_intent_passes(tmp_path: Path) -> None:
     seal(repo, intent)
     result = run_checker("intent", str(intent), cwd=repo)
     assert result.returncode == 0, result.stderr
+
+
+def test_legacy_map_metadata_requires_no_retired_runtime(tmp_path: Path) -> None:
+    """Historical free text remains readable without map existence validation."""
+    repo = make_repo(tmp_path)
+    intent = write_intent(
+        repo / "docs/loom/intent/legacy.md", originator="originator: map:old-plan"
+    )
+    text = intent.read_text().replace("kind: engineering", "map: old-plan\nkind: engineering")
+    intent.write_text(text)
+    seal(repo, intent)
+    result = run_checker("intent", str(intent), cwd=repo)
+    assert result.returncode == 0, result.stderr
+    assert intent.read_text() == text
+    assert not (repo / "docs/loom/maps").exists()
 
 
 def test_missing_frontmatter_field_blocks_schema(tmp_path: Path) -> None:
@@ -879,61 +895,6 @@ def test_ancestor_off_first_parent_chain_is_still_blocked(tmp_path: Path) -> Non
     result = run_checker("intent", str(intent), cwd=repo)
     assert result.returncode == 1
     assert "intent.needs-design-reason" in blocked_rules(result)
-
-
-# --- intent.schema: a `map:` names a Map that exists (W3 adversary P13) ----
-
-
-def write_map(repo: Path, map_id: str) -> None:
-    path = repo / "docs/loom/maps" / map_id / "MAP.md"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"---\nmap-id: {map_id}\n---\n\n## Destination\n", encoding="utf-8")
-
-
-def write_mapped_intent(repo: Path, map_id: str, *, originator: str | None = None) -> Path:
-    intent = write_intent(
-        repo / "docs/loom/intent/2026-09-02-a.md",
-        originator=originator if originator is not None else f"originator: map:{map_id}",
-    )
-    text = intent.read_text(encoding="utf-8").replace(
-        "kind: engineering", f"map: {map_id}\nkind: engineering", 1
-    )
-    intent.write_text(text, encoding="utf-8")
-    return intent
-
-
-def test_map_field_naming_a_map_that_exists_passes(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    write_map(repo, "alpha")
-    intent = write_mapped_intent(repo, "alpha")
-    seal(repo, intent)
-    result = run_checker("intent", str(intent), cwd=repo)
-    assert result.returncode == 0, result.stderr
-
-
-def test_map_field_naming_no_map_blocks(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    intent = write_mapped_intent(repo, "no-such-map-anywhere")
-    seal(repo, intent)
-    result = run_checker("intent", str(intent), cwd=repo)
-    assert result.returncode == 1
-    assert "intent.schema" in blocked_rules(result)
-    assert "no-such-map-anywhere" in result.stderr
-    assert "map" in result.stderr
-
-
-def test_originator_map_id_is_resolved_too(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    write_map(repo, "alpha")
-    intent = write_intent(
-        repo / "docs/loom/intent/2026-09-02-a.md",
-        originator="originator: map:ghost-map",
-    )
-    seal(repo, intent)
-    result = run_checker("intent", str(intent), cwd=repo)
-    assert result.returncode == 1
-    assert "intent.schema" in blocked_rules(result)
-    assert "ghost-map" in result.stderr
 
 
 # --- intent.needs-design-reason: only the front matter decides (W2 review) --

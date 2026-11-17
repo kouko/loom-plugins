@@ -1,0 +1,96 @@
+# Unified lightweight roadmap — plan
+intent: 2026-11-16-roadmap-simplification@486a3079
+spec: docs/loom/2026-11-16-roadmap-simplification/spec.md@4b25480c8
+charter: 1.1
+
+## Task DAG
+
+### Wave 1 — Replace planning ownership
+
+**W1-01 Create the lightweight roadmap skill and evaluation cases** after: none acceptance: 1,2,5
+- Files: loom-workflow/skills/roadmap/, loom-workflow/tests/roadmap/, docs/loom/2026-11-16-roadmap-simplification/evidence/
+- Test: A1 positive: ordinary-document; boundary: existing-document. A2 positive: update-verified-result; negative: conflicting-evidence. A5 positive: authorized-handoff; negative: plan-as-execution-authority.
+- Risk: REQ-1/REQ-2/REQ-5; agent-decided one instruction owner without runtime; matched baseline and skill cases must distinguish behavior from exact prose.
+
+**W1-02 Connect existing entry points and replace map discovery** after: W1-01 acceptance: 2,3
+- Files: loom-design/skills/capture-intent/, loom-workflow/skills/whats-next/, loom-workflow/skills/handoff/, loom-workflow/skills/using-loom-workflow/, loom-workflow/tests/whats-next/, loom-workflow/tests/handoff/, loom-design/tests/
+- Test: A2 positive: routed-planning; boundary: viable-work-continues. A3 positive: roadmap-discoverable; negative: map-discovery-removed.
+- Risk: REQ-2/REQ-3; agent-decided short ownership pointers; preserve existing handoff/whats-next tests and behavior, extend planning routing without introducing mandatory document creation.
+
+### Wave 2 — Retire obsolete contracts
+
+**W2-01 Remove map runtime and its intent contract** after: W1-02 acceptance: 3,4
+- Files: loom-workflow/skills/decision-map/, loom-workflow/tests/decision-map/, loom-code/scripts/loom_checker/rule_checks/intent.py, loom-code/tests/test_loom_checker_intent.py, loom-code/contract/, loom-design/skills/capture-intent/templates/intent.md, loom-code/tests/test_contract_manifest.py, loom-workflow/tests/scripts/test_skill_count.py
+- Test: A3 positive: replacement-inventory; negative: dangling-map-consumers. A4 positive: historical-files-retained; boundary: foreign-checkout-unchanged.
+- Risk: REQ-3/REQ-4; existing map and intent tests define removed coverage; narrow map-only validation intentionally, preserve unrelated schema checks and historical records.
+
+**W2-02 Retire repository-purpose drafting and preserve session goals** after: W2-01 acceptance: 3,4
+- Files: loom-workflow/skills/goal-create/, loom-workflow/tests/goal-create/, loom-code/contract/templates/PURPOSE.md, loom-code/contract/README.md, loom-code/scripts/check_contract_citations.py, loom-code/tests/test_check_contract_citations.py, loom-code/tests/test_probes_language_policy.py, loom-design/tests/interface/test_north_star_purpose_retarget.py
+- Test: A3 positive: session-goals-preserved; negative: arc-offers-absent. A4 positive: existing-purpose-readable; boundary: no-project-rewrite.
+- Risk: REQ-3/REQ-4; test_skill_md.py and test_readmes.py lose ARC-only coverage; preserve goal shape/lint/input-floor and host activation tests; historical references remain history.
+
+### Wave 3 — Release and verify
+
+**W3-01 Synchronize guides, inventories and release packet** after: W2-02 acceptance: 1,3
+- Files: README.md, loom-code/, loom-design/, loom-workflow/, .claude-plugin/marketplace.json, tests/, docs/loom/
+- Test: A1 positive: guide-ordinary-roadmap; negative: mandatory-roadmap-claim. A3 positive: thirty-skills; negative: stale-release-metadata.
+- Risk: REQ-1/REQ-3; agent-decided minor bump packet includes CHANGELOG entries, README versions and release-pin rewrites; sync generates derived manifests; no installed-cache or user-project update.
+
+**W3-02 Run behavioral boundary and integration verification** after: W3-01 acceptance: 1,2,3,4,5
+- Files: loom-workflow/tests/roadmap/, docs/loom/2026-11-16-roadmap-simplification/evidence/
+- Test: A1 positive: fresh-plan; boundary: absent-plan. A2 positive: resume; negative: failed-progress. A3 positive: session-retained; negative: map-runtime-absent. A4 positive: preserved-data; boundary: conflicting-edits. A5 positive: evidence-linked; negative: unauthorized-execution.
+- Risk: REQ-1–REQ-5; agent-decided independent adversary and semantic trials complement structural checks; full package suite required; no installed-host success inferred from source evaluation.
+
+### Wave 4 — Dogfood repair under the same requirements
+
+**W4-01 Clarify status evidence and workflow continuation** after: W3-02 acceptance: 2,5
+- Files: loom-workflow/skills/roadmap/SKILL.md, loom-workflow/CHANGELOG.md, docs/loom/2026-11-16-roadmap-simplification/evidence/
+- Test: A2 positive: preserve-reported-status; boundary: requirement-status-unknown. A5 positive: continue-approved-work; negative: unavailable-entry-invented-execution.
+- Risk: REQ-2/REQ-5; existing dogfood outputs supply semantic RED; agent-decided replace two paragraphs without schema/runtime, preserve explicit prior results and permission boundaries.
+
+**W4-02 Revalidate the repaired instruction contract** after: W4-01 acceptance: 1,2,3,4,5
+- Files: docs/loom/2026-11-16-roadmap-simplification/evidence/, loom-workflow/tests/roadmap/
+- Test: A1 positive: selected-document; boundary: no-duplicate-plan. A2 positive: genuine-excerpt; negative: unsupported-pending. A3 positive: source-workflow-preserved; boundary: no-new-runtime. A4 positive: unchanged-original; boundary: no-migration. A5 positive: bounded-advice; negative: implicit-execution.
+- Risk: REQ-1–REQ-5; retain original failure/auditor disagreement; fresh semantic witnesses and cold reader, complete suite and existing adversarial rerun; Round2 of the original review episode.
+
+### Wave 5 — Add selective planning judgment
+
+**W5-01 Define matched planning-judgment trials** after: W4-02 acceptance: 6,7,8
+- Files: loom-workflow/tests/roadmap/planning_cases.json, docs/loom/2026-11-16-roadmap-simplification/evidence/
+- Test: A6 positive: useful-software-stages; boundary: justified-foundation. A7 positive: nonsoftware-research; negative: forced-software-intake. A8 positive: simple-approved-check; negative: planning-inflation.
+- Risk: REQ-6–REQ-8; agent-decided preserve the old skill snapshot before edits; four isolated matched cases, independent output grading and explicit model-observability limits; reuse earlier maintenance cases, no prose-pin tests.
+
+**W5-02 Integrate compact general planning knowledge** after: W5-01 acceptance: 2,5,6,7,8
+- Files: loom-workflow/skills/roadmap/SKILL.md, loom-workflow/skills/roadmap/README.md, loom-workflow/CHANGELOG.md
+- Test: A2 positive: selected-document; boundary: no-duplicate-plan. A5 positive: preserve-reported-status; negative: plan-as-execution-authority. A6 positive: useful-software-stages; boundary: justified-foundation. A7 positive: nonsoftware-research; negative: forced-software-intake. A8 positive: simple-approved-check; negative: planning-inflation.
+- Risk: REQ-2/REQ-5–REQ-8; agent-decided replace generic planning guidance in place, preserve description bytes and 5.26.0 unreleased version; no new skill, bundle, runtime, fields, formula or recurring ceremony.
+
+**W5-03 Verify new and retained obligations** after: W5-02 acceptance: 1,2,3,4,5,6,7,8
+- Files: docs/loom/2026-11-16-roadmap-simplification/evidence/, docs/loom/2026-11-16-roadmap-simplification/acceptance-test-report.md
+- Test: A1 positive: ordinary-document; boundary: existing-document. A2 positive: update-verified-result; negative: conflicting-evidence. A3 positive: session-retained; negative: map-runtime-absent. A4 positive: preserved-data; boundary: no-migration. A5 positive: bounded-advice; negative: implicit-execution. A6 positive: useful-software-stages; boundary: justified-foundation. A7 positive: nonsoftware-research; negative: forced-software-intake. A8 positive: simple-approved-check; negative: planning-inflation.
+- Risk: REQ-1–REQ-8; agent-decided native same-platform tests only; clean independent acceptance, scoped adversary, full locked suite and renewed closing review; no private finance excerpt publication or installed-host triggering claim.
+
+## Simplicity check
+- none found
+
+## Questions asked
+
+① — what — 這個目標與驗收範圍符合你的意思嗎？
+Clarification — what — 你說的「排程控制」主要指什麼？這會決定 roadmap skill 是協助規劃，還是要負責實際執行。
+
+## Risks
+
+1. Shared intent and goal tests must preserve unrelated coverage; retirement deliberately removes map-only and ARC-only capabilities rather than disguising coverage loss.
+2. Existing family-relocation records remain untouched; source retirement removes their operational support, not their history. No automatic converter or cross-checkout edits.
+3. No timed/background execution is authorized. Skill evaluations must challenge accidental execution, invented dates, forced scaffolding, ambiguous documents and unverified completion.
+4. Behavioral trials use existing host-native agents and controlled fixture documents; retain matched no-skill baselines, input prompts, observed outputs, failures and limits. No external-vendor dispatch without opt-in.
+5. Version targets are agent-decided at the last functional fix; include each changed plugin's minor bump, synchronized changelog/README pins and derived manifests before finalization.
+6. Engineering exemption applies to decision point ②; user selected unified ownership explicitly. Rewritten spec reviewed independently at ebd634a4; original review does not cover it.
+7. Publication remains authorized after checks; merge separate. Preserve GitHub connectivity failures; unavailable remote evidence is unconfirmed, not a delivery pass.
+
+8. user-decided — On 2026-11-16 the user explicitly waived only the skill-authoring 15-percentage-point improvement threshold; retain semantic evaluation, all tests, independent reviews and acceptance. No comparative improvement is claimed.
+
+9. User authorized both local wording repairs on 2026-11-16. These preserve existing Acceptance and continue W1-01 obligations; do not reset the review episode. Round1 target2ba8a74a/digest04baa9c40ead33f1416aa8e2bca41fd2a3ff2b4c remains historical; repaired content requires Round2 verification.
+10. Raw finance dogfood excerpts remain local-only; publish only a minimized finding/retest summary. The 15pp waiver remains the only waived condition.
+11. User confirmed new Acceptance 6–8 on 2026-11-17. These substantive obligations support a new bounded episode; retain prior two-digest history and failed-task retries. Evidence/planning-knowledge-scope.md records the distinction from W4 repairs; pre-build review must challenge it.
+12. Commit the authorized research input. Existing passing evidence proves only its tested scope; changed content needs renewed acceptance and review before publication. No merge or production installation is authorized.

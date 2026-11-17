@@ -1,22 +1,8 @@
 # concern: unavailable Codex Goal tool must not be treated as native activation.
 """
-Structural tests for SKILL.md, the skill's entry point (Task 5).
-
-Tests:
-  1. test_declares_two_modes_and_conditional_arc — both mode names
-     (SESSION, ARC) appear as headings.
-  2. test_reference_pointers_resolve — cross-seam probe: every relative
-     `references/*` and `scripts/*` path written in SKILL.md (Task 2's
-     seam) resolves on disk relative to the skill directory.
-  3. test_floor_invocation_line_names_the_script — cross-seam probe:
-     the invocation line SKILL.md gives for the mechanical floor names
-     Task 3's script path, and that path exists.
-  4. test_session_activation_rules_are_one_registered_gate — the gate
-     block exists in SKILL.md and references/input-floor.md.
-  5. test_arc_points_at_the_purpose_template_without_restating_it — ARC
-     reproduces none of the purpose template's own field text verbatim;
-     that template is the format SSOT.
-  6. test_invocation_section_counts_the_offer_sites_that_exist.
+Structural tests for the SESSION-only skill, reference/script seams,
+activation gate and actual offer-site count. Retired ARC authoring and
+PURPOSE scaffold no longer form part of this skill's contract.
 
 The rules' wording is review-only.
 
@@ -84,12 +70,12 @@ def _gate(text: str, gate_id: str) -> str:
     return _normalize_ws(match.group(1))
 
 
-def test_declares_two_modes_and_conditional_arc():
+def test_session_is_the_only_mode_and_purpose_scaffold_is_retired():
     text = _read_skill_md()
-
-    # --- Both mode names appear as their own sections. ---
-    _section(text, "SESSION mode")
-    _section(text, "ARC mode")
+    modes = set(re.findall(r"^## ([A-Z]+) mode$", text, re.M))
+    assert modes == {"SESSION"}
+    assert not PURPOSE_TEMPLATE_PATH.exists()
+    assert "PURPOSE.md" not in text
 
 
 def test_reference_pointers_resolve():
@@ -142,34 +128,6 @@ def test_session_activation_rules_are_one_registered_gate():
         (SKILL_DIR / "references" / "input-floor.md").read_text(),
         "goal-create.session-activation",
     )
-
-
-def test_arc_points_at_the_purpose_template_without_restating_it():
-    text = _read_skill_md()
-    arc_body = _section(text, "ARC mode")
-
-    # --- Never restated: the template's own field-label text must not
-    # appear verbatim in this skill's ARC section. ---
-    assert PURPOSE_TEMPLATE_PATH.exists(), (
-        f"Purpose template missing at {PURPOSE_TEMPLATE_PATH} — "
-        "cannot verify non-restatement against it"
-    )
-    template_text = PURPOSE_TEMPLATE_PATH.read_text(encoding="utf-8")
-
-    # Extract the template's field-label lines (the SSOT prose this
-    # skill must point at, never copy) and confirm none of them shows
-    # up verbatim in ARC's own section.
-    field_lines = [
-        line.strip()
-        for line in template_text.splitlines()
-        if line.strip().startswith("**Why:**") or line.strip().startswith("**Done when:**")
-    ]
-    assert field_lines, "Could not locate the template's field-label lines"
-
-    for field_line in field_lines:
-        assert field_line not in arc_body, (
-            f"ARC section restates the purpose template's field text verbatim: {field_line!r}"
-        )
 
 
 # The token the Invocation section must contain for each surface that

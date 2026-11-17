@@ -13,9 +13,9 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.25.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.82.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
-| [`loom-workflow`](loom-workflow/README.md) | 5.25.0 | 15 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
+| [`loom-design`](loom-design/README.md) | 2.26.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
+| [`loom-code`](loom-code/README.md) | 3.83.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-workflow`](loom-workflow/README.md) | 5.26.0 | 15 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
 links open its README; skill links below open the detailed usage guide.
@@ -64,8 +64,6 @@ flowchart TD
   required.
 - **Maintain** — `maintain` attaches an incident to a matching open intent, or
   creates one, and hands it to `write-plan`.
-- **Decision map** — the second way into `capture-intent`: when a slice of a
-  long-running map is ready, `decision-map` writes an intent carrying `map:`.
 
 ### Where loom-workflow plugs in
 
@@ -74,26 +72,21 @@ points or run on demand.
 
 | Tool | When it is used in the flow | What it does |
 | --- | --- | --- |
-| [`decision-map`](loom-workflow/skills/decision-map/README.md) | Before the flow: writes the intent that starts a change | Keeps a long-running Outcome Map and turns a ready slice into an intent. |
+| [`roadmap`](loom-workflow/skills/roadmap/README.md) | On demand for staged project work | Owns optional ordinary project planning and its evidence-backed current summary. |
 | [`git-memory`](loom-workflow/skills/git-memory/README.md) | Before every commit at any station (intent, plan, build, attestation); at [`ship`](loom-code/skills/ship/README.md) when the PR is created; and before the PR is merged, which happens after [`ship`](loom-code/skills/ship/README.md) | Classifies decision, learning and gotcha memory for commits and the PR body. |
 | [`loom-memory`](loom-workflow/skills/loom-memory/README.md) | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
 | [`independent-advisor`](loom-workflow/skills/independent-advisor/README.md), [`handoff`](loom-workflow/skills/handoff/README.md), [`recap-state`](loom-workflow/skills/recap-state/README.md) | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
 | [`project-retro`](loom-workflow/skills/project-retro/README.md), [`skill-retro`](loom-workflow/skills/skill-retro/README.md) | On demand, not tied to a station | [`project-retro`](loom-workflow/skills/project-retro/README.md) reviews one coding session for project development improvements; [`skill-retro`](loom-workflow/skills/skill-retro/README.md) mines multiple sessions for skill improvement proposals. |
 
-`decision-map` is for work whose whole route cannot be listed up front; its
-loop is shown separately in the [loom-workflow README](loom-workflow/README.md#decision-map-loop).
-The map, called an Outcome Map, lives at `docs/loom/maps/<map-id>/` as
-`MAP.md` plus a `tickets/` directory and persists across sessions. An unknown
-becomes a ticket only once or is moved out of scope, and a grilling ticket hands
-its discussion to `loom-design:capture-intent` when that plugin is installed.
-The intent goes to `loom-design:capture-intent` (or `loom-code:write-plan`
-without loom-design), which owns the delivered change while the map only reads
-its status; the map is clear once every Destination acceptance criterion is
-satisfied, fog is empty, and every ticket is closed or withdrawn.
+[Roadmap](loom-workflow/skills/roadmap/README.md) uses an optional root ROADMAP.md
+or a selected existing planning document for cross-session staged work. It keeps
+current goals, completion conditions, status, next actions, unknowns and evidence
+links. Planning does not replace implementation confirmation, verification or
+acceptance. Existing maps remain readable history without migration or rewriting.
 
 ## loom-design
 
-Version 2.25.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.26.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools and optional design research. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -109,7 +102,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.82.0. Five stations carry one change from plan to PR with
+Version 3.83.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 All sixteen CLI commands define optional advisory next steps; five have direct
 JSON modes and two have checked station consumers. Advice changes neither
@@ -132,8 +125,8 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.25.0. Workflow tools used around the stations; most work without
-`loom-code`. `decision-map`'s intent delivery and explicitly requested outside
+Version 5.26.0. Workflow tools used around the stations; most work without
+`loom-code`. Explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
 attach to the flow.
@@ -143,7 +136,7 @@ attach to the flow.
 | [`loom-memory`](loom-workflow/skills/loom-memory/README.md) | Recall, record, reconcile or retire durable repository lessons. |
 | [`git-memory`](loom-workflow/skills/git-memory/README.md) | Classify commit and PR memory before committing; recall why a past decision was made. |
 | [`critique`](loom-workflow/skills/critique/README.md) | Judge a proposal or look for a simpler version of a change. |
-| [`decision-map`](loom-workflow/skills/decision-map/README.md) | Chart or advance a persistent Outcome Map across sessions. |
+| [`roadmap`](loom-workflow/skills/roadmap/README.md) | Own optional ordinary project planning and its evidence-backed current summary. |
 | [`independent-advisor`](loom-workflow/skills/independent-advisor/README.md) | Get a second opinion from another model, effort level or vendor. |
 | [`recap-state`](loom-workflow/skills/recap-state/README.md) | In-session recap of where the work stands. |
 | [`whats-next`](loom-workflow/skills/whats-next/README.md) | Next-action advice on request or when a blocker or new evidence requires reconsideration: one recommendation plus necessary alternatives, preserving existing authorization. No repeated interruption of viable plans or installed-host triggering guarantee. |
@@ -152,7 +145,7 @@ attach to the flow.
 | [`project-retro`](loom-workflow/skills/project-retro/README.md) | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | [`loom-visualization`](loom-workflow/skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
 | [`loom-interactive-diagram`](loom-workflow/skills/loom-interactive-diagram/README.md) | Create and validate editable diagrams for standalone or Loom discussions; ask before editing an external diagram whether to copy it into the project. |
-| [`goal-create`](loom-workflow/skills/goal-create/README.md) | Create a session goal or draft a repository purpose (invoked by name only). |
+| [`goal-create`](loom-workflow/skills/goal-create/README.md) | Create a session goal prompt (invoked by name only). |
 | [`dbt-model-style`](loom-workflow/skills/dbt-model-style/README.md) | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | [`using-loom-workflow`](loom-workflow/skills/using-loom-workflow/README.md) | Optional router to the right workflow tool. |
 

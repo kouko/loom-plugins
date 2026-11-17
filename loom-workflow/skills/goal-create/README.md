@@ -5,15 +5,13 @@
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > Create a goal condition. **SESSION** activates the four-field goal when
-> accepted by the current host, with an honest recovery action otherwise;
-> **ARC** drafts a repository's purpose artifact for the user to land.
+> accepted by the current host, with an honest recovery action otherwise.
 
 ---
 
 ## Overview — what this skill does
 
-This skill drafts one of two things, chosen by what the user asks for —
-never by the agent guessing from context.
+This skill drafts a goal for the current run when invoked by name.
 
 - **SESSION mode** produces the four-field goal condition —
   `Outcome`, `Constraints`, `Verification`, `Stop-when` — that a
@@ -33,15 +31,8 @@ never by the agent guessing from context.
   the skill provides one complete manual `/goal` command and states that
   submitting it replaces any active Goal.
 
-- **ARC mode** produces a draft `Why` and `Done when` for the
-  repository's purpose artifact, `docs/loom/PURPOSE.md`. It never writes
-  that file itself — the draft is only ever landed by the user's own
-  confirmation. When the repository has neither a purpose artifact nor
-  any `docs/loom/` store at all, ARC reports itself not applicable and
-  scaffolds nothing.
-
 This README is a human-facing overview. `SKILL.md` in this folder is the
-operational contract — the source both modes and both reference files
+operational contract — the source SESSION mode and both reference files
 are read from; this file does not restate it.
 
 ---

@@ -5,14 +5,13 @@
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 > 建立一個目標條件。**SESSION** 在 host 接受時啟用四欄 Goal，否則提供
-> 誠實的復原操作；**ARC** 起草儲存庫 purpose 產物的草案，交由使用者
-> 確認落地。
+> 誠實的復原操作。
 
 ---
 
 ## 概要 — 這個 skill 是什麼
 
-這個 skill 依使用者要的是什麼起草其中一種——絕不由 agent 從情境推測。
+這個 skill 在使用者指名呼叫時，起草這次執行的目標。
 
 - **SESSION 模式** 產出長時間運行 agent 的 run 拿來比對的四欄目標條件
   ——`Outcome`、`Constraints`、`Verification`、`Stop-when`（例如給
@@ -27,13 +26,8 @@
   Claude Code 未提供 `ProposeGoal`，或原生啟用未成功時，提供一條含完整
   條件的手動 `/goal` 指令，並說明提交會取代任何現有 Goal。
 
-- **ARC 模式** 產出儲存庫 purpose 產物 `docs/loom/PURPOSE.md` 的
-  `Why` 與 `Done when` 草案。這個 skill 本身絕不會寫入該檔案——草案只能
-  由使用者自己確認後落地。當儲存庫既沒有 purpose 產物、也沒有任何
-  `docs/loom/` store 時，ARC 會回報自己不適用，且不搭建任何東西。
-
 這份 README 是給人看的概要。這個資料夾裡的 `SKILL.md` 才是執行契約——
-兩種模式與兩份參考檔都從那裡讀出；這份檔案不重複它。
+SESSION 模式與兩份參考檔都從那裡讀出；這份檔案不重複它。
 
 ---
 

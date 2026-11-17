@@ -23,6 +23,12 @@ A failed command with a known recovery is ordinarily execution work, not a
 reason to reopen the direction. Reconsider again only when evidence,
 constraints or outcomes materially change.
 
+For next-stage decisions in long-running project work, use
+[roadmap](../roadmap/SKILL.md) to ground the choice in its applicable planning
+document; it owns durable planning-document creation and maintenance. This
+skill retains next-action advice, without forcing a new document or interrupting
+a viable approved task.
+
 ## Ground the choice
 
 1. Recover the original goal, latest user corrections, current progress,
