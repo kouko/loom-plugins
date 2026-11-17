@@ -513,16 +513,17 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
         return []
     _paths, removed, added = delta
     moved = _moved_paths(repo, head_sha, removed)
-    from loom_checker.probe_attribution import prerequisite_probe_programs
-    prerequisites = prerequisite_probe_programs(repo, head_sha, change_id)
-    return sorted(
+    candidates = {
         path for path in added
         if path not in moved
-        and path not in prerequisites
         and is_program_path(path)
         and _carries_concern(repo, head_sha, path)
         and suite_collection(repo, path)[0] is not False
-    )
+    }
+    if not candidates:
+        return []
+    from loom_checker.probe_attribution import prerequisite_probe_programs
+    return sorted(candidates - prerequisite_probe_programs(repo, head_sha, change_id, candidates))
 
 
 def check_adversarial_proportionate(

@@ -58,3 +58,29 @@ operation, or installed-cache change was performed.
 
 The final command includes the real finalization integration and all changed
 historical fixture cases. `git diff --check` also passed.
+
+## Integration correction: unrelated historical validation
+
+Defect class: expensive historical validation on unrelated inputs. Both
+`graduated_probe_programs` and `prerequisite_probe_programs` were searched and
+corrected. Cheap program, concern and collection checks now establish the
+automatic candidate set before historical discovery. Records whose successful
+execution artifacts do not intersect the remaining candidates never reach
+`validate_attestation`.
+
+The existing positive regression was extended with guards: unrelated evidence
+must not call the validator, and zero candidates must not call provenance
+discovery. Its RED result was:
+
+```text
+Failed: unrelated input triggered historical validation
+1 failed in 5.15s
+```
+
+Correction GREEN, using the complete focused command above:
+
+```text
+83 passed in 85.53s (0:01:25)
+```
+
+Both validator/discovery guards passed. `git diff --check` passed.

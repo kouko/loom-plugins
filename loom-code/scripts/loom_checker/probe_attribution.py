@@ -8,11 +8,15 @@ from pathlib import Path
 from loom_checker.helpers import git_maybe
 
 
-def prerequisite_probe_programs(repo: Path, head_sha: str, change_id: str) -> set[str]:
+def prerequisite_probe_programs(
+    repo: Path, head_sha: str, change_id: str, candidates: set[str],
+) -> set[str]:
     """Only pre-intent, validated executions with uninterrupted path identity qualify."""
     # Import locally: attestation validation itself consumes probe discovery.
     from loom_checker.attestation import validate_attestation
 
+    if not candidates:
+        return set()
     intent = f"docs/loom/intent/{change_id}.md"
     introductions = git_maybe(repo, "log", "--full-history", "--diff-filter=A",
                               "--format=%H", head_sha, "--", intent)
@@ -47,6 +51,7 @@ def prerequisite_probe_programs(repo: Path, head_sha: str, change_id: str) -> se
                              and execution.get("kind") == "adversarial"
                              and execution.get("result") == "pass"
                              and isinstance(execution.get("artifact"), str)}
+                artifacts &= candidates - proven
                 # No-program records cannot establish provenance and can recurse
                 # through stored_probe_programs during attestation validation.
                 if not artifacts or any(isinstance(run, dict) and "no_program" in run

@@ -51,7 +51,7 @@ def prerequisite_repo(tmp_path, damage=None):
     return repo, paths, current, evidence
 
 
-def test_inherited_five_are_excluded_without_changing_scope_or_evidence(tmp_path):
+def test_inherited_five_are_excluded_without_changing_scope_or_evidence(tmp_path, monkeypatch):
     repo, prior, current, evidence = prerequisite_repo(tmp_path)
     # Later publication metadata is not a new prerequisite boundary. The old
     # canonical revision still validates at its own historical tree.
@@ -73,6 +73,24 @@ def test_inherited_five_are_excluded_without_changing_scope_or_evidence(tmp_path
     assert [run["artifact"] for run in written(repo)["executions"]
             if run["kind"] == "adversarial"] == [prior[0], current]
     assert evidence.read_bytes() == before
+    # Ordinary tests and evidence for other paths must not trigger expensive
+    # historical validation, even when that history contains valid records.
+    from loom_checker import attestation, probe_attribution
+
+    def unexpected(*args, **kwargs):
+        pytest.fail("unrelated input triggered historical validation")
+
+    monkeypatch.setattr(attestation, "validate_attestation", unexpected)
+    for path in prior:
+        target = repo / path
+        target.write_text(target.read_text().replace("# concern:", "# ordinary:"))
+    head = commit_all(repo, "prior probes become ordinary tests")
+    assert graduated_probe_programs(repo, head, CHANGE) == [current]
+    monkeypatch.setattr(probe_attribution, "prerequisite_probe_programs", unexpected)
+    target = repo / current
+    target.write_text(target.read_text().replace("# concern:", "# ordinary:"))
+    head = commit_all(repo, "no automatic probe candidates")
+    assert graduated_probe_programs(repo, head, CHANGE) == []
 
 
 @pytest.mark.parametrize("damage", ["invalid", "malformed", "late", "changed", "copy", "revert", "mode"])
