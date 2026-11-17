@@ -20,6 +20,12 @@ match, recover the user's exact intent, and stop before changing anything.
 Completeness and precision therefore outrank narrative flow, but repeated
 schema teaching belongs in the reference rather than this always-loaded file.
 
+Reference an applicable project planning document in the existing Critical
+files block. [Roadmap](../roadmap/SKILL.md) owns its durable planning content;
+handoff owns session restart state. Resuming a roadmap does not bypass Resume
+verification or its user-direction stop, and saving a handoff does not require
+creating or rewriting a project plan.
+
 ## Prepare mode
 
 **Before authoring any HANDOFF artifact, read `references/handoff-schema.md` fully.**

@@ -1,0 +1,22 @@
+[
+  {"id":1,"selected":"roadmap","reason":"Requests staged project planning across sessions."},
+  {"id":2,"selected":"roadmap","reason":"Requests a project roadmap with long-term goals and completion conditions."},
+  {"id":3,"selected":"roadmap","reason":"Resumes an existing roadmap and asks for its next stage."},
+  {"id":4,"selected":"roadmap","reason":"Requests an evidence-backed update to roadmap status."},
+  {"id":5,"selected":"roadmap","reason":"Requests revision of an existing staged project plan after a direction change."},
+  {"id":6,"selected":"roadmap","reason":"Requests whole-project roadmap review and dependency ordering."},
+  {"id":7,"selected":"roadmap","reason":"Requests staged planning intended to continue across sessions."},
+  {"id":8,"selected":"roadmap","reason":"Requests updating a long-term project plan using new evidence."},
+  {"id":9,"selected":"roadmap","reason":"Requests a staged long-term project plan."},
+  {"id":10,"selected":"roadmap","reason":"Requests reviewing and updating the next stage of an existing roadmap."},
+  {"id":11,"selected":"whats-next","reason":"Requests general next-action advice and explicitly excludes long-term planning."},
+  {"id":12,"selected":"recap-state","reason":"Requests a brief in-session conversational recap."},
+  {"id":13,"selected":"handoff","reason":"Explicitly requests saving session state as a handoff for tomorrow."},
+  {"id":14,"selected":"none","reason":"Requests routine continuation of an approved build task, excluded by whats-next and outside the other descriptions."},
+  {"id":15,"selected":"none","reason":"Requests a bug fix rather than planning, advice, a handoff or a recap."},
+  {"id":16,"selected":"none","reason":"Requests a single-session execution goal, outside the four offered descriptions."},
+  {"id":17,"selected":"none","reason":"Requests webpage creation; mentioning a timeline does not request staged project planning."},
+  {"id":18,"selected":"none","reason":"Requests a simple factual definition, not project planning; whats-next explicitly excludes factual requests."},
+  {"id":19,"selected":"recap-state","reason":"Requests a summary of the current session without asking to save a restart artifact."},
+  {"id":20,"selected":"none","reason":"Requests checking pull-request CI, outside the four offered descriptions."}
+]

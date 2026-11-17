@@ -6,9 +6,9 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 
 Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
-> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
+> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：任意の段階的なプロジェクト計画、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.25.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.26.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -28,8 +28,6 @@ Loom は 1 つの変更を station に沿って運びます：`loom-design` が 
 どのツールも名前で直接呼び出せます。
 
 ほとんどのツールは `loom-workflow` 単体のインストールで動きます。
-`decision-map` の delivery ステップは `loom-code` の contract template から
-intent を書くため `loom-code` が必要です。地図の作成と ticket の推進には不要です。
 明示的に依頼された外部の code・plan・decision review の実行にも
 `loom-code:external-review` が必要です。
 
@@ -37,7 +35,7 @@ intent を書くため `loom-code` が必要です。地図の作成と ticket �
 
 skill がここに属するのは、station をまたいで作業を調整するか、session
 をまたいで状態を運ぶ場合です。複数の plugin から使われているだけでは条件を満たしません。
-`decision-map` がこのルールの最初の実例です。このルールは新規の収録のみを
+このルールは新規の収録のみを
 gate し、plugin にすでにある utility skill はそのまま残ります。
 
 `project-retro` はユーザーが明示的に承認した例外です。依頼に応じて 1 回の開発 session を
@@ -50,7 +48,7 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 
 | 助けが必要な場面 | ツール | 行うこと |
 |---|---|---|
-| 目標までの進め方が不明 | `decision-map` | 未知の点を調べ、準備できた部分を intent として引き渡す。 |
+| session をまたぐ段階的な計画が必要 | `roadmap` | 通常の計画文書を作成・再開・更新する。 |
 | 提案を実行する前に検討したい | `critique` | 必要な作業か、もっと単純にできるかを判断する。 |
 | 会話の途中で現在地を見失った | `recap-state` | 現状を説明し、ユーザーの確認を待つ。 |
 | 次に何をする価値があるか相談したい | `whats-next` | 現在の根拠から第一候補と必要な代替案を勧める。 |
@@ -61,31 +59,15 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 | session から改善点を見つけたい | `project-retro`, `skill-retro` | 1 回の session のプロジェクト改善、または選択した記録の反復的な skill 問題を調べる。提案のみで変更しない。 |
 | 別の実行者にレビューを依頼したい | `independent-advisor` | 費用とマシン外への送信について承認を得て、別の意見を求める。 |
 | 関係を図表で説明したい | `loom-visualization`, `loom-interactive-diagram` | chat の表や図、または編集可能な図を作る。 |
-| 明示的に目標を作成したい | `goal-create` | session の目標または repository の目的を起草する。名前で呼んだ時のみ動く。 |
+| 明示的に目標を作成したい | `goal-create` | session の目標を起草する。名前で呼んだ時のみ動く。 |
 | どのツールか分からない | `using-loom-workflow` | 適切なツールへ振り分ける。各ツールは直接呼び出すこともできる。 |
 
-### decision-map の探索フロー
+### プロジェクト計画
 
-次のループは `decision-map` だけのものです。地図は
-`docs/loom/maps/<map-id>/` に保存され、session をまたいで残ります。
-地図の作成と ticket の推進には `loom-code` は不要で、intent の引き渡しには必要です。
-
-```mermaid
-flowchart TD
-    dest["達成する結果を定義"] --> fog["未知の点を特定"]
-    fog --> ticket["未知の点を 1 つ調査<br/>対話・研究・プロトタイプ"]
-    ticket --> log["答えと判断を記録"]
-    log --> ready{"実装できる部分がある？"}
-    ready -->|"ない：調査を続ける"| fog
-    ready -->|"ある"| intent["intent を書く<br/>loom-code が必要"]
-    intent --> entry["変更を確認<br/>loom-design:capture-intent<br/>または loom-code:write-plan"]
-```
-
-`loom-design` があれば、grilling ticket は議論を `capture-intent` に渡します。
-引き渡しでは `map:` 付きの intent を書き、以後は入口の station が変更を担当し、
-地図は状態だけを参照します。一部の引き渡しは地図全体の完了ではありません。
-全 Destination の受け入れ条件を満たし、未知の点がなくなり、全 ticket が
-終了または撤回された時に完了します。
+[roadmap](skills/roadmap/README.md) は任意のルート ROADMAP.md、または指定済みの
+既存計画文書を扱います。目標、完了条件、現状、次の行動、未知の点と根拠へのリンクを
+残します。助言や作業再開だけで文書を強制作成しません。計画は実装・バックグラウンド実行・
+公開・マージの許可ではありません。旧 map は読み取り可能な履歴として残し、変換・書き換え・終了操作を行いません。
 
 ## Skills
 
@@ -94,7 +76,7 @@ flowchart TD
 | Skill | 役割 |
 |---|---|
 | [`using-loom-workflow`](skills/using-loom-workflow/README.md) | 任意のルーター：広い・曖昧な依頼に合うツールを選び、その手順を読み込む。各ツールは引き続き直接呼び出せる。 |
-| [`decision-map`](skills/decision-map/README.md) | `docs/loom/maps/<map-id>/` にある永続的な Outcome Map を作成・推進する：Destination、fog、種類付きの ticket、Decisions-so-far ログ。delivery ステップは intent を書く。 |
+| [`roadmap`](skills/roadmap/README.md) | 通常の計画文書を作成・再開・更新する。 |
 | [`critique`](skills/critique/README.ja.md) | 作る前に提案を裁く：`mode: proposal` は list や plan を KEEP / DEFER / DROP に振り分け、`mode: complexity` は 1 つの具体的変更を deletion-first で量る。 |
 | [`recap-state`](skills/recap-state/README.ja.md) | 作業が今どこにあるかを session 内で recap し、確認のために一度止まる。組み込みの `/recap`（away-summary）とは別物。 |
 | [`whats-next`](skills/whats-next/README.ja.md) | 根拠のある次の行動を 1 つ勧め、必要な代替案を示す。現在の作業の承認範囲を保つ。 |
@@ -107,7 +89,7 @@ flowchart TD
 | [`independent-advisor`](skills/independent-advisor/README.ja.md) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
 | [`loom-visualization`](skills/loom-visualization/README.md) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Loom の変更や単独の議論で、外部エディタで編集できる draw.io 図を作成・検証する。既存の外部図を編集する前に、プロジェクトへコピーするか確認する。 |
-| [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
+| [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。 |
 
 Loom の契約で数えるツールはこのうち 9 個です。`goal-create`、`dbt-model-style`、
 `project-retro` は `standalone: true` と記され、Loom フローの対象外です。
@@ -131,7 +113,7 @@ loom-workflow/
 ├── skills/
 │   ├── critique/
 │   ├── dbt-model-style/
-│   ├── decision-map/
+│   ├── roadmap/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
@@ -153,8 +135,8 @@ loom-workflow/
 ## インストール
 
 このリポジトリは `loom` という名前の plugin marketplace です。`loom-workflow`
-は単体でインストールできます。`decision-map` の delivery ステップ、または
-明示的に依頼された外部 review を使う場合は `loom-code` も追加してください。
+は単体でインストールできます。明示的に依頼された外部 review を使う場合は
+`loom-code` も追加してください。
 
 ### Claude Code
 
@@ -174,7 +156,7 @@ Codex では loom-visualization の visualization card を plugin の UserPrompt
 
 ### Antigravity CLI
 
-repo を clone し、`loom-code` を先にインストールする。`critique`・`decision-map`・
+repo を clone し、`loom-code` を先にインストールする。`critique`・
 `skill-retro` が loom-code を参照する。インストール前に `agy plugin list` で
 Claude Code から取り込まれた同名の plugin がないか確認する。install はその取り込み済みの
 コピーを置き換え、後の `agy plugin uninstall` はそれを削除する。
@@ -209,7 +191,7 @@ opencode plugin list
 
 OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill は `loom-workflow:<skill>` として提供されます。loom はコマンド `/loom-workflow:using-loom-workflow` で始めます。`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro`、`/loom-workflow:whats-next` もコマンドで、いずれも skill としても引き続き提供されます。
+skill は `loom-workflow:<skill>` として提供されます。loom はコマンド `/loom-workflow:using-loom-workflow` で始めます。`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:roadmap`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro`、`/loom-workflow:whats-next` もコマンドで、いずれも skill としても引き続き提供されます。
 
 OpenCode では、visualization card とスキルフォルダのルールが plugin の v2 hook で動きます。
 
@@ -248,7 +230,7 @@ UserPromptSubmit hook で、メッセージを送るたびに agent に届ける
 「この 12 項目の plan を critique して」       → critique（proposal）
 「そもそも作るべきか」/「作り込みすぎ？」       → critique（complexity）
 「これから commit する」                       → git-memory
-「デシジョンマップを開く」/「開地圖」           → decision-map
+「段階的なプロジェクト計画を作る」           → roadmap
 「wrap up」/「save state」                     → handoff
 「今どこだっけ」/「今の進捗を振り返って」         → recap-state
 「開発の進め方を振り返って改善点を探して」       → project-retro

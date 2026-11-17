@@ -1,0 +1,25 @@
+{
+  "purpose": "Description-selection corpus; expected selections are evaluation targets, not observed host triggering.",
+  "queries": [
+    {"query": "幫專案建立跨 session 的階段規劃", "should_trigger": true},
+    {"query": "把長期目標與完成條件整理成 ROADMAP.md", "should_trigger": true},
+    {"query": "接續 ROADMAP.md 的長期工作，看看目前該先做哪階段", "should_trigger": true},
+    {"query": "最新驗證通過了，請更新專案 roadmap 的狀態", "should_trigger": true},
+    {"query": "我們方向改了，調整 planning/finance.md 的階段規劃", "should_trigger": true},
+    {"query": "Review the whole project roadmap and order its dependencies", "should_trigger": true},
+    {"query": "Create a staged project plan we can continue next month", "should_trigger": true},
+    {"query": "Update our long-term plan using the failed acceptance evidence", "should_trigger": true},
+    {"query": "プロジェクトの段階的な長期計画を作りたい", "should_trigger": true},
+    {"query": "既存のロードマップの次の段階を確認して更新して", "should_trigger": true},
+    {"query": "接下來最值得做什麼？只給一般建議，目前沒有長期規劃", "should_trigger": false},
+    {"query": "剛剛講到哪？簡短回顧對話就好", "should_trigger": false},
+    {"query": "把這次 session 存成 handoff，明天接續", "should_trigger": false},
+    {"query": "直接繼續已批准、進行中的 build task", "should_trigger": false},
+    {"query": "修正匯入時漏掉空白列的 bug", "should_trigger": false},
+    {"query": "為這個 session 設定單次執行目標", "should_trigger": false},
+    {"query": "Create a product launch webpage with a timeline", "should_trigger": false},
+    {"query": "What is a roadmap? One sentence only", "should_trigger": false},
+    {"query": "このセッションの内容を要約して", "should_trigger": false},
+    {"query": "Check CI for the current pull request", "should_trigger": false}
+  ]
+}

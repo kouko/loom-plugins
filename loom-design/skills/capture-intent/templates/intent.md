@@ -1,8 +1,7 @@
 # <title>
-originator: <who>            # a person's name, "maintenance-loop", or map:<id>
+originator: <who>            # a person's name or "maintenance-loop"
 kind: product | engineering
 needs-design: yes | no — <reason>
-map: <map-id>                # optional
 evidence: [<paths>]          # optional; write-spec/review must read it
 status: open                 # open | confirmed <date> | closed <date> — PR #<N> | withdrawn — <reason>; absent = open
 intent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over this file WITHOUT its status: line and WITHOUT this line itself

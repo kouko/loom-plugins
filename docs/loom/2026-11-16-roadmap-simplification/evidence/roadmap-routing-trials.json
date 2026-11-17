@@ -1,0 +1,32 @@
+{
+  "summary": {
+    "B6": {
+      "response": "/private/tmp/roadmap-routing-results/B6/response.md",
+      "diff": "/private/tmp/roadmap-routing-results/B6/changes.diff",
+      "scope": "visible-state advice only; lint not executed",
+      "timing": "unavailable",
+      "failures": []
+    },
+    "B9": {
+      "response": "/private/tmp/roadmap-routing-results/B9/response.md",
+      "diff": "/private/tmp/roadmap-routing-results/B9/changes.diff",
+      "scope": "synthetic fixture update only",
+      "timing": "unavailable",
+      "failures": []
+    }
+  },
+  "artifacts": {
+    "summary.json": "{\n  \"B6\": {\n    \"response\": \"/private/tmp/roadmap-routing-results/B6/response.md\",\n    \"diff\": \"/private/tmp/roadmap-routing-results/B6/changes.diff\",\n    \"scope\": \"visible-state advice only; lint not executed\",\n    \"timing\": \"unavailable\",\n    \"failures\": []\n  },\n  \"B9\": {\n    \"response\": \"/private/tmp/roadmap-routing-results/B9/response.md\",\n    \"diff\": \"/private/tmp/roadmap-routing-results/B9/changes.diff\",\n    \"scope\": \"synthetic fixture update only\",\n    \"timing\": \"unavailable\",\n    \"failures\": []\n  }\n}",
+    "initial-files.json": "{\n  \"evidence/first.txt\": \"Synthetic fixture observation: first-format real-sample import PASS. Second format not verified. No overall acceptance or publication observed.\\n\",\n  \"planning/imports.md\": \"# Import plan\\nGoal: two formats usable\\nCurrent: first format needs real-sample verification\\nNext: verify first format, then second format\\nUnknown: second-format effort\\n\"\n}",
+    "B6/changes.diff": "",
+    "B6/final-files.json": "{}\n",
+    "B6/initial-files.json": "{}\n",
+    "B6/response.md": "次は、承認済み計画どおりローカルの lint（コードの書式や規則のチェック）です。既存テストで確認済みの表示修正を完了させるため、残っている検証を進めます。新しい制約はないので、計画の立て直しや ROADMAP.md の作成は不要です。この回答は提示状態に基づく助言で、lint は実行していません。\n",
+    "B9/changes.diff": "--- initial/planning/imports.md\n+++ final/planning/imports.md\n@@ -1,5 +1,5 @@\n # Import plan\n Goal: two formats usable\n-Current: first format needs real-sample verification\n-Next: verify first format, then second format\n+Current: first-format real-sample import PASS (see [evidence](../evidence/first.txt)); second format not verified; overall acceptance and publication not observed\n+Next: handle second format, then verify it with a real sample\n Unknown: second-format effort\n",
+    "B9/response.md": "已更新 planning/imports.md：依 evidence/first.txt，第一種格式已通過實際樣本驗證；第二種格式尚未驗證，整體驗收與發布亦未有證據。\n\n階段順序可接續，但原本「先驗證第一種」已由新證據完成，下一步改為處理第二種格式，再以真實樣本驗證。最小的下一步是先核對第二種樣本與預期匯入結果，以確認工作範圍；所需時間仍未知，不新增日期承諾。\n\n本次使用隔離的合成測試文件，只更新規劃摘要，未執行產品實作、lint、發布或合併。\n",
+    "B9/initial/evidence/first.txt": "Synthetic fixture observation: first-format real-sample import PASS. Second format not verified. No overall acceptance or publication observed.\n",
+    "B9/initial/planning/imports.md": "# Import plan\nGoal: two formats usable\nCurrent: first format needs real-sample verification\nNext: verify first format, then second format\nUnknown: second-format effort\n",
+    "B9/final/evidence/first.txt": "Synthetic fixture observation: first-format real-sample import PASS. Second format not verified. No overall acceptance or publication observed.\n",
+    "B9/final/planning/imports.md": "# Import plan\nGoal: two formats usable\nCurrent: first-format real-sample import PASS (see [evidence](../evidence/first.txt)); second format not verified; overall acceptance and publication not observed\nNext: handle second format, then verify it with a real sample\nUnknown: second-format effort\n"
+  }
+}

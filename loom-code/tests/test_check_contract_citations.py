@@ -113,6 +113,7 @@ def test_store_directory_citation_is_exempt() -> None:
 
 def test_protocol_filename_citation_is_exempt() -> None:
     assert classify_citation("docs/loom/PRINCIPLES.md") == "exempt"
+    assert classify_citation("docs/loom/PURPOSE.md") == "exempt"  # Existing user data.
     assert classify_citation("docs/loom/backlog/README.md") == "exempt"
     assert classify_citation("docs/loom/spec/MODEL.md") == "exempt"
     assert classify_citation("docs/loom/queue-state.json") == "exempt"

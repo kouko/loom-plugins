@@ -139,7 +139,7 @@ def test_tools_count_and_owner(manifest):
     assert owners.pop("engineering-research") == "loom-code"
     assert owners == {
         **dict.fromkeys({"product-principles", "design-system", "architecture-design", "design-research"}, "loom-design"),
-        **dict.fromkeys({"decision-map", "handoff", "recap-state", "loom-visualization",
+        **dict.fromkeys({"roadmap", "handoff", "recap-state", "loom-visualization",
                          "loom-interactive-diagram", "skill-retro", "git-memory",
                          "independent-advisor", "critique", "goal-create",
                          "dbt-model-style", "project-retro"}, "loom-workflow"),

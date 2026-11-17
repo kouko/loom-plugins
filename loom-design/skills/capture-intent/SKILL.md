@@ -18,7 +18,8 @@ relative paths, quoted examples and incidental filenames.
 
 Ask only until the wanted outcome is clear, write
 `docs/loom/intent/<change-id>.md`, restate it in the user's words, then hand a
-confirmed intent onward. Do not design, plan, or ask the user to judge quality.
+confirmed intent onward. Planning owner: `loom-workflow:roadmap`.
+Do not design, plan, or request user quality judgments.
 
 ## Artifact vocabulary
 
@@ -126,8 +127,7 @@ and PR bodies use the user's language.
 
 Write `docs/loom/intent/<change-id>.md` from `templates/intent.md`. Fill in:
 
-- `originator: <the user's name>` — or `map:<id>` when a decision map
-  raised it.
+- `originator: <the user's name>`.
 - `kind:` — `product` when the product's user-visible behaviour changes,
   `engineering` otherwise.
 - `needs-design:` — `yes` when either holds, and the line always carries

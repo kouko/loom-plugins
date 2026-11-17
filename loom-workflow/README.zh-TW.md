@@ -6,9 +6,9 @@
 
 Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
-> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
+> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：可選的專案階段規劃、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.25.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.26.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名稱遷移
 
@@ -25,15 +25,13 @@ Loom 讓一個變更依序走過各站：`loom-design` 整理 intent 與 spec，
 負責 plan、build、review、ship。`loom-workflow` 收的是圍繞這些站使用的工具。
 工具本身不是站：每個工具都在特定時機接上，或在需要時呼叫，而且每個工具都能直接以名稱呼叫。
 
-多數工具只裝 `loom-workflow` 就能運作。`decision-map` 的 delivery 步驟依
-`loom-code` 的 contract template 寫出 intent，因此需要 `loom-code`；開地圖與
-推進 ticket 則不需要。明確要求外部 agent 審查 code、plan 或決策時，執行也需要
+多數工具只裝 `loom-workflow` 就能運作。明確要求外部 agent 審查 code、plan 或決策時，執行需要
 `loom-code:external-review`。
 
 ## 收錄準則（Admission rule）
 
 一個 skill 屬於這裡，條件是它跨站協調工作，或跨 session 攜帶狀態；只是被好幾個
-plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。這條規則只 gate
+plugin 用到並不算數。這條規則只 gate
 新收錄，plugin 裡既有的 utility skill 維持不動。
 
 `project-retro` 是使用者明確核准的例外：依要求唯讀回顧一次開發 session，找出專案開發環境的改善點。
@@ -45,7 +43,7 @@ plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。�
 
 | 需要協助的時機 | 工具 | 做什麼 |
 |---|---|---|
-| 還不清楚如何達成目標 | `decision-map` | 調查未知事項，將準備好的部分交付為 intent。 |
+| 專案需要跨 session 的階段規劃 | `roadmap` | 建立、接續或更新普通規劃文件。 |
 | 想先檢查提案是否合理 | `critique` | 判斷工作是否必要，以及能否更簡單。 |
 | 對話中跟不上目前進度 | `recap-state` | 說明現在的位置，等待你確認。 |
 | 想知道接下來最值得做什麼 | `whats-next` | 根據目前證據推薦首選與必要替代方案。 |
@@ -56,29 +54,15 @@ plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。�
 | 想從 session 找出改善點 | `project-retro`、`skill-retro` | 回顧一次 session 的專案問題，或從所選快照找反覆出現的 skill 問題；只提案，不修改。 |
 | 想請另一個執行者審查 | `independent-advisor` | 取得第二意見；費用與外送資料需經授權。 |
 | 需要用圖表說明關係 | `loom-visualization`、`loom-interactive-diagram` | 在對話顯示表格或圖，或建立可編輯圖表。 |
-| 明確要求建立目標 | `goal-create` | 起草 session 目標或專案目的，只在指名時執行。 |
+| 明確要求建立目標 | `goal-create` | 起草 session 目標，只在指名時執行。 |
 | 不確定該用哪個工具 | `using-loom-workflow` | 分派請求；各工具也能直接呼叫。 |
 
-### decision-map 的探索流程
+### 專案規劃
 
-以下迴圈只屬於 `decision-map`。地圖保存在 `docs/loom/maps/<map-id>/`，
-可跨 session 接續。開地圖與推進 ticket 不需要 `loom-code`，交付 intent 才需要。
-
-```mermaid
-flowchart TD
-    dest["定義要達成的結果"] --> fog["找出未知事項"]
-    fog --> ticket["調查一個未知事項<br/>訪談、研究或原型驗證"]
-    ticket --> log["記錄答案與決策"]
-    log --> ready{"有準備好實作的部分？"}
-    ready -->|"沒有：繼續調查"| fog
-    ready -->|"有"| intent["寫出 intent<br/>需要 loom-code"]
-    intent --> entry["確認這次變更<br/>loom-design:capture-intent<br/>或 loom-code:write-plan"]
-```
-
-裝有 `loom-design` 時，grilling ticket 會把討論交給 `capture-intent`。
-交付步驟寫出帶 `map:` 的 intent，之後由入口站負責該變更，地圖只讀取狀態。
-交付一部分不代表整張地圖完成：仍須滿足所有 Destination 驗收條件、清空未知事項，
-並讓每張 ticket 都已關閉或撤回。
+[roadmap](skills/roadmap/README.md) 使用可選的根目錄 ROADMAP.md，或已指定的既有
+規劃文件，保存目前目標、完成條件、狀態、下一步、未知事項與證據連結。只問建議或接續
+工作不會強制建立文件。規劃不授權實作、背景執行、發布或合併。舊 map 保留可讀歷史，
+不自動轉換、改寫或結案。
 
 ## Skills
 
@@ -87,7 +71,7 @@ flowchart TD
 | Skill | 角色 |
 |---|---|
 | [`using-loom-workflow`](skills/using-loom-workflow/README.md) | 可選入口：為廣泛或不明確的請求挑出對應工具，並讀入該工具的指示。每個工具仍可直接呼叫。 |
-| [`decision-map`](skills/decision-map/README.md) | 在 `docs/loom/maps/<map-id>/` 開一張持久化的 Outcome Map 並持續推進：Destination、fog、分型的 ticket 與 Decisions-so-far 紀錄；delivery 步驟會寫出 intent。 |
+| [`roadmap`](skills/roadmap/README.md) | 建立、接續或更新普通規劃文件。 |
 | [`critique`](skills/critique/README.zh-TW.md) | 在動手做之前裁決提案：`mode: proposal` 把清單或計畫分成 KEEP / DEFER / DROP；`mode: complexity` 用 deletion-first 量一個具體改動。 |
 | [`recap-state`](skills/recap-state/README.zh-TW.md) | 在 session 內 recap 工作目前的位置，然後停下來等確認。不是內建的 `/recap`（away-summary）。 |
 | [`whats-next`](skills/whats-next/README.zh-TW.md) | 推薦有依據的下一步首選與必要替代方案，保留目前工作的授權範圍。 |
@@ -100,7 +84,7 @@ flowchart TD
 | [`independent-advisor`](skills/independent-advisor/README.zh-TW.md) | 明確要求外部 agent 審查 code、plan 或決策時，交由 `loom-code:external-review` 執行並保留原審查標準；也能向不同 model tier、effort 或廠商取得開放式 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/README.md) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | 在 Loom 變更或獨立討論中建立、驗證可編輯的 draw.io 圖表；每次編輯既有外部圖表前，先確認是否複製進專案。 |
-| [`goal-create`](skills/goal-create/README.zh-TW.md) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
+| [`goal-create`](skills/goal-create/README.zh-TW.md) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。 |
 
 Loom 的契約計入其中九個工具。`goal-create`、`dbt-model-style` 與
 `project-retro` 標記為 `standalone: true`，位於 Loom 流程之外。
@@ -124,7 +108,7 @@ loom-workflow/
 ├── skills/
 │   ├── critique/
 │   ├── dbt-model-style/
-│   ├── decision-map/
+│   ├── roadmap/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
@@ -146,8 +130,7 @@ loom-workflow/
 ## 安裝
 
 這個 repository 是名為 `loom` 的 plugin marketplace。`loom-workflow` 可以單獨安裝；
-要用 `decision-map` 的 delivery 步驟，或明確要求外部 agent 審查 code、plan
-或決策時，才需要再加裝 `loom-code`。
+明確要求外部 agent 審查 code、plan 或決策時，才需要再加裝 `loom-code`。
 
 ### Claude Code
 
@@ -167,7 +150,7 @@ codex plugin add loom-workflow@loom
 
 ### Antigravity CLI
 
-從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、`decision-map`、
+從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、
 `skill-retro` 會參照它。安裝前先用 `agy plugin list` 確認有沒有從 Claude Code
 匯入的同名 plugin：install 會取代那份匯入的副本，之後的 `agy plugin uninstall`
 也會把它刪掉。
@@ -201,7 +184,7 @@ opencode plugin list
 
 OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill 以 `loom-workflow:<skill>` 提供。以指令 `/loom-workflow:using-loom-workflow` 開始使用 loom；`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro`、`/loom-workflow:whats-next` 也是指令，且都同時仍是 skill。
+skill 以 `loom-workflow:<skill>` 提供。以指令 `/loom-workflow:using-loom-workflow` 開始使用 loom；`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:roadmap`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro`、`/loom-workflow:whats-next` 也是指令，且都同時仍是 skill。
 
 在 OpenCode 上，visualization card 與 skill 資料夾規則透過 plugin 的 v2 hook 執行。
 
@@ -238,7 +221,7 @@ OpenCode 的限制：
 「critique 這份 12 項的 plan」         → critique（proposal）
 「該不該做這個」/「是不是做過頭了」     → critique（complexity）
 「我準備 commit」                      → git-memory
-「開地圖」/「推進地圖」                 → decision-map
+「建立跨 session 的專案階段規劃」       → roadmap
 「wrap up」/「save state」             → handoff
 「剛剛講到哪」/「我跟丟了」             → recap-state
 「second opinion」/「換一個模型看看」   → independent-advisor

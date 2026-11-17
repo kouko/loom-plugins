@@ -43,7 +43,7 @@ MANDATORY_DEPENDENCY_KEYS = {
 # was retired into loom-workflow (2026-09-11) — 11 skills, was 10.
 REQUIRED_LOOM_WORKFLOW_SKILLS = {
     "critique",
-    "decision-map",
+    "roadmap",
     "git-memory",
     "loom-memory",
     "using-loom-workflow",

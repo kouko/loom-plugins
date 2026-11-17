@@ -16,3 +16,15 @@ def test_skill_is_discoverable_and_self_contained():
     for target in re.findall(r"\]\(([^)]+)\)", text):
         if not target.startswith("https://"):
             assert (SKILL.parent / target).exists()
+
+
+def test_planning_owner_is_linked_from_advice_and_router():
+    """Routing edges only; document ownership behavior needs semantic trials."""
+    route = "../roadmap/SKILL.md"
+    for source in (SKILL, WORKFLOW / "skills/using-loom-workflow/SKILL.md"):
+        targets = re.findall(r"\]\(([^)]+)\)", source.read_text())
+        assert route in targets, source
+        assert (source.parent / route).is_file()
+    router = (WORKFLOW / "skills/using-loom-workflow/SKILL.md").read_text()
+    targets = re.findall(r"\]\(([^)]+)\)", router)
+    assert "../decision-map/SKILL.md" not in targets

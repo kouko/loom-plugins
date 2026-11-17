@@ -24,7 +24,7 @@ MANIFEST = REPO_ROOT / "loom-code" / "contract" / "manifest.yaml"
 
 COUNTED = {
     "critique",
-    "decision-map",
+    "roadmap",
     "skill-retro",
     "git-memory",
     "handoff",

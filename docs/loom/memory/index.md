@@ -335,6 +335,7 @@ okf_version: "0.2"
 
 ## project
 
+- [document-ownership-does-not-require-a-runtime](document-ownership-does-not-require-a-runtime.md) — A single owner for durable planning documents needs clear reading and update responsibilities, not a specialized store, schema or execution loop.
 - [ship-does-not-write-memory-after-finalize-review](ship-does-not-write-memory-after-finalize-review.md) — Ship must not write memory entries after finalize-review has generated the attestation — committing such a file changes the functional content digest and invalidates the attestation (forcing another review round or Verification status: stale)
 - [version-bump-on-every-pr](version-bump-on-every-pr.md) — Adopted rule — every merged PR that touches a plugin must bump that plugin's version (patch by default; minor when station guidance, field, rule id, or contract manifest changes) so `claude plugin update` delivers merged changes to installed copies
 

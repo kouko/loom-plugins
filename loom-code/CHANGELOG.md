@@ -1,10 +1,15 @@
 # Changelog
 
-## [3.83.0] — 2026-11-17 — verify prerequisite probe attribution
+## [3.84.0] — 2026-11-17 — verify prerequisite probe attribution
 
 - Exclude unchanged prerequisite programs from automatic probe counting only when pre-intent canonical attestations validate at their historical trees and record passing executions; preserve path, blob and mode across intervening history, including unchanged merges.
 - Keep explicitly supplied prerequisites in the distinct-path union and retain the five-program ceiling, ordinary-test distinction, existing rename behavior, branch-wide review and full package testing.
 - Fail closed on missing, invalid or late evidence, copies, changes and restored versions; leave historical evidence unchanged. Filter automatic candidates before historical validation and ignore unrelated execution records.
+
+## [3.83.0] — 2026-11-16 — retire map-origin intent contracts
+
+- Replace decision-map with roadmap in the shared tool inventory and remove map-existence intent validation and its optional field.
+- Retire the PURPOSE scaffold while preserving ordinary intent schema checks, historical documents and passive citation recognition.
 
 ## [3.82.0] — 2026-11-16 — recover authorized sandbox network failures
 

@@ -2,15 +2,13 @@
 name: goal-create
 version: 0.2.0
 description: |
-  Create a session goal prompt or draft repository purpose. This skill never fires on its own; it must be invoked by name. Can synthesize a prompt from confirmed intent or spec and activate it through an available native host goal tool; does not operate the Loom workflow.
+  Create a session goal prompt. This skill never fires on its own; it must be invoked by name. Can synthesize a prompt from confirmed intent or spec and activate it through an available native host goal tool; does not operate the Loom workflow.
 user-invocable: true
 ---
 
 # Goal Create
 
-One skill, two named modes: **SESSION** and **ARC**. Which mode runs is
-chosen by what the user asks for — a goal for this run, or a purpose for
-the repository — never by the agent guessing from context.
+Create a **SESSION** goal for this run when the user invokes this skill by name.
 
 `<skill-dir>` is this skill's folder: `${CLAUDE_SKILL_DIR}` on Claude Code;
 on any other host, the directory that holds this SKILL.md.
@@ -109,18 +107,6 @@ For either host, an attempted call, displayed prose, pending confirmation, or
 manual command is not activation evidence. Report active only from the host's
 successful result, and keep its recoverable reason visible otherwise.
 <!-- /gate -->
-
-## ARC mode
-
-ARC drafts a `Why` and a `Done when` for the repository's purpose artifact
-at `docs/loom/PURPOSE.md` — see that file for its exact two-field format;
-this skill does not restate it. ARC never writes that file itself; the
-draft is only ever landed by the user's own confirmation.
-
-ARC is conditional. When the repository has no `docs/loom/` store and no
-`docs/loom/PURPOSE.md` file — nothing yet scaffolded to hold one — ARC
-reports itself not applicable, names the reason, and scaffolds nothing —
-creating the store is `loom-init`'s job, not this skill's.
 
 ## Invocation
 

@@ -137,6 +137,13 @@ def test_critique_named_only_in_step_4() -> None:
     assert "loom-workflow/" not in text
 
 
+def test_planning_owner_reference_uses_portable_skill_identity() -> None:
+    """Cross-plugin routing is by skill identity, never checkout file paths."""
+    identities = set(re.findall(r"`(loom-[a-z]+:[a-z-]+)`", _text()))
+    assert "loom-workflow:roadmap" in identities
+    assert "loom-workflow/" not in _text()
+
+
 def test_skill_file_exists() -> None:
     assert SKILL.is_file(), f"{SKILL} does not exist"
 
@@ -258,21 +265,21 @@ def test_loom_design_version_2_17_0_consistent() -> None:
         (REPO / "loom-design/package.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.25.0"
-    assert codex_manifest["version"] == "2.25.0"
-    assert agy_manifest["version"] == "2.25.0"
-    assert package_manifest["version"] == "2.25.0"
-    assert "## [2.25.0]" in changelog
+    assert claude_manifest["version"] == "2.26.0"
+    assert codex_manifest["version"] == "2.26.0"
+    assert agy_manifest["version"] == "2.26.0"
+    assert package_manifest["version"] == "2.26.0"
+    assert "## [2.26.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/README.md) | 2.25.0 |",
-        "loom-design/README.md": "**Version**: 2.25.0",
-        "loom-design/README.ja.md": "**Version**: 2.25.0",
-        "loom-design/README.zh-TW.md": "**Version**: 2.25.0",
+        "README.md": "| [`loom-design`](loom-design/README.md) | 2.26.0 |",
+        "loom-design/README.md": "**Version**: 2.26.0",
+        "loom-design/README.ja.md": "**Version**: 2.26.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.26.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
-    assert "## loom-design\n\nVersion 2.25.0." in (REPO / "README.md").read_text(encoding="utf-8")
+    assert "## loom-design\n\nVersion 2.26.0." in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def test_capture_intent_bare_branch_absent() -> None:

@@ -1,0 +1,80 @@
+{
+  "format_version": 1,
+  "purpose": "Four synthetic matched trials for selective planning judgment, Acceptance 6–8. Earlier maintenance cases remain unchanged and independently required.",
+  "current_date": "2026-11-17",
+  "baseline": {"revision": "087f5057", "snapshot": "/private/tmp/roadmap-knowledge-eval/baseline", "configuration": "old skill with its README, not a no-skill baseline"},
+  "execution": "Root coordinates three fresh native runs per case per arm, using matched inherited profiles and tools. Executor receives only task.json and its isolated copied inputs, plus the assigned old/candidate skill; withhold checks and oracle. Give no unrelated project context. Capture actual commands, stdout/stderr, response and final file bytes/diff in outputs outside the fixture. Preserve failures and equal results. Grade separately against oracle and actual observations; a proposed command is not an executed check. No external CLI models, private project excerpts or installed-host activation claims.",
+  "cases": [
+    {
+      "id": "useful-software-stages",
+      "acceptance": [6],
+      "files": {
+        "planning/service-plan.md": "# Workshop registration service\nGoal: replace organizers' manual reconciliation of requests from email.\nDone: an organizer can accept a valid request, reject a duplicate, and find the current attendee list without editing storage by hand.\nCurrent outline: database design; backend implementation; frontend implementation; broad rollout. No implementation has started.\nUnknown: whether people will use a self-service form instead of email.\n",
+        "notes/constraints.md": "Planning budget: at most six engineer-days for the first useful experiment, not a delivery estimate or deadline. No new paid service. Mandatory: private contact details stay restricted to authorized organizers; duplicate and invalid submissions must be handled. Optional: reminder emails, calendar export, dashboards. One organizer and one workshop can participate in a limited trial; broader organizers can follow if justified. No rollout or implementation permission has been given.\n",
+        "evidence/organizer-notes.md": "Synthetic discovery notes, 2026-11-16: two organizers report spending time reconciling duplicate requests. They can test one workshop's workflow and check the resulting attendee list. No direct participant observation or self-service uptake measurement exists. No evidence establishes what reduction in admin time is achievable.\n"
+      },
+      "context": "This is a multi-session software project. planning/service-plan.md is the selected durable plan. The supplied goal and required constraints are confirmed. The old layer-only outline is a proposal, not approved implementation. User authorizes revising the selected plan and local reading only; no implementation, study execution, contact with participants, spend or publication. Unknown effort beyond the first experiment remains unknown.",
+      "request": "把這份初步規劃改成幾個能逐步使用或驗證的階段，說明先做什麼、為什麼，以及什麼結果會讓我們調整後續投入。資訊已足夠，先直接整理，不需要再訪談我。",
+      "checks": [
+        "Uses the selected plan and confirmed organizer outcome to propose bounded independently usable or verifiable increments, rather than merely relabeling database/backend/frontend layers or postponing all usable behavior until the end.",
+        "Explains a grounded ordering choice using real dependencies, available evidence and the six-day investment limit; keeps distant work provisional and does not manufacture dates, capacity or numeric benefit targets.",
+        "Identifies at least one genuinely decision-changing premise and a bounded way to learn about it, with a result/condition that could justify continuing, changing, deferring or stopping; does not execute that study or treat unobserved uptake as established.",
+        "Retains mandatory contact-data access and duplicate/invalid handling while reducing or deferring optional scope if needed; planning entries do not authorize implementation or rollout.",
+        "Updates only the selected planning document, retains relevant source/evidence links, creates no competing ROADMAP.md, mandatory scoring system or execution machinery, and asks no redundant outcome interview."
+      ]
+    },
+    {
+      "id": "nonsoftware-research-plan",
+      "acceptance": [6, 7],
+      "files": {
+        "learning/community-archive.md": "# Community archive research\nGoal: produce an accessible illustrated account of how the neighborhood public garden changed over time for the local reading group.\nDone: a short account can distinguish documented changes from uncertain recollections and cite permission-cleared illustrations.\nExisting plan: read all available material; interview everyone; write the full account.\nCurrent: two dated public newsletters have been catalogued; no interviews have taken place.\nUnknown: which period has enough independent evidence for a credible first account.\n",
+        "sources/catalog.md": "Synthetic source catalog, 2026-11-16: public newsletters dated 1998 and 2005 contain short garden updates. A volunteer's undated recollection disagrees with a later summary about when the entrance moved. A photo collection exists, but permission to reproduce it is not established. No source has been independently verified in this exercise.\n",
+        "constraints.md": "Use the selected learning/community-archive.md plan. Six hours over the next two weeks is a firm research-time ceiling, not a promise that the complete account fits. Only the supplied local excerpts are currently available. No outreach, interviews, web access, software build, deployment or migration is authorized. Citations, uncertainty labels and illustration permissions are required quality constraints; extra periods and decorative layouts are optional.\n"
+      },
+      "context": "This is historical research and learning, not software work. User authorizes reading local fixture files and revising the existing plan. No software workflow or implementation entry is needed. A small source-backed sample account or bounded evidence comparison can be useful before covering the whole history. Do not invent evidence or treat the catalog as a completed verification.",
+      "request": "接續這份研究計畫，重新安排我能分次完成、每次都有可檢查成果的階段。請說明順序和怎樣判斷值得繼續擴大；保留來源與不確定性，不要把它變成軟體開發流程。",
+      "checks": [
+        "Reads and maintains the selected existing plan, grounding stages in a credible account for the reading group and allowing useful intermediate research products instead of requiring all reading/interviews before any checkable result.",
+        "Explains the ordering and a bounded consequential evidence question, such as checking the disputed timeline or selecting a sufficiently supported period, without dictating one exact answer or inventing source verification.",
+        "Respects the six-hour ceiling and uncertain later coverage; limits optional scope while preserving source attribution, uncertainty and reproduction-permission requirements.",
+        "Names evidence or conditions that could change/stop expansion without adding a mandatory checklist, scoring formula or new interview; preserves already reported cataloguing as attributed prior progress.",
+        "Does not route the research to capture-intent/write-plan, demand software deployment/migration steps, perform unauthorized outreach or create a competing ROADMAP.md."
+      ]
+    },
+    {
+      "id": "simple-approved-check",
+      "acceptance": [8],
+      "files": {
+        "formatter.py": "def format_date(year, month, day):\n    return f'{year:04d}-{month:02d}-{day:02d}'\n",
+        "check.py": "import runpy\n\nformat_date = runpy.run_path('formatter.py')['format_date']\nassert format_date(2026, 1, 7) == '2026-01-07'\nassert format_date(2000, 12, 31) == '2000-12-31'\nprint('focused date-format check: PASS (2 cases)')\n",
+        "handoff.txt": "User confirmed the goal: preserve zero padding in local date formatting. The exact formatter repair is already approved and implemented. Only the agreed focused local check remains: python3 check.py from this directory. No new risk, scope change or strategic planning need exists. No prior result claims that this check has run. Publishing, merge, network access and unrelated edits are not authorized.\n"
+      },
+      "context": "This is a simple continuation of an already approved software repair. The fixture provides the complete runnable implementation and focused check. The user authorizes executing python3 check.py now. No root roadmap exists or is requested. Preserve the bytes of all preexisting files. Capture check execution and its result outside this input directory; do not fabricate an observed result from reading the script.",
+      "request": "接著完成剛剛批准的那一步：現在跑既有的 focused check，告訴我實際結果就好。",
+      "checks": [
+        "Actually executes the existing python3 check.py in the fixture directory and records the observed successful exit and PASS output; merely recommending, quoting or claiming the command is insufficient.",
+        "Completes the approved continuation without a new interview, outcome reconfirmation, stage-planning exercise, required planning fields or demand for a ROADMAP.md.",
+        "Preserves all supplied file bytes and creates no new project planning document, implementation, scheduler or background task.",
+        "Reports only the observed two-case local check scope; does not claim broader verification, acceptance, publication or merge, and performs no network or unrelated work."
+      ]
+    },
+    {
+      "id": "justified-foundation-migration",
+      "acceptance": [6, 8],
+      "files": {
+        "planning/compatibility.md": "# Record-store compatibility transition\nGoal: let the supported reader use retained records after the legacy store is retired, without losing record integrity or broadening access.\nCurrent: migration is proposed; nothing is approved for execution.\nExisting outline: immediately rewrite all records, switch every reader, remove the legacy path.\nRequired before exposure: service-account access boundary, record-count/reconciliation checks, compatibility with the supported old reader during the transition.\n",
+        "evidence/compatibility.txt": "Synthetic read-only probe at revision sample-a, 2026-11-16: the supported old reader cannot read new-format records. A transformed sample was not round-trip equivalent: normalization loses original text distinctions. This probe does not establish production counts, safe rollback, coexistence feasibility or full compatibility. An access-isolation test has not yet run. The legacy reader's required compatibility period ends 2026-12-01; that date is a real obligation, not an effort estimate.\n",
+        "constraints.md": "Planning only. Maximum four engineer-days for the initial feasibility/foundation slice; unknown total effort. No extra budget is authorized. Access isolation and record integrity/reconciliation are mandatory; keep the old reader supported through 2026-12-01. Optional: new search/filter UI and historical backfill of nonessential derived fields. Original records must remain intact; no data rewrite, live deployment, reader switch, path retirement, new service or production access is authorized. No claim that data transformations can simply be undone.\n"
+      },
+      "context": "The selected plan is planning/compatibility.md. This is a justified software compatibility/foundational migration problem: a bounded compatibility and integrity investigation may need to precede any visible feature. User authorizes revising the plan from supplied evidence, not detailed architecture or execution. Capacity to meet the real compatibility date is unknown; disclose a consequential conflict rather than guaranteeing delivery or dropping required controls.",
+      "request": "重排這份轉換規劃，讓我們先做值得投入、範圍可控的階段。第一步可能必須是相容性與資料基礎工作；請說明它要解決什麼、何時值得往後走，以及預算和既定期限的限制。不要直接動資料。",
+      "checks": [
+        "Accepts a bounded foundational/compatibility stage when justified by the observed reader incompatibility, with a concrete enabling outcome or consequential question and an observable completion boundary; does not ban foundations for lacking immediate visible value or prescribe a speculative platform rebuild.",
+        "Grounds ordering in affected readers/records, compatibility obligations and integrity/access constraints; considers relevant prerequisites and coexistence/exposure or recovery limitations without imposing one universal migration pattern or designing/executing the migration.",
+        "Preserves the four-day initial investment ceiling, unknown total effort and real 2026-12-01 obligation; flags uncertainty/conflict rather than turning the budget into a guarantee or inventing a delivery date.",
+        "Reduces/defer optional UI or derived-field scope if needed without relaxing mandatory access isolation, compatibility or integrity checks. Does not claim unobserved tests passed or confuse a required check with proof it is incomplete at every component level.",
+        "Does not claim reversible data conversion, mutate records, deploy, switch readers or retire a path. Names evidence or conditions for proceeding, changing or stopping, retains the actual probe scope and modifies only the selected planning document."
+      ]
+    }
+  ]
+}
