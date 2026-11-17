@@ -27,7 +27,16 @@ RULES: list[tuple[str, str]] = [
         "adversary's output rather than ordinary new tests. A graduated program "
         "therefore still spends against the ceiling, which reading the store "
         "alone could not see, since the graduation gate empties that directory "
-        "first. A program committed elsewhere in the change's store, outside its "
+        "first. Automatic discovery excludes an unchanged prerequisite only "
+        "when another change's pre-intent canonical attestation validates at "
+        "its historical tree and records a passing execution of the same path, "
+        "whose blob and mode persist through evidence-descended history. "
+        "Unchanged merges preserve identity; copied, changed or restored "
+        "programs receive no exclusion. Explicitly supplied prerequisites "
+        "still count once in the union. Branch-wide review, reviewer floors, "
+        "automatic skips and full package tests retain their scope; historical "
+        "evidence is neither rewritten nor a current passing attestation. "
+        "A program committed elsewhere in the change's store, outside its "
         "`evidence/probes/` directory, is refused rather than left uncounted.",
     ),
     (
