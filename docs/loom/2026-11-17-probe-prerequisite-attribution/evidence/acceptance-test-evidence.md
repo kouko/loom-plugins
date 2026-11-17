@@ -131,3 +131,38 @@ this evidence document and its acceptance report. No installed cache was touched
 None. All six criteria have executed focused evidence. Historical finance
 attribution is pinned, with moving-HEAD and installation limits disclosed.
 
+## Re-run on 2026-11-17, at 5fd9870b7d6f6dd17c9924cbd01bcd757ada93e9
+
+Scope: publication-metadata correction only. No product test or finance collection was repeated. The original 84 passing focused tests remain the executed behavioral evidence; the following checks independently justify carrying their results forward.
+
+Clean setup: `git clone --no-hardlinks . /private/tmp/loom-acceptance-probe-attribution-refresh` succeeded. In that fresh clone, the documented isolated locked-requirements environment successfully imported `loom_checker.digest`, `loom_checker.probe_attribution`, `loom_checker.probes` and `loom_checker.helpers`, and loaded the contract manifest. `git status --porcelain` returned no output afterward.
+
+Executed via `PYTHONPATH=loom-code/scripts uv run --isolated --with-requirements requirements-package-tests.lock python -c '<imports and comparison>'`, with this comparison body:
+
+```python
+r = Path.cwd()
+c = "2026-11-17-probe-prerequisite-attribution"
+revisions = ["8d3fa86fab76013f23da5572102a8beec108318f",
+             "5fd9870b7d6f6dd17c9924cbd01bcd757ada93e9"]
+values = [functional_content_digest(r, h, c) for h in revisions]
+assert values[0] is not None and values[0] == values[1]
+```
+
+Actual output: `imports loaded; manifest loaded: True`; both revisions returned `25ba9a1f76c5bde8c8df4efe926cff70c909ff6d`; `functional identity equal`; exit 0. Only the contract's declared publication-only metadata was excluded by the existing digest function, with no ad hoc exclusions. Production code, permanent tests and retained spec/plan therefore have identical functional content. The current clean-load commit is the report's canonical Tried-on revision; original behavioral results remain explicitly attributed to the earlier revision.
+
+- 1: carried over — identical functional digest preserves the tested inherited-five/current-one fixture and pinned historical-helper result; extra live collection is not historical full-counter proof.
+- 2: carried over — identical functional digest preserves explicit reuse, current execution and set-union assertions.
+- 3: carried over — identical functional digest preserves all eight evidence/identity refusal parameterizations.
+- 4: carried over — identical functional digest preserves five/six ceiling and ordinary-test assertions.
+- 5: carried over — identical functional digest preserves scope, reviewer, skip and collection behavior; required full suite remains for finalize-review and is not claimed complete here.
+- 6: carried over — identical functional digest preserves evidence immutability and fresh-attestation assertions; historical finance was not queried again.
+
+## Dismissed severe findings and retained review episode
+
+Read `evidence/review-rebuttal.md` and `evidence/w3-01-tests.md`. These document the same original code reviewer `/root/closing_code`, same Round 1, original review target `6ec90d1c8678ca4d2551372a52118114e3748ecb`, returning PASS after complete counterevidence. The witness did not rerun those investigator experiments or treat them as its own test execution.
+
+1. Fatal correctness finding: Git path patterns could conceal modification/restoration of a prerequisite. Dismissed by the original reviewer after the real validator rejected the bracket-name fixture before attribution, and a valid backslash-name fixture passed real historical validation, excluded unchanged content and retained changed-then-restored content. Direct Git history returned both alteration commits. An unmatched hypothetical literal path did not prove omission of an existing file's history. No product fix resulted.
+2. Fatal external-surface-grounding finding: insufficient support for Git command semantics. Dismissed by the original reviewer after the complete fixture and official Git global-options/history-traversal documentation were examined. The review criterion did not require source links adjacent to code; missing adjacent links alone did not establish the claimed fatal defect. Primary references are recorded in `review-rebuttal.md`: https://git-scm.com/docs/git and https://git-scm.com/docs/git-log .
+
+The provisional design/plan repair was withdrawn after the hypothesis was disproven. No review episode was reset. Outstanding findings: none. The docs review's nonblocking isolation-wording nit is corrected in the report by separating pinned helper provenance from the extra live-working-tree collection query. Package-tests is not skipped; finalize-review will run its mandatory checks.
+
