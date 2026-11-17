@@ -24,8 +24,6 @@ REQ-6 — Preserve evidence
 - agent-decided (REQ-3/5): Implement attribution as a dedicated probe capability, called by graduated discovery. Keep committed_branch_delta, branch_base, reviewer floor and auto-skip logic unchanged. Avoid recursion when validating historical no-program records; records without a program execution cannot justify an exclusion.
 - user-decided (REQ-4/6): Keep five programs, local-only delivery, and the finance terminal episode; do not add higher-cap exceptions or alter installed cache.
 
-- agent-decided (REQ-1/3), Round 1 clarification: History queries naming one intent, canonical record or program must treat that name literally; only the query enumerating all canonical attestations intentionally uses a glob. Git's pathspec interpretation cannot establish uninterrupted identity for a different file. Requirements and review-episode continuity are unchanged.
-
 ## Alternatives considered
 - A configurable later branch base: rejected because it can hide unreviewed content and affects unrelated reviewer/skip calculations.
 - Only count supplied programs: rejected because programs committed or graduated but not supplied would escape the ceiling.

@@ -16,12 +16,6 @@ charter: 1.1
 - Test: A4 positive: current-release-synchronized; negative: stale-version; A6 positive: evidence-unchanged; boundary: no-finance-execution. Reuse test_write_plan_station_text.py release synchronization and adversary protocol tests.
 - Risk: agent-decided — REQ-4/6 documents existing five-program policy with verified attribution; minor release for changed contract prose. Name CHANGELOG entry and CURRENT_VERSION pin; regenerate manifests rather than editing derived files.
 
-### Wave 3 — Round 1 correction
-**W3-01 Make prerequisite history paths literal** after: W2-01 acceptance: 1,3
-- Files: loom-code/scripts/loom_checker/probe_attribution.py, loom-code/tests/test_selection_finalize.py, docs/loom/2026-11-17-probe-prerequisite-attribution/evidence/w3-01-tests.md
-- Test: A1 positive: unchanged-literal-path; negative: glob-history; A3 positive: literal-history; negative: modified-restored-glob. Extend existing fixtures with one regression for Git interpreting filenames as patterns; RED before correction.
-- Risk: agent-decided — REQ-1/3 requires exact named-path history; preserve intentional attestation enumeration glob and existing fixture coverage. Do not edit the adversary's reused program; add the regression to the existing finalization test module.
-
 ## Simplicity check
 - none found
 
@@ -33,4 +27,3 @@ charter: 1.1
 2. Historical metadata can outlive the matching tree; validate at the recorded attestation revision, never compare an old digest with current HEAD and call it valid.
 3. Reverted or copied files cannot inherit exclusions. The implementation must verify ancestry and uninterrupted path identity, preserving existing rename behavior separately.
 4. Local-only delivery; no external model content transmission, installation or finance episode retry is authorized. Use native fresh-context reviewers and retain original records.
-5. Round 1 identified Git wildcard-history mismatch and missing external-semantic grounding. W3-01 addresses both as one class; requirements and the existing bounded review episode remain unchanged.
