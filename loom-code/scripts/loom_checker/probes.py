@@ -503,15 +503,22 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
     change's probe, not this change's output, and counting it once refused a
     change that moved every test into `tests/` folders. See `_moved_paths`
     for how a move is told apart from a new or copied probe.
+
+    Validated pre-intent execution evidence also excludes an unchanged
+    prerequisite here. Explicitly supplied executions remain counted by the
+    caller's union, independently of this automatic discovery.
     """
     delta = committed_branch_delta(repo, change_id, head_sha)
     if delta is None:
         return []
     _paths, removed, added = delta
     moved = _moved_paths(repo, head_sha, removed)
+    from loom_checker.probe_attribution import prerequisite_probe_programs
+    prerequisites = prerequisite_probe_programs(repo, head_sha, change_id)
     return sorted(
         path for path in added
         if path not in moved
+        and path not in prerequisites
         and is_program_path(path)
         and _carries_concern(repo, head_sha, path)
         and suite_collection(repo, path)[0] is not False
