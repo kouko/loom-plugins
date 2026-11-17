@@ -1,0 +1,131 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-17-probe-prerequisite-attribution",
+  "content_digest": "25ba9a1f76c5bde8c8df4efe926cff70c909ff6d",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_probe_attribution.py -q",
+      "artifact": "loom-code/tests/test_probe_attribution.py",
+      "result": "pass",
+      "command_digest": "1290ef722a5f5b80c789ce722f1f3c0d6c4cf964d440559ad4adbdd5a0bb0395"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/closing_code",
+      "vendor": "openai",
+      "model": "inherited (exact model unverified)",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "d3faa624d436f22aaa083b8f2b163bb924c2e7ba",
+      "review_target_sha": "6ec90d1c8678ca4d2551372a52118114e3748ecb",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists."
+      },
+      "findings": [
+        {
+          "status": "dismissed",
+          "severity": "fatal",
+          "dimension": "correctness",
+          "anchor": "loom-code/scripts/loom_checker/probe_attribution.py:69",
+          "text": "note (non-blocking): Withdrawn. Bracket filenames fail prerequisite command validation. The complete backslash fixture passes the real historical validator, establishes exclusion while unchanged, and correctly loses exclusion after modification and restoration; Git returns both alteration commits. My nonexistent-literal-path experiment did not establish that history for an existing literal artifact would be omitted.",
+          "fix": "No production change or permanent regression is required for this disproven finding; retain the rebuttal evidence and corrected disposition."
+        },
+        {
+          "status": "dismissed",
+          "severity": "fatal",
+          "dimension": "external-surface-grounding",
+          "anchor": "loom-code/scripts/loom_checker/probe_attribution.py:69",
+          "text": "note (non-blocking): Withdrawn as a blocker. Official Git documentation now grounds the relevant CLI semantics in the review evidence, and the lens does not require citations to appear beside the code. Missing code-adjacent links therefore do not independently justify the proposed patch or the original fatal finding.",
+          "fix": "Retain the verified documentation links with the rebuttal evidence; no behavioral correction is justified."
+        }
+      ],
+      "notes": [
+        "Read the complete temporary fixture, raw output, context and W3 evidence. The unchanged production helper passed its first complete backslash trial: 1 passed, 62 deselected. This is counterevidence, not RED/GREEN or a product fix.",
+        "Original independent test evidence remains: attribution module 9 passed; release-pin module 43 passed. Same original Round 1 and target; no new digest, repository edit, finance query or test rerun by this reviewer.",
+        "Verified primary sources: https://git-scm.com/docs/git#Documentation/git.txt---literal-pathspecs and https://git-scm.com/docs/git-log for full-history and ancestry-path. These sources and the complete fixture replace my unsupported inference; no outstanding code-lens finding remains."
+      ]
+    },
+    {
+      "reviewer": "/root/closing_docs",
+      "vendor": "openai",
+      "model": "inherited (exact model unverified)",
+      "lens": "docs",
+      "verdict": "PASS",
+      "reviewed_sha": "d3faa624d436f22aaa083b8f2b163bb924c2e7ba",
+      "review_target_sha": "6ec90d1c8678ca4d2551372a52118114e3748ecb",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-11-17-probe-prerequisite-attribution/acceptance-test-report.md:22",
+          "text": "issue (non-blocking): The claim that pinning the historical revision avoided mixing in current work contradicts line 18 and the evidence report: graduated discovery still collected the moving working tree. The explicit preceding limitation prevents this wording from misleading the reader about acceptance.",
+          "fix": "Replace this bullet with an explicit distinction: the helper verified historical provenance at the pinned revision, while the full-counter query collected current-tree tests and is not historical full-counter evidence; the clean fixture establishes five-prior/one-current behavior."
+        }
+      ],
+      "notes": [
+        "Read all changed prose and release metadata, the complete adversarial protocol, ground-truth documents, attribution implementation, attestation validation, and collection implementation. This docs verdict does not resolve or supersede the existing code review's two fatal findings.",
+        "Focused release verification: test_write_plan_station_text.py completed with 43 passed; scripts/sync_codex_manifests.py --all --check passed. Independently recomputed the historical Build log: 16 pytest groups, 4040 passed and 5 skipped; shell summaries also passed. No full-suite or adversarial program rerun was performed.",
+        "Historical finance provenance and live collection are explicitly distinguished in the evidence. No finance queries, finance tests, finalizer, external model calls, or repository edits were performed by this reviewer."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "b21d7827c68d641b0e3382ac4405afbb0275be24",
+  "tested_commit": "5fd9870b7d6f6dd17c9924cbd01bcd757ada93e9",
+  "reviewed_commit": "6b856cbaed6ed3770f869e38e97e8718a907c46f",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}
