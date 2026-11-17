@@ -1,4 +1,5 @@
 """Historical execution evidence only excludes immutable prerequisite probes."""
+# concern: forged historical evidence or interrupted probe identity evades the cap
 from __future__ import annotations
 
 import hashlib
