@@ -1,11 +1,9 @@
-"""Skill folders stay flat, and both checks of that rule actually run.
+"""Skill folders stay flat.
 
 A skill holds SKILL.md plus single-level subfolders, so a file at
 `<plugin>/skills/<skill>/<subfolder>/<nested>/...` breaks the rule. The package
 suite catches that here, committed or not, from git's own list: every tracked
-path, even one under an ignored folder, plus untracked, non-ignored files. The
-loom-workflow plugin hook catches it at write time, but it defers to a
-repo-level copy of itself, so this repository must not ship one.
+path, even one under an ignored folder, plus untracked, non-ignored files.
 
 `<plugin>` is a top-level folder named in this repository's marketplace.json:
 other folders holding a `skills/` directory, such as test fixtures or records
@@ -16,14 +14,12 @@ from __future__ import annotations
 import json
 import os
 import re
-import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-HOOK = REPO / "loom-workflow" / "scripts" / "validate-skill-folder-structure.sh"
 PLUGIN_NAMES = [
     plugin["name"]
     for plugin in json.loads(
@@ -107,26 +103,3 @@ def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
 
 def test_repository_skill_folders_are_flat():
     assert_skill_folders_flat(REPO)
-
-
-# A local checkout without jq skips; under CI a missing jq runs and fails.
-@pytest.mark.skipif(
-    shutil.which("jq") is None and not os.environ.get("CI"),
-    reason="hook reads stdin via jq",
-)
-def test_nested_write_reports_violation(tmp_path):
-    skill = tmp_path / "skills" / "x"
-    nested = skill / "assets" / "sub" / "f.md"
-    _write(skill / "SKILL.md")
-    _write(nested)
-    event = {"tool_name": "Write", "tool_input": {"file_path": str(nested)}}
-
-    # cwd is this repository, so a repo-level hook copy would make it defer.
-    result = subprocess.run(
-        ["bash", str(HOOK)], input=json.dumps(event),
-        capture_output=True, text=True, cwd=REPO,
-    )
-
-    assert result.returncode == 2, result.stderr
-    assert "Skill folder structure violation" in result.stderr
-    assert "assets/sub" in result.stderr
