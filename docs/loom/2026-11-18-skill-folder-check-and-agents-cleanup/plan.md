@@ -1,5 +1,5 @@
 # Skill folder check and AGENTS.md cleanup — plan
-intent: 2026-11-18-skill-folder-check-and-agents-cleanup@dc09e338
+intent: 2026-11-18-skill-folder-check-and-agents-cleanup@0c3bd97b
 charter: 1.1
 
 ## Current State Evidence
@@ -12,25 +12,27 @@ charter: 1.1
 ## Task DAG
 Wave 1 restores the check, then aligns the guide with it.
 
-**W1-01 Restore the flat skill-folder check**  after: none  acceptance: 1, 2
-- Files: tests/test_skill_folder_flatness.py (entry), .claude/hooks/validate-skill-folder-structure.sh (delete)
-- Test: A1 positive: nested-uncommitted-path-fails; boundary: flat-and-ignored-paths-pass. A2 positive: nested-write-reports-violation; negative: test_flat_skill_passes (existing).
-- Risk: agent-decided: delete the unregistered copy, because registering it duplicates the plugin hook. Plugin deferral stays for other repositories; existing `loom-workflow/tests/scripts/test_validate_skill_folder_structure_hook.py` coverage is preserved.
+**W1-01 Restore the flat skill-folder check**  after: none  acceptance: 1
+- Files: tests/test_skill_folder_flatness.py (entry)
+- Test: A1 positive: nested-uncommitted-path-fails; boundary: flat-and-ignored-paths-pass.
+- Risk: user-decided: the package suite is the check here; the unregistered copy stays, so the plugin hook keeps deferring. Existing `loom-workflow/tests/scripts/test_validate_skill_folder_structure_hook.py` coverage is preserved.
 
-**W1-02 Align AGENTS.md with the repository**  after: W1-01  acceptance: 3, 4, 5
+**W1-02 Align AGENTS.md with the repository**  after: W1-01  acceptance: 2, 3, 4
 - Files: AGENTS.md
-- Test: A3 positive: named-paths-resolve; negative: absent-plugin-names-gone. A4 positive: rules-match-current-sources; negative: stale-review-claims-gone. A5 positive: pinned-guide-tests-pass; negative: both-must-rules-retained. No new test file.
+- Test: A2 positive: named-paths-resolve; negative: absent-plugin-names-gone. A3 positive: rules-match-current-sources; negative: stale-review-claims-gone. A4 positive: pinned-guide-tests-pass; negative: both-must-rules-retained. No new test file.
 - Risk: agent-decided: point review details to `lenses.md` and the checker instead of restating them. Keep test-pinned sections; correct version text per plugin without weakening its MUST.
 
 ## Simplicity check
-- Reuse the existing flat-skill hook test instead of adding another A2 negative test — taken
+- Leave the write-time hook out of this change and rely on the package suite — taken
 - Verify AGENTS.md by lookups and existing tests instead of new prose-pin tests — taken
 
 ## Questions asked
 ① — what — 先修檢查和文件、只清 AGENTS.md、先補 main 防護、或先不動，要選哪一個？（answer: 先修檢查和文件）
 ① — consequence — 確認範圍、刪除未註冊的 repo hook、把跨 plugin 委派規則從本 repo 移除（monkey-skills/CLAUDE.md 仍保留），並授權審查與發布檢查通過後 non-force push 和 Ready PR；這樣可以嗎？（answer: ＯＫ）
+① — consequence — 要照建議退回 hook 這部分、取消寫檔當下提示的驗收條件，並保留未註冊的 repo hook 嗎？（answer: 退回吧）
 
 ## Risks
-1. user-decided — delete the unregistered repository hook and remove the cross-plugin rule here, because it remains in the sibling repository's `CLAUDE.md`.
+1. user-decided — remove the cross-plugin rule here, because it remains in the sibling repository's `CLAUDE.md`.
 2. agent-decided — no plugin version bump: this change edits no plugin path, so installed plugin content is unchanged.
-3. agent-decided — two test `conftest.py` comments naming the old hook were already outdated and stay untouched, keeping plugin paths out of this change.
+3. user-decided — Build requirement change: activating the plugin hook exposed false alarms and misses whose fix would affect other repositories. Former Acceptance 2 is removed and later lines renumber; W1-01 continues because its package-suite obligation is unchanged.
+4. agent-decided — evidence: package-suite flatness and AGENTS.md lookups still apply; hook-write evidence and hook adversarial programs no longer apply and are replaced.
