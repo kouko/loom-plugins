@@ -22,6 +22,11 @@ Wave 1 restores the check, then aligns the guide with it.
 - Test: A2 positive: named-paths-resolve; negative: absent-plugin-names-gone. A3 positive: rules-match-current-sources; negative: stale-review-claims-gone. A4 positive: pinned-guide-tests-pass; negative: both-must-rules-retained. No new test file.
 - Risk: agent-decided: point review details to `lenses.md` and the checker instead of restating them. Keep test-pinned sections; correct version text per plugin without weakening its MUST.
 
+**W1-03 Graduate the adversarial flatness programs**  after: W1-01  acceptance: 1
+- Files: tests/test_adversarial_flatness_committed_nested_missed.py, tests/test_adversarial_flatness_nested_repository_missed.py, tests/test_adversarial_flatness_non_plugin_false_alarm.py, tests/test_adversarial_flatness_removed_still_fails.py
+- Test: A1 positive: committed-nested-path-fails; boundary: removed-path-passes.
+- Risk: agent-decided: move each program that caught a defect into root `tests/` unchanged except for path resolution, so the package suite keeps them.
+
 ## Simplicity check
 - Leave the write-time hook out of this change and rely on the package suite — taken
 - Verify AGENTS.md by lookups and existing tests instead of new prose-pin tests — taken
