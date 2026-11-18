@@ -4,7 +4,12 @@ A skill holds SKILL.md plus single-level subfolders, so a file at
 `<plugin>/skills/<skill>/<subfolder>/<nested>/...` breaks the rule. The package
 suite catches that here, committed or not, from git's own list: every tracked
 path, even one under an ignored folder, plus untracked, non-ignored files, as
-long as the path still exists in the working tree.
+long as the path still exists in the working tree. A folder git lists as one
+entry, a nested repository, is searched on disk.
+
+Two limits are accepted. An uncommitted git-ignored path passes: it does not
+enter the repository, and local caches such as `__pycache__` would otherwise
+fail the suite. A symlink to a folder passes: git stores only the link.
 
 `<plugin>` is a top-level folder named in this repository's marketplace.json:
 other folders holding a `skills/` directory, such as test fixtures or records
@@ -37,10 +42,28 @@ def nested_skill_paths(relative_paths) -> list[str]:
     return sorted(path for path in relative_paths if NESTED_SKILL_FILE.match(path))
 
 
+def files_beneath(folder: Path, root: Path) -> list[str]:
+    """Files under `folder`, relative to `root`, outside any `.git`; links not followed.
+
+    This walks the disk because a gitlink folder may have no `.git` of its own,
+    and git run there would answer for the outer repository.
+    """
+    files = []
+    for current, folders, names in os.walk(folder):
+        folders[:] = [name for name in folders if name != ".git"]
+        files += [
+            (Path(current) / name).relative_to(root).as_posix()
+            for name in names
+            if name != ".git"
+        ]
+    return files
+
+
 def git_listed_paths(root: Path) -> list[str]:
     """Listed paths still on disk, relative to `root`; real folders end in `/`.
 
-    Git lists a nested repository as the folder itself, so no file path shows it.
+    Git lists a nested repository as the folder itself, so no file path shows it:
+    such a folder is followed by the files beneath it.
     """
     listing = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "--others",
@@ -54,6 +77,8 @@ def git_listed_paths(root: Path) -> list[str]:
         if os.path.lexists(full_path):
             is_folder = full_path.is_dir() and not full_path.is_symlink()
             paths.append(f"{path}/" if is_folder else path)
+            if is_folder:
+                paths += files_beneath(full_path, root)
     return paths
 
 
@@ -107,12 +132,20 @@ def test_nested_path_fails(tmp_path, nested, committed):
 
 
 @pytest.mark.parametrize("outer_committed", [False, True], ids=["untracked", "gitlink"])
-def test_nested_git_repository_fails(tmp_path, outer_committed):
+@pytest.mark.parametrize(
+    ("repository", "inner_file", "nested"),
+    [
+        ("loom-code/skills/x/assets/vendor", "f.md", "loom-code/skills/x/assets/vendor"),
+        ("loom-code/skills/x/references", "deep/f.md", "loom-code/skills/x/references/deep/f.md"),
+        ("loom-code/skills/x", "references/deep/f.md", "loom-code/skills/x/references/deep/f.md"),
+    ],
+    ids=["repository-is-nested", "repository-at-subfolder", "repository-at-skill"],
+)
+def test_nested_git_repository_fails(tmp_path, outer_committed, repository, inner_file, nested):
     repo = _git_repo(tmp_path)
-    nested = "loom-code/skills/x/assets/vendor"
-    _git_repo(repo / nested)
-    _write(repo / nested / "f.md")
-    _commit_all(repo / nested)
+    _git_repo(repo / repository)
+    _write(repo / repository / inner_file)
+    _commit_all(repo / repository)
     if outer_committed:
         _commit_all(repo)
 
@@ -129,6 +162,9 @@ def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
     _write(repo / "loom-code/skills/x/assets/cache/f.md")
     _write(repo / "tests/skills/x/assets/sub/f.md")
     os.symlink("..", repo / "loom-code/skills/x/assets/folder-link")
+    _git_repo(repo / "loom-code/skills/y")
+    _write(repo / "loom-code/skills/y/references/f.md")
+    _commit_all(repo / "loom-code/skills/y")
 
     assert_skill_folders_flat(repo)
     assert nested_skill_paths(["docs/loom/change/loom-code/skills/x/assets/sub/f.md"]) == []
