@@ -15,9 +15,11 @@ its content to search.
 These pass:
 - An uncommitted git-ignored path: it does not enter the repository, and local
   caches such as `__pycache__` would otherwise fail the suite.
-- A symlink at `<plugin>`, its `skills` folder or beneath: git stores only the link, but it is rejected in skill scope — remove it or move it out of scope.
 - A committed file already deleted from disk: the deletion is the fix, not yet
   committed.
+
+These fail:
+- A symlink at `<plugin>`, its `skills` folder or beneath: git stores only the link, and the check rejects it — remove the link or move it out of scope.
 
 Ignore rules do not apply inside a nested repository that git lists, so an
 ignored file nested there fails: its files are walked on disk, because git run
