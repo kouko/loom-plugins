@@ -15,7 +15,7 @@ its content to search.
 These pass:
 - An uncommitted git-ignored path: it does not enter the repository, and local
   caches such as `__pycache__` would otherwise fail the suite.
-- A symlink to a folder: git stores only the link.
+- A symlink at `<plugin>`, its `skills` folder or beneath: git stores only the link, but it is rejected in skill scope — remove it or move it out of scope.
 - A committed file already deleted from disk: the deletion is the fix, not yet
   committed.
 
@@ -311,13 +311,45 @@ def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
     _write(repo / "loom-code/skills/x/assets/f.md")
     _write(repo / "loom-code/skills/x/assets/cache/f.md")
     _write(repo / "tests/skills/x/assets/sub/f.md")
-    os.symlink("..", repo / "loom-code/skills/x/assets/folder-link")
     _git_repo(repo / "loom-code/skills/y")
     _write(repo / "loom-code/skills/y/references/f.md")
     _commit_all(repo / "loom-code/skills/y")
 
     assert_skill_folders_flat(repo)
     assert nested_skill_paths(["docs/loom/change/loom-code/skills/x/assets/sub/f.md"]) == []
+
+
+def test_symlink_outside_plugin_scope_passes(tmp_path):
+    """A3 positive: symlink outside plugin scope passes."""
+    repo = _git_repo(tmp_path)
+    _write(repo / "loom-code/skills/x/SKILL.md")
+    _link(repo, "tests/outside/link", "SKILL.md")
+
+    assert_skill_folders_flat(repo)
+
+
+def test_symlink_at_plugin_root_fails(tmp_path):
+    """A3 boundary: symlink at plugin root fails."""
+    repo = _git_repo(tmp_path)
+    _link(repo, "loom-code", "..")
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert "loom-code" in str(failure.value)
+
+
+def test_in_scope_symlink_flips_pass_to_fail(tmp_path):
+    """A4 boundary: adding an in-scope file symlink flips the suite from passing to failing."""
+    repo = _git_repo(tmp_path)
+    _write(repo / "loom-code/skills/x/SKILL.md")
+    _write(repo / "loom-code/skills/x/references/f.md")
+
+    assert_skill_folders_flat(repo)
+    _link(repo, "loom-code/skills/x/references/single-file-link", "SKILL.md")
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert "single-file-link" in str(failure.value)
 
 
 def test_repository_skill_folders_are_flat():
