@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[5]
-SKILL = "plugin/skills/x"
+SKILL = "loom-code/skills/x"  # the check scopes <plugin> to marketplace names
 
 
 def _flatness_module():
@@ -33,9 +33,6 @@ def _git(root: Path, *args: str) -> None:
 
 def _committed_repo(root: Path, relative: str, symlink: bool) -> Path:
     _git(root, "init", "-q")
-    marker = root / "plugin" / ".claude-plugin" / "plugin.json"
-    marker.parent.mkdir(parents=True)
-    marker.write_text("{}\n", encoding="utf-8")
     target = root / relative
     target.parent.mkdir(parents=True)
     if symlink:
