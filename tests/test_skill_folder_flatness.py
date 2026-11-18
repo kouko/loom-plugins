@@ -3,7 +3,8 @@
 A skill holds SKILL.md plus single-level subfolders, so a file at
 `<plugin>/skills/<skill>/<subfolder>/<nested>/...` breaks the rule. The package
 suite catches that here, committed or not, from git's own list: every tracked
-path, even one under an ignored folder, plus untracked, non-ignored files.
+path, even one under an ignored folder, plus untracked, non-ignored files, as
+long as the path still exists in the working tree.
 
 `<plugin>` is a top-level folder named in this repository's marketplace.json:
 other folders holding a `skills/` directory, such as test fixtures or records
@@ -27,8 +28,7 @@ PLUGIN_NAMES = [
     )["plugins"]
 ]
 NESTED_SKILL_FILE = re.compile(
-    rf"^(?:{'|'.join(map(re.escape, PLUGIN_NAMES))})/skills/[^/]+/[^/]+/[^/]+/.",
-    re.DOTALL,
+    rf"^(?:{'|'.join(map(re.escape, PLUGIN_NAMES))})/skills/[^/]+/[^/]+/[^/]+/"
 )
 
 
@@ -38,13 +38,23 @@ def nested_skill_paths(relative_paths) -> list[str]:
 
 
 def git_listed_paths(root: Path) -> list[str]:
-    """Tracked paths plus untracked, non-ignored ones, relative to `root`."""
+    """Listed paths still on disk, relative to `root`; real folders end in `/`.
+
+    Git lists a nested repository as the folder itself, so no file path shows it.
+    """
     listing = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "--others",
          "--exclude-standard", "-z"],
         check=True, capture_output=True,
     ).stdout
-    return [os.fsdecode(path) for path in listing.split(b"\0") if path]
+    paths = []
+    for entry in filter(None, listing.split(b"\0")):
+        path = os.fsdecode(entry).rstrip("/")
+        full_path = root / path
+        if os.path.lexists(full_path):
+            is_folder = full_path.is_dir() and not full_path.is_symlink()
+            paths.append(f"{path}/" if is_folder else path)
+    return paths
 
 
 def assert_skill_folders_flat(root: Path) -> None:
@@ -65,6 +75,12 @@ def _write(path: Path) -> None:
     path.write_text("x\n", encoding="utf-8")
 
 
+def _commit_all(root: Path) -> None:
+    git = ["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
+    subprocess.run([*git, "add", "--force", "."], check=True, capture_output=True)
+    subprocess.run([*git, "commit", "-q", "-m", "fixture"], check=True)
+
+
 @pytest.mark.parametrize(
     ("nested", "committed"),
     [
@@ -78,15 +94,31 @@ def test_nested_path_fails(tmp_path, nested, committed):
     repo = _git_repo(tmp_path)
     _write(repo / nested)
     if committed:
-        git = ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
-        subprocess.run([*git, "add", "--force", "."], check=True)
-        subprocess.run([*git, "commit", "-q", "-m", "fixture"], check=True)
+        _commit_all(repo)
 
     assert nested_skill_paths(git_listed_paths(repo)) == [nested]
     with pytest.raises(AssertionError) as failure:
         assert_skill_folders_flat(repo)
     # pytest indents continuation lines, so match a newline name's last line.
     assert nested.splitlines()[-1] in str(failure.value)
+
+    (repo / nested).unlink()
+    assert_skill_folders_flat(repo)
+
+
+@pytest.mark.parametrize("outer_committed", [False, True], ids=["untracked", "gitlink"])
+def test_nested_git_repository_fails(tmp_path, outer_committed):
+    repo = _git_repo(tmp_path)
+    nested = "loom-code/skills/x/assets/vendor"
+    _git_repo(repo / nested)
+    _write(repo / nested / "f.md")
+    _commit_all(repo / nested)
+    if outer_committed:
+        _commit_all(repo)
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert nested in str(failure.value)
 
 
 def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
@@ -96,6 +128,7 @@ def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
     _write(repo / "loom-code/skills/x/assets/f.md")
     _write(repo / "loom-code/skills/x/assets/cache/f.md")
     _write(repo / "tests/skills/x/assets/sub/f.md")
+    os.symlink("..", repo / "loom-code/skills/x/assets/folder-link")
 
     assert_skill_folders_flat(repo)
     assert nested_skill_paths(["docs/loom/change/loom-code/skills/x/assets/sub/f.md"]) == []
