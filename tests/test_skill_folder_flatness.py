@@ -76,23 +76,48 @@ def git_listed_paths(root: Path) -> list[str]:
     """Listed paths still on disk, relative to `root`; real folders end in `/`.
 
     Git lists a nested repository as the folder itself, so no file path shows it:
-    such a folder is followed by the files beneath it.
+    such a folder is followed by the files beneath it. A symlink is listed as a
+    plain path and is not followed: its target may lie outside the repository.
+    A committed symlink absent from disk (a fresh clone) stays a plain path too.
     """
     listing = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "--others",
-         "--exclude-standard", "-z"],
+         "--exclude-standard", "--stage", "-z"],
         check=True, capture_output=True,
     ).stdout
     paths = []
     for entry in filter(None, listing.split(b"\0")):
-        path = os.fsdecode(entry).rstrip("/")
+        metadata, raw_path = entry.split(b"\t", 1) if b"\t" in entry else (b"", entry)
+        path = os.fsdecode(raw_path).rstrip("/")
         full_path = root / path
         if os.path.lexists(full_path):
             is_folder = full_path.is_dir() and not full_path.is_symlink()
             paths.append(f"{path}/" if is_folder else path)
             if is_folder:
                 paths += files_beneath(full_path, root)
+        elif metadata.startswith(b"120000 "):
+            paths.append(path)
     return paths
+
+
+def skill_symlinks(root: Path) -> list[str]:
+    """Symlinks at a plugin, its `skills` or beneath, from git's list and the disk."""
+    listing = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--cached", "--others",
+         "--exclude-standard", "--stage", "-z"],
+        check=True, capture_output=True,
+    ).stdout
+    links = {
+        path
+        for path in git_listed_paths(root)
+        if HOLDS_SKILL_CONTENT.match(path) and (root / path.rstrip("/")).is_symlink()
+    }
+    for entry in filter(None, listing.split(b"\0")):
+        metadata, raw_path = entry.split(b"\t", 1) if b"\t" in entry else (b"", entry)
+        path = os.fsdecode(raw_path)
+        if metadata.startswith(b"120000 ") and HOLDS_SKILL_CONTENT.match(path):
+            links.add(path)
+    return sorted(links)
 
 
 def skill_gitlinks(root: Path) -> list[str]:
@@ -111,12 +136,18 @@ def skill_gitlinks(root: Path) -> list[str]:
 
 def assert_skill_folders_flat(root: Path) -> None:
     violations = sorted(
-        {*nested_skill_paths(git_listed_paths(root)), *skill_gitlinks(root)}
+        {
+            *nested_skill_paths(git_listed_paths(root)),
+            *skill_gitlinks(root),
+            *skill_symlinks(root),
+        }
     )
     assert not violations, (
-        "skill subfolders must not contain subfolders, and no gitlink may sit "
+        "skill subfolders must not contain subfolders, no gitlink may sit "
+        "at a plugin, its skills folder or beneath, and no symlink may sit "
         "at a plugin, its skills folder or beneath; move these files up one "
-        "level, or remove a gitlink with `git rm --cached <path>` and commit:\n"
+        "level, or remove a gitlink with `git rm --cached <path>` and commit, "
+        "or delete the link:\n"
         + "\n".join(violations)
     )
 
@@ -144,6 +175,12 @@ def _add_gitlink(root: Path, path: str) -> None:
          f"160000,{'1' * 40},{path}"],
         check=True,
     )
+
+
+def _link(root: Path, path: str, target: str) -> None:
+    """A symlink at `path`, to a folder or a single file."""
+    (root / path).parent.mkdir(parents=True, exist_ok=True)
+    os.symlink(target, root / path)
 
 
 @pytest.mark.parametrize(
@@ -192,6 +229,55 @@ def test_nested_git_repository_fails(tmp_path, outer_committed, repository, inne
     with pytest.raises(AssertionError) as failure:
         assert_skill_folders_flat(repo)
     assert nested in str(failure.value)
+
+
+@pytest.mark.parametrize("committed", [False, True], ids=["untracked", "staged"])
+@pytest.mark.parametrize(
+    ("link", "target"),
+    [
+        ("loom-code/skills/x/assets/folder-link", ".."),
+        ("loom-code/skills/x/assets/file-link.md", "../../SKILL.md"),
+    ],
+    ids=["folder-link", "file-link"],
+)
+def test_skill_scope_symlink_fails_until_removed(tmp_path, link, target, committed):
+    repo = _git_repo(tmp_path)
+    _write(repo / "loom-code/skills/x/SKILL.md")
+    _link(repo, link, target)
+    if committed:
+        subprocess.run(["git", "-C", str(repo), "add", "--force", "."], check=True,
+                       capture_output=True)
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert link in str(failure.value)
+
+    (repo / link).unlink()
+    if committed:
+        subprocess.run(["git", "-C", str(repo), "rm", "-q", "--cached", link], check=True)
+    assert_skill_folders_flat(repo)
+
+
+@pytest.mark.parametrize(
+    ("link", "target"),
+    [
+        ("loom-code/skills/x/references", ".."),
+        ("loom-code/skills", ".."),
+        ("loom-code", ".."),
+        ("loom-code/skills/x/assets/deep/f.md", "../../../../../SKILL.md"),
+    ],
+    ids=["at-skill-subfolder", "at-skills", "at-plugin", "deep-file"],
+)
+def test_committed_symlink_fails_from_index_without_folder(tmp_path, link, target):
+    """A clone has the link, not a working-tree link: detection reads git's list."""
+    repo = _git_repo(tmp_path)
+    _link(repo, link, target)
+    _commit_all(repo)
+    (repo / link).unlink()
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert link in str(failure.value)
 
 
 @pytest.mark.parametrize(
