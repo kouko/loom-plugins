@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[1]
 SKILL = "loom-code/skills/x"  # the check scopes <plugin> to marketplace names
 
 

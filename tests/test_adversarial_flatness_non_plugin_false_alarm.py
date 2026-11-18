@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[1]
 
 
 def _flatness_module():
