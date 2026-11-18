@@ -1,10 +1,10 @@
 # Skill folder check and AGENTS.md cleanup — acceptance test evidence
 
-Tried on 2026-11-18, in clean copies of the project at f3770eaec
-(f3770eaecde5d6c445e5b02b6b682ba484750f6a). Every copy was a fresh
+Tried on 2026-11-18, in clean copies of the project at 9552e1de1
+(9552e1de163016299fa863abad0017419fba089c). Every copy was a fresh
 `git clone --no-hardlinks` at that commit with an empty `git status`. Each Acceptance 1
 scenario had its own clone. No trial touched the session worktree, and nothing was
-repaired.
+repaired. Section 2 is carried over from f3770eaec; see the last re-run section.
 
 Setup: the README's Development section has no contributor test setup, so I used the
 command the station gave. Every test command ran through
@@ -25,10 +25,11 @@ The full package suite was not run here; `finalize-review` executes it:
   `pytest tests loom-code/tests --ignore=<clone>/loom-code/tests/local ...`, and
   `pytest tests loom-code/tests --collect-only -q -k test_repository_skill_folders_are_flat --ignore=loom-code/tests/local`
   reports `tests/test_skill_folder_flatness.py::test_repository_skill_folders_are_flat`,
-  `1/2892 tests collected`.
-- Failure message: `AssertionError: skill subfolders must not contain subfolders, and skills must not contain gitlinks; move these files up one level or remove the gitlink:` followed by the paths.
-- In the tables, `F` is exit 1 with `1 failed, 13 passed`, the failure always being
-  `test_repository_skill_folders_are_flat`; `P` is exit 0 with `14 passed`. Baseline: `P`.
+  `1/2894 tests collected`.
+- Failure message: ``AssertionError: skill subfolders must not contain subfolders, and no gitlink may sit at a plugin, its skills folder or beneath; move these files up one level, or remove a gitlink with `git rm --cached <path>` and commit:`` followed by the paths.
+- In the tables, `F` is exit 1 with `1 failed, 15 passed`, the failure always being
+  `test_repository_skill_folders_are_flat`; `P` is exit 0 with `16 passed`. Baseline: `P`.
+  The one exception is the `loom-code` gitlink, described under its own table.
   `X` stands for `loom-code/skills/x`, `CR` for
   `loom-code/skills/closing-review/references`.
 
@@ -64,10 +65,48 @@ Committed gitlink in a new `git clone` of that commit (mode 160000, folder has 0
 | `X/` | F | `X/` | P |
 | `X/references/vendored/` | F | `X/references/vendored/` | P |
 
-Removing a gitlink: `git rm -r -f <gitlink>` is refused with exit 128,
-`fatal: could not lookup name for submodule '<path>'`; the entry stays in the index and the
-check still fails (`X/references/`, run without `-n`; the other two refused the same way
-under `-n`). "Removed by commit" is `git rm --cached <path>`, the folder moved out, commit.
+"Removed by commit" in the first table is `git rm --cached <path>`, the folder moved out,
+commit.
+
+Gitlink at every level. Each repository holds a file that would be nested once it sits in
+the plugin (`.../references/deep/f.md`). For a folder git already tracked, its files were
+first dropped from the index and moved out:
+
+| Gitlink at | Committed, inner repository present | New clone, unfetched (0 entries) | There: `git rm --cached` + commit | There: `git rm -r -f` + commit | Inner repository present: `git rm --cached` + commit | Then folder moved away |
+|---|---|---|---|---|---|---|
+| `loom-design` | F | F | P | P | **F** | P |
+| `loom-design/skills` | F | F | P | P | **F** | P |
+| `loom-code/skills` | F | F | P | P | **F** | P |
+| `X` | F | F | P | P | **F** | P |
+| `X/references` | F | F | P | P | **F** | P |
+
+Paths named: committed with the repository present, the gitlink folder and the inner nested
+file; unfetched, the gitlink folder only; after `git rm --cached` with the repository still on
+disk, the inner nested file only, because it is now an untracked repository. A flat repository
+at `X/references` in that same state: P.
+
+Gitlink at `loom-code` (mode 160000, 0 entries in a new clone). The suite runner imports
+`repo_files` from that folder (`scripts/run_package_tests.py:47-49`), so it stops before any
+test runs:
+
+| State | Suite runner | `pytest tests/test_skill_folder_flatness.py -q` |
+|---|---|---|
+| committed, inner repository present | exit 1, `ModuleNotFoundError: No module named 'repo_files'`, **no path named** | F, names `loom-code/` and the inner file |
+| new clone, unfetched | same | F, names `loom-code/` |
+| `git rm --cached` + commit | same | P |
+| plugin files restored from the earlier commit and committed | P | P |
+
+`git rm -r -f <gitlink>`, run without `-n` at all six levels:
+
+| Folder state | Result |
+|---|---|
+| holds the inner repository | exit 128, `fatal: could not lookup name for submodule '<path>'`; the entry stays in the index and the check still fails |
+| empty, in a new clone | exit 0, `rm '<path>'`; the folder is gone; after a commit the check passes (at `loom-code` this last step was not run through the check) |
+| absent, in a new clone | exit 0 |
+| holds plain files and no `.git`, in a new clone | exit 0 |
+
+A committed gitlink elsewhere in a plugin, `loom-code/vendor` holding `deep/er/f.md`: **P**,
+also in a new clone.
 
 Flat repositories (nothing nested inside):
 
@@ -120,18 +159,21 @@ Committed file deleted from disk (`CR/nested-trial/note.md`):
 
 Why each limit exists, from `tests/test_skill_folder_flatness.py`:
 
-- Ignored paths pass: `:80-81` uses `git ls-files --cached --others --exclude-standard`;
-  reason at `:15-16`.
-- Folder symlinks pass: `:89` does not treat a link as a folder; reason at `:17`.
-- Deleted but uncommitted files pass: `:88` keeps only listed paths still on disk; reason
-  at `:18-19`.
-- Every gitlink at or under a skill fails, flat or not: `:96-107`; reason at `:10-12`.
-- Ignored files inside a nested repository fail: `:56-70` walks the disk and applies no
-  ignore rule; reason at `:21-23`.
-- Folders outside `marketplace.json` are not checked: `:40-46`; reason at `:25-27`.
+- Ignored paths pass: `:82-83` uses `git ls-files --cached --others --exclude-standard`;
+  reason at `:16-17`.
+- Folder symlinks pass: `:91` does not treat a link as a folder; reason at `:18`.
+- Deleted but uncommitted files pass: `:90` keeps only listed paths still on disk; reason
+  at `:19-20`.
+- Every gitlink at a plugin, its `skills` folder or beneath fails, flat or not: `:50` and
+  `:98-109`; reason at `:10-13`. A gitlink elsewhere in a plugin does not match `:50`.
+- Ignored files inside a listed nested repository fail: `:58-72` walks the disk and applies
+  no ignore rule; reason at `:22-25`.
+- Folders outside `marketplace.json` are not checked: `:42-50`; reason at `:27-29`.
 
 Verdict basis: `partly`. "Any nested folder, committed or not" does not hold for the bold
-`P` rows of ignored names and symlinks; the removal half holds in every case tried.
+`P` rows of ignored names and symlinks, and a gitlink at `loom-code` fails the suite without
+naming the path. The removal half holds in every case tried, once the nested content is
+really gone.
 
 ## 2. `AGENTS.md` 不再提及不在這個 repo 的 plugin，也不再指向不存在的檔案或測試。
 
@@ -174,15 +216,13 @@ Verdict basis: `partly`. "Any nested folder, committed or not" does not hold for
 |---|---|---|
 | 5-7 | tracked paths, even under an ignored folder, plus untracked non-ignored files, while on disk | matches: force-added `node_modules` F; deleted file P |
 | 7-8 | a nested repository is searched on disk | matches: untracked repositories name inner files |
-| 10-12 | a gitlink at or under a skill always fails, with or without its folder | matches, including flat repositories and new clones |
-| 15-16 | an uncommitted ignored path passes | matches |
-| 17 | a folder symlink passes | matches: uncommitted, committed, new clone |
-| 18-19 | a committed file deleted from disk passes | matches |
-| 21-23 | ignore rules do not apply inside a nested repository, so an ignored file nested there fails | matches for the four repositories in visible folders; **not** for a repository under an ignored name, which passes with `__pycache__/x.pyc` inside |
-| 25-27 | only top-level folders in `marketplace.json` are plugins | matches: `new-plugin/` P |
+| 10-13 | a committed gitlink at a plugin, its `skills` folder, a skill or beneath always fails, with or without its folder | matches at every level, flat or not, in new clones; a staged gitlink fails too |
+| 16-17 | an uncommitted ignored path passes | matches |
+| 18 | a folder symlink passes | matches: uncommitted, committed, new clone |
+| 19-20 | a committed file deleted from disk passes | matches |
+| 22-25 | an ignored file inside a listed nested repository fails; a repository under an ignored name is not listed and passes | matches both halves |
+| 27-29 | only top-level folders in `marketplace.json` are plugins | matches: `new-plugin/` P |
 
-  The lines 21-23 exception is covered by lines 15-16 when both are read, but lines 21-23
-  state no such limit.
 - Review lenses and count (`AGENTS.md:95-97`): `lenses.md` exists with Code, Docs, Conformance
   and question, Skill and Plan sections.
   `python3 loom-code/scripts/loom_checker.py reviewer-count 2026-11-18-skill-folder-check-and-agents-cleanup`
@@ -203,8 +243,8 @@ Verdict basis: `partly`. "Any nested folder, committed or not" does not hold for
   `pytest loom-design/tests/spec/test_capture_intent_contract.py -q` gave `1 failed, 27 passed`
   (`test_loom_design_version_2_17_0_consistent`).
 - The older claims searched for (`11 維`, `≥2`, `三份`, `hook 擋`, `會被 ... 擋下`) have no match.
-- Verdict basis: `works`, because every `AGENTS.md` statement matches. The lines 21-23
-  wording is in the test file it points to and is reported as a nit.
+- Verdict basis: `works`: every `AGENTS.md` statement and every claim in the opening it
+  points to matches what I observed.
 
 ## 4. `AGENTS.md` 仍保留 skill 資料夾扁平與版號 bump 的 MUST 規則，完整 package suite 通過。
 
@@ -218,10 +258,10 @@ Verdict basis: `partly`. "Any nested folder, committed or not" does not hold for
     `tests/test_adversarial_agy_rule_sync.py`, and `loom-code/tests/` files
     `test_module_criteria_text.py`, `test_check_contract_citations.py`,
     `test_check_skill_crossrefs.py`, `test_legacy_contract_removed.py`,
-    `test_adversary_protocol.py`, `test_write_plan_station_text.py`: `233 passed`.
+    `test_adversary_protocol.py`, `test_write_plan_station_text.py`: `235 passed`.
   - `pytest loom-design/tests/spec/test_capture_intent_contract.py -q`: `28 passed`.
   - `pytest loom-workflow/tests/scripts/test_release_metadata.py -q`: `15 passed`.
-  - Total 276 passed; `git status --short` stayed empty.
+  - Total 278 passed; `git status --short` stayed empty.
 - Repository checks: `loom-code/scripts/check_contract_citations.py` printed
   `OK: 1 known-violating files unchanged, no new contract citations of this repo's records.`;
   `loom-code/scripts/check-skill-crossrefs.py` printed `OK: all relative skill cross-references resolve.`
@@ -239,3 +279,15 @@ This run replaces the earlier one at 23682b64c; the functional content changed s
 - 3: re-tested — `AGENTS.md:42` and the test file's opening against section 1, hook trial,
   lenses, reviewer count, versions, sync and bump trial.
 - 4: re-tested — MUST rules, covering tests and repository checks in a clean clone.
+
+## Re-run on 2026-11-18, at 9552e1de1
+
+Fix range `31126fefe..9552e1de1` changes only `tests/test_skill_folder_flatness.py`.
+
+- 1: re-tested — every case in section 1 again, plus gitlinks at a plugin, its `skills`
+  folder, a skill and a skill subfolder, unfetched, and each removal route.
+- 2: carried over — the fix leaves `AGENTS.md` unchanged and the test file it names still
+  exists.
+- 3: re-tested — `AGENTS.md:42` and the changed opening against section 1, hook trial, lenses,
+  reviewer count, versions, sync and bump trial.
+- 4: re-tested — MUST rules, covering tests including the changed file, and repository checks.
