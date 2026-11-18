@@ -39,7 +39,7 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - SKILL.md body 硬上限 ~6,000 tokens（約 4,500 words）；軟目標 ~5,000 tokens（約 3,750 words，對齊官方建議）；超過軟目標需在 PR 註明一行理由。Anthropic 官方建議 <500 lines，本 repo 改用 token 計量因為行數密度差異大
 - Domain knowledge 用目錄慣例 + 描述性檔名路由，不用靜態清單
 - Reference files 從 SKILL.md 直接引用，路徑都是 `<subfolder>/<file>` 一層 deep
-- **違規會讓 package suite 的 `tests/test_skill_folder_flatness.py` 失敗（未 commit 且被 git 忽略的路徑除外）**；本 repo 寫入時不會回報，因為未註冊的 `.claude/hooks/validate-skill-folder-structure.sh` 會讓 loom-workflow 的 hook 跳過
+- **違規會讓 package suite 的 `tests/test_skill_folder_flatness.py` 失敗（例外與原因見該測試檔開頭）**；本 repo 寫入時不會回報，因為未註冊的 `.claude/hooks/validate-skill-folder-structure.sh` 會讓 loom-workflow 的 hook 跳過
 
 ### Module Criteria
 

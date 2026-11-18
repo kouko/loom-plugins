@@ -7,9 +7,20 @@ path, even one under an ignored folder, plus untracked, non-ignored files, as
 long as the path still exists in the working tree. A folder git lists as one
 entry, a nested repository, is searched on disk.
 
-Two limits are accepted. An uncommitted git-ignored path passes: it does not
-enter the repository, and local caches such as `__pycache__` would otherwise
-fail the suite. A symlink to a folder passes: git stores only the link.
+A gitlink (a nested repository recorded in git's index) at or under
+`<plugin>/skills/<skill>` always fails, with or without its folder: a fresh
+clone, which is what CI uses, has none of its content to search.
+
+These pass:
+- An uncommitted git-ignored path: it does not enter the repository, and local
+  caches such as `__pycache__` would otherwise fail the suite.
+- A symlink to a folder: git stores only the link.
+- A committed file already deleted from disk: the deletion is the fix, not yet
+  committed.
+
+Ignore rules do not apply inside a nested repository, so an ignored file nested
+there fails: its files are walked on disk, because git run in a gitlink folder
+may answer for the outer repository.
 
 `<plugin>` is a top-level folder named in this repository's marketplace.json:
 other folders holding a `skills/` directory, such as test fixtures or records
@@ -32,9 +43,9 @@ PLUGIN_NAMES = [
         (REPO / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
     )["plugins"]
 ]
-NESTED_SKILL_FILE = re.compile(
-    rf"^(?:{'|'.join(map(re.escape, PLUGIN_NAMES))})/skills/[^/]+/[^/]+/[^/]+/"
-)
+SKILL_FOLDER = rf"^(?:{'|'.join(map(re.escape, PLUGIN_NAMES))})/skills/[^/]+"
+NESTED_SKILL_FILE = re.compile(rf"{SKILL_FOLDER}/[^/]+/[^/]+/")
+AT_OR_UNDER_SKILL = re.compile(rf"{SKILL_FOLDER}(?:/|\Z)")
 
 
 def nested_skill_paths(relative_paths) -> list[str]:
@@ -82,11 +93,28 @@ def git_listed_paths(root: Path) -> list[str]:
     return paths
 
 
+def skill_gitlinks(root: Path) -> list[str]:
+    """Gitlinks in git's index at or under a skill folder, each ending in `/`."""
+    listing = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--stage", "-z"],
+        check=True, capture_output=True,
+    ).stdout
+    gitlinks = []
+    for entry in filter(None, listing.split(b"\0")):
+        metadata, path = entry.split(b"\t", 1)
+        if metadata.startswith(b"160000 ") and AT_OR_UNDER_SKILL.match(os.fsdecode(path)):
+            gitlinks.append(f"{os.fsdecode(path)}/")
+    return gitlinks
+
+
 def assert_skill_folders_flat(root: Path) -> None:
-    violations = nested_skill_paths(git_listed_paths(root))
+    violations = sorted(
+        {*nested_skill_paths(git_listed_paths(root)), *skill_gitlinks(root)}
+    )
     assert not violations, (
-        "skill subfolders must not contain subfolders; move these files up "
-        "one level:\n" + "\n".join(violations)
+        "skill subfolders must not contain subfolders, and skills must not "
+        "contain gitlinks; move these files up one level or remove the "
+        "gitlink:\n" + "\n".join(violations)
     )
 
 
@@ -104,6 +132,15 @@ def _commit_all(root: Path) -> None:
     git = ["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
     subprocess.run([*git, "add", "--force", "."], check=True, capture_output=True)
     subprocess.run([*git, "commit", "-q", "-m", "fixture"], check=True)
+
+
+def _add_gitlink(root: Path, path: str) -> None:
+    """Record a gitlink with no folder on disk, as a fresh clone has it."""
+    subprocess.run(
+        ["git", "-C", str(root), "update-index", "--add", "--cacheinfo",
+         f"160000,{'1' * 40},{path}"],
+        check=True,
+    )
 
 
 @pytest.mark.parametrize(
@@ -152,6 +189,27 @@ def test_nested_git_repository_fails(tmp_path, outer_committed, repository, inne
     with pytest.raises(AssertionError) as failure:
         assert_skill_folders_flat(repo)
     assert nested in str(failure.value)
+
+
+@pytest.mark.parametrize("gitlink", ["loom-code/skills/x/references", "loom-code/skills/x"])
+def test_gitlink_without_folder_fails_until_removed(tmp_path, gitlink):
+    repo = _git_repo(tmp_path)
+    _add_gitlink(repo, gitlink)
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert gitlink in str(failure.value)
+
+    subprocess.run(["git", "-C", str(repo), "rm", "-q", "--cached", gitlink], check=True)
+    assert_skill_folders_flat(repo)
+
+
+def test_gitlink_outside_skills_passes(tmp_path):
+    repo = _git_repo(tmp_path)
+    _add_gitlink(repo, "vendor/skills/x/references")
+    _add_gitlink(repo, "loom-code/vendor")
+
+    assert_skill_folders_flat(repo)
 
 
 def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
