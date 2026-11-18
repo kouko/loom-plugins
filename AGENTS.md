@@ -1,11 +1,11 @@
-# Monkey Skills
+# Loom Plugins
 
 ## Skill Development Conventions
 
 ### File Paths
 - SKILL.md 內引用 bundled files 時使用相對路徑（相對於 skill 目錄）
 - Good: `checklists/security-checklist.md`, `protocols/code-brainstorming.md`
-- Bad: `domain-teams/skills/code-team/checklists/security-checklist.md`
+- Bad: `loom-code/skills/closing-review/references/lenses.md`
 - 原因：Claude Code 提供 Base Path，bundled files 從 skill 目錄相對解析
 
 ### 兩份文件：intent.md 與 spec.md（loom 1.0）
@@ -13,7 +13,7 @@
 - `docs/loom/<change-id>/spec.md`（write-spec 擁有）— 工程語言：`REQ-<n> — <name>` 每條對回 intent 的 Acceptance 編號、Design decision（標 agent-decided／user-decided）、Current state evidence、UI flows
 - spec.md 只在 `needs-design: yes` 時存在；spec 一律 reference 它的 intent，不重述
 
-### Skill Structure（CRITICAL — Anthropic 規範，違規會被 hook 擋）
+### Skill Structure（CRITICAL — Anthropic 規範）
 
 **MUST：skill 資料夾扁平 — subfolder 內不可再嵌 subfolder。**
 
@@ -39,7 +39,7 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - SKILL.md body 硬上限 ~6,000 tokens（約 4,500 words）；軟目標 ~5,000 tokens（約 3,750 words，對齊官方建議）；超過軟目標需在 PR 註明一行理由。Anthropic 官方建議 <500 lines，本 repo 改用 token 計量因為行數密度差異大
 - Domain knowledge 用目錄慣例 + 描述性檔名路由，不用靜態清單
 - Reference files 從 SKILL.md 直接引用，路徑都是 `<subfolder>/<file>` 一層 deep
-- **違規會被 `.claude/hooks/validate-skill-folder-structure.sh` 擋下**（PostToolUse on Write|Edit）
+- **違規會讓 package suite 的 `tests/test_skill_folder_flatness.py` 失敗**；安裝 loom-workflow 時，plugin hook 也會回報：Claude Code 與 OpenCode 在 Write／Edit 之後，Antigravity CLI 在寫入之前；Codex 沒有註冊這個 hook
 
 ### Module Criteria
 
@@ -90,73 +90,34 @@ repository's development records under `docs/`.
 ### Quality Gates
 
 **loom 家族（loom-code／loom-design／loom-workflow）**：品質只有三種驗證動作，
-其餘都是形式（concept-model §6）。
+其餘都是形式。
 
-| 動作 | 誰做 | 產出 |
-|---|---|---|
-| **讀** | ≥2 個 fresh-context reviewer，按型別選鏡頭（code 11 維／docs 5 維／spec-conformance／design-conformance／principles-conformance） | verdict → generated attestation |
-| **acceptance testing** | 乾淨環境照 intent 的 Acceptance 逐條試，寫成使用者看得懂的 acceptance test report | 報告 ＋ `probes[]` |
-| **對抗** | mutation／fuzz，或對抗 agent 自寫可執行的 abuse／邊界案例並逐筆自跑 | `probes[]`（`kind: adversarial`） |
-
-- 對抗跑在 build 站結尾；讀與 acceptance testing 跑在 **checkpoint review**（review 站）上；三者都不是逐 task 三臂審查；寫的人不能自己驗
+- 三種動作：**讀**（fresh-context reviewer 按 lens 審查）、**acceptance testing**（乾淨環境照 intent 的 Acceptance 逐條試）、**對抗**（mutation／fuzz，或 adversary 自寫可執行的 abuse／邊界案例）
+- 對抗跑在 Build 結尾；讀與 acceptance testing 跑在 closing-review；寫的人不能自己驗
+- Lens 定義見 `loom-code/skills/closing-review/references/lenses.md`；reviewer 人數來自 checker 的 review policy（`python3 loom-code/scripts/loom_checker.py reviewer-count <change-id>`）
 - 決定性的閘只有一支 **checker**：`python3 loom-code/scripts/loom_checker.py --list-rules`
   是規則清單的 SSOT（規則全部是「重算」，不是宣稱）；這裡不重列規則 id，重列＝第二個漂移面
 - 散文不當閘：只有 SKILL.md／reference 內以 `<!-- gate: <id> -->` 標記的段落算閘，
   沒標記的散文不得當閘用
-- 其他 plugin（domain-teams、投資／研究 toolkit 等）仍用四級系統 SELF / MUST / SHOULD / MAY；
-  gate 定義明確指定檔案路徑（相對路徑），verdict 約束內嵌於 PASS_WITH_NOTES 定義
 
 ### Versioning & Release
 
-**MUST：每個合併至 main 的 PR 必須包含 plugin.json 版號 bump**（預設 patch；有 station guidance、field、rule id 或 contract manifest 變更時為 minor）。
+**MUST：每個合併至 main 且動到 plugin 的 PR，必須 bump 該 plugin 的版號**（預設 patch；有 station guidance、field、rule id 或 contract manifest 變更時為 minor）。
 
-- 一份 SSOT：`loom-code/.claude-plugin/plugin.json` 是單一來源真相；`loom-code/.codex-plugin/plugin.json`、`loom-code/plugin.json`、`loom-code/package.json` 皆經 `scripts/sync_codex_manifests.py --all` 衍生而來；勿手動改導出檔以免版本衝突
-- `CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
-- README 版號字串同步更新
+- 每個 plugin 一份 SSOT：`<plugin>/.claude-plugin/plugin.json` 是單一來源真相；`<plugin>/.codex-plugin/plugin.json`、`<plugin>/plugin.json`、`<plugin>/package.json` 皆經 `python3 scripts/sync_codex_manifests.py --all` 衍生而來；勿手動改導出檔以免版本衝突
+- `<plugin>/CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
+- README 版號字串同步更新：`<plugin>/README.md`、`<plugin>/README.ja.md`、`<plugin>/README.zh-TW.md`，以及 root `README.md` 的 plugin 表格列與該 plugin 章節的版本行
 - 版號在最後一輪 fix 就 bump，要在 closing-review 的 finalize-review 產生 attestation 之前；在它之後才 bump 會讓 attestation 失效（stale）
 - 理由：`claude plugin update` 只比對版本字串；未 bump 的變更永遠不會發到已安裝副本
-- 機制化：`test_write_plan_station_text.py::test_current_release_metadata_is_synchronized` 斷言版號一致；bump packet 必須列出 CHANGELOG entry、pin test rewrite 為交付項
-- 參考記憶：`docs/loom/memory/version-bump-packets-must-name-changelog-entry.md`、`docs/loom/memory/version-bump-on-every-pr.md`
+- 機制化：各 plugin 的 pin test 斷言版號一致——`loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized`、`loom-design/tests/spec/test_capture_intent_contract.py`、`loom-workflow/tests/scripts/test_release_metadata.py`；bump packet 必須列出 CHANGELOG entry、pin test rewrite 為交付項
+- 參考記憶：`docs/loom/memory/version-bump-through-claude-ssot-and-sync-script.md`、`docs/loom/memory/version-bump-packets-must-name-changelog-entry.md`
 
 ### loom 1.0 flow
 - 七站：capture-intent → write-spec →（write-plan → build → review → ship），maintain 回頭開 intent
 - 三個人類決策點：①覆述並確認 intent（含 engineering 單向門；不寫 spec 的 product 單向門也在此問）②product 的可見行為與單向門確認（spec）③acceptance test report 驗收
-- 入口與完整站序：`docs/loom/README.md`；概念模型：`docs/loom/2026-09-02-simple-loom-flow/concept-model.md`
+- 入口與完整站序：`docs/loom/README.md`
 
-### Agent Behavioral Rules
-- worker：produces artifacts, does NOT produce gate verdicts
-- evaluator：produces verdicts, does NOT modify artifacts
+### Agent Conventions
 - **writer ≠ judge 由流程保證**：closing review 使用 fresh-context reviewer；
   產生的 attestation 綁定功能內容與 reviewer identity，不維護 dispatch ledger
-- Knowledge access is open（行為限制，非閱讀限制）
-
-### Agent Launch Convention
-- 傳遞 **檔案路徑** 給 agent（不是檔案內容）
-- Agent 用 Read 工具自行讀取資源
-- 路徑在 SKILL.md 中用相對路徑定義，launch 時解析為絕對路徑
-- Worker Input Contract: Resource Paths → Task → Input
-- Evaluator Input Contract: Resource Paths → Artifact → Requirements
-
-### Cross-Plugin Delegation Contract
-
-首例：`investing-toolkit:investment-memo-writer` → `domain-teams:investing-team`
-
-**規則**：
-1. **Delegation = pass paths + structured seed context** — 不傳遞 file content，不內嵌分析結果
-2. **Delegation target receives full authority** — 被委派的 skill 自行載入 standards、執行 gates、產生 verdict；委派方不干涉
-3. **Data layer stays in toolkit, analysis layer stays in domain-teams** — investing-toolkit 只負責 data fetch + pipeline orchestration；investing-team 負責分析、primary-source anchoring、gate enforcement
-4. **Gate verdicts flow back** — delegation target 的 gate 結果（PASS / NEEDS_REVISION）回傳給 orchestrating skill，不被 swallowed
-5. **Cross-plugin path resolution** — 委派時使用 plugin name + skill path（e.g. `domain-teams:investing-team`），不使用檔案系統絕對路徑
-
-**Pattern（investing-toolkit → domain-teams）**：
-```
-investing-toolkit skill
-  → data-fetcher agent (I/O only)
-  → domain-teams:{team} skill (analysis + gates)
-  → domain-teams:docs-team (formatting, optional)
-```
-
-**禁止**：
-- 不可在 toolkit skill 內自行執行 investing-team 的 gate logic（避免 gate bypass）
-- 不可把 domain-teams standards 複製到 toolkit skill（避免 drift）
-- data-fetcher agent 不可做分析（I/O only）
+- 傳遞 **檔案路徑** 給 agent（不是檔案內容）；路徑在 SKILL.md 中用相對路徑定義，launch 時解析為絕對路徑
