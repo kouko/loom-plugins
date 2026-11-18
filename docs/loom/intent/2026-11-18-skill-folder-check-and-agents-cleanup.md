@@ -1,9 +1,9 @@
 # 恢復 skill 資料夾檢查並清理 AGENTS.md
 originator: kouko
 kind: engineering
-needs-design: no — 只改 repo 內部的測試、未註冊的 hook 與貢獻者文件，沒有新增使用者介面，也沒有多狀態行為
+needs-design: no — 只改 repo 內部的測試與貢獻者文件，沒有新增使用者介面，也沒有多狀態行為
 status: confirmed 2026-11-18
-intent_confirmed_sha: ebb9766951a2c713f064ebe4ef6e2bcbf2dcc12b
+intent_confirmed_sha: 677a190e440cf609954a6d0fe2302deb4dac2262
 publication: automatic — authorized 2026-11-18 by kouko
 
 ## Problem
@@ -16,16 +16,17 @@ publication: automatic — authorized 2026-11-18 by kouko
 
 ## Acceptance
 1. 在任一 skill 的子資料夾內加入含檔案的巢狀資料夾後，不論是否已 commit，完整 package suite 都會失敗並指出該路徑；移除後恢復通過。
-2. 在安裝 loom-workflow 的環境中，於這個 repo 以 Write 或 Edit 寫入巢狀 skill 路徑時，當下會收到違規訊息。
-3. `AGENTS.md` 不再提及不在這個 repo 的 plugin，也不再指向不存在的檔案或測試。
-4. `AGENTS.md` 對 skill 資料夾檢查、審查鏡頭與人數、版號及 changelog 的描述，都與 repo 現行的檢查和檔案一致。
-5. `AGENTS.md` 仍保留 skill 資料夾扁平與版號 bump 的 MUST 規則，完整 package suite 通過。
+2. `AGENTS.md` 不再提及不在這個 repo 的 plugin，也不再指向不存在的檔案或測試。
+3. `AGENTS.md` 對 skill 資料夾檢查、審查鏡頭與人數、版號及 changelog 的描述，都與 repo 現行的檢查和檔案一致。
+4. `AGENTS.md` 仍保留 skill 資料夾扁平與版號 bump 的 MUST 規則，完整 package suite 通過。
 
 ## Constraints
 - 不改變 loom-workflow hook 在其他 repo 的行為。
+- 保留 repo 內未註冊的 `.claude/hooks/validate-skill-folder-structure.sh`，這個 repo 的 skill 資料夾規則由完整 package suite 檢查。
 - 保留 `AGENTS.md` 的 Module Criteria、Test Location、Contract Citations 與 loom 1.0 flow 規則；既有測試依賴其中的文字。
 
 ## Out of scope
+- 寫檔當下的違規提示，以及 loom-workflow hook 的誤報與漏報。
 - 從 feature branch 推送或刪除遠端 `main` 的防護。
 - 執行環境缺失時 hook 放行的問題。
 - `closing-review` 的字數超限。
