@@ -15,9 +15,11 @@ its content to search.
 These pass:
 - An uncommitted git-ignored path: it does not enter the repository, and local
   caches such as `__pycache__` would otherwise fail the suite.
-- A symlink to a folder: git stores only the link.
 - A committed file already deleted from disk: the deletion is the fix, not yet
   committed.
+
+These fail:
+- A symlink at `<plugin>`, its `skills` folder or beneath: git stores only the link, and the check rejects it — remove the link or move it out of scope.
 
 Ignore rules do not apply inside a nested repository that git lists, so an
 ignored file nested there fails: its files are walked on disk, because git run
@@ -76,23 +78,48 @@ def git_listed_paths(root: Path) -> list[str]:
     """Listed paths still on disk, relative to `root`; real folders end in `/`.
 
     Git lists a nested repository as the folder itself, so no file path shows it:
-    such a folder is followed by the files beneath it.
+    such a folder is followed by the files beneath it. A symlink is listed as a
+    plain path and is not followed: its target may lie outside the repository.
+    A committed symlink absent from disk (a fresh clone) stays a plain path too.
     """
     listing = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "--others",
-         "--exclude-standard", "-z"],
+         "--exclude-standard", "--stage", "-z"],
         check=True, capture_output=True,
     ).stdout
     paths = []
     for entry in filter(None, listing.split(b"\0")):
-        path = os.fsdecode(entry).rstrip("/")
+        metadata, raw_path = entry.split(b"\t", 1) if b"\t" in entry else (b"", entry)
+        path = os.fsdecode(raw_path).rstrip("/")
         full_path = root / path
         if os.path.lexists(full_path):
             is_folder = full_path.is_dir() and not full_path.is_symlink()
             paths.append(f"{path}/" if is_folder else path)
             if is_folder:
                 paths += files_beneath(full_path, root)
+        elif metadata.startswith(b"120000 "):
+            paths.append(path)
     return paths
+
+
+def skill_symlinks(root: Path) -> list[str]:
+    """Symlinks at a plugin, its `skills` or beneath, from git's list and the disk."""
+    listing = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--cached", "--others",
+         "--exclude-standard", "--stage", "-z"],
+        check=True, capture_output=True,
+    ).stdout
+    links = {
+        path
+        for path in git_listed_paths(root)
+        if HOLDS_SKILL_CONTENT.match(path) and (root / path.rstrip("/")).is_symlink()
+    }
+    for entry in filter(None, listing.split(b"\0")):
+        metadata, raw_path = entry.split(b"\t", 1) if b"\t" in entry else (b"", entry)
+        path = os.fsdecode(raw_path)
+        if metadata.startswith(b"120000 ") and HOLDS_SKILL_CONTENT.match(path):
+            links.add(path)
+    return sorted(links)
 
 
 def skill_gitlinks(root: Path) -> list[str]:
@@ -111,12 +138,18 @@ def skill_gitlinks(root: Path) -> list[str]:
 
 def assert_skill_folders_flat(root: Path) -> None:
     violations = sorted(
-        {*nested_skill_paths(git_listed_paths(root)), *skill_gitlinks(root)}
+        {
+            *nested_skill_paths(git_listed_paths(root)),
+            *skill_gitlinks(root),
+            *skill_symlinks(root),
+        }
     )
     assert not violations, (
-        "skill subfolders must not contain subfolders, and no gitlink may sit "
+        "skill subfolders must not contain subfolders, no gitlink may sit "
+        "at a plugin, its skills folder or beneath, and no symlink may sit "
         "at a plugin, its skills folder or beneath; move these files up one "
-        "level, or remove a gitlink with `git rm --cached <path>` and commit:\n"
+        "level, or remove a gitlink with `git rm --cached <path>` and commit, "
+        "or delete the link:\n"
         + "\n".join(violations)
     )
 
@@ -144,6 +177,12 @@ def _add_gitlink(root: Path, path: str) -> None:
          f"160000,{'1' * 40},{path}"],
         check=True,
     )
+
+
+def _link(root: Path, path: str, target: str) -> None:
+    """A symlink at `path`, to a folder or a single file."""
+    (root / path).parent.mkdir(parents=True, exist_ok=True)
+    os.symlink(target, root / path)
 
 
 @pytest.mark.parametrize(
@@ -194,6 +233,56 @@ def test_nested_git_repository_fails(tmp_path, outer_committed, repository, inne
     assert nested in str(failure.value)
 
 
+@pytest.mark.parametrize("committed", [False, True], ids=["untracked", "staged"])
+@pytest.mark.parametrize(
+    ("link", "target"),
+    [
+        ("loom-code/skills/x/assets/folder-link", ".."),
+        ("loom-code/skills/x/assets/file-link.md", "../../SKILL.md"),
+    ],
+    ids=["folder-link", "file-link"],
+)
+# concern: in-scope symlink (folder or file, untracked or staged) must be rejected
+def test_skill_scope_symlink_fails_until_removed(tmp_path, link, target, committed):
+    repo = _git_repo(tmp_path)
+    _write(repo / "loom-code/skills/x/SKILL.md")
+    _link(repo, link, target)
+    if committed:
+        subprocess.run(["git", "-C", str(repo), "add", "--force", "."], check=True,
+                       capture_output=True)
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert link in str(failure.value)
+
+    (repo / link).unlink()
+    if committed:
+        subprocess.run(["git", "-C", str(repo), "rm", "-q", "--cached", link], check=True)
+    assert_skill_folders_flat(repo)
+
+
+@pytest.mark.parametrize(
+    ("link", "target"),
+    [
+        ("loom-code/skills/x/references", ".."),
+        ("loom-code/skills", ".."),
+        ("loom-code", ".."),
+        ("loom-code/skills/x/assets/deep/f.md", "../../../../../SKILL.md"),
+    ],
+    ids=["at-skill-subfolder", "at-skills", "at-plugin", "deep-file"],
+)
+def test_committed_symlink_fails_from_index_without_folder(tmp_path, link, target):
+    """A clone has the link, not a working-tree link: detection reads git's list."""
+    repo = _git_repo(tmp_path)
+    _link(repo, link, target)
+    _commit_all(repo)
+    (repo / link).unlink()
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert link in str(failure.value)
+
+
 @pytest.mark.parametrize(
     "gitlink",
     ["loom-code/skills/x/references", "loom-code/skills/x", "loom-code/skills", "loom-code"],
@@ -225,13 +314,45 @@ def test_flat_ignored_and_non_plugin_paths_pass(tmp_path):
     _write(repo / "loom-code/skills/x/assets/f.md")
     _write(repo / "loom-code/skills/x/assets/cache/f.md")
     _write(repo / "tests/skills/x/assets/sub/f.md")
-    os.symlink("..", repo / "loom-code/skills/x/assets/folder-link")
     _git_repo(repo / "loom-code/skills/y")
     _write(repo / "loom-code/skills/y/references/f.md")
     _commit_all(repo / "loom-code/skills/y")
 
     assert_skill_folders_flat(repo)
     assert nested_skill_paths(["docs/loom/change/loom-code/skills/x/assets/sub/f.md"]) == []
+
+
+def test_symlink_outside_plugin_scope_passes(tmp_path):
+    """A3 positive: symlink outside plugin scope passes."""
+    repo = _git_repo(tmp_path)
+    _write(repo / "loom-code/skills/x/SKILL.md")
+    _link(repo, "tests/outside/link", "SKILL.md")
+
+    assert_skill_folders_flat(repo)
+
+
+def test_symlink_at_plugin_root_fails(tmp_path):
+    """A3 boundary: symlink at plugin root fails."""
+    repo = _git_repo(tmp_path)
+    _link(repo, "loom-code", "..")
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert "loom-code" in str(failure.value)
+
+
+def test_in_scope_symlink_flips_pass_to_fail(tmp_path):
+    """A4 boundary: adding an in-scope file symlink flips the suite from passing to failing."""
+    repo = _git_repo(tmp_path)
+    _write(repo / "loom-code/skills/x/SKILL.md")
+    _write(repo / "loom-code/skills/x/references/f.md")
+
+    assert_skill_folders_flat(repo)
+    _link(repo, "loom-code/skills/x/references/single-file-link", "SKILL.md")
+
+    with pytest.raises(AssertionError) as failure:
+        assert_skill_folders_flat(repo)
+    assert "single-file-link" in str(failure.value)
 
 
 def test_repository_skill_folders_are_flat():
