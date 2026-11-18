@@ -242,6 +242,7 @@ def test_nested_git_repository_fails(tmp_path, outer_committed, repository, inne
     ],
     ids=["folder-link", "file-link"],
 )
+# concern: in-scope symlink (folder or file, untracked or staged) must be rejected
 def test_skill_scope_symlink_fails_until_removed(tmp_path, link, target, committed):
     repo = _git_repo(tmp_path)
     _write(repo / "loom-code/skills/x/SKILL.md")
