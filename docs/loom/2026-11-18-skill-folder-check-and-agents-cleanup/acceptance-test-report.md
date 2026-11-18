@@ -1,6 +1,6 @@
 # 恢復 skill 資料夾檢查並清理 AGENTS.md — 我試了什麼、結果如何
 
-2026-11-18 在專案的乾淨副本上試過，版本 9552e1de1。每一條怎麼試、回來什麼：`docs/loom/2026-11-18-skill-folder-check-and-agents-cleanup/evidence/acceptance-test-evidence.md`。
+Tried on 2026-11-18 at 9552e1de1. 在專案的乾淨副本上試過。每一條怎麼試、回來什麼：`docs/loom/2026-11-18-skill-folder-check-and-agents-cleanup/evidence/acceptance-test-evidence.md`。
 
 ## 你要的東西，逐條對照
 
