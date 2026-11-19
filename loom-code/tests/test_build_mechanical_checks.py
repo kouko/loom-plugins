@@ -1,3 +1,4 @@
+# concern: A dispatch contract that drops an agent's input path or its scope bound must be rejected.
 """Build ends with a fresh adversary, the package suite and adversarial programs."""
 
 import re
