@@ -230,7 +230,7 @@ agy plugin list
 
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
-です。hook（公開リマインダー・session context・言語リマインダー）が走るのは `agy` CLI だけで、
+です。hook（push リマインダー・session context・言語リマインダー）が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では loom の役割
 （implementer・reviewer・adversary・acceptance-tester）は、loom の agent 契約に従う
 agy の `self` subagent として Gemini モデルで動きます。review station は
@@ -251,7 +251,7 @@ OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする�
 
 skill は `loom-code:<skill>` として提供されます。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動きます。loom はコマンド `/loom-code:using-loom-code` で始めます（skill としても引き続き提供されます）。
 
-OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダーが plugin の v2 hook で動きます。
+OpenCode では、セッションコンテキスト、push リマインダー、言語リマインダーが plugin の v2 hook で動きます。
 
 OpenCode での制限は次のとおりです。
 

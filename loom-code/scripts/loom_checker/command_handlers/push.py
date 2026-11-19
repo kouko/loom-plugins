@@ -220,10 +220,10 @@ def _reminder(kind: str, cwd: Path) -> str | None:
     if kind == "merge":
         return f"loom: this merges outside loom_checker.py land{clause}; merging anyway."
     if change_id is None:
-        return "loom: change not identified (no intent for this branch); proceeding with push."
+        return "loom: change not identified (no intent for this branch); proceeding."
     if status == "valid":
         return None
-    return f"loom: verification {status}{clause}; proceeding with push."
+    return f"loom: verification {status}{clause}; proceeding."
 
 
 def _emit(line: str, out, err) -> None:

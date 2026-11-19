@@ -11,7 +11,7 @@ adapter maps agy events onto the handlers Claude Code and Codex already use:
                                                + language-anchor on a loom SKILL.md read
 
 Exit status is always 0; decisions travel in the JSON. The checker denies
-direct Git merge, commit, or push on main/master; publication reminders allow.
+direct Git merge, commit, or push on main/master; push reminders allow.
 When the checker is missing or cannot answer, the adapter allows and says so
 (the same rule as the Codex stale-root fallback).
 """

@@ -30,8 +30,8 @@ PUSH = "git" + " push"
 CREATE = "gh" + " pr create"
 MERGE = "gh" + " pr merge"
 
-ABSENT = "loom: verification absent (missing: plan, attestation); proceeding with push."
-UNIDENTIFIED = "loom: change not identified (no intent for this branch); proceeding with push."
+ABSENT = "loom: verification absent (missing: plan, attestation); proceeding."
+UNIDENTIFIED = "loom: change not identified (no intent for this branch); proceeding."
 OUTSIDE_LAND = ("loom: this merges outside loom_checker.py land (missing: plan, attestation); "
                 "merging anyway.")
 CRASHED = "loom: push hook failed (boom); allowing."

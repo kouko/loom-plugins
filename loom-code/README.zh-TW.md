@@ -206,7 +206,7 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 互動模式也請一併指定。
 
 更新時在 clone 裡執行 `git pull`，再重跑 install（install 會取代已安裝的副本）；
-移除用 `agy plugin uninstall loom-code`。hook（發布提醒、session
+移除用 `agy plugin uninstall loom-code`。hook（push 提醒、session
 context 與語言提醒）只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。在 `agy`
 上，loom 的角色（implementer、reviewer、adversary、acceptance-tester）以 agy 的
 `self` subagent 執行，遵循 loom 的 agent 契約，使用 Gemini 模型。審查站在所有
@@ -227,7 +227,7 @@ OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plu
 
 skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型。以指令 `/loom-code:using-loom-code` 開始使用 loom（它同時仍是 skill）。
 
-在 OpenCode 上，session context、發布提醒與語言提醒透過 plugin 的 v2 hook 執行。
+在 OpenCode 上，session context、push 提醒與語言提醒透過 plugin 的 v2 hook 執行。
 
 OpenCode 的限制：
 

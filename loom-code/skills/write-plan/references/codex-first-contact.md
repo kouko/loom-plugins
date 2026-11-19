@@ -2,7 +2,7 @@
 
 Codex uses the installed `loom-code` plugin's two hooks from
 `hooks/hooks-codex.json`: the `SessionStart` hook `session-start` and the
-`PreToolUse` publication hook. The Codex manifest selects that file, so Codex
+`PreToolUse` push hook. The Codex manifest selects that file, so Codex
 does not also load `hooks/hooks.json`; their commands use Codex's native
 `${PLUGIN_ROOT}` hook variable rather than Claude Code's compatibility name.
 There is no repository-local checker scaffold, copied contract, or firing
@@ -42,7 +42,7 @@ At the start of a change:
    the adopting repository to suppress the host decision.
 <!-- /gate -->
 
-The publication hook activates only for publication-shaped Bash commands. Normal shell
+The push hook activates only for push- or PR-shaped Bash commands. Normal shell
 commands pass through without running repository verification. Canonical push
 validation pins the selected repository, HEAD, remote, and refspec before the
 fast attestation check.

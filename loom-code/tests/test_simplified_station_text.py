@@ -241,12 +241,14 @@ def test_attestation_readers_name_the_pr_floor_check() -> None:
     assert '"the publication gate"' not in CONTRACT_MANIFEST
 
 
-def test_readmes_name_the_hook_a_publication_reminder() -> None:
+def test_readmes_name_the_hook_a_push_reminder() -> None:
     root = (ROOT / "README.md").read_text(encoding="utf-8")
     for name in ("loom-code/README.md", "loom-code/README.ja.md", "loom-code/README.zh-TW.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "publication gate" not in text, name
+        assert "publication reminder" not in text, name
     assert "push gate" not in root and "fast publication gate" not in root
+    assert "publication reminder" not in root and "push reminder" in root
 
 
 _NO_USER_MESSAGE_CLAUSE = (

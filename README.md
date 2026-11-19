@@ -213,7 +213,7 @@ agent may act outside the project; pass it in interactive mode too.
 
 Limits on Antigravity:
 
-- The plugin hooks (the publication reminder, the session context, the language reminder
+- The plugin hooks (the push reminder, the session context, the language reminder
   and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
   desktop app or IDE, so those gates are not enforced there.
 - loom's roles (implementer, reviewer, adversary, acceptance-tester) run as agy
@@ -238,7 +238,7 @@ The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plu
 
 Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create` and `/loom-workflow:project-retro` are also commands, and each of these stays a skill too.
 
-On OpenCode, the session context, the publication reminder, the language reminder (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
+On OpenCode, the session context, the push reminder, the language reminder (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
 
 Limits on OpenCode:
 
