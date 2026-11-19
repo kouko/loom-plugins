@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.86.0] — 2026-11-19 — open-pr replaces the publish sub-command
+
+- Rename the checker's `publish` sub-command to `open-pr`. The old name is now an unknown sub-command; no alias is kept.
+- Reword the PR-opening output, station prose and hook failure message (`loom: push hook failed (…); allowing.`) so user-facing text no longer says publish or publication.
+
 ## [3.85.0] — 2026-11-19 — implementer reads the confirmed intent
 
 - Add the confirmed intent's path to the implementer dispatch inputs, beside the plan.

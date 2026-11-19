@@ -1,7 +1,7 @@
 ---
 name: ship
 description: |
-  Open or reuse a PR awaiting merge for a reviewed branch and verify its checks. Use after closing-review, normally with a matching attestation.
+  Open or reuse a PR awaiting merge; verify checks. Use after closing-review, normally with a matching attestation.
 version: 1.1.0
 ---
 

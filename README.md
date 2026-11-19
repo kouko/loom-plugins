@@ -13,8 +13,8 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.26.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.85.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-design`](loom-design/README.md) | 2.27.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
+| [`loom-code`](loom-code/README.md) | 3.86.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.26.0 | 15 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -86,7 +86,7 @@ acceptance. Existing maps remain readable history without migration or rewriting
 
 ## loom-design
 
-Version 2.26.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.27.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools and optional design research. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -102,7 +102,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.85.0. Five stations carry one change from plan to PR with
+Version 3.86.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 All sixteen CLI commands define optional advisory next steps; five have direct
 JSON modes and two have checked station consumers. Advice changes neither
