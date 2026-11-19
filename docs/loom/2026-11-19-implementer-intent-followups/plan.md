@@ -31,3 +31,4 @@ One wave: contract text and its pins change together; release metadata follows.
 
 ## Risks
 1. Tighter wording could conflict with existing implementer pins; W1-01 runs the whole test file before commit.
+2. agent-decided — the adversary probe test_build_intent_handoff_adversarial.py caught the weak Build hand-off pin; its four mutations are graduated as built-in weakened-rewrite negatives in loom-code/tests/test_build_mechanical_checks.py (package suite), so the probe stays in the evidence store as this change's adversarial program only.
