@@ -50,7 +50,7 @@ or the intent's `## Constraints` section when plan is absent or skipped, and com
 before dependent checks.
 
 Use the confirmed intent when spec or plan is skipped. Hand each agent the
-retained artifact paths and the omitted steps; never demand the omitted artifact.
+confirmed intent path, the retained artifact paths and the omitted steps; never demand the omitted artifact.
 When plan is skipped, omit the plan command and hand the implementer the intent
 path plus a bounded task, files, Acceptance references, test command and risks
 directly; create no replacement plan. Remaining dispatch, TDD and verification

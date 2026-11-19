@@ -207,9 +207,24 @@ INTENT_READ_SENTENCE = (
 INTENT_PATH_LINE = "- intent: {path}   (the confirmed intent: the change's goal)"
 INTENT_SCOPE_SENTENCE = (
     "The intent does not widen your task: Role contract 1 still bounds what you "
-    "change, and work the intent suggests beyond your task is reported under "
-    "status `DONE_WITH_CONCERNS`, never committed."
+    "change, and work the intent suggests beyond your task is not done but "
+    "described in `self_review` under status `DONE_WITH_CONCERNS`."
 )
+OUTSIDE_FILE_SENTENCE = (
+    "**Stay inside your files.** Edit one outside your task's list only when "
+    "the assigned task itself unavoidably requires the edit, naming it in "
+    "`files_outside_task_list` with one line of why — an unreported edit is the "
+    "defect a checkpoint least sees."
+)
+READ_ONLY_SENTENCE = (
+    "**Read-only inputs**: intent, plan, spec, standing documents, baseline, "
+    "sibling agent contracts."
+)
+BUILD_INTENT_HANDOFF = (
+    "Hand each agent the confirmed intent path, the retained artifact paths and "
+    "the omitted steps; never demand the omitted artifact."
+)
+BUILD_SKIPPED_PLAN_HANDOFF = "hand the implementer the intent path plus a bounded task"
 SKIPPED_PLAN_PARAGRAPH = (
     "When the station says plan or spec is skipped, use the confirmed intent and "
     "its bounded task handoff (files, Acceptance references, test command and risks) "
@@ -243,7 +258,31 @@ def test_implementer_resource_paths_name_intent() -> None:
 def test_implementer_intent_does_not_widen_task() -> None:
     prose = _flat(IMPLEMENTER)
     assert pins_exact_sentence(prose, INTENT_SCOPE_SENTENCE)
-    assert not pins_exact_sentence(prose.replace(INTENT_SCOPE_SENTENCE, ""), INTENT_SCOPE_SENTENCE)
+    weakened = prose.replace(
+        INTENT_SCOPE_SENTENCE,
+        INTENT_SCOPE_SENTENCE.replace("is not done but described in `self_review`", "is reported"),
+    )
+    assert not pins_exact_sentence(weakened, INTENT_SCOPE_SENTENCE)
+
+
+@pytest.mark.parametrize(
+    ("sentence", "weakened"),
+    [
+        (OUTSIDE_FILE_SENTENCE, ("the assigned task itself unavoidably requires the edit", "unavoidable")),
+        (READ_ONLY_SENTENCE, ("intent, plan", "plan")),
+    ],
+)
+def test_implementer_role_contract_bounds_intent(sentence: str, weakened: tuple[str, str]) -> None:
+    prose = _flat(IMPLEMENTER)
+    assert pins_exact_sentence(prose, sentence)
+    assert not pins_exact_sentence(prose.replace(sentence, sentence.replace(*weakened)), sentence)
+
+
+def test_build_hands_every_implementer_the_intent_path() -> None:
+    for pin in (BUILD_INTENT_HANDOFF, BUILD_SKIPPED_PLAN_HANDOFF):
+        assert pin in PROSE
+    assert BUILD_INTENT_HANDOFF not in PROSE.replace("the confirmed intent path, ", "")
+    assert BUILD_SKIPPED_PLAN_HANDOFF not in PROSE.replace("the intent path plus", "plus")
 
 
 def test_implementer_skipped_plan_handoff_unchanged() -> None:

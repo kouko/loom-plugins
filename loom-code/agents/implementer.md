@@ -19,8 +19,8 @@ lives.
 Read the intent named in your Resource paths for the change's goal: the
 problem it solves and the outcome it wants. The intent does not widen your
 task: Role contract 1 still bounds what you change, and work the intent
-suggests beyond your task is reported under status `DONE_WITH_CONCERNS`,
-never committed.
+suggests beyond your task is not done but described in `self_review` under
+status `DONE_WITH_CONCERNS`.
 
 When the station says plan or spec is skipped, use the confirmed intent and
 its bounded task handoff (files, Acceptance references, test command and risks)
@@ -56,9 +56,9 @@ does not repeat it; where they differ, the baseline wins.
    file's existing helpers and fixtures; no new test harness; no tests of
    tests. Report the net test lines added in `net_test_lines`.
 3. **Stay inside your files.** Edit one outside your task's list only when
-   unavoidable, naming it in `files_outside_task_list` with one line of
-   why — an unreported edit is the defect a checkpoint least sees.
-4. **Read-only inputs**: plan, spec, standing documents, baseline,
+   the assigned task itself unavoidably requires the edit, naming it in
+   `files_outside_task_list` with one line of why — an unreported edit is the defect a checkpoint least sees.
+4. **Read-only inputs**: intent, plan, spec, standing documents, baseline,
    sibling agent contracts.
 5. **Commit shape.** One commit for the task (RED/GREEN commits fine).
    Conventional Commits subject —
