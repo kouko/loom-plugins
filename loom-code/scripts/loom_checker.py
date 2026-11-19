@@ -52,7 +52,7 @@ No validation runs for --help or -h alone.
 Exit codes depend on the command: 0 may include advisory or unsynced results;
 1 means a failed check or incomplete operation; 2 means usage/internal error
 or a hook refusal. See each command's help for its completion limits.
-The publication hook allows on unexpected exceptions; other commands exit 2.
+The push hook allows on unexpected exceptions; other commands exit 2.
 
 Schemas are not restated here: the required frontmatter fields, sections,
 station names, interface-surface defaults and artifact paths are read
@@ -177,9 +177,9 @@ The host matcher handles command text beginning with literal git commit, git
 merge or git push while the payload cwd is on main/master, with refusal exit 2
 unless repository-local loom.protectMain=false explicitly allows those commands.
 This opt-out affects the host hook, not the separate native hooks below.
-Malformed/missing payload also exits 2. Publication reminders may emit a host
+Malformed/missing payload also exits 2. Push reminders may emit a host
 JSON systemMessage on stdout and a diagnostic on stderr; reminder failures and
-unexpected top-level hook exceptions allow exit 0. It performs no publication.
+unexpected top-level hook exceptions allow exit 0. It opens no PR.
 
 Native modes are explicit repository configuration operations. They read and
 refuse a core.hooksPath override or unreadable setting without changing it.
@@ -205,7 +205,7 @@ Choose exactly one form; --confirm applies only to sweep. Run in the repository
 with trusted git/gh, eligible change branch/PR and live evidence/checks. A real
 maintainer acceptance must already exist; the name or help supplies no consent.
 The accepted name must match the committed intent originator or automatic
-publication authorizer; matching a name does not establish actual consent.
+PR-opening authorizer; matching a name does not establish actual consent.
 Exactly one open PR against the default branch must match HEAD, and its live
 body must satisfy the nine-heading validator. Land polls all registered checks,
 including non-required checks, with at most 360 pending 10-second waits; network
@@ -275,7 +275,7 @@ Exit 2 means invocation, unreadable file or internal failure. Correct named
 headings or Git context; never fabricate stronger verification status.
 Can append a verification line to GITHUB_STEP_SUMMARY when set, so it is not
 strictly read-only. It runs no PR-controlled commands, tests or reviews and
-does not authorize publication or merge.
+does not authorize opening a PR or merging.
 See open-pr --help for the body heading order and content requirements.
 """,
     "standing": """standing — check applicable standing-document policy for one intent
@@ -345,7 +345,7 @@ accepted identifiers contain only letters, digits, dots, underscores and
 hyphens. Canonical artifacts are resolved through the bundled contract.
 
 Text results: exit 0 means the applicable prerequisites passed for this snapshot;
-it does not perform the station, authorize publication or verify the change.
+it does not perform the station, authorize opening a PR or verify the change.
 Conditional interface-surfaces (...) information may appear on stdout for
 engineering intents or applicable needs-design=yes write-plan intake.
 That information is advisory and may precede a later BLOCK; it is not a
@@ -437,20 +437,20 @@ through the normal review workflow. A passed stage is not overall success.
 Stderr progress is advisory and can also contain errors: while running, keep
 observing the same process; inspect its final exit and generated evidence.
 Finalization executes the package suite and declared adversarial commands and
-atomically writes the generated attestation. It grants no publication authority.
-Commit that generated attestation before publication.
+atomically writes the generated attestation. It grants no PR-opening authority.
+Commit that generated attestation before opening the PR.
 """,
-    "open-pr": """open-pr — publish an authorized branch and observe required CI
+    "open-pr": """open-pr — open or reuse a Ready PR awaiting merge for an authorized branch and observe required CI
 Usage: open-pr --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>
 Legacy: open-pr --confirm-authorized --title <text> --body-file <absolute-body-path>
 
-Publication may perform a remote write (push and create/update a Ready PR).
+open-pr may perform a remote write (push and create/update a Ready PR).
 --intent must name this change's canonical, committed, confirmed intent with
-an existing valid automatic-publication authorization that remains unrevoked.
+an existing valid automatic PR-opening authorization that remains unrevoked.
 The legacy --confirm-authorized argument records an actual explicit user
-publication decision; it is not a way to supply missing consent. If neither
+PR-opening decision; it is not a way to supply missing consent. If neither
 authorization exists, stop and obtain that decision. Help grants no authority.
-Observation grants neither publication nor merge authorization.
+Observation grants neither PR-opening nor merge authorization.
 
 --title is checked here only for nonblank text; title policy remains workflow guidance.
 --body-file must be an absolute path to a readable UTF-8 Markdown file.
@@ -483,7 +483,7 @@ committed selected content; an existing attestation must be committed.
 A temporary body snapshot is removed on return. The nonforce push can set
 upstream tracking; remote operations are not rolled back on later failure.
 
-Results: exit 0 completes publication and its required-check observation;
+Results: exit 0 means the PR is open and awaiting merge, with its required-check observation;
 exit 1 means blocked or unconfirmed; exit 2 means invocation or authorization
 errors, or internal failures. Read the diagnostic to determine the next action;
 the exit code alone is not a reason to retry.
@@ -492,7 +492,7 @@ advisory and can also contain errors; while CI is pending keep observing the
 same process. Inspect the final exit and evidence. Exit 0 with
 "No required checks registered" means no checks registered, not tests passed.
 An observation failure may follow a successful remote write. Before considering
-another publish, run delivery --goal published --json to observe existing
+another open-pr run, run delivery --goal published --json to observe existing
 state and follow its diagnostic; do not blindly repeat a write or switch routes.
 """,
     "delivery": """delivery — observe the selected delivery goal without writes
@@ -503,8 +503,8 @@ it does not check finalization, attestation or verification. published checks th
 matching Ready PR and required CI; merged checks merged delivery evidence.
 --intent optionally identifies the change's canonical committed intent (a
 relative or absolute path); it does not create or grant authorization.
-Local observation does not claim publication. Observation never authorizes
-publication or merge, and does not perform either action.
+Local observation does not claim an open PR. Observation never authorizes
+opening a PR or merging, and does not perform either action.
 
 --json emits the existing object on stdout:
 state: observed delivery condition; reason: why it was classified that way;
@@ -530,9 +530,9 @@ Hook mode consumes host stdin and emits host-specific feedback with its own
 exit semantics; it is separate from ordinary --json. Do not mix hook forms
 with observation options. Duplicate options are invalid. Malformed ordinary
 invocations may report text on stderr even when --json was supplied.
-Published/merged observation needs trusted git/gh from supported host install
+`published`/`merged` observation needs trusted git/gh from supported host install
 locations, a literal GitHub origin, authenticated gh and network read access;
-missing prerequisites can yield unconfirmed/exit 1. Published completion with
+missing prerequisites can yield unconfirmed/exit 1. `published` completion with
 "No required checks registered" does not mean tests passed.
 """,
 }

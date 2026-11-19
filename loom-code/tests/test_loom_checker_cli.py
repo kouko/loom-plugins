@@ -522,7 +522,7 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
         (["finalize-review"], 2, "finalize-review needs a change-id."),
         (["finalize-review", "2026-09-09-example", "--input", str(malformed)],
          2, "cannot read review input:"),
-        (["open-pr"], 2, "publish: --intent or --confirm-authorized is required"),
+        (["open-pr"], 2, "open-pr: --intent or --confirm-authorized is required"),
         (["delivery", "--goal", "invalid"], 2, "delivery: --goal must be local, published or merged"),
         (["plan"], 2, "plan needs a path."),
         (["plan", str(tmp_path / "absent.md")], 2, "no such plan file:"),

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import runpy
 import subprocess
 from io import StringIO
 from pathlib import Path
@@ -9,8 +10,8 @@ from loom_checker.command_handlers import publish as loom_checker
 import pytest
 
 PUBLISH_NEXT = (
-    "; next: Inspect the publication diagnostics and reconcile the named condition before "
-    "retrying publish; preserve work and do not switch merge routes.\n"
+    "; next: Inspect the open-pr diagnostics and reconcile the named condition before "
+    "running open-pr again; preserve work and do not switch merge routes.\n"
 )
 CONTEXT_HEADINGS = (
     "Context", "Intended outcome", "Scope", "Decisions", "Implementation",
@@ -297,7 +298,7 @@ def test_legacy_intent_requires_one_publication_decision(
     ], StringIO(), err)
 
     assert rc == 2
-    assert "publication decision" in err.getvalue()
+    assert "PR-opening decision" in err.getvalue()
     assert calls.calls == []
 
 
@@ -387,7 +388,7 @@ def test_publish_pushes_exact_head_and_creates_one_pr(tmp_path: Path, monkeypatc
     assert "--draft" not in create  # the pull request opens Ready
     assert "https://github.com/example/project/pull/1" in out
     assert f"Verification valid for {head}" in out
-    assert "Publication target: github.com/example/project base main" in out
+    assert "PR target: github.com/example/project base main" in out
 
 
 def test_publish_revalidates_head_remote_and_identity_after_new_pr_creation(
@@ -396,7 +397,7 @@ def test_publish_revalidates_head_remote_and_identity_after_new_pr_creation(
     cases = {
         "move_head_on_create": "live HEAD moved after PR creation",
         "move_remote_on_create": "remote branch moved after PR creation",
-        "change_pushurl_on_create": "publication identity changed after PR creation",
+        "change_pushurl_on_create": "PR target identity changed after PR creation",
     }
     for mutation, message in cases.items():
         case = tmp_path / mutation
@@ -698,7 +699,7 @@ def test_publish_revalidates_head_remote_and_identity_after_draft_ready(
     cases = {
         "move_head_on_ready": "live HEAD moved after PR readiness",
         "move_remote_on_ready": "remote branch moved after PR readiness",
-        "change_pushurl_on_ready": "publication identity changed after PR readiness",
+        "change_pushurl_on_ready": "PR target identity changed after PR readiness",
     }
     for mutation, message in cases.items():
         case = tmp_path / mutation
@@ -934,7 +935,7 @@ def test_publish_progress_before_wait(tmp_path: Path, monkeypatch) -> None:
     class ObservedCalls(ExternalCalls):
         def __call__(self, argv, **kwargs):
             if "checks" in argv:
-                assert flushed and flushed[0] == "publish: CI observation started\n"
+                assert flushed and flushed[0] == "open-pr: CI observation started\n"
             return super().__call__(argv, **kwargs)
 
     calls = ObservedCalls("")
@@ -942,13 +943,13 @@ def test_publish_progress_before_wait(tmp_path: Path, monkeypatch) -> None:
 
     def wait(seconds):
         assert seconds == 10
-        assert flushed == ["publish: CI observation started\n",
-                           "publish: CI observation started\npublish: CI registration-wait\n"]
+        assert flushed == ["open-pr: CI observation started\n",
+                           "open-pr: CI observation started\nopen-pr: CI registration-wait\n"]
 
     monkeypatch.setattr(loom_checker, "wait_publish_interval", wait)
     _, rc, _, _ = invoke(tmp_path, monkeypatch, calls, err_stream=err)
     assert rc == 0
-    assert flushed[-1].endswith("publish: CI passed\n")
+    assert flushed[-1].endswith("open-pr: CI passed\n")
 
 
 def test_publish_progress_cadence(tmp_path: Path, monkeypatch) -> None:
@@ -962,9 +963,9 @@ def test_publish_progress_cadence(tmp_path: Path, monkeypatch) -> None:
     _, rc, _, err = invoke(tmp_path, monkeypatch, calls)
     assert rc == 0
     assert err.splitlines() == [
-        "publish: CI observation started", "publish: CI registration-wait",
-        "publish: CI pending", "publish: CI pending; elapsed 60s",
-        "publish: CI pending; elapsed 120s", "publish: CI passed",
+        "open-pr: CI observation started", "open-pr: CI registration-wait",
+        "open-pr: CI pending", "open-pr: CI pending; elapsed 60s",
+        "open-pr: CI pending; elapsed 120s", "open-pr: CI passed",
     ]
 
 
@@ -981,12 +982,12 @@ def test_publish_stdout_unchanged(tmp_path: Path, monkeypatch, state, terminal, 
     _, actual, out, err = invoke(tmp_path, monkeypatch, calls)
     assert actual == rc
     expected = (f"Verification valid for {calls.head}\n"
-                "Publication target: github.com/example/project base main\n"
-                "Published PR: https://github.com/example/project/pull/1\n")
+                "PR target: github.com/example/project base main\n"
+                "PR awaiting merge: https://github.com/example/project/pull/1\n")
     expected += {"SUCCESS": "Required CI passed\n",
                  "empty": "No required checks registered\n"}.get(state, "")
     assert out == expected
-    assert f"publish: CI {terminal}\n" in err
+    assert f"open-pr: CI {terminal}\n" in err
 
 
 @pytest.mark.parametrize("failure", ["write", "flush"])
@@ -996,7 +997,7 @@ def test_publish_progress_failure_preserves_authority(tmp_path: Path, monkeypatc
     attempts = []
 
     def write(text):
-        if text.startswith("publish: CI "):
+        if text.startswith("open-pr: CI "):
             attempts.append(text)
             if failure == "write":
                 raise OSError("progress unavailable")
@@ -1323,7 +1324,7 @@ def test_good_body_without_attestation_publishes_with_reminder(
     assert any("push" in call for call in calls.calls)
     assert any("pr" in call and "create" in call for call in calls.calls)
     assert (
-        "loom: verification absent (missing: plan, attestation); publishing anyway.\n"
+        "loom: verification absent (missing: plan, attestation); proceeding with push.\n"
         in err
     )
     assert "BLOCK" not in err
@@ -1526,3 +1527,41 @@ def test_adversarial_programs_need_no_outcome_line(tmp_path: Path, monkeypatch) 
     )
 
     assert rc == 0, err
+
+
+def test_open_pr_user_text_never_says_publish():
+    import ast
+    import hashlib
+    import re
+    from loom_checker.command_handlers import push
+
+    scripts = Path(loom_checker.__file__).resolve().parents[2]
+    allowed = re.compile(
+        r"publish\.preconditions|`publication:`|publication_only_paths|--goal (local\|)?published"
+        r"|\b(un)?published\b(?=[,|)/.`\s]|$)|loom: publication hook failed \("
+    )
+    machine = {"publication", "published", "unpublished", "publish.preconditions",
+               "automatic_publication_authorized", "automatic_publication_reason"}
+    leaks = []
+    for rel in ("loom_checker/command_handlers/publish.py", "loom_checker/command_handlers/push.py",
+                "loom_checker/command_handlers/land.py", "loom_checker/cli_advice.py"):
+        tree = ast.parse((scripts / rel).read_text(encoding="utf-8"))
+        docs = {id(n.body[0].value) for n in ast.walk(tree)
+                if isinstance(n, (ast.Module, ast.FunctionDef, ast.ClassDef)) and n.body
+                and isinstance(n.body[0], ast.Expr) and isinstance(n.body[0].value, ast.Constant)}
+        native = {id(n.value) for n in ast.walk(tree) if isinstance(n, ast.Assign)
+                  and any(getattr(t, "id", "") == "NATIVE_HOOK" for t in n.targets)}
+        for node in ast.walk(tree):
+            if (isinstance(node, ast.Constant) and isinstance(node.value, str)
+                    and id(node) not in docs | native and node.value not in machine
+                    and re.search(r"publi", allowed.sub("", node.value), re.I)):
+                leaks.append((rel, node.lineno, node.value))
+    entry = runpy.run_path(str(scripts / "loom_checker.py"), run_name="_loom_checker_entry")
+    for name, text in [("usage", entry["__doc__"]), *entry["COMMAND_HELP"].items()]:
+        for line in text.splitlines():
+            if re.search(r"publi", allowed.sub("", line), re.I):
+                leaks.append(("help", name, line))
+    assert leaks == []
+    assert "run open-pr again" in (scripts / "loom_checker/command_handlers/land.py").read_text()
+    assert hashlib.sha256(push.NATIVE_HOOK).hexdigest() == (
+        "8c3910abf4fd9813b8aa08dea0c98ed286ed6de543eedd9096ada24da6dfcf70")

@@ -123,7 +123,7 @@ def stub_checker_adapter(tmp_path: Path):
 
 
 def test_pushgate_checker_exit_zero_forwards_reminder(stub_checker_adapter, change_repo, tmp_path):
-    line = "loom: verification absent (missing: attestation); publishing anyway."
+    line = "loom: verification absent (missing: attestation); proceeding with push."
     adapter = stub_checker_adapter(0, json.dumps({"systemMessage": line}), line)
     out = _run("push-gate", _push("git push origin feat", ".", [str(change_repo)]), tmp_path, adapter=adapter)
     assert out == {"decision": "allow", "reason": line}
