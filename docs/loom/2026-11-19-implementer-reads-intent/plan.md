@@ -15,7 +15,7 @@ One wave: the contract text and its pin tests change together; release metadata 
 **W1-01 Point the implementer at the intent without widening its task**  after: none  acceptance: 1, 2, 3, 4
 - Files: `loom-code/agents/implementer.md`, `loom-code/tests/test_build_mechanical_checks.py`
 - Test: A1 positive: resource-paths-name-intent; negative: intent-line-removed-fails. A2 positive: intent-does-not-widen-task; negative: scope-sentence-removed-fails. A3 positive: skipped-plan-handoff-retained; boundary: skipped-plan-sentence-unchanged. A4 positive: complete-package-suite-passes; boundary: existing-implementer-pins-pass.
-- Risk: agent-decided — one `intent:` path line plus one sentence tying it to Role contract 1 (no widening; report extra work as a concern). Existing implementer pins in this test file are preserved, not narrowed.
+- Risk: agent-decided — one `intent:` path line plus one sentence tying it to Role contract 1 (no widening; extra work reported under DONE_WITH_CONCERNS). Existing implementer pins in this test file are preserved, not narrowed.
 
 **W1-02 Minor release metadata**  after: W1-01  acceptance: 4
 - Files: `loom-code/.claude-plugin/plugin.json`, derived release manifests, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README*.md`, `loom-code/tests/test_write_plan_station_text.py`
