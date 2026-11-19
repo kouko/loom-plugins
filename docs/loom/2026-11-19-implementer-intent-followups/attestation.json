@@ -1,0 +1,82 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-19-implementer-intent-followups",
+  "content_digest": "7c3d3884e2a7d4c099ab6a52ddb9aca860430f2b",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_build_mechanical_checks.py",
+      "artifact": "loom-code/tests/test_build_mechanical_checks.py",
+      "result": "pass",
+      "command_digest": "08ae1c5b24199b775d693283192972cff1109de6856da237b29873ffcdefe26a"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-11-19-implementer-intent-followups/evidence/probes/test_build_intent_handoff_adversarial.py",
+      "artifact": "docs/loom/2026-11-19-implementer-intent-followups/evidence/probes/test_build_intent_handoff_adversarial.py",
+      "result": "pass",
+      "command_digest": "8141c1084f6f767d5bf0dc6d3110b7240d04b492e28b08ae0feb5dfe843c04f8"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-skill-1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "2b712ad41cb0b9d2583fb3b1264b64a0ed19d086",
+      "review_target_sha": "dc689319e806dd14e0ac1e9f6406340ac7b51f80",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "loom-code/skills/build/SKILL.md:52",
+          "text": "nitpick (non-blocking): 'Hand each agent' now applies to every Build-dispatched agent, not only implementers; harmless since the adversary already gets the intent path."
+        },
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "loom-code/agents/implementer.md:60",
+          "text": "nitpick (non-blocking): uneven line wrapping in implementer.md:60 and SKILL.md:52-55; a test mutation anchors on the literal newline."
+        }
+      ]
+    },
+    {
+      "reviewer": "reviewer-code-1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "2b712ad41cb0b9d2583fb3b1264b64a0ed19d086",
+      "review_target_sha": "dc689319e806dd14e0ac1e9f6406340ac7b51f80",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "cross-task-coherence",
+          "anchor": "docs/loom/2026-11-19-implementer-intent-followups/plan.md:34",
+          "text": "nitpick (non-blocking): Risk 2 says four probe mutations graduated; the probe has three, the package test adds a fourth skip-lead case."
+        },
+        {
+          "severity": "nit",
+          "dimension": "refactoring",
+          "anchor": "loom-code/skills/build/SKILL.md:52",
+          "text": "nitpick (non-blocking): 'Hand each agent the' sits alone on a line after the reflow; rewrap and update the literal mutation anchors."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "67165e8",
+  "tested_commit": "dc689319e806dd14e0ac1e9f6406340ac7b51f80",
+  "reviewed_commit": "dc689319e806dd14e0ac1e9f6406340ac7b51f80",
+  "acceptance_status": []
+}
