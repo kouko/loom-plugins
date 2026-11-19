@@ -16,8 +16,8 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py push --hook
     loom_checker.py push --install-git-hooks
     loom_checker.py push --remove-git-hooks
-    loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>
-    loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>
+    loom_checker.py open-pr --intent <absolute-path> --title <text> --body-file <absolute-path>
+    loom_checker.py open-pr --confirm-authorized --title <text> --body-file <absolute-path>
     loom_checker.py delivery [--goal local|published|merged] [--intent <path>] [--json]
     loom_checker.py land --accepted-by <name>
     loom_checker.py land --cleanup <branch>
@@ -40,7 +40,7 @@ with your plan file path.
 Plan takes a file path; intake takes a station and a change-id.
 Plan, intake, contract and reviewer-count accept an optional final --json selector;
 text remains default. Delivery retains its separate JSON interface.
-Detailed help: finalize-review --help, publish --help, delivery --help
+Detailed help: finalize-review --help, open-pr --help, delivery --help
               plan --help, intake --help, reviewer-count --help
               intent --help, intents --help, push --help, land --help
               sync-trunk --help, github-rules --help, pr-floor --help
@@ -212,7 +212,7 @@ including non-required checks, with at most 360 pending 10-second waits; network
 calls and other stages add elapsed time. Failed/cancelled/action-required checks
 refuse the merge. Absent/stale local verification is disclosed after merge,
 not a gate that prevents it; no registered checks is not proof of testing.
-See publish --help for the body heading order and content requirements.
+See open-pr --help for the body heading order and content requirements.
 The accepted form may squash merge remotely, verify, sync trunk, then delete
 the change worktree and local/remote branch. Cleanup targets a named merged
 change. Sweep computes candidates and a confirmation token; even without a
@@ -276,7 +276,7 @@ headings or Git context; never fabricate stronger verification status.
 Can append a verification line to GITHUB_STEP_SUMMARY when set, so it is not
 strictly read-only. It runs no PR-controlled commands, tests or reviews and
 does not authorize publication or merge.
-See publish --help for the body heading order and content requirements.
+See open-pr --help for the body heading order and content requirements.
 """,
     "standing": """standing — check applicable standing-document policy for one intent
 Usage: standing <path-to-intent>
@@ -440,9 +440,9 @@ Finalization executes the package suite and declared adversarial commands and
 atomically writes the generated attestation. It grants no publication authority.
 Commit that generated attestation before publication.
 """,
-    "publish": """publish — publish an authorized branch and observe required CI
-Usage: publish --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>
-Legacy: publish --confirm-authorized --title <text> --body-file <absolute-body-path>
+    "open-pr": """open-pr — publish an authorized branch and observe required CI
+Usage: open-pr --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>
+Legacy: open-pr --confirm-authorized --title <text> --body-file <absolute-body-path>
 
 Publication may perform a remote write (push and create/update a Ready PR).
 --intent must name this change's canonical, committed, confirmed intent with
@@ -558,7 +558,7 @@ COMMANDS = {
     "intents": cmd_intents,
     "intake": cmd_intake,
     "push": cmd_push,
-    "publish": cmd_publish,
+    "open-pr": cmd_publish,
     "delivery": cmd_delivery,
     "land": cmd_land,
     "sync-trunk": cmd_sync_trunk,
@@ -580,7 +580,7 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
     protected = bool(argv) and ((argv[0] in {"push", "delivery"} and "--hook" in argv[1:])
                                or (argv[0] == "github-rules" and "--print-setup" in argv[1:]))
     hint = ""
-    if argv and argv[0] in {"finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"} and not (argv[0] == "delivery" and "--hook" in argv[1:]):
+    if argv and argv[0] in {"finalize-review", "open-pr", "delivery", "plan", "intake", "reviewer-count"} and not (argv[0] == "delivery" and "--hook" in argv[1:]):
         hint = (f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
                 '(replace <loom-code> with the installed loom-code plugin directory).\n')
     try:

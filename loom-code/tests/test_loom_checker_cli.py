@@ -248,11 +248,23 @@ def test_help_covers_commands_without_claiming_validation() -> None:
         assert run_checker(flag, "plan", "missing.md").returncode == 2
 
 
-def test_publish_is_a_declared_cli_command() -> None:
+def test_open_pr_is_a_declared_cli_command() -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
 
-    assert entry["COMMANDS"]["publish"] is entry["cmd_publish"]
-    assert "loom_checker.py publish --confirm-authorized" in entry["__doc__"]
+    assert entry["COMMANDS"]["open-pr"] is entry["cmd_publish"]
+    assert "loom_checker.py open-pr --confirm-authorized" in entry["__doc__"]
+    assert entry["COMMAND_HELP"]["open-pr"].startswith("open-pr — ")
+    assert "Usage: open-pr --intent" in entry["COMMAND_HELP"]["open-pr"]
+
+
+def test_publish_is_an_unknown_sub_command(tmp_path: Path) -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+    assert "publish" not in entry["COMMANDS"] and "publish" not in entry["COMMAND_HELP"]
+    for args in (("publish", "--title", "t", "--body-file", "b"), ("publish", "--help")):
+        result = run_checker(*args, cwd=tmp_path)
+        assert result.returncode == 2 and not result.stdout
+        assert result.stderr.startswith("unknown sub-command 'publish'.")
+    assert not list(tmp_path.iterdir())
 
 
 def test_land_is_a_declared_cli_command() -> None:
@@ -444,7 +456,7 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
                             "verdict", "findings", "adversarial", "no_program",
                             "review_target_sha", "reviewed_sha", "diff base",
                             "skills/closing-review/SKILL.md"],
-        "publish": ["--intent", "--confirm-authorized", "--title", "--body-file",
+        "open-pr": ["--intent", "--confirm-authorized", "--title", "--body-file",
                     "## Context", "## Intended outcome", "## Scope", "## Decisions",
                     "## Implementation", "## Behaviour change", "## Verification",
                     "## Risks and rollback", "## Follow-ups", "Verification status:",
@@ -510,7 +522,7 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
         (["finalize-review"], 2, "finalize-review needs a change-id."),
         (["finalize-review", "2026-09-09-example", "--input", str(malformed)],
          2, "cannot read review input:"),
-        (["publish"], 2, "publish: --intent or --confirm-authorized is required"),
+        (["open-pr"], 2, "publish: --intent or --confirm-authorized is required"),
         (["delivery", "--goal", "invalid"], 2, "delivery: --goal must be local, published or merged"),
         (["plan"], 2, "plan needs a path."),
         (["plan", str(tmp_path / "absent.md")], 2, "no such plan file:"),
@@ -548,7 +560,7 @@ def test_usage_and_evidence_rejections_keep_diagnostics_and_add_one_hint(tmp_pat
 
 def test_help_explains_outcomes_and_authority(tmp_path: Path) -> None:
     finalize = run_checker("finalize-review", "--help", cwd=tmp_path).stdout
-    publish = run_checker("publish", "--help", cwd=tmp_path).stdout
+    publish = run_checker("open-pr", "--help", cwd=tmp_path).stdout
     delivery = run_checker("delivery", "--help", cwd=tmp_path).stdout
     push = run_checker("push", "--help", cwd=tmp_path).stdout
     land = run_checker("land", "--help", cwd=tmp_path).stdout
@@ -561,7 +573,7 @@ def test_help_explains_outcomes_and_authority(tmp_path: Path) -> None:
     assert "loom.protectMain=false" in push and "allows" in push
     assert "trunk not updated" in land and "exit 0" in land
     caveats = {
-        "publish": ("in this order", "no other", "temporary", "upstream", "server default", "nonblank"),
+        "open-pr": ("in this order", "no other", "temporary", "upstream", "server default", "nonblank"),
         "delivery": ("action_required", "missing_pr", "No required checks", "authenticated"),
         "push": ("literal", "shared", "fast-forward", "reset/rebase"),
         "land": ("originator", "360", "10-second", "not a gate", "next: cd"),
@@ -590,7 +602,7 @@ def test_incomplete_delivery_keeps_json_stdout(tmp_path: Path) -> None:
 
 def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
-    for command in ("finalize-review", "publish", "delivery", "push", "plan", "intake", "reviewer-count"):
+    for command in ("finalize-review", "open-pr", "delivery", "push", "plan", "intake", "reviewer-count"):
         for code in (0, 1, 2):
             def handler(args, out, err):
                 out.write('{"unchanged": true}\n')
@@ -600,7 +612,7 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
             out, err = io.StringIO(), io.StringIO()
             assert entry["main"]([command, "--hook"], out, err) == code
             assert out.getvalue() == '{"unchanged": true}\n'
-            hint_expected = code != 0 and command in {"finalize-review", "publish", "plan", "intake", "reviewer-count"}
+            hint_expected = code != 0 and command in {"finalize-review", "open-pr", "plan", "intake", "reviewer-count"}
             assert ("--help" in err.getvalue()) == hint_expected
             assert err.getvalue().startswith("original diagnostic\n")
         def crash(args, out, err):
@@ -616,7 +628,7 @@ def test_dispatch_preserves_success_internal_errors_and_hooks(monkeypatch) -> No
 
 
 def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
-    for command in ("finalize-review", "publish", "delivery", "unknown", "plan", "intake", "reviewer-count"):
+    for command in ("finalize-review", "open-pr", "delivery", "unknown", "plan", "intake", "reviewer-count"):
         for args in (("--help", "extra"), ("extra", "--help"), ("-h", "extra")):
             result = run_checker(command, *args, cwd=tmp_path)
             assert result.returncode != 0
@@ -641,7 +653,7 @@ def test_all_ordinary_commands_offer_advice_without_repeating_handlers(monkeypat
             assert entry["main"]([command], out, err) == code
             assert calls == [[]] and out.getvalue() == "original payload\n"
             assert err.getvalue().startswith("original diagnostic\n")
-            expected = (command != "delivery" or code == 2) and (code != 0 or command in {"publish", "finalize-review"})
+            expected = (command != "delivery" or code == 2) and (code != 0 or command in {"open-pr", "finalize-review"})
             assert err.getvalue().count("Suggested next step:") == int(expected), (command, code)
     for argv in ([], ["unknown-operand"]):
         out, err = io.StringIO(), io.StringIO()
@@ -663,15 +675,15 @@ def test_advice_write_failure_preserves_result_and_primary_output_errors(monkeyp
             calls.append(1)
             out.write("receipt\n")
             return code
-        monkeypatch.setitem(entry["COMMANDS"], "publish", handler)
+        monkeypatch.setitem(entry["COMMANDS"], "open-pr", handler)
         out, err = io.StringIO(), AdviceFailure()
-        assert entry["main"](["publish"], out, err) == code
+        assert entry["main"](["open-pr"], out, err) == code
         assert calls == [1] and out.getvalue() == "receipt\n"
     class PrimaryFailure(io.StringIO):
         def write(self, text):
             raise OSError("primary output unavailable")
     err = io.StringIO()
-    assert entry["main"](["publish"], PrimaryFailure(), err) == 2
+    assert entry["main"](["open-pr"], PrimaryFailure(), err) == 2
     assert "internal error: OSError: primary output unavailable" in err.getvalue()
 
 
