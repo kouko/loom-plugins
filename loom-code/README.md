@@ -4,8 +4,8 @@
 
 Skill guides open in English unless a matching translation is available.
 
-> **Five stations carry one change from a confirmed intent to a published
-> pull request, and a deterministic checker recomputes the evidence before
+> **Five stations carry one change from a confirmed intent to a pull request
+> awaiting merge, and a deterministic checker recomputes the evidence before
 > anything leaves the machine.** loom-code assumes you know basic software
 > engineering, not this plugin: it asks you at most three questions per
 > change and decides the rest itself, with the reason recorded. Quality comes
@@ -28,7 +28,7 @@ flowchart TD
     plan["Plan the work<br/>write-plan"]
     build["Implement and test<br/>build"]
     review["Review and verify<br/>closing-review"]
-    ship["③ Publish PR and accept result<br/>ship"]
+    ship["③ Open PR and accept result<br/>ship"]
 
     intent --> design
     design -->|"Yes"| spec

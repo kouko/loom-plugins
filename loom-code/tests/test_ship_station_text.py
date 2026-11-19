@@ -21,14 +21,14 @@ def test_ship_bounds_execution_context_network_recovery() -> None:
     start = text.index("### Execution-context connectivity recovery")
     recovery = text[start:text.index("Repository protection is opt-in", start)]
     for verb, literal, extras in (
-        ("Apply", "`github-rules`", ("`publish` (including CI checks), `land`, and `delivery`",)),
+        ("Apply", "`github-rules`", ("`open-pr` (including CI checks), `land`, and `delivery`",)),
         ("identifies", "known sandbox network restrictions", (
             "policy permits recovery", "authorization applicable to that operation",
             "retry the same authorized Loom command once",
             "host's permitted execution or approval mechanism")),
         ("ends", "recovery", ("Explicit platform denial", "unavailable permission mechanism", "failed retry")),
         ("Preserve", "original and retry outputs", ("stop automatic retries",)),
-        ("Inspect", "partial publication state", ("canonical Loom route",)),
+        ("Inspect", "partial PR-opening state", ("canonical Loom route",)),
     ):
         assert affirms(recovery, verb, literal, *extras), literal
         sample = f"{verb} {literal} {' '.join(extras)}."
@@ -48,7 +48,7 @@ def test_ship_bounds_execution_context_network_recovery() -> None:
     )
     assert any(
         re.match(r"Never substitute\b", s) and "raw Git push" in s
-        and "GitHub CLI" in s and "publication/merge" in s
+        and "GitHub CLI" in s and "PR-opening/merge" in s
         and "alter credentials" in s and "bypass a denial" in s
         for s in sentences
     )
@@ -92,11 +92,20 @@ def test_merge_acceptance_is_not_permission_to_discard_trunk() -> None:
     ), "the rule also covers uncommitted changes in the trunk checkout"
 
 
+# ship-text-calls-open-pr (A5 positive) / no-station-text-runs-publish-subcommand (A5 negative)
+def test_ship_text_calls_open_pr_not_publish() -> None:
+    text = SHIP.read_text(encoding="utf-8")
+    assert "--repair open-pr --intent" in text
+    assert "--repair open-pr --confirm-authorized" in text
+    assert "--repair publish" not in text
+    assert not re.search(r"^## \d\. Publish", text, re.M)
+
+
 # ship-text-separates-authorization-from-acceptance
 def test_ship_text_separates_authorization_from_acceptance() -> None:
     text = SHIP.read_text(encoding="utf-8")
     assert not re.search(r"^## 1\. Confirm acceptance$", text, re.M)
-    assert re.search(r"^## 1\. Confirm publication authorization$", text, re.M)
+    assert re.search(r"^## 1\. Confirm PR-opening authorization$", text, re.M)
 
 
 # ship-text-has-no-direct-gh-pr-merge (A1 negative)
@@ -118,7 +127,7 @@ def test_ship_text_keeps_no_worktree_instruction() -> None:
 
 GATE_OPEN_RE = re.compile(r"<!--\s*gate:\s*[A-Za-z0-9._-]+\s*-->")
 GATE_CLOSE = "<!-- /gate -->"
-NO_HANDOVER = "hand a refused publication command to the user to run"
+NO_HANDOVER = "hand a refused PR-opening command to the user to run"
 
 
 def _gate_regions(text: str) -> list[tuple[int, int]]:

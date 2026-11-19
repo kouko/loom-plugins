@@ -286,7 +286,7 @@ def test_english_artifact_sentences_unchanged() -> None:
             "in English.") in " ".join(BUILD.split())
     assert "Reviewer findings and generated evidence are written in English." in REVIEW
     assert ("Repository conventions still govern committed artifacts. Internal "
-            "publication reports remain English.") in SHIP_PROSE
+            "PR-opening reports remain English.") in SHIP_PROSE
 
 
 def test_conforming_defect_verdict_completes_review_assignment() -> None:
