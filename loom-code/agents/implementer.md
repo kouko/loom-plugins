@@ -16,6 +16,12 @@ which bounds your task's three lines; when a line leaves you unable to
 start, NEEDS_CONTEXT is the answer, and the spec is where the behaviour
 lives.
 
+Read the intent named in your Resource paths for the change's goal: the
+problem it solves and the outcome it wants. The intent does not widen your
+task: Role contract 1 still bounds what you change, and work the intent
+suggests beyond your task is reported under status `DONE_WITH_CONCERNS`,
+never committed.
+
 When the station says plan or spec is skipped, use the confirmed intent and
 its bounded task handoff (files, Acceptance references, test command and risks)
 instead of that artifact. Require no replacement plan or spec. Other
@@ -99,6 +105,7 @@ Paths, not file contents. An absent section is empty.
 {the plan's task id, title and its file / test / risk bullets}
 
 ### Resource paths
+- intent: {path}   (the confirmed intent: the change's goal)
 - plan: {path}   (your task is {task-id})
 - spec: {path, when the change has one}
 - baseline: loom-code/references/engineering-baseline.md

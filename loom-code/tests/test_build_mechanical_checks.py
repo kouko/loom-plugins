@@ -1,3 +1,4 @@
+# concern: A dispatch contract that drops an agent's input path or its scope bound must be rejected.
 """Build ends with a fresh adversary, the package suite and adversarial programs."""
 
 import re
@@ -9,6 +10,7 @@ from prose_pin import (
     affirms,
     flat_prose as _flat,
     has_negation,
+    pins_exact_sentence,
     split_sentences as _sentences,
 )
 # The recipes are reached through the routing table, so no one kind's test
@@ -194,6 +196,58 @@ def test_dead_pointer_helpers_catalogue_link_reintroduced_fails() -> None:
 )
 def test_contract_no_attack_catalogue_or_task_trailer_reference(path: Path) -> None:
     assert _dead_pointer_hits(path.read_text(encoding="utf-8")) == [], path
+
+
+# --- Implementer reads the intent; the intent does not widen its task -------
+
+INTENT_READ_SENTENCE = (
+    "Read the intent named in your Resource paths for the change's goal: the "
+    "problem it solves and the outcome it wants."
+)
+INTENT_PATH_LINE = "- intent: {path}   (the confirmed intent: the change's goal)"
+INTENT_SCOPE_SENTENCE = (
+    "The intent does not widen your task: Role contract 1 still bounds what you "
+    "change, and work the intent suggests beyond your task is reported under "
+    "status `DONE_WITH_CONCERNS`, never committed."
+)
+SKIPPED_PLAN_PARAGRAPH = (
+    "When the station says plan or spec is skipped, use the confirmed intent and "
+    "its bounded task handoff (files, Acceptance references, test command and risks) "
+    "instead of that artifact. Require no replacement plan or spec. Other "
+    "requirements in this contract remain in force unless explicitly skipped."
+)
+
+
+def _resource_paths_name_intent(text: str) -> bool:
+    block = text.split("### Resource paths", 1)[-1].split("###", 1)[0]
+    return INTENT_PATH_LINE in block.splitlines() and "- plan: {path}" in block
+
+
+def test_implementer_resource_paths_name_intent() -> None:
+    text = IMPLEMENTER.read_text(encoding="utf-8")
+    assert _resource_paths_name_intent(text)
+    assert not _resource_paths_name_intent(re.sub(r"^- intent: .*\n", "", text, flags=re.M))
+    weakened_line = "- intent: {path}   (only when the plan is skipped; omit otherwise)"
+    assert not _resource_paths_name_intent(text.replace(INTENT_PATH_LINE, weakened_line))
+    prose = _flat(IMPLEMENTER)
+    assert pins_exact_sentence(prose, INTENT_READ_SENTENCE)
+    weakened = prose.replace(
+        INTENT_READ_SENTENCE,
+        "Read the intent named in your Resource paths for the change's goal only "
+        "if your task row leaves you unsure, and skip it otherwise.",
+    )
+    assert affirms(weakened, "Read", "intent", "goal")  # the keyword check it replaces
+    assert not pins_exact_sentence(weakened, INTENT_READ_SENTENCE)
+
+
+def test_implementer_intent_does_not_widen_task() -> None:
+    prose = _flat(IMPLEMENTER)
+    assert pins_exact_sentence(prose, INTENT_SCOPE_SENTENCE)
+    assert not pins_exact_sentence(prose.replace(INTENT_SCOPE_SENTENCE, ""), INTENT_SCOPE_SENTENCE)
+
+
+def test_implementer_skipped_plan_handoff_unchanged() -> None:
+    assert SKIPPED_PLAN_PARAGRAPH in _flat(IMPLEMENTER)
 
 
 def test_build_verify_step_links_adversarial_recipes_in_place() -> None:
