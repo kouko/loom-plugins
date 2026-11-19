@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.85.0] — 2026-11-19 — implementer reads the confirmed intent
+
+- Add the confirmed intent's path to the implementer dispatch inputs, beside the plan.
+- Tell the implementer to read the intent for the change's goal, while Role contract 1 still bounds the task to its plan row; work the intent suggests beyond the task goes in the report as a concern, never into a commit.
+
 ## [3.84.0] — 2026-11-17 — verify prerequisite probe attribution
 
 - Exclude unchanged prerequisite programs from automatic probe counting only when pre-intent canonical attestations validate at their historical trees and record passing executions; preserve path, blob and mode across intervening history, including unchanged merges.
