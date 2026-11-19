@@ -1,5 +1,5 @@
 # Implementer intent hand-off follow-ups — plan
-intent: 2026-11-19-implementer-intent-followups@f5ad61c
+intent: 2026-11-19-implementer-intent-followups@59d6884
 charter: 1.1
 
 ## Current State Evidence
