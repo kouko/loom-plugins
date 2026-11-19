@@ -1,6 +1,7 @@
 # concern: Advisory output must not repeat handlers, reclassify outcomes, or contaminate protected protocols.
 # concern: Help routing must not bypass validation, alter result streams, or grant authority.
 # concern: Exact discovery must avoid handler, stdin, filesystem and subprocess work outside a repository.
+# concern: A retired sub-command name must not still dispatch, push, or open a PR through an alias or prefix.
 """Executable contract for `loom_checker.py`'s CLI surface (plan W0-02).
 
 The rule-id table this asserts is a mechanism population: `--list-rules`
