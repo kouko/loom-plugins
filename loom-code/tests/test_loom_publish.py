@@ -1538,7 +1538,7 @@ def test_open_pr_user_text_never_says_publish():
     scripts = Path(loom_checker.__file__).resolve().parents[2]
     allowed = re.compile(
         r"publish\.preconditions|`publication:`|publication_only_paths|--goal (local\|)?published"
-        r"|\b(un)?published\b(?=[,|)/.`\s]|$)|loom: publication hook failed \("
+        r"|\b(un)?published\b(?=[,|)/.`\s]|$)"
     )
     machine = {"publication", "published", "unpublished", "publish.preconditions",
                "automatic_publication_authorized", "automatic_publication_reason"}
@@ -1561,6 +1561,11 @@ def test_open_pr_user_text_never_says_publish():
         for line in text.splitlines():
             if re.search(r"publi", allowed.sub("", line), re.I):
                 leaks.append(("help", name, line))
+    plugin = scripts.parent
+    for rel in ("hooks.json", "hooks/hooks.json", "hooks/hooks-codex.json",
+                "hooks/hooks-opencode.json", "hooks/agy_adapter.py", "scripts/loom_checker.py"):
+        leaks += [(rel, hit) for hit in re.findall(r"loom: publi\w* hook failed",
+                                                   (plugin / rel).read_text(encoding="utf-8"))]
     assert leaks == []
     assert "run open-pr again" in (scripts / "loom_checker/command_handlers/land.py").read_text()
     assert hashlib.sha256(push.NATIVE_HOOK).hexdigest() == (

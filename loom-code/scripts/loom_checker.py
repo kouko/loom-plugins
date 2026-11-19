@@ -638,7 +638,7 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
             write_result(preparation, out)
             return 2
         if argv[:2] == ["push", "--hook"]:  # the publication hook never refuses on a crash (REQ-4)
-            err.write(f"loom: publication hook failed ({type(exc).__name__}: {exc}); allowing.\n")
+            err.write(f"loom: push hook failed ({type(exc).__name__}: {exc}); allowing.\n")
             return 0
         err.write(f"loom_checker internal error: {type(exc).__name__}: {exc}\n")
         if not protected:

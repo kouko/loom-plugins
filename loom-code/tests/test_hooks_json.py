@@ -134,7 +134,7 @@ def test_pre_tool_use_checker_missing_allows_and_says_so(hooks, tmp_path):
     result = _claude_pre_tool_use(
         hooks, {"tool_name": "Bash", "tool_input": {"command": f"{PUSH} -u origin feat"}}, missing)
     assert result.returncode == 0, result.stderr
-    assert "loom: publication hook failed (" in result.stderr
+    assert "loom: push hook failed (" in result.stderr
     assert "; allowing." in result.stderr
     assert str(missing / "scripts" / "loom_checker.py") in result.stderr
 
@@ -397,7 +397,7 @@ def test_missing_ready_runtime_reports_repair_without_checker_refusal(hooks, tmp
         {"tool_name": "Bash", "tool_input": {"command": "git push origin feat"}}),
         text=True, capture_output=True, env=env, timeout=30)
     assert result.returncode == 0
-    assert "--repair" in result.stderr and "publication hook failed" in result.stderr
+    assert "--repair" in result.stderr and "push hook failed" in result.stderr
 
 
 @pytest.mark.parametrize("host,event", [

@@ -95,7 +95,7 @@ def test_pushgate_crashing_checker_push_allows_and_says_so(crashing_checker_adap
     out = _run("push-gate", _push("git push origin feat", ".", [str(change_repo)]), tmp_path,
                adapter=crashing_checker_adapter)
     assert out["decision"] == "allow", out
-    assert out["reason"].startswith("loom: publication hook failed (checker exited 3"), out
+    assert out["reason"].startswith("loom: push hook failed (checker exited 3"), out
     assert out["reason"].endswith("; allowing."), out
 
 

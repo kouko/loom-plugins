@@ -82,11 +82,11 @@ def push_gate(payload: dict) -> int:
                 return _emit({"decision": "deny", "reason": reason or "BLOCK: checker refused"})
             if result.returncode == 86:
                 error = "checker runtime unavailable" + (f": {reason}" if reason else "")
-                return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})
+                return _emit({"decision": "allow", "reason": f"loom: push hook failed ({error}); allowing."})
             error = f"checker exited {result.returncode}" + (f": {reason}" if reason else "")
         except (OSError, subprocess.SubprocessError) as exc:
             error = str(exc)
-    return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})
+    return _emit({"decision": "allow", "reason": f"loom: push hook failed ({error}); allowing."})
 
 
 # --- pre-invocation ------------------------------------------------------------

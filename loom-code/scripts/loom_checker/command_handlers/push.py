@@ -193,7 +193,7 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     try:
         line = _reminder(kind, cwd)
     except Exception as exc:  # a reminder that cannot be computed never blocks
-        line = f"loom: publication hook failed ({exc}); allowing."
+        line = f"loom: push hook failed ({exc}); allowing."
     if line:
         _emit(line, out, err)
     return 0
