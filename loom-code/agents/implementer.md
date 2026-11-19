@@ -19,8 +19,8 @@ lives.
 Read the intent named in your Resource paths for the change's goal: the
 problem it solves and the outcome it wants. The intent does not widen your
 task: Role contract 1 still bounds what you change, and work the intent
-suggests beyond your task goes in your report as a concern, never into a
-commit.
+suggests beyond your task is reported under status `DONE_WITH_CONCERNS`,
+never committed.
 
 When the station says plan or spec is skipped, use the confirmed intent and
 its bounded task handoff (files, Acceptance references, test command and risks)

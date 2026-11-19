@@ -3,7 +3,7 @@
 ## [3.85.0] — 2026-11-19 — implementer reads the confirmed intent
 
 - Add the confirmed intent's path to the implementer dispatch inputs, beside the plan.
-- Tell the implementer to read the intent for the change's goal, while Role contract 1 still bounds the task to its plan row; work the intent suggests beyond the task goes in the report as a concern, never into a commit.
+- Tell the implementer to read the intent for the change's goal, while Role contract 1 still bounds the task to its plan row; work the intent suggests beyond the task is reported under status `DONE_WITH_CONCERNS`, never committed.
 
 ## [3.84.0] — 2026-11-17 — verify prerequisite probe attribution
 
