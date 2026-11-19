@@ -4,7 +4,7 @@
 
 skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
 
-> **5 つのステーションが一つの変更を確認済みの intent から公開済みの
+> **5 つのステーションが一つの変更を確認済みの intent からマージ待ちの
 > pull request まで運び、何かがマシンの外に出る前に決定的な checker が
 > 証拠を再計算します。** loom-code が前提にするのは基本的なソフトウェア工学の
 > 知識であって、この plugin の知識ではありません。1 変更につき質問は最大 3 つ、
@@ -28,7 +28,7 @@ flowchart TD
     plan["作業を計画<br/>write-plan"]
     build["実装とテスト<br/>build"]
     review["レビューと検証<br/>closing-review"]
-    ship["③ PR を公開し結果を確認<br/>ship"]
+    ship["③ PR を開き結果を確認<br/>ship"]
 
     intent --> design
     design -->|"必要"| spec
@@ -148,7 +148,7 @@ checker が「問題なし」と言うことはありません。ステーショ
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
 テスト環境は変更しません。標準ライブラリだけを使う簡単な hook は、動作する
 システムの Python を使い、使えなければ準備済みのキャッシュ環境を使います。
-checker を使う公開用 hook は `--ready` で準備済みの環境だけを使い、
+checker を使う push hook は `--ready` で準備済みの環境だけを使い、
 使えない場合は修復方法を知らせます。hook 自体はインストールしません。
 
 ## loom-design・loom-workflow との組み合わせ
@@ -189,7 +189,7 @@ codex plugin add loom-code@loom
 codex plugin list
 ```
 
-インストール済みの `PreToolUse` hook が公開操作の割り込みを担います。導入先の
+インストール済みの `PreToolUse` hook がpush 操作の割り込みを担います。導入先の
 repo に checker のコピー、複製した contract、trust ledger は要りません。
 
 安全に更新するには、次の順序で実行します。

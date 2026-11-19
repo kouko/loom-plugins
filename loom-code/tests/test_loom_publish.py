@@ -1557,7 +1557,8 @@ def test_open_pr_user_text_never_says_publish():
                     and re.search(r"publi", allowed.sub("", node.value), re.I)):
                 leaks.append((rel, node.lineno, node.value))
     entry = runpy.run_path(str(scripts / "loom_checker.py"), run_name="_loom_checker_entry")
-    for name, text in [("usage", entry["__doc__"]), *entry["COMMAND_HELP"].items()]:
+    for name, text in [("usage", entry["__doc__"]), ("notice", entry["HELP_NOTICE"]),
+                       *entry["COMMAND_HELP"].items()]:
         for line in text.splitlines():
             if re.search(r"publi", allowed.sub("", line), re.I):
                 leaks.append(("help", name, line))

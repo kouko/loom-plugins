@@ -4,7 +4,7 @@
 
 技能詳細頁有同語言翻譯時連至該版本，其餘連至英文版。
 
-> **五個站把一次變更從確認過的 intent 送到已發布的 pull request；任何東西
+> **五個站把一次變更從確認過的 intent 送到等待合併的 pull request；任何東西
 > 離開本機之前，決定性的 checker 會重算一次證據。** loom-code 假設你具備
 > 基本軟體工程知識，而不是熟悉這個 plugin：每次變更最多問你三個問題，其餘
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
@@ -26,7 +26,7 @@ flowchart TD
     plan["規劃工作<br/>write-plan"]
     build["實作與測試<br/>build"]
     review["審查與驗證<br/>closing-review"]
-    ship["③ 發布 PR 並驗收結果<br/>ship"]
+    ship["③ 開 PR 並驗收結果<br/>ship"]
 
     intent --> design
     design -->|"需要"| spec
@@ -130,7 +130,7 @@ hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest�
 各站透過 `scripts/loom-python --repair` 在使用者快取中備妥 checker 專用的
 Python 與套件，接著重跑原本的檢查；使用者專案的測試環境不受影響。只用標準函式庫
 的簡單 hook 會使用可運作的系統 Python；若無法使用，則改用已備妥的快取環境。
-需要 checker 的發布 hook 以 `--ready` 沿用已備妥的環境，不自行安裝；環境不可用時
+需要 checker 的 push hook 以 `--ready` 沿用已備妥的環境，不自行安裝；環境不可用時
 會顯示修復方式。
 
 ## 與 loom-design、loom-workflow 組合
@@ -169,7 +169,7 @@ codex plugin add loom-code@loom
 codex plugin list
 ```
 
-已安裝的 `PreToolUse` hook 負責攔截發布操作；採用的 repo 不需要保存 checker
+已安裝的 `PreToolUse` hook 負責攔截 push 操作；採用的 repo 不需要保存 checker
 副本、複製的 contract 或 trust ledger。
 
 若要安全更新，請依序執行：

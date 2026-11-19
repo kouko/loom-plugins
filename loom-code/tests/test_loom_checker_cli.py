@@ -487,7 +487,7 @@ def test_covered_help_is_discoverable_and_explains_inputs(tmp_path: Path) -> Non
             result = run_checker(command, flag, cwd=tmp_path)
             assert (result.returncode, result.stderr) == (0, "")
             assert all(word in result.stdout for word in words), result.stdout
-            assert "No validation or publication" in result.stdout
+            assert "No validation ran and no PR was opened" in result.stdout
             assert "Replace <loom-code>" in result.stdout
     assert not list(tmp_path.iterdir())
 
@@ -633,7 +633,7 @@ def test_nonexact_help_forms_retain_normal_rejection(tmp_path: Path) -> None:
         for args in (("--help", "extra"), ("extra", "--help"), ("-h", "extra")):
             result = run_checker(command, *args, cwd=tmp_path)
             assert result.returncode != 0
-            assert "No validation or publication" not in result.stdout
+            assert "No validation ran and no PR was opened" not in result.stdout
     hook = run_checker("delivery", "--hook", "--help", cwd=tmp_path)
     assert (hook.returncode, hook.stdout, hook.stderr) == (
         2, "", "delivery: use --hook alone or --hook --host claude|codex\n")

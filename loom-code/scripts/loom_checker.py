@@ -538,7 +538,7 @@ missing prerequisites can yield unconfirmed/exit 1. `published` completion with
 }
 
 HELP_NOTICE = """
-No validation or publication occurred: help only, exit 0.
+No validation ran and no PR was opened: help only, exit 0.
 Use "<loom-code>/scripts/loom-python" --ready <command> <arguments>.
 Replace <loom-code> with the installed loom-code plugin directory; launcher
 runtime readiness is still required. Bundled paths above are plugin-relative.
@@ -547,7 +547,7 @@ network and write runtime caches/locks before checker help; it is not offline.
 For a literal file operand named --help or -h, use ./--help or ./-h.
 Ordinary text guidance uses Suggested next step: on stderr, except the normal
 github-rules human report on stdout. Advice is optional and never authorizes
-execution, retry, publication, merge or bypassing trust. Advice-only write
+execution, retry, opening a PR, merge or bypassing trust. Advice-only write
 failures do not change results. Hooks, setup, CI annotations and mandatory cwd
 handoffs retain their separate protocols; help itself is discovery only.
 """
