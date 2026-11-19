@@ -52,7 +52,7 @@ def test_premature_stop_and_repeat_disclose_actual_incompletion(reviewed_deliver
         assert result["decision"] == "block"
         reason = result["reason"]
     assert "next:" in reason and "unpublished" in reason
-    assert "If you are waiting for the user's answer or publication was withdrawn, " in reason
+    assert "If you are waiting for the user's answer or PR-opening authorization was withdrawn, " in reason
     assert "stop again and say so; otherwise: " in reason
 
 

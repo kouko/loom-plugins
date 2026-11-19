@@ -30,11 +30,11 @@ PUSH = "git" + " push"
 CREATE = "gh" + " pr create"
 MERGE = "gh" + " pr merge"
 
-ABSENT = "loom: verification absent (missing: plan, attestation); publishing anyway."
-UNIDENTIFIED = "loom: change not identified (no intent for this branch); publishing anyway."
+ABSENT = "loom: verification absent (missing: plan, attestation); proceeding."
+UNIDENTIFIED = "loom: change not identified (no intent for this branch); proceeding."
 OUTSIDE_LAND = ("loom: this merges outside loom_checker.py land (missing: plan, attestation); "
                 "merging anyway.")
-CRASHED = "loom: publication hook failed (boom); allowing."
+CRASHED = "loom: push hook failed (boom); allowing."
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -142,7 +142,7 @@ def test_cli_push_hook_crash_allows(tmp_path, monkeypatch):
     err = StringIO()
 
     assert _checker_cli().main(["push", "--hook"], StringIO(), err) == 0
-    assert err.getvalue() == "loom: publication hook failed (RuntimeError: boom); allowing.\n"
+    assert err.getvalue() == "loom: push hook failed (RuntimeError: boom); allowing.\n"
 
 
 def test_cli_other_subcommand_crash_keeps_exit_two(monkeypatch):

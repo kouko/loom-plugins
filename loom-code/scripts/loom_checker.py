@@ -16,8 +16,8 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py push --hook
     loom_checker.py push --install-git-hooks
     loom_checker.py push --remove-git-hooks
-    loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>
-    loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>
+    loom_checker.py open-pr --intent <absolute-path> --title <text> --body-file <absolute-path>
+    loom_checker.py open-pr --confirm-authorized --title <text> --body-file <absolute-path>
     loom_checker.py delivery [--goal local|published|merged] [--intent <path>] [--json]
     loom_checker.py land --accepted-by <name>
     loom_checker.py land --cleanup <branch>
@@ -40,7 +40,7 @@ with your plan file path.
 Plan takes a file path; intake takes a station and a change-id.
 Plan, intake, contract and reviewer-count accept an optional final --json selector;
 text remains default. Delivery retains its separate JSON interface.
-Detailed help: finalize-review --help, publish --help, delivery --help
+Detailed help: finalize-review --help, open-pr --help, delivery --help
               plan --help, intake --help, reviewer-count --help
               intent --help, intents --help, push --help, land --help
               sync-trunk --help, github-rules --help, pr-floor --help
@@ -52,7 +52,7 @@ No validation runs for --help or -h alone.
 Exit codes depend on the command: 0 may include advisory or unsynced results;
 1 means a failed check or incomplete operation; 2 means usage/internal error
 or a hook refusal. See each command's help for its completion limits.
-The publication hook allows on unexpected exceptions; other commands exit 2.
+The push hook allows on unexpected exceptions; other commands exit 2.
 
 Schemas are not restated here: the required frontmatter fields, sections,
 station names, interface-surface defaults and artifact paths are read
@@ -177,9 +177,9 @@ The host matcher handles command text beginning with literal git commit, git
 merge or git push while the payload cwd is on main/master, with refusal exit 2
 unless repository-local loom.protectMain=false explicitly allows those commands.
 This opt-out affects the host hook, not the separate native hooks below.
-Malformed/missing payload also exits 2. Publication reminders may emit a host
+Malformed/missing payload also exits 2. Push reminders may emit a host
 JSON systemMessage on stdout and a diagnostic on stderr; reminder failures and
-unexpected top-level hook exceptions allow exit 0. It performs no publication.
+unexpected top-level hook exceptions allow exit 0. It opens no PR.
 
 Native modes are explicit repository configuration operations. They read and
 refuse a core.hooksPath override or unreadable setting without changing it.
@@ -205,14 +205,14 @@ Choose exactly one form; --confirm applies only to sweep. Run in the repository
 with trusted git/gh, eligible change branch/PR and live evidence/checks. A real
 maintainer acceptance must already exist; the name or help supplies no consent.
 The accepted name must match the committed intent originator or automatic
-publication authorizer; matching a name does not establish actual consent.
+PR-opening authorizer; matching a name does not establish actual consent.
 Exactly one open PR against the default branch must match HEAD, and its live
 body must satisfy the nine-heading validator. Land polls all registered checks,
 including non-required checks, with at most 360 pending 10-second waits; network
 calls and other stages add elapsed time. Failed/cancelled/action-required checks
 refuse the merge. Absent/stale local verification is disclosed after merge,
 not a gate that prevents it; no registered checks is not proof of testing.
-See publish --help for the body heading order and content requirements.
+See open-pr --help for the body heading order and content requirements.
 The accepted form may squash merge remotely, verify, sync trunk, then delete
 the change worktree and local/remote branch. Cleanup targets a named merged
 change. Sweep computes candidates and a confirmation token; even without a
@@ -275,8 +275,8 @@ Exit 2 means invocation, unreadable file or internal failure. Correct named
 headings or Git context; never fabricate stronger verification status.
 Can append a verification line to GITHUB_STEP_SUMMARY when set, so it is not
 strictly read-only. It runs no PR-controlled commands, tests or reviews and
-does not authorize publication or merge.
-See publish --help for the body heading order and content requirements.
+does not authorize opening a PR or merging.
+See open-pr --help for the body heading order and content requirements.
 """,
     "standing": """standing — check applicable standing-document policy for one intent
 Usage: standing <path-to-intent>
@@ -345,7 +345,7 @@ accepted identifiers contain only letters, digits, dots, underscores and
 hyphens. Canonical artifacts are resolved through the bundled contract.
 
 Text results: exit 0 means the applicable prerequisites passed for this snapshot;
-it does not perform the station, authorize publication or verify the change.
+it does not perform the station, authorize opening a PR or verify the change.
 Conditional interface-surfaces (...) information may appear on stdout for
 engineering intents or applicable needs-design=yes write-plan intake.
 That information is advisory and may precede a later BLOCK; it is not a
@@ -437,20 +437,20 @@ through the normal review workflow. A passed stage is not overall success.
 Stderr progress is advisory and can also contain errors: while running, keep
 observing the same process; inspect its final exit and generated evidence.
 Finalization executes the package suite and declared adversarial commands and
-atomically writes the generated attestation. It grants no publication authority.
-Commit that generated attestation before publication.
+atomically writes the generated attestation. It grants no PR-opening authority.
+Commit that generated attestation before opening the PR.
 """,
-    "publish": """publish — publish an authorized branch and observe required CI
-Usage: publish --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>
-Legacy: publish --confirm-authorized --title <text> --body-file <absolute-body-path>
+    "open-pr": """open-pr — open or reuse a Ready PR awaiting merge for an authorized branch and observe required CI
+Usage: open-pr --intent <absolute-intent-path> --title <text> --body-file <absolute-body-path>
+Legacy: open-pr --confirm-authorized --title <text> --body-file <absolute-body-path>
 
-Publication may perform a remote write (push and create/update a Ready PR).
+open-pr may perform a remote write (push and create/update a Ready PR).
 --intent must name this change's canonical, committed, confirmed intent with
-an existing valid automatic-publication authorization that remains unrevoked.
+an existing valid automatic PR-opening authorization that remains unrevoked.
 The legacy --confirm-authorized argument records an actual explicit user
-publication decision; it is not a way to supply missing consent. If neither
+PR-opening decision; it is not a way to supply missing consent. If neither
 authorization exists, stop and obtain that decision. Help grants no authority.
-Observation grants neither publication nor merge authorization.
+Observation grants neither PR-opening nor merge authorization.
 
 --title is checked here only for nonblank text; title policy remains workflow guidance.
 --body-file must be an absolute path to a readable UTF-8 Markdown file.
@@ -483,7 +483,7 @@ committed selected content; an existing attestation must be committed.
 A temporary body snapshot is removed on return. The nonforce push can set
 upstream tracking; remote operations are not rolled back on later failure.
 
-Results: exit 0 completes publication and its required-check observation;
+Results: exit 0 means the PR is open and awaiting merge, with its required-check observation;
 exit 1 means blocked or unconfirmed; exit 2 means invocation or authorization
 errors, or internal failures. Read the diagnostic to determine the next action;
 the exit code alone is not a reason to retry.
@@ -492,7 +492,7 @@ advisory and can also contain errors; while CI is pending keep observing the
 same process. Inspect the final exit and evidence. Exit 0 with
 "No required checks registered" means no checks registered, not tests passed.
 An observation failure may follow a successful remote write. Before considering
-another publish, run delivery --goal published --json to observe existing
+another open-pr run, run delivery --goal published --json to observe existing
 state and follow its diagnostic; do not blindly repeat a write or switch routes.
 """,
     "delivery": """delivery — observe the selected delivery goal without writes
@@ -503,8 +503,8 @@ it does not check finalization, attestation or verification. published checks th
 matching Ready PR and required CI; merged checks merged delivery evidence.
 --intent optionally identifies the change's canonical committed intent (a
 relative or absolute path); it does not create or grant authorization.
-Local observation does not claim publication. Observation never authorizes
-publication or merge, and does not perform either action.
+Local observation does not claim an open PR. Observation never authorizes
+opening a PR or merging, and does not perform either action.
 
 --json emits the existing object on stdout:
 state: observed delivery condition; reason: why it was classified that way;
@@ -530,15 +530,15 @@ Hook mode consumes host stdin and emits host-specific feedback with its own
 exit semantics; it is separate from ordinary --json. Do not mix hook forms
 with observation options. Duplicate options are invalid. Malformed ordinary
 invocations may report text on stderr even when --json was supplied.
-Published/merged observation needs trusted git/gh from supported host install
+`published`/`merged` observation needs trusted git/gh from supported host install
 locations, a literal GitHub origin, authenticated gh and network read access;
-missing prerequisites can yield unconfirmed/exit 1. Published completion with
+missing prerequisites can yield unconfirmed/exit 1. `published` completion with
 "No required checks registered" does not mean tests passed.
 """,
 }
 
 HELP_NOTICE = """
-No validation or publication occurred: help only, exit 0.
+No validation ran and no PR was opened: help only, exit 0.
 Use "<loom-code>/scripts/loom-python" --ready <command> <arguments>.
 Replace <loom-code> with the installed loom-code plugin directory; launcher
 runtime readiness is still required. Bundled paths above are plugin-relative.
@@ -547,7 +547,7 @@ network and write runtime caches/locks before checker help; it is not offline.
 For a literal file operand named --help or -h, use ./--help or ./-h.
 Ordinary text guidance uses Suggested next step: on stderr, except the normal
 github-rules human report on stdout. Advice is optional and never authorizes
-execution, retry, publication, merge or bypassing trust. Advice-only write
+execution, retry, opening a PR, merge or bypassing trust. Advice-only write
 failures do not change results. Hooks, setup, CI annotations and mandatory cwd
 handoffs retain their separate protocols; help itself is discovery only.
 """
@@ -558,7 +558,7 @@ COMMANDS = {
     "intents": cmd_intents,
     "intake": cmd_intake,
     "push": cmd_push,
-    "publish": cmd_publish,
+    "open-pr": cmd_publish,
     "delivery": cmd_delivery,
     "land": cmd_land,
     "sync-trunk": cmd_sync_trunk,
@@ -580,7 +580,7 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
     protected = bool(argv) and ((argv[0] in {"push", "delivery"} and "--hook" in argv[1:])
                                or (argv[0] == "github-rules" and "--print-setup" in argv[1:]))
     hint = ""
-    if argv and argv[0] in {"finalize-review", "publish", "delivery", "plan", "intake", "reviewer-count"} and not (argv[0] == "delivery" and "--hook" in argv[1:]):
+    if argv and argv[0] in {"finalize-review", "open-pr", "delivery", "plan", "intake", "reviewer-count"} and not (argv[0] == "delivery" and "--hook" in argv[1:]):
         hint = (f'Help: "<loom-code>/scripts/loom-python" --ready {argv[0]} --help '
                 '(replace <loom-code> with the installed loom-code plugin directory).\n')
     try:
@@ -637,8 +637,8 @@ def main(argv: list[str], out=sys.stdout, err=sys.stderr) -> int:
             error_result(preparation, "internal", f"loom_checker internal error: {type(exc).__name__}: {exc}")
             write_result(preparation, out)
             return 2
-        if argv[:2] == ["push", "--hook"]:  # the publication hook never refuses on a crash (REQ-4)
-            err.write(f"loom: publication hook failed ({type(exc).__name__}: {exc}); allowing.\n")
+        if argv[:2] == ["push", "--hook"]:  # the push hook never refuses on a crash (REQ-4)
+            err.write(f"loom: push hook failed ({type(exc).__name__}: {exc}); allowing.\n")
             return 0
         err.write(f"loom_checker internal error: {type(exc).__name__}: {exc}\n")
         if not protected:

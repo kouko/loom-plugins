@@ -162,7 +162,7 @@ RULES: list[tuple[str, str]] = [
     ),
     (
         "publish.preconditions",
-        "publish pushes HEAD and opens or updates its one pull request only when the change "
+        "open-pr pushes HEAD and opens or updates its one pull request only when the change "
         "is identified, publication is authorized, any generated attestation is committed, "
         "git and gh resolve to trusted executables, "
         "origin is a literal GitHub URL, and HEAD, the remote branch and the PR identity stay "
@@ -174,7 +174,7 @@ RULES: list[tuple[str, str]] = [
         "The exact pull-request body carries Ship's nine top-level contextual headings "
         "exactly once and in order, with no competing Memory heading or explicit claim "
         "to expose private or hidden chain-of-thought, and any `Verification status:` "
-        "line states exactly the status publish computes.",
+        "line states exactly the status open-pr computes.",
     ),
     (
         "ci.pr-floor",

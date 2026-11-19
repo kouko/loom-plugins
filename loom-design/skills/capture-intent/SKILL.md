@@ -190,11 +190,11 @@ twice, and this is the only stop this station makes.
 1. **The restatement.** Once required facts are settled and this existing
    confirmation step is ready, read `references/confirmation-ready-template.md`.
 
-   For the current contract, automatic publication is the default. This same
+   For the current contract, opening the PR automatically is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after `closing-review` and publication checks pass, while merge
-   remains a separate decision. Say that the user may explicitly opt out before
-   publication. Do not hide that consequence in mechanism language or add it
+   push and a Ready PR awaiting merge after `closing-review` and the PR-opening checks
+   pass, while merge remains a separate decision. Say that the user may explicitly
+   opt out before the PR is opened. Do not hide that consequence in mechanism language or add it
    after the user has answered. Write
    `publication: automatic — authorized <date> by <name>` only after that
    informed yes; an opt-out leaves the field absent.

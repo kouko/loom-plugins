@@ -185,7 +185,7 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     cwd = Path(str(payload.get("cwd") or os.getcwd()))
     if _protect_main(command, cwd):
         err.write("loom: direct git merge, commit, or push on main/master is blocked. "
-                  "Next: preserve your work on a feature branch or worktree and publish its PR.\n")
+                  "Next: preserve your work on a feature branch or worktree and open its PR.\n")
         return 2
     kind = publication_kind(command)
     if kind is None:
@@ -193,7 +193,7 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     try:
         line = _reminder(kind, cwd)
     except Exception as exc:  # a reminder that cannot be computed never blocks
-        line = f"loom: publication hook failed ({exc}); allowing."
+        line = f"loom: push hook failed ({exc}); allowing."
     if line:
         _emit(line, out, err)
     return 0
@@ -220,10 +220,10 @@ def _reminder(kind: str, cwd: Path) -> str | None:
     if kind == "merge":
         return f"loom: this merges outside loom_checker.py land{clause}; merging anyway."
     if change_id is None:
-        return "loom: change not identified (no intent for this branch); publishing anyway."
+        return "loom: change not identified (no intent for this branch); proceeding."
     if status == "valid":
         return None
-    return f"loom: verification {status}{clause}; publishing anyway."
+    return f"loom: verification {status}{clause}; proceeding."
 
 
 def _emit(line: str, out, err) -> None:

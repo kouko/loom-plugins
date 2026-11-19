@@ -4,15 +4,15 @@
 
 Skill guides open in English unless a matching translation is available.
 
-> **Five stations carry one change from a confirmed intent to a published
-> pull request, and a deterministic checker recomputes the evidence before
+> **Five stations carry one change from a confirmed intent to a pull request
+> awaiting merge, and a deterministic checker recomputes the evidence before
 > anything leaves the machine.** loom-code assumes you know basic software
 > engineering, not this plugin: it asks you at most three questions per
 > change and decides the rest itself, with the reason recorded. Quality comes
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.85.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.86.0 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -28,7 +28,7 @@ flowchart TD
     plan["Plan the work<br/>write-plan"]
     build["Implement and test<br/>build"]
     review["Review and verify<br/>closing-review"]
-    ship["③ Publish PR and accept result<br/>ship"]
+    ship["③ Open PR and accept result<br/>ship"]
 
     intent --> design
     design -->|"Yes"| spec
@@ -226,7 +226,7 @@ Stations use `scripts/loom-python --repair` to prepare their own checker Python
 and dependencies in a user cache, then rerun the original check. This does not
 change the project's test environment. Simple standard-library hooks use a
 viable host Python, falling back to a ready cached runtime if one is unavailable.
-Checker-backed publication hooks use `--ready`: they reuse an existing runtime
+Checker-backed push hooks use `--ready`: they reuse an existing runtime
 without installing anything and report how to repair it when the runtime is
 unavailable.
 
@@ -270,7 +270,7 @@ codex plugin add loom-code@loom
 codex plugin list
 ```
 
-The installed `PreToolUse` hook owns publication interception; adopting
+The installed `PreToolUse` hook owns push interception; adopting
 repositories carry no checker copy, copied contract, or trust ledger.
 
 To update safely:
@@ -310,7 +310,7 @@ agent may act outside the project; pass it in interactive mode too.
 
 To update, run `git pull` in the clone and install again; the install replaces
 the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
-publication reminder, the session context and the language reminder) run only in
+push reminder, the session context and the language reminder) run only in
 the `agy` CLI, not in the Antigravity desktop app or IDE. On `agy` the loom roles (implementer,
 reviewer, adversary, acceptance-tester) run as agy `self` subagents that follow
 loom's agent contracts, on Gemini models. The review station is
@@ -332,7 +332,7 @@ The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plu
 
 Skills are offered as `loom-code:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with the command `/loom-code:using-loom-code`, which stays a skill too.
 
-On OpenCode, the session context, the publication reminder and the language reminder run through the plugin's v2 hooks.
+On OpenCode, the session context, the push reminder and the language reminder run through the plugin's v2 hooks.
 
 Limits on OpenCode:
 

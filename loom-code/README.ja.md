@@ -4,7 +4,7 @@
 
 skill の詳細は、同じ言語の翻訳がある場合はその版、それ以外は英語版にリンクします。
 
-> **5 つのステーションが一つの変更を確認済みの intent から公開済みの
+> **5 つのステーションが一つの変更を確認済みの intent からマージ待ちの
 > pull request まで運び、何かがマシンの外に出る前に決定的な checker が
 > 証拠を再計算します。** loom-code が前提にするのは基本的なソフトウェア工学の
 > 知識であって、この plugin の知識ではありません。1 変更につき質問は最大 3 つ、
@@ -12,7 +12,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.85.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.86.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -28,7 +28,7 @@ flowchart TD
     plan["作業を計画<br/>write-plan"]
     build["実装とテスト<br/>build"]
     review["レビューと検証<br/>closing-review"]
-    ship["③ PR を公開し結果を確認<br/>ship"]
+    ship["③ PR を開き結果を確認<br/>ship"]
 
     intent --> design
     design -->|"必要"| spec
@@ -148,7 +148,7 @@ checker が「問題なし」と言うことはありません。ステーショ
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
 テスト環境は変更しません。標準ライブラリだけを使う簡単な hook は、動作する
 システムの Python を使い、使えなければ準備済みのキャッシュ環境を使います。
-checker を使う公開用 hook は `--ready` で準備済みの環境だけを使い、
+checker を使う push hook は `--ready` で準備済みの環境だけを使い、
 使えない場合は修復方法を知らせます。hook 自体はインストールしません。
 
 ## loom-design・loom-workflow との組み合わせ
@@ -189,7 +189,7 @@ codex plugin add loom-code@loom
 codex plugin list
 ```
 
-インストール済みの `PreToolUse` hook が公開操作の割り込みを担います。導入先の
+インストール済みの `PreToolUse` hook がpush 操作の割り込みを担います。導入先の
 repo に checker のコピー、複製した contract、trust ledger は要りません。
 
 安全に更新するには、次の順序で実行します。
@@ -230,7 +230,7 @@ agy plugin list
 
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
-です。hook（公開リマインダー・session context・言語リマインダー）が走るのは `agy` CLI だけで、
+です。hook（push リマインダー・session context・言語リマインダー）が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では loom の役割
 （implementer・reviewer・adversary・acceptance-tester）は、loom の agent 契約に従う
 agy の `self` subagent として Gemini モデルで動きます。review station は
@@ -251,7 +251,7 @@ OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする�
 
 skill は `loom-code:<skill>` として提供されます。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動きます。loom はコマンド `/loom-code:using-loom-code` で始めます（skill としても引き続き提供されます）。
 
-OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダーが plugin の v2 hook で動きます。
+OpenCode では、セッションコンテキスト、push リマインダー、言語リマインダーが plugin の v2 hook で動きます。
 
 OpenCode での制限は次のとおりです。
 

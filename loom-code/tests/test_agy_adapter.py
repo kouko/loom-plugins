@@ -129,7 +129,7 @@ def _codex_fallback(payload: dict, tmp_path: Path, matcher: int = 0) -> subproce
     )
 
 
-FAILED_ALLOWING = "loom: publication hook failed ("
+FAILED_ALLOWING = "loom: push hook failed ("
 
 
 SELECTION_WRITE = "echo x >> .git/loom/selections/c.jsonl"

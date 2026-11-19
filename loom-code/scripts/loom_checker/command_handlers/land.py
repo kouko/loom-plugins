@@ -1018,13 +1018,13 @@ def _merge_preconditions(
         except (KeyError, TypeError, ValueError, AttributeError):
             return _block("open PR response has an unreadable pull request", err)
     if not matching:
-        return _block(f"no open PR for {branch} against {base}; publish again", err)
+        return _block(f"no open PR for {branch} against {base}; run open-pr again", err)
     if len(matching) > 1:
         return _block(f"multiple open PRs for {branch} against {base}", err)
     number, pr_head = matching[0]
     if pr_head != head:
         return _block(
-            f"PR #{number} head {pr_head[:7]} is not HEAD {head[:7]}; publish again", err
+            f"PR #{number} head {pr_head[:7]} is not HEAD {head[:7]}; run open-pr again", err
         )
 
     # The live body is the one squashed, so it is checked first: a missing

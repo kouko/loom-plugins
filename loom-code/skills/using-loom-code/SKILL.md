@@ -15,7 +15,7 @@ follow its linked SKILL.md. A directly named skill goes straight to that skill.
 | Plan or start a change; no implementation plan yet, including an absent or unconfirmed intent | [write-plan](../write-plan/SKILL.md) |
 | Implement a committed plan with a confirmed intent | [build](../build/SKILL.md) |
 | Build completed, or functional changes invalidated review evidence | [closing-review](../closing-review/SKILL.md) |
-| Publish a branch, normally one with a matching review attestation | [ship](../ship/SKILL.md) |
+| Open or reuse a PR awaiting merge for a branch, normally one with a matching review attestation | [ship](../ship/SKILL.md) |
 | Alert, CI or regression failure, or dogfood incident outside an active unmerged change, arriving without a user's request to fix a bug | [maintain](../maintain/SKILL.md) |
 | Run one consented outside review for an owning Loom review skill | [external-review](../external-review/SKILL.md) |
 | Resolve a factual evidence gap that could change an engineering decision, in an existing task or standalone discussion, including a small capability/version check, or consider preserving research from a merged change | [engineering-research](../engineering-research/SKILL.md) |

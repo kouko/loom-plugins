@@ -64,11 +64,11 @@ twice.
    a diagram for a wording correction. Avoid paths, identifiers, and mechanism
    names unless needed to understand the request.
 
-   For the current contract, automatic publication is the default. This same
+   For the current contract, opening the PR automatically is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after `closing-review` and publication checks pass, while merge
-   remains a separate decision. Say that the user may explicitly opt out before
-   publication. Write
+   push and a Ready PR awaiting merge after `closing-review` and the PR-opening checks
+   pass, while merge remains a separate decision. Say that the user may explicitly
+   opt out before the PR is opened. Write
    `publication: automatic — authorized <date> by <name>` only after that
    informed yes; an opt-out leaves the field absent.
 

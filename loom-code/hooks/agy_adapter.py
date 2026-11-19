@@ -11,7 +11,7 @@ adapter maps agy events onto the handlers Claude Code and Codex already use:
                                                + language-anchor on a loom SKILL.md read
 
 Exit status is always 0; decisions travel in the JSON. The checker denies
-direct Git merge, commit, or push on main/master; publication reminders allow.
+direct Git merge, commit, or push on main/master; push reminders allow.
 When the checker is missing or cannot answer, the adapter allows and says so
 (the same rule as the Codex stale-root fallback).
 """
@@ -82,11 +82,11 @@ def push_gate(payload: dict) -> int:
                 return _emit({"decision": "deny", "reason": reason or "BLOCK: checker refused"})
             if result.returncode == 86:
                 error = "checker runtime unavailable" + (f": {reason}" if reason else "")
-                return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})
+                return _emit({"decision": "allow", "reason": f"loom: push hook failed ({error}); allowing."})
             error = f"checker exited {result.returncode}" + (f": {reason}" if reason else "")
         except (OSError, subprocess.SubprocessError) as exc:
             error = str(exc)
-    return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})
+    return _emit({"decision": "allow", "reason": f"loom: push hook failed ({error}); allowing."})
 
 
 # --- pre-invocation ------------------------------------------------------------

@@ -32,7 +32,7 @@ def test_each_subcommand_resolves_to_its_declared_owner_module() -> None:
     script = """
 import runpy
 commands = runpy.run_path('loom_checker.py')['COMMANDS']
-expected = {'intent': 'intent', 'intents': 'intents', 'intake': 'intake', 'push': 'push', 'publish': 'publish', 'delivery': 'publish', 'land': 'land', 'sync-trunk': 'sync', 'github-rules': 'github_rules', 'pr-floor': 'pr_floor', 'standing': 'standing', 'contract': 'contract', 'charter': 'charter', 'plan': 'plan', 'reviewer-count': 'reviewer_count', 'finalize-review': 'finalize'}
+expected = {'intent': 'intent', 'intents': 'intents', 'intake': 'intake', 'push': 'push', 'open-pr': 'publish', 'delivery': 'publish', 'land': 'land', 'sync-trunk': 'sync', 'github-rules': 'github_rules', 'pr-floor': 'pr_floor', 'standing': 'standing', 'contract': 'contract', 'charter': 'charter', 'plan': 'plan', 'reviewer-count': 'reviewer_count', 'finalize-review': 'finalize'}
 assert {name: fn.__module__ for name, fn in commands.items()} == {name: 'loom_checker.command_handlers.' + module for name, module in expected.items()}
 """
     subprocess.run([sys.executable, "-c", script], cwd=SCRIPTS, check=True, capture_output=True, text=True)

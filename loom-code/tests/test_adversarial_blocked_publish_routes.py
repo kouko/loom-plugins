@@ -466,7 +466,7 @@ def test_probe_publish_refuses_the_same_naked_body(tmp_path) -> None:
     repo = _attested_branch_without_a_skip(tmp_path)
     body = tmp_path / "naked-publish.md"
     body.write_text(NAKED_BODY, encoding="utf-8")
-    result = _checker(repo, ["publish", "--title", "feat(x): naked",
+    result = _checker(repo, ["open-pr", "--title", "feat(x): naked",
                              "--body-file", str(body), "--confirm-authorized"])
     assert result.returncode == 1
     assert result.stderr.startswith("BLOCK push.contextual-body: ")
@@ -481,7 +481,7 @@ def test_probe_publish_refuses_a_body_that_is_not_a_regular_file(tmp_path) -> No
     repo = _repo(tmp_path, "fiforepo")
     fifo = tmp_path / "publish-fifo.md"
     os.mkfifo(fifo)
-    result = _checker(repo, ["publish", "--title", "t",
+    result = _checker(repo, ["open-pr", "--title", "t",
                              "--body-file", str(fifo), "--confirm-authorized"])
     assert result.returncode == 2
     assert "--body-file is not a readable file" in result.stderr

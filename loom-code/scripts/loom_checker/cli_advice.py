@@ -5,8 +5,8 @@ from __future__ import annotations
 def suggested_next(command: str, category: str) -> str | None:
     if category == "passed":
         return {
-            "publish": "Review the publication evidence and await human acceptance before merging.",
-            "finalize-review": "Commit the generated verification evidence, then follow the authorized publication workflow.",
+            "open-pr": "Review the open-pr evidence and await human acceptance before merging.",
+            "finalize-review": "Commit the generated verification evidence, then follow the authorized PR-opening workflow.",
         }.get(command)
     if category == "global":
         return "Inspect global --help and select a supported command before deliberately rerunning."
@@ -23,7 +23,7 @@ def suggested_next(command: str, category: str) -> str | None:
             "intents": "Inspect the reported remote-default evidence and preserve indeterminate intent states until delivery can be confirmed.",
             "intake": "Restore the reported station prerequisites through their owning workflow and obtain any missing human confirmation before continuing.",
             "push": "Preserve existing work and hook ownership; resolve the reported protection or origin condition before deliberately rerunning.",
-            "publish": "Follow the reported publication prerequisite or remedy; reconcile ambiguous remote effects with delivery before deliberately rerunning.",
+            "open-pr": "Follow the reported open-pr prerequisite or remedy; reconcile ambiguous remote effects with delivery before deliberately rerunning.",
             "land": "Follow the reported merge or cleanup remedy, preserve work and existing acceptance, and reconcile remote effects before deliberately rerunning.",
             "sync-trunk": "Preserve outstanding work and resolve the reported trunk condition before deliberately rerunning the existing sync workflow.",
             "standing": "Resolve the reported standing-document requirement through its owner before continuing; do not invent approval or alter waivers.",

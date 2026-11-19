@@ -86,15 +86,15 @@ PUBLISH_CI_PENDING_WAITS = 360
 
 
 def _publish_usage(reason: str, err) -> int:
-    err.write(f"publish: {reason}\n")
+    err.write(f"open-pr: {reason}\n")
     return 2
 
 
 def _publish_block(reason: str, err, next_action: str | None = None,
                    *, rule: str = "publish.preconditions") -> int:
     remedy = (next_action or
-              "Inspect the publication diagnostics and reconcile the named condition before "
-              "retrying publish; preserve work and do not switch merge routes.")
+              "Inspect the open-pr diagnostics and reconcile the named condition before "
+              "running open-pr again; preserve work and do not switch merge routes.")
     return report([(rule, f"{reason}; next: {remedy}")], err)
 
 
@@ -102,7 +102,7 @@ def _publish_origin_state(repo: Path, expected_branch: str) -> tuple[str | None,
     """Return the single literal origin URL or a publication identity error."""
     branch = current_branch(repo)
     if branch != expected_branch:
-        return None, "symbolic branch changed before publication"
+        return None, "symbolic branch changed before opening the PR"
     origin_urls = (git_maybe(repo, "config", "--get-all", "remote.origin.url") or "").splitlines()
     if len(origin_urls) != 1:
         return None, "literal origin must have exactly one fetch URL"
@@ -146,7 +146,7 @@ def _publish_args(args: list[str]) -> tuple[str, Path, Path | None, bool] | str:
         else:
             return f"unexpected argument {token!r}"
     if not authorized and intent_file is None:
-        return "--intent or --confirm-authorized is required for publication authorization"
+        return "--intent or --confirm-authorized is required for PR-opening authorization"
     if not title or not title.strip():
         return "--title needs non-empty text"
     if body_file is None or not body_file.is_absolute():
@@ -173,7 +173,7 @@ def _intent_authorizes_publication(
     try:
         committed = git_text(repo, "show", f"HEAD:{intent_rel}")
     except UsageError:
-        return False, "automatic publication requires a committed intent at HEAD"
+        return False, "automatic PR opening requires a committed intent at HEAD"
     front, _sections = parse_document(committed)
     if not re.fullmatch(r"confirmed \d{4}-\d{2}-\d{2}", front.get("status", "")):
         return False, "committed intent is not confirmed"
@@ -183,13 +183,13 @@ def _intent_authorizes_publication(
         publication,
     )
     if match is None or not is_real_date(match.group(1)):
-        return False, "committed intent has no valid automatic-publication authorization"
+        return False, "committed intent has no valid automatic PR-opening authorization"
     try:
         working_front, _ = parse_document(canonical.read_text(encoding="utf-8"))
     except (OSError, UnicodeError):
-        return False, "automatic-publication authorization revoked: working intent is unavailable"
+        return False, "automatic PR-opening authorization revoked: working intent is unavailable"
     if working_front.get("publication") != publication:
-        return False, "automatic-publication authorization revoked in the working intent"
+        return False, "automatic PR-opening authorization revoked in the working intent"
     return True, None
 
 
@@ -360,9 +360,9 @@ def observe_delivery(
         if authorization_reason:
             evidence["automatic_publication_reason"] = authorization_reason
         publication_next = (
-            "Resume publish for this feature branch only while its automatic authorization remains valid."
+            "Resume open-pr for this feature branch only while its automatic authorization remains valid."
             if authorized else
-            "If an existing explicit user decision authorizes publication, resume publish with "
+            "If an existing explicit user decision authorizes opening the PR, resume open-pr with "
             "--confirm-authorized; otherwise obtain that user decision before writing. "
             "Observation grants no write permission."
         )
@@ -391,7 +391,7 @@ def observe_delivery(
                 return result("unconfirmed", "local HEAD or branch changed during observation",
                               "Stabilize the selected branch and rerun delivery.")
             return result("local", "attributable work is committed locally",
-                          "Report the explicit local goal; publication needs separate authorization.", True)
+                          "Report the explicit local goal; opening a PR needs separate authorization.", True)
 
         origin, origin_error = _publish_origin_state(repo, branch)
         identity = github_repo_from_origin(repo)
@@ -565,7 +565,7 @@ def _delivery_stop(out, err, host="codex") -> int:
             observed = observe_delivery(repo, goal="published", intent_file=intent,
                                         trusted_git=trusted_git, trusted_gh=trusted_gh)
             if git_text(repo, "rev-parse", "HEAD") != head:
-                raise UsageError("selected HEAD changed during published delivery observation")
+                raise UsageError("selected HEAD changed during PR delivery observation")
         if observed.complete or observed.state == "uncommitted":
             return 0  # A pause certifies nothing; publication never grants merge.
         feedback = f"Delivery incomplete ({observed.state}): {observed.reason}\nnext: {observed.next}"
@@ -574,7 +574,7 @@ def _delivery_stop(out, err, host="codex") -> int:
                                   f"Delivery unconfirmed: {observed.reason}\nnext: {observed.next}"},
                                  ensure_ascii=False) + "\n")
         else:
-            feedback = ("If you are waiting for the user's answer or publication was withdrawn, "
+            feedback = ("If you are waiting for the user's answer or PR-opening authorization was withdrawn, "
                         "stop again and say so; otherwise: " + feedback)
             response = ({"hookSpecificOutput": {"hookEventName": "Stop", "additionalContext": feedback}}
                         if host == "claude" else {"decision": "block", "reason": feedback})
@@ -673,11 +673,11 @@ def _external_or_block(argv: list[str], *, repo: Path, env: dict[str, str], err)
     try:
         result = run_publish_external(argv, cwd=repo, env=env)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        _publish_block(f"publication command could not run: {type(exc).__name__}: {exc}", err)
+        _publish_block(f"open-pr command could not run: {type(exc).__name__}: {exc}", err)
         return None
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
-        _publish_block(f"publication command failed: {detail}", err)
+        _publish_block(f"open-pr command failed: {detail}", err)
         return None
     return result
 
@@ -688,7 +688,7 @@ def _observe_required_ci(
     """Observe required PR checks in this process until a terminal state."""
     def progress(state: str) -> None:
         try:
-            err.write(f"publish: CI {state}\n")
+            err.write(f"open-pr: CI {state}\n")
             err.flush()
         except OSError:
             pass  # Progress loss must not change publication or CI decisions.
@@ -772,14 +772,14 @@ def cmd_publish(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     trusted_git = resolve_publish_executable("git")
     trusted_gh = resolve_publish_executable("gh")
     if not trusted_git or not trusted_gh:
-        return _publish_block("publication requires trusted git and gh executables", err)
+        return _publish_block("open-pr requires trusted git and gh executables", err)
 
     previous_path = os.environ.get("PATH")
     os.environ["PATH"] = os.pathsep.join(dict.fromkeys(
         [str(Path(trusted_git).parent), str(Path(trusted_gh).parent), "/usr/bin", "/bin"]
     ))
     try:
-        with tempfile.TemporaryDirectory(prefix="loom-publish-") as snapshot_dir:
+        with tempfile.TemporaryDirectory(prefix="loom-open-pr-") as snapshot_dir:
             body_snapshot = Path(snapshot_dir) / "pr-body.md"
             body_snapshot.write_text(body, encoding="utf-8")
             body_snapshot.chmod(0o600)
@@ -829,15 +829,15 @@ def _cmd_publish_trusted(
         authorized = intent_authorized
     if not authorized:
         return _publish_usage(
-            f"{intent_error or 'intent has no confirmed automatic-publication authorization'}; "
-            "obtain one publication decision and pass --confirm-authorized",
+            f"{intent_error or 'intent has no confirmed automatic PR-opening authorization'}; "
+            "obtain one PR-opening decision and pass --confirm-authorized",
             err,
         )
 
     head = git_maybe(repo, "rev-parse", "HEAD")
     branch = current_branch(repo)
     if not head or not branch or not git_ok(repo, "check-ref-format", "--branch", branch):
-        return _publish_block("publication requires a safe current symbolic branch and HEAD", err)
+        return _publish_block("open-pr requires a safe current symbolic branch and HEAD", err)
     origin_url, origin_error = _publish_origin_state(repo, branch)
     if origin_error:
         return _publish_block(origin_error, err)
@@ -854,7 +854,7 @@ def _cmd_publish_trusted(
         repo, "status", "--porcelain", "--", attestation_rel
     ) != "":
         return _publish_block(f"{attestation_rel} is not committed — "
-                              "commit it, then publish again", err)
+                              "commit it, then run open-pr again", err)
     status = verification_status(repo, change_id, head=head)
     stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
     if stated_error:
@@ -869,7 +869,7 @@ def _cmd_publish_trusted(
     if status != "valid":
         clause = missing_clause(missing_records(repo, change_id, status, head))
         err.write(f"loom: verification {status}{' ' + clause if clause else ''}; "
-                  "publishing anyway.\n")
+                  "proceeding with push.\n")
 
     base_result = _external_or_block(
         # gh repo view accepts [HOST/]OWNER/REPO and exposes defaultBranchRef:
@@ -883,7 +883,7 @@ def _cmd_publish_trusted(
     base = base_result.stdout.strip()
     if not base or base == branch or not git_ok(repo, "check-ref-format", "--branch", base):
         return _publish_block("origin default branch is missing, unsafe, or equals the head branch", err)
-    out.write(f"Publication target: {identity} base {base}\n")
+    out.write(f"PR target: {identity} base {base}\n")
 
     remote_result = _external_or_block(
         # Git documents ls-remote as the read-only remote-ref query:
@@ -902,7 +902,7 @@ def _cmd_publish_trusted(
             repo, "merge-base", "--is-ancestor", remote_head, head
         ):
             return _publish_block(
-                "remote branch is unknown or diverged; fetch and reconcile it before publishing",
+                "remote branch is unknown or diverged; fetch and reconcile it before opening the PR",
                 err,
             )
 
@@ -911,7 +911,7 @@ def _cmd_publish_trusted(
     current_origin, origin_error = _publish_origin_state(repo, branch)
     if origin_error or current_origin != origin_url:
         return _publish_block(
-            f"publication identity changed before push: {origin_error or 'origin URL changed'}", err
+            f"PR target identity changed before push: {origin_error or 'origin URL changed'}", err
         )
     if remote_head != head:
         push_result = _external_or_block(
@@ -936,7 +936,7 @@ def _cmd_publish_trusted(
     current_origin, origin_error = _publish_origin_state(repo, branch)
     if origin_error or current_origin != origin_url:
         return _publish_block(
-            f"publication identity changed before PR creation: "
+            f"PR target identity changed before PR creation: "
             f"{origin_error or 'origin URL changed'}", err,
         )
 
@@ -987,7 +987,7 @@ def _cmd_publish_trusted(
     current_origin, origin_error = _publish_origin_state(repo, branch)
     if origin_error or current_origin != origin_url:
         return _publish_block(
-            f"publication identity changed before PR creation: "
+            f"PR target identity changed before PR creation: "
             f"{origin_error or 'origin URL changed'}", err,
         )
     pre_create_remote = _external_or_block(
@@ -1006,7 +1006,7 @@ def _cmd_publish_trusted(
     current_origin, origin_error = _publish_origin_state(repo, branch)
     if origin_error or current_origin != origin_url:
         return _publish_block(
-            f"publication identity changed before PR creation: "
+            f"PR target identity changed before PR creation: "
             f"{origin_error or 'origin URL changed'}", err,
         )
 
@@ -1024,7 +1024,7 @@ def _cmd_publish_trusted(
         current_origin, origin_error = _publish_origin_state(repo, branch)
         if origin_error or current_origin != origin_url:
             return _publish_block(
-                f"publication identity changed after PR update: "
+                f"PR target identity changed after PR update: "
                 f"{origin_error or 'origin URL changed'}", err,
             )
         post_update_remote = _external_or_block(
@@ -1050,7 +1050,7 @@ def _cmd_publish_trusted(
             current_origin, origin_error = _publish_origin_state(repo, branch)
             if origin_error or current_origin != origin_url:
                 return _publish_block(
-                    f"publication identity changed after PR readiness: "
+                    f"PR target identity changed after PR readiness: "
                     f"{origin_error or 'origin URL changed'}", err,
                 )
             post_ready_remote = _external_or_block(
@@ -1085,7 +1085,7 @@ def _cmd_publish_trusted(
     current_origin, origin_error = _publish_origin_state(repo, branch)
     if origin_error or current_origin != origin_url:
         return _publish_block(
-            f"publication identity changed after PR creation: "
+            f"PR target identity changed after PR creation: "
             f"{origin_error or 'origin URL changed'}", err,
         )
     post_create_remote = _external_or_block(
@@ -1099,7 +1099,7 @@ def _cmd_publish_trusted(
     ]
     if created_remote != [head]:
         return _publish_block("remote branch moved after PR creation", err)
-    out.write(f"Published PR: {url}\n")
+    out.write(f"PR awaiting merge: {url}\n")
     return _observe_required_ci(
         url, trusted_gh=trusted_gh, repo=repo, env=env, out=out, err=err
     )

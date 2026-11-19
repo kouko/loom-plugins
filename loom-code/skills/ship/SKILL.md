@@ -1,41 +1,41 @@
 ---
 name: ship
 description: |
-  Publish a reviewed branch and verify PR checks. Use after closing-review, normally with a matching attestation.
+  Open or reuse a PR awaiting merge; verify checks. Use after closing-review, normally with a matching attestation.
 version: 1.1.0
 ---
 
 # Ship
 
-Ship validates publication state; it does not repeat functional verification.
+Ship validates PR-opening state; it does not repeat functional verification.
 It does not execute package tests or adversarial probes.
 Write the PR body and every message to the user, including the decision
 point ③ result and acceptance question, in the user's conversation language
 when the host can establish it from the confirmed intent or active
 conversation. Repository
-conventions still govern committed artifacts. Internal publication reports
+conventions still govern committed artifacts. Internal PR-opening reports
 remain English.
 
-## 1. Confirm publication authorization
+## 1. Confirm PR-opening authorization
 
-When a factual gap could change a publication decision, identify it and use
+When a factual gap could change a PR-opening decision, identify it and use
 `loom-code:engineering-research` as needed; reuse adequate evidence directly.
-Return findings or uncertainty to Ship within existing authorization. Missing
-observed publication or check success remains unknown; research does not supply
+Return findings or uncertainty to Ship within existing authorization. A missing
+observed open PR or check success remains unknown; research does not supply
 delivery proof or advance user decisions.
 
 Read the intent and acceptance test report when one was required. A confirmed intent
 with `publication: automatic — authorized <YYYY-MM-DD> by <name>` carries that
 decision into Ship; do not ask again. Intent prose, status, or contract version
 never implies authorization. A legacy intent without that machine-readable field
-requires one publication decision before anything leaves the machine.
-The user may still explicitly stop publication before the outward action.
+requires one decision to open the PR before anything leaves the machine.
+The user may still explicitly stop opening the PR before the outward action.
 On withdrawal, remove its `publication:` field immediately and commit that
-withdrawal before another publication attempt; an uncommitted revocation still
-denies authorization. Observation never authorizes publication or merge.
+withdrawal before another attempt to open the PR; an uncommitted revocation still
+denies authorization. Observation never authorizes opening a PR or merge.
 Small and engineering-only changes retain branch/PR policy regardless of
 workflow simplification. An explicit local-only target permits local delivery
-observation, never a claim of published delivery.
+observation, never a claim that a PR awaits merge.
 
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
@@ -50,7 +50,7 @@ continue. When you honour such a skip, write it straight into the PR body's
 `skipped-by-instruction:` lines and leaves both unchanged, because each
 is functional content and an appended line would make the attestation stale.
 
-## 2. Prepare publication text
+## 2. Prepare PR text
 
 Ship owns one top-level PR body schema. Reconstruct it from the current intent,
 the spec when one exists, plan, recomputed Git change, generated attestation,
@@ -95,9 +95,9 @@ a concrete rollback or recovery path; remaining risks>
 Use a Markdown table for any list‑type or comparison‑type information (options, trade‑offs, decision summaries, etc.). Do not use inline ①②③ lists or plain‑text enumerations.
 
 Under the Verification heading, write the line `Verification status: <status>`,
-where `<status>` is the status `publish` computes locally and prints on its
+where `<status>` is the status `open-pr` computes locally and prints on its
 `Verification <status> for <head>` line: `valid`,
-`absent`, or `stale (<reason>)`. When publish refuses the line, copy the
+`absent`, or `stale (<reason>)`. When `open-pr` refuses the line, copy the
 `Verification status:` line the refusal prints into the body. When the
 attestation records that the adversarial step's outcome is no program, write
 the line
@@ -148,23 +148,23 @@ installed, this routing is silently skipped.
 committed after finalize-review is itself functional content: it changes the
 functional content digest and invalidates the attestation the branch already
 has, forcing either another review round (full package suite plus two
-reviewers, bounded by the three-digest episode limit) or publication with
+reviewers, bounded by the three-digest episode limit) or opening the PR with
 `Verification status: stale`. Therefore Ship **does not write memory
 entries** after finalize-review has run; `loom-workflow:loom-memory` routes
 qualifying lessons discovered at or after Ship to the next change's branch
 instead of reopening this one.
 
-Before publication, reject a body with a missing heading, evidence source that
+Before opening the PR, reject a body with a missing heading, evidence source that
 was silently ignored, unsupported decision claim, hidden-reasoning claim, or a
 diagram that is required by the relationships above but absent. Retired review
 and probe accounting ledgers and their fields are not valid inputs.
 
-Publication-only edits do not change the functional digest and do not return to
+Publication-only edits (PR title and body text) do not change the functional digest and do not return to
 `closing-review`. Functional edits invalidate the attestation and do.
 
-## 3. Publish once
+## 3. Open the PR once
 
-Before publishing, run `"<loom-code>/scripts/loom-python" --repair github-rules`
+Before opening the PR, run `"<loom-code>/scripts/loom-python" --repair github-rules`
 and relay its lines to the user. When it reports a missing rule, ask the user
 in consequence form — from then on <trunk> accepts changes only through a PR
 whose body check passes, for you too — then show the user the setup command
@@ -174,11 +174,11 @@ setup command unasked. When it reports `template not on <trunk>`, relay the
 printed step to the user; add the template only after the user explicitly
 agrees, as its own change and never inside the current change's PR, then run
 `github-rules` again for the rules. When it reports that the rules could not be
-confirmed, tell the user and continue publishing.
+confirmed, tell the user and continue opening the PR.
 
 ### Execution-context connectivity recovery
 
-Apply this guidance to `github-rules`, `publish` (including CI checks), `land`,
+Apply this guidance to `github-rules`, `open-pr` (including CI checks), `land`,
 and `delivery` throughout Ship, before treating a connection failure as terminal
 or rules as unconfirmed. A generic connection error alone proves neither DNS
 failure nor invalid credentials. Authentication or repository-permission errors
@@ -187,7 +187,7 @@ failure unattributed; do not automatically retry it.
 
 When available evidence identifies known sandbox network restrictions as the
 cause, policy permits recovery, and the operation already has the required
-authorization applicable to that operation (publication or merge consent only
+authorization applicable to that operation (PR-opening or merge consent only
 when that operation requires it), retry the same authorized Loom command once
 through the host's permitted execution or approval mechanism. On Codex this can
 be the shell tool's supported permission request; use the current host's actual
@@ -198,11 +198,11 @@ human decision boundaries. This guidance grants no permissions or authorization.
 Explicit platform denial, an unavailable permission mechanism, or a failed retry
 ends recovery. Preserve the original and retry outputs, report the blocker and
 unfinished or unconfirmed state, and stop automatic retries. Inspect partial
-publication state through the canonical Loom route before any further mutation:
+PR-opening state through the canonical Loom route before any further mutation:
 use the read-only `delivery` observation in Handoff while the branch exists;
 after a confirmed merge use §5's `land --cleanup` recovery when appropriate,
 without replaying `--accepted-by`. Never substitute raw Git push or GitHub CLI
-publication/merge commands, alter credentials, or bypass a denial. A successful
+PR-opening/merge commands, alter credentials, or bypass a denial. A successful
 retry is evidence only for the result it actually reports.
 
 Repository protection is opt-in and affects ordinary human Git operations too.
@@ -218,17 +218,17 @@ History operations and fast-forward local merges may not invoke these hooks;
 server PR/check restrictions remain authoritative. Missing or unconfirmed server
 rules must be disclosed; inspection never authorizes setup.
 
-For an intent carrying automatic-publication authorization, pass its absolute
-path to the installed plugin's one publication command:
+For an intent carrying automatic authorization (its `publication:` line), pass its absolute
+path to the installed plugin's one PR-opening command:
 
 ```text
-"<loom-code>/scripts/loom-python" --repair publish --intent <absolute-intent-path> --title <title> --body-file <absolute-path>
+"<loom-code>/scripts/loom-python" --repair open-pr --intent <absolute-intent-path> --title <title> --body-file <absolute-path>
 ```
 
-For a legacy intent, obtain one publication decision and acknowledge it with:
+For a legacy intent, obtain one decision to open the PR and acknowledge it with:
 
 ```text
-"<loom-code>/scripts/loom-python" --repair publish --confirm-authorized --title <title> --body-file <absolute-path>
+"<loom-code>/scripts/loom-python" --repair open-pr --confirm-authorized --title <title> --body-file <absolute-path>
 ```
 
 The `<title>` is a Conventional Commits subject whose type equals the current
@@ -238,7 +238,8 @@ The command validates the body, identifies the change from the branch
 `<type>/<change-id>` or its one committed intent, and computes the
 verification status locally and prints it. It then derives the origin repository, default
 base, current branch, and exact refspec (destination/refspec safety); performs
-a non-forced push; and opens or reuses one PR. Publishing proceeds without an
+a non-forced push; and opens or reuses one PR, which then awaits merge as a
+separate user decision. Opening the PR proceeds without an
 attestation: an absent or stale one is disclosed, not refused. Before pushing,
 beyond authorization and repository safety, it refuses only a malformed body
 (naming the heading), a `Verification status:` line that differs from the computed status (naming
@@ -248,12 +249,12 @@ that the adversarial step's outcome is no program (naming
 the line to carry), an attestation left uncommitted, and an unidentified
 change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
-hand a refused publication command to the user to run; where a refusal names a
+hand a refused PR-opening command to the user to run; where a refusal names a
 remedy, take it, and where it names none, apply the recovery guidance above
 before stopping; otherwise report the refusal and stop.
 
 The installed plugin's `PreToolUse` hook gives early shell feedback and
-publication reminders; it cannot cover every shell spelling. Native Git
+PR-opening reminders; it cannot cover every shell spelling. Native Git
 protection is independent of that reminder and of workflow simplification.
 Preserve work on a feature branch/worktree when blocked; never recommend bypass
 or data discard. Follow a scoped failure's observed reason and safe next action;
@@ -262,7 +263,7 @@ if automatic repair is unjustified, report the missing condition and stop.
 
 ## 4. Observe CI
 
-The publication command reports the PR URL, inspects required CI immediately,
+The PR-opening command reports the PR URL, inspects required CI immediately,
 and checks again every 10 seconds while any required check remains pending.
 It stops when all required checks pass, a required check fails or is cancelled,
 or GitHub reports that user action is required. Optional checks do not keep the
@@ -279,13 +280,13 @@ registered and finish successfully. For other observation errors, apply the
 recovery guidance above before stopping; errors without a justified recovery
 remain blockers.
 
-Observation belongs only to the active publication process. Do not create a
+Observation belongs only to the active PR-opening process. Do not create a
 scheduler, daemon, persistent polling record, or restart recovery mechanism.
 Stopping the task or Desktop app stops observation.
 
 CI is the external trust boundary. When required CI fails, the same active task
 identifies the failed required checks and each available failure log; the
-publication command's failure does not end the task. Missing required
+PR-opening command's failure does not end the task. Missing required
 diagnostics or permission, a safely unattributed failure, a persistent external
 failure established from available evidence, or a required change to
 requirements, visible behaviour, or guarantees is reported as a concrete
@@ -300,16 +301,16 @@ flagged one included, and is recorded as Build §2 states. Every committed-file
 change, including code, tests, and version files, invalidates the attestation
 and resumes the same bounded Review episode at its next functional digest
 without resetting the episode or adding another retry budget, then returns to
-Ship. A PR title, body, or other publication data not committed to the
+Ship. A PR title, body, or other PR data not committed to the
 repository may be fixed in place and reuse the matching attestation.
 
 ## 5. Land after acceptance
 
 After all checks pass, present the result and the acceptance test report when one
-exists (decision point ③). Publication never authorizes or invokes merge; only
+exists (decision point ③). Opening the PR never authorizes or invokes merge; only
 the maintainer's explicit acceptance does. Never type `gh pr merge` yourself:
 merge through land, which checks the live PR body and discloses verification.
-Publication authorization, including `publication: automatic`, is not
+PR-opening authorization, including `publication: automatic`, is not
 acceptance; always present the result and ask at decision point ③ before
 running land. Before running land, invoke `loom-workflow:git-memory` for the
 merge checkpoint.
@@ -323,7 +324,7 @@ cd '<absolute worktree root>' && "<loom-code>/scripts/loom-python" --repair land
 ```
 
 `<name>` is the maintainer who accepted; it must match the intent originator or
-the publication authorizer. Always render that absolute `cd`;
+the PR-opening authorizer. Always render that absolute `cd`;
 never rely on the Bash tool's workdir, because Codex may report the task root
 rather than the executor worktree, and `land` acts on the worktree it runs in.
 `land` removes that worktree, so the agent's next Bash command starts with the
@@ -347,7 +348,7 @@ answers yes to the printed list.
 
 ## Handoff
 
-Before reporting published delivery while the change remains identifiable,
+Before reporting that the PR is open and awaiting merge while the change remains identifiable,
 run the shared read-only observation on every supported host:
 
 ```text
@@ -367,12 +368,12 @@ Use `--goal local` only for an explicit local-only target.
 Report the observed state, reason, next action and evidence; PR existence,
 an agent's claim and stale remote-tracking refs cannot prove exact-head delivery.
 Incomplete or unavailable evidence remains incomplete or unconfirmed, never
-success. Observation never authorizes publication or merge.
+success. Observation never authorizes opening a PR or merge.
 Claude Code and Codex Stop hooks request at most one continuation for authorized
 unfinished changes whose selected committed HEAD has matching verification and
 no attributable pending work. Absent or stale verification, including explicit
 skips without matching evidence, permits a silent pause before remote lookup;
-explicit publication remains available with verification disclosure. Changed
+explicitly opening the PR remains available with verification disclosure. Changed
 HEAD or unavailable local evidence produces an unconfirmed diagnostic without
 continuation. Matching review cannot establish whether a human answer is pending;
 the reminder retains conditional guidance to stop and explain that boundary.
@@ -387,7 +388,7 @@ use this same command and disclose that limitation rather than claiming a hook
 blocked termination.
 
 Report the attestation digest when one exists, else the verification status
-publish printed, publication checks, PR URL, CI state, and land's output.
+`open-pr` printed, PR-opening checks, PR URL, CI state, and land's output.
 
 After verified merge into main and successful cleanup, follow land's printed
 `next:` destination before further filesystem work. If the completed change

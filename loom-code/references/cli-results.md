@@ -24,7 +24,7 @@ clean-copy acceptance remain separate release evidence.
 | `intents` | Indeterminate exit 1 requires remote-default evidence; keep empty lists, selected IDs, `--remote` and `--metadata` columns. | [CLI local-ref cases](../tests/test_loom_checker_cli.py) |
 | `intake` | Version-1 JSON or text advice addresses station prerequisites; retain notices and skipped-artifact semantics. | [Intake cases](../tests/test_loom_checker_intake.py), [JSON parity](../tests/test_preparation_json.py) |
 | `push` | Ordinary native install/remove errors retain ownership/origin remedies; host `--hook` and installed native-hook bytes stay separate. | [Native ownership](../tests/test_native_git_protection.py), [host framing](../tests/test_hooks_json.py) |
-| `publish` | Refusals retain prerequisites and reconciliation; success suggests inspecting evidence and awaiting acceptance. Progress and write/poll counts remain unchanged. | [Controlled publication cases](../tests/test_loom_publish.py) |
+| `open-pr` | Refusals retain prerequisites and reconciliation; success suggests inspecting evidence and awaiting acceptance. Progress and write/poll counts remain unchanged. | [Controlled PR-opening cases](../tests/test_loom_publish.py) |
 | `delivery` | JSON `suggested_next` aliases legacy `next`; text keeps its legacy lines and adds the same advice. Pre-result usage errors retain text diagnostics; incomplete/unconfirmed stays incomplete. | [Delivery states/parity](../tests/test_delivery.py), [Stop protocol](../tests/test_delivery_stop.py), [CLI usage](../tests/test_loom_checker_cli.py) |
 | `land` | Refusals preserve accepted-merge versus cleanup remedies; a removable sweep list requests review and approval before token use. Preserve `next: cd`, freshness and no-repeat-merge behavior. | [Merge](../tests/test_land_merge.py), [cleanup](../tests/test_land_cleanup.py), [sweep](../tests/test_land_sweep.py) |
 | `sync-trunk` | Fetch WARN remains exit 0 and explicitly unsynced; refusals preserve work and normal Build recovery. No extra fetch or method switch. | [Real temporary Git cases](../tests/test_sync_trunk.py) |
@@ -35,7 +35,7 @@ clean-copy acceptance remain separate release evidence.
 | `charter` | Refusal advice refers to the reported manifest/row; preserve Markdown table output, row order and `--manifest`. | [Charter cases](../tests/test_contract_charter.py) |
 | `plan` | Version-1 JSON or text; missing/unreadable-file errors keep usage advice matching JSON, not an asserted internal failure. | [Field caps](../tests/test_plan_field_caps.py), [JSON parity](../tests/test_preparation_json.py) |
 | `reviewer-count` | Version-1 JSON plus typed `data`, or text integer; errors preserve the real floor policy without a default. Checked in closing-review. | [JSON](../tests/test_preparation_json.py), [consumer boundaries](../tests/test_checked_readonly.py) |
-| `finalize-review` | Refusals require authentic evidence through its owner; success suggests committing generated evidence before authorized publication. Preserve execution/progress/attestation rules. | [CLI failures](../tests/test_loom_checker_cli.py), [finalization](../tests/test_probe_confirmation_finalize.py) |
+| `finalize-review` | Refusals require authentic evidence through its owner; success suggests committing generated evidence before an authorized PR opening. Preserve execution/progress/attestation rules. | [CLI failures](../tests/test_loom_checker_cli.py), [finalization](../tests/test_probe_confirmation_finalize.py) |
 
 Help, `--list-rules`, launcher modes, standalone dispatch scripts and host hooks
 are discovery or separate protocols, not extra checker commands. The remaining
@@ -54,7 +54,7 @@ eleven commands retain text interfaces; this change adds no JSON mode.
   is unestablished; do not invent success, a reviewer default or text fallback.
 - Preserve each command's authorization, host trust and recovery behavior.
   For an ambiguous remote write, use the existing delivery observation before
-  considering another write. Observation never authorizes publication or merge.
+  considering another write. Observation never authorizes opening a PR or merge.
 
 ## Suggested next steps
 
@@ -73,7 +73,7 @@ envelopes' empty-checker-stderr contract to delivery.
 Ordinary text refusals/errors use `Suggested next step:` on stderr while
 retaining diagnostics and existing Help hints. Useful success follow-up is
 allowed, such as committing generated verification or awaiting acceptance after
-publication. Successful checks and empty lists need no invented follow-up.
+the PR opens. Successful checks and empty lists need no invented follow-up.
 State owners retain uncertainty at exit zero: a fetch failure is unsynced,
 unreadable GitHub protection is unconfirmed, standing WARNs are nonblocking and
 absent/stale PR verification is a notice, not a new body-floor failure. GitHub
@@ -87,7 +87,7 @@ core validity or classification. The consumer preserves accepted raw JSON,
 including unusable advice and compatible numeric extensions; accepting core
 fields does not make arbitrary advice trustworthy or executable.
 
-Advice never grants authorization to continue, publish, merge or bypass host
+Advice never grants authorization to continue, open a PR, merge or bypass host
 trust. Its presence, absence or contents must not trigger automatic execution,
 retry or text fallback. An unknown observation cannot establish a prerequisite
 through its suggestion. Absence of a useful suggestion is a valid state.
@@ -122,12 +122,12 @@ resolution rate, time, tokens or cost has been measured.
 | `github-rules --print-setup` | Keep executable setup content and existing failure/template output unchanged; no new advice is inserted. Printing setup never authorizes applying it. [Setup/probe cases](../tests/test_github_rules.py). |
 | PR-floor CI | Keep stdout annotation escaping and existing step-summary contents/write count; added advice is separate stderr. [CI cases](../tests/test_pr_floor.py). |
 | Land cleanup and sweep | Keep the mandatory literal `next: cd` handoff and stdout list/token; advice does not supply approval or repeat an accepted merge. [Sweep](../tests/test_land_sweep.py), [merge](../tests/test_land_merge.py), [cleanup](../tests/test_land_cleanup.py). |
-| Progress and launcher readiness | Keep existing cadence, flush, polling and mutation counts. Launcher repair/startup messages and standalone tools are separate interfaces. [Publication](../tests/test_loom_publish.py), [runtime](../tests/test_loom_python_runtime.py). |
+| Progress and launcher readiness | Keep existing cadence, flush, polling and mutation counts. Launcher repair/startup messages and standalone tools are separate interfaces. [PR opening](../tests/test_loom_publish.py), [runtime](../tests/test_loom_python_runtime.py). |
 
 Remote-operation tests use controlled Git/gh responses and temporary repositories;
 the GitHub-rules server-enforcement case is a local simulation. These checks do
 not establish installed-host/model compliance, live GitHub enforcement or
-unconsented publication/merge/cleanup on user repositories. Independent acceptance
+unconsented PR opening/merge/cleanup on user repositories. Independent acceptance
 and full release checks are reported separately, not inferred from this map.
 
 ## Checked read-only calls

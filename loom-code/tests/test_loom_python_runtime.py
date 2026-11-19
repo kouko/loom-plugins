@@ -156,7 +156,9 @@ def test_all_command_help_uses_ready_runtime_without_repair(tmp_path: Path) -> N
     tools = fake_uv(tmp_path)
     assert run_launcher(tmp_path, "--repair", "--list-rules", tools=tools).returncode == 0
     log = (tmp_path / "uv.log").read_text()
-    commands = ("intent", "intents", "intake", "push", "publish", "delivery", "land",
+    retired = run_launcher(tmp_path, "--repair", "publish", "--title", "t", "--body-file", "b", tools=tools)
+    assert retired.returncode == 2 and retired.stderr.startswith("unknown sub-command 'publish'.")
+    commands = ("intent", "intents", "intake", "push", "open-pr", "delivery", "land",
                 "sync-trunk", "github-rules", "pr-floor", "standing", "contract",
                 "charter", "plan", "reviewer-count", "finalize-review")
     for command in commands:

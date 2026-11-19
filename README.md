@@ -4,7 +4,7 @@ Loom carries one change from a rough idea to a merged pull request, with
 machines verifying machines along the way. Agents write the intent, spec,
 plan and code; fresh-context agents that did not write them review it, put it
 through independent acceptance testing and attack the result; a
-deterministic checker recomputes the evidence before anything is published.
+deterministic checker recomputes the evidence before any PR is opened.
 You are asked only three times: to confirm what the change is, to confirm
 visible product behaviour when there is any, and to accept the result, through the acceptance test report when one is required.
 
@@ -13,8 +13,8 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/README.md) | 2.26.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
-| [`loom-code`](loom-code/README.md) | 3.85.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
+| [`loom-design`](loom-design/README.md) | 2.27.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
+| [`loom-code`](loom-code/README.md) | 3.86.0 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
 | [`loom-workflow`](loom-workflow/README.md) | 5.26.0 | 15 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
@@ -35,7 +35,7 @@ flowchart TD
     plan["Plan the work<br/>write-plan"]
     build["Implement and test<br/>build"]
     review["Review and verify<br/>closing-review"]
-    ship["③ Publish PR and accept result<br/>ship"]
+    ship["③ Open PR and accept result<br/>ship"]
 
     intent --> design
     design -->|"Yes"| spec
@@ -86,7 +86,7 @@ acceptance. Existing maps remain readable history without migration or rewriting
 
 ## loom-design
 
-Version 2.26.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.27.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools and optional design research. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -102,7 +102,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.85.0. Five stations carry one change from plan to PR with
+Version 3.86.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 All sixteen CLI commands define optional advisory next steps; five have direct
 JSON modes and two have checked station consumers. Advice changes neither
@@ -114,7 +114,7 @@ decisions nor authorization. See the
 | [`write-plan`](loom-code/skills/write-plan/README.md) | Turn a confirmed intent into a task DAG with tests and risks per task. |
 | [`build`](loom-code/skills/build/README.md) | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
 | [`closing-review`](loom-code/skills/closing-review/README.md) | Run the closing review (read, acceptance testing) on Build-checked content and generate an attestation. |
-| [`ship`](loom-code/skills/ship/README.md) | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
+| [`ship`](loom-code/skills/ship/README.md) | Push the reviewed branch, open or reuse a PR awaiting merge and verify checks (decision point ③). |
 | [`maintain`](loom-code/skills/maintain/README.md) | Attach alerts, CI or regression failures or incidents that arrive without a user's bug-fix request to a matching open intent, or create one, and hand it to write-plan. |
 | [`using-loom-code`](loom-code/skills/using-loom-code/README.md) | Optional router to the right station. |
 | [`external-review`](loom-code/skills/external-review/README.md) | Execute one authorized outside review with an explicit model and effort; the caller keeps its review criteria. |
@@ -213,7 +213,7 @@ agent may act outside the project; pass it in interactive mode too.
 
 Limits on Antigravity:
 
-- The plugin hooks (the publication reminder, the session context, the language reminder
+- The plugin hooks (the push reminder, the session context, the language reminder
   and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
   desktop app or IDE, so those gates are not enforced there.
 - loom's roles (implementer, reviewer, adversary, acceptance-tester) run as agy
@@ -238,7 +238,7 @@ The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plu
 
 Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create` and `/loom-workflow:project-retro` are also commands, and each of these stays a skill too.
 
-On OpenCode, the session context, the publication reminder, the language reminder (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
+On OpenCode, the session context, the push reminder, the language reminder (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
 
 Limits on OpenCode:
 
@@ -258,7 +258,7 @@ preserving their existing results and exit behavior. The first rollout is bounde
 
 | Command | Current behavior |
 |---|---|
-| `publish` | Flushed, newline-delimited stderr reports CI observation, registration/pending transitions, and elapsed waiting at the first polling opportunity after each 60-second interval. Terminal states distinguish passed, no required checks, and failed/unconfirmed observations. Existing polling, timeout, stdout and authorization behavior remain unchanged. |
+| `open-pr` | Flushed, newline-delimited stderr reports CI observation, registration/pending transitions, and elapsed waiting at the first polling opportunity after each 60-second interval. Terminal states distinguish passed, no required checks, and failed/unconfirmed observations. Existing polling, timeout, stdout and authorization behavior remain unchanged. |
 | `finalize-review` | Flushed stderr names each probe/package-suite stage before execution and reports its result after evidence validation. Child exit 0 alone is insufficient; a passed stage is not final attestation success. Child logs remain captured, with no heartbeat inside a subprocess. |
 | `delivery --json` and dispatch JSON | Delivery retains its five legacy fields and adds `suggested_next` equal to `next`; dispatch JSON remains separate. No global JSON envelope is added. |
 | `plan <path> --json` and `intake <station> <change-id> --json` | Optional preparation results: one stdout object with schema version, command, status, ordered diagnostics, notices, usage/internal error and optional advice. These statuses do not establish full verification or authority. |
@@ -285,7 +285,7 @@ consumer to the remaining commands.
 Progress is advisory: never parse it for gate decisions. It contains stage/state
 labels, not operands, credentials or raw child logs. Progress-only write failures
 are best-effort loss; existing result/error handling and mutation counts remain
-unchanged. A publication timeout is an unknown outcome: observe delivery before
+unchanged. An `open-pr` timeout is an unknown outcome: observe delivery before
 retrying a potentially completed mutation. No automatic retry is added.
 
 For command discovery and input recovery, run
@@ -299,7 +299,7 @@ command parsing. `--ready` needs a valid cached runtime and exits 86 when it is
 missing or invalid; `--repair` may download dependencies and write runtime
 caches before showing checker help.
 
-The existing command-Help hints remain limited to `finalize-review`, `publish`,
+The existing command-Help hints remain limited to `finalize-review`, `open-pr`,
 `delivery`, `plan`, `intake` and `reviewer-count`. Ordinary refusals/errors also
 offer `Suggested next step:` advice while retaining their diagnostics, result
 classification and exit. Internal-error advice asks for investigation without
