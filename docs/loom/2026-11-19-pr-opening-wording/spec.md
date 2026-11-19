@@ -6,15 +6,15 @@ pre-build-review: required — renames a public CLI command and removes the old 
 REQ-1 — open-pr command
   The loom checker shall accept `open-pr` with exactly the arguments `publish` accepts today (`--intent <path> --title <text> --body-file <path>`, and the legacy `--confirm-authorized` form), and shall push, open or reuse the PR, and observe CI as `publish` does today → Acceptance #1
 REQ-2 — Old name removed
-  WHEN a caller runs the `publish` sub-command, the loom checker shall report `unknown sub-command 'publish'` exactly as for any non-existent sub-command, push nothing, open no PR, and exit non-zero; no alias and no rename hint is kept (carried: 「直接移除 │ 只回 unknown sub-command，不推送」) → Acceptance #2
+  WHEN a caller runs the `publish` sub-command, the loom checker shall report `unknown sub-command 'publish'` exactly as for any non-existent sub-command, push nothing, open no PR, and exit non-zero; the same holds for `publish --help` and `loom-python --repair publish ...`; no alias and no rename hint is kept (carried: 「直接移除 │ 只回 unknown sub-command，不推送」) → Acceptance #2
 REQ-3 — CLI output wording
-  The loom checker shall describe the PR-opening step in its printed lines, its usage and `open-pr --help` text, and its error advice as opening or reusing a PR awaiting merge, with no occurrence of publish/published/publication in that text except the machine identifiers listed as out of scope (carried: 「移除 publish 這個字」) → Acceptance #3
+  The loom checker shall describe the PR-opening step in its printed lines, its usage and `open-pr --help` text, and its error advice as opening or reusing a PR awaiting merge, with no occurrence of publish/published/publication in that text except the machine identifiers listed as out of scope; this includes any checker advice elsewhere that tells the user to rerun the step (e.g. `land` advice, which shall say `run open-pr again`) (carried: 「移除 publish 這個字」) → Acceptance #3
 REQ-4 — Push reminder wording
-  The push reminder hook messages that today end in `publishing anyway.` shall use the same wording without the word publish → Acceptance #4
+  The push reminder hook messages that today end in `publishing anyway.` and the PreToolUse hook message `...and publish its PR.` (`command_handlers/push.py:188`) shall use the same wording without the word publish; only `NATIVE_HOOK` (`push.py:39-54`) stays byte-identical → Acceptance #4
 REQ-5 — Station wording
-  The Ship station's user reports, its acceptance prompt, the commands it tells the agent to run (`open-pr`), and capture-intent's/write-plan's disclosure that a yes authorizes a later push and Ready PR shall use the same wording and the new command name, and shall keep that merge is a separate decision → Acceptance #5
+  The Ship station's skill description, headings, guidance prose, user reports, acceptance prompt and the commands it tells the agent to run (`open-pr`), the using-loom-code routing row, and capture-intent's/write-plan's disclosure that a yes authorizes a later push and Ready PR shall use the same wording and the new command name, and shall keep that merge is a separate decision → Acceptance #5
 REQ-6 — README wording
-  The repository READMEs shall describe this step with the same wording and the new command name → Acceptance #6
+  Every non-history document that describes this step or names the sub-command — the repository and plugin READMEs, `loom-code/skills/ship/README.md`, and `loom-code/references/cli-results.md` — shall use the same wording and the new command name → Acceptance #6
 REQ-7 — Native hook unchanged
   The native git hook script bytes shall stay identical, so a repository with the hook already installed still installs and uninstalls it normally after the update → Acceptance #7
 REQ-8 — End-to-end
@@ -37,9 +37,9 @@ REQ-8 — End-to-end
 ## Current state evidence
 - Forward: `loom-code/scripts/loom_checker.py:561` dispatches `"publish": cmd_publish`; `loom-code/skills/ship/SKILL.md:225,231` instruct the call.
 - Reverse: `loom-code/scripts/loom_checker.py:443` (`COMMAND_HELP`), `:583` (hint set), `loom-code/scripts/loom_checker/cli_advice.py:8,26`, usage lines `loom_checker.py:19-20,43,215,279`.
-- Error: `loom-code/scripts/loom_checker.py:606` raises `unknown sub-command` for unmatched names.
-- Data: printed lines in `loom-code/scripts/loom_checker/command_handlers/publish.py:691,872,886,1102`; hook messages `command_handlers/push.py:223,226`.
-- Boundary: `NATIVE_HOOK` at `command_handlers/push.py:39` stays byte-identical; `docs/loom/**` history untouched.
+- Error: `loom-code/scripts/loom_checker/command_handlers/land.py:1021,1027` advise `publish again`; `loom-code/scripts/loom_checker.py:606` raises `unknown sub-command` for unmatched names.
+- Data: printed lines in `loom-code/scripts/loom_checker/command_handlers/publish.py:691,872,886,1102`; hook messages `command_handlers/push.py:188,223,226`; docs `loom-code/references/cli-results.md:27`, `README.md:261,302`, `loom-code/skills/ship/SKILL.md:4,98,100,165,181`, `loom-code/skills/ship/README.md:5,21,28`, `loom-code/skills/using-loom-code/SKILL.md:18`. Tests pinning `publish`: `test_loom_checker_cli.py`, `test_loom_checker_modules.py`, `test_loom_python_runtime.py`, `test_adversarial_blocked_publish_routes.py`.
+- Boundary: `NATIVE_HOOK` at `command_handlers/push.py:39` stays byte-identical; `docs/loom/**` history and recorded dogfood artifacts under `docs/skill-dogfood/` untouched.
 
 ## UI flows
 | case | what the user/agent does | what they see |
