@@ -1,5 +1,5 @@
 # The PR-opening step is no longer called publish — spec
-intent: 2026-11-19-pr-opening-wording@fbff7a163
+intent: 2026-11-19-pr-opening-wording@114d02af7
 pre-build-review: required — renames a public CLI command and removes the old name with no alias (public contract change)
 
 ## Requirements

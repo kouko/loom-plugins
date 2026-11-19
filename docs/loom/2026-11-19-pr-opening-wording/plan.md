@@ -1,6 +1,6 @@
 # The PR-opening step is no longer called publish — plan
-intent: 2026-11-19-pr-opening-wording@fbff7a163
-spec: docs/loom/2026-11-19-pr-opening-wording/spec.md@6599f4462
+intent: 2026-11-19-pr-opening-wording@114d02af7
+spec: docs/loom/2026-11-19-pr-opening-wording/spec.md@12edddc21
 charter: 1.1
 
 ## Task DAG
