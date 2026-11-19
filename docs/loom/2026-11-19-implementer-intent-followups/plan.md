@@ -19,8 +19,8 @@ One wave: contract text and its pins change together; release metadata follows.
 
 **W1-02 Minor release metadata**  after: W1-01  acceptance: 5
 - Files: `loom-code/.claude-plugin/plugin.json`, derived release manifests, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README*.md`, `loom-code/tests/test_write_plan_station_text.py`
-- Test: A5 positive: release-metadata-synchronized-3.86.0; boundary: readme-versions-match-manifest.
-- Risk: agent-decided — minor 3.86.0 because station guidance changes; manifests derived via scripts/sync_codex_manifests.py --all.
+- Test: A5 positive: release-metadata-synchronized-3.87.0; boundary: readme-versions-match-manifest.
+- Risk: agent-decided — minor 3.87.0 because station guidance changes; manifests derived via scripts/sync_codex_manifests.py --all.
 
 ## Simplicity check
 - Reword Build's existing hand-off sentence instead of adding a new one — taken
