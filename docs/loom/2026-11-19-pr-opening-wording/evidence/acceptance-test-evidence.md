@@ -60,3 +60,8 @@ Tried on 2026-11-19, in a clean copy of the project at 75e480392 (detached workt
 - 8: re-tested — same 146 targeted tests passed; Ship commands still match the CLI. Full package suite left to finalize-review.
 - UI flows: new command, old command, help re-tested as items 1-3; push reminder carried over as item 4.
 - Minor: ja README:192 now reads "hook がpush 操作" (no space before "push"), cosmetic.
+
+## Re-run on 2026-11-19, at ee1a0e44e
+Tried on 2026-11-19, in a clean copy of the project at ee1a0e44e (detached worktree; HEAD verified). Fix range 6f6e3422e..ee1a0e44e: 35fd12bed adds `docs/loom/2026-11-19-pr-opening-wording/attestation.json` only; ee1a0e44e rewords one line of `docs/loom/intent/2026-09-18-blocked-publish-names-the-legal-routes.md:55` (historical intent prose). No code, help text, README, skill or hook file changed. Setup: `loom_checker.py --help` exit 0.
+- 8: re-tested — the 3 targeted test files: 146 passed in 40.38s; `python3 loom-code/scripts/check_doc_citations.py docs/loom/intent/2026-09-18-blocked-publish-names-the-legal-routes.md docs/loom/2026-11-19-pr-opening-wording/acceptance-test-report.md` → "OK: all citations resolve." exit 0 (the CI check the fix targets). Full package suite left to finalize-review.
+- 1, 2, 3, 4, 5, 6, 7 and UI flows: carried over — the fix touches only an attestation record and one historical intent line, neither of which is read by the CLI, hook, stations or READMEs.
