@@ -1,6 +1,6 @@
 # The PR-opening step is no longer called publish — acceptance test evidence
 
-Tried on 2026-11-19, in a clean copy of the project at 518bcca7a (detached `git worktree add` of HEAD in a scratch directory; the pre-change version came from a second worktree at merge-base 995d77d2a). Remote operations used a throwaway local repo with a local bare `origin`; nothing was pushed to GitHub and no real PR was opened.
+Tried on 2026-11-19, in a clean copy of the project at 518bcca7a; re-run at 75e480392 (see the last section) (detached `git worktree add` of HEAD in a scratch directory; the pre-change version came from a second worktree at merge-base 995d77d2a). Remote operations used a throwaway local repo with a local bare `origin`; nothing was pushed to GitHub and no real PR was opened.
 
 Setup: no install step is needed; `python3 loom-code/scripts/loom_checker.py --help` runs in the clean copy and lists `open-pr` (usage lines 11-12, "Detailed help: finalize-review --help, open-pr --help, delivery --help").
 
@@ -47,3 +47,16 @@ Setup: no install step is needed; `python3 loom-code/scripts/loom_checker.py --h
 
 ## UI flows (spec)
 - new command: as item 1. old command: as item 2. help: as item 3 (footer wording remains). push reminder: as item 4.
+
+## Re-run on 2026-11-19, at 75e480392
+Tried on 2026-11-19, in a clean copy of the project at 75e480392 (detached worktree). Fix range 6e83bc65f..75e480392 touches `loom_checker.py` (HELP_NOTICE, 2 lines), `loom-code/README.zh-TW.md`, `loom-code/README.ja.md`, `loom-code/references/cli-results.md`, `test_loom_checker_cli.py`, `test_loom_publish.py`. Setup: `loom_checker.py --help` exit 0.
+- 1: re-tested — targeted tests (`test_loom_publish.py`, `test_loom_checker_cli.py`, `test_adversarial_blocked_publish_routes.py`, run with `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID`) 146 passed in 38.19s; the fix changed help text and two of these test files.
+- 2: re-tested — `loom_checker.py publish` → `unknown sub-command 'publish'.` (unknown-command path shares the help module the fix edited).
+- 3: re-tested — full `open-pr --help` grepped for publish/publication: only hit is line 53 `delivery --goal published` (value name, out of scope). Footer now "No validation ran and no PR was opened: help only, exit 0." and "never authorizes execution, retry, opening a PR, merge or bypassing trust." Head line and refusal advice unchanged from first run (open or reuse … awaiting merge; running open-pr again).
+- 4: carried over — fix diff does not touch `command_handlers/push.py`.
+- 5: carried over — fix diff does not touch any SKILL.md (ship, using-loom-code, capture-intent, write-plan). The "Publication-only edits" nit remains.
+- 6: re-tested — all READMEs and cli-results.md grepped for 發布/公開/publish/publication. zh-TW:7 "送到等待合併的 pull request", :29 "③ 開 PR 並驗收結果", :133 "push hook", :172 "攔截 push 操作"; ja:7 "マージ待ちの pull request", :31 "③ PR を開き結果を確認", :151 "push hook", :192 "push 操作"; cli-results.md:27,:125 link labels "PR-opening cases"/"PR opening"; remaining publish hits are only the test file name `test_loom_publish.py` (internal name, out of scope). Remaining 公開 hits are "公開介面/公開インターフェース" (public interface, unrelated). Root and English READMEs unchanged since the first run.
+- 7: carried over — fix diff does not touch `NATIVE_HOOK` or hook install/remove code.
+- 8: re-tested — same 146 targeted tests passed; Ship commands still match the CLI. Full package suite left to finalize-review.
+- UI flows: new command, old command, help re-tested as items 1-3; push reminder carried over as item 4.
+- Minor: ja README:192 now reads "hook がpush 操作" (no space before "push"), cosmetic.
