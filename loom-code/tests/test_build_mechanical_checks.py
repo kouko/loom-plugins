@@ -222,9 +222,12 @@ READ_ONLY_SENTENCE = (
 )
 BUILD_INTENT_HANDOFF = (
     "Hand each agent the confirmed intent path, the retained artifact paths and "
-    "the omitted steps; never demand the omitted artifact."
+    "the omitted steps;"
 )
-BUILD_SKIPPED_PLAN_HANDOFF = "hand the implementer the intent path plus a bounded task"
+BUILD_SKIPPED_PLAN_HANDOFF = (
+    "When plan is skipped, omit the plan command and hand the implementer the intent "
+    "path plus a bounded task, files, Acceptance references, test command and risks directly;"
+)
 SKIPPED_PLAN_PARAGRAPH = (
     "When the station says plan or spec is skipped, use the confirmed intent and "
     "its bounded task handoff (files, Acceptance references, test command and risks) "
@@ -278,11 +281,27 @@ def test_implementer_role_contract_bounds_intent(sentence: str, weakened: tuple[
     assert not pins_exact_sentence(prose.replace(sentence, sentence.replace(*weakened)), sentence)
 
 
+def _handoff_unscoped(text: str) -> bool:
+    """Both hand-offs are exact sentences, and no skip lead opens the every-dispatch one."""
+    if not all(pins_exact_sentence(" ".join(text.split()), s)
+               for s in (BUILD_INTENT_HANDOFF, BUILD_SKIPPED_PLAN_HANDOFF)):
+        return False
+    para = next(_sentences(" ".join(p.split())) for p in re.split(r"\n\s*\n", text)
+                if BUILD_INTENT_HANDOFF in _sentences(" ".join(p.split())))
+    return not any("skipped" in s for s in para[: para.index(BUILD_INTENT_HANDOFF)])
+
+
 def test_build_hands_every_implementer_the_intent_path() -> None:
-    for pin in (BUILD_INTENT_HANDOFF, BUILD_SKIPPED_PLAN_HANDOFF):
-        assert pin in PROSE
-    assert BUILD_INTENT_HANDOFF not in PROSE.replace("the confirmed intent path, ", "")
-    assert BUILD_SKIPPED_PLAN_HANDOFF not in PROSE.replace("the intent path plus", "plus")
+    assert _handoff_unscoped(BUILD)
+    planned = "Hand each agent the\nconfirmed intent path"
+    for weakened in (
+        BUILD.replace(planned, "Optionally, when it helps: " + planned),
+        BUILD.replace(planned, "Never " + planned),
+        BUILD.replace("and hand the implementer the intent\npath", "and do not hand the implementer the intent\npath"),
+        BUILD.replace(planned, "When plan is skipped. " + planned),
+    ):
+        assert weakened != BUILD
+        assert not _handoff_unscoped(weakened)
 
 
 def test_implementer_skipped_plan_handoff_unchanged() -> None:
