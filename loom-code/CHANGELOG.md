@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.87.0] — 2026-11-19 — implementer intent follow-ups
+
+- Build names the confirmed intent's path on every implementer dispatch, not only some of them.
+- The implementer leaves work beyond its task undone and describes it in `self_review` under status `DONE_WITH_CONCERNS`.
+- The intent joins the implementer's read-only inputs.
+- The outside-file exception is limited to edits the task requires.
+- The scope pin rejects a weakened rewrite of the task bound.
+
 ## [3.86.0] — 2026-11-19 — open-pr replaces the publish sub-command
 
 - Rename the checker's `publish` sub-command to `open-pr`. The old name is now an unknown sub-command; no alias is kept.
