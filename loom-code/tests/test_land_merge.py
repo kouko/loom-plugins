@@ -229,6 +229,44 @@ def test_failing_nonrequired_check_blocks(tmp_path: Path, monkeypatch) -> None:
     assert no_merge(calls)
 
 
+# keep-worktree A2 positive: keep-flag-failing-check-refuses-merge
+def test_keep_worktree_failing_check_refuses_merge(tmp_path: Path, monkeypatch) -> None:
+    def configure(calls: LandCalls) -> None:
+        calls.checks = [[PASS, {"name": "lint", "state": "FAILURE", "bucket": "fail"}]]
+        calls.check_returncodes = [1]
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", "--keep-worktree", configure=configure
+    )
+
+    assert rc == 1
+    assert "BLOCK land.merge: check lint: FAILURE" in err
+    assert "Merged PR" not in out
+    assert no_merge(calls)
+
+
+# keep-worktree A1 negative: keep-flag-with-cleanup-or-sweep-is-usage-error
+def test_keep_worktree_with_cleanup_or_sweep_usage_error() -> None:
+    for args in (["--cleanup", "feat/x", "--keep-worktree"], ["--keep-worktree", "--sweep"]):
+        out, err = StringIO(), StringIO()
+
+        assert land.cmd_land(args, out, err) == 2, args
+        assert err.getvalue() == "land: --keep-worktree applies only to --accepted-by\n", args
+        assert out.getvalue() == "", args
+
+
+# keep-worktree A3 boundary: duplicate-keep-flag-usage-error
+def test_keep_worktree_twice_usage_error() -> None:
+    out, err = StringIO(), StringIO()
+
+    rc = land.cmd_land(
+        ["--accepted-by", "kouko", "--keep-worktree", "--keep-worktree"], out, err
+    )
+
+    assert rc == 2
+    assert err.getvalue() == "land: --keep-worktree may appear only once\n"
+
+
 # A2 negative: unstable-state-blocks
 def test_unstable_state_blocks(tmp_path: Path, monkeypatch) -> None:
     def configure(calls: LandCalls) -> None:
