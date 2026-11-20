@@ -22,6 +22,11 @@ Wave 1 — land code (W1-01), then prose that names the new option (W1-02); Wave
 - Test: A5 positive: release_sync; boundary: release_stale_pin. Pin test `test_current_release_metadata_is_synchronized`; derived manifests via `scripts/sync_codex_manifests.py --all`.
 - Risk: minor bump 3.87.0 → 3.88.0 (new CLI option); recheck origin/main version before bumping (agent-decided).
 
+**W3-01 Graduate the keep-block-recovery probe into the suite**  after: W2-01  acceptance: 5
+- Files: `loom-code/tests/test_ship_station_text.py`, `docs/loom/2026-11-20-land-keep-worktree/evidence/probes/test_probe_keep_block_recovery.py`
+- Test: A5 positive: ship-keep-block-recovery-keeps-worktree; negative: negated-keep-sentence-rejected.
+- Risk: probe caught the ship §5 BLOCK-recovery defect, so review.probe-graduation requires moving it into the suite before finalize-review; probe file deleted after its cases move (agent-decided).
+
 ## Simplicity check
 - drop new A3 test, cite existing `test_land_cleanup.py:176` — taken
 - fold trunk-sync and cleanup-after-keep checks into the A1 keep fixture — taken
