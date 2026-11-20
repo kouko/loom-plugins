@@ -1,8 +1,29 @@
 # Keep the worktree when landing an accepted change — acceptance test evidence
 
-Tried on 2026-11-21, in a clean copy of the project at 278f801d.
+Tried on 2026-11-21, in a clean copy of the project at 863e5231.
 
-## Setup
+## Re-run after fix (43d90db3..863e5231)
+
+- Fix diff: `loom-code/skills/ship/SKILL.md` (§5 post-merge BLOCK paragraph
+  now states the `--keep-worktree` case first and "otherwise run
+  `land --cleanup <branch>`"; the earlier-work cleanup sentence gains
+  "except a change landed with `--keep-worktree`: its worktree stays until
+  the maintainer asks for it to be removed"), plus test-only additions in
+  `test_land_merge.py` (bare `--keep-worktree` usage error) and
+  `test_ship_station_text.py` (new
+  `test_ship_earlier_work_cleanup_spares_kept_worktree`, affirmative case in
+  the keep-block matcher test). No `land.py` change.
+- Rows re-tested in full: 1 and 5 (ship text governs them). Rows 2-4 were
+  not touched by the diff but the whole driver (Scenarios A, B, B2, C) was
+  re-run at 863e5231 anyway; every observation below matches the earlier
+  run except fresh scratch SHAs and temp paths.
+- Clean copy: `git worktree add <scratch>/at-rerun2 863e5231` (detached,
+  no uncommitted files; removed with `git worktree remove` afterwards).
+- Setup check at 863e5231: `loom-code/scripts/loom-python --ready land
+  --keep-worktree` -> `land: --keep-worktree applies only to --accepted-by`,
+  exit 2; `land --help` exit 0, text unchanged from the earlier run.
+
+## Setup (original run, 278f801d)
 
 - Clean copy: `git worktree add --detach <scratch>/at-wt 278f801d` (no
   uncommitted files; removed with `git worktree remove` afterwards).
@@ -68,6 +89,18 @@ back each verdict are quoted below.
   git calls that remove/push: []
   ```
 
+- Re-run at 863e5231: identical observations (`Trunk main fast-forwarded
+  to c5ec3e0`; all booleans as above; remove/push calls `[]`).
+- Ship text after merge (re-read at 863e5231, `ship/SKILL.md`):
+  :337-341 "If land prints `Merged PR` and then a BLOCK, do not rerun
+  `--accepted-by`; resolve the named state. When the land that printed the
+  BLOCK carried `--keep-worktree`, keep the worktree for a later
+  `land --cleanup <branch>` once the maintainer wants it removed; otherwise
+  run `land --cleanup <branch>`."; :349-351 "For one merged change left from
+  earlier work, run `land --cleanup <branch>` through the same command,
+  except a change landed with `--keep-worktree`: its worktree stays until
+  the maintainer asks for it to be removed." Neither cleanup instruction now
+  reaches a kept worktree without the maintainer asking.
 - Caveat (stated by the new help text itself): land deletes neither
   branch, "but a hosting setting that deletes head branches on merge can
   still remove the remote one". A GitHub repository with "Automatically
@@ -181,10 +214,12 @@ back each verdict are quoted below.
     → `land: --keep-worktree applies only to --accepted-by`, exit 2;
     `land --accepted-by kouko --keep-worktree --keep-worktree` →
     `land: --keep-worktree may appear only once`, exit 2.
-  - Wording nit (no verdict impact): ship :337-338 first says "resolve the
-    named state and run `land --cleanup <branch>`" and only the next
-    sentence carves out the keep case; an agent reading one sentence at a
-    time meets the cleanup instruction first.
+  - Earlier wording nit (ship :337-338 met the cleanup instruction before
+    the keep carve-out) is resolved at 863e5231: the keep case now comes
+    first and cleanup is the "otherwise" branch (quoted under row 1).
+  - Re-run at 863e5231: bare `land --keep-worktree` and
+    `land --cleanup feat/x --keep-worktree` -> `land: --keep-worktree
+    applies only to --accepted-by`, exit 2.
 - Evidence: tests passed —
   `test_ship_station_text.py::test_ship_text_has_no_direct_gh_pr_merge`,
   `::test_ship_text_adds_keep_worktree_when_maintainer_asks`,
@@ -212,6 +247,14 @@ UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python uv run
   loom-code/tests/test_ship_station_text.py::test_ship_keep_block_recovery_keeps_worktree \
   loom-code/tests/test_ship_station_text.py::test_keep_block_matcher_negated_sentence_rejected
 12 passed in 17.91s
+```
+
+Re-run at 863e5231 (same list plus the new earlier-work test):
+
+```text
+... same 12 node ids ... \
+  loom-code/tests/test_ship_station_text.py::test_ship_earlier_work_cleanup_spares_kept_worktree
+13 passed in 14.47s
 ```
 
 The complete package suite (`uv run --isolated --with-requirements
