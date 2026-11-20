@@ -324,12 +324,15 @@ cd '<absolute worktree root>' && "<loom-code>/scripts/loom-python" --repair land
 ```
 
 `<name>` is the maintainer who accepted; it must match the intent originator or
-the PR-opening authorizer. Always render that absolute `cd`;
+the PR-opening authorizer. When the maintainer asks to keep the worktree, add
+`--keep-worktree` to that land command. Always render that absolute `cd`;
 never rely on the Bash tool's workdir, because Codex may report the task root
 rather than the executor worktree, and `land` acts on the worktree it runs in.
-`land` removes that worktree, so the agent's next Bash command starts with the
-`cd` printed on land's `next:` line. When no `next:` line is printed, keep the
-current directory.
+Without `--keep-worktree`, `land` removes that worktree, so the agent's next
+Bash command starts with the `cd` printed on land's `next:` line. When no
+`next:` line is printed, keep the current directory. With `--keep-worktree`,
+the kept worktree and branch stay until a later `land --cleanup <branch>`;
+land prints no `next:` line, so stay in the kept worktree.
 
 If land prints `Merged PR` and then a BLOCK, do not rerun `--accepted-by`;
 resolve the named state and run `land --cleanup <branch>`. If it names a

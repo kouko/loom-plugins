@@ -272,9 +272,18 @@ def test_land_is_a_declared_cli_command() -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
 
     assert entry["COMMANDS"]["land"] is entry["cmd_land"]
-    assert "loom_checker.py land --accepted-by <name>" in entry["__doc__"]
+    assert "loom_checker.py land --accepted-by <name> [--keep-worktree]" in entry["__doc__"]
     assert "loom_checker.py land --cleanup <branch>" in entry["__doc__"]
     assert "loom_checker.py land --sweep [--confirm <token>]" in entry["__doc__"]
+
+
+# land-help-no-longer-asks-preservation-accepted-form-cannot-honour (A5 negative)
+def test_land_help_names_keep_worktree_for_preservation(tmp_path: Path) -> None:
+    land = " ".join(run_checker("land", "--help", cwd=tmp_path).stdout.split())
+    assert "Usage: land --accepted-by <name> [--keep-worktree]" in land
+    assert "Do not run cleanup when worktree preservation was requested." not in land
+    assert "With --keep-worktree the accepted form keeps" in land
+    assert "pass --keep-worktree to the accepted form" in land
 
 
 def test_sync_trunk_is_a_declared_cli_command() -> None:

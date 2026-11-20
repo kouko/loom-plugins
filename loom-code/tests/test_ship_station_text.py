@@ -119,10 +119,14 @@ def test_ship_text_has_no_direct_gh_pr_merge() -> None:
             assert has_negation(clause), f"`gh pr merge` clause is affirmative: {sentence}"
 
 
-# ship-text-keeps-no-worktree-instruction (A11 negative)
-def test_ship_text_keeps_no_worktree_instruction() -> None:
-    text = SHIP.read_text(encoding="utf-8").lower()
-    assert "keep the worktree" not in " ".join(text.split())
+# ship-text-adds-keep-worktree-when-maintainer-asks (A5 positive)
+def test_ship_text_adds_keep_worktree_when_maintainer_asks() -> None:
+    flat = " ".join(SHIP.read_text(encoding="utf-8").split())
+    land = flat[flat.index("## 5. Land after acceptance"):]
+    land = land[:land.index("## 6.")] if "## 6." in land else land
+    assert affirms(land, "add", "`--keep-worktree`", "maintainer asks to keep the worktree")
+    assert "Never type `gh pr merge` yourself" in land
+    assert affirms(land, "kept", "`land --cleanup <branch>`")
 
 
 GATE_OPEN_RE = re.compile(r"<!--\s*gate:\s*[A-Za-z0-9._-]+\s*-->")
