@@ -217,8 +217,9 @@ See open-pr --help for the body heading order and content requirements.
 The accepted form may squash merge remotely, verify, sync trunk, then delete
 the change worktree and local/remote branch. With --keep-worktree the accepted
 form keeps the worktree and local/remote branch and prints the later
-land --cleanup <branch> command. Cleanup targets a named merged
-change. Sweep computes candidates and a confirmation token; even without a
+land --cleanup <branch> command; land deletes neither branch, but a hosting
+setting that deletes head branches on merge can still remove the remote one.
+Cleanup targets a named merged change. Sweep computes candidates and a confirmation token; even without a
 token it fetches/prunes refs. A matching revalidated token enables deletion.
 When worktree preservation was requested, pass --keep-worktree to the accepted
 form and do not run cleanup.
@@ -231,7 +232,9 @@ Removable sweep listings add Suggested next step: on stderr; review the list
 and obtain approval before deliberately using its token. Listing is not consent.
 Progress/results appear on stdout. Merge can succeed before verification or
 cleanup fails: inspect remote merge and preserved work before corrective action;
-use cleanup for an already merged change instead of blindly repeating a merge.
+use cleanup for an already merged change instead of blindly repeating a merge,
+except that a change landed with --keep-worktree stays until the maintainer
+wants it removed.
 Dirty work and divergent local trunk are preserved/refused, not force-discarded.
 If cleanup removes the invoking worktree, follow the printed next: cd command
 to leave the removed working directory; with --keep-worktree none is printed.

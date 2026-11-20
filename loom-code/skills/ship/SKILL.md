@@ -335,8 +335,10 @@ the kept worktree and branch stay until a later `land --cleanup <branch>`;
 land prints no `next:` line, so stay in the kept worktree.
 
 If land prints `Merged PR` and then a BLOCK, do not rerun `--accepted-by`;
-resolve the named state and run `land --cleanup <branch>`. If it names a
-failing non-required check, repair it as in §4.
+resolve the named state and run `land --cleanup <branch>`. When the land that
+printed the BLOCK carried `--keep-worktree`, resolve the named state and keep
+the worktree for a later `land --cleanup <branch>` once the maintainer wants it
+removed. If it names a failing non-required check, repair it as in §4.
 
 If land prints `trunk not updated`, report that line to the maintainer and
 leave the local trunk as it is. Never discard local trunk commits (`git reset`,
@@ -393,9 +395,9 @@ blocked termination.
 Report the attestation digest when one exists, else the verification status
 `open-pr` printed, PR-opening checks, PR URL, CI state, and land's output.
 
-After verified merge into main and successful cleanup, follow land's printed
-`next:` destination before further filesystem work. If the completed change
-has relevant research records, invoke `loom-code:engineering-research` by name
+After verified merge into main, follow land's printed `next:` destination
+before further filesystem work when cleanup ran and printed one. If the
+completed change has relevant research records, invoke `loom-code:engineering-research` by name
 for its optional long-term preservation guidance. It checks enduring or
 cross-repository value, merged revision and release-dependent evidence, and
 prepares concrete candidate content, provenance, destination and scope before

@@ -284,6 +284,9 @@ def test_land_help_names_keep_worktree_for_preservation(tmp_path: Path) -> None:
     assert "Do not run cleanup when worktree preservation was requested." not in land
     assert "With --keep-worktree the accepted form keeps" in land
     assert "pass --keep-worktree to the accepted form" in land
+    recovery = next(s for s in land.split(". ") if "use cleanup for an already merged" in s)
+    assert "--keep-worktree" in recovery, "post-merge recovery has no keep exception"
+    assert "deletes head branches on merge" in land, "remote branch keep is unqualified"
 
 
 def test_sync_trunk_is_a_declared_cli_command() -> None:

@@ -127,6 +127,9 @@ def test_ship_text_adds_keep_worktree_when_maintainer_asks() -> None:
     assert affirms(land, "add", "`--keep-worktree`", "maintainer asks to keep the worktree")
     assert "Never type `gh pr merge` yourself" in land
     assert affirms(land, "kept", "`land --cleanup <branch>`")
+    research = flat[flat.index("After verified merge into main"):]
+    research = research[:research.index("`loom-code:engineering-research`")]
+    assert "successful cleanup" not in research, "research follow-up waits on cleanup"
 
 
 GATE_OPEN_RE = re.compile(r"<!--\s*gate:\s*[A-Za-z0-9._-]+\s*-->")
