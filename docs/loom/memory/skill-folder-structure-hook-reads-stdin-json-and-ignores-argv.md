@@ -1,6 +1,6 @@
 ---
 name: skill-folder-structure-hook-reads-stdin-json-and-ignores-argv
-description: A PostToolUse hook script that reads its target from the stdin JSON event ignores a path passed as argv — invoking it as `bash hook.sh <path>` from CI or a reviewer shell exits 0 without checking anything, so a "structure check" step built on the hook is a silent no-op; use the repo's CI checker (which takes the plugin as an argument) for any non-hook invocation
+description: A PostToolUse hook script that reads its target from the stdin JSON event ignores a path passed as argv — invoking it as `bash hook.sh <path>` from CI or a reviewer shell exits 0 without checking anything, so a "structure check" step built on the hook is a silent no-op; use the package-suite test `tests/test_skill_folder_flatness.py` for any non-hook invocation
 type: gotcha
 sources:
   - resource: think-orbit Part 1 close-out (2026-08-18) — `.claude/hooks/validate-skill-folder-structure.sh <path>` was used as a CI step and as reviewer GREEN evidence for six tasks; a probe with a nested subfolder returned exit 0, revealing the hook reads `tool_input.file_path` from stdin (`INPUT=$(cat)`) and never looks at `$1`; `tsundoku-ci.yml` carries the same dead step
@@ -19,8 +19,8 @@ memory recipes) that says `bash hook.sh <path>` inherits a green light
 that never turned red.
 
 **How to apply:** for CI or manual verification of skill folder
-structure, run `python3 scripts/check-skill-structure.py <plugin>`
-(flat folders, frontmatter, word cap); reserve the hook for its
+structure, run `python3 -m pytest tests/test_skill_folder_flatness.py`
+(flat skill folders); reserve the hook for its
 PostToolUse wiring. When a check step exits 0 suspiciously fast, feed it
 a known-bad input once before trusting it — the same probe habit as
 [[a-mechanical-check-can-go-green-by-skipping]].

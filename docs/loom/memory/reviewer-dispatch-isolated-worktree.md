@@ -46,12 +46,7 @@ orchestrator's main tree — the dispatch packet names absolute paths
 under the main repo, and nothing stops the agent from running git
 there — leaving the main tree's HEAD detached; the arc's close-out
 commit then landed on a detached HEAD and needed an ff-merge +
-autostash recovery. Mechanized since: the dispatch guidance's fourth
-worktree bullet forbids checkout/switch in the orchestrator's tree
-(`loom-code/skills/subagent-driven-development/references/dispatch-hygiene-notes.md`
-§Worktree-isolated reviewer dispatch), and finishing Step 8 gates the
-close-out commit on `git symbolic-ref -q HEAD` resolving to the
-finished branch
-(`loom-code/skills/finishing-a-development-branch/SKILL.md`). The
-standing rule: isolation is something the dispatched agent must be
+autostash recovery. The guidance and close-out gate added for this then
+were removed with the skills that carried them, so nothing mechanical
+enforces it now. The standing rule: isolation is something the dispatched agent must be
 TOLD to stay inside, not something granting a worktree achieves.

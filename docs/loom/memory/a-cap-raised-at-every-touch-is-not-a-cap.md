@@ -34,5 +34,4 @@ prior raises. Two or more means the cap is not the problem being solved: the
 options are extraction to a reference file, deletion, or an explicit decision —
 recorded where the next person will read it — that the cap was set wrong and
 this is the last raise. A raise with no such record is the eighteenth raise
-waiting to happen. Related: [[verified-gate-pytest-suite-misses-skill-structure-word-cap]]
-(the same cap, measured rather than enforced).
+waiting to happen.

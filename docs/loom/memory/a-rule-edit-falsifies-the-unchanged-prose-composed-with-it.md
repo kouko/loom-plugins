@@ -24,7 +24,7 @@ by the per-task lane that verified the pinned edit itself:
   same branch shipped.
 
 **Why:** the class is structurally invisible to the tools that guard
-edits. `claim_copy_sweep` finds copies of the CHANGED claim; the stale
+edits. A claim-copy sweep finds copies of the CHANGED claim; the stale
 text here contains no copy of it — it states a neighboring proposition
 (a count, a self-description, an old policy) that the change silently
 falsified. Pin tests guard the inserted text, not what it composes
