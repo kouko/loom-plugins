@@ -19,7 +19,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py open-pr --intent <absolute-path> --title <text> --body-file <absolute-path>
     loom_checker.py open-pr --confirm-authorized --title <text> --body-file <absolute-path>
     loom_checker.py delivery [--goal local|published|merged] [--intent <path>] [--json]
-    loom_checker.py land --accepted-by <name>
+    loom_checker.py land --accepted-by <name> [--keep-worktree]
     loom_checker.py land --cleanup <branch>
     loom_checker.py land --sweep [--confirm <token>]
     loom_checker.py sync-trunk
@@ -198,10 +198,11 @@ evade the host matcher. Native hooks do not intercept fast-forward merges or
 reset/rebase; Git options that skip hooks can bypass applicable native checks.
 """,
     "land": """land — merge an accepted PR or clean up merged changes
-Usage: land --accepted-by <name>
+Usage: land --accepted-by <name> [--keep-worktree]
        land --cleanup <branch>
        land --sweep [--confirm <token>]
-Choose exactly one form; --confirm applies only to sweep. Run in the repository
+Choose exactly one form; --confirm applies only to sweep and --keep-worktree
+only to the accepted form. Run in the repository
 with trusted git/gh, eligible change branch/PR and live evidence/checks. A real
 maintainer acceptance must already exist; the name or help supplies no consent.
 The accepted name must match the committed intent originator or automatic
@@ -214,10 +215,14 @@ refuse the merge. Absent/stale local verification is disclosed after merge,
 not a gate that prevents it; no registered checks is not proof of testing.
 See open-pr --help for the body heading order and content requirements.
 The accepted form may squash merge remotely, verify, sync trunk, then delete
-the change worktree and local/remote branch. Cleanup targets a named merged
-change. Sweep computes candidates and a confirmation token; even without a
+the change worktree and local/remote branch. With --keep-worktree the accepted
+form keeps the worktree and local/remote branch and prints the later
+land --cleanup <branch> command; land deletes neither branch, but a hosting
+setting that deletes head branches on merge can still remove the remote one.
+Cleanup targets a named merged change. Sweep computes candidates and a confirmation token; even without a
 token it fetches/prunes refs. A matching revalidated token enables deletion.
-Do not run cleanup when worktree preservation was requested.
+When worktree preservation was requested, pass --keep-worktree to the accepted
+form and do not run cleanup.
 Exit 0 can follow successful merge/cleanup even when best-effort trunk sync
 was skipped or failed and stdout says "trunk not updated". Read the trunk
 result; preserve work before independently resolving local trunk conditions.
@@ -227,10 +232,12 @@ Removable sweep listings add Suggested next step: on stderr; review the list
 and obtain approval before deliberately using its token. Listing is not consent.
 Progress/results appear on stdout. Merge can succeed before verification or
 cleanup fails: inspect remote merge and preserved work before corrective action;
-use cleanup for an already merged change instead of blindly repeating a merge.
+use cleanup for an already merged change instead of blindly repeating a merge,
+except that a change landed with --keep-worktree stays until the maintainer
+wants it removed.
 Dirty work and divergent local trunk are preserved/refused, not force-discarded.
 If cleanup removes the invoking worktree, follow the printed next: cd command
-to leave the removed working directory.
+to leave the removed working directory; with --keep-worktree none is printed.
 """,
     "sync-trunk": """sync-trunk — bring a clean change branch onto fetched trunk
 Usage: sync-trunk

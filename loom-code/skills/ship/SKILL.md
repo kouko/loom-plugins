@@ -324,16 +324,21 @@ cd '<absolute worktree root>' && "<loom-code>/scripts/loom-python" --repair land
 ```
 
 `<name>` is the maintainer who accepted; it must match the intent originator or
-the PR-opening authorizer. Always render that absolute `cd`;
+the PR-opening authorizer. When the maintainer asks to keep the worktree, add
+`--keep-worktree` to that land command. Always render that absolute `cd`;
 never rely on the Bash tool's workdir, because Codex may report the task root
 rather than the executor worktree, and `land` acts on the worktree it runs in.
-`land` removes that worktree, so the agent's next Bash command starts with the
-`cd` printed on land's `next:` line. When no `next:` line is printed, keep the
-current directory.
+Without `--keep-worktree`, `land` removes that worktree, so the agent's next
+Bash command starts with the `cd` printed on land's `next:` line. When no
+`next:` line is printed, keep the current directory. With `--keep-worktree`,
+the kept worktree and branch stay until a later `land --cleanup <branch>`;
+land prints no `next:` line, so stay in the kept worktree.
 
 If land prints `Merged PR` and then a BLOCK, do not rerun `--accepted-by`;
-resolve the named state and run `land --cleanup <branch>`. If it names a
-failing non-required check, repair it as in §4.
+resolve the named state. When the land that printed the BLOCK carried
+`--keep-worktree`, keep the worktree for a later `land --cleanup <branch>` once
+the maintainer wants it removed; otherwise run `land --cleanup <branch>`. If it
+names a failing non-required check, repair it as in §4.
 
 If land prints `trunk not updated`, report that line to the maintainer and
 leave the local trunk as it is. Never discard local trunk commits (`git reset`,
@@ -342,7 +347,8 @@ checkout (`git stash`, `git restore`, or a checkout discard) without the
 maintainer's explicit yes to that discard: the acceptance at decision point ③ is not that permission.
 
 For one merged change left from earlier work, run `land --cleanup <branch>`
-through the same command. `land --sweep` lists merged changes, removes nothing,
+through the same command, except a change landed with `--keep-worktree`: its
+worktree stays until the maintainer asks for it to be removed. `land --sweep` lists merged changes, removes nothing,
 and prints a token; pass `--sweep --confirm <token>` only after the maintainer
 answers yes to the printed list.
 
@@ -390,9 +396,9 @@ blocked termination.
 Report the attestation digest when one exists, else the verification status
 `open-pr` printed, PR-opening checks, PR URL, CI state, and land's output.
 
-After verified merge into main and successful cleanup, follow land's printed
-`next:` destination before further filesystem work. If the completed change
-has relevant research records, invoke `loom-code:engineering-research` by name
+After verified merge into main, follow land's printed `next:` destination
+before further filesystem work when cleanup ran and printed one. If the
+completed change has relevant research records, invoke `loom-code:engineering-research` by name
 for its optional long-term preservation guidance. It checks enduring or
 cross-repository value, merged revision and release-dependent evidence, and
 prepares concrete candidate content, provenance, destination and scope before
