@@ -157,6 +157,14 @@ def test_ship_keep_block_recovery_keeps_worktree() -> None:
         "`--keep-worktree` exception; the kept worktree would be removed")
 
 
+# earlier-work cleanup keeps a kept worktree (A1)
+def test_ship_earlier_work_cleanup_spares_kept_worktree() -> None:
+    later = [s for s in _land_sentences() if "earlier work" in s]
+    assert later, "ship §5 earlier-work cleanup sentence"
+    assert any(KEEP_FLAG in s and "maintainer asks" in s for s in later), (
+        "earlier-work `land --cleanup` carries no `--keep-worktree` exception")
+
+
 # negated-keep-sentence-rejected (A5 negative)
 def test_keep_block_matcher_negated_sentence_rejected() -> None:
     assert not _keeps_after_block(split_sentences(

@@ -335,10 +335,10 @@ the kept worktree and branch stay until a later `land --cleanup <branch>`;
 land prints no `next:` line, so stay in the kept worktree.
 
 If land prints `Merged PR` and then a BLOCK, do not rerun `--accepted-by`;
-resolve the named state and run `land --cleanup <branch>`. When the land that
-printed the BLOCK carried `--keep-worktree`, resolve the named state and keep
-the worktree for a later `land --cleanup <branch>` once the maintainer wants it
-removed. If it names a failing non-required check, repair it as in §4.
+resolve the named state. When the land that printed the BLOCK carried
+`--keep-worktree`, keep the worktree for a later `land --cleanup <branch>` once
+the maintainer wants it removed; otherwise run `land --cleanup <branch>`. If it
+names a failing non-required check, repair it as in §4.
 
 If land prints `trunk not updated`, report that line to the maintainer and
 leave the local trunk as it is. Never discard local trunk commits (`git reset`,
@@ -347,7 +347,8 @@ checkout (`git stash`, `git restore`, or a checkout discard) without the
 maintainer's explicit yes to that discard: the acceptance at decision point ③ is not that permission.
 
 For one merged change left from earlier work, run `land --cleanup <branch>`
-through the same command. `land --sweep` lists merged changes, removes nothing,
+through the same command, except a change landed with `--keep-worktree`: its
+worktree stays until the maintainer asks for it to be removed. `land --sweep` lists merged changes, removes nothing,
 and prints a token; pass `--sweep --confirm <token>` only after the maintainer
 answers yes to the printed list.
 
