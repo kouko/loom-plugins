@@ -46,4 +46,5 @@ One wave of three independent content tasks, then release metadata. The W1 negat
 ① — what — 可以幫我列出你要統一的用詞嗎
 
 ## Risks
+- user-decided — second-vendor selection-confirmed: codex
 1. Deleting a memory entry loses a lesson; each deletion names the removed tool in the commit body and git history keeps the text.
