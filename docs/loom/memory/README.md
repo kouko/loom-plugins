@@ -55,10 +55,10 @@ should be batched, not one-PR-per-discovery.
 
 **Pull, not push.** Nothing auto-loads this folder. Retrieval = read
 the index below / grep on demand. This preserves the documented
-anti-preload decision (`dev-workflow/skills/git-memory/SKILL.md:193-197`);
+anti-preload decision (`loom-workflow/skills/git-memory/SKILL.md` §Recall routing);
 evidence: a 2026 ETH Zurich study found always-loaded auto-generated
 context files reduced agent task success by ~3% and raised inference
-cost by ~20% (`dev-workflow/skills/git-memory/standards/memory-conventions.md`
+cost by ~20% (`loom-workflow/skills/git-memory/standards/memory-conventions.md`
 §Pull retrieval).
 
 Before acting on a recalled entry, verify any file/flag/skill it names
