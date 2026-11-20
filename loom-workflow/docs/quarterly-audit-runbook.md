@@ -109,7 +109,7 @@ Action items:
 - [ ] All 3 shared conventions (golden-anchor / test-prompts /
       constitution) spot-checked against consuming skills
 - [ ] Cross-plugin conventions (mindsets in code-team) verified
-      consistent with loom-workflow:complexity-critique consumption
+      consistent with loom-workflow:critique (mode: complexity) consumption
 
 ### 4. External dependency audit
 
