@@ -247,7 +247,11 @@ def test_keep_worktree_failing_check_refuses_merge(tmp_path: Path, monkeypatch) 
 
 # keep-worktree A1 negative: keep-flag-with-cleanup-or-sweep-is-usage-error
 def test_keep_worktree_with_cleanup_or_sweep_usage_error() -> None:
-    for args in (["--cleanup", "feat/x", "--keep-worktree"], ["--keep-worktree", "--sweep"]):
+    for args in (
+        ["--keep-worktree"],
+        ["--cleanup", "feat/x", "--keep-worktree"],
+        ["--keep-worktree", "--sweep"],
+    ):
         out, err = StringIO(), StringIO()
 
         assert land.cmd_land(args, out, err) == 2, args

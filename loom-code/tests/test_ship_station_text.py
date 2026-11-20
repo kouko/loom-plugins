@@ -167,6 +167,8 @@ def test_ship_earlier_work_cleanup_spares_kept_worktree() -> None:
 
 # negated-keep-sentence-rejected (A5 negative)
 def test_keep_block_matcher_negated_sentence_rejected() -> None:
+    assert _keeps_after_block(split_sentences(
+        "When land with `--keep-worktree` prints a BLOCK, keep the worktree."))
     assert not _keeps_after_block(split_sentences(
         "When land with `--keep-worktree` prints a BLOCK, do not keep the worktree."))
     assert not _keeps_after_block(split_sentences(
