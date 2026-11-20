@@ -132,6 +132,39 @@ def test_ship_text_adds_keep_worktree_when_maintainer_asks() -> None:
     assert "successful cleanup" not in research, "research follow-up waits on cleanup"
 
 
+KEEP_FLAG = "`--keep-worktree`"
+KEEP_VERB = re.compile(r"\b(keep|keeps|leave|leaves|stay|stays|preserve|preserves)\b.*\bworktree\b",
+                       re.IGNORECASE)
+
+
+def _keeps_after_block(sentences: list[str]) -> bool:
+    """Some sentence names a BLOCK and the flag, and affirms keeping the worktree."""
+    for s in sentences:
+        if "BLOCK" not in s or KEEP_FLAG not in s:
+            continue
+        # The flag's own spelling contains "keep" and "worktree"; it is not the verb.
+        if KEEP_VERB.search(s.replace(KEEP_FLAG, " ")) and not has_negation(s):
+            return True
+    return False
+
+
+# ship-keep-block-recovery-keeps-worktree (A5 positive)
+def test_ship_keep_block_recovery_keeps_worktree() -> None:
+    land = _land_sentences()
+    assert any("If land prints `Merged PR` and then a BLOCK" in s for s in land)
+    assert _keeps_after_block(land), (
+        "ship §5 routes a post-merge BLOCK to `land --cleanup <branch>` with no "
+        "`--keep-worktree` exception; the kept worktree would be removed")
+
+
+# negated-keep-sentence-rejected (A5 negative)
+def test_keep_block_matcher_negated_sentence_rejected() -> None:
+    assert not _keeps_after_block(split_sentences(
+        "When land with `--keep-worktree` prints a BLOCK, do not keep the worktree."))
+    assert not _keeps_after_block(split_sentences(
+        "When land with `--keep-worktree` prints a BLOCK, run `land --cleanup <branch>`."))
+
+
 GATE_OPEN_RE = re.compile(r"<!--\s*gate:\s*[A-Za-z0-9._-]+\s*-->")
 GATE_CLOSE = "<!-- /gate -->"
 NO_HANDOVER = "hand a refused PR-opening command to the user to run"
