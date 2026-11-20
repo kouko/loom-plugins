@@ -4,6 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.26.1] — 2026-11-21 — stale skill references
+
+- Update stale skill references in loom-workflow docs to current skill names; historical records keep the name that ran, with the current name noted.
+
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 
 - Add roadmap as the unified owner of optional ordinary project planning documents; retain selected existing documents, verified-result scope, unknowns and existing delivery authorization.
