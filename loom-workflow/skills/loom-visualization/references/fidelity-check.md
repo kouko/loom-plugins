@@ -99,7 +99,8 @@ A finding whose class is unclear gates. Fail closed.
 
 ### The fix cycle, and where it stops
 
-Adapted from `loom-code:requesting-docs-review`, which faced the same
+Adapted from the docs-lens review by a fresh-context `loom-code:reviewer`,
+which faced the same
 problem: prose has no test to terminate on.
 
 - **Rounds 1–3 are the only full check.** No round cap, no re-sampling.

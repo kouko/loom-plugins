@@ -9,7 +9,8 @@ sources:
 Delta confirmation is this repo's standard resolution for a gating
 verdict: fix once, then have **the same reviewer** confirm the delta via
 `SendMessage`, never a fresh whole-corpus round. Ten-plus live runs made it
-standard; `requesting-docs-review`'s Directive 2 encodes it.
+standard; the retired `requesting-docs-review` skill encoded it as its
+Directive 2, and the `loom-code:reviewer` docs lens carries it today.
 
 It has an unstated lifetime. The reviewer is addressable only by a handle —
 its `agentId`, or a `name:` if one was assigned — and that handle lives in

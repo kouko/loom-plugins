@@ -1,31 +1,20 @@
 ---
 name: test-must-land-in-the-ci-lane-its-plugin-runs
-description: A new test only gates if it lands in the exact lane its plugin's CI actually runs — dev-workflow CI runs ONLY dev-workflow/tests/test-*.sh (bash glob, no pytest job over dev-workflow/skills/**), and loom-code CI runs pytest loom-code/tests/; a test dropped in the wrong lane is a dark test that passes locally and never gates
+description: A new test only gates if it lands in the exact lane its plugin's CI actually runs — loom-family CI runs scripts/run_package_tests.py over the TEST_ROOTS it names (skipping tests/local/); a test dropped outside those roots is a dark test that passes locally and never gates
 type: gotcha
 sources:
   - resource: PR closeout-privacy-gate (2026-07-19) — caught twice at plan + execution time
 ---
 
-Two different plugins in this repo run their CI test suites two
-different ways, and neither globs everything:
+CI does not glob every test file in the repo. The loom-family workflows
+run `python3 scripts/run_package_tests.py --loom-family`, which collects
+only the test roots in its `TEST_ROOTS` constant and skips `tests/local/`.
+A test placed next to the code it tests (in `scripts/` or a skill folder)
+runs locally and is a real dev-time check, but it **never gates in CI**.
 
-- **dev-workflow** (`.github/workflows/dev-workflow-ci.yml`) runs ONLY
-  `for t in dev-workflow/tests/test-*.sh; do bash "$t"; done`. There is
-  **no pytest job anywhere in CI** that covers `dev-workflow/skills/**`.
-  A `test_*.py` co-located next to a skill script (mirroring
-  distill-sessions) runs locally and is a real dev-time suite, but it
-  **never gates in CI**. To gate a `dev-workflow/skills/` behavior, add
-  a bash CLI test under `dev-workflow/tests/test-*.sh` that exercises the
-  real script (exit codes / output), not only a pytest.
-- **loom-code** (`.github/workflows/loom-code-ci.yml`) runs
-  `pytest loom-code/tests/ tests/`; the gating lane for a SKILL.md
-  prose pin is a `loom-code/tests/test_*.py` pytest (precedent:
-  `test_finishing_merge_path_guidance.py`).
-
-Caught twice in one arc: a plan first routed finishing-SKILL pins to
-`loom-code/tests/*.sh` (dark) → moved to `loom-code/scripts/test_*.py`;
-and a `privacy-scan.py` pytest had no CI gate → added a paired bash CLI
-test under `dev-workflow/tests/`.
+Caught twice in one arc (2026-07-19, under the CI lanes of that time): a
+plan first routed SKILL.md pins into a lane CI never ran, and a script's
+pytest had no CI gate until a paired test was added in a gated lane.
 
 **Why:** "the test passes locally" and "the test gates in CI" are
 different claims. A dark test gives false regression confidence — the
@@ -35,9 +24,9 @@ target plugin's CI actually executes.
 
 **How to apply:** before choosing a new test's type + location, open the
 target plugin's `.github/workflows/*-ci.yml` and read the actual `run:`
-lines. Place the test where that workflow will execute it: for
-`dev-workflow/skills/**`, a bash test in `dev-workflow/tests/`; for a
-loom-code SKILL.md/prose pin, a pytest under `loom-code/tests/`. (Extends
+lines. Place the test where that workflow will execute it: for a loom
+plugin, under one of the `TEST_ROOTS` (for example a loom-code SKILL.md
+prose pin as a pytest under `loom-code/tests/`). (Extends
 [[gha-paths-filter-gates-at-workflow-level]]: that entry is about which
 *pushes* trigger a workflow; this is about which *tests* a triggered
 workflow actually executes.)

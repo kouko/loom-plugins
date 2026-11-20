@@ -61,7 +61,7 @@ notable sessions:
 
 ```bash
 python3 scripts/skill-telemetry.py log \
-    --skill complexity-critique \
+    --skill critique \
     --plugin loom-workflow \
     --event-type skill_invoke \
     --user-reaction accept \
@@ -114,7 +114,7 @@ Periodically (or as part of quarterly audit step 2):
 python3 scripts/skill-telemetry.py summarize
 
 # Filter to a single skill
-python3 scripts/skill-telemetry.py summarize --skill skill-refactor
+python3 scripts/skill-telemetry.py summarize --skill git-memory
 ```
 
 Output is JSON suitable for piping to `jq` or further analysis.
@@ -127,8 +127,8 @@ Example summary structure:
   "filter_skill": null,
   "total_entries": 142,
   "by_skill": {
-    "complexity-critique": {"invokes": 23, "completes": 22, "errors": 1, "rerun": 3},
-    "skill-refactor": {"invokes": 8, "completes": 7, "errors": 1, "rerun": 0},
+    "critique": {"invokes": 23, "completes": 22, "errors": 1, "rerun": 3},
+    "git-memory": {"invokes": 8, "completes": 7, "errors": 1, "rerun": 0},
     ...
   }
 }

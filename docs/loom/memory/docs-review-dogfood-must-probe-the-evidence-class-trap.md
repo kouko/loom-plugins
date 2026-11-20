@@ -23,7 +23,9 @@ that is both load-bearing and invisible to string tests — every other duty
 behavior, and its failure mode looks like diligence.
 
 **How to apply:** On every future change to docs-review contracts
-(requesting-docs-review, docs-reviewer agent, aggregation wording), re-run the
+(the `loom-code:reviewer` docs lens, which replaced the retired
+requesting-docs-review skill and docs-reviewer agent, and its aggregation
+wording), re-run the
 trap probe from the dogfood record's D3 recipe before ship: round-1 findings
 with one evidence-class defect, a remediation that rephrases it in place, one
 cold reviewer. Expected: not-fixed + no re-litigation + passing verdict

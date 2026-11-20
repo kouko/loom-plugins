@@ -6,10 +6,9 @@ sources:
   - resource: PR #479 (loom-pipeline conductor v0.1, 2026-07-04)
 ---
 
-`LOOM-SIMPLIFY:` is loom-code's in-code marker for a deliberate,
+`LOOM-SIMPLIFY:` is loom's in-code marker for a deliberate,
 scope-bounded shortcut; each marker records the shortcut, a
-checkable ceiling, the upgrade path, and a reference
-(`loom-code/skills/subagent-driven-development/standards/deliberate-simplification.md`).
+checkable ceiling, and the upgrade path.
 When review reaches such a marker and the recorded upgrade turns out
 to be one-line-cheap, execute the upgrade right there instead of
 leaving the marker for later. On PR #479 three such upgrades were

@@ -46,17 +46,17 @@ or short. The leaks matter more than the rule: a repairer who trusts a
 single-line sweep gets a confident count that is wrong in exactly the direction
 that makes the next fix ship a fresh contradiction.
 
-**How to apply.** Before editing any claim that could have copies: (1) run
-`python3 scripts/claim_copy_sweep.py --claim "<the sentence>"` — it normalizes
-whitespace on both sides, so hard-wrapped copies cannot hide, and it prints the
-operative / frozen partition plus its own named leaks. Add `--also "<other
-phrasing>"` for every restatement you already know about. **Sweep a phrase, not
+**How to apply.** Before editing any claim that could have copies: (1) sweep
+for it with a multiline matcher that treats any run of whitespace as one space
+(for example `rg -U` with `\s+` between words), so hard-wrapped copies cannot
+hide, and separate operative hits from history yourself. Sweep again for every
+other phrasing you already know about. **Sweep a phrase, not
 a token**: a bare number as the claim returns hits from every document where
 those digits meant something else entirely, while a distinctive phrase returns
 copies that are actually copies. And **the review's scope is not the claim's
 population** — sweeping a stale `file:line` pointer returned copies in documents
 a reviewer working from the branch diff never saw, which is the whole reason to
-run the tool rather than trust a reader. Neither observation carries a count
+run the sweep rather than trust a reader. Neither observation carries a count
 here on purpose: this entry is itself in the swept corpus, so any total written
 would count its own sentences — leak three, stated below and demonstrated twice
 on this arc. (2) write the resulting count into the artifact and
@@ -74,13 +74,13 @@ that [[an-instrument-can-be-correct-at-every-step-and-still-not-support-its-judg
 identifies as the fatal property of a measurement that never persists. Moving it
 here fixes where it lives, not what it is.
 
-**The unwrapping half is now mechanised; the obligation half is not.**
-`scripts/claim_copy_sweep.py` (2026-08-03) closes the hard-wrap leak. Measured
-live on this corpus, re-runnable as printed:
+**The unwrapping half was once mechanised; the obligation half never was.**
+`scripts/claim_copy_sweep.py` (2026-08-03, since removed from the repo) closed
+the hard-wrap leak. Measured live on the corpus of that time:
 
 ```
 grep -rln "architectural blast radius" --include='*.md' .   # contiguous
-python3 scripts/claim_copy_sweep.py --claim "architectural blast radius"
+python3 scripts/claim_copy_sweep.py --claim "architectural blast radius"  # removed
 ```
 
 The sweep returned every file the grep returned **plus** files the grep
@@ -89,16 +89,15 @@ reported as clean — one of those being this very entry's sibling
 split across a line break. No total is stated here on purpose:
 the first attempt at this passage quoted one, and the count moved between two
 runs minutes apart because writing the passage added the phrase to the corpus
-it was counting. That is leak three, live. Re-run the command rather than
+it was counting. That is leak three, live. Re-run a sweep rather than
 citing a figure.
-The sweep additionally separates operative hits from history (plugin
-CHANGELOGs, in that run), because
-[[big-rename-operative-frozen-sweep]] records an automated sweep rewriting
-history into self-contradiction. It reports and never edits, for the same
-reason. **Nothing still obliges a repairer to run it** — that was left open
-deliberately rather than added as another gate; the synonym leak likewise
-stays open by nature, and `--also` only covers restatements you already know
-about.
+The sweep also separated operative hits from history (plugin CHANGELOGs, in
+that run), because [[big-rename-operative-frozen-sweep]] records an automated
+sweep rewriting history into self-contradiction; it reported and never edited,
+for the same reason. **Nothing obliges a repairer to sweep** — that was left
+open deliberately rather than added as another gate; the synonym leak likewise
+stays open by nature, and extra phrasings only cover restatements you already
+know about.
 [[pin-shared-wording-in-plan-copies-transcribe-from-pin]] is the prevention-side
 sibling: it stops copies from diverging when you already know a wording will fan
 out; this entry is for the copies you did not know about.
@@ -125,7 +124,7 @@ run the tool. Nothing did, and a five-round arc paid for it.
 
 **How to apply, sharpened:** when a claim is found in two places, treat the
 population as unknown and run the sweep before editing either — and phrase the
-sweep from the **proposition** ("this section carries tokens"), then `--also`
+sweep from the **proposition** ("this section carries tokens"), then sweep
 each synonym you can generate, rather than from the strings you happen to have
 in front of you. If the arc is fixing a claim at all, the enumeration is not
 optional overhead; it is the cheapest step in the arc.

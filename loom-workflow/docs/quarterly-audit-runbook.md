@@ -109,7 +109,7 @@ Action items:
 - [ ] All 3 shared conventions (golden-anchor / test-prompts /
       constitution) spot-checked against consuming skills
 - [ ] Cross-plugin conventions (mindsets in code-team) verified
-      consistent with loom-workflow:complexity-critique consumption
+      consistent with loom-workflow:critique (mode: complexity) consumption
 
 ### 4. External dependency audit
 
@@ -122,12 +122,12 @@ For each skill with NOTICE file:
 - Check upstream license is still MIT (or compatible)
 - Note any upstream updates that would warrant local sync
 
-Skills with NOTICE files (as of v1.7.0):
-- skill-creator-advance (Anthropic → AllanYiin → kouko)
-- skill-judge (Leonardo Flores → kouko)
-- complexity-critique (joshuadavidthomas → softaworks → kouko)
-- skill-refactor (original; design influence from darwin-skill)
-- skill-tuning (original; design influence from darwin-skill)
+Skills with NOTICE files (check with `ls loom-workflow/skills/*/NOTICE*`):
+- critique (`NOTICE`; complexity mode adapted from joshuadavidthomas → softaworks → kouko)
+- loom-visualization (`NOTICE.md`; ascii-graph-toolkit)
+
+skill-creator-advance, skill-judge, skill-refactor and skill-tuning moved
+to the `skill-dev-toolkit` plugin; audit their NOTICE files there.
 
 Action items:
 - [ ] All upstream URLs resolve

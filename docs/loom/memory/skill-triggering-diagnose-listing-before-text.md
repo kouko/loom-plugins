@@ -15,7 +15,7 @@ semantically routed to. research-toolkit's fix that measurably worked:
 a `using-<family>` entry router (fired 2/2 in both A/B runs while
 sibling members stayed evicted) + repositioning vs the host built-in by
 positive specificity, verified by a 16-record 中/日/英 corpus driven
-through `loom-code/scripts/loom_firing_harness.py` (family fires
+through the firing harness of that time, since removed (family fires
 2/13 → 5/13, zero over-fire). CJK keyword stuffing was NOT part of the
 fix — the house 51-probe A/B (PR #426/#428/#429) shows it changes
 nothing; keep at most one representative CJK trigger.
