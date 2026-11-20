@@ -32,6 +32,11 @@ One wave of three independent content tasks, then release metadata. The W1 negat
 - Test: A4 positive: complete-package-suite-passes; boundary: release-metadata-synchronized.
 - Risk: agent-decided — patch bump; wording-only fix, no station guidance change.
 
+**W3-01 Graduate the retired-skill probe into the package suite**  after: W1-02  acceptance: 2
+- Files: `tests/test_living_docs_retired_skill_claims.py`
+- Test: A2 positive: graduated-probe-passes-at-head; negative: probe-red-on-reverted-sentences.
+- Risk: agent-decided — review.probe-graduation requires it: the adversary probe caught five present-tense claims; copy it without the concern header, keep the evidence copy as the declared program.
+
 ## Simplicity check
 - Add a permanent checker for dead paths in memory — declined: new mechanism beyond the intent; existing validate plus adversary probes cover this change.
 - Mark W1 negative cases as one-off evidence, not permanent tests — taken
