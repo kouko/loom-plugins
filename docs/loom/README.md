@@ -36,8 +36,6 @@ decision context is why they were kept in the first place — but no
 station reads them, and nothing new should be written into them.
 
 - [`plans/`](plans/) — writing-plans output, 2026-05-18 → 2026-09-01
-- `maps/` — retained planning history; no current runtime manages or converts it.
-
 ## checkpoint 的三個驗證角色什麼時候被觸發
 
 acceptance tester＝`acceptance-tester`、讀者＝`reviewer`、對抗者＝`adversary`
