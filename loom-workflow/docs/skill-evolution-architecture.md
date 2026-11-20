@@ -48,7 +48,13 @@ explicit accept-risk or schedule-validation decision is required.
 
 ### What we already have
 
-loom-workflow currently ships:
+*(History: this is what loom-workflow shipped when the plan was written.
+`complexity-critique` has since been retired in favour of `critique`
+(mode: complexity), and the skill-modifying skills (`skill-creator-advance`,
+`skill-judge`, `skill-refactor`, `skill-tuning`) now live in the
+`skill-dev-toolkit` plugin.)*
+
+At planning time loom-workflow shipped:
 - `skill-creator-advance` — creation + general iterative improvement + eval infrastructure (grader / comparator / analyzer agents + run_loop scripts) + description optimization
 - `skill-judge` — advisory 8-dimension quality rubric (0–120 scale, never modifies)
 - `git-memory` — out of scope here
@@ -227,11 +233,15 @@ This is a single PR, mostly text edits. Doesn't break existing flows. Worth doin
 
 ### Phase C — implement skill-refactor (medium risk)
 
+*(History: the paths below are where the plan put skill-refactor and
+skill-tuning; both skills now ship in the `skill-dev-toolkit` plugin, not
+loom-workflow.)*
+
 Required components:
-- `loom-workflow/skills/skill-refactor/SKILL.md` — Iron Law / Gate Function (equivalence Q + token Q + invariant Q) / verdict (PROCEED / RESHAPE / REJECT) / refactor hat editor prompt
-- `loom-workflow/commands/skill-refactor.md`
+- `skills/skill-refactor/SKILL.md` — Iron Law / Gate Function (equivalence Q + token Q + invariant Q) / verdict (PROCEED / RESHAPE / REJECT) / refactor hat editor prompt
+- `commands/skill-refactor.md`
 - LICENSE / NOTICE if any upstream attribution
-- `loom-workflow/skills/skill-refactor/README.{en,ja,zh-TW}.md`
+- `skills/skill-refactor/README.{en,ja,zh-TW}.md`
 - Optional: `references/equivalence-check-protocol.md` (how to check semantic output equivalence with subagent)
 - Optional: `references/refactor-moves.md` (catalog of refactor-hat-safe transformations)
 - plugin.json bump 1.5.0 → 1.6.0 + CHANGELOG
@@ -244,10 +254,10 @@ Risk: LLM equivalence check needs validation. If "is output A equivalent to outp
 ### Phase D — implement skill-tuning (higher uncertainty)
 
 Required components:
-- `loom-workflow/skills/skill-tuning/SKILL.md` — variant-generation editor prompt, A/B harness protocol, preference logging
-- `loom-workflow/commands/skill-tuning.md`
+- `skills/skill-tuning/SKILL.md` — variant-generation editor prompt, A/B harness protocol, preference logging
+- `commands/skill-tuning.md`
 - LICENSE / NOTICE
-- `loom-workflow/skills/skill-tuning/README.{en,ja,zh-TW}.md`
+- `skills/skill-tuning/README.{en,ja,zh-TW}.md`
 - Optional: `references/ab-harness.md` (how to spawn variants + present to user)
 - Optional: `references/preference-log-schema.md`
 - plugin.json bump + CHANGELOG

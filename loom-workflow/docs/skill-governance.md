@@ -132,8 +132,8 @@ Per repo-level `CLAUDE.md` §Cross-Plugin Delegation Contract:
 - Plugin-A consuming Plugin-B's resources passes paths, not content
 - Single source of truth lives in the authority plugin
 - Cross-plugin runtime dependency is acceptable when consumer
-  explicitly signals it (e.g., complexity-critique's mindset
-  references)
+  explicitly signals it (e.g., `critique` mode: complexity's mindset
+  references, formerly complexity-critique's)
 - For zero-runtime-dependency cases, use SSOT-and-functional-copy
   (PR #159 precedent)
 
