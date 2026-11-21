@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.27.0] — 2026-11-22 — loom-herdr skill for herdr panes, agents and conversations
+
+- Add the `loom-herdr` skill: loads the installed herdr's own `herdr --skill` instructions at run time (no bundled copy), then adds conversation search across open Claude, Codex and OpenCode panes, led agent-to-agent conversations and Codex sandbox help. Selected only when the user names herdr.
+- Register it in the plugin manifest and the `using-loom-workflow` router; skill count rises from fifteen to sixteen, with `loom-herdr` outside the lifecycle contract like `whats-next`.
+
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 
 - Add roadmap as the unified owner of optional ordinary project planning documents; retain selected existing documents, verified-result scope, unknowns and existing delivery authorization.
