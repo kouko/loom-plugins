@@ -37,6 +37,13 @@ charter: 1.1
 - Test: A1 positive: catalog-lists-loom-herdr; boundary: root-readme-loom-workflow-row-version-synced.
 - Risk: agent-decided — root table row version and skill count follow W2-01's bump.
 
+### Wave 3
+
+**W3-01 Graduate adversary probes into the suite**  after: W1-01  acceptance: 4, 5
+- Files: loom-workflow/tests/loom-herdr/test_herdr_search_adversarial.py
+- Test: A4 positive: snippet-dotted-capital; negative: limit-negative-rejected. A5 positive: history-malformed-record-unsearchable; boundary: probes-store-emptied.
+- Risk: agent-decided — the three probes caught real defects, so they move from the change store into the package suite (closing-review probe graduation).
+
 ## Simplicity check
 - skill README in English only, as dbt-model-style and git-memory ship — taken
 - budget exception line instead of raising the budget — declined: adds an exception to every later count.
