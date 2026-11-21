@@ -15,7 +15,7 @@ Codex, Antigravity CLI and OpenCode:
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.27.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
 | [`loom-code`](loom-code/README.md) | 3.87.1 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
-| [`loom-workflow`](loom-workflow/README.md) | 5.26.0 | 15 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
+| [`loom-workflow`](loom-workflow/README.md) | 5.27.0 | 16 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions, herdr pane and conversation operation. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
 links open its README; skill links below open the detailed usage guide.
@@ -125,7 +125,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.26.0. Workflow tools used around the stations; most work without
+Version 5.27.0. Workflow tools used around the stations; most work without
 `loom-code`. Explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -145,6 +145,7 @@ attach to the flow.
 | [`project-retro`](loom-workflow/skills/project-retro/README.md) | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | [`loom-visualization`](loom-workflow/skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
 | [`loom-interactive-diagram`](loom-workflow/skills/loom-interactive-diagram/README.md) | Create and validate editable diagrams for standalone or Loom discussions; ask before editing an external diagram whether to copy it into the project. |
+| [`loom-herdr`](loom-workflow/skills/loom-herdr/README.md) | Operate herdr panes, agents and conversations with herdr's own instructions plus conversation search; selected only when you name herdr. |
 | [`goal-create`](loom-workflow/skills/goal-create/README.md) | Create a session goal prompt (invoked by name only). |
 | [`dbt-model-style`](loom-workflow/skills/dbt-model-style/README.md) | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | [`using-loom-workflow`](loom-workflow/skills/using-loom-workflow/README.md) | Optional router to the right workflow tool. |
