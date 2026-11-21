@@ -8,6 +8,7 @@ not open in any pane. Plain case-insensitive substring match; no index.
 
 import argparse
 import json
+import re
 import sqlite3
 import subprocess
 import sys
@@ -31,11 +32,13 @@ def collect_text(value, out):
 
 
 def snippet(text, query):
-    idx = text.lower().find(query)
-    if idx < 0:
+    # Match on the original text: lower() can change length (e.g. "İ"), so an
+    # index found in text.lower() would slice the wrong part of text.
+    found = re.search(re.escape(query), text, re.IGNORECASE)
+    if not found:
         return None
-    start = max(0, idx - 40)
-    end = idx + len(query) + 80
+    start = max(0, found.start() - 40)
+    end = found.end() + 80
     body = " ".join(text[start:end].split())
     return ("..." if start else "") + body + ("..." if end < len(text) else "")
 
@@ -58,9 +61,14 @@ def jsonl_texts(path):
                 continue
             if not isinstance(record, dict):
                 continue
+            payload = record.get("payload")
             if not cwd:
-                cwd = record.get("cwd") or (record.get("payload") or {}).get("cwd") or ""
-            body = record.get("message", record.get("payload"))
+                cwd = record.get("cwd") or (
+                    payload.get("cwd") if isinstance(payload, dict) else ""
+                ) or ""
+                if not isinstance(cwd, str):
+                    cwd = ""
+            body = record.get("message", payload)
             # Codex session_meta and developer items carry system prompts, not conversation.
             if record.get("type") == "session_meta" or (
                 isinstance(body, dict) and body.get("role") in ("developer", "system")
@@ -204,8 +212,8 @@ class Search:
                 self.add(agent, cwd or session[0], session[1], pane)
             else:
                 raise LookupError(f"unsupported agent {agent!r}")
-        except (LookupError, OSError, sqlite3.Error) as exc:
-            reason = exc.args[0] if isinstance(exc, LookupError) else str(exc)
+        except Exception as exc:  # one bad transcript must not abort the run
+            reason = exc.args[0] if isinstance(exc, LookupError) and exc.args else str(exc)
             self.unsearchable.append(row(agent, cwd, f"unsearchable: {reason}", pane))
         return sid
 
@@ -225,16 +233,23 @@ class Search:
         except LookupError as exc:
             if opencode_db(self.home).exists():
                 self.unsearchable.append(row("opencode", "", f"unsearchable: {exc.args[0]}"))
-        except sqlite3.Error as exc:
+        except Exception as exc:  # e.g. sqlite3.Error or malformed message data
             self.unsearchable.append(row("opencode", "", f"unsearchable: {exc}"))
 
     def history_jsonl(self, agent, path):
         try:
             cwd, texts = jsonl_texts(path)
-        except OSError as exc:
+        except Exception as exc:  # one bad transcript must not abort the run
             self.unsearchable.append(row(agent, "", f"unsearchable: {exc}"))
             return
         self.add(agent, cwd, texts)
+
+
+def non_negative_int(value):
+    number = int(value)
+    if number < 0:
+        raise argparse.ArgumentTypeError("limit must be 0 or more")
+    return number
 
 
 def main(argv=None):
@@ -243,7 +258,8 @@ def main(argv=None):
     parser.add_argument("--history", action="store_true",
                         help="also search transcripts not open in herdr")
     parser.add_argument("--json", action="store_true", help="emit a JSON list of rows")
-    parser.add_argument("--limit", type=int, default=20, help="maximum hit rows (default 20)")
+    parser.add_argument("--limit", type=non_negative_int, default=20,
+                        help="maximum hit rows (default 20)")
     args = parser.parse_args(argv)
     query = args.query.lower()
     if not query:
@@ -260,7 +276,7 @@ def main(argv=None):
     if args.history:
         search.history(open_ids)
 
-    rows = search.hits[: max(args.limit, 0)] + search.unsearchable
+    rows = search.hits[: args.limit] + search.unsearchable
     if args.json:
         print(json.dumps(rows, ensure_ascii=False, indent=1))
     else:

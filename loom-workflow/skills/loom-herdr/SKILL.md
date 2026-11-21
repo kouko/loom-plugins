@@ -68,7 +68,8 @@ This agent leads; the other agent only answers.
 6. When a screen read does not show the complete reply, use the official
    file hand-off: create the directory with `mktemp -d`, outside the repo,
    ask the other agent to write its reply there, read the
-   file, and delete the directory at the end.
+   file, and delete the directory whenever the conversation ends, including
+   on a timeout, a `blocked` state or a changed target.
 7. At the round cap or when done, report the outcome to the user.
 
 ### Codex sandbox

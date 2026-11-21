@@ -54,6 +54,7 @@ def test_full_reply_read_beyond_screen():
     assert "mktemp -d" in body
     assert re.search(r"outside the repo", body)
     assert re.search(r"delete", body, re.I)
+    assert re.search(r"delete the directory whenever the conversation ends", body)
 
 
 def test_timeout_or_blocked_ends_with_report():
