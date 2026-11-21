@@ -8,9 +8,13 @@ How to wire optional **opt-in, per-user** telemetry for loom-workflow
 skill invocations.
 
 This document is the operational counterpart to
-`scripts/skill-telemetry.py` (historical: removed). Telemetry data lives **on each user's
+`scripts/skill-telemetry.py`. Telemetry data lives **on each user's
 local machine**; nothing is committed to the repo, and there is no
 server-side aggregation in this scaffold.
+
+(Note 2026-11-21: `scripts/skill-telemetry.py`, named above and in the
+`skill-telemetry.py export --strip-*` step under Privacy stance and the
+hook setup under Option B, has been removed from this repository.)
 
 ---
 
@@ -44,7 +48,7 @@ The telemetry script is designed to minimize data sensitivity:
 3. **`prompt_summary` is opt-in** — only set if the user explicitly
    provides a non-sensitive summary
 4. **Sanitized export** — when sharing logs (e.g., for cross-user
-   research), use `skill-telemetry.py export --strip-*` (historical: removed) to redact
+   research), use `skill-telemetry.py export --strip-*` to redact
    user-id / notes / prompt summary
 
 The intended threat model: a single user wants per-skill usage
@@ -64,7 +68,7 @@ Skip hooks entirely; log events from your terminal manually after
 notable sessions:
 
 ```bash
-# historical: scripts/skill-telemetry.py removed
+# historical (2026-11-21): script removed
 python3 scripts/skill-telemetry.py log \
     --skill complexity-critique \
     --plugin loom-workflow \
@@ -78,7 +82,7 @@ skills you care about, without taking on hook configuration.
 
 ### Option B: Hook-driven (more comprehensive but env-dependent)
 
-Configure your `~/.claude/settings.json` to call the telemetry (historical: script removed)
+Configure your `~/.claude/settings.json` to call the telemetry
 script on relevant events. The exact hook event names depend on
 your Claude Code version's hook API.
 
@@ -115,11 +119,12 @@ intentionally agnostic.
 Periodically (or as part of quarterly audit step 2):
 
 ```bash
+# historical (2026-11-21): script removed
 # Per-skill usage summary
-python3 scripts/skill-telemetry.py summarize  # historical: script removed
+python3 scripts/skill-telemetry.py summarize
 
 # Filter to a single skill
-python3 scripts/skill-telemetry.py summarize --skill skill-refactor  # historical: script removed
+python3 scripts/skill-telemetry.py summarize --skill skill-refactor
 ```
 
 Output is JSON suitable for piping to `jq` or further analysis.
@@ -150,7 +155,7 @@ If you ever need to share aggregate telemetry (research project,
 team sync, debugging session):
 
 ```bash
-# historical: scripts/skill-telemetry.py removed
+# historical (2026-11-21): script removed
 python3 scripts/skill-telemetry.py export \
     --out /tmp/sanitized.jsonl \
     --strip-prompt-summary \
@@ -187,8 +192,9 @@ The audit runbook step 2 (skill lifecycle state review) consumes
 telemetry summaries:
 
 ```bash
+# historical (2026-11-21): script removed
 # Identify skills with low invocation count over the last quarter
-python3 scripts/skill-telemetry.py summarize | jq '.by_skill | to_entries[] | select(.value.invokes < 5) | .key'  # historical: script removed
+python3 scripts/skill-telemetry.py summarize | jq '.by_skill | to_entries[] | select(.value.invokes < 5) | .key'
 ```
 
 Skills with persistent low usage become candidates for

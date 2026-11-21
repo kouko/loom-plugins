@@ -162,6 +162,10 @@ Currently outstanding (as of v1.7.0):
 - skill-tuning: 1 real-skill walkthrough verifying A/B flow
   produces meaningful preference signal
 
+(Note 2026-11-21: skill-refactor and skill-tuning moved to the
+`skill-dev-toolkit` plugin; track their validation gates there, not in
+this repository's CHANGELOG.)
+
 Action items:
 - [ ] All outstanding validation gates inventoried
 - [ ] Each gate >2 quarters outstanding has explicit accept-risk
@@ -173,10 +177,14 @@ Goal: detect drift in skills that have been using
 `scripts/score_history.py` for evaluation tracking. The tool ships with
 the `skill-dev-toolkit` plugin (skill-judge moved there).
 
-For each skill with a `.skill-judge-history.jsonl` file:
+For each skill with a `.skill-judge-history.jsonl` file, run
+`score_history.py` from the installed skill-dev-toolkit plugin's
+`skills/skill-judge/scripts/` folder (not from this repository root;
+skill-dev-toolkit is not part of this repository):
 
 ```bash
-python3 skill-dev-toolkit/skills/skill-judge/scripts/score_history.py \
+# <skill-dev-toolkit-install> = the installed plugin's folder, outside this repo
+python3 <skill-dev-toolkit-install>/skills/skill-judge/scripts/score_history.py \
     drift <skill>/.skill-judge-history.jsonl
 ```
 

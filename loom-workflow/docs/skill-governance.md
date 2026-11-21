@@ -22,13 +22,13 @@ For each shared resource, exactly one location is the canonical
 Source of Truth (SSOT). Functional copies elsewhere are managed
 via the same-PR drift rule.
 
-### loom-workflow internal SSOT (historical: moved to skill-dev-toolkit)
+### loom-workflow internal SSOT
 
 | Convention / Resource | Canonical Location | Functional Copies | Enforced By |
 |---|---|---|---|
-| `golden-anchor-protocol` | `skills/skill-refactor/references/golden-anchor-protocol.md` | `skills/skill-tuning/references/golden-anchor-protocol.md` | `scripts/check-shared-conventions-drift.py` (CI) (historical: removed) |
-| `test-prompts-schema` | `skills/skill-refactor/references/test-prompts-schema.md` | `skills/skill-tuning/references/test-prompts-schema.md` | `scripts/check-shared-conventions-drift.py` (CI) (historical: removed) |
-| `constitution-schema` | `skills/skill-refactor/references/constitution-schema.md` | `skills/skill-tuning/references/constitution-schema.md` | `scripts/check-shared-conventions-drift.py` (CI) (historical: removed) |
+| `golden-anchor-protocol` | `skills/skill-refactor/references/golden-anchor-protocol.md` | `skills/skill-tuning/references/golden-anchor-protocol.md` | `scripts/check-shared-conventions-drift.py` (CI) |
+| `test-prompts-schema` | `skills/skill-refactor/references/test-prompts-schema.md` | `skills/skill-tuning/references/test-prompts-schema.md` | `scripts/check-shared-conventions-drift.py` (CI) |
+| `constitution-schema` | `skills/skill-refactor/references/constitution-schema.md` | `skills/skill-tuning/references/constitution-schema.md` | `scripts/check-shared-conventions-drift.py` (CI) |
 | Multi-judge ensemble protocol | `skills/skill-refactor/references/multi-judge-ensemble.md` | (none — skill-refactor specific) | none needed |
 | Refactor moves catalog | `skills/skill-refactor/references/refactor-moves-catalog.md` | (none — skill-refactor specific) | none needed |
 | Equivalence check protocol | `skills/skill-refactor/references/equivalence-check-protocol.md` | (none — skill-refactor specific) | none needed |
@@ -37,6 +37,12 @@ via the same-PR drift rule.
 | Preference log schema | `skills/skill-tuning/references/preference-log-schema.md` | (none — skill-tuning specific) | none needed |
 | Self-trained judge pipeline | `skills/skill-tuning/references/self-trained-judge-pipeline.md` | (none — skill-tuning specific) | none needed |
 | Architecture planning doc | `loom-workflow/docs/skill-evolution-architecture.md` | (none — single canonical) | none needed |
+
+(Note 2026-11-21: skill-refactor and skill-tuning, with every
+`skills/skill-refactor/…` and `skills/skill-tuning/…` file in the table
+above, moved to the `skill-dev-toolkit` plugin.
+`scripts/check-shared-conventions-drift.py`, listed under Enforced By,
+has been removed from this repository; no drift check runs here.)
 
 ### Cross-plugin SSOT
 
@@ -107,18 +113,23 @@ Annotation in plugin README:
 3. Write the convention as a reference file in canonical location
 4. For each skill that consumes it, copy as functional copy with
    header blockquote pointing to canonical
-5. Update `scripts/check-shared-conventions-drift.py` (historical: removed)
+5. Update `scripts/check-shared-conventions-drift.py`
    `SHARED_CONVENTIONS` manifest to include the new pair
 6. Update this governance doc's SSOT Registry section
-7. Verify drift CI passes locally (historical: drift CI removed)
+7. Verify drift CI passes locally
 
 ### Editing an existing shared convention
 
 1. **Edit canonical location first**
 2. Mirror to all functional copies in the **same PR**
-3. CI gate enforces this via `check-shared-conventions-drift.py` (historical: removed)
+3. CI gate enforces this via `check-shared-conventions-drift.py`
 4. Update header blockquote on canonical/copies if SSOT location
    itself moves (rare; requires explicit governance decision)
+
+(Note 2026-11-21: `scripts/check-shared-conventions-drift.py` and its
+CI gate have been removed from this repository, so step 5 and step 7 of
+"Adding" and step 3 of "Editing" above no longer have a script or CI
+job to run.)
 
 ### Deleting a shared convention
 
@@ -242,4 +253,7 @@ skill-internal README beyond its lighter-discipline scope.
 | Removing slash command without deprecation period | Breaking change; users with stale references confused |
 | Skipping NOTICE / LICENSE for derivative skills | Attribution chain breaks; legal compliance risk |
 | Letting validation gates remain OUTSTANDING indefinitely | Architecture doc §6 lists validation gates per phase; deferring forever defeats the purpose |
-| Not running `check-shared-conventions-drift.py` (historical: removed) locally before push | CI catches but developer time wasted on flagging push |
+| Not running `check-shared-conventions-drift.py` locally before push | CI catches but developer time wasted on flagging push |
+
+(Note 2026-11-21: `check-shared-conventions-drift.py`, named in the last
+row above, has been removed from this repository.)
