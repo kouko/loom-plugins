@@ -6,11 +6,12 @@ sources:
   - resource: feat-knowledge-triage-v1 (2026-07-18) — bucket-vocabulary drift guard, T5 implementer finding
 ---
 
-Historical case (2026-07-18; the test and the loom-spec and loom-discovery
-plugins are no longer in the repo):
-`scripts/test_bucket_vocabulary_consistency.py` pinned byte-identity of the
+(Note 2026-11-21: historical case from 2026-07-18; the test and the
+loom-spec and loom-discovery plugins are no longer in the repo.)
+
+`scripts/test_bucket_vocabulary_consistency.py` pins byte-identity of the
 three-bucket pin blocks across loom-code, loom-spec, and the plan doc, and
-ran in `loom-code-ci.yml` (whose pytest line then covered repo-root `scripts/`).
+runs in `loom-code-ci.yml` (whose pytest line covers repo-root `scripts/`).
 But that workflow's `paths:` filter originally listed only `loom-code/**` +
 `scripts/**` + `docs/loom/**` — so a PR editing ONLY
 `loom-spec/.../domain-tag-triage.md` or

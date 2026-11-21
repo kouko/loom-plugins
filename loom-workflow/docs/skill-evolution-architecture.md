@@ -42,19 +42,21 @@ explicit accept-risk or schedule-validation decision is required.
 
 ## Original Planning Doc Begins Below
 
+*(Note 2026-11-21: the planning doc below is kept verbatim and names
+skills and paths as they were then. `complexity-critique` has since been
+retired in favour of `critique` (mode: complexity), and
+`skill-creator-advance`, `skill-judge`, `skill-refactor` and
+`skill-tuning` now ship in the `skill-dev-toolkit` plugin, so its
+`loom-workflow:skill-*` names and `loom-workflow/skills/skill-*` paths
+read today as `skill-dev-toolkit:skill-*`.)*
+
 ---
 
 ## 1. Context — Why This Doc Exists
 
 ### What we already have
 
-*(History: this is what loom-workflow shipped when the plan was written.
-`complexity-critique` has since been retired in favour of `critique`
-(mode: complexity), and the skill-modifying skills (`skill-creator-advance`,
-`skill-judge`, `skill-refactor`, `skill-tuning`) now live in the
-`skill-dev-toolkit` plugin.)*
-
-At planning time loom-workflow shipped:
+loom-workflow currently ships:
 - `skill-creator-advance` — creation + general iterative improvement + eval infrastructure (grader / comparator / analyzer agents + run_loop scripts) + description optimization
 - `skill-judge` — advisory 8-dimension quality rubric (0–120 scale, never modifies)
 - `git-memory` — out of scope here
@@ -173,7 +175,7 @@ These nine differences are the *implementation guidance* for the two SKILL.md fi
 **Problem**: "edit or optimize an existing skill" is too broad — it claims territory that skill-refactor and skill-tuning will own.
 
 **Proposed**:
-> Create new skills, do major redesigns of existing skills (add/split/merge phases, change agent decomposition, redesign workflow), measure skill performance with iterative eval-driven development, and optimize a skill's description for better triggering accuracy. Use when users want to create a skill from scratch, redesign or significantly rewrite a skill, run evals, benchmark, or optimize description triggering. Do NOT use for token / structure refactor with output equivalence (use `skill-dev-toolkit:skill-refactor`) or human-judged A/B output quality testing (use `skill-dev-toolkit:skill-tuning`). Do NOT use for domain-team skills (use `domain-teams:skill-team`). スキル作成・大規模再設計・評価ループ。技能建立・大幅重設計・評估迴圈。
+> Create new skills, do major redesigns of existing skills (add/split/merge phases, change agent decomposition, redesign workflow), measure skill performance with iterative eval-driven development, and optimize a skill's description for better triggering accuracy. Use when users want to create a skill from scratch, redesign or significantly rewrite a skill, run evals, benchmark, or optimize description triggering. Do NOT use for token / structure refactor with output equivalence (use `loom-workflow:skill-refactor`) or human-judged A/B output quality testing (use `loom-workflow:skill-tuning`). Do NOT use for domain-team skills (use `domain-teams:skill-team`). スキル作成・大規模再設計・評価ループ。技能建立・大幅重設計・評估迴圈。
 
 ### 5.2 "Improving an Existing Skill" section (lines 235–264) — convert to router
 
@@ -188,10 +190,10 @@ When a user wants to improve an existing skill, first determine
 which kind of improvement:
 
 (a) Token reduction / structure cleanup with output behavior unchanged
-    → Hand off to `skill-dev-toolkit:skill-refactor`. Do not handle here.
+    → Hand off to `loom-workflow:skill-refactor`. Do not handle here.
     
 (b) Output quality / A/B variant exploration with human judgment
-    → Hand off to `skill-dev-toolkit:skill-tuning`. Do not handle here.
+    → Hand off to `loom-workflow:skill-tuning`. Do not handle here.
     
 (c) Structural change — add/split/merge phases, change agent
     decomposition, redesign workflow, change input/output contract
@@ -211,7 +213,7 @@ The 5-dimension diagnose stays for case (c). It's wrong-shape for cases (a) and 
 
 This section is fine as-is, but should add a note distinguishing from skill-tuning:
 
-> The blind comparator uses a subagent as judge (LLM-as-judge). For taste-sensitive output where LLM-judge is known to be unreliable (creative writing, voice, design feel), use `skill-dev-toolkit:skill-tuning` instead — that skill uses human judgment per iteration and accumulates a preference log.
+> The blind comparator uses a subagent as judge (LLM-as-judge). For taste-sensitive output where LLM-judge is known to be unreliable (creative writing, voice, design feel), use `loom-workflow:skill-tuning` instead — that skill uses human judgment per iteration and accumulates a preference log.
 
 ---
 
@@ -233,15 +235,11 @@ This is a single PR, mostly text edits. Doesn't break existing flows. Worth doin
 
 ### Phase C — implement skill-refactor (medium risk)
 
-*(History: the paths below are where the plan put skill-refactor and
-skill-tuning; both skills now ship in the `skill-dev-toolkit` plugin, not
-loom-workflow.)*
-
 Required components:
-- `skills/skill-refactor/SKILL.md` — Iron Law / Gate Function (equivalence Q + token Q + invariant Q) / verdict (PROCEED / RESHAPE / REJECT) / refactor hat editor prompt
-- `commands/skill-refactor.md`
+- `loom-workflow/skills/skill-refactor/SKILL.md` — Iron Law / Gate Function (equivalence Q + token Q + invariant Q) / verdict (PROCEED / RESHAPE / REJECT) / refactor hat editor prompt
+- `loom-workflow/commands/skill-refactor.md`
 - LICENSE / NOTICE if any upstream attribution
-- `skills/skill-refactor/README.{en,ja,zh-TW}.md`
+- `loom-workflow/skills/skill-refactor/README.{en,ja,zh-TW}.md`
 - Optional: `references/equivalence-check-protocol.md` (how to check semantic output equivalence with subagent)
 - Optional: `references/refactor-moves.md` (catalog of refactor-hat-safe transformations)
 - plugin.json bump 1.5.0 → 1.6.0 + CHANGELOG
@@ -254,10 +252,10 @@ Risk: LLM equivalence check needs validation. If "is output A equivalent to outp
 ### Phase D — implement skill-tuning (higher uncertainty)
 
 Required components:
-- `skills/skill-tuning/SKILL.md` — variant-generation editor prompt, A/B harness protocol, preference logging
-- `commands/skill-tuning.md`
+- `loom-workflow/skills/skill-tuning/SKILL.md` — variant-generation editor prompt, A/B harness protocol, preference logging
+- `loom-workflow/commands/skill-tuning.md`
 - LICENSE / NOTICE
-- `skills/skill-tuning/README.{en,ja,zh-TW}.md`
+- `loom-workflow/skills/skill-tuning/README.{en,ja,zh-TW}.md`
 - Optional: `references/ab-harness.md` (how to spawn variants + present to user)
 - Optional: `references/preference-log-schema.md`
 - plugin.json bump + CHANGELOG

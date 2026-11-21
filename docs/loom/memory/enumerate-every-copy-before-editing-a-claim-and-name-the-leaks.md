@@ -74,14 +74,18 @@ that [[an-instrument-can-be-correct-at-every-step-and-still-not-support-its-judg
 identifies as the fatal property of a measurement that never persists. Moving it
 here fixes where it lives, not what it is.
 
-**The unwrapping half was once mechanised; the obligation half never was.**
-`scripts/claim_copy_sweep.py` (2026-08-03, since removed from the repo) closed
-the hard-wrap leak. Measured live on the corpus of that time:
+**The unwrapping half is now mechanised; the obligation half is not.**
+`scripts/claim_copy_sweep.py` (2026-08-03) closes the hard-wrap leak. Measured
+live on this corpus, re-runnable as printed:
 
 ```
 grep -rln "architectural blast radius" --include='*.md' .   # contiguous
-python3 scripts/claim_copy_sweep.py --claim "architectural blast radius"  # removed
+python3 scripts/claim_copy_sweep.py --claim "architectural blast radius"
 ```
+
+(Note 2026-11-21: `scripts/claim_copy_sweep.py` has since been removed from
+the repo, so the command above no longer runs; sweep by hand as "How to
+apply" describes.)
 
 The sweep returned every file the grep returned **plus** files the grep
 reported as clean — one of those being this very entry's sibling
@@ -89,15 +93,16 @@ reported as clean — one of those being this very entry's sibling
 split across a line break. No total is stated here on purpose:
 the first attempt at this passage quoted one, and the count moved between two
 runs minutes apart because writing the passage added the phrase to the corpus
-it was counting. That is leak three, live. Re-run a sweep rather than
+it was counting. That is leak three, live. Re-run the command rather than
 citing a figure.
-The sweep also separated operative hits from history (plugin CHANGELOGs, in
-that run), because [[big-rename-operative-frozen-sweep]] records an automated
-sweep rewriting history into self-contradiction; it reported and never edited,
-for the same reason. **Nothing obliges a repairer to sweep** — that was left
-open deliberately rather than added as another gate; the synonym leak likewise
-stays open by nature, and extra phrasings only cover restatements you already
-know about.
+The sweep additionally separates operative hits from history (plugin
+CHANGELOGs, in that run), because
+[[big-rename-operative-frozen-sweep]] records an automated sweep rewriting
+history into self-contradiction. It reports and never edits, for the same
+reason. **Nothing still obliges a repairer to run it** — that was left open
+deliberately rather than added as another gate; the synonym leak likewise
+stays open by nature, and `--also` only covers restatements you already know
+about.
 [[pin-shared-wording-in-plan-copies-transcribe-from-pin]] is the prevention-side
 sibling: it stops copies from diverging when you already know a wording will fan
 out; this entry is for the copies you did not know about.

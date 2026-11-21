@@ -12,9 +12,13 @@ only the test roots in its `TEST_ROOTS` constant and skips `tests/local/`.
 A test placed next to the code it tests (in `scripts/` or a skill folder)
 runs locally and is a real dev-time check, but it **never gates in CI**.
 
-Caught twice in one arc (2026-07-19, under the CI lanes of that time): a
-plan first routed SKILL.md pins into a lane CI never ran, and a script's
-pytest had no CI gate until a paired test was added in a gated lane.
+Caught twice in one arc: a plan first routed finishing-SKILL pins to
+`loom-code/tests/*.sh` (dark) → moved to `loom-code/scripts/test_*.py`;
+and a `privacy-scan.py` pytest had no CI gate → added a paired bash CLI
+test under `dev-workflow/tests/`.
+
+(Note 2026-11-21: that arc, 2026-07-19, ran under the CI lanes of that
+time; dev-workflow and those per-plugin lanes are no longer in this repo.)
 
 **Why:** "the test passes locally" and "the test gates in CI" are
 different claims. A dark test gives false regression confidence — the
