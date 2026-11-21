@@ -34,3 +34,16 @@ scaffold's own `.codex/hooks/contract/` copy as gate work, while
 two exemption sets are aligned. The intent status grammar in
 `loom-code/contract/manifest.yaml` (`open | confirmed | withdrawn`) also
 lacks the `closed <date> — PR #<N>` form the ship station writes.
+
+(Note 2026-11-22: the "Known gap carried forward" paragraph above is
+2026-09-03 history. `push.dispatch-covers-tasks` and the scaffold's
+`.codex/hooks/contract/` copy no longer exist, and the intent status
+grammar in `loom-code/contract/manifest.yaml` now includes
+`closed <date> — PR #<N>`. The checkpoint lesson still applies: do not
+let the first run of a whole-branch publication check happen at ship.
+Today `loom_checker.py --list-rules` lists `push.contextual-body` and
+`ci.pr-floor` as the publication checks, and `loom_checker.py push --hook`
+only refuses direct git commit, merge or push on main/master and reminds
+of the verification status. Run
+`loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha>` and
+the complete package suite at each wave end, not first at ship.)

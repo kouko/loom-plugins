@@ -1,6 +1,6 @@
 ---
 name: contract-class-review-does-not-reach-generated-artifacts
-description: A clause added to docs-reviewer's dimensions binds only where its scope contract lets it look — since the 0.75.0 contract-class narrowing, record-class docs/** (generated briefs/plans/specs) exit review scope before dimension evaluation runs, so a template-contract enforcement clause reaches the template files themselves but never the instances writers generate from them; instance-level gating needs its own check in whatever actually reads instances (for plans: in 2026-08 plan-document-reviewer, since retired; today `loom_checker.py` plan rules and the reviewer's Plan lens in loom-code/skills/closing-review/references/lenses.md)
+description: In 2026-08 (docs-reviewer and its 0.75.0 contract-class scope, since retired), a clause added to docs-reviewer's dimensions bound only where its scope contract let it look — record-class docs/** (generated briefs/plans/specs) exited review scope before dimension evaluation ran, so a template-contract enforcement clause reached the template files but never the generated instances. The lesson stands: before citing a reviewer as the feedback loop, check it actually reads the instances. Today no `loom_checker.py` rule enforces slot presence in generated plans (the closing-review Plan lens scores deletion-first only); enforcing it needs a new checker rule
 type: gotcha
 sources:
   - resource: feat/visualization-trigger-layer (2026-08-11) — T5 code-quality reviewer caught the plan's own Notes overstating docs-reviewer coverage ("the loop for plans is covered at branch time"), corrected in the plan's Decision Log
@@ -37,3 +37,8 @@ Today base that check on `loom-code/agents/reviewer.md` and the lenses in
 `loom-code/skills/closing-review/references/lenses.md`, and on which
 files the dispatching station passes the reviewer (the plan lens, for
 one, receives the draft plan before Build).
+
+(Note 2026-11-22: receiving the draft plan does not make the Plan lens a
+slot check; it scores `deletion-first` only. No current `loom_checker.py`
+rule checks a diagram slot, so the open debt above would need a new
+`plan.*` checker rule.)

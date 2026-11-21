@@ -1,6 +1,6 @@
 ---
 name: a-docs-reviewer-dimension-sentence-gates-templates-not-generated-instances
-description: A sentence added to docs-reviewer's omission (or any) dimension row reaches only contract-class `.md` — skill files, references, agents, hooks — because record-class `docs/**` is outside its jurisdiction; it never gates the generated briefs, plans, or specs the sentence is written about, so instance-level enforcement must be a validator or a reviewer that reads instances (in 2026-08 plan-document-reviewer and the spec validator; today `loom_checker.py` rules such as plan.field-caps and spec.req-grammar, or the reviewer's Plan lens in closing-review/references/lenses.md), and the change's plan should say which one — recorded twice now (2026-08-11 diagram slot, 2026-08-17 table routing)
+description: In 2026-08 (docs-reviewer, since retired), a sentence added to docs-reviewer's omission (or any) dimension row reached only contract-class `.md` — skill files, references, agents, hooks — because record-class `docs/**` was outside its jurisdiction; it never gated the generated briefs, plans, or specs the sentence was written about. The lesson stands: check which artifact a reviewer actually reads before counting a lens sentence as enforcement. Today no `loom_checker.py` rule enforces a slot such as a diagram or table in generated plans or specs (the closing-review Plan lens scores deletion-first only), so enforcing one needs a new checker rule; the change's plan should name it or record the gap — recorded twice (2026-08-11 diagram slot, 2026-08-17 table routing)
 type: gotcha
 sources:
   - resource: branch loom-doc-container (loom-code 0.85.0, 2026-08-17) — brief Decision, Task 5; precedent docs/loom/plans/2026-08-11-visualization-trigger-layer.md Decision Log 1
@@ -36,3 +36,8 @@ against the lenses in
 files the dispatching station hands it (for example, the plan lens reads
 a draft plan before Build) rather than assuming a lens sees every
 generated brief, plan or spec.
+
+(Note 2026-11-22: the Plan lens scores `deletion-first` only, so it does
+not enforce a slot's presence; no current `loom_checker.py` rule checks a
+diagram or table slot either. Enforcing one would need a new checker
+rule, for example a `plan.*` rule beside `plan.field-caps`.)

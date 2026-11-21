@@ -56,10 +56,15 @@ before trusting any corpus result:
   read the transcripts — the fired-skill count does not grade text.
 
 **Historical (note 2026-11-21):** until the Loom 1.0 cutover (commit
-eae874c43, 2026-09-03) these safeguards were enforced by
-`loom-code/scripts/loom_firing_harness.py`, whose `parse_corpus` took
-file content rather than a path and whose module docstring held the
-authoritative trap list (#1–#6), with corpora under
+eae874c43, 2026-09-03) these safeguards were documented in
+`loom-code/scripts/loom_firing_harness.py`, which enforced some of them:
+its `run` mode refused fewer than 4 turns (#1), `filter_contaminated`
+discarded contaminated records (#3) and the `grade` mode separated
+EXACT / FAMILY / OVER (#4); `validate_corpus` only warned on short
+queries (#2), corpus phrasing was a hand-authoring rule (#5), and
+whether a recommendation surfaced needed manual transcript inspection
+(#6). Its `parse_corpus` took file content rather than a path, its module
+docstring held the authoritative trap list (#1–#6), and corpora lived under
 `docs/loom/firing-corpus/`. That harness, its parser and its corpus are
 removed; the safeguards above are kept from its docstring because they
 still apply to any hand-run `claude -p` corpus.

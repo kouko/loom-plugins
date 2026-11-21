@@ -98,7 +98,15 @@ Action items:
 - [ ] No Active skill has been untouched for >12 months without
       recent invocation evidence (suggests it should be Deprecated)
 - [ ] All Deprecated >3 months reviewed for Retired transition
-- [ ] Lifecycle table in governance doc updated if states changed
+- [ ] Any state change (deprecation, merge, retirement) recorded in
+      the new release's entry in `loom-workflow/CHANGELOG.md`, and the
+      Skills table in `loom-workflow/README.md` updated to match
+
+(Note 2026-11-22: the last item used to read "Lifecycle table in
+governance doc updated if states changed". That table in
+`skill-governance.md` is now a historical snapshot, kept as written.
+Lifecycle decisions are recorded in `loom-workflow/CHANGELOG.md`, and
+the README Skills table lists the skills that ship today.)
 
 ### 3. Convention drift inspection
 
@@ -177,10 +185,12 @@ Currently outstanding (as of v1.7.0):
 `skill-dev-toolkit` plugin; track their validation gates there, not in
 this repository's CHANGELOG.)
 
-Action items:
-- [ ] All outstanding validation gates inventoried
-- [ ] Each gate >2 quarters outstanding has explicit accept-risk
-      or schedule-validation decision
+(Note 2026-11-22: this step is historical; skip it. The search above
+finds only the skill-refactor and skill-tuning gates, which belong to
+`skill-dev-toolkit`. loom-workflow keeps no OUTSTANDING validation gates
+today. The step's former action items were "All outstanding validation
+gates inventoried" and "Each gate >2 quarters outstanding has explicit
+accept-risk or schedule-validation decision".)
 
 ### 6. Skill-judge score history (if data available)
 
@@ -219,7 +229,13 @@ Goal: catch stale documentation.
 - [ ] Plugin README version line matches plugin.json version
 - [ ] Plugin README skills table matches actual skills directory
 - [ ] CHANGELOG.md most recent entry is for the current version
-- [ ] Governance doc SSOT Registry has no orphaned entries
+- [ ] Governance doc SSOT Registry rows that still apply here (the
+      Cross-plugin SSOT table and the Architecture planning doc row)
+      name files that exist
+
+(Note 2026-11-22: this item used to read "Governance doc SSOT Registry
+has no orphaned entries". The other loom-workflow internal rows moved to
+`skill-dev-toolkit` and stay in the registry as history.)
 - [ ] Architecture doc §10 acceptance criteria still reflect
       reality (skills that have shipped should not still appear
       as "to be implemented")

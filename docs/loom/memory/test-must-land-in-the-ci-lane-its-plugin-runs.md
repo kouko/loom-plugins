@@ -1,6 +1,6 @@
 ---
 name: test-must-land-in-the-ci-lane-its-plugin-runs
-description: A new test only gates if it lands in a lane CI actually runs — loom-family CI runs scripts/run_package_tests.py --only <group> over the TEST_ROOTS it names (skipping each root's local/ folder), the group is chosen by test TYPE (every shell test runs in loom-workflow CI's workflow-shell group), and a guarded path triggers the test only if it is in that workflow's paths:; a test dropped outside those lanes is a dark test that passes locally and never gates
+description: A new test only gates if it lands in a lane CI actually runs — loom-family CI runs `python3 scripts/run_package_tests.py --loom-family --only <group>` over the TEST_ROOTS it names (skipping each root's local/ folder), the group is chosen by test TYPE (every shell test runs in loom-workflow CI's workflow-shell group), and a guarded path triggers the test only if it is in that workflow's paths:; a test dropped outside those lanes is a dark test that passes locally and never gates
 type: gotcha
 sources:
   - resource: PR closeout-privacy-gate (2026-07-19) — caught twice at plan + execution time

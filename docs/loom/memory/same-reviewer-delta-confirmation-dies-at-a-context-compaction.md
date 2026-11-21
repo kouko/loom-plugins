@@ -64,15 +64,18 @@ recall:
 2. Prefer closing the fix→confirm cycle **before** starting unrelated work,
    while the handle is certainly live. A confirmation deferred across other
    tasks is a confirmation gambling on context length.
-3. When the handle IS already lost, the honest path is neither repair
-   above: let the fix ride into closing-review's **Round 3 terminal
-   verification**, which reviews the final digest once
-   (`loom-code/skills/closing-review/SKILL.md` §4), and **state in the
-   report that these fixes were never delta-confirmed by the reviewer that
-   raised them, and why**. The disclosure is the load-bearing part; a
-   silently unconfirmed fix and a disclosed one differ entirely to whoever
-   reads the close-out. If no round remains, the episode ends
-   `NON_CONVERGENT` (same section) rather than in a fresh reviewer.
+3. When the handle IS already lost, recover the same reviewer first: a
+   `SendMessage` to its recorded `name:` resumes it from its transcript.
+   `loom-code/agents/reviewer.md` (§Fix rounds) requires each later round
+   of the episode to resume **the same agent
+   that wrote the previous round's verdict, never a fresh one**, and
+   disclosure does not replace that reviewer. If the same reviewer cannot
+   be recovered, report the verification as incomplete under
+   closing-review's execution-failure rules
+   (`loom-code/skills/closing-review/SKILL.md` §4): an unavailable
+   executor may retry once against the same functional-content digest,
+   and a second failed attempt ends the episode as `EXECUTION_FAILED`.
+   Do not carry the fixes into Round 3 under a different reviewer.
 
 Historical (2026-08-13): the fallback then was to let the fix ride into
 **whole-branch review** — which reads the whole diff anyway; that

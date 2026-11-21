@@ -9,13 +9,16 @@ sources:
   - resource: 2026-11-20-stale-doc-references adversary probe test_deleted_memory_lesson_survives.py (the two deletions dropped this shared lesson)
 ---
 
-`scripts/run_package_tests.py` collects pytest files and `test-*.sh`
-shell tests. CI also runs check scripts as their own steps, which the
+`python3 scripts/run_package_tests.py --loom-family` collects pytest
+files and `test-*.sh` shell tests, and without `--only` also runs the
+`workflow-mermaid` group (npm install, Mermaid validator and its
+negative check). CI also runs check scripts as their own steps, which the
 package suite never calls. A branch can therefore be green locally and
 red in CI.
 
-As of 2026-11-21 the CI workflows run, among others, these checks
-outside the package suite. This list is not complete; the source is the
+As of 2026-11-22 the CI workflows run, among others, these checks,
+which the complete runner (`--loom-family` without `--only`) does not
+invoke. This list is not complete; the source is the
 `run:` lines of `.github/workflows/*.yml`.
 
 - `agy plugin validate ./loom-code` (and `./loom-design`,
@@ -32,9 +35,6 @@ outside the package suite. This list is not complete; the source is the
 - `python3 loom-code/scripts/check-skill-crossrefs.py`
 - `python3 loom-code/scripts/loom_checker.py pr-floor` with the PR body,
   base, head and branch (`loom-pr-floor-reusable.yml`)
-- `python3 scripts/run_package_tests.py --loom-family --only workflow-mermaid`
-  after `npm ci --prefix loom-workflow/tests/mermaid`
-  (`loom-workflow-ci.yml`)
 
 The two earlier cases were a skill-structure word cap and a living-spec
 `@req` tag check, each a CI step the local suite did not run. The

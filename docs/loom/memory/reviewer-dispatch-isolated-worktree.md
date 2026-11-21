@@ -59,5 +59,17 @@ TOLD to stay inside, not something granting a worktree achieves.
 Note 2026-11-21: `subagent-driven-development` and
 `finishing-a-development-branch`, with the dispatch guidance and the
 close-out gate above, were removed at the Loom 1.0 cutover (commit
-eae874c43, 2026-09-03); today no successor enforces this mechanically,
-so the standing rule rests on the dispatch prompt alone.
+eae874c43, 2026-09-03). Today three separate things bear on it:
+
+- In-host reviewers: only prompt instructions. `loom-code/agents/reviewer.md`
+  tells the reviewer not to edit anything in the repository; nothing
+  mechanically stops a checkout in the orchestrator's tree, so the
+  standing rule above still rests on the dispatch prompt.
+- Outside reviews: `loom-code/skills/external-review/SKILL.md` asks Codex
+  for a read-only command sandbox, Claude Code for restricted modes with
+  only `Read`, `Glob` and `Grep`, and Antigravity for plan mode with its
+  terminal sandbox.
+- PR publication: `loom_checker.py open-pr`
+  (`loom-code/scripts/loom_checker/command_handlers/publish.py`) requires
+  a symbolic current branch and refuses a detached HEAD. It replaces no
+  close-out commit gate; it only stops publishing from a detached HEAD.
