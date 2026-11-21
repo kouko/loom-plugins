@@ -32,7 +32,13 @@ and followed the extension marker.
 `herdr pane list` gives `agent_session.value` per pane. Of 17 live panes:
 Claude 2/2 and Codex 6/6 resolved to `~/.claude/projects/*/<id>.jsonl` and
 `~/.codex/sessions/*/*/*/*<id>.jsonl`; OpenCode 3 ids stored in
-`~/.local/share/opencode/opencode.db` (not verified); 5 plain shells.
+`~/.local/share/opencode/opencode.db`; 5 plain shells.
+
+OpenCode verified 2026-11-22 (read-only `file:...opencode.db?mode=ro`):
+`select count(*) from session_v2 where id='ses_ede59df38ffehTza7vSEgg2iF7'` → 1;
+`select count(*) from session_message where session_id=<same>` → 20, text in
+`data` JSON (e.g. `{"text":"請先看一下當前的實作",...}`); the same id is absent
+from legacy `session` and `part`/`message` tables.
 
 ## Pitfalls from upstream issues (reported by a research subagent, not re-verified)
 #2900 `--current` outside a pane falls back to the focused pane; #4764 name
