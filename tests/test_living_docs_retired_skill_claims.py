@@ -31,10 +31,10 @@ CASES = [
      r"Note 2026-11-21: the list above is as of v1\.7\.0\.[^\n]*(?:\n[^\n]+)*?\bcritique\b"),
     ("docs/loom/memory/same-reviewer-delta-confirmation-dies-at-a-context-compaction.md",
      r"`requesting-docs-review`'s Directive 2\s+encodes it",
-     None),
+     r"\(Note 2026-11-21: `requesting-docs-review` was removed\.[^\n]*(?:\n[^\n]+)*?same reviewers"),
     ("docs/loom/memory/docs-review-dogfood-must-probe-the-evidence-class-trap.md",
-     r"On every future change to docs-review contracts\s+\(requesting-docs-review",
-     None),
+     r"On every future change to docs-review contracts\s+(?:>\s*)?\(requesting-docs-review",
+     r"\*\*Historical procedure \(2026-07-30, no longer current\):\*\*[^\n]*(?:\n[^\n]+)*?\bverbatim:"),
 ]
 
 
@@ -59,6 +59,6 @@ def test_living_docs_retired_skill_names_absent_as_current():
 
 def test_old_name_without_dated_note_is_flagged():
     """Removing the dated note from a historical file exposes the old name."""
-    for rel, pattern, note in CASES[:3]:
+    for rel, pattern, note in CASES:
         text = re.sub(note, "", (ROOT / rel).read_text(encoding="utf-8"))
         assert _is_stale(text, pattern, note), rel
