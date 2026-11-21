@@ -59,7 +59,8 @@ need it.
    second.
 2. **Do not narrate task-ownership history in a code artifact.** Record the
    boundary and its rationale — which is durable — and leave the history to the
-   plan's Decision Log, which is where anyone looking for it will go.
+   commit messages and the plan's task entries in `## Task DAG`, which is where
+   anyone looking for it will go.
 3. **Orchestrators: treat "plan amended" as invalidating in-flight dispatches that
    quote it.** Either finish plan amendments before dispatching implementers who
    will cite the plan, or tell the dispatch explicitly that the plan is being edited

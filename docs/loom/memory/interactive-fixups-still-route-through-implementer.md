@@ -1,6 +1,6 @@
 ---
 name: interactive-fixups-still-route-through-implementer
-description: In interactive fix-up rounds outside an SDD dispatch, reviewer findings must still be routed through an implementer dispatch — the main agent fixing them by direct edit is the recorded test-skipping leak path
+description: In interactive fix-up rounds (Build or closing-review fix rounds, worked outside an implementer dispatch), reviewer findings must still be routed through an implementer dispatch — the main agent fixing them by direct edit is the recorded test-skipping leak path
 type: process
 sources:
   - resource: PR #492 (loom-code 0.23.0; TDD-miss mining across 57 sessions, 2026-07-04)
@@ -17,6 +17,12 @@ is the recorded leak path by which untested production code ships:
 mining of past sessions found this exact pattern (miss pattern A3 —
 25 production edits with zero tests, and review PASS never flagged
 them).
+
+Note 2026-11-21: the subagent-driven development (SDD) skill was
+removed; today Build makes `loom-code:implementer` dispatch mandatory
+for every implementation task and forbids the main agent substituting
+itself (`loom-code/skills/build/SKILL.md`), and closing-review returns
+fixes to Build. The rule here still applies to those fix rounds.
 
 **Why:** the implementer dispatch is what carries the test-first
 discipline; direct edits bypass it silently, and reviewers did not

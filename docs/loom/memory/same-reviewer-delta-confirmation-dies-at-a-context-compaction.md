@@ -9,11 +9,13 @@ sources:
 Delta confirmation is this repo's standard resolution for a gating
 verdict: fix once, then have **the same reviewer** confirm the delta via
 `SendMessage`, never a fresh whole-corpus round. Ten-plus live runs made it
-standard; the retired `requesting-docs-review` skill encoded it as its
-Directive 2. Today closing-review's Round 2 resumes the same reviewers over
-the fix delta (`loom-code/skills/closing-review/SKILL.md`), and
+standard; `requesting-docs-review`'s Directive 2 encodes it.
+
+(Note 2026-11-21: `requesting-docs-review` was removed. Today
+closing-review's Round 2 resumes the same reviewers over the fix delta
+(`loom-code/skills/closing-review/SKILL.md`), and
 `loom-code/agents/reviewer.md` "Fix rounds" requires the resumed agent to be
-the one that wrote the previous verdict, never a fresh one.
+the one that wrote the previous verdict, never a fresh one.)
 
 It has an unstated lifetime. The reviewer is addressable only by a handle —
 its `agentId`, or a `name:` if one was assigned — and that handle lives in
@@ -38,8 +40,15 @@ themselves at that moment are wrong:
 **How to apply.** Treat reviewer handles as *perishable state*, not as
 recall:
 
-1. **Dispatch any reviewer whose verdict may need a fix round with a stable
-   `name:`, and record THAT name in the plan** — never the `agentId`. An
+1. **Today:** resume the same reviewer with whatever mechanism the host
+   provides; closing-review owns that resume (Round 2,
+   `loom-code/skills/closing-review/SKILL.md`), and do not record a
+   reviewer name in the plan — verification identity belongs to the
+   attestation (`loom-code/contract/manifest.yaml`, the plan's `must_not`
+   "verification identity … goes_to: attestation"), which
+   `finalize-review` writes. **Historical (2026-08-13) recipe:** dispatch
+   any reviewer whose verdict may need a fix round with a stable
+   `name:`, and record THAT name in the plan — never the `agentId`. An
    agentId is session-scoped and the harness forbids surfacing it, so writing
    one into a committed artifact is both prohibited and useless: it resolves
    nowhere in a later session. A `name:` is a plain string the dispatcher
@@ -55,13 +64,20 @@ recall:
 2. Prefer closing the fix→confirm cycle **before** starting unrelated work,
    while the handle is certainly live. A confirmation deferred across other
    tasks is a confirmation gambling on context length.
-3. When the handle IS already lost, **state in the report that these fixes
-   were never confirmed by the reviewer that raised them, and why**. The
-   disclosure is the load-bearing part; a silently unconfirmed fix and a
-   disclosed one differ entirely to whoever reads the close-out. Historical
-   (2026-08-13): the fallback then was to let the fix ride into the
-   whole-branch review of that time; that review no longer exists, and
-   closing-review defines no fallback for a lost reviewer handle.
+3. When the handle IS already lost, the honest path is neither repair
+   above: let the fix ride into closing-review's **Round 3 terminal
+   verification**, which reviews the final digest once
+   (`loom-code/skills/closing-review/SKILL.md` §4), and **state in the
+   report that these fixes were never delta-confirmed by the reviewer that
+   raised them, and why**. The disclosure is the load-bearing part; a
+   silently unconfirmed fix and a disclosed one differ entirely to whoever
+   reads the close-out. If no round remains, the episode ends
+   `NON_CONVERGENT` (same section) rather than in a fresh reviewer.
+
+Historical (2026-08-13): the fallback then was to let the fix ride into
+**whole-branch review** — which reads the whole diff anyway; that
+whole-branch review became closing-review's branch-end review of the
+cumulative content.
 
 **Contradiction check:** does not contradict
 [[agent-contract-edits-do-not-reach-this-sessions-subagents]] — that entry is

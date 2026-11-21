@@ -39,8 +39,19 @@ before trusting any corpus result:
   orient-first queries hit the turn ceiling, which reads as a trigger miss;
 - give each query enough context to route — a context-less query draws a
   clarifying question instead, which also reads as a false miss;
-- exclude session-limit and error records from grading, and report how
-  many were excluded rather than dropping them silently;
+- exclude session-limit records and genuine execution failures from
+  grading, and report how many were excluded rather than dropping them
+  silently — but KEEP `error_max_turns` records and grade them normally:
+  a session that fires a skill and keeps working past the turn cap can
+  hold a valid skill invocation;
+- grade EXACT and FAMILY separately: a fire of a sibling skill in the
+  expected skill's family counts as FAMILY, never folded into EXACT;
+  and for a query that expects no skill, count an over-trigger only when
+  a skill of the family under test fires — a correct non-family routing
+  is not an over-trigger;
+- write the corpus as phrasings derived from each skill's description,
+  seasoned with the few real natural triggers, rather than mining
+  transcripts wholesale (they are mostly "go/OK" continuations);
 - when invocation counts cannot show whether a recommendation appeared,
   read the transcripts — the fired-skill count does not grade text.
 

@@ -50,8 +50,8 @@ no scope unless someone writes one.
    split immediately.
 3. A downstream task that touches a surface an upstream task only presumed about
    must be given an explicit obligation to RE-CONFIRM it. That obligation, not a
-   test, is what caught this — write it into the plan's Decision Log where the
-   next dispatch packet will carry it.
+   test, is what caught this — write it into the downstream task's own entry in
+   the plan's `## Task DAG`, where the next dispatch packet will carry it.
 4. Both failure directions need naming. This entry's plan predicted a leak and
    got a deletion; a prediction of the direction is itself a claim that can be
    wrong, so pin the behaviour, not the prediction.

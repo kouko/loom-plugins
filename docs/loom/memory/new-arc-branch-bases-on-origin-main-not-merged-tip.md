@@ -27,9 +27,10 @@ the wrong diff.
 origin/main tip, not from a local possibly-squash-merged tip. The
 recommended form is `git fetch origin && git checkout -b <branch>
 <main-tip-sha>`, with `<main-tip-sha>` resolved via
-`git rev-parse origin/main` after the fetch — per
-`environment-gotchas.md` §S3, which records the guard's observed
-behavior: `git checkout -b <branch> origin/main` is not actually
+`git rev-parse origin/main` after the fetch — as recorded in the
+since-removed `environment-gotchas.md` §S3 (deleted at the Loom 1.0
+cutover, commit eae874c43, 2026-09-03), which recorded the guard's
+observed behavior: `git checkout -b <branch> origin/main` is not actually
 blocked, but the sha form still gives the freshness check below an
 explicit, pinned value to verify against instead of a moving ref. If
 the worktree is parked on a merged branch, that convenience is the
