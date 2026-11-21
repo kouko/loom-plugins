@@ -62,6 +62,16 @@ One wave of three independent content tasks, then release metadata. The W1 negat
 - Test: A4 positive: complete-package-suite-passes; boundary: release-metadata-synchronized.
 - Risk: agent-decided — loom-code patch bump for PRODUCT-SPEC; loom-workflow stays 5.26.1 (unreleased) with its CHANGELOG entry extended.
 
+**W4-05 Fix adversary findings on renewed acceptance**  after: W4-04  acceptance: 1, 2, 3
+- Files: `loom-workflow/docs/quarterly-audit-runbook.md`, `loom-workflow/docs/skill-governance.md`, `loom-workflow/docs/telemetry-setup.md`, `docs/loom/memory/*.md`, `docs/loom/memory/index.md`
+- Test: A1 negative: out-of-repo-command-not-presented-as-runnable-here; A3 positive: ci-only-check-lesson-cited-in-a-surviving-entry.
+- Risk: agent-decided — restore the CI-only-checks lesson as a rewritten entry around today's CI-only checks; inline historical markers move into separate dated notes.
+
+**W5-01 Graduate the renewed-acceptance probes into the package suite**  after: W4-05  acceptance: 1, 3
+- Files: `tests/test_living_docs_runbook_commands_resolve.py`, `tests/test_memory_ci_only_check_lesson.py`
+- Test: A1/A3 positive: graduated-probes-pass-at-head; negative: probes-red-at-7f862daec.
+- Risk: agent-decided — review.probe-graduation: both probes caught defects; copy without the concern header.
+
 ## Simplicity check
 - Add a permanent checker for dead paths in memory — declined: new mechanism beyond the intent; existing validate plus adversary probes cover this change.
 - Mark W1 negative cases as one-off evidence, not permanent tests — taken
