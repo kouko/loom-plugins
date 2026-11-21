@@ -55,8 +55,10 @@ has been removed from this repository; no drift check runs here.)
 
 ## Ownership
 
-Each skill has an **owner** responsible for its lifecycle.
-Historical snapshot (kept as written, before the skill-dev-toolkit move):
+Each skill has an **owner** responsible for its lifecycle:
+
+(Note 2026-11-21: the table below is a historical snapshot, kept as
+written before the skill-dev-toolkit move.)
 
 | Skill | Owner | Notes |
 |---|---|---|
@@ -91,7 +93,10 @@ A skill is always in exactly one of these states:
 | **Deprecated** | Still works but newer alternative recommended | Owner declares; description gains "Use newer-skill instead" not-trigger; subsequent PRs may strip its slash command |
 | **Retired** | No longer maintained / removed in next release | Was deprecated for ≥3 months OR explicit decision; removal is breaking change → major version bump |
 
-Annotation in plugin README (historical snapshot, kept as written):
+Annotation in plugin README:
+
+(Note 2026-11-21: the table below is a historical snapshot, kept as
+written.)
 
 | Skill | State | Since |
 |---|---|---|
@@ -151,6 +156,10 @@ job to run.)
 3. Once no skill depends, delete from canonical + all functional
    copies + drift manifest in same PR
 
+(Note 2026-11-21: the drift manifest in step 3 lived in the removed
+`scripts/check-shared-conventions-drift.py`; no drift manifest exists
+in this repository today.)
+
 ---
 
 ## Cross-Plugin Contract
@@ -160,8 +169,8 @@ Per repo-level `CLAUDE.md` §Cross-Plugin Delegation Contract:
 - Plugin-A consuming Plugin-B's resources passes paths, not content
 - Single source of truth lives in the authority plugin
 - Cross-plugin runtime dependency is acceptable when consumer
-  explicitly signals it (e.g., `critique` mode: complexity's mindset
-  references, formerly complexity-critique's)
+  explicitly signals it (e.g., complexity-critique's mindset
+  references)
 - For zero-runtime-dependency cases, use SSOT-and-functional-copy
   (PR #159 precedent)
 
@@ -170,6 +179,14 @@ Two-Hats split (skill-refactor / skill-tuning) shares 3
 conventions via SSOT-and-functional-copy specifically to preserve
 runtime independence (each skill installable / runnable without
 the other).
+
+(Note 2026-11-21: the repo-level `CLAUDE.md` cited above is the
+monkey-skills-era file; today's `CLAUDE.md` only includes `AGENTS.md`,
+which has no Cross-Plugin Delegation Contract section, so the list
+above is a historical record of that contract. `complexity-critique` is
+now `critique` (mode: complexity). The Two-Hats split (skill-refactor /
+skill-tuning) and its three shared conventions now live in the
+`skill-dev-toolkit` plugin, not in loom-workflow.)
 
 ---
 
@@ -215,6 +232,11 @@ Quarterly audits review:
 
 See `loom-workflow/docs/quarterly-audit-runbook.md` for the
 operational checklist.
+
+(Note 2026-11-21: no drift CI runs in this repository, so item 3 is a
+manual check (runbook step 3). The skill-refactor / skill-tuning
+validation gates in item 5 moved with those skills to the
+`skill-dev-toolkit` plugin and are tracked there.)
 
 ---
 
@@ -275,3 +297,6 @@ skill-internal README beyond its lighter-discipline scope.
 
 (Note 2026-11-21: `check-shared-conventions-drift.py`, named in the last
 row above, has been removed from this repository.)
+
+(Note 2026-11-21: for the first row, no drift script runs in CI here;
+drift is caught only by the manual check in runbook step 3.)

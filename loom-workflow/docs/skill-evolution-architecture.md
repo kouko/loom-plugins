@@ -7,6 +7,13 @@ now also tracks implementation status across the 5-PR rollout.
 **Last status update**: 2026-04-29 (post-v2.0.0 rename)
 **Trigger**: research into `alchaincyf/darwin-skill` + critique of LLM-as-judge for taste-sensitive output.
 
+(Note 2026-11-21: this status section is frozen as of v2.0.0 and is no
+longer updated. The convention drift CI it lists under H3 has been
+removed from this repository. skill-creator-advance, skill-judge,
+skill-refactor and skill-tuning moved to the `skill-dev-toolkit`
+plugin, so the outstanding validation gates below are tracked there,
+not in quarterly-audit-runbook step 5.)
+
 ## Implementation Status (as of v2.0.0)
 
 | PR | Version | Scope | Status |

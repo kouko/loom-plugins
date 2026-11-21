@@ -71,8 +71,10 @@ whole-branch review is designed to catch; the match test-suite proves it.)
   (bash-3.2-safe: collect-SHAs-first avoids empty-array-under-`set -u`).
 - Malformed `--match` regex validated up front (exit 1, clean message).
 - Two `loom-code:code-reviewer` whole-branch reviews, both
-  PASS_WITH_NOTES with all notes addressed. (Note 2026-11-21: that agent
-  is now `loom-code:reviewer`.)
+  PASS_WITH_NOTES with all notes addressed.
 - Dogfood: post-merge `memory-grep.sh --verify c5bad9b7` exits 0 — the
   trailers survived the squash mid-body, confirming the skill's core bet
   on a real squash-merged `main`.
+
+(Note 2026-11-21: the `loom-code:code-reviewer` agent named above is now
+`loom-code:reviewer`.)

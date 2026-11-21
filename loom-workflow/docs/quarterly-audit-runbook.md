@@ -45,33 +45,40 @@ Whenever any of these happen:
 - [ ] Current git status clean (no in-flight branches that block
       file inspection)
 - [ ] `gh` CLI authenticated; can read PRs
-- [ ] Python 3.11+ available for running CI scripts locally
+- [ ] Python 3 available for running `score_history.py` (step 6)
 
 ---
 
 ## The audit checklist
 
-### 1. SSOT registry verification
+### 1. Skill membership and licensing
 
-Goal: ensure governance doc's SSOT Registry matches reality.
+Goal: confirm the plugin's skill list and licensing match what is on
+disk.
 
 ```bash
-# (historical) The convention drift check, scripts/check-shared-conventions-drift.py,
-# has been removed; the shared conventions now live in skill-dev-toolkit.
-
-# Check ownership tables in skill-governance.md vs actual LICENSE
-# files in each skill directory
-for skill in loom-workflow/skills/*/; do
-    name=$(basename "$skill")
-    echo "=== $name ==="
-    head -5 "$skill/LICENSE" 2>/dev/null | grep -i copyright || echo "  (no LICENSE or no copyright line)"
-done
+# Skills that ship in loom-workflow today
+ls loom-workflow/skills
+# Skills that carry their own LICENSE (all others follow the
+# repository-level LICENSE)
+ls loom-workflow/skills/*/LICENSE*
 ```
 
 Action items:
-- [ ] All conventions in registry pass drift check (historical: drift check removed)
-- [ ] Each skill's LICENSE matches stated owner in governance doc
-- [ ] Any new shared convention added since last audit is in registry
+- [ ] `ls loom-workflow/skills` matches the Skills table in
+      `loom-workflow/README.md`
+- [ ] Each skill without its own LICENSE is covered by the
+      repository-level `LICENSE`; each skill listed by the second
+      command (as of 2026-11-21, only `critique`) still has its LICENSE
+      and NOTICE
+
+(Note 2026-11-21: this step used to verify the SSOT Registry in
+`skill-governance.md` by running `scripts/check-shared-conventions-drift.py`,
+and to compare each skill's LICENSE with the owner named in the
+governance doc's ownership table. That script has been removed, the
+registry's conventions moved to the `skill-dev-toolkit` plugin, and the
+ownership table is a historical snapshot, so those checks no longer
+apply here.)
 
 ### 2. Skill lifecycle state review
 
@@ -95,21 +102,25 @@ Action items:
 
 ### 3. Convention drift inspection
 
-Goal: catch any drift not caught by CI (e.g., conceptual drift
-between skill behavior and convention documentation).
+Goal: catch drift between the mindsets bundled in
+`loom-workflow/skills/critique/references/` and their canonical copies
+in `domain-teams:code-team/standards/mindset-*.md` (see
+`loom-workflow/skills/critique/NOTICE`).
 
-For each shared convention:
-- Read the canonical version
-- Verify the skills that depend on it still implement the
-  documented behavior (sample-based; spot-check a few skills)
-- If drift discovered: file an action item to either align skill
-  with convention or update convention to reflect skill reality
+- Read the canonical version of each mindset
+- Verify critique's bundled copy still matches it
+- If drift discovered: file an action item to either align the copy
+  with the canonical version or record why it differs
 
 Action items:
-- [ ] All 3 shared conventions (golden-anchor / test-prompts /
-      constitution) spot-checked against consuming skills
-- [ ] Cross-plugin conventions (mindsets in code-team) verified
-      consistent with loom-workflow:critique (mode: complexity) consumption
+- [ ] Each bundled mindset in critique compared with its canonical
+      copy in domain-teams:code-team
+
+(Note 2026-11-21: this step used to spot-check the three shared
+conventions (golden-anchor / test-prompts / constitution) and catch
+"drift not caught by CI". Those conventions moved to the
+`skill-dev-toolkit` plugin with skill-refactor and skill-tuning, and no
+drift CI runs in this repository.)
 
 ### 4. External dependency audit
 
