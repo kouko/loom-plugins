@@ -56,8 +56,8 @@ Whenever any of these happen:
 Goal: ensure governance doc's SSOT Registry matches reality.
 
 ```bash
-# Run the convention drift CI locally
-python3 scripts/check-shared-conventions-drift.py
+# (historical) The convention drift check, scripts/check-shared-conventions-drift.py,
+# has been removed; the shared conventions now live in skill-dev-toolkit.
 
 # Check ownership tables in skill-governance.md vs actual LICENSE
 # files in each skill directory
@@ -163,12 +163,13 @@ Action items:
 ### 6. Skill-judge score history (if data available)
 
 Goal: detect drift in skills that have been using
-`scripts/score_history.py` for evaluation tracking.
+`scripts/score_history.py` for evaluation tracking. The tool ships with
+the `skill-dev-toolkit` plugin (skill-judge moved there).
 
 For each skill with a `.skill-judge-history.jsonl` file:
 
 ```bash
-python3 loom-workflow/skills/skill-judge/scripts/score_history.py \
+python3 skill-dev-toolkit/skills/skill-judge/scripts/score_history.py \
     drift <skill>/.skill-judge-history.jsonl
 ```
 

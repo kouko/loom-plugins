@@ -1,5 +1,9 @@
 # Skill Telemetry Setup
 
+> **Historical.** `scripts/skill-telemetry.py` has been removed from
+> this repository; no script ships for the commands below. Kept as the
+> record of the original opt-in telemetry design.
+
 How to wire optional **opt-in, per-user** telemetry for loom-workflow
 skill invocations.
 

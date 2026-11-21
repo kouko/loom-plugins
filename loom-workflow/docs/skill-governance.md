@@ -1,5 +1,10 @@
 # Skill Governance
 
+> **Historical in part.** skill-refactor and skill-tuning (and their
+> shared conventions below) moved to the `skill-dev-toolkit` plugin;
+> `scripts/check-shared-conventions-drift.py` has been removed from this
+> repository and no drift check runs here.
+
 How loom-workflow's family of skills is governed: who owns what,
 how conventions evolve, when skills retire, and how cross-plugin
 contracts are enforced.

@@ -18,7 +18,7 @@ this directory is written by the stations.
 The artifact type of any path is decided by the `artifact_types` mapping
 in `loom-code/contract/manifest.yaml` — `docs/loom/intent/**` is an intent, `**/evidence/**`
 is evidence, `docs/loom/memory/**` is memory, `docs/loom/maps/**` is a
-map. That mapping is what tells Build and the review station which of
+map (a manifest pattern only; no `maps/` store exists in this repo). That mapping is what tells Build and the review station which of
 the three verification actions a file owes: the adversarial programs at
 the end of Build, then read and acceptance testing in review.
 
