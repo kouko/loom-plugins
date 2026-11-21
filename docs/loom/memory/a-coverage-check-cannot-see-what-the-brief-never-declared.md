@@ -17,12 +17,19 @@ the intent Acceptance lines it owns (`acceptance: <numbers>`). For a newly
 authored plan, `loom_checker.py` rule `intake.test-case-pair`
 (`loom-code/scripts/loom_checker/rule_checks/intake.py`,
 `check_test_case_pairs`) runs two separate checks: an ownership check, that
-every task carries the marker and every intent Acceptance line is owned by
-some task; and a test-pair check, that each task's `Test` field gives a
-positive plus a negative or boundary case for each line it owns. Tasks whose
-Files are all documentation or release-only (low-risk docs, change or
-evidence stores, release metadata at plugin root) are exempt from the
-test-pair check but not from ownership. The same gap holds: both checks bind
+every task except a legacy `W<n>-memory` task ID (which the check skips)
+carries the marker and every intent Acceptance line is owned by some task;
+and a test-pair check, that each task's `Test` field gives a positive plus a
+negative or boundary case for each line it owns. `_is_task_exempt_from_test_pairs`
+skips the test-pair check (not ownership) only when every Files entry is one
+of: a `.md`/`.mdx`/`.rst`/`.txt` file outside `docs/loom/`; such a file under
+`docs/loom/<change-id>/` or `docs/loom/evidence/`; or a bare one-component
+entry `plugin.json`, `CHANGELOG.md`, `README`, `README.md`, `README.markdown`
+or `README.txt`. A test path, or any path with a component in `agents`,
+`api`, `cli`, `commands`, `contract`, `hooks`, `skills` or `templates` (or a
+protected name such as `SKILL.md`), keeps the pairs. A repository-relative
+manifest is not exempt: a Files entry of `loom-code/plugin.json` or
+`loom-code/.claude-plugin/plugin.json` still requires pairs. The same gap holds: both checks bind
 only to Acceptance lines the intent declared, so an obligation the repo's conventions impose (a version
 bump, an index regen) must be declared in the intent or plan to be checked.
 

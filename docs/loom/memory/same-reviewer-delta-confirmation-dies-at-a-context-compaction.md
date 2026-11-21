@@ -1,6 +1,6 @@
 ---
 name: same-reviewer-delta-confirmation-dies-at-a-context-compaction
-description: The repo's standard fix-resolution mechanism — the SAME reviewer confirming a delta via SendMessage rather than a fresh whole-artifact round — is addressable only through handles held in the orchestrator's live context, so a context compaction silently destroys it for every already-completed reviewer; the loss surfaces as "I cannot remember whom to ask", never as an error, and the tempting repairs (a fresh reviewer, or flipping the ledger anyway) each discard exactly what the mechanism was protecting; the `name:`/SendMessage recipe below is the historical (2026-08-13) Claude Code example — today closing-review resumes the same reviewer through the host-specific resume mechanism, and an unrecoverable reviewer ends the episode as `EXECUTION_FAILED`
+description: 2026-08-13: the then-standard fix-resolution mechanism — the SAME reviewer confirming a delta via SendMessage rather than a fresh whole-artifact round — was addressable only through handles held in the orchestrator's live context, so a context compaction silently destroyed access to every already-completed reviewer; the loss surfaced as "I cannot remember whom to ask", never as an error, and the tempting repairs (a fresh reviewer, or flipping the ledger anyway) each discard exactly what the mechanism protects. Today closing-review resumes the same reviewer through whatever resume mechanism the host provides, and if that fails the verification is reported incomplete (one retry at most, then `EXECUTION_FAILED`).
 type: gotcha
 sources:
   - resource: brief-item-addressability arc (2026-08-13) — after a compaction, T7's and T8's reviewers were unreachable; ListAgents listed only the one still-running subagent, and no completed reviewer could be resumed
@@ -48,7 +48,12 @@ belongs to the attestation that `finalize-review` writes. If the same
 reviewer cannot be recovered, report the verification as incomplete under
 closing-review's execution-failure rules (§4): an unavailable executor may
 retry once against the same functional-content digest, and a second failed
-attempt ends the episode as `EXECUTION_FAILED`. Disclosure does not replace
+attempt ends the episode as `EXECUTION_FAILED`. If the reviewer being
+retried is an outside executor, that retry "requires a newly authorized
+review with a fresh preflight; never retry silently" (closing-review §4;
+its §2 gate `review.external-dispatch`: "every repeat outside execution is a newly
+authorized review with a fresh preflight"; `loom-code/skills/external-review/SKILL.md`:
+"A retry is a newly authorized review with a fresh preflight"). Disclosure does not replace
 that reviewer, and the fixes do not ride into a later round under a
 different reviewer.
 
