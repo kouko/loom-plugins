@@ -1,6 +1,6 @@
 ---
 name: cold-read-and-adversarial-review-catch-different-failures
-description: A fresh-context cold-read verifies a reader UNDERSTANDS a rule; an adversarial whole-branch review verifies the rule is ROBUST against a reader trying to exploit it — these are different failure classes and one does not substitute for the other on exemption/gate-mechanism changes
+description: A fresh-context cold-read verifies a reader UNDERSTANDS a rule; an adversarial pass (today Build's `loom-code:adversary` before closing-review) verifies the rule is ROBUST against a reader trying to exploit it — these are different failure classes and one does not substitute for the other on exemption/gate-mechanism changes
 type: practice
 sources:
   - resource: PR #520 (loom-code mechanical-exemption sync-script category, 2026-07-08)
@@ -33,7 +33,8 @@ mechanics involved (e.g. a SKILL.md prose clarification that doesn't
 change what an agent is *allowed to skip*). The moment a doc change
 touches an exemption, a gate, a self-check, or anything that lets an
 agent skip a safety step under some condition, treat it as
-security-relevant and get an adversarial whole-branch review — a
+security-relevant and make sure the Build-end `loom-code:adversary`
+attacks that exemption or gate before closing-review — a
 cold-read alone is not sufficient evidence the change is safe to ship,
 even if it passes cleanly.
 
@@ -43,3 +44,9 @@ this trigger rule's mechanical form: a plan-level `safety-bearing: yes`
 flag plus a guarded-path signal fires the audit before merge, rather
 than leaving "does this touch an exemption/gate/self-check" to be
 recognized by prose alone.
+
+Note 2026-11-21: `finishing-a-development-branch` and its Step 3.5 were
+removed; today the adversarial step is Build's dispatch of
+`loom-code:adversary` after all tasks land
+(`loom-code/skills/build/SKILL.md`), which runs on every change unless the
+user skips it in plain words, rather than on a `safety-bearing` flag.

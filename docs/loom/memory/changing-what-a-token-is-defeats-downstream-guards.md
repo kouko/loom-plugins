@@ -38,7 +38,7 @@ two more.
    before testing) over guards that assume a shape, even when the shape
    fix alone would close today's bug. Defense in depth here is cheap: the
    next shape change is coming.
-3. Ask the whole-branch reviewer explicitly to hunt the seam, and when it
+3. Ask closing-review's branch-end reviewers explicitly to hunt the seam, and when it
    finds one, **assume there is another** — that instruction alone turned
    up instances 3 through 6 on this branch.
 4. A structural pin is worth more than the guards: a lockstep test across

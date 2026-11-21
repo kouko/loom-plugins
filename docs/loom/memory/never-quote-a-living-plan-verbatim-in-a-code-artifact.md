@@ -1,6 +1,6 @@
 ---
 name: never-quote-a-living-plan-verbatim-in-a-code-artifact
-description: A code artifact that quotes plan prose verbatim, or narrates a task's ownership history, is false the moment the plan is amended — and under parallel SDD the orchestrator amends the plan WHILE the implementer is writing those quotes; in one round every plan quotation in an artifact was false while its code citations failed at about 1 in 12, because code is a stable citation target within a task and a plan under active amendment is not. A reviewer's own "all twelve citations hold" did not survive a second audit either
+description: A code artifact that quotes plan prose verbatim, or narrates a task's ownership history, is false the moment the plan is amended — and when the main agent amends the plan while Build's implementers are still writing (on 2026-07-30, under parallel SDD), those quotes go false mid-task; in one round every plan quotation in an artifact was false while its code citations failed at about 1 in 12, because code is a stable citation target within a task and a plan under active amendment is not. A reviewer's own "all twelve citations hold" did not survive a second audit either
 type: gotcha
 sources:
   - resource: feat-us-quarterly-statement-series Task D round 3 (US quarterly series arc, 2026-07-30)
@@ -43,6 +43,12 @@ edit into a false claim inside a committed artifact, and the artifact's author i
 not the person who will make that edit. The asymmetry — code citations failing at
 about 1 in 12 while every plan quotation in the same artifact, in the same round,
 was false — is the whole lesson.
+
+Note 2026-11-21: the subagent-driven development (SDD) workflow named
+above was removed. Today Build dispatches `loom-code:implementer` per
+task, and the main agent keeps the plan current while they run
+(`loom-code/contract/manifest.yaml`, plan `edits_after:
+plan-maintained`), so the same race applies to Build's implementers.
 
 There is a second, simpler defect underneath: **the module was narrating plan
 history at all.** "Ownership moved from Task D to Task H to Task J" is the Decision

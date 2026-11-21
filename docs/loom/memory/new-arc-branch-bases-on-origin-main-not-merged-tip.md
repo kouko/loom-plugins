@@ -34,8 +34,8 @@ observed behavior: `git checkout -b <branch> origin/main` is not actually
 blocked, but the sha form still gives the freshness check below an
 explicit, pinned value to verify against instead of a moving ref. If
 the worktree is parked on a merged branch, that convenience is the
-trap. At finishing, ALWAYS verify base freshness before dispatching
-the whole-branch reviewer:
+trap. Before closing-review, ALWAYS verify base freshness before
+dispatching its reviewers over the cumulative branch content:
 `git log --oneline origin/main..HEAD | wc -l` must equal this arc's
 commit count, and `git diff origin/main HEAD --stat` must list only this
 arc's files; a mismatch → `git rebase --onto origin/main <old-base>`
