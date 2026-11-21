@@ -69,7 +69,7 @@ done
 ```
 
 Action items:
-- [ ] All conventions in registry pass drift check
+- [ ] All conventions in registry pass drift check (historical: drift check removed)
 - [ ] Each skill's LICENSE matches stated owner in governance doc
 - [ ] Any new shared convention added since last audit is in registry
 
