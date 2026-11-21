@@ -7,6 +7,9 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.26.1] — 2026-11-21 — stale skill references
 
 - Update stale skill references in loom-workflow docs to current skill names; historical records keep the name that ran, with the current name noted.
+- Label historical references in the telemetry, governance and runbook docs, and repoint the score_history path.
+- Restore historical wording in skill-evolution-architecture and fidelity-check.
+- Correct memory lessons that cited absent targets or unsourced procedures.
 
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 

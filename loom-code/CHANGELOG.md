@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.87.1] — 2026-11-21 — stale doc references
+
+- PRODUCT-SPEC.md lists the current station skill paths.
+
 ## [3.87.0] — 2026-11-19 — implementer intent follow-ups
 
 - Build names the confirmed intent's path on every implementer dispatch, not only some of them.
