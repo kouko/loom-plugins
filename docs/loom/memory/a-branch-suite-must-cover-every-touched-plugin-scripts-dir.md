@@ -73,5 +73,6 @@ moved module's name — including by-path loads via
 
 Pairs with [[a-per-task-triad-cannot-see-cross-plugin-guard-tests]]:
 the per-task triad blindness and the verify-command blindness are two
-layers of the same cross-plugin coverage gap — whole-branch review is
-the net that catches both.
+layers of the same cross-plugin coverage gap — the complete package suite
+at the end of Build and closing-review's branch-end reviewers are the net
+that catches both.

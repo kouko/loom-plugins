@@ -24,7 +24,7 @@ catch it because the defect is disagreement BETWEEN layers, not a wrong
 statement within one.
 
 **How to apply:** treat the release note as a cross-layer summary at
-whole-branch review time — read each of its semantic claims against the
+closing-review time (the branch-end reviewers) — read each of its semantic claims against the
 layer that owns the semantics (schema file, skill text, code), and run
 any runnable upgrade-impact claim against a pre-branch store instead of
 accepting it as prose.

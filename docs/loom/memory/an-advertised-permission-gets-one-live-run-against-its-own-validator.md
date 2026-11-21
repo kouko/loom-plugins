@@ -33,6 +33,6 @@ artifact the permission licenses, run the branch's own
 validator/guard against it, and require the permitted form to pass.
 Reviewers should treat a MAY-sentence like untested code — a
 capability without one green execution is unverified, whatever the
-prose rounds said. Cheapest venue: the whole-branch review dispatch
-packet names each newly granted capability and asks one arm to
-exercise it.
+prose rounds said. Cheapest venue: Build's adversary dispatch names each newly
+granted capability and asks for one live run of it; closing-review's
+branch-end reviewers check that the run happened.
