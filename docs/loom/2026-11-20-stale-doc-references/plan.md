@@ -1,5 +1,5 @@
 # Remove stale references to deleted tools and renamed skills — plan
-intent: 2026-11-20-stale-doc-references@082671b7a
+intent: 2026-11-20-stale-doc-references@a1ba08ecf
 charter: 1.1
 
 ## Current State Evidence
@@ -13,6 +13,11 @@ charter: 1.1
 - Difference: an outside Codex review of 4ee0ebbef returned NEEDS_REVISION (12 important). The user reconfirmed a rewritten Acceptance: A1 widens from skill/agent names to every current reference (scripts, workflows, files, dirs) in named files plus a search elsewhere; A2 is new (historical wording preserved); A3 is new (memory lessons kept or justified); A4 unchanged.
 - Affected obligations: W1-01 now answers A3 and A1; W1-02 answers A1 and A2; W1-03 answers A1. Their committed work stays; evidence from the earlier digest proves only the old A1-A3 and is replaced by W4 checks.
 - Continuity: W4 tasks are new because each names a concrete changed obligation; the review episode continues under review.bounded-episode with renewed confirmation.
+
+## Requirements change (2026-11-22)
+- Difference: the review episode ended NON_CONVERGENT at dc38b83e2 because A1 and A3 covered the whole repo. The user reconfirmed a narrowed Acceptance: A1 covers new or changed claims in the diff from b2c4bdc8e, the 11 Round 3 locations and claims this change invalidates; A3 runs the validator store-wide and applies A1 to added and edited entries; unrelated pre-existing defects go to PR Follow-ups; A4 runs on the final candidate commit.
+- Affected obligations: W1 through W5 implementation stays applicable under the narrowed lines; W6-01 fixes the 11 Round 3 locations and W6-02 verifies them.
+- Continuity: a new review episode starts under the renewed confirmation.
 
 ## Task DAG
 One wave of three independent content tasks, then release metadata. The W1 negative cases are one-off evidence for this change (adversary probes or recorded grep output), not permanent tests; standing checks stay memory validate and the release pin test.
@@ -71,6 +76,16 @@ One wave of three independent content tasks, then release metadata. The W1 negat
 - Files: `tests/test_living_docs_runbook_commands_resolve.py`, `tests/test_memory_ci_only_check_lesson.py`
 - Test: A1/A3 positive: graduated-probes-pass-at-head; negative: probes-red-at-7f862daec.
 - Risk: agent-decided — review.probe-graduation: both probes caught defects; copy without the concern header.
+
+**W6-01 Fix the 11 Round 3 outside-review locations**  after: W5-01  acceptance: 1, 2, 3
+- Files: `loom-workflow/docs/quarterly-audit-runbook.md`, `docs/loom/KICKOFF-DEFAULTS.md`, `docs/loom/memory/*.md`, `docs/loom/memory/index.md`
+- Test: A1 positive: each-round-3-location-matches-its-source; negative: no-loom-family-less-command-or-mermaid-outside-suite-claim.
+- Risk: agent-decided — dated notes in separate paragraphs; sweep each defect class across the branch diff.
+
+**W6-02 Verify the renewed Acceptance**  after: W6-01  acceptance: 1, 2, 3, 4
+- Files: none (verification only)
+- Test: A3 positive: memory-validate-passes; A4 positive: complete-package-suite-passes.
+- Risk: agent-decided — run focused guards, validator and the complete suite on the final candidate.
 
 ## Simplicity check
 - Add a permanent checker for dead paths in memory — declined: new mechanism beyond the intent; existing validate plus adversary probes cover this change.
