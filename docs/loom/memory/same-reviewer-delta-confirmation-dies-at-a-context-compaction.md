@@ -61,8 +61,7 @@ recall:
    disclosed one differ entirely to whoever reads the close-out. Historical
    (2026-08-13): the fallback then was to let the fix ride into the
    whole-branch review of that time; that review no longer exists, and
-   closing-review names no lost-handle fallback today, so ask the user
-   rather than picking a repair above on your own.
+   closing-review defines no fallback for a lost reviewer handle.
 
 **Contradiction check:** does not contradict
 [[agent-contract-edits-do-not-reach-this-sessions-subagents]] — that entry is
