@@ -32,16 +32,17 @@ A green number that excludes a touched dir is a structural false-green:
 it cannot see the breakage by construction, no matter how carefully it
 is read.
 
-**Two facts above went stale and are corrected here (2026-09-01).**
-The five sibling plugins named — loom-discovery, loom-spec,
-loom-interface-design, loom-product-principles, loom-pipeline — were
-merged into a single `loom-design`, so the enumeration is now
-`loom-code/scripts`, `loom-design/scripts`, `loom-workflow/scripts`,
-repo `scripts/`, and `.claude/hooks/`. And the per-directory
-requirement is gone: the basename collision that forced it was fixed
-by giving `loom-design/scripts/` a `pytest.ini` with
-`--import-mode=importlib` plus a `pythonpath` line, so one invocation
-now collects the whole tree.
+**Historical: the directory lists above are from 2026-08-15 and no
+longer apply.** On 2026-09-01 the five sibling plugins merged into
+`loom-design`, and later every test moved out of `scripts/` into
+`tests/` folders. Today (see AGENTS.md "Test Location") the package
+suite, `python3 scripts/run_package_tests.py --loom-family`, collects
+the roots in that script's `TEST_ROOTS` constant — root `tests/`,
+`loom-code/tests/`, `loom-design/tests/`, `loom-workflow/tests/` — and
+`loom-design/tests/pytest.ini` carries loom-design's importlib import
+mode. The lesson survives unchanged: a verify run that leaves out a
+root the branch touched is green by omission, so prefer the full
+package suite over a hand-picked subset.
 
 **The mirror failure, same class, opposite direction (2026-09-01).**
 This entry says: cover every dir you CHANGED. That is half the rule. An

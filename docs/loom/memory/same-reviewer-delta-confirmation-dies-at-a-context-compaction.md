@@ -10,7 +10,10 @@ Delta confirmation is this repo's standard resolution for a gating
 verdict: fix once, then have **the same reviewer** confirm the delta via
 `SendMessage`, never a fresh whole-corpus round. Ten-plus live runs made it
 standard; the retired `requesting-docs-review` skill encoded it as its
-Directive 2, and the `loom-code:reviewer` docs lens carries it today.
+Directive 2. Today closing-review's Round 2 resumes the same reviewers over
+the fix delta (`loom-code/skills/closing-review/SKILL.md`), and
+`loom-code/agents/reviewer.md` "Fix rounds" requires the resumed agent to be
+the one that wrote the previous verdict, never a fresh one.
 
 It has an unstated lifetime. The reviewer is addressable only by a handle —
 its `agentId`, or a `name:` if one was assigned — and that handle lives in
@@ -52,12 +55,14 @@ recall:
 2. Prefer closing the fix→confirm cycle **before** starting unrelated work,
    while the handle is certainly live. A confirmation deferred across other
    tasks is a confirmation gambling on context length.
-3. When the handle IS already lost, the honest path is neither repair above:
-   let the fix ride into **whole-branch review** — which reads the whole diff
-   anyway — and **state in the report that these fixes were never
-   delta-confirmed and why**. The disclosure is the load-bearing part; a
-   silently unconfirmed fix and a disclosed one differ entirely to whoever
-   reads the close-out.
+3. When the handle IS already lost, **state in the report that these fixes
+   were never confirmed by the reviewer that raised them, and why**. The
+   disclosure is the load-bearing part; a silently unconfirmed fix and a
+   disclosed one differ entirely to whoever reads the close-out. Historical
+   (2026-08-13): the fallback then was to let the fix ride into the
+   whole-branch review of that time; that review no longer exists, and
+   closing-review names no lost-handle fallback today, so ask the user
+   rather than picking a repair above on your own.
 
 **Contradiction check:** does not contradict
 [[agent-contract-edits-do-not-reach-this-sessions-subagents]] — that entry is
