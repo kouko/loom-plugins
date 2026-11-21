@@ -1,6 +1,6 @@
 ---
 name: a-coverage-check-cannot-see-what-the-brief-never-declared
-description: brief-item coverage proves every declared item reached a task and is silent about items the brief never declared, so a requirement the repo's own conventions impose — a version bump, a mirrored sibling, an index regen — passes every coverage gate and every plan-review round by being absent rather than unmet
+description: a coverage check (2026-08 brief-item coverage; today the plan's per-task `acceptance:` numbers) proves every declared item reached a task and is silent about items never declared, so a requirement the repo's own conventions impose — a version bump, a mirrored sibling, an index regen — passes every coverage gate and every plan-review round by being absent rather than unmet
 type: process
 sources:
   - resource: 2026-08-22 contracts-cite-only-what-ships arc — three rounds of plan review, a 5-of-5 coverage pass and four whole-branch reviewers, and the missing version bump was caught by exactly one arm, in a closing note, after implementation was finished
@@ -10,6 +10,14 @@ A plan carrying `Brief item covered:` on every task, verified by
 `check_scenario_coverage.py`, proves one thing: each identifier the brief
 declared is cited by at least one task. It says nothing about whether the
 brief declared everything it should have.
+
+Note 2026-11-21: the `Brief item covered:` field and `check_scenario_coverage.py`
+were removed; today each task in `loom-code/contract/templates/plan.md` names
+the intent Acceptance lines it owns (`acceptance: <numbers>`), and
+`loom_checker.py` rule `intake.test-case-pair` checks that each named line has
+test cases. The same gap holds: those checks bind only to Acceptance lines the
+intent declared, so an obligation the repo's conventions impose (a version
+bump, an index regen) must be declared in the intent or plan to be checked.
 
 That gap has a shape. The requirement most likely to fall through it is one
 the repository's own conventions impose rather than the arc's subject matter —

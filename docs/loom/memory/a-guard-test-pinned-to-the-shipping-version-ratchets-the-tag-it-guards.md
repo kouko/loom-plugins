@@ -53,6 +53,11 @@ sort them before touching either:
 Tell them apart by the test's subject, not by the literal: if the test would
 still be meaningful with no version anywhere in it, the literal is incidental.
 
+Note 2026-11-21: `check_version_bump.py` was removed; today no check catches
+a missed bump. The per-plugin pin tests named in AGENTS.md "Versioning &
+Release" assert only that a plugin's version strings agree, so a missed bump
+must be caught by reading the diff against that rule.
+
 Related: [[a-cap-raised-at-every-touch-is-not-a-cap]] (the same
 read-the-sequence tell on a different constant);
 [[a-test-can-pin-behaviour-with-a-false-rationale]] (why the deliberate pin's

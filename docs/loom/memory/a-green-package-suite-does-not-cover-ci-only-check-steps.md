@@ -14,11 +14,15 @@ shell tests. CI also runs check scripts as their own steps, which the
 package suite never calls. A branch can therefore be green locally and
 red in CI.
 
-As of 2026-11-21, `.github/workflows/loom-code-ci.yml` runs these
-CI-only checks:
+As of 2026-11-21 the CI workflows run, among others, these checks
+outside the package suite. This list is not complete; the source is the
+`run:` lines of `.github/workflows/*.yml`.
 
+- `agy plugin validate ./loom-code` (and `./loom-design`,
+  `./loom-workflow`), in loom-code-ci.yml's Antigravity CLI step
 - `python3 scripts/check_plugin_boundaries.py <plugin>` (loom-code,
   loom-design, loom-workflow)
+- `python3 scripts/sync_codex_manifests.py --check --all`
 - `python3 loom-code/scripts/check_mechanisms.py --baseline origin/main`
   and `--measure`
 - `python3 loom-code/scripts/check_contract_citations.py`
@@ -26,6 +30,11 @@ CI-only checks:
   operative locations (CI step "Check doc citations resolve"):
   `git ls-files '*.md' | grep -E '^(docs/loom/[^/]+\.md|docs/loom/intent/|loom-(code|design|memory|workflow)/(skills|agents|references|contract)/)' | xargs python3 loom-code/scripts/check_doc_citations.py`
 - `python3 loom-code/scripts/check-skill-crossrefs.py`
+- `python3 loom-code/scripts/loom_checker.py pr-floor` with the PR body,
+  base, head and branch (`loom-pr-floor-reusable.yml`)
+- `python3 scripts/run_package_tests.py --loom-family --only workflow-mermaid`
+  after `npm ci --prefix loom-workflow/tests/mermaid`
+  (`loom-workflow-ci.yml`)
 
 The two earlier cases were a skill-structure word cap and a living-spec
 `@req` tag check, each a CI step the local suite did not run. The
@@ -34,11 +43,21 @@ leading-at-req-comment-trips-living-spec-checker).
 
 The size-cap lesson still applies: AGENTS.md sets a SKILL.md body hard cap
 of ~6,000 tokens (~4,500 words). As of 2026-11-21 no repo-wide check
-enforces it; only two per-skill tests do
-(`loom-workflow/tests/loom-memory/test_skill_contract.py` `WORD_HARD_CAP`
-and `loom-workflow/tests/scripts/test_independent_advisor_compaction.py`).
-For any other SKILL.md, verify by hand with `wc -w <skill>/SKILL.md`
-(≤ 4,500). (Historical, 2026-08-15: the cap was then enforced in CI by
+enforces it; some per-skill tests do, each with its own cap and counting
+convention. Examples:
+`loom-workflow/tests/loom-memory/test_skill_contract.py` (`WORD_HARD_CAP`),
+`loom-workflow/tests/scripts/test_independent_advisor_compaction.py`,
+`loom-workflow/tests/scripts/test_loom_visualization_compaction.py:78`,
+`loom-design/tests/spec/test_capture_intent_contract.py:164` (body only),
+and the chars/4 body-token checks in
+`loom-workflow/tests/handoff/test_handoff_skill_md.py` and
+`loom-workflow/tests/recap-state/test_skill_md.py`. Grep the plugin's
+`tests/` for `WORD_CAP` or `split()` to find others. The cap applies to
+the SKILL.md body, so for a skill with a test, count the way that test
+counts; for any other SKILL.md, strip the frontmatter and count the body
+with Python `len(body.split())` (≤ 4,500) — `wc -w` also counts the
+frontmatter, and even on the body can differ from `split()` by one (see
+[[name-the-word-count-convention-when-citing-a-count]]). (Historical, 2026-08-15: the cap was then enforced in CI by
 `scripts/check-skill-structure.py`'s word count, outside the package
 suite, run from `.github/workflows/skill-structure.yml` — see the deleted
 entries verified-gate-pytest-suite-misses-skill-structure-word-cap and
