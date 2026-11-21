@@ -25,3 +25,14 @@ generated instances; if the answer is "nothing mechanical", either add
 the instance gate (validator / plan-document-reviewer check) or record it
 as debt explicitly — never let the docs-reviewer sentence stand in for
 instance enforcement.
+
+**Historical (note 2026-11-21):** docs-reviewer, plan-document-reviewer
+and the 0.75.0 scope contract named above are retired; the setup is
+2026-08 history. The lesson stands: before a lens sentence counts as
+enforcement, check whether the reviewer actually reads the generated
+artifact. Today's reviewer is `loom-code/agents/reviewer.md`, scored
+against the lenses in
+`loom-code/skills/closing-review/references/lenses.md`; check which
+files the dispatching station hands it (for example, the plan lens reads
+a draft plan before Build) rather than assuming a lens sees every
+generated brief, plan or spec.

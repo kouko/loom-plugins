@@ -28,3 +28,12 @@ this entry tracks); for generated briefs/specs, no automated reader
 currently admits them — writer-side template obligation is the only
 layer, so weigh that when deciding whether a deferred check is safe
 debt.
+
+**Historical (note 2026-11-21):** docs-reviewer, plan-document-reviewer
+and their scope contract are retired; the routing in "How to apply" is
+the 2026-08 setup. The lesson stands — check that the reviewer actually
+reads the generated artifact before citing it as the feedback loop.
+Today base that check on `loom-code/agents/reviewer.md` and the lenses in
+`loom-code/skills/closing-review/references/lenses.md`, and on which
+files the dispatching station passes the reviewer (the plan lens, for
+one, receives the draft plan before Build).

@@ -27,10 +27,22 @@ behavior it guards can break on main with a green check. Test *type*
 target plugin's CI actually executes.
 
 **How to apply:** before choosing a new test's type + location, open the
-target plugin's `.github/workflows/*-ci.yml` and read the actual `run:`
-lines. Place the test where that workflow will execute it: for a loom
-plugin, under one of the `TEST_ROOTS` (for example a loom-code SKILL.md
-prose pin as a pytest under `loom-code/tests/`). (Extends
+target plugin's `.github/workflows/*-ci.yml` and check two things:
+
+1. the `--only <group>` its `run_package_tests.py --loom-family` step
+   selects (as of 2026-11-21: `code` in loom-code-ci.yml, `design` in
+   loom-design-ci.yml, `workflow-shell` and `workflow-python` in
+   loom-workflow-ci.yml) — the group decides which `TEST_ROOTS` and which
+   test type run (`workflow-shell` runs `test-*.sh`, the others pytest);
+2. the workflow's `pull_request:` and `push:` `paths:` filters — the new
+   test's path, and the code it guards, must match them, or the job never
+   starts for that change.
+
+Place the test where both hold (for example a loom-code SKILL.md prose
+pin as a pytest under `loom-code/tests/`). Dated examples, 2026-07-19:
+the arc above used the per-plugin commands of that time — pytest under
+`loom-code/scripts/test_*.py` for loom-code and a bash CLI test under
+`dev-workflow/tests/` for dev-workflow. (Extends
 [[gha-paths-filter-gates-at-workflow-level]]: that entry is about which
 *pushes* trigger a workflow; this is about which *tests* a triggered
 workflow actually executes.)

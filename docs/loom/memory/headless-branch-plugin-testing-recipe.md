@@ -32,4 +32,23 @@ version directories are the tell. Recipe:
 branch; without the empty directory and the probe, failed records
 look like routing bugs when they are setup bugs.
 
-**How to apply:** follow the three steps above.
+**How to apply:** follow the three steps above, plus these run safeguards
+before trusting any corpus result:
+
+- give each run a max-turns floor of at least 4 — `--max-turns 1` makes
+  orient-first queries hit the turn ceiling, which reads as a trigger miss;
+- give each query enough context to route — a context-less query draws a
+  clarifying question instead, which also reads as a false miss;
+- exclude session-limit and error records from grading, and report how
+  many were excluded rather than dropping them silently;
+- when invocation counts cannot show whether a recommendation appeared,
+  read the transcripts — the fired-skill count does not grade text.
+
+**Historical (note 2026-11-21):** until the Loom 1.0 cutover (commit
+eae874c43, 2026-09-03) these safeguards were enforced by
+`loom-code/scripts/loom_firing_harness.py`, whose `parse_corpus` took
+file content rather than a path and whose module docstring held the
+authoritative trap list (#1–#6), with corpora under
+`docs/loom/firing-corpus/`. That harness, its parser and its corpus are
+removed; the safeguards above are kept from its docstring because they
+still apply to any hand-run `claude -p` corpus.
