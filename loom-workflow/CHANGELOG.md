@@ -11,6 +11,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Restore historical wording in skill-evolution-architecture and fidelity-check.
 - Correct memory lessons that cited absent targets or unsourced procedures.
 - Quarterly-audit runbook steps 2, 5 and 7 now name current sources; the retired steps are marked historical.
+- Quarterly-audit runbook checks each upstream license against its NOTICE entry and no longer reports retired validation gates; telemetry examples are restored verbatim under a dated note.
 
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 

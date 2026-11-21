@@ -14,7 +14,9 @@ server-side aggregation in this scaffold.
 
 (Note 2026-11-21: `scripts/skill-telemetry.py`, named above and in the
 `skill-telemetry.py export --strip-*` step under Privacy stance and the
-hook setup under Option B, has been removed from this repository.)
+hook setup under Option B, has been removed from this repository. The
+command examples below are kept verbatim as the original design; none of
+them runs today.)
 
 ---
 
@@ -68,7 +70,6 @@ Skip hooks entirely; log events from your terminal manually after
 notable sessions:
 
 ```bash
-# historical (2026-11-21): script removed
 python3 scripts/skill-telemetry.py log \
     --skill complexity-critique \
     --plugin loom-workflow \
@@ -119,7 +120,6 @@ intentionally agnostic.
 Periodically (or as part of quarterly audit step 2):
 
 ```bash
-# historical (2026-11-21): script removed
 # Per-skill usage summary
 python3 scripts/skill-telemetry.py summarize
 
@@ -155,7 +155,6 @@ If you ever need to share aggregate telemetry (research project,
 team sync, debugging session):
 
 ```bash
-# historical (2026-11-21): script removed
 python3 scripts/skill-telemetry.py export \
     --out /tmp/sanitized.jsonl \
     --strip-prompt-summary \
@@ -192,7 +191,6 @@ The audit runbook step 2 (skill lifecycle state review) consumes
 telemetry summaries:
 
 ```bash
-# historical (2026-11-21): script removed
 # Identify skills with low invocation count over the last quarter
 python3 scripts/skill-telemetry.py summarize | jq '.by_skill | to_entries[] | select(.value.invokes < 5) | .key'
 ```

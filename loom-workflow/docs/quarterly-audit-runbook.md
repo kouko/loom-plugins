@@ -30,12 +30,17 @@ Quarterly:
 
 Whenever any of these happen:
 - Major skill release (new skill, breaking change, version major bump)
-- External dependency update (upstream MIT skill modified, Anthropic
+- External dependency update (upstream skill named in a NOTICE modified, Anthropic
   Skills API contract change)
 - User-reported regression that suggests systemic drift
 - Validation gate from architecture doc §6 has been completed and
   needs reflection in governance docs
 - Cross-plugin contract violation discovered
+
+(Note 2026-11-22: the validation-gate trigger above is historical;
+loom-workflow keeps no outstanding validation gates, and step 5 is
+skipped. The external-dependency trigger used to read "upstream MIT
+skill modified"; upstream licenses are those their NOTICE entries state.)
 
 ---
 
@@ -132,13 +137,15 @@ drift CI runs in this repository.)
 
 ### 4. External dependency audit
 
-Goal: ensure upstream MIT chains are intact and attribution is
-current.
+Goal: ensure upstream attribution chains are intact and each upstream
+license still matches its NOTICE entry.
 
 For each skill with NOTICE file:
 - Verify upstream URL still resolves
 - Verify upstream skill / project still exists at stated path
-- Check upstream license is still MIT (or compatible)
+- Check each upstream license still matches the license its NOTICE entry
+  states (licenses differ: loom-visualization's `NOTICE.md` lists MIT
+  entries and CC BY 4.0 for the C4 model)
 - Note any upstream updates that would warrant local sync
 
 Skills with NOTICE files (as of v1.7.0):
@@ -157,8 +164,13 @@ to the `skill-dev-toolkit` plugin; audit their NOTICE files there.)
 
 Action items:
 - [ ] All upstream URLs resolve
-- [ ] All upstream licenses confirmed still MIT
+- [ ] Each upstream license confirmed to match its NOTICE entry
 - [ ] Significant upstream updates noted for follow-up sync
+
+(Note 2026-11-22: this step used to require every upstream license to be
+"still MIT (or compatible)" and its action item read "All upstream licenses
+confirmed still MIT". The criterion is now the license each NOTICE entry
+states.)
 
 ### 5. Validation gate status
 
@@ -233,12 +245,14 @@ Goal: catch stale documentation.
       Cross-plugin SSOT table and the Architecture planning doc row)
       name files that exist
 
-(Note 2026-11-22: this item used to read "Governance doc SSOT Registry
-has no orphaned entries". The other loom-workflow internal rows moved to
-`skill-dev-toolkit` and stay in the registry as history.)
-- [ ] Architecture doc §10 acceptance criteria still reflect
-      reality (skills that have shipped should not still appear
-      as "to be implemented")
+(Note 2026-11-22: the SSOT Registry item used to read "Governance doc
+SSOT Registry has no orphaned entries". The other loom-workflow internal
+rows moved to `skill-dev-toolkit` and stay in the registry as history.
+A further item, "Architecture doc §10 acceptance criteria still reflect
+reality (skills that have shipped should not still appear as \"to be
+implemented\")", was removed: `skill-evolution-architecture.md` is the
+preserved original proposal, historical, and its wording is kept as
+written, not aligned with shipped behaviour.)
 
 ---
 
@@ -257,7 +271,6 @@ Save to `loom-workflow/docs/audit-reports/YYYY-Qn-audit.md`:
 
 - N skills active, M deprecated, K retired
 - Convention drift (manual check, §3): PASS / FAIL (details if FAIL)
-- Outstanding validation gates: N (list)
 - Score-history drift findings: N (list)
 
 ## Action items
@@ -276,6 +289,10 @@ That CI check, `scripts/check-shared-conventions-drift.py`, has been
 removed from this repository, so the line now records the manual
 convention drift inspection of §3 instead.)
 
+(Note 2026-11-22: the template also used to ask for "Outstanding
+validation gates: N (list)". Step 5 is historical and skipped, so the
+report no longer carries that line.)
+
 Commit the audit report. The next quarterly audit references the
 prior one's open action items.
 
@@ -288,14 +305,15 @@ prior one's open action items.
 | Convention drift (manual check, §3) | File an action item to align the skill or update the convention |
 | Skill should be Deprecated | Open PR adding deprecation marker + not-trigger; minor bump |
 | Skill should be Retired | Wait for 3-month deprecation; then PR removing skill; major bump |
-| Validation gate complete | Update CHANGELOG / governance doc; close gate |
-| Validation gate >2 quarters outstanding | Decision: schedule validation (one-shot PR) OR formally accept-risk (note in governance doc) |
-| External upstream broken | Investigate; if upstream gone, update NOTICE; if MIT changed, follow license terms |
+| External upstream broken | Investigate; if upstream gone, update NOTICE; if a license no longer matches its NOTICE entry, follow the new license terms and update the NOTICE |
 | Score-history drift | Investigate; possibly run skill-tuning; possibly accept (taste evolved with intent) |
 
 (Note 2026-11-21: the first row used to read "Convention drift in CI —
 Block merging until same-PR drift rule honored". No drift CI runs in this
-repository any more, so it is no longer a merge blocker.)
+repository any more, so it is no longer a merge blocker. Note 2026-11-22:
+two rows, "Validation gate complete" and "Validation gate >2 quarters
+outstanding", were removed because step 5 is historical and skipped; the
+external-upstream row used to say "if MIT changed, follow license terms".)
 
 ---
 

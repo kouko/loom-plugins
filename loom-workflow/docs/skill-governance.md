@@ -236,7 +236,10 @@ operational checklist.
 (Note 2026-11-21: no drift CI runs in this repository, so item 3 is a
 manual check (runbook step 3). The skill-refactor / skill-tuning
 validation gates in item 5 moved with those skills to the
-`skill-dev-toolkit` plugin and are tracked there.)
+`skill-dev-toolkit` plugin and are tracked there. Note 2026-11-22: for
+item 4, upstream licenses are not all MIT; the runbook's step 4 checks
+each upstream license against its NOTICE entry, and loom-visualization's
+`NOTICE.md` lists CC BY 4.0 for the C4 model.)
 
 ---
 

@@ -3,7 +3,8 @@
 
 Every `python3 <path>.py` line inside a fenced bash block of the listed
 living docs must name a file that exists in this repository, unless the
-same block marks the command historical. A command that only works from
+same block marks the command historical or the doc opens, before its
+first `## ` section, with a `> **Historical.**` banner. A command that only works from
 another repository (for example a plugin shipped elsewhere) is not a
 current reference here.
 """
@@ -19,11 +20,14 @@ DOCS = [
 ]
 
 FENCE = re.compile(r"```bash\n(.*?)```", re.S)
+HISTORICAL_DOC = re.compile(r"^> \*\*Historical\.\*\*", re.M)
 CMD = re.compile(r"^\s*python3\s+([\w./-]+\.py)\b", re.M)
 
 
 def _unresolved(text, exists=lambda p: (ROOT / p).is_file()):
     misses = []
+    if HISTORICAL_DOC.search(text.split("\n## ", 1)[0]):
+        return misses
     for block in FENCE.findall(text):
         if re.search(r"#[^\n]*\bhistorical\b", block, re.I):
             continue
@@ -48,3 +52,7 @@ def test_unresolved_historical_block_skipped():
     old = "```bash\n# historical: removed\npython3 gone/tool.py run\n```\n"
     assert _unresolved(live, exists=lambda p: False) == ["gone/tool.py"]
     assert _unresolved(old, exists=lambda p: False) == []
+    banner = "# T\n\n> **Historical.** removed\n\n## A\n" + live
+    assert _unresolved(banner, exists=lambda p: False) == []
+    late = "# T\n\n## A\n> **Historical.** removed\n" + live
+    assert _unresolved(late, exists=lambda p: False) == ["gone/tool.py"]

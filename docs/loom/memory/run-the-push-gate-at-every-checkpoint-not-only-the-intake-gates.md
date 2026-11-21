@@ -1,10 +1,25 @@
 ---
 name: run-the-push-gate-at-every-checkpoint-not-only-the-intake-gates
-description: A checkpoint that runs only the intake gates (intent / standing / contract) and never `loom_checker.py push` against HEAD reaches decision point ③ with a push gate that has never been green; on simple-loom-flow the first real run blocked on five rules, all real, and closing them cost nine review rounds, three user-run history rewrites and three blind-run addenda — run `push` at every wave-end against HEAD, and treat orchestrator-inline commits as the violation the rule says they are
+description: Do not let the first run of a whole-branch publication check happen at ship — today follow loom-code build's end-of-Build checks (complete package suite plus adversarial programs, repeated after every fix) and dry-run `loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha>`, which blocks only on PR-body structure and reports verification status separately; historical (2026-09-03): a checkpoint that ran only the intake gates and never the since-retired bare `loom_checker.py push` reached ③ with a never-green push gate that blocked on five real rules and cost nine review rounds
 type: practice
 sources:
   - resource: simple-loom-flow (2026-09-03) — rounds 22–30 of the branch-end review; findings R22-*/R23-*/R24-*, CI-1, CI-2
 ---
+
+Note 2026-11-22 (current procedure): the bare `loom_checker.py push`
+gate described below is retired; `push` now takes only `--hook`,
+`--install-git-hooks` or `--remove-git-hooks`, and `push --hook` only
+refuses direct git commit, merge or push on main/master and reminds of
+the verification status. The current checkpoint procedure is loom-code
+build's end-of-Build checks (`loom-code/skills/build/SKILL.md` §3: the
+complete package suite and every adversarial program, repeated after every
+fix), plus `loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha>`
+against the drafted PR body: `pr-floor` blocks (`BLOCK ci.pr-floor`, exit 1)
+only on PR-body structure, and reports absent or stale verification
+separately as advisory output without changing that result. Everything from
+here to the end of the entry is the 2026-09-03 history.
+
+Historical (2026-09-03):
 
 The push gate is the only rule set that recomputes the whole branch
 (trailers vs `dispatch[]`, frozen stores, probe re-execution, second
@@ -39,11 +54,5 @@ lacks the `closed <date> — PR #<N>` form the ship station writes.
 2026-09-03 history. `push.dispatch-covers-tasks` and the scaffold's
 `.codex/hooks/contract/` copy no longer exist, and the intent status
 grammar in `loom-code/contract/manifest.yaml` now includes
-`closed <date> — PR #<N>`. The checkpoint lesson still applies: do not
-let the first run of a whole-branch publication check happen at ship.
-Today `loom_checker.py --list-rules` lists `push.contextual-body` and
-`ci.pr-floor` as the publication checks, and `loom_checker.py push --hook`
-only refuses direct git commit, merge or push on main/master and reminds
-of the verification status. Run
-`loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha>` and
-the complete package suite at each wave end, not first at ship.)
+`closed <date> — PR #<N>`. For the current checkpoint procedure see the
+note at the top of this entry.)

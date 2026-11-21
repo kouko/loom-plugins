@@ -5,7 +5,9 @@ Graduated from the 2026-11-20-stale-doc-references adversary probe.
 Every `python3 <path>.py` or `bash <path>.sh` command inside a fenced
 bash block of the listed living docs (at a line start or after `&&` or
 `;`, the path quoted or not) must name a file that exists in this
-repository, unless the same block marks the command historical. A path
+repository, unless the same block marks the command historical or the
+doc opens, before its first `## ` section, with a `> **Historical.**`
+banner. A path
 `$VAR/...` or `${VAR}/...` is explicitly out-of-repo and passes only when
 an earlier line of the same block assigns `VAR=`. A command that only works from
 another repository (for example a plugin shipped elsewhere) is not a
@@ -23,6 +25,7 @@ DOCS = [
 ]
 
 FENCE = re.compile(r"```bash\n(.*?)```", re.S)
+HISTORICAL_DOC = re.compile(r"^> \*\*Historical\.\*\*", re.M)
 CMD = re.compile(
     r"(?:^|&&|;)[ \t]*(?:python3|bash)\s+\"?([^\s\"]+\.(?:py|sh))\"?", re.M)
 VAR = re.compile(r"\$\{?(\w+)\}?/")
@@ -30,6 +33,8 @@ VAR = re.compile(r"\$\{?(\w+)\}?/")
 
 def _unresolved(text, exists=lambda p: (ROOT / p).is_file()):
     misses = []
+    if HISTORICAL_DOC.search(text.split("\n## ", 1)[0]):
+        return misses
     for block in FENCE.findall(text):
         if re.search(r"#[^\n]*\bhistorical\b", block, re.I):
             continue
@@ -59,6 +64,10 @@ def test_unresolved_historical_block_skipped():
     old = "```bash\n# historical: removed\npython3 gone/tool.py run\n```\n"
     assert _unresolved(live, exists=lambda p: False) == ["gone/tool.py"]
     assert _unresolved(old, exists=lambda p: False) == []
+    banner = "# T\n\n> **Historical.** removed\n\n## A\n" + live
+    assert _unresolved(banner, exists=lambda p: False) == []
+    late = "# T\n\n## A\n> **Historical.** removed\n" + live
+    assert _unresolved(late, exists=lambda p: False) == ["gone/tool.py"]
     var = '```bash\nT="$HOME/x"\npython3 "$T/s.py" drift "$H"\n```\n'
     bare = '```bash\ncd x && python3 "$T/s.py"\nbash <d>/run.sh\n```\n'
     assert _unresolved(var, exists=lambda p: False) == []

@@ -13,10 +13,17 @@ brief declared everything it should have.
 
 Note 2026-11-21: the `Brief item covered:` field and `check_scenario_coverage.py`
 were removed; today each task in `loom-code/contract/templates/plan.md` names
-the intent Acceptance lines it owns (`acceptance: <numbers>`), and
-`loom_checker.py` rule `intake.test-case-pair` checks that each named line has
-test cases. The same gap holds: those checks bind only to Acceptance lines the
-intent declared, so an obligation the repo's conventions impose (a version
+the intent Acceptance lines it owns (`acceptance: <numbers>`). For a newly
+authored plan, `loom_checker.py` rule `intake.test-case-pair`
+(`loom-code/scripts/loom_checker/rule_checks/intake.py`,
+`check_test_case_pairs`) runs two separate checks: an ownership check, that
+every task carries the marker and every intent Acceptance line is owned by
+some task; and a test-pair check, that each task's `Test` field gives a
+positive plus a negative or boundary case for each line it owns. Tasks whose
+Files are all documentation or release-only (low-risk docs, change or
+evidence stores, release metadata at plugin root) are exempt from the
+test-pair check but not from ownership. The same gap holds: both checks bind
+only to Acceptance lines the intent declared, so an obligation the repo's conventions impose (a version
 bump, an index regen) must be declared in the intent or plan to be checked.
 
 That gap has a shape. The requirement most likely to fall through it is one

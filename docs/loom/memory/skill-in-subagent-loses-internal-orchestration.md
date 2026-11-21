@@ -32,9 +32,11 @@ wrap the whole skill into one subagent to save main-loop context. If a run
 was nevertheless executed degraded, disclose it explicitly in the artifact
 and the user report. Harness-fact sibling: named Agent dispatch needs
 SendMessage — recorded until 2026-09-03 in the since-removed loom-code
-environment-gotchas §A1, and today in
-[[same-reviewer-delta-confirmation-dies-at-a-context-compaction]] — same
-Agent-tool family, different trap.
+environment-gotchas §A1; the historical Claude Code example of that recipe
+survives in [[same-reviewer-delta-confirmation-dies-at-a-context-compaction]],
+whose current guidance is to resume an agent through the host-specific
+resume mechanism rather than a `name:`/`SendMessage` pair — same Agent-tool
+family, different trap.
 
 **Correction (2026-08-19, re-probed live).** The tool-availability claim above
 is **no longer true for `Agent`**. A `general-purpose` subagent in session

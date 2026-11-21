@@ -1,6 +1,6 @@
 ---
 name: same-reviewer-delta-confirmation-dies-at-a-context-compaction
-description: The repo's standard fix-resolution mechanism — the SAME reviewer confirming a delta via SendMessage rather than a fresh whole-artifact round — is addressable only through handles held in the orchestrator's live context, so a context compaction silently destroys it for every already-completed reviewer; the loss surfaces as "I cannot remember whom to ask", never as an error, and the tempting repairs (a fresh reviewer, or flipping the ledger anyway) each discard exactly what the mechanism was protecting
+description: The repo's standard fix-resolution mechanism — the SAME reviewer confirming a delta via SendMessage rather than a fresh whole-artifact round — is addressable only through handles held in the orchestrator's live context, so a context compaction silently destroys it for every already-completed reviewer; the loss surfaces as "I cannot remember whom to ask", never as an error, and the tempting repairs (a fresh reviewer, or flipping the ledger anyway) each discard exactly what the mechanism was protecting; the `name:`/SendMessage recipe below is the historical (2026-08-13) Claude Code example — today closing-review resumes the same reviewer through the host-specific resume mechanism, and an unrecoverable reviewer ends the episode as `EXECUTION_FAILED`
 type: gotcha
 sources:
   - resource: brief-item-addressability arc (2026-08-13) — after a compaction, T7's and T8's reviewers were unreachable; ListAgents listed only the one still-running subagent, and no completed reviewer could be resumed
@@ -37,18 +37,28 @@ themselves at that moment are wrong:
   into the record, and the fix rounds most needing confirmation are the ones
   whose findings were judgment-bearing.
 
+Note 2026-11-22 (current recovery): the procedure below is the
+2026-08-13 recipe, kept verbatim as history. Today closing-review owns the
+resume: its Round 2 resumes the same reviewers over the fix delta with
+whatever mechanism the host provides (`loom-code/skills/closing-review/SKILL.md`),
+and `loom-code/agents/reviewer.md` (§Fix rounds) requires each later round
+to resume **the same agent that wrote the previous round's verdict, never a
+fresh one**. Do not record a reviewer name in the plan; verification identity
+belongs to the attestation that `finalize-review` writes. If the same
+reviewer cannot be recovered, report the verification as incomplete under
+closing-review's execution-failure rules (§4): an unavailable executor may
+retry once against the same functional-content digest, and a second failed
+attempt ends the episode as `EXECUTION_FAILED`. Disclosure does not replace
+that reviewer, and the fixes do not ride into a later round under a
+different reviewer.
+
+Historical (2026-08-13):
+
 **How to apply.** Treat reviewer handles as *perishable state*, not as
 recall:
 
-1. **Today:** resume the same reviewer with whatever mechanism the host
-   provides; closing-review owns that resume (Round 2,
-   `loom-code/skills/closing-review/SKILL.md`), and do not record a
-   reviewer name in the plan — verification identity belongs to the
-   attestation (`loom-code/contract/manifest.yaml`, the plan's `must_not`
-   "verification identity … goes_to: attestation"), which
-   `finalize-review` writes. **Historical (2026-08-13) recipe:** dispatch
-   any reviewer whose verdict may need a fix round with a stable
-   `name:`, and record THAT name in the plan — never the `agentId`. An
+1. **Dispatch any reviewer whose verdict may need a fix round with a stable
+   `name:`, and record THAT name in the plan** — never the `agentId`. An
    agentId is session-scoped and the harness forbids surfacing it, so writing
    one into a committed artifact is both prohibited and useless: it resolves
    nowhere in a later session. A `name:` is a plain string the dispatcher
@@ -64,23 +74,12 @@ recall:
 2. Prefer closing the fix→confirm cycle **before** starting unrelated work,
    while the handle is certainly live. A confirmation deferred across other
    tasks is a confirmation gambling on context length.
-3. When the handle IS already lost, resume the same reviewer through the
-   host's available mechanism (closing-review owns the resume).
-   `loom-code/agents/reviewer.md` (§Fix rounds) requires each later round
-   of the episode to resume **the same agent
-   that wrote the previous round's verdict, never a fresh one**, and
-   disclosure does not replace that reviewer. If the same reviewer cannot
-   be recovered, report the verification as incomplete under
-   closing-review's execution-failure rules
-   (`loom-code/skills/closing-review/SKILL.md` §4): an unavailable
-   executor may retry once against the same functional-content digest,
-   and a second failed attempt ends the episode as `EXECUTION_FAILED`.
-   Do not carry the fixes into Round 3 under a different reviewer.
-
-Historical (2026-08-13): the fallback then was to let the fix ride into
-**whole-branch review** — which reads the whole diff anyway; that
-whole-branch review became closing-review's branch-end review of the
-cumulative content.
+3. When the handle IS already lost, the honest path is neither repair above:
+   let the fix ride into **whole-branch review** — which reads the whole diff
+   anyway — and **state in the report that these fixes were never
+   delta-confirmed and why**. The disclosure is the load-bearing part; a
+   silently unconfirmed fix and a disclosed one differ entirely to whoever
+   reads the close-out.
 
 **Contradiction check:** does not contradict
 [[agent-contract-edits-do-not-reach-this-sessions-subagents]] — that entry is
