@@ -28,7 +28,7 @@ CASES = [
      ARCH_NOTE),
     ("loom-workflow/docs/quarterly-audit-runbook.md",
      r"Skills with NOTICE files[^\n]*\n(?:- [^\n]*\n)*- (?:complexity-critique|skill-refactor|skill-tuning) ",
-     r"Note 2026-11-21: the list above is as of v1\.7\.0\.[\s\S]*\bcritique\b"),
+     r"Note 2026-11-21: the list above is as of v1\.7\.0\.[^\n]*(?:\n[^\n]+)*?\bcritique\b"),
     ("docs/loom/memory/same-reviewer-delta-confirmation-dies-at-a-context-compaction.md",
      r"`requesting-docs-review`'s Directive 2\s+encodes it",
      None),

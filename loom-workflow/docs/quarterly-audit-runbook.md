@@ -183,9 +183,13 @@ For each skill with a `.skill-judge-history.jsonl` file, run
 skill-dev-toolkit is not part of this repository):
 
 ```bash
-# <skill-dev-toolkit-install> = the installed plugin's folder, outside this repo
-python3 <skill-dev-toolkit-install>/skills/skill-judge/scripts/score_history.py \
-    drift <skill>/.skill-judge-history.jsonl
+# Set both to real paths first. TOOLKIT is the installed plugin's folder,
+# outside this repo (find it with:
+#   find ~/.claude/plugins/cache -name score_history.py -path '*skill-dev-toolkit*')
+TOOLKIT="/path/to/skill-dev-toolkit"
+SKILL_DIR="/path/to/audited-skill"
+python3 "$TOOLKIT/skills/skill-judge/scripts/score_history.py" \
+    drift "$SKILL_DIR/.skill-judge-history.jsonl"
 ```
 
 If drift flagged: investigate (refactor introduced subtle
@@ -225,7 +229,7 @@ Save to `loom-workflow/docs/audit-reports/YYYY-Qn-audit.md`:
 ## Findings summary
 
 - N skills active, M deprecated, K retired
-- Drift CI: PASS / FAIL (details if FAIL)
+- Convention drift (manual check, §3): PASS / FAIL (details if FAIL)
 - Outstanding validation gates: N (list)
 - Score-history drift findings: N (list)
 
@@ -240,6 +244,11 @@ Save to `loom-workflow/docs/audit-reports/YYYY-Qn-audit.md`:
 Any observations that don't fit elsewhere.
 ```
 
+(Note 2026-11-21: this template used to ask for "Drift CI: PASS / FAIL".
+That CI check, `scripts/check-shared-conventions-drift.py`, has been
+removed from this repository, so the line now records the manual
+convention drift inspection of §3 instead.)
+
 Commit the audit report. The next quarterly audit references the
 prior one's open action items.
 
@@ -249,13 +258,17 @@ prior one's open action items.
 
 | Finding type | Action |
 |---|---|
-| Convention drift in CI | Block merging until same-PR drift rule honored |
+| Convention drift (manual check, §3) | File an action item to align the skill or update the convention |
 | Skill should be Deprecated | Open PR adding deprecation marker + not-trigger; minor bump |
 | Skill should be Retired | Wait for 3-month deprecation; then PR removing skill; major bump |
 | Validation gate complete | Update CHANGELOG / governance doc; close gate |
 | Validation gate >2 quarters outstanding | Decision: schedule validation (one-shot PR) OR formally accept-risk (note in governance doc) |
 | External upstream broken | Investigate; if upstream gone, update NOTICE; if MIT changed, follow license terms |
 | Score-history drift | Investigate; possibly run skill-tuning; possibly accept (taste evolved with intent) |
+
+(Note 2026-11-21: the first row used to read "Convention drift in CI —
+Block merging until same-PR drift rule honored". No drift CI runs in this
+repository any more, so it is no longer a merge blocker.)
 
 ---
 

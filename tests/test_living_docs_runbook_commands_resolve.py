@@ -2,9 +2,12 @@
 
 Graduated from the 2026-11-20-stale-doc-references adversary probe.
 
-Every `python3 <path>.py` line inside a fenced bash block of the listed
-living docs must name a file that exists in this repository, unless the
-same block marks the command historical. A command that only works from
+Every `python3 <path>.py` or `bash <path>.sh` command inside a fenced
+bash block of the listed living docs (at a line start or after `&&` or
+`;`, the path quoted or not) must name a file that exists in this
+repository, unless the same block marks the command historical. A path
+`$VAR/...` or `${VAR}/...` is explicitly out-of-repo and passes only when
+an earlier line of the same block assigns `VAR=`. A command that only works from
 another repository (for example a plugin shipped elsewhere) is not a
 current reference here.
 """
@@ -20,7 +23,9 @@ DOCS = [
 ]
 
 FENCE = re.compile(r"```bash\n(.*?)```", re.S)
-CMD = re.compile(r"^\s*python3\s+([\w./-]+\.py)\b", re.M)
+CMD = re.compile(
+    r"(?:^|&&|;)[ \t]*(?:python3|bash)\s+\"?([^\s\"]+\.(?:py|sh))\"?", re.M)
+VAR = re.compile(r"\$\{?(\w+)\}?/")
 
 
 def _unresolved(text, exists=lambda p: (ROOT / p).is_file()):
@@ -28,8 +33,13 @@ def _unresolved(text, exists=lambda p: (ROOT / p).is_file()):
     for block in FENCE.findall(text):
         if re.search(r"#[^\n]*\bhistorical\b", block, re.I):
             continue
-        for path in CMD.findall(block):
-            if not exists(path):
+        for m in CMD.finditer(block):
+            path, var = m.group(1), VAR.match(m.group(1))
+            if var:
+                assign = rf"^[ \t]*(?:export[ \t]+)?{var.group(1)}="
+                if not re.search(assign, block[:m.start()], re.M):
+                    misses.append(path)
+            elif not exists(path):
                 misses.append(path)
     return misses
 
@@ -49,3 +59,7 @@ def test_unresolved_historical_block_skipped():
     old = "```bash\n# historical: removed\npython3 gone/tool.py run\n```\n"
     assert _unresolved(live, exists=lambda p: False) == ["gone/tool.py"]
     assert _unresolved(old, exists=lambda p: False) == []
+    var = '```bash\nT="$HOME/x"\npython3 "$T/s.py" drift "$H"\n```\n'
+    bare = '```bash\ncd x && python3 "$T/s.py"\nbash <d>/run.sh\n```\n'
+    assert _unresolved(var, exists=lambda p: False) == []
+    assert _unresolved(bare, exists=lambda p: False) == ["$T/s.py", "<d>/run.sh"]

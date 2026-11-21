@@ -55,7 +55,8 @@ has been removed from this repository; no drift check runs here.)
 
 ## Ownership
 
-Each skill has an **owner** responsible for its lifecycle:
+Each skill has an **owner** responsible for its lifecycle.
+Historical snapshot (kept as written, before the skill-dev-toolkit move):
 
 | Skill | Owner | Notes |
 |---|---|---|
@@ -66,6 +67,12 @@ Each skill has an **owner** responsible for its lifecycle:
 | `skill-refactor` | kouko | original design (darwin-skill inspiration only) |
 | `skill-tuning` | kouko | original design (darwin-skill inspiration only) |
 | `dogfood-skill-testing` | kouko | original design (vercel-labs/agent-browser dogfood-pattern inspiration only, Apache-2.0) |
+
+(Note 2026-11-21: skill-creator-advance, skill-judge, skill-refactor,
+skill-tuning and dogfood-skill-testing now ship in the `skill-dev-toolkit`
+plugin, not in loom-workflow. Of the rows above only `git-memory` and
+`critique` are still loom-workflow skills. For current membership see
+`loom-workflow/README.md` (the skills table) or `ls loom-workflow/skills`.)
 
 Ownership transfers require:
 1. Update LICENSE / NOTICE to reflect new owner
@@ -84,7 +91,7 @@ A skill is always in exactly one of these states:
 | **Deprecated** | Still works but newer alternative recommended | Owner declares; description gains "Use newer-skill instead" not-trigger; subsequent PRs may strip its slash command |
 | **Retired** | No longer maintained / removed in next release | Was deprecated for ≥3 months OR explicit decision; removal is breaking change → major version bump |
 
-Annotation in plugin README:
+Annotation in plugin README (historical snapshot, kept as written):
 
 | Skill | State | Since |
 |---|---|---|
@@ -100,6 +107,11 @@ Annotation in plugin README:
 | dogfood-skill-testing | Active | 2026-06-03 (v0.1.0) |
 
 (Updated on state transitions; default Active.)
+
+(Note 2026-11-21: skill-creator-advance, skill-judge, skill-refactor,
+skill-tuning and dogfood-skill-testing moved to the `skill-dev-toolkit`
+plugin; their lifecycle is tracked there. For loom-workflow's current
+skills see `loom-workflow/README.md` or `ls loom-workflow/skills`.)
 
 ---
 
@@ -236,6 +248,12 @@ lighter discipline. Dev-workflow's
 plugin-level READMEs (`loom-workflow/README.{md,ja.md,zh-TW.md}`)
 should be authored / updated via `docs-team` per the same convention,
 since they are plugin-level not skill-internal.
+
+(Note 2026-11-21: the six-skill list above is a historical snapshot.
+skill-creator-advance, skill-judge, skill-refactor and skill-tuning moved
+to the `skill-dev-toolkit` plugin; git-memory and critique remain. For
+loom-workflow's current skills see `loom-workflow/README.md` or
+`ls loom-workflow/skills`.)
 
 When a skill-internal README needs significant restructuring (e.g.,
 adding architecture-doc-grade content, splitting into Diátaxis
