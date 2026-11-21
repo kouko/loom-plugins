@@ -29,3 +29,10 @@ disposition to individual review up front, dispatch spec-reviewer alone
 per task (record the code-quality/docs slot as N/A — record-class
 prose), and skip the batch packet entirely. Reserve the batch CLI for
 batches with at least one contract-class member.
+
+(Note 2026-11-21: docs-reviewer, spec-reviewer, Review Batches and the batch
+review CLI were retired, so the procedure above is historical. Today
+closing-review dispatches `loom-code/agents/reviewer.md` with the lenses in
+`loom-code/skills/closing-review/references/lenses.md` at branch end. The
+general lesson remains: when a library accepts a result its CLI cannot
+consume, route around the CLI instead of improvising its input.)

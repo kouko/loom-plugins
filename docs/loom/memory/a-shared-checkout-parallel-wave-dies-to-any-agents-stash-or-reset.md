@@ -28,3 +28,9 @@ state; a reviewer that needs the pre-commit tree reads it from git
 (`git show <sha>^:<path>`) or an isolated `git worktree add`, never by
 moving this tree. If a wave must let agents move the tree, give each task
 its own worktree instead. Related: [[a-correction-issued-in-a-dispatch-packet-evaporates]].
+
+(Note 2026-11-21: spec-reviewer, code-quality-reviewer and docs-reviewer
+were retired; today the dispatched roles are `loom-code/agents/implementer.md`,
+`adversary.md`, `acceptance-tester.md` and `reviewer.md` (lenses in
+`loom-code/skills/closing-review/references/lenses.md`). The same
+trap-guard goes in every one of those dispatches.)

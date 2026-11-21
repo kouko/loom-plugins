@@ -31,3 +31,10 @@ heuristic/hook/security-surface → full weight regardless of size) is
 the shape that survives evidence. Shipped implementation: loom-code's
 `Review-weight: mechanical` opt-in per-task field (PR #514) —
 kind-gated via `plan-document-reviewer` Check 16, never LOC-gated.
+
+(Note 2026-11-21: plan-document-reviewer and the `Review-weight` field
+were retired; today review weight comes from the checker's review policy,
+`python3 loom-code/scripts/loom_checker.py reviewer-count <change-id>`,
+dispatching `loom-code/agents/reviewer.md` with the lenses in
+`loom-code/skills/closing-review/references/lenses.md`. The kind-not-LOC
+lesson still applies to any proposal to tier that policy.)
