@@ -64,8 +64,8 @@ recall:
 2. Prefer closing the fix→confirm cycle **before** starting unrelated work,
    while the handle is certainly live. A confirmation deferred across other
    tasks is a confirmation gambling on context length.
-3. When the handle IS already lost, recover the same reviewer first: a
-   `SendMessage` to its recorded `name:` resumes it from its transcript.
+3. When the handle IS already lost, resume the same reviewer through the
+   host's available mechanism (closing-review owns the resume).
    `loom-code/agents/reviewer.md` (§Fix rounds) requires each later round
    of the episode to resume **the same agent
    that wrote the previous round's verdict, never a fresh one**, and

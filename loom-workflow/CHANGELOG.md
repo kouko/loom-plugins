@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Label historical references in the telemetry, governance and runbook docs, and repoint the score_history path.
 - Restore historical wording in skill-evolution-architecture and fidelity-check.
 - Correct memory lessons that cited absent targets or unsourced procedures.
+- Quarterly-audit runbook steps 2, 5 and 7 now name current sources; the retired steps are marked historical.
 
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 
