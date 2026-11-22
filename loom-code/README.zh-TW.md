@@ -128,7 +128,7 @@ Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 s
 plan、`intake`、`contract`、`reviewer-count` 四個 v1 模式各自輸出恰一個標準輸出
 JSON 物件加換行，checker stderr 為空：
 `schema_version: 1`、`command`、`status`、有序 `diagnostics` 物件
-（`rule_id`、`message`）、有序字串 `notices`、`error`、`data`。
+（`rule_id`、`message`）、有序字串 `notices`、`error`。
 四個模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**至少包含一個非空白字符的英文字串**，
 通過為 null。文字拒絕/錯誤在 stderr 附加 `Suggested next step:`；原始
 diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null error；
@@ -137,8 +137,11 @@ diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null er
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
 
-在上述四模式中，`contract` 與 `reviewer-count` 兩個 read-only 模式的 JSON 結果
-始終包含 `data` 物件（使用錯誤時每個欄位均為 `null`）；完成觀測時的型別資料如下：
+`data` 欄位僅出現在 `contract` 與 `reviewer-count` 的 read-only JSON 結果中；
+`plan` 與 `intake` 的 output 中不含 `data` 欄位。使用錯誤時 `contract` 與
+`reviewer-count` 的 `data` 物件各欄位均為 `null`。
+
+完成觀測時的型別資料說明如下：
 
 | 指令 | 完成觀測的型別資料 |
 |---|---|
