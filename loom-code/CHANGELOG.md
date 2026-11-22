@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.87.2] — 2026-11-23 — README sync: add missing checker section to ja/zh, version bump
+
+- Add missing checker section material (five JSON-command list, data table, envelope fields, suggested_next rules, delivery paragraphs) to loom-code's Japanese and Traditional Chinese READMEs.
+- Update version strings across 4 manifest files and 3 README files per plugin.
+
 ## [3.87.1] — 2026-11-21 — stale doc references
 
 - PRODUCT-SPEC.md lists the current station skill paths.

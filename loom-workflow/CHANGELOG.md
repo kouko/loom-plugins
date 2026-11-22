@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.26.2] — 2026-11-23 — README sync: old-map definition + version bump
+
+- Define what an "old map" is on first use: a decision map from before `roadmap` replaced it.
+- Update version strings across 4 manifests and 3 READMEs per plugin.
+
 ## [5.26.1] — 2026-11-21 — stale skill references
 
 - Update stale skill references in loom-workflow docs to current skill names; historical records keep the name that ran, with the current name noted.
