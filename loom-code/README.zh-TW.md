@@ -179,7 +179,7 @@ checker 一次。不寫 artifact、不裝 runtime、不改 policy/authority/host
 真理或整體工作完成。既有結果分類、必要欄位、remote-operation 協調保留。
 全部 16 checker 指令定義建議行為，含 5 直接 JSON 模式與 2 checked station
 consumer。一般文字 stderr 用 `Suggested next step:`；GitHub rules 正常報告
-保留 stdout。建議類 OSError/UnicodeError 不改結果、不重複動作。未知或
+保留 stdout。僅在寫入建議訊息時發生的 OSError 或 UnicodeError，不會改變結果，也不會重複執行動作。未知或
 未同步 exit-zero 結果維持未知/未同步；成功檢查無需填充。hook payloads/
 native-hook bytes、setup、CI annotations、progress、強制 cleanup cwd handoff
 各保留其協定。[CLI 結果指南](references/cli-results.md) 將各指令/模式對應
