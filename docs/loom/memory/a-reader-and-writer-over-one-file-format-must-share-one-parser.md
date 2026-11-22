@@ -23,5 +23,5 @@ routine (extract it if needed) rather than re-deriving the grammar with a
 new regex; (2) a writer that cannot find its anchor returns an error the
 caller turns into a non-zero exit — never a silent `return`; (3) plan all
 rewrites before performing any so a failed anchor leaves zero partial
-writes; (4) at whole-branch review, ask explicitly "which pairs of
+writes; (4) at closing-review (the branch-end reviewers), ask explicitly "which pairs of
 functions parse the same bytes?" — that question is what surfaced this.

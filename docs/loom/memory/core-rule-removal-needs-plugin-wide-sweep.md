@@ -38,8 +38,8 @@ skill's own three-language READMEs, got the same fix).
 **How to apply:** after editing a core rule's defining file, `grep -rl`
 the literal phrase being removed across the WHOLE plugin (not just the
 skill directory) before calling the change complete. Expect a first sweep
-to still miss residue — budget for at least one whole-branch review round
-specifically hunting for it, and don't be surprised when two independent
+to still miss residue — ask closing-review's reviewers (the branch-end
+review of the cumulative content) to hunt for it specifically, and don't be surprised when two independent
 reviewers converge on the same miss (that's corroboration, not noise).
 Distinguish living docs (fix them) from point-in-time archives/changelogs
 (leave them — they're supposed to describe what was true when written).

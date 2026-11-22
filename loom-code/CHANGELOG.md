@@ -1,8 +1,8 @@
 # Changelog
 
-## [3.87.1] — 2026-11-22 — admit the loom-herdr skill
+## [3.87.1] — 2026-11-21 — stale doc references
 
-- budget-exception: loom-herdr — admit the herdr operator skill released in loom-workflow 5.27.0, raising the measured skill ceiling from 27 to 28 while rejecting 29; regression eval `loom-workflow/tests/loom-herdr/test_skill_md.py`.
+- PRODUCT-SPEC.md lists the current station skill paths.
 
 ## [3.87.0] — 2026-11-19 — implementer intent follow-ups
 

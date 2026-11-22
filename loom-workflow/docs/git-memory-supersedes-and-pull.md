@@ -75,3 +75,6 @@ whole-branch review is designed to catch; the match test-suite proves it.)
 - Dogfood: post-merge `memory-grep.sh --verify c5bad9b7` exits 0 — the
   trailers survived the squash mid-body, confirming the skill's core bet
   on a real squash-merged `main`.
+
+(Note 2026-11-21: the `loom-code:code-reviewer` agent named above is now
+`loom-code:reviewer`.)

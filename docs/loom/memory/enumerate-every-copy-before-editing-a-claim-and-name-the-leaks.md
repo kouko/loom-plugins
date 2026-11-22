@@ -46,17 +46,17 @@ or short. The leaks matter more than the rule: a repairer who trusts a
 single-line sweep gets a confident count that is wrong in exactly the direction
 that makes the next fix ship a fresh contradiction.
 
-**How to apply.** Before editing any claim that could have copies: (1) run
-`python3 scripts/claim_copy_sweep.py --claim "<the sentence>"` — it normalizes
-whitespace on both sides, so hard-wrapped copies cannot hide, and it prints the
-operative / frozen partition plus its own named leaks. Add `--also "<other
-phrasing>"` for every restatement you already know about. **Sweep a phrase, not
+**How to apply.** Before editing any claim that could have copies: (1) sweep
+for it with a multiline matcher that treats any run of whitespace as one space
+(for example `rg -U` with `\s+` between words), so hard-wrapped copies cannot
+hide, and separate operative hits from history yourself. Sweep again for every
+other phrasing you already know about. **Sweep a phrase, not
 a token**: a bare number as the claim returns hits from every document where
 those digits meant something else entirely, while a distinctive phrase returns
 copies that are actually copies. And **the review's scope is not the claim's
 population** — sweeping a stale `file:line` pointer returned copies in documents
 a reviewer working from the branch diff never saw, which is the whole reason to
-run the tool rather than trust a reader. Neither observation carries a count
+run the sweep rather than trust a reader. Neither observation carries a count
 here on purpose: this entry is itself in the swept corpus, so any total written
 would count its own sentences — leak three, stated below and demonstrated twice
 on this arc. (2) write the resulting count into the artifact and
@@ -82,6 +82,10 @@ live on this corpus, re-runnable as printed:
 grep -rln "architectural blast radius" --include='*.md' .   # contiguous
 python3 scripts/claim_copy_sweep.py --claim "architectural blast radius"
 ```
+
+(Note 2026-11-21: `scripts/claim_copy_sweep.py` has since been removed from
+the repo, so the command above no longer runs; sweep by hand as "How to
+apply" describes.)
 
 The sweep returned every file the grep returned **plus** files the grep
 reported as clean — one of those being this very entry's sibling
@@ -125,7 +129,7 @@ run the tool. Nothing did, and a five-round arc paid for it.
 
 **How to apply, sharpened:** when a claim is found in two places, treat the
 population as unknown and run the sweep before editing either — and phrase the
-sweep from the **proposition** ("this section carries tokens"), then `--also`
+sweep from the **proposition** ("this section carries tokens"), then sweep
 each synonym you can generate, rather than from the strings you happen to have
 in front of you. If the arc is fixing a claim at all, the enumeration is not
 optional overhead; it is the cheapest step in the arc.

@@ -1,6 +1,6 @@
 ---
 name: hold-every-plan-write-while-a-review-packet-is-sealed
-description: A sealed batch ReviewPacket's identity digests the WHOLE plan file, so any other write to the plan between `packet` and `apply-result` — a claim flip, a Notes line — forces a re-seal + re-record + rebind of the unchanged reviewer results; on this arc it happened FOUR times in one run, and each re-record hit a second trap — an orphan superseded receipt (result_applied false) left in the scan directory blocks the re-send until moved out; apply-result also refuses while ANY batch member on the plan is still not implemented
+description: Historical (2026-08-31, retired batch review) — a sealed batch ReviewPacket's identity digested the WHOLE plan file, so any other write to the plan between `packet` and `apply-result` — a claim flip, a Notes line — forces a re-seal + re-record + rebind of the unchanged reviewer results; on this arc it happened FOUR times in one run, and each re-record hit a second trap — an orphan superseded receipt (result_applied false) left in the scan directory blocks the re-send until moved out; apply-result also refuses while ANY batch member on the plan is still not implemented. Today no sealed packet exists; closing-review ties each round to the functional-content digest the reviewers read, so the surviving lesson is to batch other edits to reviewed content instead of interleaving them with a review round
 type: gotcha
 sources:
   - resource: adversarial-audit-station arc, docs/loom/plans/2026-08-31-adversarial-audit-station.md — backlog entries 2026-08-31-packet-identity-binds-whole-plan-text and 2026-08-31-orphan-dispatch-receipt-jams-batch (both start events fired on this arc)
@@ -31,6 +31,16 @@ reviewed bytes without losing that guarantee — but nothing in the tool
 chain queues concurrent plan writes, so every unrelated write during a
 review window collides with it, and every collision recovery path has
 its own second-order trap (orphan receipts, all-members-implemented).
+
+Note 2026-11-21: the batch review this entry describes (`packet`,
+`record-dispatch`, `apply-result`, receipts, the plan's Decision Log)
+was removed; no sealed packet exists today. closing-review counts a new
+digest whenever a functional-content file changed since the content the
+reviewers last read (`loom-code/skills/closing-review/SKILL.md` §4), and
+the attestation binds the reviewed content digest. The procedure below
+is historical (2026-08-31); its lesson — an edit landing while reviewers
+read a digest-bound artifact forces rework, so queue it rather than
+interleave it — still applies to closing-review rounds.
 
 **How to apply:** treat "a batch is sealed for review" as a lock on the
 whole plan file — queue every other ledger/Notes write until that

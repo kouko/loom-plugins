@@ -1,6 +1,6 @@
 ---
 name: section-gate-must-flag-entry-lookalikes-not-just-matches
-description: A section-scoped gate that matches one entry marker (e.g. `- OQ-<n>`) reports clean on unresolved content when the author used a different bullet (`*`, `1.`) — the matcher accepted only its exact grammar and silently treated every non-matching look-alike as prose, so a full unresolved section read as empty; a gate's job is to flag malformed/look-alike entries, not only to confirm well-formed ones
+description: A section-scoped gate that matches one entry marker (e.g. `- OQ-<n>` in the since-removed check_open_questions.py, 2026-08-14) reports clean on unresolved content when the author used a different bullet (`*`, `1.`) — the matcher accepted only its exact grammar and silently treated every non-matching look-alike as prose, so a full unresolved section read as empty; a gate's job is to flag malformed/look-alike entries, not only to confirm well-formed ones
 type: gotcha
 sources:
   - resource: feat/open-question-dispatch-gate (whole-branch review fix bfb1b79a, 2026-08-14)
@@ -13,6 +13,11 @@ had authored its open questions with `*` and `1.` bullets instead of
 `-`. Every one of those lines fell through `_LOOKS_LIKE_ENTRY` to
 ignored-prose, the section read as having no entries, and the gate
 exited **0 — clean** on a plan whose questions were all still `[OPEN]`.
+
+Note 2026-11-21: `check_open_questions.py` was removed and today's plan
+template (`loom-code/contract/templates/plan.md`) has no
+`## Open Questions` section; no successor gate exists. The general
+shape below still applies to any section-scoped gate.
 
 The whole-branch review caught it because it read the plan's body, not
 the gate's exit code. The per-task suite had not — every fixture used

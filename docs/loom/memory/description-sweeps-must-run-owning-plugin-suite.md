@@ -1,6 +1,6 @@
 ---
 name: description-sweeps-must-run-owning-plugin-suite
-description: Frontmatter-description edits look test-free but plugins pin description content in scripts/ guard tests ("Axis 0" mandate, "not for"/N/A needles, isolation clauses) — a sweep dispatch that omits the owning plugin's package suite ships red guards to close-out; every description-sweep task packet must carry that plugin's suite as its Resolved test command
+description: Frontmatter-description edits look test-free but plugins pin description content in `<plugin>/tests/` guard tests ("Axis 0" mandate, "not for"/N/A needles, isolation clauses) — a sweep dispatch that omits the owning plugin's package suite ships red guards to close-out; every description-sweep task packet must carry that plugin's suite as its Resolved test command
 type: gotcha
 sources:
   - resource: feat/description-token-economy Task 7c collateral (2026-07-14) — two loom-code guards red at close-out; the 7c dispatch omitted the package suite and verdict-only reviewers never ran tests
@@ -19,11 +19,12 @@ so the sweep had to keep a clause a pure cutting-rules reading would
 delete.
 
 **Why:** description text is contract surface — plugins pin routing
-mandates, N/A announcements, and isolation phrases in scripts/ tests.
+mandates, N/A announcements, and isolation phrases in `<plugin>/tests/` tests.
 A sweep that only measures char counts is blind to these pins in both
 directions (breaking them, or wrongly deleting what they require).
 
 **How to apply:** every description-sweep or frontmatter-edit task
 packet carries the owning plugin's package suite (plus the repo tri-dir
 suite) as its Resolved test command, and the implementer greps the
-plugin's scripts/ for tests reading the SKILL.md before cutting.
+plugin's `<plugin>/tests/` (and root `tests/`) for tests reading the
+SKILL.md before cutting.

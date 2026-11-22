@@ -1,6 +1,6 @@
 ---
 name: a-sealed-review-packet-freezes-the-whole-plan-file-until-apply-result
-description: A batch ReviewPacket's identity digests the ENTIRE plan file, so any write to the plan between `packet` and `apply-result` — a `claimed`/`done` flip on a task outside the batch, a Decision Log line — changes the rebuilt identity and the receipt binding refuses with "packet_identity does not match the rebuilt packet"; freeze the plan from `packet` to `apply-result`, and if it moved, re-seal, re-record, and rebind the unchanged reviewer results — never edit the receipt
+description: Historical (2026-08-31; ReviewPacket, record-dispatch and apply-result since retired) — a batch ReviewPacket's identity digested the ENTIRE plan file, so any write to the plan between `packet` and `apply-result` — a `claimed`/`done` flip on a task outside the batch, a Decision Log line — changes the rebuilt identity and the receipt binding refuses with "packet_identity does not match the rebuilt packet"; freeze the plan from `packet` to `apply-result`, and if it moved, re-seal, re-record, and rebind the unchanged reviewer results — never edit the receipt
 type: gotcha
 sources:
   - resource: batch-review-hardening (2026-08-31) — the first live run of the receipt-bound apply-result refused twice on this exact shape (orchestrator flipped T4/T5/T7 ledger lines and then committed DL-3 while the T1–T3 batch was out for review); member shas were identical both times
@@ -28,3 +28,10 @@ the re-send), `record-dispatch` again, rewrite `packet_identity` in the
 reviewer result file to the new identity, then `apply-result`. Rebinding is
 honest only when member shas and sealed bytes are identical; otherwise the
 reviewers must re-review.
+
+Note 2026-11-21: the ReviewPacket, `record-dispatch` and `apply-result` were
+removed, so the procedure above is historical. No sealed packet exists today;
+the closing-review attestation binds the reviewed content digest and reviewer
+identity instead (`loom-code/skills/closing-review/SKILL.md`). The lasting
+lesson: when an identity digests a whole file, an unrelated write to that
+file invalidates it, so know what the digest covers before writing.

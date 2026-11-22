@@ -13,6 +13,11 @@ mechanical-review-weight skip branch) doesn't need a full live SDD run
 with real subagent reviewer dispatch — the rule's value lives entirely
 in one decision branch, not in producing an artifact.
 
+Note 2026-11-21: the example is from 2026-07 (PR #514); the SDD skill
+and its mechanical-review-weight branch were removed, with no
+successor branch. The method applies to a single process rule in any
+current skill.
+
 **How it was done:** built a real (not fabricated) git sandbox with
 three commit states — (a) a mechanical edit that genuinely matches its
 declared exact-spec across its declared files, (b) an ordinary logic

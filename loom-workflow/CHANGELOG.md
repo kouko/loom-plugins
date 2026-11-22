@@ -4,10 +4,14 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
-## [5.27.0] — 2026-11-22 — loom-herdr skill for herdr panes, agents and conversations
+## [5.26.1] — 2026-11-21 — stale skill references
 
-- Add the `loom-herdr` skill: loads the installed herdr's own `herdr --skill` instructions at run time (no bundled copy), then adds conversation search across open Claude, Codex and OpenCode panes, led agent-to-agent conversations and Codex sandbox help. Selected only when the user names herdr.
-- Register it in the plugin manifest and the `using-loom-workflow` router; skill count rises from fifteen to sixteen, with `loom-herdr` outside the lifecycle contract like `whats-next`.
+- Update stale skill references in loom-workflow docs to current skill names; historical records keep the name that ran, with the current name noted.
+- Label historical references in the telemetry, governance and runbook docs, and repoint the score_history path.
+- Restore historical wording in skill-evolution-architecture and fidelity-check.
+- Correct memory lessons that cited absent targets or unsourced procedures.
+- Quarterly-audit runbook steps 2, 5 and 7 now name current sources; the retired steps are marked historical.
+- Quarterly-audit runbook checks each upstream license against its NOTICE entry and no longer reports retired validation gates; telemetry examples are restored verbatim under a dated note.
 
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 

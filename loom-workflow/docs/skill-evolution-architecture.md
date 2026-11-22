@@ -7,6 +7,13 @@ now also tracks implementation status across the 5-PR rollout.
 **Last status update**: 2026-04-29 (post-v2.0.0 rename)
 **Trigger**: research into `alchaincyf/darwin-skill` + critique of LLM-as-judge for taste-sensitive output.
 
+(Note 2026-11-21: this status section is frozen as of v2.0.0 and is no
+longer updated. The convention drift CI it lists under H3 has been
+removed from this repository. skill-creator-advance, skill-judge,
+skill-refactor and skill-tuning moved to the `skill-dev-toolkit`
+plugin, so the outstanding validation gates below are tracked there,
+not in quarterly-audit-runbook step 5.)
+
 ## Implementation Status (as of v2.0.0)
 
 | PR | Version | Scope | Status |
@@ -41,6 +48,14 @@ items per the runbook. If outstanding for >2 quarters, an
 explicit accept-risk or schedule-validation decision is required.
 
 ## Original Planning Doc Begins Below
+
+*(Note 2026-11-21: the planning doc below is kept verbatim and names
+skills and paths as they were then. `complexity-critique` has since been
+retired in favour of `critique` (mode: complexity), and
+`skill-creator-advance`, `skill-judge`, `skill-refactor` and
+`skill-tuning` now ship in the `skill-dev-toolkit` plugin, so its
+`loom-workflow:skill-*` names and `loom-workflow/skills/skill-*` paths
+read today as `skill-dev-toolkit:skill-*`.)*
 
 ---
 

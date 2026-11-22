@@ -102,6 +102,9 @@ A finding whose class is unclear gates. Fail closed.
 Adapted from `loom-code:requesting-docs-review`, which faced the same
 problem: prose has no test to terminate on.
 
+(Note 2026-11-21: `loom-code:requesting-docs-review` is now the docs
+lens of `loom-code:closing-review`.)
+
 - **Rounds 1–3 are the only full check.** No round cap, no re-sampling.
   Nothing gating → done.
 - **On a gating finding: fix the `.md`** — never the HTML — then re-run
