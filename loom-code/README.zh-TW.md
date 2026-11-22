@@ -148,9 +148,6 @@ reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列�
 | `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
 | `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**非空白**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個非空白的 change ID。 |
 
-重要提示：`data` 僅出現在 `contract` 和 `reviewer-count` 的 output 中，`plan` 
-和 `intake` 的 output 中不含 `data` 欄位。
-
 規劃與 closing-review 使用共享 checked consumer，而非解析成功文案
 或重複 validator。將 `<loom-code>` 替換為已安裝 plugin 目錄；在 commit
 功能工作後的選定乾淨 repo 執行 reviewer 呼叫。
@@ -167,14 +164,17 @@ true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.revi
 決定 reviewer 派遣。不相容 `2.99` 為 blocked 觀測；malformed `bad` 為有效
 用法錯誤。無效輸出為空 stdout、`checked-readonly:` 診斷、exit 2。錯誤與
 無效結果皆不允許續行、reviewer 預設、文字 fallback、自動重試。接受核心
-觀測後，始終保留原始診斷；僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議，與原始診斷一併顯示。接受的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
+觀測後，始終保留原始診斷；僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議，與原始診斷一併顯示。受理的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
 建議不授權、不觸發自動動作。contract 拒絕時依診斷指示的 plugin；loom-code
 或消費端 plugin 可能較舊。consumer 故障保留原診斷與 exit 區別，在 stderr
 加上本地產生的建議。
 
+**usable `suggested_next`**: 當值為**非空白字串**時為可用建議；缺失、 `null`、
+空白字串、或非字串型別者均被忽略，此時保留原始診斷作為基準。
+
 此 helper 以配置的 30 秒 subprocess timeout 與保留啟動 exit 86 執行
 checker 一次。不寫 artifact、不裝 runtime、不改 policy/authority/host trust；
-外層 launcher `--repair` 準備 cache，`--ready` 重用之。結構檢查不證明計算
+外層 launcher `--repair` **何時需要時**準備 cache，`--ready` 重用之。結構檢查不證明計算
 真理或整體工作完成。既有結果分類、必要欄位、remote-operation 協調保留。
 全部 16 checker 指令定義建議行為，含 5 直接 JSON 模式與 2 checked station
 consumer。一般文字 stderr 用 `Suggested next step:`；GitHub rules 正常報告

@@ -176,10 +176,6 @@ reviewer 呼び出しを実行します。
 
 この consumer は `--json` を追加し、バージョン/コマンド、必須型、不変のリクエスト
 アイデンティティと exit/status 合意を検証し、互換性のある追加フィールドを保持します。
-**共通するフィールド**：`schema_version`、`command`、`status`、`diagnostics`（順序付き）、
-`notices`、`error`、`suggested_next`。
-**read-only コマンド専用のフィールド**：`data` は `plan` と `intake` では含まれず、
-`contract` と `reviewer-count` に含まれます。詳しくは各コマンドの `--help` を参照してください。
 **この helper が結果を受理するまで、計画は継続せず、reviewer も派遣されません**。
 受理された passed かつ true compatibility のみが計画継続を許可し、受理された passed かつ
 正の整数 `data.reviewer_floor` のみが reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
@@ -195,7 +191,7 @@ stderr に追加します。
 
 このヘルパーは、設定された 30 秒のサブプロセス timeout と起動 exit 86 の保持で
 checker を 1 回実行します。artifact を書いたり、runtime をインストールしたり、
-ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` が
+ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` **when needed** が
 キャッシュを準備し、`--ready` がそれを再利用します。構造的検査は計算の真実や
 ワークフロー全体の完了を証明しません。既存の結果分類、必須フィールド、リモート操作の
 調停はそのままです。全 16 checker コマンドが助言的振る舞いを定義し、5 つの直接 JSON
@@ -208,6 +204,9 @@ checker を 1 回実行します。artifact を書いたり、runtime をイン�
 [CLI 結果ガイド](references/cli-results.md) は各コマンド/モードを実行可能な検査に
 マッピングし、例外を説明します。追加の JSON モード、checked consumer、自動アクションは
 導入しません。解決率、時間、トークン、コストの向上は測定されていません。
+
+** read-only コマンドの JSON 結果**: `data` フィールドは `plan` と `intake` では含まれず、
+`contract` と `reviewer-count` に含まれます。詳しくは各コマンドの `--help` を参照してください。
 
 `scripts/loom_checker.py` が決定的な層です。どのルールも宣言を信じずに
 リポジトリから再計算し、ルール一覧は `--list-rules` が正です。終了コードは
