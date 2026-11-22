@@ -75,7 +75,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
 | [`external-review`](skills/external-review/README.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
-| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後の Vault 保存は、その都度、保存先と範囲の承認を得る**スキルがその承認を求める**。 |
+| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後、該当する研究を Vault に保存する提案をする場合があり、その都度、保存先と範囲についてユーザーの承認を求めます。 |
 
 ## Agents
 
@@ -127,9 +127,9 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 バージョン 1 の結果を stdout に出力します。**--json は出力形式を変更しつつ、
 チェックと終了コードは保持します**。成功、ルールによる拒否、使用／内部
 エラーを区別し、診断と通知の順序を保持しますが、ワークフロー全体の完了は
-意味しません。**各コマンドの `--help` には、起動時の標準出力やプロセス
-失敗の制限についての記述があります**。各コマンドの `--help` を参照すれば
-フィールドの一覧がわかります。（help には `suggested_next` も含まれます）。
+意味しません。**各コマンドの `--help` には、結果のフィールド、起動時および
+プロセス失敗時の制限について記述されています**。各コマンドの `--help` を
+見ればフィールドの一覧がわかります。（help には `suggested_next` も含まれます）。
 
 五つの checker コマンドが JSON をサポートします：`plan`、`intake`、`contract`、
 `reviewer-count`、`delivery`。最初の四つは末尾の `--json` のみで JSON を選び、

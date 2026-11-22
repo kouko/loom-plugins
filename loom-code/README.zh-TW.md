@@ -67,7 +67,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
 | [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
-| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後的 Vault 保存逐次確認目的地與範圍，**技能會主動詢問是否保存**。 |
+| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後若研究符合條件，技能可能會提議保存到 Vault，其時需逐次確認目的地與範圍並取得承認。 |
 
 ## Agents
 
@@ -133,7 +133,7 @@ Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 s
 | `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
 | `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**非空白**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個非空白的 change ID。 |
 
-contract、`reviewer-count` 以及 `delivery` 各模式輸出恰一個標準輸出 JSON 物件加換行，checker stderr 為空：
+contract、`reviewer-count` 各模式輸出恰一個標準輸出 JSON 物件加換行，checker stderr 為空：
 `schema_version: 1`、`command`、`status`、有序 `diagnostics` 物件
 （`rule_id`、`message`）、有序字串 `notices`、`error`、`data`。
 四個 v1 模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**至少包含一個非空白字符的英文字串**，
@@ -143,6 +143,9 @@ diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null er
 `error: {kind: usage|internal, message}`。所有 error data 值為 null。
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
+
+delivery 模式保留其獨特的 `{state, reason, next, evidence, complete}` 欄位並增設 `suggested_next` 等於 `next`；無共用 envelope 或 schema version。一般文字保留 state/next 行並在 stderr 加上相同建議。delivery 可能保留 Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。準備模式的空 stderr 契約不適用。
+
 重要提示：`data` 僅出現在 `contract` 和 `reviewer-count` 的 output 中，`plan` 
 和 `intake` 的 output 中不含 `data` 欄位。
 
