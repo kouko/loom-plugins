@@ -67,7 +67,8 @@ Use [roadmap](skills/roadmap/README.md) for an optional root ROADMAP.md or a sel
 existing document. Keep current goals, completion conditions, status, next actions,
 unknowns and evidence links. Advice or resumption alone does not force creation.
 Planning grants no implementation, background execution, publication or merge
-permission. Old maps remain readable without conversion, rewriting or closure.
+permission. **Old maps** (decision maps from before `roadmap` replaced them) remain
+readable without conversion, rewriting or closure.
 
 ## Skills
 
