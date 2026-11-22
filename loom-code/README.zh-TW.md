@@ -133,13 +133,14 @@ JSON 物件加換行，checker stderr 為空：
 通過為 null。文字拒絕/錯誤在 stderr 附加 `Suggested next step:`；原始
 diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null error；
 阻擋即 exit 1、rule diagnostics、null error；錯誤即 exit 2、空 diagnostics、
-`error: {kind: usage|internal, message}`。所有 error data 值為 null。
+`error: {kind: usage|internal, message}`。無論是使用錯誤或內部錯誤，所有
+`data` 物件的欄位均為 `null`。
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
 
 `data` 欄位僅出現在 `contract` 與 `reviewer-count` 的 read-only JSON 結果中；
-`plan` 與 `intake` 的 output 中不含 `data` 欄位。使用錯誤時 `contract` 與
-`reviewer-count` 的 `data` 物件各欄位均為 `null`。
+`plan` 與 `intake` 的 output 中不含 `data` 欄位。無論是使用錯誤或內部錯誤，
+`contract` 與 `reviewer-count` 的 `data` 物件各欄位均為 `null`。
 
 完成觀測時的型別資料說明如下：
 

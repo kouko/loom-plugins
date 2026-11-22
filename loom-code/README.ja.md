@@ -157,7 +157,7 @@ exit 2 となる**ことがあります。準備モードの空 stderr 契約は
 **少なくとも 1 文字の非空白文字を含む英語の文字列**、通過時は null。テキスト拒否/エラーは `Suggested next step:` を
 stderr に追加し、元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
 ブロックは exit 1、ルール diagnostics、null error；エラーは exit 2、空 diagnostics、
-`error: {kind: usage|internal, message}`。すべての error data 値は null です。
+`error: {kind: usage|internal, message}`。無論是使用エラー或いは內部錯誤，所有 `data` 欄位の數值均為 `null` です。
 reviewer-count にブロッカー結果はなく、欠落/ダーティリポジトリは使用エラー。
 空配列は `[]` のままです。キー順や人間向けメッセージではなく、フィールドと型を使ってください。
 
