@@ -127,13 +127,13 @@ Help/error stderr，含 `--json` 的前置結果失敗；準備模式的空 stde
 
 | 指令 | 完成觀測的型別資料 |
 |---|---|
-| `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本移除。 |
+| `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
 | `reviewer-count <change-id> --json` | 不變的 `change_id` 字串與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與非空單一 operand。 |
 
 各模式輸出恰一個標準輸出 JSON 物件加換行，checker stderr 為空：
 `schema_version: 1`、`command`、`status`、有序 `diagnostics` 物件
 （`rule_id`、`message`）、有序字串 `notices`、`error`、`data`。
-四個 v1 模式亦輸出建議性 `suggested_next`：阻擋/錯誤為非空英文字串，
+四個 v1 模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**非空白**英文字串，
 通過為 null。文字拒絕/錯誤在 stderr 附加 `Suggested next step:`；原始
 diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null error；
 阻擋即 exit 1、rule diagnostics、null error；錯誤即 exit 2、空 diagnostics、
@@ -157,7 +157,7 @@ true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.revi
 決定 reviewer 派遣。不相容 `2.99` 為 blocked 觀測；malformed `bad` 為有效
 用法錯誤。無效輸出為空 stdout、`checked-readonly:` 診斷、exit 2。錯誤與
 無效結果皆不允許續行、reviewer 預設、文字 fallback、自動重試。接受核心
-觀測後，僅在非空字串時呈現適用的 `suggested_next` 作為建議；否則保留原始
+觀測後，僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議；否則（缺失、null、空白、別型別）保留原始
 診斷。接受的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
 建議不授權、不觸發自動動作。contract 拒絕時依診斷指示的 plugin；loom-code
 或消費端 plugin 可能較舊。consumer 故障保留原診斷與 exit 區別，在 stderr

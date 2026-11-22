@@ -137,14 +137,15 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 `{state, reason, next, evidence, complete}` フィールドを保ち、
 `suggested_next` を `next` と等しく追加します；共通エンベロープやスキーマバージョンは
 追加しません。通常のテキスト出力は state/next 行を保ち、同じアドバイスを stderr に
-追加します。delivery は Help/error stderr を保持する場合があり、準備モードの
-空 stderr 契約は適用されません。
+追加します。delivery は Help/error stderr を保持する場合があり、**無効な `--goal` などで
+起動失敗時は JSON を出力せず、stderr にテキスト診断のみで exit 2 となる**場合があります。
+準備モードの空 stderr 契約は適用されません。
 
 二つの読み取り専用モードは、完了した観測時に準備エンベロープへ `data` を追加します：
 
 | コマンド | 完了観測時の型付きデータ |
 |---|---|
-| `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは除去されます。 |
+| `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは周囲の空白を除去して `data.contract_version` として返されます。 |
 | `reviewer-count <change-id> --json` | 不変の `change_id` 文字列と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと空でない単一オペランドが必要です。 |
 
 それぞれは標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
@@ -175,8 +176,8 @@ reviewer 呼び出しを実行します。
 reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
 使用エラーです。無効な出力は空標準出力、`checked-readonly:` 診断、exit 2。エラーも
 無効結果も継続や reviewer デフォルト、テキストフォールバック、自動リトライを許しません。
-コア観測を受理した後、適用可能な `suggested_next` を空でない文字列の時だけ助言として
-提示し、それ以外は元の診断を保持します。受理された生 JSON に使えないアドバイスが
+コア観測を受理した後、適用可能な `suggested_next` を**非空白文字列**の時だけ助言として
+提示し、それ以外（欠落、null、空白のみ、別の型）は元の診断を保持します。受理された生 JSON に使えないアドバイスが
 含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
 アドバイスは認可を与えず、自動実行をトリガーしません。contract 拒否の場合は診断の
 示すプラグインに従います；loom-code か消費側プラグインのいずれかが古い可能性があります。
