@@ -140,10 +140,12 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 `suggested_next` を `next` と等しく追加します；共通エンベロープやスキーマバージョンは
 追加しません。通常のテキスト出力は state/next 行を保ち、同じアドバイスを stderr に
 追加します。delivery は Help/error stderr を保持する場合があり、**結果生成前に失敗した場合
-（無効な `--goal` などの引数エラーを含む）は JSON を出力せず、stderr にテキスト診断のみで
-exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
+（無効な `--goal` などの引数エラーを含む）は `--json` を指定しても JSON を出力せず、
+stderr にテキスト診断のみで exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
 
-二つの読み取り専用モードの JSON 結果は常に `data` オブジェクトを含み、使用エラー時はそのすべてのフィールドが `null` となります。完成観測時の型付きデータは以下の通りです：
+`data` 欄位は `contract` と `reviewer-count` のみが JSON 結果に含み、
+そのすべてのフィールドは使用エラー・内部エラーの両方で `null` となります。
+完成観測時の型付きデータは以下の通りです：
 
 | コマンド | 完成観測時の型付きデータ |
 |---|---|
