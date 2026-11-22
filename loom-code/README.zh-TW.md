@@ -47,7 +47,7 @@ flowchart TD
 - **規格** —— 只有 product 變更會問 ②，由寫 spec 的那一方問：
   `loom-design:write-spec`，或只裝 code 時 `write-plan` 寫的最小 spec。
 - **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行，最後由獨立的
-  adversary 寫出對抗程式，`build` 跑完整 package 測試，全數通過才交出。`closing-review`
+  adversary 寫出對抗程式，`build` 同時跑對抗程式與完整 package 測試，全數通過才交出。`closing-review`
   對這份已檢查的內容跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
@@ -67,7 +67,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
 | [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
-| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後的 Vault 保存逐次確認目的地與範圍。 |
+| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後的 Vault 保存逐次確認目的地與範圍，**技能會主動詢問是否保存**。 |
 
 ## Agents
 
@@ -113,9 +113,8 @@ package。
 版本 1 的準備檢查結果。**--json 更改輸出格式，但保留檢查與退出碼**。
 plan 與 intake 會將 JSON 結果輸出至 stdout。
 成功、規則阻擋與使用／內部錯誤會被區分，診斷及提示的順序會被保留，但不代表整體工作流已完成。
-各コマンドの `--help` には、起動時の標準出力やプロセス失敗の制限についての記述があります。
-help には `suggested_next` も含まれます。**4 コマンド：plan、intake、contract、reviewer-count**。
-output description では all four commands を name し、read-only commands を区別する。
+請參考各命令的 `--help`，其中會說明標準輸出、啟動限制與程序失敗限制，並列出欄位（包含 `suggested_next`）。
+**5 個命令支援 JSON**：plan、intake、contract、reviewer-count、delivery。
 
 五個 checker 指令支援 JSON：`plan`、`intake`、`contract`、
 `reviewer-count`、`delivery`。前四者僅透過尾部 `--json` 選取 JSON；
@@ -134,7 +133,7 @@ Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 s
 | `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
 | `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**非空白**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個非空白的 change ID。 |
 
-各模式輸出恰一個標準輸出 JSON 物件加換行，checker stderr 為空：
+contract、`reviewer-count` 以及 `delivery` 各模式輸出恰一個標準輸出 JSON 物件加換行，checker stderr 為空：
 `schema_version: 1`、`command`、`status`、有序 `diagnostics` 物件
 （`rule_id`、`message`）、有序字串 `notices`、`error`、`data`。
 四個 v1 模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**至少包含一個非空白字符的英文字串**，
@@ -144,6 +143,8 @@ diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null er
 `error: {kind: usage|internal, message}`。所有 error data 值為 null。
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
+重要提示：`data` 僅出現在 `contract` 和 `reviewer-count` 的 output 中，`plan` 
+和 `intake` 的 output 中不含 `data` 欄位。
 
 規劃與 closing-review 使用共享 checked consumer，而非解析成功文案
 或重複 validator。將 `<loom-code>` 替換為已安裝 plugin 目錄；在 commit

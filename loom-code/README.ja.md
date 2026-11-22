@@ -75,7 +75,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
 | [`external-review`](skills/external-review/README.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
-| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後の Vault 保存は、その都度、保存先と範囲の承認を得る。 |
+| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後の Vault 保存は、その都度、保存先と範囲の承認を得る**スキルがその承認を求める**。 |
 
 ## Agents
 
@@ -174,10 +174,10 @@ reviewer 呼び出しを実行します。
 
 この consumer は `--json` を追加し、バージョン/コマンド、必須型、不変のリクエスト
 アイデンティティと exit/status 合意を検証し、互換性のある追加フィールドを保持します。
-**7 つの共通フィールド**：`schema_version`、`command`、`status`、`diagnostics`（順序付き）、
-`notices`、`error`、`data`。
-`data` は `plan` と `intake` では含まれず、`contract` と `reviewer-count` に含まれます。
-**suggested_next** は 4 番目のフィールドです。
+**共通するフィールド**：`schema_version`、`command`、`status`、`diagnostics`（順序付き）、
+`notices`、`error`、`suggested_next`。
+**read-only コマンド専用のフィールド**：`data` は `plan` と `intake` では含まれず、
+`contract` と `reviewer-count` に含まれます。詳しくは各コマンドの `--help` を参照してください。
 **この helper が結果を受理するまで、計画は継続せず、reviewer も派遣されません**。
 受理された passed かつ true compatibility のみが計画継続を許可し、受理された passed かつ
 正の整数 `data.reviewer_floor` のみが reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
