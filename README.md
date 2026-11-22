@@ -145,6 +145,7 @@ attach to the flow.
 | [`project-retro`](loom-workflow/skills/project-retro/README.md) | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | [`loom-visualization`](loom-workflow/skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
 | [`loom-interactive-diagram`](loom-workflow/skills/loom-interactive-diagram/README.md) | Create and validate editable diagrams for standalone or Loom discussions; ask before editing an external diagram whether to copy it into the project. |
+| [`loom-herdr`](loom-workflow/skills/loom-herdr/README.md) | Operate herdr panes, agents and conversations with herdr's own instructions plus conversation search; selected only when you name herdr. |
 | [`goal-create`](loom-workflow/skills/goal-create/README.md) | Create a session goal prompt (invoked by name only). |
 | [`dbt-model-style`](loom-workflow/skills/dbt-model-style/README.md) | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | [`using-loom-workflow`](loom-workflow/skills/using-loom-workflow/README.md) | Optional router to the right workflow tool. |

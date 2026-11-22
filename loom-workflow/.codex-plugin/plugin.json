@@ -25,7 +25,9 @@
     "independent-advisor",
     "goal-create",
     "dbt-model-style",
-    "dbt"
+    "dbt",
+    "loom-herdr",
+    "herdr"
   ],
   "hooks": "./hooks/hooks-codex.json",
   "interface": {
