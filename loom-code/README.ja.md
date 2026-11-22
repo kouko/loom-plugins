@@ -143,7 +143,7 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 （無効な `--goal` などの引数エラーを含む）は `--json` を指定しても JSON を出力せず、
 stderr にテキスト診断のみで exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
 
-`data` 欄位は `contract` と `reviewer-count` のみが JSON 結果に含み、
+`data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含み、
 そのすべてのフィールドは使用エラー・内部エラーの両方で `null` となります。
 完成観測時の型付きデータは以下の通りです：
 
@@ -156,12 +156,13 @@ stderr にテキスト診断のみで exit 2 となる**ことがあります。
 `schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
 （`rule_id`、`message`）、順序付き文字列 `notices`、`error`。
 
-`data` 欄位僅出現在 `contract` 與 `reviewer-count` 的 read-only JSON 結果中；`plan` 與 `intake` 的 output 中不含 `data` 欄位。
+`data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含み、
+`plan` と `intake` の出力には `data` フィールドが含まれません。
 四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は
 **少なくとも 1 文字の非空白文字を含む英語の文字列**、通過時は null。テキスト拒否/エラーは `Suggested next step:` を
 stderr に追加し、元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
 ブロックは exit 1、ルール diagnostics、null error；エラーは exit 2、空 diagnostics、
-`error: {kind: usage|internal, message}`。無論是使用エラー或いは內部錯誤，所有 `data` 欄位の數值均為 `null` です。
+`error: {kind: usage|internal, message}`。使用エラーでも内部エラーでも、すべての `data` フィールドの値は `null` です。
 reviewer-count にブロッカー結果はなく、欠落/ダーティリポジトリは使用エラー。
 空配列は `[]` のままです。キー順や人間向けメッセージではなく、フィールドと型を使ってください。
 
@@ -195,8 +196,8 @@ stderr に追加します。
 
 このヘルパーは、設定された 30 秒のサブプロセス timeout と起動 exit 86 の保持で
 checker を 1 回実行します。artifact を書いたり、runtime をインストールしたり、
-ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` **必要に応じて** が
-キャッシュを準備し、`--ready` がそれを再利用します。構造的検査は計算の真実や
+ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` は
+必要に応じてキャッシュを準備し、`--ready` がそれを再利用します。構造的検査は計算の真実や
 ワークフロー全体の完了を証明しません。既存の結果分類、必須フィールド、リモート操作の
 調停はそのままです。全 16 checker コマンドが助言的振る舞いを定義し、5 つの直接 JSON
 モードと 2 つの checked station consumer があります。通常のテキストは stderr で
@@ -208,9 +209,6 @@ checker を 1 回実行します。artifact を書いたり、runtime をイン�
 [CLI 結果ガイド](references/cli-results.md) は各コマンド/モードを実行可能な検査に
 マッピングし、例外を説明します。追加の JSON モード、checked consumer、自動アクションは
 導入しません。解決率、時間、トークン、コストの向上は測定されていません。
-
-** read-only コマンドの JSON 結果**: `data` フィールドは `plan` と `intake` では含まれず、
-`contract` と `reviewer-count` に含まれます。詳しくは各コマンドの `--help` を参照してください。
 
 `scripts/loom_checker.py` が決定的な層です。どのルールも宣言を信じずに
 リポジトリから再計算し、ルール一覧は `--list-rules` が正です。終了コードは
