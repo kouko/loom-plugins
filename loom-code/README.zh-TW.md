@@ -67,7 +67,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
 | [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
-| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後若研究符合條件，技能可能會提議保存到 Vault，其時需逐次確認目的地與範圍並取得承認。 |
+| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後若研究符合條件，技能可能會提議保存到 Vault，每次保存前都須就目的地與內容範圍取得使用者的明確授權。 |
 
 ## Agents
 
@@ -114,7 +114,6 @@ package。
 plan 與 intake 會將 JSON 結果輸出至 stdout。
 成功、規則阻擋與使用／內部錯誤會被區分，診斷及提示的順序會被保留，但不代表整體工作流已完成。
 請參考各命令的 `--help`，其中會說明標準輸出、啟動限制與程序失敗限制，並列出欄位（包含 `suggested_next`）。
-**5 個命令支援 JSON**：plan、intake、contract、reviewer-count、delivery。
 
 五個 checker 指令支援 JSON：`plan`、`intake`、`contract`、
 `reviewer-count`、`delivery`。前四者僅透過尾部 `--json` 選取 JSON；
@@ -126,7 +125,8 @@ read-only 模式混用 help 與最終 JSON 為用法錯誤；plan/intake 視混�
 Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。
 準備模式的空 stderr 契約不適用。
 
-兩個 read-only 模式在完成觀測時向準備 envelope 增加 `data`：
+兩個 read-only 模式的 JSON 結果始終包含 `data` 欄位（使用錯誤時兩值皆為 `null`）；
+完成觀測時的型別資料如下：
 
 | 指令 | 完成觀測的型別資料 |
 |---|---|
@@ -143,8 +143,6 @@ diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null er
 `error: {kind: usage|internal, message}`。所有 error data 值為 null。
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
-
-delivery 模式保留其獨特的 `{state, reason, next, evidence, complete}` 欄位並增設 `suggested_next` 等於 `next`；無共用 envelope 或 schema version。一般文字保留 state/next 行並在 stderr 加上相同建議。delivery 可能保留 Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。準備模式的空 stderr 契約不適用。
 
 重要提示：`data` 僅出現在 `contract` 和 `reviewer-count` 的 output 中，`plan` 
 和 `intake` 的 output 中不含 `data` 欄位。
@@ -165,8 +163,7 @@ true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.revi
 決定 reviewer 派遣。不相容 `2.99` 為 blocked 觀測；malformed `bad` 為有效
 用法錯誤。無效輸出為空 stdout、`checked-readonly:` 診斷、exit 2。錯誤與
 無效結果皆不允許續行、reviewer 預設、文字 fallback、自動重試。接受核心
-觀測後，僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議；否則（缺失、null、空白、別型別）保留原始
-診斷。接受的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
+觀測後，始終保留原始診斷；僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議，與原始診斷一併顯示。接受的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
 建議不授權、不觸發自動動作。contract 拒絕時依診斷指示的 plugin；loom-code
 或消費端 plugin 可能較舊。consumer 故障保留原診斷與 exit 區別，在 stderr
 加上本地產生的建議。

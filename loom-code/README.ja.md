@@ -143,9 +143,9 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 （無効な `--goal` などの引数エラーを含む）は JSON を出力せず、stderr にテキスト診断のみで
 exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
 
-二つの読み取り専用モードは、完了した観測時に準備エンベロープへ `data` を追加します：
+二つの読み取り専用モードの JSON 結果は常に `data` 欄位を含みます（使用エラー時は両方とも `null`）；完成観測時の型別資料如下：
 
-| コマンド | 完了観測時の型付きデータ |
+| コマンド | 完成観測時の型付きデータ |
 |---|---|
 | `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは周囲の空白を除去して `data.contract_version` として返されます。 |
 | `reviewer-count <change-id> --json` | 不変の `change_id` 文字列（**少なくとも 1 文字の非空白文字を含む**）と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと非空白の単一 change ID が必要です。 |
@@ -165,6 +165,8 @@ reviewer-count にブロッカー結果はなく、欠落/ダーティリポジ�
 共有の checked consumer を使います。`<loom-code>` をインストール済みプラグイン
 ディレクトリに置き換え、機能作業を commit した後の選択されたクリーンリポジトリで
 reviewer 呼び出しを実行します。
+
+コア観測を受理した後、元の診断を常に保持し、適用可能な `suggested_next` が**非空白文字列**の場合にのみ助言として元の診断とともに提示します。受理された生 JSON に使えないアドバイスが含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
 
 ```sh
 "<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
