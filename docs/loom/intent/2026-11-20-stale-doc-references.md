@@ -3,7 +3,7 @@ originator: kouko
 kind: engineering
 needs-design: no — documentation and skill wording only; no interface surface (cli/api/commands/tsx/templates) is touched
 evidence: []
-status: confirmed 2026-11-22 (renewed 2026-11-22: Acceptance narrowed after NON_CONVERGENT outside review)
+status: confirmed 2026-11-22 (renewed 2026-11-22: Acceptance narrowed after NON_CONVERGENT outside review; recorded under the canonical confirmation subject)
 publication: automatic — authorized 2026-11-21 by kouko
 intent_confirmed_sha: 354a4f6
 
