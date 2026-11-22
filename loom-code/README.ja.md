@@ -152,7 +152,9 @@ exit 2 となる**ことがあります。準備モードの空 stderr 契約は
 
 それぞれは標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
 `schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
-（`rule_id`、`message`）、順序付き文字列 `notices`、`error`、`data`。
+（`rule_id`、`message`）、順序付き文字列 `notices`、`error`。
+
+`data` 欄位僅出現在 `contract` 與 `reviewer-count` 的 read-only JSON 結果中；`plan` 與 `intake` 的 output 中不含 `data` 欄位。
 四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は
 **少なくとも 1 文字の非空白文字を含む英語の文字列**、通過時は null。テキスト拒否/エラーは `Suggested next step:` を
 stderr に追加し、元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
@@ -191,7 +193,7 @@ stderr に追加します。
 
 このヘルパーは、設定された 30 秒のサブプロセス timeout と起動 exit 86 の保持で
 checker を 1 回実行します。artifact を書いたり、runtime をインストールしたり、
-ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` **when needed** が
+ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` **必要に応じて** が
 キャッシュを準備し、`--ready` がそれを再利用します。構造的検査は計算の真実や
 ワークフロー全体の完了を証明しません。既存の結果分類、必須フィールド、リモート操作の
 調停はそのままです。全 16 checker コマンドが助言的振る舞いを定義し、5 つの直接 JSON

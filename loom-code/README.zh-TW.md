@@ -175,7 +175,7 @@ true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.revi
 
 此 helper 以配置的 30 秒 subprocess timeout 與保留啟動 exit 86 執行
 checker 一次。不寫 artifact、不裝 runtime、不改 policy/authority/host trust；
-外層 launcher `--repair` **何時需要時**準備 cache，`--ready` 重用之。結構檢查不證明計算
+外層 launcher `--repair` **在需要時**準備 cache，`--ready` 重用之。結構檢查不證明計算
 真理或整體工作完成。既有結果分類、必要欄位、remote-operation 協調保留。
 全部 16 checker 指令定義建議行為，含 5 直接 JSON 模式與 2 checked station
 consumer。一般文字 stderr 用 `Suggested next step:`；GitHub rules 正常報告
