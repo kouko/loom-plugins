@@ -1,5 +1,5 @@
 {
   "name": "loom-workflow",
-  "version": "5.26.0",
-  "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — optional staged project roadmaps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), whats-next (evidence-grounded next-action advice), recap, handoff, project-retro (one project session), skill-retro (recurring skill issues), chat visualizations (tables / ASCII / Mermaid, reasoning pages) and editable diagrams for standalone or Loom discussions, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills."
+  "version": "5.27.0",
+  "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — optional staged project roadmaps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), whats-next (evidence-grounded next-action advice), recap, handoff, project-retro (one project session), skill-retro (recurring skill issues), chat visualizations (tables / ASCII / Mermaid, reasoning pages) and editable diagrams for standalone or Loom discussions, cross-executor second opinion, loom-herdr (herdr panes, agents and conversation search), plus the standalone goal-create and dbt-model-style skills."
 }

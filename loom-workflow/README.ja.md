@@ -8,7 +8,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：任意の段階的なプロジェクト計画、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.26.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.27.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -71,7 +71,7 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 
 ## Skills
 
-15 skills：14 個のツールと任意のルーター 1 個。
+16 skills：15 個のツールと任意のルーター 1 個。
 
 | Skill | 役割 |
 |---|---|
@@ -89,11 +89,12 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 | [`independent-advisor`](skills/independent-advisor/README.ja.md) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
 | [`loom-visualization`](skills/loom-visualization/README.md) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Loom の変更や単独の議論で、外部エディタで編集できる draw.io 図を作成・検証する。既存の外部図を編集する前に、プロジェクトへコピーするか確認する。 |
+| [`loom-herdr`](skills/loom-herdr/README.md) | herdr の pane・agent・会話を操作する。インストール済み herdr 自身の手順を読み込み、開いている pane をまたぐ会話検索、主導する agent 間の会話、Codex sandbox の補助を加える。herdr を名指しした時のみ選ばれる。 |
 | [`goal-create`](skills/goal-create/README.ja.md) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。 |
 
 Loom の契約で数えるツールはこのうち 9 個です。`goal-create`、`dbt-model-style`、
 `project-retro` は `standalone: true` と記され、Loom フローの対象外です。
-独立した助言用の `whats-next`、`loom-memory`、ルーターは契約に含まれませんが、
+独立した助言用の `whats-next`、`loom-herdr`、`loom-memory`、ルーターは契約に含まれませんが、
 その skill ファイルは機構の総数に数えられます。
 
 ## Repository 構成
@@ -118,6 +119,7 @@ loom-workflow/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
+│   ├── loom-herdr/
 │   ├── loom-memory/
 │   ├── loom-visualization/
 │   ├── project-retro/

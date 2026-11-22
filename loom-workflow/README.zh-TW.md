@@ -8,7 +8,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：可選的專案階段規劃、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.26.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.27.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名稱遷移
 
@@ -66,7 +66,7 @@ plugin 用到並不算數。這條規則只 gate
 
 ## Skills
 
-共 15 個 skills：14 個工具與 1 個可選入口。
+共 16 個 skills：15 個工具與 1 個可選入口。
 
 | Skill | 角色 |
 |---|---|
@@ -84,11 +84,12 @@ plugin 用到並不算數。這條規則只 gate
 | [`independent-advisor`](skills/independent-advisor/README.zh-TW.md) | 明確要求外部 agent 審查 code、plan 或決策時，交由 `loom-code:external-review` 執行並保留原審查標準；也能向不同 model tier、effort 或廠商取得開放式 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/README.md) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | 在 Loom 變更或獨立討論中建立、驗證可編輯的 draw.io 圖表；每次編輯既有外部圖表前，先確認是否複製進專案。 |
+| [`loom-herdr`](skills/loom-herdr/README.md) | 操作 herdr 的 pane、agent 與對話：先載入已安裝 herdr 自己的指示，再加上跨開啟中 pane 的對話搜尋、由一方主導的 agent 間對話，以及 Codex sandbox 協助。只在指名 herdr 時選用。 |
 | [`goal-create`](skills/goal-create/README.zh-TW.md) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。 |
 
 Loom 的契約計入其中九個工具。`goal-create`、`dbt-model-style` 與
 `project-retro` 標記為 `standalone: true`，位於 Loom 流程之外。
-獨立提供建議的 `whats-next`、`loom-memory` 與入口路由不列入契約，
+獨立提供建議的 `whats-next`、`loom-herdr`、`loom-memory` 與入口路由不列入契約，
 但其 skill 檔案仍計入機制總數。
 
 ## Repository 結構
@@ -113,6 +114,7 @@ loom-workflow/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
+│   ├── loom-herdr/
 │   ├── loom-memory/
 │   ├── loom-visualization/
 │   ├── project-retro/
