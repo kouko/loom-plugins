@@ -125,7 +125,7 @@ read-only 模式混用 help 與最終 JSON 為用法錯誤；plan/intake 視混�
 Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。
 準備模式的空 stderr 契約不適用。
 
-兩個 read-only 模式的 JSON 結果始終包含 `data` 欄位（使用錯誤時兩值皆為 `null`）；
+兩個 read-only 模式的 JSON 結果始終包含 `data` 物件，使用錯誤時每個欄位均為 `null`；
 完成觀測時的型別資料如下：
 
 | 指令 | 完成觀測的型別資料 |
