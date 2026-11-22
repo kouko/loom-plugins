@@ -129,6 +129,76 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 意味しません。六つのフィールドと起動／プロセス失敗の制限は、各コマンドの
 正確な `--help` で確認できます。
 
+五つの checker コマンドが JSON をサポートします：`plan`、`intake`、`contract`、
+`reviewer-count`、`delivery`。最初の四つは末尾の `--json` のみで JSON を選び、
+重複セレクタは使用エラー。コマンドの正確な `--help`/`-h` は引き続きテキスト出力です。
+二つの読み取り専用モードで help と最終 JSON が混在するのは使用エラー；plan/intake は
+混在形式を通常の入力として検証します。delivery は独自の
+`{state, reason, next, evidence, complete}` フィールドを保ち、
+`suggested_next` を `next` と等しく追加します；共通エンベロープやスキーマバージョンは
+追加しません。通常のテキスト出力は state/next 行を保ち、同じアドバイスを stderr に
+追加します。delivery は Help/error stderr を保持する場合があり、準備モードの
+空 stderr 契約は適用されません。
+
+二つの読み取り専用モードは、完了した観測時に準備エンベロープへ `data` を追加します：
+
+| コマンド | 完了観測時の型付きデータ |
+|---|---|
+| `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは除去されます。 |
+| `reviewer-count <change-id> --json` | 不変の `change_id` 文字列と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと空でない単一オペランドが必要です。 |
+
+それぞれは標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
+`schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
+（`rule_id`、`message`）、順序付き文字列 `notices`、`error`、`data`。
+四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は空でない
+英語文字列、通過時は null。テキスト拒否/エラーは `Suggested next step:` を stderr に追加し、
+元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
+ブロックは exit 1、ルール diagnostics、null error；エラーは exit 2、空 diagnostics、
+`error: {kind: usage|internal, message}`。すべての error data 値は null です。
+reviewer-count にブロッカー結果はなく、欠落/ダーティリポジトリは使用エラー。
+空配列は `[]` のままです。キー順や人間向けメッセージではなく、フィールドと型を使ってください。
+
+計画とクロージングレビューは、成功プローズを解析したりバリデータを重複させたりせず、
+共有の checked consumer を使います。`<loom-code>` をインストール済みプラグイン
+ディレクトリに置き換え、機能作業を commit した後の選択されたクリーンリポジトリで
+reviewer 呼び出しを実行します。
+
+```sh
+"<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py --help
+```
+
+この consumer は `--json` を追加し、バージョン/コマンド、必須型、不変のリクエスト
+アイデンティティと exit/status 合意を検証し、互換性のある追加フィールドを保持します。
+通過かつ互換 true のみが計画継続を許可し、通過かつ正の整数 `data.reviewer_floor` のみが
+reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
+使用エラーです。無効な出力は空標準出力、`checked-readonly:` 診断、exit 2。エラーも
+無効結果も継続や reviewer デフォルト、テキストフォールバック、自動リトライを許しません。
+コア観測を受理した後、適用可能な `suggested_next` を空でない文字列の時だけ助言として
+提示し、それ以外は元の診断を保持します。受理された生 JSON に使えないアドバイスが
+含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
+アドバイスは認可を与えず、自動実行をトリガーしません。contract 拒否の場合は診断の
+示すプラグインに従います；loom-code か消費側プラグインのいずれかが古い可能性があります。
+consumer の故障は、元の診断と exit 区別を保ったまま、ローカルで生成されたアドバイスを
+stderr に追加します。
+
+このヘルパーは、設定された 30 秒のサブプロセス timeout と起動 exit 86 の保持で
+checker を 1 回実行します。artifact を書いたり、runtime をインストールしたり、
+ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` が
+キャッシュを準備し、`--ready` がそれを再利用します。構造的検査は計算の真実や
+ワークフロー全体の完了を証明しません。既存の結果分類、必須フィールド、リモート操作の
+調停はそのままです。全 16 checker コマンドが助言的振る舞いを定義し、5 つの直接 JSON
+モードと 2 つの checked station consumer があります。通常のテキストは stderr で
+`Suggested next step:` を使い、GitHub rules の通常レポートは標準出力を保持します。
+アドバイスのみの OSError/UnicodeError は結果を変更せず、アクションを繰り返しません。
+未知や未同期の exit-zero 結果はそのまま未知・未同期のままです；成功した検査に
+フィラーは不要です。hook ペイロード/ネイティブ hook バイト、セットアップ、CI アノテーション、
+進捗、必須クリーンアップ cwd 引き渡しはそれぞれのプロトコルを保ちます。
+[CLI 結果ガイド](references/cli-results.md) は各コマンド/モードを実行可能な検査に
+マッピングし、例外を説明します。追加の JSON モード、checked consumer、自動アクションは
+導入しません。解決率、時間、トークン、コストの向上は測定されていません。
+
 `scripts/loom_checker.py` が決定的な層です。どのルールも宣言を信じずに
 リポジトリから再計算し、ルール一覧は `--list-rules` が正です。終了コードは
 合格で 0、ルールによるブロックで 1、使い方や内部のエラーで 2 — 判定できない
