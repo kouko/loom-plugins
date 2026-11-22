@@ -47,7 +47,7 @@ flowchart TD
 - **規格** —— 只有 product 變更會問 ②，由寫 spec 的那一方問：
   `loom-design:write-spec`，或只裝 code 時 `write-plan` 寫的最小 spec。
 - **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行，最後由獨立的
-  adversary 寫出對抗程式，`build` 同時跑對抗程式與完整 package 測試，全數通過才交出。`closing-review`
+  adversary 寫出對抗程式，`build` 依序執行完整套件測試與各項對抗程式，全數通過才交出。`closing-review`
   對這份已檢查的內容跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
@@ -125,24 +125,25 @@ read-only 模式混用 help 與最終 JSON 為用法錯誤；plan/intake 視混�
 Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。
 準備模式的空 stderr 契約不適用。
 
-兩個 read-only 模式的 JSON 結果始終包含 `data` 物件，使用錯誤時每個欄位均為 `null`；
-完成觀測時的型別資料如下：
-
-| 指令 | 完成觀測的型別資料 |
-|---|---|
-| `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
-| `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**非空白**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個非空白的 change ID。 |
-
-contract、`reviewer-count` 各模式輸出恰一個標準輸出 JSON 物件加換行，checker stderr 為空：
+plan、`intake`、`contract`、`reviewer-count` 四個 v1 模式各自輸出恰一個標準輸出
+JSON 物件加換行，checker stderr 為空：
 `schema_version: 1`、`command`、`status`、有序 `diagnostics` 物件
 （`rule_id`、`message`）、有序字串 `notices`、`error`、`data`。
-四個 v1 模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**至少包含一個非空白字符的英文字串**，
+四個模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**至少包含一個非空白字符的英文字串**，
 通過為 null。文字拒絕/錯誤在 stderr 附加 `Suggested next step:`；原始
 diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null error；
 阻擋即 exit 1、rule diagnostics、null error；錯誤即 exit 2、空 diagnostics、
 `error: {kind: usage|internal, message}`。所有 error data 值為 null。
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
+
+在上述四模式中，`contract` 與 `reviewer-count` 兩個 read-only 模式的 JSON 結果
+始終包含 `data` 物件（使用錯誤時每個欄位均為 `null`）；完成觀測時的型別資料如下：
+
+| 指令 | 完成觀測的型別資料 |
+|---|---|
+| `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
+| `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**非空白**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個非空白的 change ID。 |
 
 重要提示：`data` 僅出現在 `contract` 和 `reviewer-count` 的 output 中，`plan` 
 和 `intake` 的 output 中不含 `data` 欄位。
