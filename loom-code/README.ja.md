@@ -91,7 +91,8 @@ flowchart TD
 
 レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
 reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
-1 人、それ以外や判定できないときは 2 人です。acceptance testing が行われるのは、Acceptance
+1 人、それ以外や判定できないときは 2 人です。**closing-review はこの検証済みの
+reviewer-count 結果を使用します**。acceptance testing が行われるのは、Acceptance
 行を機械的に判定できないときだけです。
 
 ## 訊かれる 3 つの質問
@@ -123,11 +124,12 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 ## checker
 
 `plan <path> --json` と `intake <station> <change-id> --json` は、準備検査の
-バージョン 1 の結果を stdout に出力します。`--json` は末尾に置き、既定の
-テキスト出力と終了コードは変わりません。成功、ルールによる拒否、使用／内部
+バージョン 1 の結果を stdout に出力します。**--json は出力形式を変更しつつ、
+チェックと終了コードは保持します**。成功、ルールによる拒否、使用／内部
 エラーを区別し、診断と通知の順序を保持しますが、ワークフロー全体の完了は
-意味しません。六つのフィールドと起動／プロセス失敗の制限は、各コマンドの
-正確な `--help` で確認できます。
+意味しません。**各コマンドの `--help` には、起動時の標準出力やプロセス
+失敗の制限についての記述があります**。各コマンドの `--help` を参照すれば
+フィールドの一覧がわかります。（help には `suggested_next` も含まれます）。
 
 五つの checker コマンドが JSON をサポートします：`plan`、`intake`、`contract`、
 `reviewer-count`、`delivery`。最初の四つは末尾の `--json` のみで JSON を選び、
@@ -137,23 +139,23 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 `{state, reason, next, evidence, complete}` フィールドを保ち、
 `suggested_next` を `next` と等しく追加します；共通エンベロープやスキーマバージョンは
 追加しません。通常のテキスト出力は state/next 行を保ち、同じアドバイスを stderr に
-追加します。delivery は Help/error stderr を保持する場合があり、**無効な `--goal` などで
-起動失敗時は JSON を出力せず、stderr にテキスト診断のみで exit 2 となる**場合があります。
-準備モードの空 stderr 契約は適用されません。
+追加します。delivery は Help/error stderr を保持する場合があり、**結果生成前に失敗した場合
+（無効な `--goal` などの引数エラーを含む）は JSON を出力せず、stderr にテキスト診断のみで
+exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
 
 二つの読み取り専用モードは、完了した観測時に準備エンベロープへ `data` を追加します：
 
 | コマンド | 完了観測時の型付きデータ |
 |---|---|
 | `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは周囲の空白を除去して `data.contract_version` として返されます。 |
-| `reviewer-count <change-id> --json` | 不変の `change_id` 文字列と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと空でない単一オペランドが必要です。 |
+| `reviewer-count <change-id> --json` | 不変の `change_id` 文字列（**少なくとも 1 文字の非空白文字を含む**）と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと非空白の単一 change ID が必要です。 |
 
 それぞれは標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
 `schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
 （`rule_id`、`message`）、順序付き文字列 `notices`、`error`、`data`。
-四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は空でない
-英語文字列、通過時は null。テキスト拒否/エラーは `Suggested next step:` を stderr に追加し、
-元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
+四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は
+**少なくとも 1 文字の非空白文字を含む英語の文字列**、通過時は null。テキスト拒否/エラーは `Suggested next step:` を
+stderr に追加し、元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
 ブロックは exit 1、ルール diagnostics、null error；エラーは exit 2、空 diagnostics、
 `error: {kind: usage|internal, message}`。すべての error data 値は null です。
 reviewer-count にブロッカー結果はなく、欠落/ダーティリポジトリは使用エラー。
@@ -172,8 +174,13 @@ reviewer 呼び出しを実行します。
 
 この consumer は `--json` を追加し、バージョン/コマンド、必須型、不変のリクエスト
 アイデンティティと exit/status 合意を検証し、互換性のある追加フィールドを保持します。
-通過かつ互換 true のみが計画継続を許可し、通過かつ正の整数 `data.reviewer_floor` のみが
-reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
+**7 つの共通フィールド**：`schema_version`、`command`、`status`、`diagnostics`（順序付き）、
+`notices`、`error`、`data`。
+`data` は `plan` と `intake` では含まれず、`contract` と `reviewer-count` に含まれます。
+**suggested_next** は 4 番目のフィールドです。
+**この helper が結果を受理するまで、計画は継続せず、reviewer も派遣されません**。
+受理された passed かつ true compatibility のみが計画継続を許可し、受理された passed かつ
+正の整数 `data.reviewer_floor` のみが reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
 使用エラーです。無効な出力は空標準出力、`checked-readonly:` 診断、exit 2。エラーも
 無効結果も継続や reviewer デフォルト、テキストフォールバック、自動リトライを許しません。
 コア観測を受理した後、適用可能な `suggested_next` を**非空白文字列**の時だけ助言として
@@ -219,8 +226,7 @@ checker が「問題なし」と言うことはありません。ステーショ
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
 テスト環境は変更しません。標準ライブラリだけを使う簡単な hook は、動作する
 システムの Python を使い、使えなければ準備済みのキャッシュ環境を使います。
-checker を使う push hook は `--ready` で準備済みの環境だけを使い、
-使えない場合は修復方法を知らせます。hook 自体はインストールしません。
+checker を使う push hook は `--ready` で**インストール済みの hook が既存の checker runtime を再利用し**、実行時に何もインストールしません。環境が使えない場合は修復方法を知らせます。
 
 ## loom-design・loom-workflow との組み合わせ
 
