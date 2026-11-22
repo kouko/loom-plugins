@@ -15,7 +15,7 @@ Codex, Antigravity CLI and OpenCode:
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/README.md) | 2.27.0 | 7 | Front of the flow: intent, specification, product principles, visual design, architecture; optional design research. |
 | [`loom-code`](loom-code/README.md) | 3.87.1 | 8 | Engineering stations: plan, build, closing-review, ship, maintain; optional engineering research. |
-| [`loom-workflow`](loom-workflow/README.md) | 5.26.1 | 15 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
+| [`loom-workflow`](loom-workflow/README.md) | 5.26.1 | 16 | Tools around the stations: memory, critique, whats-next advice, recap, handoff, one-session project retro, cross-session skill distillation, second opinions ([`independent-advisor`](loom-workflow/skills/independent-advisor/README.md)), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog. Plugin
 links open its README; skill links below open the detailed usage guide.
