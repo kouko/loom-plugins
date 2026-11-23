@@ -432,6 +432,39 @@ def test_sweep_marks_invoking_kept_worktree_kept(tmp_path: Path, monkeypatch) ->
     ]
 
 
+# record-kept A1 positive: sweep-inside-kept-worktree-marks-kept (main checkout variant)
+def test_sweep_kept_branch_checked_out_in_main_marks_kept(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    layout.branch("feat/k")
+    git(layout.repo, "switch", "-q", "feat/k")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    assert any(line.startswith("kept feat/k ") for line in out.splitlines()), out
+
+
+# record-kept A1 negative: keep-record-write-failure-exits-nonzero
+def test_keep_land_config_lock_held_exits_nonzero(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    _tip, wt = layout.branch("feat/k", worktree="wt-k")
+    monkeypatch.setattr(land, "sync_trunk", lambda target, out: None)
+    target = land.LandTarget(wt, "", "feat/k", "main", "github.com/example/project", 1,
+                             GIT, GH, None)
+    lock = layout.repo / ".git" / "config.lock"
+    lock.write_text("", encoding="utf-8")
+    out, err = StringIO(), StringIO()
+    try:
+        rc = land._sync_and_clean(target, out, err, keep=True)
+    finally:
+        lock.unlink()
+
+    assert rc == 1
+    assert "keep record not written" in err.getvalue()
+    assert wt.is_dir()
+
+
 # record-kept A1 boundary: an empty keep record still marks the change kept
 def test_sweep_empty_keep_record_counts_as_kept(tmp_path: Path, monkeypatch) -> None:
     layout = Repo(tmp_path)
