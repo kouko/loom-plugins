@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.88.0] — 2026-11-20 — land can keep the worktree
+
+- The accepted land form gains `--keep-worktree`: it merges with the same checks, acceptance line and trunk sync, then keeps the change worktree and the local and remote branch, and prints the later `land --cleanup <branch>` command instead of `next: cd`.
+- `--keep-worktree` is a usage error with `--cleanup` or `--sweep`, alone, or repeated.
+- Ship §5 and `land --help` tell the agent to pass `--keep-worktree` when the maintainer asks to keep the worktree.
+
 ## [3.87.2] — 2026-11-23 — README sync: restore missing checker details to ja/zh, version bump
 
 - Restore missing checker details to loom-code's Japanese and Traditional Chinese READMEs (five JSON-command list, data table with two read-only formats, envelope fields, suggested_next rules, delivery's stderr exception).

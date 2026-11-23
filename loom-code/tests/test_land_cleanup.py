@@ -112,7 +112,8 @@ class Calls:
         return subprocess.run(argv, capture_output=True, text=True, timeout=timeout, **kwargs)
 
 
-def run_land(monkeypatch, layout: Layout, *, cwd: Path | None = None, configure=None):
+def run_land(monkeypatch, layout: Layout, *, cwd: Path | None = None, configure=None,
+             args: tuple[str, ...] = ("--accepted-by", "kouko")):
     calls = Calls(layout)
     if configure:
         configure(calls)
@@ -131,7 +132,7 @@ def run_land(monkeypatch, layout: Layout, *, cwd: Path | None = None, configure=
         land, "resolve_publish_executable", lambda name: GIT if name == "git" else GH
     )
     out, err = StringIO(), StringIO()
-    rc = land.cmd_land(["--accepted-by", "kouko"], out, err)
+    rc = land.cmd_land(list(args), out, err)
     return rc, out.getvalue(), err.getvalue(), calls
 
 
@@ -201,6 +202,49 @@ def test_merged_change_refs_worktree_removed(tmp_path: Path, monkeypatch) -> Non
     assert push[-2:] == ["origin", ":refs/heads/feat/x"]
     timeouts = {tuple(argv): timeout for argv, timeout in calls.calls}
     assert timeouts[tuple(remove)] == 300 and timeouts[tuple(push)] == 300
+
+
+KEEP = ("--accepted-by", "kouko", "--keep-worktree")
+
+
+# keep-worktree A1 positive: keep-flag-keeps-all-syncs-trunk-then-cleanup-removes-all
+def test_keep_worktree_flag_keeps_all_then_cleanup_removes_all(
+    tmp_path: Path, monkeypatch
+) -> None:
+    layout = Layout(tmp_path)
+
+    rc, _out, err, calls = run_land(monkeypatch, layout, args=KEEP)
+
+    assert rc == 0, err
+    assert git(layout.repo, "rev-parse", "refs/heads/main") == layout.merged
+    nothing_removed(layout, calls)
+
+    context = land.LandTarget(layout.repo, "", "", "main", "github.com/example/project", 0,
+                              GIT, GH, dict(os.environ))
+    monkeypatch.setattr(land, "_cleanup_context", lambda *a: context)
+    monkeypatch.setattr(land, "_merged_prs", lambda *a: [
+        {"number": 7, "headRefOid": layout.head, "headRefName": "feat/x"}])
+    out, err = StringIO(), StringIO()
+    assert land.cmd_land(["--cleanup", "feat/x"], out, err) == 0, err.getvalue()
+    assert not layout.wt.exists()
+    assert not ref_exists(layout.repo, "refs/heads/feat/x")
+    assert not layout.remote_has("feat/x")
+
+
+# keep-worktree A4 positive: keep-output-names-cleanup-command
+def test_keep_worktree_output_names_cleanup_command(tmp_path: Path, monkeypatch) -> None:
+    layout = Layout(tmp_path)
+
+    rc, out, err, _ = run_land(monkeypatch, layout, cwd=layout.wt, args=KEEP)
+
+    assert rc == 0, err
+    assert out.splitlines() == [
+        "Merged PR #7 as a1b2c3d",
+        f"Trunk main fast-forwarded to {layout.merged[:7]}",
+        f"Kept worktree {layout.wt} on branch feat/x; "
+        "remove it later with: land --cleanup feat/x",
+    ]
+    assert Path.cwd().resolve() == layout.wt
 
 
 # A6 boundary: cwd-inside-worktree-prints-next-cd
