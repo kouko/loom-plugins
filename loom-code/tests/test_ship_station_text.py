@@ -157,12 +157,24 @@ def test_ship_keep_block_recovery_keeps_worktree() -> None:
         "`--keep-worktree` exception; the kept worktree would be removed")
 
 
-# earlier-work cleanup keeps a kept worktree (A1)
-def test_ship_earlier_work_cleanup_spares_kept_worktree() -> None:
-    later = [s for s in _land_sentences() if "earlier work" in s]
-    assert later, "ship §5 earlier-work cleanup sentence"
-    assert any(KEEP_FLAG in s and "maintainer asks" in s for s in later), (
-        "earlier-work `land --cleanup` carries no `--keep-worktree` exception")
+def _earlier_work_sentences() -> list[str]:
+    land = _land_sentences()
+    start = next(i for i, s in enumerate(land) if "earlier work" in s)
+    return land[start:]
+
+
+# ship-leaves-kept-lines-and-asks-before-earlier-work-cleanup (A5 positive)
+# ship-has-no-unasked-earlier-work-cleanup (A5 negative)
+def test_ship_earlier_work_cleanup_leaves_kept_and_asks() -> None:
+    later = _earlier_work_sentences()
+    assert any("`land --sweep`" in s and not has_negation(s.replace("removes nothing", ""))
+               for s in later), "earlier work is listed by `land --sweep`"
+    assert any(re.search(r"\bLeave every change on a `kept` line\b", s) for s in later)
+    cleaning = [s for s in later if "`land --cleanup <branch>`" in s or "--confirm <token>" in s]
+    assert cleaning, "ship §5 earlier-work cleanup sentence"
+    for s in cleaning:
+        assert re.search(r"only after the maintainer answers yes", s), (
+            f"earlier-work cleanup without the maintainer's yes: {s}")
 
 
 # negated-keep-sentence-rejected (A5 negative)

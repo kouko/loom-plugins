@@ -287,6 +287,7 @@ def test_land_help_names_keep_worktree_for_preservation(tmp_path: Path) -> None:
     recovery = next(s for s in land.split(". ") if "use cleanup for an already merged" in s)
     assert "--keep-worktree" in recovery, "post-merge recovery has no keep exception"
     assert "deletes head branches on merge" in land, "remote branch keep is unqualified"
+    assert "on a kept line it never removes" in land, "help omits the kept sweep line"
 
 
 def test_sync_trunk_is_a_declared_cli_command() -> None:
