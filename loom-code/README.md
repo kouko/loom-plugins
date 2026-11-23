@@ -150,7 +150,8 @@ The two read-only modes add `data` to the preparation envelope:
 
 Each emits exactly one stdout object plus newline and empty checker stderr:
 `schema_version: 1`, `command`, `status`, ordered `diagnostics` objects
-(`rule_id`, `message`), ordered string `notices`, `error`, and `data`.
+(`rule_id`, `message`), ordered string `notices`, and `error`.
+`contract` and `reviewer-count` also carry `data`; `plan` and `intake` output has no `data` field.
 All four version-1 modes also emit advisory `suggested_next`: a nonblank English
 string for blocked/error, null for passed. Text refusals/errors append
 `Suggested next step:` on stderr; original diagnostics and Help hints remain.

@@ -3,7 +3,7 @@
 ## [3.87.2] — 2026-11-23 — README sync: restore missing checker details to ja/zh, version bump
 
 - Restore missing checker details to loom-code's Japanese and Traditional Chinese READMEs (five JSON-command list, data table with two read-only formats, envelope fields, suggested_next rules, delivery's stderr exception).
-- Update version strings across 4 manifest files and 3 README files per plugin.
+- Update version strings across 4 manifest files and 3 README files per plugin, and the root README table/section.
 
 ## [3.87.1] — 2026-11-21 — stale doc references
 

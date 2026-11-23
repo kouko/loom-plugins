@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.26.2] — 2026-11-23 — README sync: old-map definition + version bump
 
 - Define what an "old map" is on first use: a decision map from before `roadmap` replaced it.
-- Update version strings across 4 manifests and 3 READMEs per plugin.
+- Update version strings across 4 manifests and 3 READMEs per plugin, and the root README table/section.
 
 ## [5.26.1] — 2026-11-21 — stale skill references
 

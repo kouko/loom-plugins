@@ -156,7 +156,6 @@ stderr に診断、Help ヒント、suggested next step を含むテキストが
 `schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
 （`rule_id`、`message`）、順序付き文字列 `notices`、`error`。
 
-`data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含み、
 `plan` と `intake` の出力には `data` フィールドが含まれません。
 四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は
 **少なくとも 1 文字の非空白文字を含む英語の文字列**、通過時は null。テキスト拒否/エラーは `Suggested next step:` を
