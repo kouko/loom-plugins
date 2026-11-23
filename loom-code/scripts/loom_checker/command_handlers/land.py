@@ -697,6 +697,22 @@ def _sweep_list(
     if prs is None:
         return 1
     invoking = current_branch(context.repo)
+    # The key's presence is the record, whatever its value. `git branch -m`
+    # moves the record to the new name, so a kept change is also recognised
+    # by its PR head being the tip of a local branch that carries a record.
+    _code, records, _detail = _git_run(
+        context, context.repo, "config", "--get-regexp", r"^branch\..*\.loomkept$"
+    )
+    kept_branches: set[str] = set()
+    kept_tips: set[str] = set()
+    for record in records.splitlines():
+        key = record.split(" ", 1)[0]
+        if key.lower().startswith("branch.") and key.lower().endswith(".loomkept"):
+            name = key[len("branch."):-len(".loomkept")]
+            kept_branches.add(name)
+            tip = _tip(context, context.repo, f"refs/heads/{name}")
+            if isinstance(tip, str):
+                kept_tips.add(tip)
 
     lines: list[str] = []
     removable: list[tuple[LandTarget, CleanupPlan]] = []
@@ -709,10 +725,7 @@ def _sweep_list(
                    if pr["headRefName"] == branch and pr["headRefOid"] in tips), None)
         if pr is None:
             continue
-        # The key's presence is the record, whatever its value.
-        kept = _git_run(
-            context, context.repo, "config", "--get", f"branch.{branch}.loomKept"
-        )[0] == 0
+        kept = branch in kept_branches or pr["headRefOid"] in kept_tips
         if branch == invoking and not kept:
             lines.append(f"skip {branch} — current working directory")
             continue
@@ -727,7 +740,8 @@ def _sweep_list(
         else:
             where = "no worktree"
         if kept:
-            lines.append(f"kept {branch} — {where}; remove with: land --cleanup {branch}")
+            once = " once that is resolved" if isinstance(plan, str) else ""
+            lines.append(f"kept {branch} — {where}; remove with: land --cleanup {branch}{once}")
             continue
         if isinstance(plan, str):
             lines.append(f"skip {branch} — {plan}")

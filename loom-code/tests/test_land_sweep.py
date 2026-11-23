@@ -359,7 +359,7 @@ def test_sweep_lists_kept_apart_and_confirm_spares_it(tmp_path: Path, monkeypatc
     token = token_of(out)
     assert out.splitlines() == [
         f"kept feat/k — worktree {wt_k} has untracked files; "
-        "remove with: land --cleanup feat/k",
+        "remove with: land --cleanup feat/k once that is resolved",
         f"remove feat/u {u[:7]} — worktree {wt_u}, local, remote",
         f"confirm with: land --sweep --confirm {token}",
     ]
@@ -372,6 +372,25 @@ def test_sweep_lists_kept_apart_and_confirm_spares_it(tmp_path: Path, monkeypatc
     assert (wt_k / "wip.txt").exists()
     assert git(layout.repo, "rev-parse", "refs/heads/feat/k") == k
     assert git(layout.repo, "config", "--get", "branch.feat/k.loomKept") == "2026-11-23"
+
+
+# record-kept A2 boundary: a kept branch renamed locally still spares its old-name remote
+def test_sweep_keeps_renamed_kept_branch_remote(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    layout.branch("feat/k", worktree="wt-k")
+    _, wt_u = layout.branch("feat/u", worktree="wt-u")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+    git(layout.repo, "branch", "-m", "feat/k", "feat/k2")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    assert any(line.startswith("kept feat/k ") for line in out.splitlines()), out
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep", "--confirm", token_of(out))
+
+    assert rc == 0, err
+    assert layout.gone("feat/u", wt_u)
+    assert ref_exists(layout.origin, "refs/heads/feat/k")
 
 
 # record-kept A3 boundary: cleanup-without-local-branch-clears-record
