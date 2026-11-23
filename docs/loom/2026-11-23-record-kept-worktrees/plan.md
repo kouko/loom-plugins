@@ -22,6 +22,11 @@ Wave 1 — land code (W1-01), then ship text and help that describe it (W1-02); 
 - Test: A5 positive: release_sync; boundary: release_stale_pin. Pin test `test_current_release_metadata_is_synchronized`; derived manifests via `scripts/sync_codex_manifests.py --all`.
 - Risk: minor bump 3.88.0 → 3.89.0 (CLI output and station guidance change); recheck origin/main version before bumping (agent-decided).
 
+**W3-01 Graduate the two kept-record probes into the suite**  after: W2-01  acceptance: 1
+- Files: `loom-code/tests/test_land_sweep.py`, `docs/loom/2026-11-23-record-kept-worktrees/evidence/probes/test_probe_sweep_from_kept_worktree.py`, `docs/loom/2026-11-23-record-kept-worktrees/evidence/probes/test_probe_keep_record_write_failure.py`
+- Test: A1 positive: sweep-inside-kept-worktree-marks-kept; negative: keep-record-write-failure-exits-nonzero.
+- Risk: both probes caught defects fixed in febc9ee7, so review.probe-graduation moves them into the suite before finalize-review; probe files deleted after their cases move (agent-decided).
+
 ## Simplicity check
 - merge A1 boundary into A1 positive (sweep skips the invoking worktree, so it is one run) — taken
 - one mixed kept/unkept sweep case covers A2 and A4 negative — taken
