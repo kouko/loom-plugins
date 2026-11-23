@@ -1,6 +1,67 @@
 # Keep the worktree when landing an accepted change — acceptance test evidence
 
-Tried on 2026-11-21, in a clean copy of the project at 863e5231.
+Tried on 2026-11-23, in a clean copy of the project at cf7051a7.
+
+## Re-run after trunk merge (863e5231..cf7051a7)
+
+- Change since the last run: cf23dd5e (attestation only) and merge cf7051a7
+  of origin/main fbb0e260 (#172/#174/#175/#176: docs, loom-workflow herdr
+  skill, README sync; version-metadata conflicts resolved keeping loom-code
+  3.88.0).
+- `git diff --stat 863e5231 cf7051a7 -- loom-code/scripts loom-code/skills/ship
+  loom-code/tests/test_land_cleanup.py loom-code/tests/test_land_merge.py
+  loom-code/tests/test_ship_station_text.py loom-code/tests/test_loom_checker_cli.py`
+  -> only `loom-code/scripts/check_mechanisms.py` (skill budget 27 -> 28 for
+  loom-herdr). `land.py`, `loom_checker.py`, `ship/SKILL.md` and the
+  land/ship/CLI tests are byte-identical to 863e5231.
+- Every row was re-tested in full anyway, as the station asked.
+- Clean copy: `git worktree add --detach <scratch>/at-merge cf7051a7` (no
+  uncommitted files; removed with `git worktree remove` afterwards).
+- Setup check at cf7051a7: `loom-code/scripts/loom-python --ready land
+  --cleanup feat/x --keep-worktree` -> `land: --keep-worktree applies only to
+  --accepted-by`, exit 2; `land --help` exit 0 with
+  `Usage: land --accepted-by <name> [--keep-worktree]`, "When worktree
+  preservation was requested, pass --keep-worktree to the accepted form and
+  do not run cleanup.", and no "Do not run cleanup when worktree preservation
+  was requested."
+- Driver: rewritten in scratch (the earlier one was not kept) to the same
+  outline as the appendix, run as
+  `uv run ... python -I drive_keep.py <clean-copy> <scratch-base>`;
+  `land module:` printed the clean copy's `land.py`. Results:
+  - Row 1 (Scenario B): rc 0; stdout `Merged PR #7 as a1b2c3d` /
+    `Trunk main fast-forwarded to 8826dae` / `Kept worktree .../B-keep-real/wt-x
+    on branch feat/x; remove it later with: land --cleanup feat/x`; stderr
+    `''`; cwd after = wt-x; worktree dir, local branch, remote branch all
+    True; checked-out branch `feat/x`; HEAD, status, uncommitted edit and
+    untracked file all unchanged; remove/push/update-ref git calls `[]`.
+    Ship text re-read at cf7051a7: :311, :327-328, :331-335, :337-341,
+    :349-351 read word for word as quoted under rows 1 and 5 below.
+  - Row 2 (Scenario A, plain vs keep, `_land_accepted` keep kw
+    `[False]`/`[True]`): happy, failing check, invalid PR body and foreign
+    name each give identical rc/stdout/stderr/`Accepted-by:`/call order in
+    both modes. Happy: `Accepted-by: kouko 2026-11-23` both; call order
+    `repo view, api, pr view, pr checks, pr view, pr view, pr merge, pr view,
+    fetch origin, cat-file commit`. Failing check: rc 1, `BLOCK land.merge:
+    check lint: FAILURE; next: Inspect the named CI logs, fix the failure and
+    rerun checks before retrying.`, merged False. Invalid body: rc 1,
+    `BLOCK land.merge: PR body heading "Summary" is not one of the nine
+    contextual headings; ...`, merged False. Foreign name: rc 1,
+    `BLOCK land.merge: acceptance not recorded; ...`, merged False. Scenario B
+    with keep: local main == merged True.
+  - Row 3 (Scenario C): rc 0; the six lines `Merged PR #7 as a1b2c3d`,
+    `Trunk main fast-forwarded to ebdb2e4`, `Removed worktree .../wt-x`,
+    `Deleted local branch feat/x`, `Deleted remote branch feat/x`,
+    `next: cd '.../C-default-real/repo'`; worktree, local and remote branch
+    all False.
+  - Row 4 (Scenario B2): dirty -> rc 1, `BLOCK land.cleanup: worktree
+    .../wt-x has modified files`, all three still present; after reverting
+    -> rc 0, `Worktree for feat/x: ...`, `Removed worktree ...`,
+    `Deleted local branch feat/x`, `Deleted remote branch feat/x`,
+    `next: cd '.../repo'`; all three gone. GitHub lookups scripted, as before.
+  - Row 5: ship text and `land --help` as above; misuse forms covered by the
+    passing usage-error tests.
+- Criterion tests at cf7051a7: the same 13 node ids listed under "Criterion
+  tests run" -> `13 passed in 17.91s`.
 
 ## Re-run after fix (43d90db3..863e5231)
 
