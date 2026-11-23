@@ -1,6 +1,9 @@
 # Record kept worktrees so sweep never removes them — acceptance test evidence
 
-Tried on 2026-11-23, in a clean copy of the project at 2e024f7a.
+Tried on 2026-11-23, in a clean copy of the project at 028cb9e8.
+
+The sections 1-5 below are the first run, at 2e024f7a. Every row was re-tested
+at 028cb9e8; see "Re-run on 2026-11-23, at 028cb9e8" at the end.
 
 ## Setup
 
@@ -205,3 +208,111 @@ UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python \
 
 The full package suite (`scripts/run_package_tests.py --loom-family`) was not run
 here; finalize-review runs it and refuses the attestation when it fails.
+
+## Re-run on 2026-11-23, at 028cb9e8
+
+Fix range 1cdaa3d3..028cb9e8: `_sweep_list` now reads every
+`branch.*.loomkept` key once and also treats a candidate as kept when its PR
+head is the tip of a local branch carrying a record (renamed kept branch);
+a kept line whose cleanup plan is refused ends "... once that is resolved";
+`land --help` adds the record-write-failure sentence; ship SKILL.md §5 adds
+"A yes to the printed list covers only its `remove` lines; a kept change is
+removed only when the maintainer names that branch." The sweep change touches
+every listing, so all five rows were re-tested in full; none carried over.
+
+Clean copy: `git worktree add <scratch>/at-028 028cb9e8`; baseline for row 4:
+`git worktree add <scratch>/at-main2 5ee4814f`. Same harness as above
+(`<scratch>/drv/driver.py`, `setup.py`, `unkept.sh`); new scenario
+`<scratch>/drv/scenario2.sh` = the first-run scenario plus a fifth change
+`feat/ren` kept and then renamed locally (`git -C wt-ren branch -m feat/ren
+feat/ren-local`), run directory `$R=<scratch>/run-028`.
+
+Setup check: `uv run ... python loom-code/scripts/loom_checker.py land --help`
+in the clean copy, exit 0, prints "The keep form records the keep, so a later
+sweep shows that change on a kept line it never removes; land --cleanup
+<branch> removes a kept change and its record. If the record cannot be
+written, land exits 1 after the merge and prints git config
+branch.<branch>.loomKept <date> to write it."
+
+- 1: re-tested — sessions 1, 2, 2b keep-landed `feat/keep`, `feat/dirty`,
+  `feat/ren` (each its own process, exit 0, "Kept worktree ... remove it later
+  with: land --cleanup <b>"). Records are in `.git/config` only
+  (`branch.feat/keep.loomkept`, `branch.feat/dirty.loomkept`, and after the
+  rename `branch.feat/ren-local.loomkept`); `git -C wt-keep status --porcelain
+  --ignored` empty. Fresh-process sweeps from the main checkout, from inside
+  `wt-keep`, from inside the dirty `wt-dirty` and from inside the renamed
+  `wt-ren` all printed the same lines and token:
+  ```
+  kept feat/dirty — worktree $R/wt-dirty has modified files; remove with: land --cleanup feat/dirty once that is resolved
+  kept feat/keep — worktree $R/wt-keep; remove with: land --cleanup feat/keep
+  remove feat/plain 180dfaf — worktree $R/wt-plain, local, remote
+  kept feat/ren — no worktree; remove with: land --cleanup feat/ren
+  confirm with: land --sweep --confirm 42b82f5f901f
+  [exit 0]
+  ```
+  The dirty kept line now ends "once that is resolved" (earlier nit closed).
+- 2: re-tested — `land --sweep --confirm 42b82f5f901f` removed only
+  `feat/plain` (worktree, local, remote). After it:
+  ```
+  feat/keep        local=yes remote=yes record=2026-11-23
+  feat/dirty       local=yes remote=yes record=2026-11-23
+  feat/ren         local=no remote=yes record=none
+  feat/ren-local   local=yes remote=no record=2026-11-23
+  worktrees: repo [main], wt-dirty [feat/dirty], wt-keep [feat/keep], wt-ren [feat/ren-local]
+  wt-dirty: file.txt notes.txt wt-dirty.txt; wt-dirty.txt = "feat/dirty\nedited"
+  ```
+  The renamed kept change's old-name remote is now on a `kept` line and
+  survives the confirm (at 2e024f7a it was a `remove` line). Session 8, only
+  kept left: three `kept` lines, "No merged changes to clean up", no token.
+- 3: re-tested — `land --cleanup feat/keep`: "Removed worktree ... Deleted
+  local branch feat/keep / Deleted remote branch feat/keep", exit 0; then
+  `local=no remote=no record=none`, `wt-keep` gone, `git config
+  --get-regexp 'branch\.feat/keep'` empty. `land --cleanup feat/dirty`:
+  `BLOCK land.cleanup: worktree $R/wt-dirty has modified files`, exit 1,
+  record kept. Renamed case (finding below): `land --cleanup feat/ren` — the
+  command its kept line prints — output only "Deleted remote branch
+  feat/ren", exit 0; `wt-ren`, local `feat/ren-local` and its record remain.
+  `land --cleanup feat/ren-local` → `BLOCK land.cleanup: no merged PR for
+  feat/ren-local`, exit 1. Session 11 sweep then lists only `kept feat/dirty`
+  — the renamed kept worktree and its record are no longer shown at all.
+- 4: re-tested — `unkept.sh` run against 5ee4814f and against 028cb9e8,
+  same run dir `<scratch>/RUN2`, `GIT_AUTHOR_DATE=GIT_COMMITTER_DATE=
+  2026-11-23T00:00:00Z`, sequentially. `diff -s unkept-main-2.txt
+  unkept-head-2.txt` → identical. Key lines: `skip feat/dirtyplain — worktree
+  ... has untracked files`, `remove feat/plain 9886822 — worktree ...,
+  local, remote`, `confirm with: land --sweep --confirm dd9ad2d9fe1a`, from
+  `wt-plain`: `skip feat/plain — current working directory`, named cleanup of
+  the dirty one: `BLOCK land.cleanup: ... has untracked files`.
+- 5: re-tested — ship SKILL.md §5 at 028cb9e8 (lines 349-356) given with a
+  mixed listing (two `kept`, two `remove`, token) to a fresh-context sonnet
+  agent told to read nothing else and run nothing (input file
+  `<scratch>/coldreader/input.md`). Answers: maintainer silent → cleans
+  nothing, asks; `kept` lines → left alone; "yes, go ahead with the list" →
+  `--sweep --confirm <token>` or one `--cleanup` per `remove` line, no kept
+  change removed (cites "A yes to the printed list covers only its `remove`
+  lines"); "yes, clean everything" → still leaves both kept, asks for branch
+  names (cites "a kept change is removed only when the maintainer names that
+  branch"); "remove feat/keep" → `land --cleanup feat/keep`. Ambiguity it
+  raised: none that would remove a kept change; it noted the rule does not
+  itself say the token excludes kept lines (the tool output above shows it
+  does). The earlier list-scope nit is closed.
+
+Finding (nit): renamed kept branch. After `git branch -m` of a kept branch,
+sweep lists it as `kept feat/ren — no worktree; remove with: land --cleanup
+feat/ren`. The worktree does exist (on `feat/ren-local`), and the printed
+command removes only the old-name remote branch, leaves the worktree, local
+branch and record, and afterwards no sweep lists that change; `land --cleanup
+<new name>` is refused for lack of a merged PR. Nothing kept is lost, but the
+listing misreports the worktree and the printed removal does not remove the
+change or its record.
+
+Tests run at 028cb9e8 (criterion tests only):
+```
+UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python \
+  uv run --isolated --with-requirements requirements-package-tests.lock \
+  python -m pytest loom-code/tests/test_land_sweep.py \
+  loom-code/tests/test_land_cleanup.py loom-code/tests/test_ship_station_text.py -q
+52 passed in 156.76s (0:02:36)
+```
+The full package suite was not run here; finalize-review runs it and refuses
+the attestation when it fails.
