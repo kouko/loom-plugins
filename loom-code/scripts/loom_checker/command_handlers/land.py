@@ -215,10 +215,16 @@ def _sync_and_clean(target: LandTarget, out, err, *, keep: bool = False) -> int:
     sync_trunk(target, out)
     if keep:
         # The keep record: common config, so every worktree's sweep sees it.
-        _git_run(target, target.repo, "config", f"branch.{target.branch}.loomKept",
-                 date.today().isoformat())
+        value = date.today().isoformat()
+        code, _stdout, detail = _git_run(
+            target, target.repo, "config", f"branch.{target.branch}.loomKept", value
+        )
         out.write(f"Kept worktree {target.repo} on branch {target.branch}; "
                   f"remove it later with: land --cleanup {target.branch}\n")
+        if code != 0:
+            return _cleanup_block(
+                f"keep record not written: {detail}; run: "
+                f"git config branch.{target.branch}.loomKept {value}", err)
         return 0
     return cleanup_change(target, out, err, worktree=target.repo)
 
@@ -703,15 +709,15 @@ def _sweep_list(
                    if pr["headRefName"] == branch and pr["headRefOid"] in tips), None)
         if pr is None:
             continue
-        if branch == invoking:
+        # The key's presence is the record, whatever its value.
+        kept = _git_run(
+            context, context.repo, "config", "--get", f"branch.{branch}.loomKept"
+        )[0] == 0
+        if branch == invoking and not kept:
             lines.append(f"skip {branch} — current working directory")
             continue
         target = _change_target(context, branch, pr)
         plan = plan_cleanup(target, fetch=False)
-        code, kept, _detail = _git_run(
-            context, context.repo, "config", "--get", f"branch.{branch}.loomKept"
-        )
-        kept = code == 0 and bool(kept.strip())
         if isinstance(plan, str):
             where = plan
         elif plan.worktree is not None:

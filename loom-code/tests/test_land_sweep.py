@@ -417,6 +417,35 @@ def test_sweep_skips_invoking_worktree(tmp_path: Path, monkeypatch) -> None:
     assert layout.intact("feat/x", wt)
 
 
+# record-kept A1 boundary: sweep run inside the kept worktree marks it kept
+def test_sweep_marks_invoking_kept_worktree_kept(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    _, wt = layout.branch("feat/k", worktree="wt-k")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep", cwd=wt)
+
+    assert rc == 0, err
+    assert out.splitlines() == [
+        f"kept feat/k — worktree {wt}; remove with: land --cleanup feat/k",
+        "No merged changes to clean up",
+    ]
+
+
+# record-kept A1 boundary: an empty keep record still marks the change kept
+def test_sweep_empty_keep_record_counts_as_kept(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    _, wt = layout.branch("feat/k", worktree="wt-k")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    assert out.splitlines()[0] == (
+        f"kept feat/k — worktree {wt}; remove with: land --cleanup feat/k"
+    )
+
+
 def test_sweep_reports_unexamined_older_prs(tmp_path: Path, monkeypatch) -> None:
     layout = Repo(tmp_path)
 
