@@ -1,3 +1,4 @@
+# concern: A change landed with --keep-worktree must never be listed for removal by sweep, from any worktree, even when renamed or dirty.
 """`land --cleanup <branch>` and `land --sweep [--confirm <token>]`
 (plan W3-02; spec REQ-9, REQ-10).
 

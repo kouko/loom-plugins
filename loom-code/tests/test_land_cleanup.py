@@ -1,3 +1,4 @@
+# concern: A keep land must durably record the keep or fail loudly, and cleanup must clear that record.
 """`land --accepted-by` trunk fast-forward and change cleanup
 (plan W3-01; spec REQ-5..REQ-8).
 
