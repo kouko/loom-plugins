@@ -352,7 +352,8 @@ every change on a `kept` line alone: it was landed with `--keep-worktree` and
 stays until the maintainer asks for it to be removed. Clean any other listed
 change — `land --cleanup <branch>` for one, or pass `--sweep --confirm <token>`
 — only after the maintainer answers yes to the printed list, never on your own
-judgement.
+judgement. A yes to the printed list covers only its `remove` lines; a kept change is
+removed only when the maintainer names that branch.
 
 ## Handoff
 

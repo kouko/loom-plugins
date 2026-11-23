@@ -288,6 +288,7 @@ def test_land_help_names_keep_worktree_for_preservation(tmp_path: Path) -> None:
     assert "--keep-worktree" in recovery, "post-merge recovery has no keep exception"
     assert "deletes head branches on merge" in land, "remote branch keep is unqualified"
     assert "on a kept line it never removes" in land, "help omits the kept sweep line"
+    assert "exits 1 after the merge" in land and "git config branch.<branch>.loomKept" in land, "help omits the failed-record note"
 
 
 def test_sync_trunk_is_a_declared_cli_command() -> None:

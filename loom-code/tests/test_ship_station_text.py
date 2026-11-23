@@ -175,6 +175,9 @@ def test_ship_earlier_work_cleanup_leaves_kept_and_asks() -> None:
     for s in cleaning:
         assert re.search(r"only after the maintainer answers yes", s), (
             f"earlier-work cleanup without the maintainer's yes: {s}")
+    joined = " ".join(later)
+    assert "covers only its `remove` lines" in joined and "names that branch" in joined, (
+        "ship §5 must say a yes covers only `remove` lines and a kept change needs its branch named")
 
 
 # negated-keep-sentence-rejected (A5 negative)

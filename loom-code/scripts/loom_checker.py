@@ -221,7 +221,8 @@ land --cleanup <branch> command; land deletes neither branch, but a hosting
 setting that deletes head branches on merge can still remove the remote one.
 The keep form records the keep, so a later sweep shows that change on a kept
 line it never removes; land --cleanup <branch> removes a kept change and its
-record.
+record. If the record cannot be written, land exits 1 after the merge and
+prints git config branch.<branch>.loomKept <date> to write it.
 Cleanup targets a named merged change. Sweep computes candidates and a confirmation token; even without a
 token it fetches/prunes refs. A matching revalidated token enables deletion.
 When worktree preservation was requested, pass --keep-worktree to the accepted

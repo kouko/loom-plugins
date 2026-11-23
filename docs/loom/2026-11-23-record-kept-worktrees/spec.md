@@ -17,7 +17,7 @@ REQ-5 — Ship cleans only unrecorded changes, and asks when unsure
 ## Design decision
 - The keep record is one git config entry, `branch.<branch>.loomKept`, written with `git config` in the repository's common config when the keep land succeeds (after trunk sync, alongside today's "Kept worktree" line). agent-decided — it lives outside every working tree, is never committed or pushed (intent Constraint 1), is readable from any worktree of the repository, and git removes the `branch.<branch>` section when the local branch is deleted.
 - Sweep reads `git config --get branch.<branch>.loomKept` for each candidate; a set value produces `kept <branch> — <where>; remove with: land --cleanup <branch>` instead of a `remove` line and the change is not added to the removable list. The token is computed only over `remove` lines (unchanged rule), so kept changes cannot enter a confirmed sweep. user-decided — the maintainer chose "list separately, mark kept, never delete" at decision point ① (2026-11-23).
-- `land --cleanup <branch>` on a kept change behaves as for any merged change and then unsets `branch.<branch>.loomKept` explicitly (no error when already gone), so a record cannot outlive a cleanup that removed only the remote branch or found no local branch. agent-decided — explicit cleanup is the maintainer's request to remove (intent Proposed outcome).
+- `land --cleanup <branch>` on a kept change behaves as for any merged change and then removes the `branch.<branch>` config section (which holds the record), even when no local branch exists (no error when already gone), so a record cannot outlive a cleanup that removed only the remote branch or found no local branch. agent-decided — explicit cleanup is the maintainer's request to remove (intent Proposed outcome).
 - Ship §5: the earlier-work cleanup paragraph is rewritten so the agent runs `land --sweep` (listing only), leaves `kept` lines alone, and cleans other merged changes only after the maintainer answers yes to the listing; this also covers 3.88.0-era keeps that have no record (intent Out of scope: no backfill). The land help text documents the `kept` line and the record. agent-decided.
 - No new flag, file, or schema. Release as a minor loom-code bump (station guidance and CLI output change). agent-decided.
 
@@ -38,7 +38,8 @@ REQ-5 — Ship cleans only unrecorded changes, and asks when unsure
 ## UI flows
 | case | what the agent runs | what it sees |
 |---|---|---|
-| keep a change | `land --accepted-by <name> --keep-worktree` | unchanged output ("Kept worktree … remove it later with: land --cleanup <branch>"); the record is written silently |
+| keep a change | `land --accepted-by <name> --keep-worktree` | the Kept worktree line ("Kept worktree … remove it later with: land --cleanup <branch>"); the record is written |
+| keep record write fails | `land --accepted-by <name> --keep-worktree` | the Kept worktree line, then `BLOCK land.cleanup: keep record not written: <detail>; run: git config branch.<branch>.loomKept <date>`; exit 1 |
 | later session lists sweep | `land --sweep` | a `kept <branch> — <where>; remove with: land --cleanup <branch>` line for each kept change, `remove …` lines for the rest; the confirm token covers only `remove` lines |
 | only kept changes merged | `land --sweep` | the `kept` lines, then "No merged changes to clean up"; no token |
 | confirm sweep | `land --sweep --confirm <token>` | removes only the `remove` lines; kept changes untouched |
