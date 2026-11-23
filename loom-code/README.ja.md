@@ -12,7 +12,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.87.2 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.87.3 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -128,8 +128,7 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 チェックと終了コードは保持します**。成功、ルールによる拒否、使用／内部
 エラーを区別し、診断と通知の順序を保持しますが、ワークフロー全体の完了は
 意味しません。**各コマンドの `--help` には、結果のフィールド、起動時および
-プロセス失敗時の制限について記述されています**。各コマンドの `--help` を
-見ればフィールドの一覧がわかります。（help には `suggested_next` も含まれます）。
+プロセス失敗時の制限について記述されています**（help には `suggested_next` も含まれます）。
 
 五つの checker コマンドが JSON をサポートします：`plan`、`intake`、`contract`、
 `reviewer-count`、`delivery`。最初の四つは末尾の `--json` のみで JSON を選び、
@@ -143,8 +142,7 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 （無効な `--goal` などの引数エラーを含む）は `--json` を指定しても JSON を出力せず、
 stderr に診断、Help ヒント、suggested next step を含むテキストが出力されて exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
 
-`data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含み、
-そのすべてのフィールドは使用エラー・内部エラーの両方で `null` となります。
+`data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含みます。
 完成観測時の型付きデータは以下の通りです：
 
 | コマンド | 完成観測時の型付きデータ |

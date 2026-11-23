@@ -1,8 +1,15 @@
 # Changelog
 
+## [3.87.3] — 2026-11-23 — README follow-ups: remove duplicates, align the three languages
+
+- English README states the delivery pre-result failure (no JSON, stderr text, exit 2) and the whitespace stripping of the contract manifest version, which the translations already said.
+- Traditional Chinese README states that delivery failure exits 2 and drops its repeated suggested_next and data-null paragraphs; Japanese README drops its repeated `--help` and data-null sentences.
+- Add the English README correction to the 3.87.2 entry.
+
 ## [3.87.2] — 2026-11-23 — README sync: restore missing checker details to ja/zh, version bump
 
 - Restore missing checker details to loom-code's Japanese and Traditional Chinese READMEs (five JSON-command list, data table with two read-only formats, envelope fields, suggested_next rules, delivery's stderr exception).
+- Correct the English README: only `contract` and `reviewer-count` carry `data`; `plan` and `intake` output has none.
 - Update version strings across 4 manifest files and 3 README files per plugin, and the root README table/section.
 
 ## [3.87.1] — 2026-11-21 — stale doc references

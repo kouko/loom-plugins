@@ -10,7 +10,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.87.2 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.87.3 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -122,7 +122,7 @@ read-only 模式混用 help 與最終 JSON 為用法錯誤；plan/intake 視混�
 一般輸入驗證。delivery 保留其獨特的 `{state, reason, next, evidence, complete}`
 欄位並增設 `suggested_next` 等於 `next`；無共用 envelope 或 schema version。
 一般文字保留 state/next 行並在 stderr 加上相同建議。delivery 可能保留
-Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。
+Help/error stderr，**在結果生成前失敗時（含無效 `--goal` 等參數錯誤），即使使用了 `--json` 也不輸出 JSON，而是在 stderr 輸出含診斷、Help 提示與建議下一步的文字，並以 exit 2 結束**。
 準備模式的空 stderr 契約不適用。
 
 plan、`intake`、`contract`、`reviewer-count` 四個 v1 模式各自輸出恰一個標準輸出
@@ -133,8 +133,7 @@ JSON 物件加換行，checker stderr 為空：
 通過為 null。文字拒絕/錯誤在 stderr 附加 `Suggested next step:`；原始
 diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null error；
 阻擋即 exit 1、rule diagnostics、null error；錯誤即 exit 2、空 diagnostics、
-`error: {kind: usage|internal, message}`。無論是使用錯誤或內部錯誤，所有
-`data` 物件的欄位均為 `null`。
+`error: {kind: usage|internal, message}`。
 reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
 請用欄位與型別而非鍵順或人言判斷。
 
@@ -165,13 +164,10 @@ true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.revi
 決定 reviewer 派遣。不相容 `2.99` 為 blocked 觀測；malformed `bad` 為有效
 用法錯誤。無效輸出為空 stdout、`checked-readonly:` 診斷、exit 2。錯誤與
 無效結果皆不允許續行、reviewer 預設、文字 fallback、自動重試。接受核心
-觀測後，始終保留原始診斷；僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議，與原始診斷一併顯示。受理的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
+觀測後，始終保留原始診斷；僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議，與原始診斷一併顯示；缺失、`null`、空字串、純空白字串或非字串型別的建議一律忽略。受理的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
 建議不授權、不觸發自動動作。contract 拒絕時依診斷指示的 plugin；loom-code
 或消費端 plugin 可能較舊。consumer 故障保留原診斷與 exit 區別，在 stderr
 加上本地產生的建議。
-
-**usable `suggested_next`**: 當值為**非空白字串**時為可用建議；缺失、 `null`、
-空字串、純空白字串、或非字串型別者均被忽略，此時保留原始診斷作為基準。
 
 此 helper 以配置的 30 秒 subprocess timeout 與保留啟動 exit 86 執行
 checker 一次。不寫 artifact、不裝 runtime、不改 policy/authority/host trust；
