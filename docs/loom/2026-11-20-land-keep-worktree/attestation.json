@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-11-20-land-keep-worktree",
-  "content_digest": "cf34b9d09be1b6c3c1d34a84ad9234d0dce0bc16",
+  "content_digest": "3fa31f436615dd5e1c060f8dd2e8d5b6b442ce71",
   "executions": [
     {
       "kind": "package-tests",
@@ -29,14 +29,8 @@
         {
           "severity": "nit",
           "dimension": "tests",
-          "anchor": "loom-code/tests/test_land_cleanup.py:224",
-          "text": "cleanup-after-keep leg stubs _cleanup_context/_merged_prs instead of faking at run_land_external; non-blocking"
-        },
-        {
-          "severity": "nit",
-          "dimension": "tests",
           "anchor": "loom-code/tests/test_ship_station_text.py :: def test_ship_earlier_work_cleanup_spares_kept_worktree",
-          "text": "earlier-work pin does not reject a negated sentence; non-blocking"
+          "text": "earlier-work pin does not reject a negated sentence; non-blocking, left open"
         }
       ]
     },
@@ -52,8 +46,8 @@
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": "071e271078c209413df6c88c506ba672682d9a24",
-  "tested_commit": "863e5231",
-  "reviewed_commit": "a44e026316f21242970d473ed56864d1cd29b0cf",
+  "tested_commit": "cf7051a7",
+  "reviewed_commit": "a7104e789ea7a7ab70ace302cf19cb3c2277c494",
   "acceptance_status": [
     {
       "acceptance": 1,
