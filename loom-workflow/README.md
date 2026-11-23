@@ -8,7 +8,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: optional staged project roadmaps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.26.1 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.26.2 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -67,7 +67,8 @@ Use [roadmap](skills/roadmap/README.md) for an optional root ROADMAP.md or a sel
 existing document. Keep current goals, completion conditions, status, next actions,
 unknowns and evidence links. Advice or resumption alone does not force creation.
 Planning grants no implementation, background execution, publication or merge
-permission. Old maps remain readable without conversion, rewriting or closure.
+permission. **Old maps** (decision maps from before `roadmap` replaced them) remain
+readable without conversion, rewriting or closure.
 
 ## Skills
 

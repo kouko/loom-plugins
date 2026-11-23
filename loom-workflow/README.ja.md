@@ -8,7 +8,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：任意の段階的なプロジェクト計画、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.26.1 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.26.2 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -67,7 +67,8 @@ gate し、plugin にすでにある utility skill はそのまま残ります�
 [roadmap](skills/roadmap/README.md) は任意のルート ROADMAP.md、または指定済みの
 既存計画文書を扱います。目標、完了条件、現状、次の行動、未知の点と根拠へのリンクを
 残します。助言や作業再開だけで文書を強制作成しません。計画は実装・バックグラウンド実行・
-公開・マージの許可ではありません。旧 map は読み取り可能な履歴として残し、変換・書き換え・終了操作を行いません。
+公開・マージの許可ではありません。**旧 map**（`roadmap` が置き換える前の decision map）
+は読み取り可能な履歴として残し、変換・書き換え・終了操作を行いません。
 
 ## Skills
 

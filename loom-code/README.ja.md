@@ -12,7 +12,7 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.87.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.87.2 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill + 1 研究用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -22,13 +22,13 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 
 ```mermaid
 flowchart TD
-    intent["① 解決する問題を確認<br/>capture-intent"]
+    intent["① この変更を確認<br/>capture-intent"]
     design{"設計が必要？"}
-    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの振る舞いのみ確認"]
+    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの可視振る舞いを確認"]
     plan["作業を計画<br/>write-plan"]
     build["実装とテスト<br/>build"]
     review["レビューと検証<br/>closing-review"]
-    ship["③ PR を開き結果を確認<br/>ship"]
+    ship["③ PR を開き、結果を受理<br/>ship"]
 
     intent --> design
     design -->|"必要"| spec
@@ -75,7 +75,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
 | [`external-review`](skills/external-review/README.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
-| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後の Vault 保存は、その都度、保存先と範囲の承認を得る。 |
+| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後、該当する研究を Vault に保存する提案をする場合があり、その都度、保存先と範囲についてユーザーの明示的な同意が必要です。 |
 
 ## Agents
 
@@ -91,7 +91,8 @@ flowchart TD
 
 レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
 reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
-1 人、それ以外や判定できないときは 2 人です。acceptance testing が行われるのは、Acceptance
+1 人、それ以外や判定できないときは 2 人です。**closing-review はこの検証済みの
+reviewer-count 結果を使用します**。acceptance testing が行われるのは、Acceptance
 行を機械的に判定できないときだけです。
 
 ## 訊かれる 3 つの質問
@@ -123,11 +124,86 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 ## checker
 
 `plan <path> --json` と `intake <station> <change-id> --json` は、準備検査の
-バージョン 1 の結果を stdout に出力します。`--json` は末尾に置き、既定の
-テキスト出力と終了コードは変わりません。成功、ルールによる拒否、使用／内部
+バージョン 1 の結果を stdout に出力します。**--json は出力形式を変更しつつ、
+チェックと終了コードは保持します**。成功、ルールによる拒否、使用／内部
 エラーを区別し、診断と通知の順序を保持しますが、ワークフロー全体の完了は
-意味しません。六つのフィールドと起動／プロセス失敗の制限は、各コマンドの
-正確な `--help` で確認できます。
+意味しません。**各コマンドの `--help` には、結果のフィールド、起動時および
+プロセス失敗時の制限について記述されています**。各コマンドの `--help` を
+見ればフィールドの一覧がわかります。（help には `suggested_next` も含まれます）。
+
+五つの checker コマンドが JSON をサポートします：`plan`、`intake`、`contract`、
+`reviewer-count`、`delivery`。最初の四つは末尾の `--json` のみで JSON を選び、
+重複セレクタは使用エラー。コマンドの正確な `--help`/`-h` は引き続きテキスト出力です。
+二つの読み取り専用モードで help と最終 JSON が混在するのは使用エラー；plan/intake は
+混在形式を通常の入力として検証します。delivery は独自の
+`{state, reason, next, evidence, complete}` フィールドを保ち、
+`suggested_next` を `next` と等しく追加します；共通エンベロープやスキーマバージョンは
+追加しません。通常のテキスト出力は state/next 行を保ち、同じアドバイスを stderr に
+追加します。delivery は Help/error stderr を保持する場合があり、**結果生成前に失敗した場合
+（無効な `--goal` などの引数エラーを含む）は `--json` を指定しても JSON を出力せず、
+stderr に診断、Help ヒント、suggested next step を含むテキストが出力されて exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
+
+`data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含み、
+そのすべてのフィールドは使用エラー・内部エラーの両方で `null` となります。
+完成観測時の型付きデータは以下の通りです：
+
+| コマンド | 完成観測時の型付きデータ |
+|---|---|
+| `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは周囲の空白を除去して `data.contract_version` として返されます。 |
+| `reviewer-count <change-id> --json` | 不変の `change_id` 文字列（**少なくとも 1 文字の非空白文字を含む**）と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと非空白の単一 change ID が必要です。 |
+
+`plan`、`intake`、`contract`、`reviewer-count` の四つのバージョン 1 モードは、それぞれ標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
+`schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
+（`rule_id`、`message`）、順序付き文字列 `notices`、`error`。
+
+`plan` と `intake` の出力には `data` フィールドが含まれません。
+四つのバージョン 1 モードはすべて助言的 `suggested_next` を出します：ブロック/エラー時は
+**少なくとも 1 文字の非空白文字を含む英語の文字列**、通過時は null。テキスト拒否/エラーは `Suggested next step:` を
+stderr に追加し、元の診断と Help ヒントを保持します。通過は exit 0、空 diagnostics、null error；
+ブロックは exit 1、ルール diagnostics、null error；エラーは exit 2、空 diagnostics、
+`error: {kind: usage|internal, message}`。使用エラーでも内部エラーでも、すべての `data` フィールドの値は `null` です。
+reviewer-count にブロッカー結果はなく、欠落/ダーティリポジトリは使用エラー。
+空配列は `[]` のままです。キー順や人間向けメッセージではなく、フィールドと型を使ってください。
+
+計画とクロージングレビューは、成功プローズを解析したりバリデータを重複させたりせず、
+共有の checked consumer を使います。`<loom-code>` をインストール済みのプラグインディレクトリに置き換え、`<change-id>` を置き換え、機能作業を commit した後の選択されたクリーンリポジトリで
+reviewer 呼び出しを実行します。
+
+コア観測を受理した後、元の診断を常に保持し、適用可能な `suggested_next` が**非空白文字列**の場合にのみ助言として元の診断とともに提示します。欠落、null、空文字列、空白のみ、または非文字列の値は無視されます。受理された生 JSON に使えないアドバイスが含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
+
+```sh
+"<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py --help
+```
+
+この consumer は `--json` を追加し、バージョン/コマンド、必須型、不変のリクエスト
+アイデンティティと exit/status 合意を検証し、互換性のある追加フィールドを保持します。
+**この helper が結果を受理するまで、計画は継続せず、reviewer も派遣されません**。
+受理された passed かつ true compatibility のみが計画継続を許可し、受理された passed かつ
+正の整数 `data.reviewer_floor` のみが reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
+使用エラーです。無効な出力は空標準出力、`checked-readonly:` 診断、exit 2。エラーも
+無効結果も継続や reviewer デフォルト、テキストフォールバック、自動リトライを許しません。
+アドバイスは認可を与えず、自動実行をトリガーしません。contract 拒否の場合は診断の
+示すプラグインに従います；loom-code か消費側プラグインのいずれかが古い可能性があります。
+consumer の故障は、元の診断と exit 区別を保ったまま、ローカルで生成されたアドバイスを
+stderr に追加します。
+
+このヘルパーは、設定された 30 秒のサブプロセス timeout と起動 exit 86 の保持で
+checker を 1 回実行します。artifact を書いたり、runtime をインストールしたり、
+ポリシー・権限・ホスト信頼を変更したりはしません；外側の launcher の `--repair` は
+必要に応じてキャッシュを準備し、`--ready` がそれを再利用します。構造的検査は計算の真実や
+ワークフロー全体の完了を証明しません。既存の結果分類、必須フィールド、リモート操作の
+調停はそのままです。全 16 checker コマンドが助言的振る舞いを定義し、5 つの直接 JSON
+モードと 2 つの checked station consumer があります。通常のテキストは stderr で
+`Suggested next step:` を使い、GitHub rules の通常レポートは標準出力を保持します。
+アドバイスのみの OSError/UnicodeError は結果を変更せず、アクションを繰り返しません。
+未知や未同期の exit-zero 結果はそのまま未知・未同期のままです；成功した検査に
+フィラーは不要です。hook ペイロード/ネイティブ hook バイト、セットアップ、CI アノテーション、
+進捗、必須クリーンアップ cwd 引き渡しはそれぞれのプロトコルを保ちます。
+[CLI 結果ガイド](references/cli-results.md) は各コマンド/モードを実行可能な検査に
+マッピングし、例外を説明します。追加の JSON モード、checked consumer、自動アクションは
+導入しません。解決率、時間、トークン、コストの向上は測定されていません。
 
 `scripts/loom_checker.py` が決定的な層です。どのルールも宣言を信じずに
 リポジトリから再計算し、ルール一覧は `--list-rules` が正です。終了コードは
@@ -148,8 +224,7 @@ checker が「問題なし」と言うことはありません。ステーショ
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
 テスト環境は変更しません。標準ライブラリだけを使う簡単な hook は、動作する
 システムの Python を使い、使えなければ準備済みのキャッシュ環境を使います。
-checker を使う push hook は `--ready` で準備済みの環境だけを使い、
-使えない場合は修復方法を知らせます。hook 自体はインストールしません。
+checker を使う push hook は `--ready` で**インストール済みの hook が既存の checker runtime を再利用し**、実行時に何もインストールしません。環境が使えない場合は修復方法を知らせます。
 
 ## loom-design・loom-workflow との組み合わせ
 

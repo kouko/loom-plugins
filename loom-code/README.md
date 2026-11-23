@@ -12,7 +12,7 @@ Skill guides open in English unless a matching translation is available.
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.87.1 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.87.2 · **Skills**: 5 stations + 1 router + 1 external review skill + 1 research skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -150,7 +150,8 @@ The two read-only modes add `data` to the preparation envelope:
 
 Each emits exactly one stdout object plus newline and empty checker stderr:
 `schema_version: 1`, `command`, `status`, ordered `diagnostics` objects
-(`rule_id`, `message`), ordered string `notices`, `error`, and `data`.
+(`rule_id`, `message`), ordered string `notices`, and `error`.
+`contract` and `reviewer-count` also carry `data`; `plan` and `intake` output has no `data` field.
 All four version-1 modes also emit advisory `suggested_next`: a nonblank English
 string for blocked/error, null for passed. Text refusals/errors append
 `Suggested next step:` on stderr; original diagnostics and Help hints remain.

@@ -8,7 +8,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：可選的專案階段規劃、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.26.1 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.26.2 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名稱遷移
 
@@ -61,8 +61,8 @@ plugin 用到並不算數。這條規則只 gate
 
 [roadmap](skills/roadmap/README.md) 使用可選的根目錄 ROADMAP.md，或已指定的既有
 規劃文件，保存目前目標、完成條件、狀態、下一步、未知事項與證據連結。只問建議或接續
-工作不會強制建立文件。規劃不授權實作、背景執行、發布或合併。舊 map 保留可讀歷史，
-不自動轉換、改寫或結案。
+工作不會強制建立文件。規劃不授權實作、背景執行、發布或合併。**舊 map**（`roadmap` 取代前的 decision map）保留可讀歷史，
+不轉換、不改寫、不結案。
 
 ## Skills
 
