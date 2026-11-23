@@ -242,6 +242,22 @@ def test_keep_worktree_flag_keeps_all_then_cleanup_removes_all(
     assert git(layout.repo, "config", "--get", "branch.feat/x.loomKept", check=False) == ""
 
 
+# record-kept A1 negative: keep-record-write-failure-exits-nonzero
+def test_keep_land_config_lock_held_exits_nonzero(tmp_path: Path, monkeypatch) -> None:
+    layout = Layout(tmp_path)
+    lock = layout.repo / ".git" / "config.lock"
+    monkeypatch.setattr(land, "sync_trunk", lambda target, out: lock.write_text("", encoding="utf-8"))
+
+    try:
+        rc, _out, err, _calls = run_land(monkeypatch, layout, args=KEEP)
+    finally:
+        lock.unlink(missing_ok=True)
+
+    assert rc == 1
+    assert "keep record not written" in err
+    assert layout.wt.is_dir()
+
+
 # keep-worktree A4 positive: keep-output-names-cleanup-command
 def test_keep_worktree_output_names_cleanup_command(tmp_path: Path, monkeypatch) -> None:
     layout = Layout(tmp_path)
