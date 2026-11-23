@@ -316,3 +316,31 @@ UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python \
 ```
 The full package suite was not run here; finalize-review runs it and refuses
 the attestation when it fails.
+
+## Re-run on 2026-11-23, at 84712259
+
+Fix range bb4621e2..84712259 (tested HEAD 84712259, clean copy via
+`git worktree add <scratch>/wt HEAD`): 4af9026c adds one `# concern:` comment
+line at the top of `loom-code/tests/test_land_sweep.py` and
+`loom-code/tests/test_land_cleanup.py`; 84712259 adds a repo memory note under
+`docs/loom/memory/` (plus its index line).
+
+Carry-over check: `git diff --stat 028cb9e8 84712259 -- loom-code/scripts
+loom-code/skills` printed nothing (the product code, ship text and help are
+byte-identical to what rows 1-5 were tested on at 028cb9e8). The only other
+files changed since are the two test comment lines, the memory note and this
+report/evidence. Rows 1-5: carried over, no behaviour in them could be affected.
+
+Setup check at 84712259: `uv run ... python loom-code/scripts/loom_checker.py
+land --help` in the clean copy, exit 0, help text printed.
+
+Criterion tests re-run at 84712259:
+```
+UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python \
+  uv run --isolated --with-requirements requirements-package-tests.lock \
+  python -m pytest loom-code/tests/test_land_sweep.py \
+  loom-code/tests/test_land_cleanup.py loom-code/tests/test_ship_station_text.py -q
+52 passed in 145.82s (0:02:25)
+```
+The full package suite was not run here; finalize-review runs it and refuses
+the attestation when it fails.
