@@ -351,13 +351,15 @@ def test_sweep_lists_kept_apart_and_confirm_spares_it(tmp_path: Path, monkeypatc
     k, wt_k = layout.branch("feat/k", worktree="wt-k")
     u, wt_u = layout.branch("feat/u", worktree="wt-u")
     git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+    (wt_k / "wip.txt").write_text("still working\n", encoding="utf-8")
 
     rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
 
     assert rc == 0, err
     token = token_of(out)
     assert out.splitlines() == [
-        f"kept feat/k — worktree {wt_k}; remove with: land --cleanup feat/k",
+        f"kept feat/k — worktree {wt_k} has untracked files; "
+        "remove with: land --cleanup feat/k",
         f"remove feat/u {u[:7]} — worktree {wt_u}, local, remote",
         f"confirm with: land --sweep --confirm {token}",
     ]
@@ -367,6 +369,7 @@ def test_sweep_lists_kept_apart_and_confirm_spares_it(tmp_path: Path, monkeypatc
     assert rc == 0, err
     assert layout.gone("feat/u", wt_u)
     assert layout.intact("feat/k", wt_k)
+    assert (wt_k / "wip.txt").exists()
     assert git(layout.repo, "rev-parse", "refs/heads/feat/k") == k
     assert git(layout.repo, "config", "--get", "branch.feat/k.loomKept") == "2026-11-23"
 

@@ -708,20 +708,23 @@ def _sweep_list(
             continue
         target = _change_target(context, branch, pr)
         plan = plan_cleanup(target, fetch=False)
+        code, kept, _detail = _git_run(
+            context, context.repo, "config", "--get", f"branch.{branch}.loomKept"
+        )
+        kept = code == 0 and bool(kept.strip())
         if isinstance(plan, str):
-            lines.append(f"skip {branch} — {plan}")
-            continue
-        if plan.worktree is not None:
+            where = plan
+        elif plan.worktree is not None:
             where = f"worktree {plan.worktree}"
         elif plan.in_main:
             where = f"main worktree {plan.main} switches to {context.base}"
         else:
             where = "no worktree"
-        code, kept, _detail = _git_run(
-            context, context.repo, "config", "--get", f"branch.{branch}.loomKept"
-        )
-        if code == 0 and kept.strip():
+        if kept:
             lines.append(f"kept {branch} — {where}; remove with: land --cleanup {branch}")
+            continue
+        if isinstance(plan, str):
+            lines.append(f"skip {branch} — {plan}")
             continue
         lines.append(
             f"remove {branch} {plan.head[:7]} — {where}, "
