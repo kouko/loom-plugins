@@ -1,5 +1,6 @@
-"""loom-workflow ships fifteen skills: nine counted tools, three standalone
-tools, out-of-contract loom-memory and whats-next, and one optional router.
+"""loom-workflow ships sixteen skills: nine counted tools, three standalone
+tools, out-of-contract loom-memory, whats-next and loom-herdr, and one
+optional router.
 
 The loom 1.0 budget counts nine tools in loom-code's contract manifest.
 `goal-create`, `dbt-model-style`, and `project-retro` sit outside the loom flow and are marked
@@ -12,7 +13,7 @@ retired from [loom-code's] contract ... owned solely by the independent
 manifest still does not name it, counted or standalone. This test pins all
 boundaries: the directory set on disk, the manifest's agreement on its own
 twelve tools, and the deliberate absence of `loom-memory`, independent
-`whats-next` advice and the optional `using-loom-workflow` discovery router
+`whats-next` advice, the herdr operator `loom-herdr` and the optional `using-loom-workflow` discovery router
 from that manifest. Advice and discovery do not change the lifecycle tool
 budget; their SKILL.md files still count in the mechanism census.
 """
@@ -37,8 +38,9 @@ STANDALONE = {"goal-create", "dbt-model-style", "project-retro"}
 # Ships in loom-workflow/skills/ but is deliberately absent from loom-code's
 # contract manifest — carried over unchanged from when `loom-memory` was its
 # own independent plugin (REQ-24 of 2026-09-10-okf-compatible-loom-memory).
-# Independent whats-next advice also adds no lifecycle contract tool.
-OUT_OF_CONTRACT = {"loom-memory", "whats-next"}
+# Independent whats-next advice and the loom-herdr operator also add no
+# lifecycle contract tool.
+OUT_OF_CONTRACT = {"loom-memory", "whats-next", "loom-herdr"}
 OPTIONAL_ROUTERS = {"using-loom-workflow"}
 
 
@@ -64,11 +66,11 @@ def _manifest_tools() -> dict[str, bool]:
     return tools
 
 
-def test_fifteen_skill_directories_ship():
+def test_sixteen_skill_directories_ship():
     on_disk = {p.name for p in SKILLS_DIR.iterdir() if p.is_dir()}
 
     assert on_disk == COUNTED | STANDALONE | OUT_OF_CONTRACT | OPTIONAL_ROUTERS
-    assert len(on_disk) == 15
+    assert len(on_disk) == 16
 
 
 def test_every_skill_has_a_skill_md():
@@ -85,7 +87,7 @@ def test_manifest_agrees_on_the_three_standalone_skills():
 
 
 def test_loom_memory_stays_out_of_the_contract_manifest():
-    """`loom-memory` ships on disk (`test_fifteen_skill_directories_ship`) but
+    """`loom-memory` ships on disk (`test_sixteen_skill_directories_ship`) but
     must not appear in loom-code's contract manifest — the relocation moved
     its files, not its relationship to loom-code's mechanism budget."""
     assert "loom-memory" not in _manifest_tools()

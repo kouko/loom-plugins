@@ -22,6 +22,9 @@ map. That mapping is what tells Build and the review station which of
 the three verification actions a file owes: the adversarial programs at
 the end of Build, then read and acceptance testing in review.
 
+(Note 2026-11-21: `docs/loom/maps/**` is a manifest pattern only; no
+`maps/` store exists in this repo.)
+
 Optional staged project planning uses root ROADMAP.md or a selected existing
 planning document, maintained by [roadmap](../../loom-workflow/skills/roadmap/README.md).
 It is a current summary with evidence links, not required scaffolding or delivery authority.
@@ -37,6 +40,8 @@ station reads them, and nothing new should be written into them.
 
 - [`plans/`](plans/) — writing-plans output, 2026-05-18 → 2026-09-01
 - `maps/` — retained planning history; no current runtime manages or converts it.
+
+(Note 2026-11-21: no `maps/` directory exists in this repo today.)
 
 ## checkpoint 的三個驗證角色什麼時候被觸發
 

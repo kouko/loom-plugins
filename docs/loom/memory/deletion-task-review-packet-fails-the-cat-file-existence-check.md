@@ -1,6 +1,6 @@
 ---
 name: deletion-task-review-packet-fails-the-cat-file-existence-check
-description: SDD's per-task reviewer fan-out requires `git cat-file -e <reviewed_sha>:<path>` for every declared `Files touched`, so a task whose whole job is deleting files can never satisfy it — the paths are absent at every SHA after the deletion commit; dispatch the reviewers with the deletion commit as scope (cross-read the removed bytes at `<commit>~1:<path>`, prove absence at `<commit>:<path>`), record the deviation in the plan's Decision Log, and keep the immutable-SHA rule intact
+description: Historical (2026-08-31; SDD since retired) — SDD's per-task reviewer fan-out required `git cat-file -e <reviewed_sha>:<path>` for every declared `Files touched`, so a task whose whole job is deleting files can never satisfy it — the paths are absent at every SHA after the deletion commit; dispatch the reviewers with the deletion commit as scope (cross-read the removed bytes at `<commit>~1:<path>`, prove absence at `<commit>:<path>`), record the deviation in the plan's Decision Log, and keep the immutable-SHA rule intact
 type: gotcha
 sources:
   - resource: branch loom-script-refactor-phase2 (2026-08-31) — Task 4 (`git rm claim_ticket.py test_claim_ticket.py`) hit it at the first individual review fan-out; recorded as plan DL-1
@@ -26,3 +26,12 @@ for that reason alone.
 The contract text itself is the fix that outlives this note: an
 "absent-at-sha is the expected state for a deletion task" clause in
 SDD Step 3 (a backlog entry, not this memory, tracks that edit).
+
+Note 2026-11-21: `subagent-driven-development`, its per-task reviewer
+fan-out and the plan's `## Decision Log` were removed, and the backlog is
+frozen, so the procedure above is historical; no successor runs a
+per-SHA existence check. The surviving lesson: a check that requires a
+declared path to exist must treat absence as the expected state for a
+deletion — review a deletion at the deletion commit (removed bytes at
+`<commit>~1:<path>`, absence at `<commit>:<path>`), and record any such
+deviation in the plan's `## Risks` or the commit message.

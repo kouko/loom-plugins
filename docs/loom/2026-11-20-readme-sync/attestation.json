@@ -1,0 +1,96 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-20-readme-sync",
+  "content_digest": "b66bf0f22dd8265caf120fcb086d38a905e9c616",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "no_program": "Docs-only README translation change; no executable behavior to attack."
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-a",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "a039ce6927032e3a4377b737e4ceffa3dd7e898a",
+      "review_target_sha": "d63a022c01d569b9e058d8dd8006c1fa8d86cd0d",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-code/CHANGELOG.md:3",
+          "text": "3.87.2 entry omits the English README data-field correction"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-code/README.zh-TW.md :: **usable `suggested_next`**",
+          "text": "zh-TW repeats usable-suggested_next and data-null rules"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-code/README.ja.md :: 各コマンドの `--help` を見ればフィールドの一覧がわかります。",
+          "text": "duplicate --help sentence"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-workflow/.claude-plugin/plugin.json:4",
+          "text": "em-dash written as \\u2014 escape"
+        }
+      ]
+    },
+    {
+      "reviewer": "reviewer-b",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "reviewed_sha": "a039ce6927032e3a4377b737e4ceffa3dd7e898a",
+      "review_target_sha": "d63a022c01d569b9e058d8dd8006c1fa8d86cd0d",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-code/README.ja.md :: 各コマンドの `--help` を見ればフィールドの一覧がわかります。",
+          "text": "duplicate --help sentence"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-code/CHANGELOG.md :: Restore missing checker details",
+          "text": "CHANGELOG omits English README change"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-code/README.ja.md :: exit 2 となる",
+          "text": "ja adds delivery exit-2 detail absent in English"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "d568cf5",
+  "tested_commit": "954b0b390",
+  "reviewed_commit": "d63a022c01d569b9e058d8dd8006c1fa8d86cd0d",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}

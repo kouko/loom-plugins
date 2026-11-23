@@ -26,7 +26,7 @@ markdown link, so "not a link" is not a reason for it to matter less.
 **How to apply:** when prose moves between depths — SKILL.md into
 `references/`, a reference into `rubrics/`, anything into `agents/` — re-resolve
 every path literal from the NEW directory, not just the markdown links. A
-repo-root-relative form (`loom-code/hooks/family-relay.md`) survives the move;
+repo-root-relative form (`loom-code/skills/closing-review/references/lenses.md`) survives the move;
 a bare or shallowly-relative one does not. Two cheap rules that avoid the class:
 prefer the plugin-qualified form for anything outside the current skill, and
 when the pointer crosses into another skill, ask whether the content should be

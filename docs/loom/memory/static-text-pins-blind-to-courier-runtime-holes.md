@@ -29,8 +29,9 @@ artifact type is necessary but provides zero evidence on those axes.
 **How to apply:** when reviewing or shipping security-critical courier code
 in a Workflow script, (1) require the reviewer to EXECUTE adversarial
 probes (extract the guard function into a standalone node eval with
-traversal/quote payloads) and to grep the repo's guard docs
-(environment-gotchas, dcg patterns) for every shell command the courier
-issues; (2) once a hole is fixed, pin it with an EXECUTABLE test mirroring
+traversal/quote payloads) and to check every shell command the courier
+issues against the dangerous-command-guard (dcg) patterns and this
+memory store's `type: gotcha` entries (the environment-gotchas doc cited
+above was removed on 2026-09-03); (2) once a hole is fixed, pin it with an EXECUTABLE test mirroring
 the repro (node -e via subprocess), not only a marker regex; (3) treat
 "suite is green" as a non-statement about courier runtime security.

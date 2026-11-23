@@ -1,6 +1,6 @@
 ---
 name: same-reviewer-delta-confirmation-dies-at-a-context-compaction
-description: The repo's standard fix-resolution mechanism — the SAME reviewer confirming a delta via SendMessage rather than a fresh whole-artifact round — is addressable only through handles held in the orchestrator's live context, so a context compaction silently destroys it for every already-completed reviewer; the loss surfaces as "I cannot remember whom to ask", never as an error, and the tempting repairs (a fresh reviewer, or flipping the ledger anyway) each discard exactly what the mechanism was protecting
+description: 2026-08-13: the then-standard fix-resolution mechanism — the SAME reviewer confirming a delta via SendMessage rather than a fresh whole-artifact round — was addressable only through handles held in the orchestrator's live context, so a context compaction silently destroyed access to every already-completed reviewer; the loss surfaced as "I cannot remember whom to ask", never as an error, and the tempting repairs (a fresh reviewer, or flipping the ledger anyway) each discard exactly what the mechanism protects. Today closing-review resumes the same reviewer through whatever resume mechanism the host provides, and if that fails the verification is reported incomplete (one retry at most, then `EXECUTION_FAILED`).
 type: gotcha
 sources:
   - resource: brief-item-addressability arc (2026-08-13) — after a compaction, T7's and T8's reviewers were unreachable; ListAgents listed only the one still-running subagent, and no completed reviewer could be resumed
@@ -10,6 +10,12 @@ Delta confirmation is this repo's standard resolution for a gating
 verdict: fix once, then have **the same reviewer** confirm the delta via
 `SendMessage`, never a fresh whole-corpus round. Ten-plus live runs made it
 standard; `requesting-docs-review`'s Directive 2 encodes it.
+
+(Note 2026-11-21: `requesting-docs-review` was removed. Today
+closing-review's Round 2 resumes the same reviewers over the fix delta
+(`loom-code/skills/closing-review/SKILL.md`), and
+`loom-code/agents/reviewer.md` "Fix rounds" requires the resumed agent to be
+the one that wrote the previous verdict, never a fresh one.)
 
 It has an unstated lifetime. The reviewer is addressable only by a handle —
 its `agentId`, or a `name:` if one was assigned — and that handle lives in
@@ -30,6 +36,28 @@ themselves at that moment are wrong:
 - **flip the ledger as though confirmed** — this launders an unconfirmed fix
   into the record, and the fix rounds most needing confirmation are the ones
   whose findings were judgment-bearing.
+
+Note 2026-11-22 (current recovery): the procedure below is the
+2026-08-13 recipe, kept verbatim as history. Today closing-review owns the
+resume: its Round 2 resumes the same reviewers over the fix delta with
+whatever mechanism the host provides (`loom-code/skills/closing-review/SKILL.md`),
+and `loom-code/agents/reviewer.md` (§Fix rounds) requires each later round
+to resume **the same agent that wrote the previous round's verdict, never a
+fresh one**. Do not record a reviewer name in the plan; verification identity
+belongs to the attestation that `finalize-review` writes. If the same
+reviewer cannot be recovered, report the verification as incomplete under
+closing-review's execution-failure rules (§4): an unavailable executor may
+retry once against the same functional-content digest, and a second failed
+attempt ends the episode as `EXECUTION_FAILED`. If the reviewer being
+retried is an outside executor, that retry "requires a newly authorized
+review with a fresh preflight; never retry silently" (closing-review §4;
+its §2 gate `review.external-dispatch`: "every repeat outside execution is a newly
+authorized review with a fresh preflight"; `loom-code/skills/external-review/SKILL.md`:
+"A retry is a newly authorized review with a fresh preflight"). Disclosure does not replace
+that reviewer, and the fixes do not ride into a later round under a
+different reviewer.
+
+Historical (2026-08-13):
 
 **How to apply.** Treat reviewer handles as *perishable state*, not as
 recall:

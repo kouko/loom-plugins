@@ -21,6 +21,7 @@ The selected skill owns its procedure, permissions, and output contract.
 | Explicitly invoke `goal-create` by name for a session goal | [goal-create](../goal-create/SKILL.md) |
 | Save state for another session or resume a saved HANDOFF | [handoff](../handoff/SKILL.md) |
 | Recommend the next action for the current goal, or reconsider direction after a blocker or material new evidence | [whats-next](../whats-next/SKILL.md) |
+| Operate herdr panes, agents or conversations, when the user explicitly names herdr | [loom-herdr](../loom-herdr/SKILL.md) |
 | Ask for a second opinion from another model, higher effort, or another vendor | [independent-advisor](../independent-advisor/SKILL.md) |
 | Remember, recall, reconcile, or forget a durable repository lesson; or a task needs a prior lesson; or you are saving a lesson to your own host memory | [loom-memory](../loom-memory/SKILL.md) |
 | Show a comparison, flow, decision, state, or reasoning chain as a table, ASCII, or Mermaid diagram in coding chat, or render documented reasoning as a standalone page | [loom-visualization](../loom-visualization/SKILL.md) |

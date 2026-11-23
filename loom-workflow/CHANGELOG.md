@@ -4,6 +4,20 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.26.2] — 2026-11-23 — README sync: old-map definition + version bump
+
+- Define what an "old map" is on first use: a decision map from before `roadmap` replaced it.
+- Update version strings across 4 manifests and 3 READMEs per plugin, and the root README table/section.
+
+## [5.26.1] — 2026-11-21 — stale skill references
+
+- Update stale skill references in loom-workflow docs to current skill names; historical records keep the name that ran, with the current name noted.
+- Label historical references in the telemetry, governance and runbook docs, and repoint the score_history path.
+- Restore historical wording in skill-evolution-architecture and fidelity-check.
+- Correct memory lessons that cited absent targets or unsourced procedures.
+- Quarterly-audit runbook steps 2, 5 and 7 now name current sources; the retired steps are marked historical.
+- Quarterly-audit runbook checks each upstream license against its NOTICE entry and no longer reports retired validation gates; telemetry examples are restored verbatim under a dated note.
+
 ## [5.26.0] — 2026-11-16 — replace map runtime with ordinary project planning
 
 - Add roadmap as the unified owner of optional ordinary project planning documents; retain selected existing documents, verified-result scope, unknowns and existing delivery authorization.

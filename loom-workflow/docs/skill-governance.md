@@ -1,5 +1,10 @@
 # Skill Governance
 
+> **Historical in part.** skill-refactor and skill-tuning (and their
+> shared conventions below) moved to the `skill-dev-toolkit` plugin;
+> `scripts/check-shared-conventions-drift.py` has been removed from this
+> repository and no drift check runs here.
+
 How loom-workflow's family of skills is governed: who owns what,
 how conventions evolve, when skills retire, and how cross-plugin
 contracts are enforced.
@@ -33,6 +38,12 @@ via the same-PR drift rule.
 | Self-trained judge pipeline | `skills/skill-tuning/references/self-trained-judge-pipeline.md` | (none — skill-tuning specific) | none needed |
 | Architecture planning doc | `loom-workflow/docs/skill-evolution-architecture.md` | (none — single canonical) | none needed |
 
+(Note 2026-11-21: skill-refactor and skill-tuning, with every
+`skills/skill-refactor/…` and `skills/skill-tuning/…` file in the table
+above, moved to the `skill-dev-toolkit` plugin.
+`scripts/check-shared-conventions-drift.py`, listed under Enforced By,
+has been removed from this repository; no drift check runs here.)
+
 ### Cross-plugin SSOT
 
 | Convention | Canonical Location | Notes |
@@ -46,6 +57,9 @@ via the same-PR drift rule.
 
 Each skill has an **owner** responsible for its lifecycle:
 
+(Note 2026-11-21: the table below is a historical snapshot, kept as
+written before the skill-dev-toolkit move.)
+
 | Skill | Owner | Notes |
 |---|---|---|
 | `skill-creator-advance` | kouko (with AllanYiin upstream attribution) | MIT chain in NOTICE |
@@ -55,6 +69,12 @@ Each skill has an **owner** responsible for its lifecycle:
 | `skill-refactor` | kouko | original design (darwin-skill inspiration only) |
 | `skill-tuning` | kouko | original design (darwin-skill inspiration only) |
 | `dogfood-skill-testing` | kouko | original design (vercel-labs/agent-browser dogfood-pattern inspiration only, Apache-2.0) |
+
+(Note 2026-11-21: skill-creator-advance, skill-judge, skill-refactor,
+skill-tuning and dogfood-skill-testing now ship in the `skill-dev-toolkit`
+plugin, not in loom-workflow. Of the rows above only `git-memory` and
+`critique` are still loom-workflow skills. For current membership see
+`loom-workflow/README.md` (the skills table) or `ls loom-workflow/skills`.)
 
 Ownership transfers require:
 1. Update LICENSE / NOTICE to reflect new owner
@@ -75,6 +95,9 @@ A skill is always in exactly one of these states:
 
 Annotation in plugin README:
 
+(Note 2026-11-21: the table below is a historical snapshot, kept as
+written.)
+
 | Skill | State | Since |
 |---|---|---|
 | skill-creator-advance | Active | 2026-04-13 |
@@ -89,6 +112,11 @@ Annotation in plugin README:
 | dogfood-skill-testing | Active | 2026-06-03 (v0.1.0) |
 
 (Updated on state transitions; default Active.)
+
+(Note 2026-11-21: skill-creator-advance, skill-judge, skill-refactor,
+skill-tuning and dogfood-skill-testing moved to the `skill-dev-toolkit`
+plugin; their lifecycle is tracked there. For loom-workflow's current
+skills see `loom-workflow/README.md` or `ls loom-workflow/skills`.)
 
 ---
 
@@ -115,6 +143,11 @@ Annotation in plugin README:
 4. Update header blockquote on canonical/copies if SSOT location
    itself moves (rare; requires explicit governance decision)
 
+(Note 2026-11-21: `scripts/check-shared-conventions-drift.py` and its
+CI gate have been removed from this repository, so step 5 and step 7 of
+"Adding" and step 3 of "Editing" above no longer have a script or CI
+job to run.)
+
 ### Deleting a shared convention
 
 1. Migration path required if any skill depends on the convention
@@ -122,6 +155,10 @@ Annotation in plugin README:
    longer use the convention
 3. Once no skill depends, delete from canonical + all functional
    copies + drift manifest in same PR
+
+(Note 2026-11-21: the drift manifest in step 3 lived in the removed
+`scripts/check-shared-conventions-drift.py`; no drift manifest exists
+in this repository today.)
 
 ---
 
@@ -142,6 +179,14 @@ Two-Hats split (skill-refactor / skill-tuning) shares 3
 conventions via SSOT-and-functional-copy specifically to preserve
 runtime independence (each skill installable / runnable without
 the other).
+
+(Note 2026-11-21: the repo-level `CLAUDE.md` cited above is the
+monkey-skills-era file; today's `CLAUDE.md` only includes `AGENTS.md`,
+which has no Cross-Plugin Delegation Contract section, so the list
+above is a historical record of that contract. `complexity-critique` is
+now `critique` (mode: complexity). The Two-Hats split (skill-refactor /
+skill-tuning) and its three shared conventions now live in the
+`skill-dev-toolkit` plugin, not in loom-workflow.)
 
 ---
 
@@ -188,6 +233,14 @@ Quarterly audits review:
 See `loom-workflow/docs/quarterly-audit-runbook.md` for the
 operational checklist.
 
+(Note 2026-11-21: no drift CI runs in this repository, so item 3 is a
+manual check (runbook step 3). The skill-refactor / skill-tuning
+validation gates in item 5 moved with those skills to the
+`skill-dev-toolkit` plugin and are tracked there. Note 2026-11-22: for
+item 4, upstream licenses are not all MIT; the runbook's step 4 checks
+each upstream license against its NOTICE entry, and loom-visualization's
+`NOTICE.md` lists CC BY 4.0 for the C4 model.)
+
 ---
 
 ## Decision Authority
@@ -221,6 +274,12 @@ plugin-level READMEs (`loom-workflow/README.{md,ja.md,zh-TW.md}`)
 should be authored / updated via `docs-team` per the same convention,
 since they are plugin-level not skill-internal.
 
+(Note 2026-11-21: the six-skill list above is a historical snapshot.
+skill-creator-advance, skill-judge, skill-refactor and skill-tuning moved
+to the `skill-dev-toolkit` plugin; git-memory and critique remain. For
+loom-workflow's current skills see `loom-workflow/README.md` or
+`ls loom-workflow/skills`.)
+
 When a skill-internal README needs significant restructuring (e.g.,
 adding architecture-doc-grade content, splitting into Diátaxis
 modes), that's a signal it should be promoted to a docs-team
@@ -238,3 +297,9 @@ skill-internal README beyond its lighter-discipline scope.
 | Skipping NOTICE / LICENSE for derivative skills | Attribution chain breaks; legal compliance risk |
 | Letting validation gates remain OUTSTANDING indefinitely | Architecture doc §6 lists validation gates per phase; deferring forever defeats the purpose |
 | Not running `check-shared-conventions-drift.py` locally before push | CI catches but developer time wasted on flagging push |
+
+(Note 2026-11-21: `check-shared-conventions-drift.py`, named in the last
+row above, has been removed from this repository.)
+
+(Note 2026-11-21: for the first row, no drift script runs in CI here;
+drift is caught only by the manual check in runbook step 3.)

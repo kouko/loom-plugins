@@ -1,6 +1,6 @@
 ---
 name: skill-triggering-diagnose-listing-before-text
-description: Skill under-firing recipe — diagnose the live listing first (host evicts least-used descriptions over the ~1% budget), fix with an entry router + repositioned descriptions (routers survive eviction; CJK keyword stuffing is A/B-refuted), measure with a corpus A/B on the firing harness
+description: Skill under-firing recipe — diagnose the live listing first (host evicts least-used descriptions over the ~1% budget), fix with an entry router + repositioned descriptions (routers survive eviction; CJK keyword stuffing is A/B-refuted), measure with a two-run corpus comparison (A/B over the same corpus, never one run)
 type: practice
 sources:
   - resource: research-skill-r2 branch (research-toolkit triggering + dogfood, 2026-07-06)
@@ -19,6 +19,11 @@ through `loom-code/scripts/loom_firing_harness.py` (family fires
 2/13 → 5/13, zero over-fire). CJK keyword stuffing was NOT part of the
 fix — the house 51-probe A/B (PR #426/#428/#429) shows it changes
 nothing; keep at most one representative CJK trigger.
+
+(Note 2026-11-21: `loom_firing_harness.py` was removed at the Loom 1.0
+cutover; the surviving measurement method is the two-run corpus
+comparison in step (4), run by hand with `claude -p` per
+[[headless-branch-plugin-testing-recipe]].)
 
 **Why:** description rewrites are the visible knob, so sessions reach
 for them first and burn effort where the routing signal never arrives;

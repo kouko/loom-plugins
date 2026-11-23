@@ -37,9 +37,9 @@ PR #19 the per-class proof ran on a standalone copy, which is the vacuity that
 Until Loom assigns that maintenance to a role, expect the host classifier to
 route the run and commit to the maintainer.
 
-Note: the store charter still names `environment-gotchas.md` as the home for
-harness friction, but that file no longer exists in this repository, so this
-entry records the classifier half here.
+Note: the store charter (`docs/loom/memory/README.md`) marks
+`environment-gotchas.md` as historical and routes recurring harness friction
+to this store, so this entry records the classifier half here.
 
 Related: [[a-graduated-probe-that-pins-a-fact-of-the-moment-goes-red-at-the-next-change]]
 (a different mechanism — a fact of the branch-moment going stale across

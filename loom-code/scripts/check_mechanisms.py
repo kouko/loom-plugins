@@ -710,14 +710,17 @@ def run_measure(repo: Path) -> int:
     # separately owned design research admits one more skill with matching
     # skill/tool exceptions in the design/code research release packet;
     # next-action advice is admitted in release 3.81.1 with a matching
-    # skill exception in loom-workflow 5.25.0.
-    if skill_count > 27:
-        print(f"RED: skill count {skill_count} exceeds the loom budget of 27")
+    # skill exception in loom-workflow 5.25.0;
+    # the herdr operator skill loom-herdr is admitted 2026-11-22 in release
+    # 3.87.1 with loom-workflow 5.27.0 (user asked for one skill wrapping
+    # herdr's own instructions rather than installing two).
+    if skill_count > 28:
+        print(f"RED: skill count {skill_count} exceeds the loom budget of 28")
     if artifact_types > 8:
         print(f"RED: artifact-type count {artifact_types} exceeds the per-change budget of 8")
     print(f"session-start word count: {words}")
 
-    exit_code = 1 if (skill_count > 27 or artifact_types > 8) else 0
+    exit_code = 1 if (skill_count > 28 or artifact_types > 8) else 0
     if words < 0:
         print("RED: no loom-code/hooks/session-start to measure; the injection "
               "budget cannot be recomputed")

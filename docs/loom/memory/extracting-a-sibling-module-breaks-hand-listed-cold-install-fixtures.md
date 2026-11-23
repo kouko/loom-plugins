@@ -17,7 +17,7 @@ so the failure looks environmental and gets misattributed to
 "pre-existing" or "concurrent implementers".
 
 Two habits close it: (1) before dispatching the first task that adds
-the import, `grep -ln "copyfile\|copytree" <plugin>/scripts/test_*.py`
+the import, `grep -rln --include='test_*.py' "copyfile\|copytree" <plugin>/tests/ tests/`
 and list the hits in the plan task's `Files touched`; (2) never accept
 "pre-existing failure" from an implementer without a baseline run at
 the branch's merge base — this branch started fully green.

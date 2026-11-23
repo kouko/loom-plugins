@@ -32,6 +32,8 @@ ENGINEERING_RESEARCH_DESCRIPTION_CHARS = 238
 DESIGN_RESEARCH_DESCRIPTION_CHARS = 222
 # Explicit admission for bounded next-action advice; keep the frozen catalog.
 WHATS_NEXT_DESCRIPTION_CHARS = 308
+# Explicit admission for the herdr operator skill; keep the frozen catalog.
+LOOM_HERDR_DESCRIPTION_CHARS = 308
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",
@@ -56,6 +58,7 @@ ADDED_LEAVES = {
     "loom-code/skills/engineering-research/SKILL.md",
     "loom-design/skills/design-research/SKILL.md",
     "loom-workflow/skills/whats-next/SKILL.md",
+    "loom-workflow/skills/loom-herdr/SKILL.md",
 }
 # The old frozen corpus stays historical; roadmap replaces a retired capability
 # rather than renaming the same behavior. Both sides count toward current total.
@@ -187,9 +190,12 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
     assert len(design_research) == DESIGN_RESEARCH_DESCRIPTION_CHARS
     whats_next = _description(_skills()["loom-workflow"]["whats-next"])
     assert len(whats_next) == WHATS_NEXT_DESCRIPTION_CHARS
+    loom_herdr = _description(_skills()["loom-workflow"]["loom-herdr"])
+    assert len(loom_herdr) == LOOM_HERDR_DESCRIPTION_CHARS
     exception = (PROJECT_RETRO_DESCRIPTION_CHARS + SKILL_RETRO_DESCRIPTION_DELTA
                  + INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS + ENGINEERING_RESEARCH_DESCRIPTION_CHARS
-                 + DESIGN_RESEARCH_DESCRIPTION_CHARS + WHATS_NEXT_DESCRIPTION_CHARS)
+                 + DESIGN_RESEARCH_DESCRIPTION_CHARS + WHATS_NEXT_DESCRIPTION_CHARS
+                 + LOOM_HERDR_DESCRIPTION_CHARS)
     assert candidate <= DESCRIPTION_BUDGET + exception
     assert (candidate - exception) * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
 

@@ -1,0 +1,114 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-21-herdr-skill",
+  "content_digest": "427157709d62072120c2563c9ca740ba254d111f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/loom-herdr/test_herdr_search_adversarial.py",
+      "artifact": "loom-workflow/tests/loom-herdr/test_herdr_search_adversarial.py",
+      "result": "pass",
+      "command_digest": "0549f5c95ce615187709f735801f50018a287138369e2aba86ca31b01bcbe743"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "code-lens-r1",
+      "vendor": "claude",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "b2c4bdc8ef59775b29b5670b59a235c65ae15fdd",
+      "review_target_sha": "90257f2f191f94124c5861e21a5de68e23f2d8f6",
+      "findings": [
+        {
+          "severity": "nit",
+          "path": "loom-workflow/tests/loom-herdr/test_herdr_search_adversarial.py",
+          "line": 48,
+          "text": "test_limit_negative_rejected accepts either outcome; assert returncode != 0 and 'limit' in stderr"
+        },
+        {
+          "severity": "nit",
+          "path": "loom-workflow/skills/loom-herdr/scripts/herdr_search.py",
+          "line": 264,
+          "text": "query lowercased before display use; keep raw for future display"
+        },
+        {
+          "severity": "nit",
+          "path": "loom-workflow/skills/loom-herdr/SKILL.md",
+          "line": 36,
+          "text": "--history scope justified by user decision; note only, no fix required"
+        }
+      ]
+    },
+    {
+      "reviewer": "skill-lens-r1",
+      "vendor": "claude",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "b2c4bdc8ef59775b29b5670b59a235c65ae15fdd",
+      "review_target_sha": "90257f2f191f94124c5861e21a5de68e23f2d8f6",
+      "findings": [
+        {
+          "severity": "nit",
+          "path": "loom-workflow/skills/loom-herdr/SKILL.md",
+          "line": 66,
+          "text": "$HERDR_PANE_ID used but its source never explained in one sentence"
+        },
+        {
+          "severity": "nit",
+          "path": "docs/loom/evidence/mechanisms.yaml",
+          "line": 124,
+          "text": "loom-herdr row eval names only test_skill_md.py; consider naming all three test files"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "eaa37f1ecdd78888af5c7572a8885fde5c24e2e7",
+  "tested_commit": "1914f318e",
+  "reviewed_commit": "90257f2f191f94124c5861e21a5de68e23f2d8f6",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    },
+    {
+      "acceptance": 8,
+      "status": "works"
+    }
+  ]
+}

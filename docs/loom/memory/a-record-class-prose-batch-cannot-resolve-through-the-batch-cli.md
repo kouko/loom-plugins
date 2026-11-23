@@ -1,6 +1,6 @@
 ---
 name: a-record-class-prose-batch-cannot-resolve-through-the-batch-cli
-description: An all-record-class prose Review Batch has a valid single-arm resolution in the batch library but no path through the batch review CLI, so it must resolve task-by-task through individual review instead
+description: In 2026-08/09 batch review (since retired), an all-record-class prose Review Batch had a valid single-arm resolution in the batch library but no path through the batch review CLI, so it had to resolve task-by-task; the lasting lesson is to route around a CLI that cannot consume a result its library accepts
 type: gotcha
 sources:
   - resource: 2026-09-01 — prose-edit self-sweep arc (docs/loom/plans/2026-09-01-prose-edit-self-sweep.md, DL-2); backlog 2026-09-01-apply-result-cannot-take-record-class-narrowed-arms
@@ -29,3 +29,10 @@ disposition to individual review up front, dispatch spec-reviewer alone
 per task (record the code-quality/docs slot as N/A — record-class
 prose), and skip the batch packet entirely. Reserve the batch CLI for
 batches with at least one contract-class member.
+
+(Note 2026-11-21: docs-reviewer, spec-reviewer, Review Batches and the batch
+review CLI were retired, so the procedure above is historical. Today
+closing-review dispatches `loom-code/agents/reviewer.md` with the lenses in
+`loom-code/skills/closing-review/references/lenses.md` at branch end. The
+general lesson remains: when a library accepts a result its CLI cannot
+consume, route around the CLI instead of improvising its input.)

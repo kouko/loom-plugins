@@ -24,4 +24,4 @@ verification, security sweeps), ship it as its own workflow file with an
 unfiltered `push: branches: [...]` trigger, and keep path-scoped test jobs in
 their own filtered workflow. Check the `on:` block's `paths:` before adding
 any job to an existing workflow; document the file split's reason in the
-workflow header (live example: `.github/workflows/memory-verify-merged.yml`).
+workflow header.

@@ -24,7 +24,7 @@ sources:
 | Decision bound to a commit | git-memory trailers (`Decision:`) |
 | Distilled practice / habit / process / recurring gotcha | **`docs/loom/memory/`** (this store) |
 | One-off event artifact (audit, dogfood, measurement, review record) | `docs/loom/<change-id>/evidence/` when it belongs to one change; `docs/loom/evidence/` when it outlives the change |
-| Harness/dcg friction (plugin-shipped) | `loom-code/.../environment-gotchas.md` — stays, NOT migrated |
+| Harness/dcg friction (plugin-shipped) | Historical: `loom-code/skills/using-loom-code/references/environment-gotchas.md` held this until the Loom 1.0 cutover deleted it (commit eae874c43, 2026-09-03); no plugin-shipped home exists now, so a recurring harness gotcha comes here as a `gotcha` entry |
 
 > `docs/loom/backlog/` and `docs/loom/{plans,specs,design}/` are frozen at
 > loom 1.0 (see `docs/loom/README.md` §Frozen stores). Nothing is written
@@ -55,10 +55,10 @@ should be batched, not one-PR-per-discovery.
 
 **Pull, not push.** Nothing auto-loads this folder. Retrieval = read
 the index below / grep on demand. This preserves the documented
-anti-preload decision (`dev-workflow/skills/git-memory/SKILL.md:193-197`);
+anti-preload decision (`loom-workflow/skills/git-memory/SKILL.md` §Recall routing);
 evidence: a 2026 ETH Zurich study found always-loaded auto-generated
 context files reduced agent task success by ~3% and raised inference
-cost by ~20% (`dev-workflow/skills/git-memory/standards/memory-conventions.md`
+cost by ~20% (`loom-workflow/skills/git-memory/standards/memory-conventions.md`
 §Pull retrieval).
 
 Before acting on a recalled entry, verify any file/flag/skill it names

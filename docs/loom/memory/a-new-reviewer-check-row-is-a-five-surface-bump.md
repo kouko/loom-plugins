@@ -1,6 +1,6 @@
 ---
 name: a-new-reviewer-check-row-is-a-five-surface-bump
-description: Appending a check row to plan-document-reviewer-prompt.md moves five surfaces in one commit — the row itself, the prompt's own output-contract counts (denominator + two check-id ranges), the obligation-sweep max-row constant, two sibling <N> literals, and the tracked-byte fingerprint — grep the pin tests for the old count before shipping the row
+description: Appending a row to a count-pinned contract table moves every surface that pins the count in one commit — in the 2026-08 case (the since-retired plan-document-reviewer-prompt.md) five: the row itself, the prompt's own output-contract counts (denominator + two check-id ranges), the obligation-sweep max-row constant, two sibling <N> literals, and the tracked-byte fingerprint — grep the pin tests for the old count before shipping the row
 type: gotcha
 sources:
   - resource: direction-surfacing branch, Check 22 addition (2026-08-29)
@@ -28,3 +28,9 @@ row number, and the old ranges; retarget them in the SAME commit as the
 row — the release-ritual pattern in
 [[tracked-byte-pin-tests-repin-in-the-same-commit-as-the-bytes]] —
 then re-pin the fingerprint last.
+
+(Note 2026-11-21: plan-document-reviewer-prompt.md and the four pin tests
+named above were retired; today the reviewer is `loom-code/agents/reviewer.md`
+and its dimension rows live in
+`loom-code/skills/closing-review/references/lenses.md`. The lesson applies to
+any table whose row count a test pins: grep for the old count first.)

@@ -8,7 +8,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: optional staged project roadmaps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.26.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.26.2 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -67,11 +67,12 @@ Use [roadmap](skills/roadmap/README.md) for an optional root ROADMAP.md or a sel
 existing document. Keep current goals, completion conditions, status, next actions,
 unknowns and evidence links. Advice or resumption alone does not force creation.
 Planning grants no implementation, background execution, publication or merge
-permission. Old maps remain readable without conversion, rewriting or closure.
+permission. **Old maps** (decision maps from before `roadmap` replaced them) remain
+readable without conversion, rewriting or closure.
 
 ## Skills
 
-Fifteen skills: fourteen tools and one optional router.
+Sixteen skills: fifteen tools and one optional router.
 
 | Skill | Role |
 |---|---|
@@ -89,11 +90,12 @@ Fifteen skills: fourteen tools and one optional router.
 | [`independent-advisor`](skills/independent-advisor/README.md) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
 | [`loom-visualization`](skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
 | [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
+| [`loom-herdr`](skills/loom-herdr/README.md) | Operate herdr panes, agents and conversations: loads the installed herdr's own instructions, then adds conversation search across open panes, led agent-to-agent conversations and Codex sandbox help. Selected only when you name herdr. |
 | [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. |
 
 Loom's contract counts nine of these tools. It marks `goal-create`,
 `dbt-model-style` and `project-retro` as `standalone: true`, outside the Loom
-flow. Independent `whats-next` advice, `loom-memory` and the router stay
+flow. Independent `whats-next` advice, `loom-herdr`, `loom-memory` and the router stay
 outside the contract; their skill files still count in the mechanism census.
 
 ## Repository structure
@@ -118,6 +120,7 @@ loom-workflow/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
+│   ├── loom-herdr/
 │   ├── loom-memory/
 │   ├── loom-visualization/
 │   ├── project-retro/

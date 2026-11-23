@@ -1,6 +1,6 @@
 ---
 name: a-shared-checkout-parallel-wave-dies-to-any-agents-stash-or-reset
-description: When several implementers run concurrently in ONE git checkout, any agent — a reviewer as much as an implementer — that runs `git stash`, `git reset --hard`, or `git checkout -- <path>` wipes every sibling's uncommitted work; a spec-reviewer's "harmless" stash/pop mid-wave erased two implementers' in-progress files, so the no-stash/no-reset trap-guard must ride EVERY packet in the wave (reviewers included), or the wave runs in per-task worktrees
+description: When several implementers run concurrently in ONE git checkout, any agent — a reviewer as much as an implementer — that runs `git stash`, `git reset --hard`, or `git checkout -- <path>` wipes every sibling's uncommitted work; on 2026-08-17 a (since retired) spec-reviewer's "harmless" stash/pop mid-wave erased two implementers' in-progress files, so the no-stash/no-reset trap-guard must ride EVERY packet in the wave (reviewers included), or the wave runs in per-task worktrees
 type: gotcha
 sources:
   - resource: branch loom-doc-container (loom-code 0.85.0, 2026-08-17) — wave 1, T3 spec-reviewer stash vs T2/T6 implementers
@@ -28,3 +28,9 @@ state; a reviewer that needs the pre-commit tree reads it from git
 (`git show <sha>^:<path>`) or an isolated `git worktree add`, never by
 moving this tree. If a wave must let agents move the tree, give each task
 its own worktree instead. Related: [[a-correction-issued-in-a-dispatch-packet-evaporates]].
+
+(Note 2026-11-21: spec-reviewer, code-quality-reviewer and docs-reviewer
+were retired; today the dispatched roles are `loom-code/agents/implementer.md`,
+`adversary.md`, `acceptance-tester.md` and `reviewer.md` (lenses in
+`loom-code/skills/closing-review/references/lenses.md`). The same
+trap-guard goes in every one of those dispatches.)

@@ -43,6 +43,17 @@ by giving `loom-design/scripts/` a `pytest.ini` with
 `--import-mode=importlib` plus a `pythonpath` line, so one invocation
 now collects the whole tree.
 
+**Note 2026-11-21: the directory lists above, including the 2026-09-01
+correction, no longer apply.** Every test later moved out of `scripts/`
+into `tests/` folders. Today (see AGENTS.md "Test Location") the package
+suite, `python3 scripts/run_package_tests.py --loom-family`, collects
+the roots in that script's `TEST_ROOTS` constant — root `tests/`,
+`loom-code/tests/`, `loom-design/tests/`, `loom-workflow/tests/` — and
+`loom-design/tests/pytest.ini` carries loom-design's importlib import
+mode. The lesson survives unchanged: a verify run that leaves out a
+root the branch touched is green by omission, so prefer the full
+package suite over a hand-picked subset.
+
 **The mirror failure, same class, opposite direction (2026-09-01).**
 This entry says: cover every dir you CHANGED. That is half the rule. An
 arc that split `loom-design/scripts/pipeline/batch_queue.py` verified
@@ -62,5 +73,6 @@ moved module's name — including by-path loads via
 
 Pairs with [[a-per-task-triad-cannot-see-cross-plugin-guard-tests]]:
 the per-task triad blindness and the verify-command blindness are two
-layers of the same cross-plugin coverage gap — whole-branch review is
-the net that catches both.
+layers of the same cross-plugin coverage gap — the complete package suite
+at the end of Build and closing-review's branch-end reviewers are the net
+that catches both.

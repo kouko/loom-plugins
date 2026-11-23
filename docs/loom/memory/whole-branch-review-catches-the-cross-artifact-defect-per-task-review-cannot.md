@@ -1,6 +1,6 @@
 ---
 name: whole-branch-review-catches-the-cross-artifact-defect-per-task-review-cannot
-description: A claim restated across several artifacts can pass every per-task review and still be false at the branch level, because each task reviewer sees only its own slice; only a whole-branch cross-artifact pass compares the copies against each other
+description: A claim restated across several artifacts can pass every per-task review and still be false at the branch level, because each task reviewer sees only its own slice; only a cross-artifact pass over the whole branch (2026-09 the whole-branch review; today closing-review's branch-end review of the cumulative content) compares the copies against each other
 type: practice
 sources:
   - resource: 2026-09-01 — prose-edit self-sweep arc; whole-branch opus review found 3 stale/false-self-claim defects (98 vs 104 finding count, a nonexistent "second test", a stale sibling-path date) that all six per-task reviews had passed
@@ -22,7 +22,9 @@ irony that they shipped in the very branch introducing a writer-side
 sweep against them is the strongest available argument for the
 whole-branch scope, not against the sweep.
 
-**How to apply:** Treat whole-branch review as non-optional whenever a
+**How to apply:** Treat closing-review's branch-end review of the
+cumulative content as non-optional, and ask its reviewers to read the
+copies against each other, whenever a
 branch restates the same claim (a count, a capability, a path, a
 version) across more than one artifact. Do not let an all-PASS set of
 per-task reviews stand in for it — they answer a different question.

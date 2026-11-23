@@ -1,6 +1,6 @@
 ---
 name: per-task-review-misses-duplicated-fallback-fix
-description: A fix at one location that shares a contract with other locations (code call-sites reading a data shape, OR a doc section's promise and its downstream enforcing check) can PASS individual per-task review while the sibling locations stay unfixed — only whole-branch cross-task-coherence review catches the gap
+description: A fix at one location that shares a contract with other locations (code call-sites reading a data shape, OR a doc section's promise and its downstream enforcing check) can PASS individual per-task review while the sibling locations stay unfixed — only a review across all tasks catches the gap (2026-07 the whole-branch cross-task-coherence review; today closing-review's branch-end review of the cumulative content)
 type: gotcha
 sources:
   - resource: deep-deep-research bake-off round-2 bugfixes branch (2026-07-08)
@@ -30,8 +30,8 @@ call sites is a candidate, not just build-concatenated modules.
 (adds a fallback, tolerates a missing/renamed key, relaxes a type
 check), grep the whole repo/package for other read-sites of the same
 field before declaring the task done — don't rely on per-task review
-scope to catch it. At minimum, never skip the whole-branch review step
-just because every individual task already PASSed; that step's unique
+scope to catch it. At minimum, never skip closing-review's branch-end
+review just because every individual task already PASSed; that step's unique
 value is exactly this class of gap.
 
 **Second occurrence (2026-07-08, same session, loom-code branch

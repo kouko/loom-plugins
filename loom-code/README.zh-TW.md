@@ -20,13 +20,13 @@
 
 ```mermaid
 flowchart TD
-    intent["① 確認要解決的問題<br/>capture-intent"]
+    intent["① 確認這次變更<br/>capture-intent"]
     design{"需要設計？"}
-    spec["寫出設計<br/>write-spec<br/>② 僅確認產品可見行為"]
+    spec["寫出設計<br/>write-spec<br/>② 確認可見產品行為"]
     plan["規劃工作<br/>write-plan"]
     build["實作與測試<br/>build"]
     review["審查與驗證<br/>closing-review"]
-    ship["③ 開 PR 並驗收結果<br/>ship"]
+    ship["③ 開 PR 並接受變更結果<br/>ship"]
 
     intent --> design
     design -->|"需要"| spec
@@ -47,7 +47,7 @@ flowchart TD
 - **規格** —— 只有 product 變更會問 ②，由寫 spec 的那一方問：
   `loom-design:write-spec`，或只裝 code 時 `write-plan` 寫的最小 spec。
 - **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行，最後由獨立的
-  adversary 寫出對抗程式並跑完整 package 測試，全數通過才交出。`closing-review`
+  adversary 寫出對抗程式，`build` 依序執行完整套件測試與各項對抗程式，全數通過才交出。`closing-review`
   對這份已檢查的內容跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
@@ -67,7 +67,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
 | [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
-| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後的 Vault 保存逐次確認目的地與範圍。 |
+| [`engineering-research`](skills/engineering-research/README.md) | 查證 Loom 任務或獨立工程討論中會影響決策的證據缺口，按問題保存研究紀錄；合併後若研究符合條件，技能可能會提議保存到 Vault，每次保存前都須就目的地與內容範圍取得使用者的明確授權。 |
 
 ## Agents
 
@@ -81,8 +81,8 @@ flowchart TD
 | [`adversary`](agents/adversary.md) | `build` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
 
 審查者人數不是 agent 自己選的：`loom_checker.py reviewer-count` 依整條分支的
-差異計算 —— 範圍窄且低風險的變更一位，其他情況或無法判斷時兩位。只有當某行
-Acceptance 無法機械判定時才會做 acceptance testing。
+差異計算 —— 範圍窄且低風險的變更一位，其他情況或無法判斷時兩位。**closing-review 使用這個已驗證的
+reviewer-count 結果**。只有當某行 Acceptance 無法機械判定時才會做 acceptance testing。
 
 ## 會問你的三個問題
 
@@ -110,9 +110,81 @@ package。
 ## checker
 
 `plan <path> --json` 與 `intake <station> <change-id> --json` 可選擇輸出
-版本 1 的準備檢查結果。`--json` 必須放最後；預設文字與退出碼保持不變。
-結果區分通過、規則阻擋與使用／內部錯誤，保留診斷及提示的順序，並不代表
-整體工作完成。六個欄位與啟動／程序失敗限制可由各命令的精確 `--help` 查閱。
+版本 1 的準備檢查結果。**--json 更改輸出格式，但保留檢查與退出碼**。
+plan 與 intake 會將 JSON 結果輸出至 stdout。
+成功、規則阻擋與使用／內部錯誤會被區分，診斷及提示的順序會被保留，但不代表整體工作流已完成。
+請參考各命令的 `--help`，其中會說明標準輸出、啟動限制與程序失敗限制，並列出欄位（包含 `suggested_next`）。
+
+五個 checker 指令支援 JSON：`plan`、`intake`、`contract`、
+`reviewer-count`、`delivery`。前四者僅透過尾部 `--json` 選取 JSON；
+重複 selector 為用法錯誤。指令的精確 `--help`/`-h` 仍為文字輸出。兩個
+read-only 模式混用 help 與最終 JSON 為用法錯誤；plan/intake 視混合形式為
+一般輸入驗證。delivery 保留其獨特的 `{state, reason, next, evidence, complete}`
+欄位並增設 `suggested_next` 等於 `next`；無共用 envelope 或 schema version。
+一般文字保留 state/next 行並在 stderr 加上相同建議。delivery 可能保留
+Help/error stderr，**在結果生成前失敗時可使 stdout 為空且僅在 stderr 產生文字**，即使使用了 `--json`。
+準備模式的空 stderr 契約不適用。
+
+plan、`intake`、`contract`、`reviewer-count` 四個 v1 模式各自輸出恰一個標準輸出
+JSON 物件加換行，checker stderr 為空：
+`schema_version: 1`、`command`、`status`、有序 `diagnostics` 物件
+（`rule_id`、`message`）、有序字串 `notices`、`error`。
+四個模式亦輸出建議性 `suggested_next`：阻擋/錯誤為**至少包含一個非空白字符的英文字串**，
+通過為 null。文字拒絕/錯誤在 stderr 附加 `Suggested next step:`；原始
+diagnostics 與 Help 提示保留。通過即 exit 0、空 diagnostics、null error；
+阻擋即 exit 1、rule diagnostics、null error；錯誤即 exit 2、空 diagnostics、
+`error: {kind: usage|internal, message}`。無論是使用錯誤或內部錯誤，所有
+`data` 物件的欄位均為 `null`。
+reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列仍為 `[]`。
+請用欄位與型別而非鍵順或人言判斷。
+
+`data` 欄位僅出現在 `contract` 與 `reviewer-count` 的 read-only JSON 結果中；
+`plan` 與 `intake` 的 output 中不含 `data` 欄位。無論是使用錯誤或內部錯誤，
+`contract` 與 `reviewer-count` 的 `data` 物件各欄位均為 `null`。
+
+完成觀測時的型別資料說明如下：
+
+| 指令 | 完成觀測的型別資料 |
+|---|---|
+| `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
+| `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**含至少一個非空白字符**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個含至少一個非空白字符的 change ID。 |
+
+規劃與 closing-review 使用共享 checked consumer，而非解析成功文案
+或重複 validator。將 `<loom-code>` 替換為已安裝 plugin 目錄；在 commit
+功能工作後的選定乾淨 repo 執行 reviewer 呼叫。
+
+```sh
+"<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --ready --script checked_readonly.py --help
+```
+
+此 consumer 加入 `--json`，驗證 version/command、必要型別、不變的請求
+identity 與 exit/status 一致，保留相容的額外欄位。僅 accepted passed 且
+true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.reviewer_floor`
+決定 reviewer 派遣。不相容 `2.99` 為 blocked 觀測；malformed `bad` 為有效
+用法錯誤。無效輸出為空 stdout、`checked-readonly:` 診斷、exit 2。錯誤與
+無效結果皆不允許續行、reviewer 預設、文字 fallback、自動重試。接受核心
+觀測後，始終保留原始診斷；僅在**非空白字串**時呈現適用的 `suggested_next` 作為建議，與原始診斷一併顯示。受理的原始 JSON 可能含無用建議：核心驗證不使任意建議可信或可執行。
+建議不授權、不觸發自動動作。contract 拒絕時依診斷指示的 plugin；loom-code
+或消費端 plugin 可能較舊。consumer 故障保留原診斷與 exit 區別，在 stderr
+加上本地產生的建議。
+
+**usable `suggested_next`**: 當值為**非空白字串**時為可用建議；缺失、 `null`、
+空字串、純空白字串、或非字串型別者均被忽略，此時保留原始診斷作為基準。
+
+此 helper 以配置的 30 秒 subprocess timeout 與保留啟動 exit 86 執行
+checker 一次。不寫 artifact、不裝 runtime、不改 policy/authority/host trust；
+外層 launcher `--repair` **在需要時**準備 cache，`--ready` 重用之。結構檢查不證明計算
+真理或整體工作完成。既有結果分類、必要欄位、remote-operation 協調保留。
+全部 16 checker 指令定義建議行為，含 5 直接 JSON 模式與 2 checked station
+consumer。一般文字 stderr 用 `Suggested next step:`；GitHub rules 正常報告
+保留 stdout。僅在寫入建議訊息時發生的 OSError 或 UnicodeError，不會改變結果，也不會重複執行動作。未知或
+未同步 exit-zero 結果維持未知/未同步；成功檢查無需填充。hook payloads/
+native-hook bytes、setup、CI annotations、progress、強制 cleanup cwd handoff
+各保留其協定。[CLI 結果指南](references/cli-results.md) 將各指令/模式對應
+可執行檢查並解釋例外。不新增 JSON 模式、checked consumer、自動動作。解決率、
+時間、token、成本的改善幅度目前尚未量化。
 
 `scripts/loom_checker.py` 是決定性層：每條規則都從 repo 重算，不採信宣稱，
 規則清單以 `--list-rules` 為準。通過時退出碼 0，規則擋下時 1，用法或內部
@@ -142,7 +214,7 @@ Python 與套件，接著重跑原本的檢查；使用者專案的測試環境�
 - **loom-design** 在 `write-plan` 上游加上 `capture-intent` 與 `write-spec`；
   沒裝時，`write-plan` 自己確認 intent 並寫最小 spec。
 - **loom-workflow** 在各站周圍加上工具，例如 `ship` 用
-  `loom-workflow:git-memory` 為 PR 內文分類 memory。
+  `loom-workflow:git-memory` 為 PR 本文分類 memory。
 
 相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）
 以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的
