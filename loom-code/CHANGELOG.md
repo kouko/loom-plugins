@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.89.0] — 2026-11-23 — sweep never removes kept worktrees
+
+- `land --keep-worktree` records the keep in git config (`branch.<branch>.loomKept`), outside the worktree and never committed.
+- `land --sweep` lists kept changes on a `kept` line, even when they have local changes; the confirm token excludes them and sweep never removes them.
+- `land --cleanup <branch>` removes a kept change and its record.
+- Ship §5 has the agent leave `kept` lines alone and clean other earlier-work changes only after the maintainer's yes.
+
 ## [3.88.0] — 2026-11-20 — land can keep the worktree
 
 - The accepted land form gains `--keep-worktree`: it merges with the same checks, acceptance line and trunk sync, then keeps the change worktree and the local and remote branch, and prints the later `land --cleanup <branch>` command instead of `next: cd`.
