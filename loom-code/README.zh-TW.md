@@ -20,13 +20,13 @@
 
 ```mermaid
 flowchart TD
-    intent["① 確認要解決的問題<br/>capture-intent"]
+    intent["① 確認這次變更<br/>capture-intent"]
     design{"需要設計？"}
-    spec["寫出設計<br/>write-spec<br/>② 僅確認產品可見行為"]
+    spec["寫出設計<br/>write-spec<br/>② 確認可見產品行為"]
     plan["規劃工作<br/>write-plan"]
     build["實作與測試<br/>build"]
     review["審查與驗證<br/>closing-review"]
-    ship["③ 開 PR 並驗收結果<br/>ship"]
+    ship["③ 開 PR 並接受變更結果<br/>ship"]
 
     intent --> design
     design -->|"需要"| spec
@@ -147,7 +147,7 @@ reviewer-count 無 blocker 結果；缺失/髒 repo 為用法錯誤。空陣列�
 | 指令 | 完成觀測的型別資料 |
 |---|---|
 | `contract --require <major.minor> --json` | `contract_version`、`required_version` 字串、`compatible` 布林值；最後的 `--require` 為準。提供的要求字串保留，manifest 版本去除前後空白並作為 `data.contract_version` 返回。 |
-| `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**非空白**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個非空白的 change ID。 |
+| `reviewer-count <change-id> --json` | 不變的 `change_id` 字串（**含至少一個非空白字符**）與整數 `reviewer_floor`（目前 1 或 2）；需乾淨 repo 與一個含至少一個非空白字符的 change ID。 |
 
 規劃與 closing-review 使用共享 checked consumer，而非解析成功文案
 或重複 validator。將 `<loom-code>` 替換為已安裝 plugin 目錄；在 commit
@@ -171,7 +171,7 @@ true compatibility 允許規劃繼續；僅 accepted passed 正整數 `data.revi
 加上本地產生的建議。
 
 **usable `suggested_next`**: 當值為**非空白字串**時為可用建議；缺失、 `null`、
-空白字串、或非字串型別者均被忽略，此時保留原始診斷作為基準。
+空字串、純空白字串、或非字串型別者均被忽略，此時保留原始診斷作為基準。
 
 此 helper 以配置的 30 秒 subprocess timeout 與保留啟動 exit 86 執行
 checker 一次。不寫 artifact、不裝 runtime、不改 policy/authority/host trust；
@@ -184,7 +184,7 @@ consumer。一般文字 stderr 用 `Suggested next step:`；GitHub rules 正常�
 native-hook bytes、setup、CI annotations、progress、強制 cleanup cwd handoff
 各保留其協定。[CLI 結果指南](references/cli-results.md) 將各指令/模式對應
 可執行檢查並解釋例外。不新增 JSON 模式、checked consumer、自動動作。解決率、
-時間、token、成本無測得提升。
+時間、token、成本的改善幅度目前尚未量化。
 
 `scripts/loom_checker.py` 是決定性層：每條規則都從 repo 重算，不採信宣稱，
 規則清單以 `--list-rules` 為準。通過時退出碼 0，規則擋下時 1，用法或內部
@@ -214,7 +214,7 @@ Python 與套件，接著重跑原本的檢查；使用者專案的測試環境�
 - **loom-design** 在 `write-plan` 上游加上 `capture-intent` 與 `write-spec`；
   沒裝時，`write-plan` 自己確認 intent 並寫最小 spec。
 - **loom-workflow** 在各站周圍加上工具，例如 `ship` 用
-  `loom-workflow:git-memory` 為 PR 內文分類 memory。
+  `loom-workflow:git-memory` 為 PR 本文分類 memory。
 
 相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）
 以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的

@@ -22,13 +22,13 @@ skill の詳細は、同じ言語の翻訳がある場合はその版、それ�
 
 ```mermaid
 flowchart TD
-    intent["① 解決する問題を確認<br/>capture-intent"]
+    intent["① この変更を確認<br/>capture-intent"]
     design{"設計が必要？"}
-    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの振る舞いのみ確認"]
+    spec["設計をまとめる<br/>write-spec<br/>② プロダクトの可視振る舞いを確認"]
     plan["作業を計画<br/>write-plan"]
     build["実装とテスト<br/>build"]
     review["レビューと検証<br/>closing-review"]
-    ship["③ PR を開き結果を確認<br/>ship"]
+    ship["③ PR を開き、結果を受理<br/>ship"]
 
     intent --> design
     design -->|"必要"| spec
@@ -75,7 +75,7 @@ flowchart TD
 | [`maintain`](skills/maintain/README.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/README.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
 | [`external-review`](skills/external-review/README.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
-| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後、該当する研究を Vault に保存する提案をする場合があり、その都度、保存先と範囲についてユーザーの承認を求めます。 |
+| [`engineering-research`](skills/engineering-research/README.md) | Loom の作業や単独の技術議論で判断を左右する根拠を調べ、問いごとの研究記録を残す。マージ後、該当する研究を Vault に保存する提案をする場合があり、その都度、保存先と範囲についてユーザーの明示的な同意が必要です。 |
 
 ## Agents
 
@@ -141,7 +141,7 @@ artifact — intent・spec・plan・attestation・acceptance test report・`KICK
 追加しません。通常のテキスト出力は state/next 行を保ち、同じアドバイスを stderr に
 追加します。delivery は Help/error stderr を保持する場合があり、**結果生成前に失敗した場合
 （無効な `--goal` などの引数エラーを含む）は `--json` を指定しても JSON を出力せず、
-stderr にテキスト診断のみで exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
+stderr に診断、Help ヒント、suggested next step を含むテキストが出力されて exit 2 となる**ことがあります。準備モードの空 stderr 契約は適用されません。
 
 `data` フィールドは `contract` と `reviewer-count` のみが JSON 結果に含み、
 そのすべてのフィールドは使用エラー・内部エラーの両方で `null` となります。
@@ -152,7 +152,7 @@ stderr にテキスト診断のみで exit 2 となる**ことがあります。
 | `contract --require <major.minor> --json` | `contract_version` と `required_version` 文字列、`compatible` 真偽値；最後の `--require` が優先。指定された要求文字列は保持され、manifest バージョンは周囲の空白を除去して `data.contract_version` として返されます。 |
 | `reviewer-count <change-id> --json` | 不変の `change_id` 文字列（**少なくとも 1 文字の非空白文字を含む**）と整数 `reviewer_floor`（現在は 1 または 2）；クリーンなリポジトリと非空白の単一 change ID が必要です。 |
 
-それぞれは標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
+`plan`、`intake`、`contract`、`reviewer-count` の四つのバージョン 1 モードは、それぞれ標準出力に正確に 1 個の JSON オブジェクトと改行を出力し、checker stderr は空です：
 `schema_version: 1`、`command`、`status`、順序付き `diagnostics` オブジェクト
 （`rule_id`、`message`）、順序付き文字列 `notices`、`error`。
 
@@ -167,11 +167,10 @@ reviewer-count にブロッカー結果はなく、欠落/ダーティリポジ�
 空配列は `[]` のままです。キー順や人間向けメッセージではなく、フィールドと型を使ってください。
 
 計画とクロージングレビューは、成功プローズを解析したりバリデータを重複させたりせず、
-共有の checked consumer を使います。`<loom-code>` をインストール済みプラグイン
-ディレクトリに置き換え、機能作業を commit した後の選択されたクリーンリポジトリで
+共有の checked consumer を使います。`<loom-code>` をインストール済みのプラグインディレクトリに置き換え、`<change-id>` を置き換え、機能作業を commit した後の選択されたクリーンリポジトリで
 reviewer 呼び出しを実行します。
 
-コア観測を受理した後、元の診断を常に保持し、適用可能な `suggested_next` が**非空白文字列**の場合にのみ助言として元の診断とともに提示します。受理された生 JSON に使えないアドバイスが含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
+コア観測を受理した後、元の診断を常に保持し、適用可能な `suggested_next` が**非空白文字列**の場合にのみ助言として元の診断とともに提示します。欠落、null、空文字列、空白のみ、または非文字列の値は無視されます。受理された生 JSON に使えないアドバイスが含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
 
 ```sh
 "<loom-code>/scripts/loom-python" --repair --script checked_readonly.py contract --require 2.1
@@ -186,9 +185,6 @@ reviewer 呼び出しを実行します。
 正の整数 `data.reviewer_floor` のみが reviewer 派遣を決めます。互換性のない `2.99` はブロック観測；不正な `bad` は有効な
 使用エラーです。無効な出力は空標準出力、`checked-readonly:` 診断、exit 2。エラーも
 無効結果も継続や reviewer デフォルト、テキストフォールバック、自動リトライを許しません。
-コア観測を受理した後、適用可能な `suggested_next` を**非空白文字列**の時だけ助言として
-提示し、それ以外（欠落、null、空白のみ、別の型）は元の診断を保持します。受理された生 JSON に使えないアドバイスが
-含まれる可能性があります：コア検証は任意のアドバイスを信頼可能や実行可能にしません。
 アドバイスは認可を与えず、自動実行をトリガーしません。contract 拒否の場合は診断の
 示すプラグインに従います；loom-code か消費側プラグインのいずれかが古い可能性があります。
 consumer の故障は、元の診断と exit 区別を保ったまま、ローカルで生成されたアドバイスを
