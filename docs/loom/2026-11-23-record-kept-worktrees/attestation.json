@@ -1,0 +1,117 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-23-record-kept-worktrees",
+  "content_digest": "ad7a705210205bc8ec8572218d83275633da903f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_land_sweep.py",
+      "artifact": "loom-code/tests/test_land_sweep.py",
+      "result": "pass",
+      "command_digest": "0234aa01671cfa9a167626f7ee4183986d148e6a6f173d77a9be0bf224fb6fe3"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_land_cleanup.py",
+      "artifact": "loom-code/tests/test_land_cleanup.py",
+      "result": "pass",
+      "command_digest": "90e96a8bb67ce3b2738ee499f5be0b3ba4ceb778e6e9fae7412193217c727872"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a9be35bbf0b2c4692",
+      "vendor": "claude",
+      "model": "opus",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:703",
+          "text": "config --get-regexp read fails open on timeout/OSError; non-blocking"
+        },
+        {
+          "severity": "nit",
+          "dimension": "spec-conformance",
+          "anchor": "docs/loom/2026-11-23-record-kept-worktrees/spec.md :: Design decision 2",
+          "text": "spec still describes per-branch read and omits tip-match rule; non-blocking"
+        },
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:743",
+          "text": "locally renamed kept branch cannot be fully removed through loom; backlog; non-blocking"
+        },
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "docs/loom/memory/a-graduated-probe-keeps-its-concern-line.md :: Why paragraph",
+          "text": "Why sentence names graduation discovery instead of the declared-artifact path; non-blocking, fix on next branch"
+        }
+      ]
+    },
+    {
+      "reviewer": "a7ca9c333442245cc",
+      "vendor": "claude",
+      "model": "opus",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "spec-conformance",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:728",
+          "text": "tip-match kept rule not described in spec Design decision 2; non-blocking"
+        },
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:744",
+          "text": "renamed kept branch line says no worktree; backlog; non-blocking"
+        },
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "docs/loom/memory/a-graduated-probe-keeps-its-concern-line.md :: Why paragraph",
+          "text": "Why sentence names graduation discovery instead of the declared-artifact path; non-blocking, fix on next branch"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "6561d19dd9e6e5f78760d5c05d47cd8292b1df63",
+  "tested_commit": "84712259",
+  "reviewed_commit": "09d5a2dd5b40a7a14c488a7b81a62fae1e9a3b1e",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}
