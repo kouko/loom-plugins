@@ -214,6 +214,9 @@ def _sync_and_clean(target: LandTarget, out, err, *, keep: bool = False) -> int:
     `keep`, leave the worktree and both branches for a later `--cleanup`."""
     sync_trunk(target, out)
     if keep:
+        # The keep record: common config, so every worktree's sweep sees it.
+        _git_run(target, target.repo, "config", f"branch.{target.branch}.loomKept",
+                 date.today().isoformat())
         out.write(f"Kept worktree {target.repo} on branch {target.branch}; "
                   f"remove it later with: land --cleanup {target.branch}\n")
         return 0
@@ -524,8 +527,9 @@ def execute_cleanup(
         if code != 0:
             return finish(labelled_block(f"local branch {branch} not deleted: {detail}", err))
         out.write(f"Deleted local branch {branch}\n")
-        # An absent section exits non-zero; that is the state we want.
-        _git_run(target, anchor, "config", "--remove-section", f"branch.{branch}")
+    # Also clears a keep record left without a local branch. An absent
+    # section exits non-zero; that is the state we want.
+    _git_run(target, anchor, "config", "--remove-section", f"branch.{branch}")
 
     if plan.remote:
         code, _stdout, detail = _git_run(
@@ -713,6 +717,12 @@ def _sweep_list(
             where = f"main worktree {plan.main} switches to {context.base}"
         else:
             where = "no worktree"
+        code, kept, _detail = _git_run(
+            context, context.repo, "config", "--get", f"branch.{branch}.loomKept"
+        )
+        if code == 0 and kept.strip():
+            lines.append(f"kept {branch} — {where}; remove with: land --cleanup {branch}")
+            continue
         lines.append(
             f"remove {branch} {plan.head[:7]} — {where}, "
             f"{'local' if plan.local else 'no local'}, {'remote' if plan.remote else 'no remote'}"

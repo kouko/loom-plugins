@@ -218,17 +218,28 @@ def test_keep_worktree_flag_keeps_all_then_cleanup_removes_all(
     assert rc == 0, err
     assert git(layout.repo, "rev-parse", "refs/heads/main") == layout.merged
     nothing_removed(layout, calls)
+    assert git(layout.repo, "config", "--get", "branch.feat/x.loomKept") != ""
 
     context = land.LandTarget(layout.repo, "", "", "main", "github.com/example/project", 0,
                               GIT, GH, dict(os.environ))
     monkeypatch.setattr(land, "_cleanup_context", lambda *a: context)
     monkeypatch.setattr(land, "_merged_prs", lambda *a: [
         {"number": 7, "headRefOid": layout.head, "headRefName": "feat/x"}])
+    # record-kept A1 positive + boundary: a later sweep from main lists it kept, no token
+    out, err = StringIO(), StringIO()
+    assert land.cmd_land(["--sweep"], out, err) == 0, err.getvalue()
+    assert out.getvalue().splitlines() == [
+        f"kept feat/x — worktree {layout.wt}; remove with: land --cleanup feat/x",
+        "No merged changes to clean up",
+    ]
+    nothing_removed(layout, calls)
+
     out, err = StringIO(), StringIO()
     assert land.cmd_land(["--cleanup", "feat/x"], out, err) == 0, err.getvalue()
     assert not layout.wt.exists()
     assert not ref_exists(layout.repo, "refs/heads/feat/x")
     assert not layout.remote_has("feat/x")
+    assert git(layout.repo, "config", "--get", "branch.feat/x.loomKept", check=False) == ""
 
 
 # keep-worktree A4 positive: keep-output-names-cleanup-command

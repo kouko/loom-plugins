@@ -345,6 +345,48 @@ def test_sweep_confirm_replans_before_each_removal(tmp_path: Path, monkeypatch) 
     assert all(str(wt_c) not in argv for argv in calls.argvs("worktree", "remove"))
 
 
+# record-kept A2 positive/negative, A4 negative: mixed-listing-confirm-removes-only-unkept
+def test_sweep_lists_kept_apart_and_confirm_spares_it(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    k, wt_k = layout.branch("feat/k", worktree="wt-k")
+    u, wt_u = layout.branch("feat/u", worktree="wt-u")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    token = token_of(out)
+    assert out.splitlines() == [
+        f"kept feat/k — worktree {wt_k}; remove with: land --cleanup feat/k",
+        f"remove feat/u {u[:7]} — worktree {wt_u}, local, remote",
+        f"confirm with: land --sweep --confirm {token}",
+    ]
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep", "--confirm", token)
+
+    assert rc == 0, err
+    assert layout.gone("feat/u", wt_u)
+    assert layout.intact("feat/k", wt_k)
+    assert git(layout.repo, "rev-parse", "refs/heads/feat/k") == k
+    assert git(layout.repo, "config", "--get", "branch.feat/k.loomKept") == "2026-11-23"
+
+
+# record-kept A3 boundary: cleanup-without-local-branch-clears-record
+def test_cleanup_without_local_branch_clears_record(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    layout.branch("feat/r", local=False)
+    git(layout.repo, "config", "branch.feat/r.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--cleanup", "feat/r")
+
+    assert rc == 0, err
+    assert layout.gone("feat/r")
+    assert subprocess.run(
+        ["git", "-C", str(layout.repo), "config", "--get", "branch.feat/r.loomKept"],
+        capture_output=True, text=True,
+    ).stdout == ""
+
+
 def test_sweep_no_candidates(tmp_path: Path, monkeypatch) -> None:
     layout = Repo(tmp_path)
     _, wt = layout.branch("feat/x-2", worktree="wt-x-2", merged=False)
