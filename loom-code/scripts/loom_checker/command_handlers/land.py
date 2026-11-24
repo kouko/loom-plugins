@@ -108,14 +108,20 @@ def _block(reason: str, err, next_action: str | None = None,
     return report([(rule, f"{reason}; next: {remedy}")], err)
 
 
-def _land_args(args: list[str]) -> tuple[str, str | None, str | None] | str:
-    """Return (form, value, confirm) for one of the three forms, or a usage error."""
+def _land_args(args: list[str]) -> tuple[str, str | None, str | None, bool] | str:
+    """Return (form, value, confirm, keep) for one of the three forms, or a usage error."""
     rest = list(args)
     form: str | None = None
     value: str | None = None
     confirm: str | None = None
+    keep = False
     while rest:
         token = rest.pop(0)
+        if token == "--keep-worktree":
+            if keep:
+                return "--keep-worktree may appear only once"
+            keep = True
+            continue
         if token in {"--accepted-by", "--cleanup", "--confirm"}:
             if not rest or not rest[0].strip():
                 return f"{token} needs a value"
@@ -134,7 +140,9 @@ def _land_args(args: list[str]) -> tuple[str, str | None, str | None] | str:
         form, value = token, operand
     if confirm is not None and form != "--sweep":
         return "--confirm applies only to --sweep"
-    return form or "--accepted-by", value, confirm
+    if keep and form != "--accepted-by":
+        return "--keep-worktree applies only to --accepted-by"
+    return form or "--accepted-by", value, confirm, keep
 
 
 def cmd_land(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
@@ -142,7 +150,7 @@ def cmd_land(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     parsed = _land_args(args)
     if isinstance(parsed, str):
         return _usage(parsed, err)
-    form, value, confirm = parsed
+    form, value, confirm, keep = parsed
 
     redirected = sorted(
         key for key in os.environ
@@ -165,7 +173,7 @@ def cmd_land(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     ))
     try:
         if form == "--accepted-by":
-            return _land_accepted(value, trusted_git, trusted_gh, out, err)
+            return _land_accepted(value, trusted_git, trusted_gh, out, err, keep=keep)
         context = _cleanup_context(trusted_git, trusted_gh, err)
         if isinstance(context, int):
             return context
@@ -180,7 +188,8 @@ def cmd_land(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
 
 
 def _land_accepted(
-    accepted_by: str | None, trusted_git: str, trusted_gh: str, out, err
+    accepted_by: str | None, trusted_git: str, trusted_gh: str, out, err,
+    *, keep: bool = False,
 ) -> int:
     target = _merge_preconditions(accepted_by, trusted_git, trusted_gh, out, err)
     if isinstance(target, int):
@@ -196,13 +205,18 @@ def _land_accepted(
                   "merged anyway.\n")
     if _verify_merge(target, merge_commit, title, body, err) != 0:
         return 1
-    return _sync_and_clean(target, out, err)
+    return _sync_and_clean(target, out, err, keep=keep)
 
 
-def _sync_and_clean(target: LandTarget, out, err) -> int:
+def _sync_and_clean(target: LandTarget, out, err, *, keep: bool = False) -> int:
     """After a verified merge: fast-forward the trunk, then clean up the
-    invoking worktree's change (spec 'Which worktree path')."""
+    invoking worktree's change (spec 'Which worktree path'), or, with
+    `keep`, leave the worktree and both branches for a later `--cleanup`."""
     sync_trunk(target, out)
+    if keep:
+        out.write(f"Kept worktree {target.repo} on branch {target.branch}; "
+                  f"remove it later with: land --cleanup {target.branch}\n")
+        return 0
     return cleanup_change(target, out, err, worktree=target.repo)
 
 
