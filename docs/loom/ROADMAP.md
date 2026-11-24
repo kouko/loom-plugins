@@ -48,6 +48,7 @@ that one line in English. Ride these small fixes on the same branch:
 | Package suite needs PyYAML in uv's base interpreter | launcher tests symlink their fake runtime to the base interpreter, so the documented `package-tests` command fails locally when that base lacks PyYAML (CI is unaffected); see `docs/loom/memory/the-package-suite-needs-pyyaml-in-uvs-base-interpreter.md` | set `UV_PYTHON` to an interpreter whose base has PyYAML |
 | Flaky timing tests | two 5 s timeout tests in `loom-code/tests/test_external_review.py` failed once inside finalize-review under heavy machine load | re-run finalize-review |
 | Renamed kept branch | after a local `git branch -m`, sweep shows the kept change as "no worktree" and `land --cleanup <old>` removes only the old-name remote; loom cannot fully remove it (nothing is deleted wrongly) | remove the worktree and branch with git |
+| Root-only PRs can never merge | main's branch protection requires the `pytest + knowledge-drift + codex-manifest-drift` check, but `.github/workflows/loom-code-ci.yml` only runs on listed paths (`loom-code/**`, `docs/loom/**`, `scripts/**`, plugin manifests, …), so a PR touching only root files never reports that check and stays BLOCKED (found on PR #179) | place the file under a triggering path (this roadmap moved to `docs/loom/` for that reason), or merge with admin rights |
 
 ### Open questions
 
