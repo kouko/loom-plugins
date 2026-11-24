@@ -28,6 +28,8 @@ the end of Build, then read and acceptance testing in review.
 Optional staged project planning uses root ROADMAP.md or a selected existing
 planning document, maintained by [roadmap](../../loom-workflow/skills/roadmap/README.md).
 It is a current summary with evidence links, not required scaffolding or delivery authority.
+This repository's selected planning document is [ROADMAP.md](ROADMAP.md) in this folder
+(a root-only change does not trigger the required CI check, see its "Later" table).
 
 ## Frozen stores — read-only history
 
