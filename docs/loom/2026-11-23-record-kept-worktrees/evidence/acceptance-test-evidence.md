@@ -1,6 +1,6 @@
 # Record kept worktrees so sweep never removes them — acceptance test evidence
 
-Tried on 2026-11-23, in a clean copy of the project at 028cb9e8.
+Tried on 2026-11-24, in a clean copy of the project at d2ccaa5b.
 
 The sections 1-5 below are the first run, at 2e024f7a. Every row was re-tested
 at 028cb9e8; see "Re-run on 2026-11-23, at 028cb9e8" at the end.
@@ -341,6 +341,35 @@ UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python \
   python -m pytest loom-code/tests/test_land_sweep.py \
   loom-code/tests/test_land_cleanup.py loom-code/tests/test_ship_station_text.py -q
 52 passed in 145.82s (0:02:25)
+```
+The full package suite was not run here; finalize-review runs it and refuses
+the attestation when it fails.
+
+## Re-run on 2026-11-24, at d2ccaa5b
+
+Change since 84712259: 15cfe9bf (attestation only) and merge d2ccaa5b, which
+brings origin/main 49c7cbb6 (#178, README follow-ups) and resolves 10
+version-metadata conflicts keeping loom-code 3.89.0. Tested HEAD d2ccaa5b,
+clean copy via `git worktree add <scratch>/wt HEAD`.
+
+Carry-over check: `git diff --stat 15cfe9bf d2ccaa5b -- loom-code/scripts
+loom-code/skills loom-code/tests` printed nothing (0 lines), so the product
+code, ship text, help and tests are identical to what rows 1-5 were tested
+on. Rows 1-5: carried over, nothing in them could be affected.
+
+Setup check at d2ccaa5b: `uv run ... python loom-code/scripts/loom_checker.py
+land --help` in the clean copy printed the keep-form paragraph ("The keep
+form records the keep, so a later sweep shows that change on a kept line it
+never removes; land --cleanup <branch> removes a kept change and its
+record. If the record cannot be written, ...").
+
+Criterion tests re-run at d2ccaa5b:
+```
+UV_PYTHON=/usr/local/Caskroom/miniconda/base/envs/dbt-redshift/bin/python \
+  uv run --isolated --with-requirements requirements-package-tests.lock \
+  python -m pytest loom-code/tests/test_land_sweep.py \
+  loom-code/tests/test_land_cleanup.py loom-code/tests/test_ship_station_text.py -q
+52 passed in 173.60s (0:02:53)
 ```
 The full package suite was not run here; finalize-review runs it and refuses
 the attestation when it fails.
