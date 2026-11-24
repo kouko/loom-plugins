@@ -4,6 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.26.3] — 2026-11-23 — restore literal em-dash in manifest description
+
+- The plugin description stores the em-dash as `—` again instead of the `\u2014` escape the 5.26.2 bump wrote.
+
 ## [5.26.2] — 2026-11-23 — README sync: old-map definition + version bump
 
 - Define what an "old map" is on first use: a decision map from before `roadmap` replaced it.

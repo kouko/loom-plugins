@@ -138,14 +138,16 @@ modes; plan/intake validate mixed forms as ordinary inputs. Delivery retains its
 distinct `{state, reason, next, evidence, complete}` fields and adds
 `suggested_next` equal to `next`; no common envelope or schema version is added.
 Ordinary text preserves its state/next lines and adds the same advice on stderr.
-Delivery may retain Help/error stderr, including pre-result text failures with
-`--json`; the preparation modes' empty-stderr contract does not apply to it.
+Delivery may retain Help/error stderr: a failure before any result (including an
+argument error such as an invalid `--goal`) prints no JSON even with `--json`,
+writes diagnostics, Help hints and the suggested next step to stderr, and exits 2.
+The preparation modes' empty-stderr contract does not apply to it.
 
 The two read-only modes add `data` to the preparation envelope:
 
 | Command | Typed data on a completed observation |
 |---|---|
-| `contract --require <major.minor> --json` | `contract_version` and `required_version` strings, `compatible` boolean; last `--require` wins. The supplied requirement string is preserved, and the manifest version is stripped. |
+| `contract --require <major.minor> --json` | `contract_version` and `required_version` strings, `compatible` boolean; last `--require` wins. The supplied requirement string is preserved, and the manifest version is stripped of surrounding whitespace. |
 | `reviewer-count <change-id> --json` | Unchanged `change_id` string and integer `reviewer_floor` (currently 1 or 2); requires a clean repository and one nonblank operand. |
 
 Each emits exactly one stdout object plus newline and empty checker stderr:
