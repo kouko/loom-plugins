@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.88.1] — 2026-11-24 — README follow-ups: remove duplicates, align the three languages
+
+- English README states the delivery pre-result failure (no JSON, stderr text, exit 2) and the whitespace stripping of the contract manifest version, which the translations already said.
+- Traditional Chinese README states that delivery failure exits 2 and drops its repeated suggested_next and data-null paragraphs; Japanese README drops its repeated `--help` and data-null sentences.
+- Add the English README correction to the 3.87.2 entry.
+
 ## [3.88.0] — 2026-11-20 — land can keep the worktree
 
 - The accepted land form gains `--keep-worktree`: it merges with the same checks, acceptance line and trunk sync, then keeps the change worktree and the local and remote branch, and prints the later `land --cleanup <branch>` command instead of `next: cd`.
