@@ -214,8 +214,17 @@ def _sync_and_clean(target: LandTarget, out, err, *, keep: bool = False) -> int:
     `keep`, leave the worktree and both branches for a later `--cleanup`."""
     sync_trunk(target, out)
     if keep:
+        # The keep record: common config, so every worktree's sweep sees it.
+        value = date.today().isoformat()
+        code, _stdout, detail = _git_run(
+            target, target.repo, "config", f"branch.{target.branch}.loomKept", value
+        )
         out.write(f"Kept worktree {target.repo} on branch {target.branch}; "
                   f"remove it later with: land --cleanup {target.branch}\n")
+        if code != 0:
+            return _cleanup_block(
+                f"keep record not written: {detail}; run: "
+                f"git config branch.{target.branch}.loomKept {value}", err)
         return 0
     return cleanup_change(target, out, err, worktree=target.repo)
 
@@ -524,8 +533,9 @@ def execute_cleanup(
         if code != 0:
             return finish(labelled_block(f"local branch {branch} not deleted: {detail}", err))
         out.write(f"Deleted local branch {branch}\n")
-        # An absent section exits non-zero; that is the state we want.
-        _git_run(target, anchor, "config", "--remove-section", f"branch.{branch}")
+    # Also clears a keep record left without a local branch. An absent
+    # section exits non-zero; that is the state we want.
+    _git_run(target, anchor, "config", "--remove-section", f"branch.{branch}")
 
     if plan.remote:
         code, _stdout, detail = _git_run(
@@ -687,6 +697,22 @@ def _sweep_list(
     if prs is None:
         return 1
     invoking = current_branch(context.repo)
+    # The key's presence is the record, whatever its value. `git branch -m`
+    # moves the record to the new name, so a kept change is also recognised
+    # by its PR head being the tip of a local branch that carries a record.
+    _code, records, _detail = _git_run(
+        context, context.repo, "config", "--get-regexp", r"^branch\..*\.loomkept$"
+    )
+    kept_branches: set[str] = set()
+    kept_tips: set[str] = set()
+    for record in records.splitlines():
+        key = record.split(" ", 1)[0]
+        if key.lower().startswith("branch.") and key.lower().endswith(".loomkept"):
+            name = key[len("branch."):-len(".loomkept")]
+            kept_branches.add(name)
+            tip = _tip(context, context.repo, f"refs/heads/{name}")
+            if isinstance(tip, str):
+                kept_tips.add(tip)
 
     lines: list[str] = []
     removable: list[tuple[LandTarget, CleanupPlan]] = []
@@ -699,20 +725,27 @@ def _sweep_list(
                    if pr["headRefName"] == branch and pr["headRefOid"] in tips), None)
         if pr is None:
             continue
-        if branch == invoking:
+        kept = branch in kept_branches or pr["headRefOid"] in kept_tips
+        if branch == invoking and not kept:
             lines.append(f"skip {branch} — current working directory")
             continue
         target = _change_target(context, branch, pr)
         plan = plan_cleanup(target, fetch=False)
         if isinstance(plan, str):
-            lines.append(f"skip {branch} — {plan}")
-            continue
-        if plan.worktree is not None:
+            where = plan
+        elif plan.worktree is not None:
             where = f"worktree {plan.worktree}"
         elif plan.in_main:
             where = f"main worktree {plan.main} switches to {context.base}"
         else:
             where = "no worktree"
+        if kept:
+            once = " once that is resolved" if isinstance(plan, str) else ""
+            lines.append(f"kept {branch} — {where}; remove with: land --cleanup {branch}{once}")
+            continue
+        if isinstance(plan, str):
+            lines.append(f"skip {branch} — {plan}")
+            continue
         lines.append(
             f"remove {branch} {plan.head[:7]} — {where}, "
             f"{'local' if plan.local else 'no local'}, {'remote' if plan.remote else 'no remote'}"

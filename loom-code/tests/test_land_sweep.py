@@ -1,3 +1,4 @@
+# concern: A change landed with --keep-worktree must never be listed for removal by sweep, from any worktree, even when renamed or dirty.
 """`land --cleanup <branch>` and `land --sweep [--confirm <token>]`
 (plan W3-02; spec REQ-9, REQ-10).
 
@@ -345,6 +346,70 @@ def test_sweep_confirm_replans_before_each_removal(tmp_path: Path, monkeypatch) 
     assert all(str(wt_c) not in argv for argv in calls.argvs("worktree", "remove"))
 
 
+# record-kept A2 positive/negative, A4 negative: mixed-listing-confirm-removes-only-unkept
+def test_sweep_lists_kept_apart_and_confirm_spares_it(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    k, wt_k = layout.branch("feat/k", worktree="wt-k")
+    u, wt_u = layout.branch("feat/u", worktree="wt-u")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+    (wt_k / "wip.txt").write_text("still working\n", encoding="utf-8")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    token = token_of(out)
+    assert out.splitlines() == [
+        f"kept feat/k — worktree {wt_k} has untracked files; "
+        "remove with: land --cleanup feat/k once that is resolved",
+        f"remove feat/u {u[:7]} — worktree {wt_u}, local, remote",
+        f"confirm with: land --sweep --confirm {token}",
+    ]
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep", "--confirm", token)
+
+    assert rc == 0, err
+    assert layout.gone("feat/u", wt_u)
+    assert layout.intact("feat/k", wt_k)
+    assert (wt_k / "wip.txt").exists()
+    assert git(layout.repo, "rev-parse", "refs/heads/feat/k") == k
+    assert git(layout.repo, "config", "--get", "branch.feat/k.loomKept") == "2026-11-23"
+
+
+# record-kept A2 boundary: a kept branch renamed locally still spares its old-name remote
+def test_sweep_keeps_renamed_kept_branch_remote(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    layout.branch("feat/k", worktree="wt-k")
+    _, wt_u = layout.branch("feat/u", worktree="wt-u")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+    git(layout.repo, "branch", "-m", "feat/k", "feat/k2")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    assert any(line.startswith("kept feat/k ") for line in out.splitlines()), out
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep", "--confirm", token_of(out))
+
+    assert rc == 0, err
+    assert layout.gone("feat/u", wt_u)
+    assert ref_exists(layout.origin, "refs/heads/feat/k")
+
+
+# record-kept A3 boundary: cleanup-without-local-branch-clears-record
+def test_cleanup_without_local_branch_clears_record(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    layout.branch("feat/r", local=False)
+    git(layout.repo, "config", "branch.feat/r.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--cleanup", "feat/r")
+
+    assert rc == 0, err
+    assert layout.gone("feat/r")
+    assert subprocess.run(
+        ["git", "-C", str(layout.repo), "config", "--get", "branch.feat/r.loomKept"],
+        capture_output=True, text=True,
+    ).stdout == ""
+
+
 def test_sweep_no_candidates(tmp_path: Path, monkeypatch) -> None:
     layout = Repo(tmp_path)
     _, wt = layout.branch("feat/x-2", worktree="wt-x-2", merged=False)
@@ -370,6 +435,48 @@ def test_sweep_skips_invoking_worktree(tmp_path: Path, monkeypatch) -> None:
     ]
     assert err == ""
     assert layout.intact("feat/x", wt)
+
+
+# record-kept A1 boundary: sweep run inside the kept worktree marks it kept
+def test_sweep_marks_invoking_kept_worktree_kept(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    _, wt = layout.branch("feat/k", worktree="wt-k")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep", cwd=wt)
+
+    assert rc == 0, err
+    assert out.splitlines() == [
+        f"kept feat/k — worktree {wt}; remove with: land --cleanup feat/k",
+        "No merged changes to clean up",
+    ]
+
+
+# record-kept A1 positive: sweep-inside-kept-worktree-marks-kept (main checkout variant)
+def test_sweep_kept_branch_checked_out_in_main_marks_kept(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    layout.branch("feat/k")
+    git(layout.repo, "switch", "-q", "feat/k")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "2026-11-23")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    assert any(line.startswith("kept feat/k ") for line in out.splitlines()), out
+
+
+# record-kept A1 boundary: an empty keep record still marks the change kept
+def test_sweep_empty_keep_record_counts_as_kept(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    _, wt = layout.branch("feat/k", worktree="wt-k")
+    git(layout.repo, "config", "branch.feat/k.loomKept", "")
+
+    rc, out, err, _calls = run(monkeypatch, layout, "--sweep")
+
+    assert rc == 0, err
+    assert out.splitlines()[0] == (
+        f"kept feat/k — worktree {wt}; remove with: land --cleanup feat/k"
+    )
 
 
 def test_sweep_reports_unexamined_older_prs(tmp_path: Path, monkeypatch) -> None:

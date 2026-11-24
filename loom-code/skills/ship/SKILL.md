@@ -346,11 +346,14 @@ leave the local trunk as it is. Never discard local trunk commits (`git reset`,
 checkout (`git stash`, `git restore`, or a checkout discard) without the
 maintainer's explicit yes to that discard: the acceptance at decision point ③ is not that permission.
 
-For one merged change left from earlier work, run `land --cleanup <branch>`
-through the same command, except a change landed with `--keep-worktree`: its
-worktree stays until the maintainer asks for it to be removed. `land --sweep` lists merged changes, removes nothing,
-and prints a token; pass `--sweep --confirm <token>` only after the maintainer
-answers yes to the printed list.
+For merged changes left from earlier work, run `land --sweep` through the same
+command: it lists merged changes, removes nothing, and prints a token. Leave
+every change on a `kept` line alone: it was landed with `--keep-worktree` and
+stays until the maintainer asks for it to be removed. Clean any other listed
+change — `land --cleanup <branch>` for one, or pass `--sweep --confirm <token>`
+— only after the maintainer answers yes to the printed list, never on your own
+judgement. A yes to the printed list covers only its `remove` lines; a kept change is
+removed only when the maintainer names that branch.
 
 ## Handoff
 
