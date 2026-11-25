@@ -1,0 +1,87 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-25-agent-hook-protect-main-spellings",
+  "content_digest": "8d302e85f01b62827454620cf2fed8b64fc48e63",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_abuse_main_guard_overblocks.py",
+      "artifact": "loom-code/tests/test_abuse_main_guard_overblocks.py",
+      "result": "pass",
+      "command_digest": "c211bb3723b6661a311cfd23d2bee31d0d7e4d9e8864a560ff3351032094ae70"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_abuse_main_guard_slips.py",
+      "artifact": "loom-code/tests/test_abuse_main_guard_slips.py",
+      "result": "pass",
+      "command_digest": "a1ec6a10a754d4fca3a472f429dde0a651a6668dd4e9aacfc9a56d753da31719"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-a",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "5ece56d25",
+      "review_target_sha": "c13c536c8",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-b",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "5ece56d25",
+      "review_target_sha": "c13c536c8",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-code/tests/test_abuse_main_guard_slips.py:44",
+          "text": "graduated probe files duplicate six cases already in test_main_branch_hook.py"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "18d07977f374536f90000a09827b05c7f84ac674",
+  "tested_commit": "c13c536c8",
+  "reviewed_commit": "0e1237fbf629e0569af492c1064c1c6dc83b861d",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}
