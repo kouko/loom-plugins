@@ -16,7 +16,7 @@ charter: 1.1
 **W1-01 Document Codex hook re-approval after update**  after: none  acceptance: 1, 2, 3, 4, 5
 - Files: loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md
 - Test: A1 positive: live-codex-main-commit-blocked; negative: none-needed-docs. A2 positive: live-codex-cd-main-blocked; negative: live-codex-feature-commit-allowed. A3 positive: live-codex-feature-commit-allowed; boundary: live-codex-cd-main-blocked. A4 positive: package-suite-green; boundary: hooks-files-unchanged. A5 positive: readme-codex-update-note; boundary: three-readmes-consistent.
-- Risk: no hook or checker code changes; A1–A2 were not settled by acceptance testing (Codex model refused the commit); delivery rests on A3–A5; agent-decided.
+- Risk: no hook or checker code changes; AT re-run verified A1 (hook blocked main commit); A2 unsettled (Codex model refused); A3 carried over; delivery rests on A1, A3–A5; agent-decided.
 
 **W1-02 Release metadata for loom-code 3.90.2**  after: W1-01  acceptance: 4
 - Files: loom-code/.claude-plugin/plugin.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md, README.md, loom-code/tests/test_write_plan_station_text.py
