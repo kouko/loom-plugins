@@ -13,6 +13,9 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import repo_root
+from loom_checker.rule_checks.push import ASSIGNMENT
+from loom_checker.rule_checks.push import _operator_segments
+from loom_checker.rule_checks.push import _tokenise
 from loom_checker.rule_checks.push import publication_kind
 from loom_checker.verification import identify_change
 from loom_checker.verification import missing_clause
@@ -25,8 +28,6 @@ import re
 import sys
 import subprocess
 
-
-DIRECT_GIT_CHANGE = re.compile(r"^\s*git[ \t]+(merge|commit|push)(?=[ \t]|$)")
 
 # Static, relocatable POSIX shell: no installed launcher or Python at runtime.
 # These hooks do not intercept reset/rebase or fast-forward merges. Remote PR
@@ -199,15 +200,205 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     return 0
 
 
+PROTECTED = {"main", "master"}
+# Git global options that take their value as the next word (git(1) OPTIONS).
+GIT_VALUE_OPTIONS = {"-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env"}
+PUSH_VALUE_OPTIONS = {"--repo", "-o", "--push-option", "--receive-pack", "--exec"}
+
+
+# git-switch(1) / git-checkout(1) OPTIONS
+CREATE_FLAGS = {"switch": {"-c", "-C", "--create", "--force-create", "--orphan"},
+                "checkout": {"-b", "-B", "--orphan"}}
+
+
+def _resolve(base: Path | None, target: str) -> Path | None:
+    """`target` read from `base` (an absolute or `~` target needs no base);
+    None when it is not an existing directory."""
+    path = Path(target).expanduser()
+    if not path.is_absolute():
+        if base is None:
+            return None
+        path = base / path
+    return path if path.is_dir() else None
+
+
 def _protect_main(command: str, cwd: Path) -> bool:
-    """A literal Git verb at the start, including when later shell text follows."""
-    if not DIRECT_GIT_CHANGE.match(command):
+    """Each simple command of the text, read in order: a `cd <dir>` moves the
+    effective directory, `git -C <dir>` moves it for that call, an earlier
+    `git switch`/`git checkout` sets that checkout's branch, and a `( … )`
+    group keeps its `cd` and branch changes inside it. A Git commit, merge
+    or push on main/master, or a push whose destination is main/master from
+    any branch, is refused. A directory that cannot be resolved leaves that
+    command unjudged; `bash -c`, scripts and other wrappers stay outside the
+    guard."""
+    here: Path | None = cwd
+    branches: dict[str, str] = {}  # checkout -> branch an earlier switch set
+    saved: list[tuple[Path | None, dict[str, str]]] = []
+    for segment in _operator_segments(_plain_text(command)):
+        tokens = _tokenise(segment)
+        while tokens and tokens[0][:1] in {"(", "{"}:
+            if tokens[0][0] == "(":
+                saved.append((here, dict(branches)))
+            tokens[0] = tokens[0][1:]
+            if not tokens[0]:
+                tokens = tokens[1:]
+        closes = 0
+        while tokens and tokens[-1][-1:] in {")", "}"}:
+            if tokens[-1][-1] == ")":
+                if closes == len(saved):
+                    break
+                closes += 1
+            tokens[-1] = tokens[-1][:-1]
+            if not tokens[-1]:
+                tokens = tokens[:-1]
+        tokens = _drop_redirects(tokens)
+        while tokens and ASSIGNMENT.match(tokens[0]):
+            tokens = tokens[1:]
+        if tokens[:1] == ["cd"]:
+            rest = [t for t in tokens[1:] if t not in {"-P", "-L", "-e", "--"}]
+            here = _resolve(here, rest[0] if rest else "~") if rest[:1] != ["-"] else None
+        elif tokens[:1] == ["git"] and _git_on_main(tokens[1:], here, branches):
+            return True
+        for _ in range(closes):
+            here, branches = saved.pop()
+    return False
+
+
+# bash(1) REDIRECTION and Here Documents.
+HEREDOC = re.compile(r"(?<!<)<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+REDIRECT = re.compile(r"^(\d*|&)(>>?|<<?-?|<>|>&|<&)")
+
+
+def _plain_text(command: str) -> str:
+    """The command without heredoc bodies, and with each `$( … )` or
+    backtick substitution reduced to one placeholder word: text there is
+    data (a commit message, a PR body), not a command the hook judges."""
+    kept: list[str] = []
+    pending: list[str] = []
+    for line in command.split("\n"):
+        if pending:
+            if line.strip() == pending[0]:
+                pending.pop(0)
+            continue
+        kept.append(line)
+        pending = [match.group(2) for match in HEREDOC.finditer(line)]
+    text = "\n".join(kept)
+    out: list[str] = []
+    index = 0
+    while index < len(text):
+        if text.startswith("$(", index):
+            depth, index = 1, index + 2
+            while index < len(text) and depth:
+                depth += {"(": 1, ")": -1}.get(text[index], 0)
+                index += 1
+            out.append("SUBST")
+        elif text[index] == "`":
+            end = text.find("`", index + 1)
+            index = len(text) if end < 0 else end + 1
+            out.append("SUBST")
+        else:
+            out.append(text[index])
+            index += 1
+    return "".join(out)
+
+
+def _drop_redirects(tokens: list[str]) -> list[str]:
+    """Words without redirections (`2>/dev/null`, `> file`, `<<EOF`)."""
+    kept: list[str] = []
+    skip = False
+    for token in tokens:
+        if skip:
+            skip = False
+            continue
+        match = REDIRECT.match(token)
+        if match:
+            skip = match.end() == len(token)  # a bare operator: its target is the next word
+            continue
+        kept.append(token)
+    return kept
+
+
+def _checkout(where: Path) -> str:
+    # git-rev-parse(1) --show-toplevel
+    return git_maybe(where, "rev-parse", "--show-toplevel") or str(where.resolve())
+
+
+def _switch_target(verb: str, args: list[str], where: Path) -> str | None:
+    """The branch `git switch|checkout` leaves the checkout on, or None when
+    the form is not read (detach, `-`, a path, several operands)."""
+    for index, arg in enumerate(args[:-1]):
+        if arg in CREATE_FLAGS[verb]:
+            return args[index + 1]
+    if "--" in args or (verb == "switch" and {"--detach", "-d"} & set(args)):
+        return None
+    operands = [arg for arg in args if not arg.startswith("-")]
+    if len(operands) != 1 or operands[0] == "-":
+        return None
+    if verb == "checkout" and (where / operands[0]).exists():
+        return None
+    return operands[0]
+
+
+def _git_on_main(args: list[str], where: Path | None, branches: dict[str, str]) -> bool:
+    index = 0
+    while index < len(args) and args[index].startswith("-"):
+        if args[index] == "-C" and index + 1 < len(args):
+            where = _resolve(where, args[index + 1])
+        index += 2 if args[index] in GIT_VALUE_OPTIONS | {"-C"} else 1
+    verb, rest = (args[index], args[index + 1:]) if index < len(args) else ("", [])
+    if where is None:
         return False
-    branch = current_branch(cwd)
-    if branch not in {"main", "master"}:
+    if verb in CREATE_FLAGS:
+        target = _switch_target(verb, rest, where)
+        if target is not None:
+            branches[_checkout(where)] = target
+        return False
+    if verb not in {"merge", "commit", "push"}:
         return False
     # https://git-scm.com/docs/git-config (--local limits scope; --bool normalizes false values)
-    return git_maybe(cwd, "config", "--local", "--bool", "--get", "loom.protectMain") != "false"
+    if git_maybe(where, "config", "--local", "--bool", "--get", "loom.protectMain") == "false":
+        return False
+    branch = (branches.get(_checkout(where)) if branches else None) or current_branch(where)
+    if branch in PROTECTED:
+        return True
+    if verb == "push" and "--mirror" in rest:
+        return True
+    # --all (alias --branches) pushes every local branch, so a local main/master reaches the remote one.
+    # git-rev-parse(1) --verify --quiet
+    if verb == "push" and {"--all", "--branches"} & set(rest) and any(
+            git_maybe(where, "rev-parse", "--verify", "--quiet", f"refs/heads/{name}")
+            for name in PROTECTED):
+        return True
+    return verb == "push" and any(_branch_name(dst, branch) in PROTECTED
+                                  for dst in _push_destinations(rest))
+
+
+def _push_destinations(args: list[str]) -> list[str]:
+    """Destination side of each refspec after the remote (git-push(1) <refspec>)."""
+    positional: list[str] = []
+    skip = False
+    for arg in args:
+        if skip:
+            skip = False
+        elif arg in PUSH_VALUE_OPTIONS:
+            skip = True
+        elif not arg.startswith("-"):
+            positional.append(arg)
+    # With --repo the remote is named there, so every positional is a refspec.
+    if not any(arg == "--repo" or arg.startswith("--repo=") for arg in args):
+        positional = positional[1:]
+    return [spec.lstrip("+").rsplit(":", 1)[-1] for spec in positional]
+
+
+def _branch_name(ref: str, branch: str | None) -> str:
+    """Git's refname rules: `refs/heads/X` and `heads/X` both name branch X
+    (git-rev-parse(1) SPECIFYING REVISIONS)."""
+    if ref == "HEAD":
+        return branch or ""
+    for prefix in ("refs/heads/", "heads/"):
+        if ref.startswith(prefix):
+            return ref[len(prefix):]
+    return ref
 
 
 def _reminder(kind: str, cwd: Path) -> str | None:
