@@ -252,6 +252,11 @@ codex plugin list
 hook 路徑。安裝成功後，請立刻重新啟動 Codex，再執行任何其他工具或命令。不要
 先移除 plugin；那只會讓同一段路徑失效期間更早開始。
 
+更新後，請以互動模式啟動 Codex 一次，並在 Codex 詢問時核准變更過的 loom-code
+hook。核准之前 Codex 可能略過 hook，agent hook 就不會擋下對 main 的 commit、
+merge 或 push（原生 git hook 與 GitHub 規則仍然有效）。`codex exec` 無法顯示
+這個核准提示。
+
 ### Antigravity CLI
 
 Antigravity CLI（`agy`）從本機目錄安裝 plugin。先 clone repo，並在另外兩個

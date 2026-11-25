@@ -278,6 +278,12 @@ task が保持している version 付き hook path を削除する場合があ�
 別の tool や command を実行する前に Codex を直ちに再起動してください。先に
 plugin を削除しても、同じ path 不在期間が早く始まるだけなので行いません。
 
+更新後は Codex を対話モードで一度起動し、Codex が尋ねたら変更された loom-code の
+hook を承認してください。承認されるまで Codex は hook を skip することがあり、
+agent hook は main への commit・merge・push を止めません（ネイティブ git hook と
+GitHub のルールは引き続き有効です）。`codex exec` はこの承認プロンプトを表示
+できません。
+
 ### Antigravity CLI
 
 Antigravity CLI（`agy`）はローカルのディレクトリから plugin をインストール

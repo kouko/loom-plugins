@@ -289,6 +289,11 @@ hook path held by an active task. After it succeeds, restart Codex immediately
 before running another tool or command. Do not remove the plugin first; that
 only creates the same broken-path window earlier.
 
+After updating, start Codex interactively once and approve the changed loom-code
+hooks when Codex asks. Until they are approved, Codex may skip the hook, so the
+agent hook does not stop commits, merges or pushes to main (native git hooks and
+GitHub rules still apply). `codex exec` cannot show that approval prompt.
+
 ### Antigravity CLI
 
 Antigravity CLI (`agy`) installs a plugin from a local directory. Clone the
