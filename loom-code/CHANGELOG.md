@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.90.1] — 2026-11-25 — agent hook refuses more spellings of committing or pushing to main
+
+- The agent PreToolUse guard now also refuses `cd <main> && git commit|merge` and `git -C <main> commit|merge`.
+- It refuses pushes to main/master from any branch: a refspec destination of main/master, `--delete`, `--all`/`--branches`, and `--mirror`.
+- `bash -c` / `sh -c` wrappers remain outside the guard.
+
 ## [3.90.0] — 2026-11-25 — add discovery-guide.md for candidate discovery
 
 - Add `loom-code/skills/engineering-research/references/discovery-guide.md` with a 9-step package/tool discovery sequence for building candidate lists before F2 trade study. Covers package registry (pip index versions + browser search), GitHub topics, awesome lists, dependents verification, security/license filters, and personal starred repos.
