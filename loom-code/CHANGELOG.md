@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.90.2] — 2026-11-25 — Document Codex hook re-approval after update
+
+- README (en, ja, zh-TW): after updating loom-code in Codex, start Codex interactively once and approve the changed hooks; until then Codex may skip the agent hook and it does not stop commits, merges or pushes to main.
+
 ## [3.90.1] — 2026-11-25 — agent hook refuses more spellings of committing or pushing to main
 
 - The agent PreToolUse guard now also refuses `cd <main> && git commit|merge` and `git -C <main> commit|merge`.
