@@ -1,6 +1,6 @@
 # Agent hook blocks common spellings that commit, merge or push to main — acceptance test evidence
 
-Tried on 2026-11-25, in a clean copy of the project at 5ece56d25 (first run at 6c2b92868; sections 1–6 below record that first run, the re-run section at the end records 5ece56d25).
+Tried on 2026-11-25, in a clean copy of the project at c13c536c8 (first run at 6c2b92868; sections 1–6 below record that first run, the re-run sections at the end record 5ece56d25 and c13c536c8).
 
 ## Setup
 
@@ -125,3 +125,26 @@ Every refusal on every host carried `loom: direct git merge, commit, or push on 
 - 5: re-tested — every repo of every run had empty hook folders and no `core.hooksPath`.
 - 6: re-tested — OpenCode loader and Antigravity adapter gave the same verdicts as Claude Code on the full list; Codex hook command matched; live Codex session still not run (not verified).
 - Criterion tests at 5ece56d25: `python3 -m pytest -q -p no:cacheprovider loom-code/tests/test_main_branch_hook.py loom-code/tests/test_agy_adapter.py loom-code/tests/test_opencode_loader.py` → `118 passed in 18.54s`. Full suite left to finalize-review: `python3 scripts/run_package_tests.py --loom-family`.
+
+## Re-run on 2026-11-25, at c13c536c8
+
+Fix range `5ece56d25..c13c536c8` (c13c536c8 "graduate main-guard adversarial probes"): moves `test_abuse_main_guard_overblocks.py` and `test_abuse_main_guard_slips.py` from the change's evidence probes into `loom-code/tests/`, plus the plan and these two documents. `git diff --stat 5ece56d25 c13c536c8 -- loom-code/scripts loom-code/hooks loom-code/opencode loom-code/index.js` is empty: no hook or guard code changed. Even so, every row was re-tested at the final commit so the report binds to it.
+
+Fresh clean copy `git worktree add --detach <scratch>/clean c13c536c8`; same driver, same case list as the 5ece56d25 re-run (1a–4j), fresh throwaway repos per host run, header `hooks-dir: [] core.hooksPath: (unset)` on all five runs.
+
+```
+claude:    1a 1b 1c 2a 2b 3a 3b 3c 3d 3e 4a-old 4b-old 4c-old = x2 ; 4d 4e 4f 4g 4h 4i 4j = x0
+optout:    every case x0
+opencode:  1a..3e, 4a-old..4c-old = refused; 4d..4j = allowed
+agy:       1a..3e, 4a-old..4c-old = deny; 4d..4j = allow
+codex-cmd: 1a..3e, 4a-old..4c-old = x2; 4d..4j = x0
+```
+The refusal message `loom: direct git merge, commit, or push on main/master is blocked. …` appears 52 times in the log (13 refused cases × 4 protected host runs); identical to the 5ece56d25 re-run.
+
+- 1: re-tested — 1a–1c refused on every host.
+- 2: re-tested — 2a–2b refused on every host.
+- 3: re-tested — 3a–3e refused on every host.
+- 4: re-tested — 4a–4c refused; 4d–4j allowed (4i hook decision only); opt-out repo allowed every case.
+- 5: re-tested — no native hooks in any repo of any run.
+- 6: re-tested — OpenCode loader and Antigravity adapter match Claude Code; Codex hook command matches; live Codex session still not verified.
+- Criterion tests at c13c536c8, including the two moved files: `python3 -m pytest -q -p no:cacheprovider loom-code/tests/test_main_branch_hook.py loom-code/tests/test_agy_adapter.py loom-code/tests/test_opencode_loader.py loom-code/tests/test_abuse_main_guard_overblocks.py loom-code/tests/test_abuse_main_guard_slips.py` → `127 passed in 17.93s`. Full suite left to finalize-review: `python3 scripts/run_package_tests.py --loom-family`.

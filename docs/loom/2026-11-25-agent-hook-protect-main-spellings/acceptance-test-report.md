@@ -1,6 +1,6 @@
 # Agent hook 擋下三種繞過 main 的寫法 — 我試了什麼、結果如何
 
-Tried on 2026-11-25, in a clean copy of the project at 5ece56d25. How I tried
+Tried on 2026-11-25, in a clean copy of the project at c13c536c8. How I tried
 each line and what came back: `docs/loom/2026-11-25-agent-hook-protect-main-spellings/evidence/acceptance-test-evidence.md`.
 
 ## 你要的東西，一條一條
@@ -24,7 +24,7 @@ each line and what came back: `docs/loom/2026-11-25-agent-hook-protect-main-spel
 - **OpenCode 與 Antigravity 用它們的 hook 入口直接餵指令，而不是開一個真的 OpenCode／Antigravity 對話** — 驗收條文寫的就是「送進載入器與轉接器」，所以這樣算數；若你要的是「在那個工具裡真的讓模型下指令」，那還沒試過。
 - **Codex 只驗了它的 hook 指令，沒開真的 Codex 對話** — Codex 的指令列工具其實有裝，但要讓模型實際下這些指令，得先把外掛裝進你的 Codex 設定，我不想動你的環境，所以那部分標為 not verified。
 - **建立 PR 的那條指令只看檢查放不放行，沒有真的去開 PR** — 真的執行會對外發出東西，所以只確認了檢查放行。
-- **這次修正後六條全部重測，沒有沿用上一輪結果** — 修正改的是所有條目共用的檢查規則，每一條都可能受影響。
+- **這次修正後六條全部重測，沒有沿用上一輪結果** — 修正改的是所有條目共用的檢查規則，每一條都可能受影響。最後一次變動只是搬動測試檔，沒有改到檢查本身；我仍在最終版本上把六條各跑了一遍，結果與前一輪完全相同。
 
 ## 你叫我跳過的步驟
 
