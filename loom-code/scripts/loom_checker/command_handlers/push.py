@@ -248,6 +248,13 @@ def _git_on_main(args: list[str], where: Path | None) -> bool:
     branch = current_branch(where)
     if branch in PROTECTED:
         return True
+    if verb == "push" and "--mirror" in rest:
+        return True
+    # --all pushes every local branch, so a local main/master reaches the remote one.
+    if verb == "push" and "--all" in rest and any(
+            git_maybe(where, "rev-parse", "--verify", "--quiet", f"refs/heads/{name}")
+            for name in PROTECTED):
+        return True
     return verb == "push" and any(_branch_name(dst, branch) in PROTECTED
                                   for dst in _push_destinations(rest))
 

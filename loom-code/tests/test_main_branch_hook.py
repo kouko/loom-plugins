@@ -74,6 +74,7 @@ def _pair(tmp_path: Path) -> tuple[Path, Path]:
     "git push origin HEAD:main",                          # feature-push-head-to-main-denied
     "git push origin +HEAD:refs/heads/master", "git push origin main",
     "git push origin --delete main", "echo ok; git push -u origin HEAD:master",
+    "git push --all origin", "git push --mirror origin",
 ])
 def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
     repo, feature = _pair(tmp_path)
