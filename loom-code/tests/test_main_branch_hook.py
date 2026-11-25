@@ -78,6 +78,7 @@ def _pair(tmp_path: Path) -> tuple[Path, Path]:
     "(cd ../repo && git commit -m change)", "cd missing; cd {repo} && git commit -m change",
     "git push origin HEAD:heads/main", "git switch main && git commit -m change",
     "cd ../repo && git commit -m \"$(cat <<'EOF'\nx\nEOF\n)\"",
+    "git push --repo origin main", "git push --repo=origin HEAD:main",
 ])
 def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
     repo, feature = _pair(tmp_path)

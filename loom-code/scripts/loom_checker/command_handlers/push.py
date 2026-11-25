@@ -381,7 +381,10 @@ def _push_destinations(args: list[str]) -> list[str]:
             skip = True
         elif not arg.startswith("-"):
             positional.append(arg)
-    return [spec.lstrip("+").rsplit(":", 1)[-1] for spec in positional[1:]]
+    # With --repo the remote is named there, so every positional is a refspec.
+    if not any(arg == "--repo" or arg.startswith("--repo=") for arg in args):
+        positional = positional[1:]
+    return [spec.lstrip("+").rsplit(":", 1)[-1] for spec in positional]
 
 
 def _branch_name(ref: str, branch: str | None) -> str:
