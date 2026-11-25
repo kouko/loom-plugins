@@ -6,7 +6,7 @@ instead of restating its caps or its edits-after policy list.
 from __future__ import annotations
 
 # Version sync constant - updated only on releases
-CURRENT_VERSION = "3.90.1"
+CURRENT_VERSION = "3.90.2"
 
 # One literal is load-bearing and pinned here: the SKILL.md sentence naming
 # `artifacts.plan.charter`.
@@ -389,6 +389,7 @@ def test_repo_grep_no_bare_branch() -> None:
     assert not hits, hits
 
 
+# concern: release drift — a plugin manifest, README or CHANGELOG keeps a stale version string after a bump.
 def test_current_release_metadata_is_synchronized() -> None:
     claude_manifest = json.loads(
         (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")

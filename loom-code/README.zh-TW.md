@@ -10,7 +10,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.90.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.90.2 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill + 1 個研究 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -251,6 +251,11 @@ codex plugin list
 `plugin add` 會替換已安裝版本的快取，因此可能刪除執行中 task 仍持有的版本化
 hook 路徑。安裝成功後，請立刻重新啟動 Codex，再執行任何其他工具或命令。不要
 先移除 plugin；那只會讓同一段路徑失效期間更早開始。
+
+更新後，請以互動模式啟動 Codex 一次，並在 Codex 詢問時核准變更過的 loom-code
+hook。核准之前 Codex 可能略過 hook，agent hook 可能不會擋下對 main 的 commit、
+merge 或 push（原生 git hook 與 GitHub 規則仍然有效）。`codex exec` 可能不會顯示
+這個核准提示。
 
 ### Antigravity CLI
 
