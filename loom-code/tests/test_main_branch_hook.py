@@ -39,7 +39,7 @@ def _hook(cwd: Path, command: str):
     "git merge feature", "git commit -m change", "git push origin HEAD",
     "git commit -m 'cost $5 | review'", "git commit -m change && echo done",
     "git push origin HEAD; echo done", "true; git commit -m change",
-    "cd . && git push origin main",
+    "cd . && git push origin main", "(cd x) && git commit -m change",
 ])
 def test_direct_git_mutation_denied_on_main_branches(tmp_path, branch, command):
     repo = _repo(tmp_path, branch)
@@ -75,6 +75,8 @@ def _pair(tmp_path: Path) -> tuple[Path, Path]:
     "git push origin +HEAD:refs/heads/master", "git push origin main",
     "git push origin --delete main", "echo ok; git push -u origin HEAD:master",
     "git push --all origin", "git push --mirror origin", "git push --branches origin",
+    "(cd ../repo && git commit -m change)", "cd missing; cd {repo} && git commit -m change",
+    "git push origin HEAD:heads/main", "git switch main && git commit -m change",
 ])
 def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
     repo, feature = _pair(tmp_path)
@@ -90,6 +92,8 @@ def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
     "cd ../wt && git push origin HEAD:feature",           # feature-push-to-feature-allowed
     "cd ../wt && git push origin refs/tags/v1",
     "cd missing && git commit -m change",
+    "git switch -c fix/x && git commit -am m", "git checkout -b x; git push -u origin HEAD",
+    "(cd ../wt && git commit -m change)",
 ])
 def test_feature_targets_from_main_allowed(tmp_path, command):
     repo, _feature = _pair(tmp_path)
