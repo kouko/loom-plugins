@@ -76,6 +76,17 @@ the relevant source code and connected execution path. README, documentation,
 search snippets, stars and discussion status alone are not implementation
 verification. Follow the repository-specific requirements in the source policy.
 
+## Building a candidate list
+
+When a design, library or tool decision needs candidates and no credible list
+exists yet, read [discovery guide](references/discovery-guide.md) before
+choosing an evaluation approach. It covers package-registry, code-host and
+curated-list search, production-use evidence, security and license filters, and
+the user's own starred projects, and returns a candidate table for the trade
+study. When credible candidates already exist, skip it and use the evaluation
+approach below. Discovery builds the candidate list; it does not judge fit, and
+a candidate's presence or popularity is not evidence of superiority.
+
 ## Choosing an evaluation approach
 
 When proposing or materially restructuring an important engineering solution,
