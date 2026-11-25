@@ -24,6 +24,7 @@ from loom_checker.verification import verification_status
 from pathlib import Path
 import json
 import os
+import re
 import sys
 import subprocess
 
@@ -232,7 +233,7 @@ def _protect_main(command: str, cwd: Path) -> bool:
     here: Path | None = cwd
     branches: dict[str, str] = {}  # checkout -> branch an earlier switch set
     saved: list[tuple[Path | None, dict[str, str]]] = []
-    for segment in _operator_segments(command):
+    for segment in _operator_segments(_plain_text(command)):
         tokens = _tokenise(segment)
         while tokens and tokens[0][:1] in {"(", "{"}:
             if tokens[0][0] == "(":
@@ -249,6 +250,7 @@ def _protect_main(command: str, cwd: Path) -> bool:
             tokens[-1] = tokens[-1][:-1]
             if not tokens[-1]:
                 tokens = tokens[:-1]
+        tokens = _drop_redirects(tokens)
         while tokens and ASSIGNMENT.match(tokens[0]):
             tokens = tokens[1:]
         if tokens[:1] == ["cd"]:
@@ -259,6 +261,60 @@ def _protect_main(command: str, cwd: Path) -> bool:
         for _ in range(closes):
             here, branches = saved.pop()
     return False
+
+
+# bash(1) REDIRECTION and Here Documents.
+HEREDOC = re.compile(r"(?<!<)<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+REDIRECT = re.compile(r"^(\d*|&)(>>?|<<?-?|<>|>&|<&)")
+
+
+def _plain_text(command: str) -> str:
+    """The command without heredoc bodies, and with each `$( … )` or
+    backtick substitution reduced to one placeholder word: text there is
+    data (a commit message, a PR body), not a command the hook judges."""
+    kept: list[str] = []
+    pending: list[str] = []
+    for line in command.split("\n"):
+        if pending:
+            if line.strip() == pending[0]:
+                pending.pop(0)
+            continue
+        kept.append(line)
+        pending = [match.group(2) for match in HEREDOC.finditer(line)]
+    text = "\n".join(kept)
+    out: list[str] = []
+    index = 0
+    while index < len(text):
+        if text.startswith("$(", index):
+            depth, index = 1, index + 2
+            while index < len(text) and depth:
+                depth += {"(": 1, ")": -1}.get(text[index], 0)
+                index += 1
+            out.append("SUBST")
+        elif text[index] == "`":
+            end = text.find("`", index + 1)
+            index = len(text) if end < 0 else end + 1
+            out.append("SUBST")
+        else:
+            out.append(text[index])
+            index += 1
+    return "".join(out)
+
+
+def _drop_redirects(tokens: list[str]) -> list[str]:
+    """Words without redirections (`2>/dev/null`, `> file`, `<<EOF`)."""
+    kept: list[str] = []
+    skip = False
+    for token in tokens:
+        if skip:
+            skip = False
+            continue
+        match = REDIRECT.match(token)
+        if match:
+            skip = match.end() == len(token)  # a bare operator: its target is the next word
+            continue
+        kept.append(token)
+    return kept
 
 
 def _checkout(where: Path) -> str:

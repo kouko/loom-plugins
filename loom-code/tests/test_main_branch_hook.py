@@ -77,6 +77,7 @@ def _pair(tmp_path: Path) -> tuple[Path, Path]:
     "git push --all origin", "git push --mirror origin", "git push --branches origin",
     "(cd ../repo && git commit -m change)", "cd missing; cd {repo} && git commit -m change",
     "git push origin HEAD:heads/main", "git switch main && git commit -m change",
+    "cd ../repo && git commit -m \"$(cat <<'EOF'\nx\nEOF\n)\"",
 ])
 def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
     repo, feature = _pair(tmp_path)
@@ -94,10 +95,22 @@ def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
     "cd missing && git commit -m change",
     "git switch -c fix/x && git commit -am m", "git checkout -b x; git push -u origin HEAD",
     "(cd ../wt && git commit -m change)",
+    "git switch feature 2>/dev/null; git commit -m x",
 ])
 def test_feature_targets_from_main_allowed(tmp_path, command):
     repo, _feature = _pair(tmp_path)
     assert _hook(repo, command).returncode == 0
+
+
+@pytest.mark.parametrize("command", [
+    "git commit -m \"$(cat <<'EOF'\nfix: a\n\ncd ../repo && git commit is now refused\nEOF\n)\"",
+    "git commit -F - <<'EOF'\nfix\ngit push origin main\nEOF",
+    "gh pr create --title t --body \"$(cat <<'EOF'\n## Test\ngit push origin HEAD:main\nEOF\n)\"",
+    "git commit -m \"$(cat <<'EOF'\nx\ngit push origin HEAD:main\nEOF\n)\"",
+])
+def test_heredoc_and_substitution_text_not_judged(tmp_path, command):
+    _main, feature = _pair(tmp_path)
+    assert _hook(feature, command).returncode == 0
 
 
 def test_opt_out_allows_cd_main_commit(tmp_path):
