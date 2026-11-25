@@ -291,8 +291,8 @@ only creates the same broken-path window earlier.
 
 After updating, start Codex interactively once and approve the changed loom-code
 hooks when Codex asks. Until they are approved, Codex may skip the hook, so the
-agent hook does not stop commits, merges or pushes to main (native git hooks and
-GitHub rules still apply). `codex exec` cannot show that approval prompt.
+agent hook may not stop commits, merges or pushes to main (native git hooks and
+GitHub rules still apply). `codex exec` may not show that approval prompt.
 
 ### Antigravity CLI
 
