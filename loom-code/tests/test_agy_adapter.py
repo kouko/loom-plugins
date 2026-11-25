@@ -111,6 +111,21 @@ def test_main_branch_git_commit_returns_deny(change_repo, tmp_path):
     assert "main/master" in out["reason"]
 
 
+@pytest.mark.parametrize("command, decision", [
+    ("cd {main} && git commit -m change", "deny"),
+    ("git -C {main} merge feat", "deny"),
+    ("git push origin HEAD:main", "deny"),
+    ("git push origin HEAD:feat", "allow"),
+])
+def test_main_spellings_from_feature_branch(change_repo, tmp_path, command, decision):
+    main = tmp_path / "main-wt"
+    _git(change_repo, "worktree", "add", "-q", str(main), "main")
+    payload = _tool_payload(command.format(main=main), ".", [str(change_repo)])
+    out = _run("push-gate", payload, tmp_path)
+    assert out["decision"] == decision, out
+    assert ("main/master" in out.get("reason", "")) == (decision == "deny")
+
+
 @pytest.fixture
 def checkerless_adapter(tmp_path: Path) -> Path:
     root = tmp_path / "plugin"

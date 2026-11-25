@@ -282,3 +282,23 @@ def test_push_reminder_uses_session_directory(tmp_path: Path):
     env = {**os.environ, "STUB_SESSION_DIR": str(repo)}
     output = _node("loom-code", json.dumps(fires), cwd=elsewhere, env=env)["event"]["result"]["output"]
     assert "change not identified" in output and "not inside a git work tree" not in output
+
+
+@pytest.mark.parametrize("command, refused", [
+    ("cd {main} && git commit -m change", True),
+    ("git -C {main} merge feature", True),
+    ("git push origin HEAD:main", True),
+    ("git push origin HEAD:feature", False),
+])
+def test_main_spellings_refused_from_feature_session(tmp_path: Path, command, refused):
+    main, feature = tmp_path / "main", tmp_path / "feature"
+    subprocess.run(["git", "init", "-q", "-b", "main", str(main)], check=True)
+    subprocess.run(["git", "-C", str(main), "-c", "user.name=T", "-c", "user.email=t@example.com",
+                    "commit", "-q", "--allow-empty", "-m", "initial"], check=True)
+    subprocess.run(["git", "-C", str(main), "worktree", "add", "-q", "-b", "feature", str(feature)],
+                   check=True)
+    call = {"tool": "shell", "sessionID": "root", "id": "c7",
+            "input": {"command": command.format(main=main)}}
+    env = {**os.environ, "STUB_SESSION_DIR": str(feature)}
+    threw = _fire("loom-code", "execute.before", call, tmp_path, env)["threw"]
+    assert ("main/master" in threw) if refused else threw is None, threw

@@ -13,6 +13,9 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import current_branch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import repo_root
+from loom_checker.rule_checks.push import ASSIGNMENT
+from loom_checker.rule_checks.push import _operator_segments
+from loom_checker.rule_checks.push import _tokenise
 from loom_checker.rule_checks.push import publication_kind
 from loom_checker.verification import identify_change
 from loom_checker.verification import missing_clause
@@ -21,12 +24,9 @@ from loom_checker.verification import verification_status
 from pathlib import Path
 import json
 import os
-import re
 import sys
 import subprocess
 
-
-DIRECT_GIT_CHANGE = re.compile(r"^\s*git[ \t]+(merge|commit|push)(?=[ \t]|$)")
 
 # Static, relocatable POSIX shell: no installed launcher or Python at runtime.
 # These hooks do not intercept reset/rebase or fast-forward merges. Remote PR
@@ -199,15 +199,77 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     return 0
 
 
+PROTECTED = {"main", "master"}
+# Git global options that take their value as the next word (git(1) OPTIONS).
+GIT_VALUE_OPTIONS = {"-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env"}
+PUSH_VALUE_OPTIONS = {"--repo", "-o", "--push-option", "--receive-pack", "--exec"}
+
+
+def _resolve(base: Path | None, target: str) -> Path | None:
+    """`target` read from `base`; None when it is not an existing directory."""
+    if base is None:
+        return None
+    path = base / Path(target).expanduser()
+    return path if path.is_dir() else None
+
+
 def _protect_main(command: str, cwd: Path) -> bool:
-    """A literal Git verb at the start, including when later shell text follows."""
-    if not DIRECT_GIT_CHANGE.match(command):
-        return False
-    branch = current_branch(cwd)
-    if branch not in {"main", "master"}:
+    """Each simple command of the text, read in order: a `cd <dir>` moves the
+    effective directory, `git -C <dir>` moves it for that call, and a Git
+    commit, merge or push on main/master there, or a push whose destination
+    is main/master from any branch, is refused. A directory that cannot be
+    resolved leaves that command unjudged; `bash -c`, scripts and other
+    wrappers stay outside the guard."""
+    here: Path | None = cwd
+    for segment in _operator_segments(command):
+        tokens = _tokenise(segment)
+        while tokens and ASSIGNMENT.match(tokens[0]):
+            tokens = tokens[1:]
+        if tokens[:1] == ["cd"]:
+            rest = [t for t in tokens[1:] if t not in {"-P", "-L", "-e", "--"}]
+            here = _resolve(here, rest[0] if rest else "~") if rest[:1] != ["-"] else None
+        elif tokens[:1] == ["git"] and _git_on_main(tokens[1:], here):
+            return True
+    return False
+
+
+def _git_on_main(args: list[str], where: Path | None) -> bool:
+    index = 0
+    while index < len(args) and args[index].startswith("-"):
+        if args[index] == "-C" and index + 1 < len(args):
+            where = _resolve(where, args[index + 1])
+        index += 2 if args[index] in GIT_VALUE_OPTIONS | {"-C"} else 1
+    verb, rest = (args[index], args[index + 1:]) if index < len(args) else ("", [])
+    if verb not in {"merge", "commit", "push"} or where is None:
         return False
     # https://git-scm.com/docs/git-config (--local limits scope; --bool normalizes false values)
-    return git_maybe(cwd, "config", "--local", "--bool", "--get", "loom.protectMain") != "false"
+    if git_maybe(where, "config", "--local", "--bool", "--get", "loom.protectMain") == "false":
+        return False
+    branch = current_branch(where)
+    if branch in PROTECTED:
+        return True
+    return verb == "push" and any(_branch_name(dst, branch) in PROTECTED
+                                  for dst in _push_destinations(rest))
+
+
+def _push_destinations(args: list[str]) -> list[str]:
+    """Destination side of each refspec after the remote (git-push(1) <refspec>)."""
+    positional: list[str] = []
+    skip = False
+    for arg in args:
+        if skip:
+            skip = False
+        elif arg in PUSH_VALUE_OPTIONS:
+            skip = True
+        elif not arg.startswith("-"):
+            positional.append(arg)
+    return [spec.lstrip("+").rsplit(":", 1)[-1] for spec in positional[1:]]
+
+
+def _branch_name(ref: str, branch: str | None) -> str:
+    if ref == "HEAD":
+        return branch or ""
+    return ref[len("refs/heads/"):] if ref.startswith("refs/heads/") else ref
 
 
 def _reminder(kind: str, cwd: Path) -> str | None:

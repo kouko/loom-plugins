@@ -38,7 +38,8 @@ def _hook(cwd: Path, command: str):
 @pytest.mark.parametrize("command", [
     "git merge feature", "git commit -m change", "git push origin HEAD",
     "git commit -m 'cost $5 | review'", "git commit -m change && echo done",
-    "git push origin HEAD; echo done",
+    "git push origin HEAD; echo done", "true; git commit -m change",
+    "cd . && git push origin main",
 ])
 def test_direct_git_mutation_denied_on_main_branches(tmp_path, branch, command):
     repo = _repo(tmp_path, branch)
@@ -57,10 +58,54 @@ def test_feature_branch_allows_git_mutation(tmp_path, command):
     assert _hook(repo, command).returncode == 0
 
 
-@pytest.mark.parametrize("command", ["true; git commit -m change", "cd x && git push origin main", "bash -c 'git push origin main'"])
-def test_prefixed_and_wrapped_commands_are_outside_guard(tmp_path, command):
+def _pair(tmp_path: Path) -> tuple[Path, Path]:
+    """A repo on main and a linked worktree on `feature`; no native hooks."""
     repo = _repo(tmp_path)
+    feature = tmp_path / "wt"
+    _git(repo, "worktree", "add", "-q", "-b", "feature", str(feature))
+    return repo, feature
+
+
+@pytest.mark.parametrize("command", [
+    "cd ../repo && git commit -m change",                 # cd-main-commit-denied
+    "cd {repo} && FOO=1 git commit -m change",
+    "git -C ../repo merge feature",                       # git-C-main-merge-denied
+    "git -c core.pager=cat -C .. -C repo commit -m change",
+    "git push origin HEAD:main",                          # feature-push-head-to-main-denied
+    "git push origin +HEAD:refs/heads/master", "git push origin main",
+    "git push origin --delete main", "echo ok; git push -u origin HEAD:master",
+])
+def test_main_spellings_from_feature_worktree_denied(tmp_path, command):
+    repo, feature = _pair(tmp_path)
+    assert not (repo / ".git" / "hooks" / "pre-commit").exists()  # no-native-hooks-repo-denies
+    result = _hook(feature, command.format(repo=repo))
+    assert result.returncode == 2, result.stderr
+    assert "direct git merge, commit, or push on main/master is blocked" in result.stderr
+
+
+@pytest.mark.parametrize("command", [
+    "cd ../wt && git commit -m change",                   # cd-feature-commit-allowed
+    "git -C ../wt commit -m change",                      # git-C-feature-commit-allowed
+    "cd ../wt && git push origin HEAD:feature",           # feature-push-to-feature-allowed
+    "cd ../wt && git push origin refs/tags/v1",
+    "cd missing && git commit -m change",
+])
+def test_feature_targets_from_main_allowed(tmp_path, command):
+    repo, _feature = _pair(tmp_path)
     assert _hook(repo, command).returncode == 0
+
+
+def test_opt_out_allows_cd_main_commit(tmp_path):
+    repo, feature = _pair(tmp_path)
+    _git(repo, "config", "--local", "loom.protectMain", "false")
+    assert _hook(feature, "cd ../repo && git commit -m change").returncode == 0
+
+
+@pytest.mark.parametrize("command", ["bash -c 'git push origin main'",
+                                     "sh -c 'cd ../repo && git commit -m change'"])
+def test_shell_wrappers_stay_outside_guard(tmp_path, command):
+    _main, feature = _pair(tmp_path)
+    assert _hook(feature, command).returncode == 0
 
 
 def test_non_git_and_detached_head_allow_ordinary_command(tmp_path):
