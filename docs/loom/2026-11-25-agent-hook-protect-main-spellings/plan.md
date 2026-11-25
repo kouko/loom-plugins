@@ -23,6 +23,11 @@ charter: 1.1
 - Test: A4 positive: release_sync; boundary: release_stale_pin. Existing pin `test_current_release_metadata_is_synchronized` covers it.
 - Risk: A4 ownership is nominal (installed copies only get the kept behaviour after a bump); patch 3.90.0 → 3.90.1 via SSOT then `sync_codex_manifests.py --all`; agent-decided.
 
+**W1-03 Graduate adversarial probes into loom-code suite**  after: W1-01  acceptance: 4
+- Files: docs/loom/2026-11-25-agent-hook-protect-main-spellings/evidence/probes/test_abuse_main_guard_overblocks.py, docs/loom/2026-11-25-agent-hook-protect-main-spellings/evidence/probes/test_abuse_main_guard_slips.py, loom-code/tests/test_abuse_main_guard_overblocks.py, loom-code/tests/test_abuse_main_guard_slips.py
+- Test: A4 positive: overblock-probes-pass; boundary: slip-probes-pass
+- Risk: probe content unchanged; only location
+
 ## Simplicity check
 - Patch only the existing `_protect_main` instead of adding a new module or rule id — taken
 - Track `cd` targets and `git -C` paths per operator segment, without a full shell parser — taken

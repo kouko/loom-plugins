@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[2]
 CHECKER = ROOT / "loom-code" / "scripts" / "loom_checker.py"
 
 
