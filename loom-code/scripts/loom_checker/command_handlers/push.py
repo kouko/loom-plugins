@@ -206,6 +206,7 @@ GIT_VALUE_OPTIONS = {"-c", "--git-dir", "--work-tree", "--namespace", "--super-p
 PUSH_VALUE_OPTIONS = {"--repo", "-o", "--push-option", "--receive-pack", "--exec"}
 
 
+# git-switch(1) / git-checkout(1) OPTIONS
 CREATE_FLAGS = {"switch": {"-c", "-C", "--create", "--force-create", "--orphan"},
                 "checkout": {"-b", "-B", "--orphan"}}
 
@@ -318,6 +319,7 @@ def _drop_redirects(tokens: list[str]) -> list[str]:
 
 
 def _checkout(where: Path) -> str:
+    # git-rev-parse(1) --show-toplevel
     return git_maybe(where, "rev-parse", "--show-toplevel") or str(where.resolve())
 
 
@@ -362,6 +364,7 @@ def _git_on_main(args: list[str], where: Path | None, branches: dict[str, str]) 
     if verb == "push" and "--mirror" in rest:
         return True
     # --all (alias --branches) pushes every local branch, so a local main/master reaches the remote one.
+    # git-rev-parse(1) --verify --quiet
     if verb == "push" and {"--all", "--branches"} & set(rest) and any(
             git_maybe(where, "rev-parse", "--verify", "--quiet", f"refs/heads/{name}")
             for name in PROTECTED):
@@ -388,7 +391,8 @@ def _push_destinations(args: list[str]) -> list[str]:
 
 
 def _branch_name(ref: str, branch: str | None) -> str:
-    """Git's refname rules: `refs/heads/X` and `heads/X` both name branch X."""
+    """Git's refname rules: `refs/heads/X` and `heads/X` both name branch X
+    (git-rev-parse(1) SPECIFYING REVISIONS)."""
     if ref == "HEAD":
         return branch or ""
     for prefix in ("refs/heads/", "heads/"):
