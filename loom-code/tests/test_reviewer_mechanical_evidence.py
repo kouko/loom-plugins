@@ -12,6 +12,7 @@ in those files is a finding.
 import re
 from pathlib import Path
 
+from prose_pin import has_negation, pins_exact_sentence
 from prose_pin import split_sentences as _sentences
 
 
@@ -25,6 +26,21 @@ def _flat(path: Path) -> str:
 
 
 LENSES_REF = "`loom-code/skills/closing-review/references/lenses.md`"
+
+
+UNREQUESTED_BEHAVIOUR = (
+    "Reconciliation also runs a fourth direction, excess: behaviour the change "
+    "delivers that the intent leaves unrequested, or that the intent's Out of "
+    "scope excludes, is a finding you must raise, and this applies to every "
+    "change, including one that skipped the spec."
+)
+
+
+def test_reviewer_raises_unrequested_behaviour() -> None:
+    """Acceptance 1 and 2: the shared reconciliation paragraph obliges every
+    lens to raise behaviour the intent did not ask for, spec or none."""
+    assert not has_negation(UNREQUESTED_BEHAVIOUR)
+    assert pins_exact_sentence(_flat(REVIEWER_PATH), UNREQUESTED_BEHAVIOUR)
 
 
 def test_reviewer_spells_the_lenses_path_one_way() -> None:
