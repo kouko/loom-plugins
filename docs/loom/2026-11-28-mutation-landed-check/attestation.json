@@ -1,0 +1,106 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-28-mutation-landed-check",
+  "content_digest": "50e011651c794460df05eeae9e1b008b153ed35c",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-11-28-mutation-landed-check/evidence/probes/test_probe_mutation_rule_pins.py",
+      "artifact": "docs/loom/2026-11-28-mutation-landed-check/evidence/probes/test_probe_mutation_rule_pins.py",
+      "result": "pass",
+      "command_digest": "e1d26f15b8ed893fe9a5a21eccd4687c2182232f99918a36ff524be999f78129"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "claude-reviewer-1",
+      "vendor": "anthropic",
+      "model": "opus",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "9ce1731bbc33ce611347b72f948a67c3122fbfb4",
+      "review_target_sha": "f10cadf2798f368ecf6d19c346c1bd94b7fc293b",
+      "findings": [],
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS_WITH_NOTES",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      }
+    },
+    {
+      "reviewer": "codex-gpt-6.2-sol",
+      "vendor": "openai",
+      "model": "gpt-6.2-sol",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "9ce1731bbc33ce611347b72f948a67c3122fbfb4",
+      "review_target_sha": "f10cadf2798f368ecf6d19c346c1bd94b7fc293b",
+      "findings": [],
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS — The mutation-tool exemption applies exclusively to confirming that the mutation landed.",
+        "inconsistency": "PASS — The shared standard, CHANGELOG, sentence pin and acceptance evidence agree.",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Round 2 finding: fixed. The revised sentence explicitly retains the requirement that the unmutated code passes.",
+        "Independently ran both changed test files: 48 passed in 0.40s.",
+        "All five acceptance results are supported by the final acceptance evidence. The final commit changes only the acceptance report and evidence; the working tree remains clean."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.2-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.2-sol",
+        "observed_effort": "high",
+        "output_digest": "1b2b0d67044f5fae4c420f80f78c863e77ca47cbea2a22b40694df974aa509cf",
+        "reviewer": "codex-gpt-6.2-sol",
+        "review_target_sha": "f10cadf2798f368ecf6d19c346c1bd94b7fc293b"
+      }
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "c609d1bd2398fc8660d1cbecf41d7b651c486bad",
+  "tested_commit": "3fe55ccc732c865b1d027875c82143f40feef9fd",
+  "reviewed_commit": "f10cadf2798f368ecf6d19c346c1bd94b7fc293b",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    }
+  ]
+}

@@ -13,6 +13,18 @@ it names is a finding — one restating a constant or the implementation,
 one reading source text to assert code structure (prose-pin tests that meet §5 of this file excepted),
 or a mock or stub replacing the very seam it claims to cover.
 
+Whoever forces a RED by deliberately mutating code, a fixture or text must
+confirm, before counting it as evidence, that the mutation landed — a
+non-empty diff against the pristine copy, or the edit anchor matched exactly
+once — and that the unmutated version passes. An unconfirmed RED is not
+evidence.
+
+The diff or the matched anchor must lie in the code, fixture or text the
+test covers, and a matched anchor counts only once the edit was applied there
+and the text changed. A mutation tool that applies and checks its own mutants
+has already confirmed they landed, and its run on the unmutated code must
+still pass.
+
 ## 2. Expected values come from an independent source
 
 A tautological assertion is a finding: its expected value is computed the

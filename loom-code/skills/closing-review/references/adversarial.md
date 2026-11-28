@@ -122,8 +122,9 @@ as a generic-word substitution that a global replace with a case-insensitive
 comparison lets through. A copy of the probe's logic proves nothing about that
 program. One mutation restores the original behaviour the stale program
 rejected, and the updated probe must turn RED on it. Each mutation must turn
-the probe RED and is then reverted, and the report gives each one's command and
-observed result. The adversary
+the probe RED and is then reverted, and the report gives each one's command,
+observed result and how the mutation was confirmed landed, as
+`../../../references/tests-standard.md` §1 requires. The adversary
 commits the updated probe before it makes a copy, because `git worktree add` and
 `git archive` hold only committed content, and an uncommitted update takes the
 edit-tool route in the working tree. The adversary
