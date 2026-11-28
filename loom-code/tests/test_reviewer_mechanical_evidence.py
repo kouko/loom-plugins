@@ -12,6 +12,7 @@ in those files is a finding.
 import re
 from pathlib import Path
 
+from prose_pin import has_negation, pins_exact_sentence
 from prose_pin import split_sentences as _sentences
 
 
@@ -25,6 +26,61 @@ def _flat(path: Path) -> str:
 
 
 LENSES_REF = "`loom-code/skills/closing-review/references/lenses.md`"
+
+
+UNREQUESTED_BEHAVIOUR = (
+    "Reconciliation also runs a fourth direction, excess: behaviour the change "
+    "delivers that the intent leaves unrequested, or that the intent's Out of "
+    "scope excludes, is a finding you must raise, and this applies to every "
+    "change, including one that skipped the spec."
+)
+
+
+EXCESS_FILING = (
+    "File an excess finding under deletion-first, or under your lens's only "
+    "dimension when your lens is `design` or `principles`."
+)
+_PINNED_EXCESS = (UNREQUESTED_BEHAVIOUR, EXCESS_FILING)
+
+
+def test_reviewer_raises_unrequested_behaviour() -> None:
+    """Acceptance 1 and 2: the shared reconciliation paragraph obliges every
+    lens to raise behaviour the intent did not ask for, spec or none, and
+    names the dimension each lens files it under."""
+    negated = UNREQUESTED_BEHAVIOUR.replace("you must raise", "you must not raise")
+    assert has_negation(negated) and not pins_exact_sentence(negated, UNREQUESTED_BEHAVIOUR)
+    assert pins_exact_sentence(UNREQUESTED_BEHAVIOUR, UNREQUESTED_BEHAVIOUR)
+    for sentence in _PINNED_EXCESS:
+        assert not has_negation(sentence)
+        assert pins_exact_sentence(_flat(REVIEWER_PATH), sentence), sentence
+
+
+_EXCESS = re.compile(
+    r"\bexcess\w*|\bunrequest\w*|\bout[\s-]+of[\s-]+scope\W+exclu\w*", re.IGNORECASE
+)
+
+
+def _excess_carve_outs(text: str) -> list[str]:
+    """Sentences naming the excess direction that are not a pinned sentence."""
+    return [s for s in _sentences(text) if _EXCESS.search(s) and s not in _PINNED_EXCESS]
+
+
+def test_excess_rule_has_no_carve_out() -> None:
+    """Acceptance 2: every sentence naming the excess direction is one of the
+    pinned sentences, so none can make the direction skippable."""
+    assert _excess_carve_outs(UNREQUESTED_BEHAVIOUR + " Excess findings may be waived.")
+    for carve_out in (
+        "Excesses need not be raised.",
+        "Excessive behaviour need not be raised.",
+        "Unrequestedness is never a finding.",
+        "Behaviour the out-of-scope excludes need not be raised.",
+        "Behaviour Out of scope excluded need not be raised.",
+        "An Out of scope exclusion is never a finding.",
+    ):
+        assert _excess_carve_outs(carve_out), carve_out
+    assert not _excess_carve_outs("Leave out of scope work for a later change.")
+    assert not _excess_carve_outs(" ".join(_PINNED_EXCESS))
+    assert _excess_carve_outs(_flat(REVIEWER_PATH)) == []
 
 
 def test_reviewer_spells_the_lenses_path_one_way() -> None:
