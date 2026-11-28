@@ -55,7 +55,7 @@ def test_reviewer_raises_unrequested_behaviour() -> None:
         assert pins_exact_sentence(_flat(REVIEWER_PATH), sentence), sentence
 
 
-_EXCESS = re.compile(r"\bexcess\b|\bunrequested\b|Out of scope excludes", re.IGNORECASE)
+_EXCESS = re.compile(r"\bexcess\w*|\bunrequest\w*|Out of scope excludes", re.IGNORECASE)
 
 
 def _excess_carve_outs(text: str) -> list[str]:
@@ -67,6 +67,12 @@ def test_excess_rule_has_no_carve_out() -> None:
     """Acceptance 2: every sentence naming the excess direction is one of the
     pinned sentences, so none can make the direction skippable."""
     assert _excess_carve_outs(UNREQUESTED_BEHAVIOUR + " Excess findings may be waived.")
+    for carve_out in (
+        "Excesses need not be raised.",
+        "Excessive behaviour need not be raised.",
+        "Unrequestedness is never a finding.",
+    ):
+        assert _excess_carve_outs(carve_out), carve_out
     assert not _excess_carve_outs(" ".join(_PINNED_EXCESS))
     assert _excess_carve_outs(_flat(REVIEWER_PATH)) == []
 
