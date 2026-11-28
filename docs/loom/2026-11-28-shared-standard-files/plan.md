@@ -47,3 +47,4 @@ charter: 1.1
 1. Intent Problem says the judge asks only for RED→GREEN evidence; `lenses.md:58` already bans cannot-fail tests and internal-function tests. Acceptance is unaffected; the writer still lacks them.
 2. Moving review-gate prose can flip polarity; the adversary runs polarity near-miss probes against every moved sentence before hand-off.
 3. user-decided — automatic publication after closing-review; merge stays a separate decision.
+user-decided — second-vendor selection-confirmed: codex
