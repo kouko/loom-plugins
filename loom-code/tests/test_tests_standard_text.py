@@ -35,6 +35,8 @@ MOVED_RULES = (
     "A test of a test is a finding",
     "adds at most one test, extending an existing test first",
     "must confirm, before counting it as evidence, that the mutation landed",
+    "must lie in the code, fixture or text the test covers",
+    "and that the unmutated version passes",
 )
 # Every rule sentence, pinned whole: a count-only pin lets "is a finding"
 # flip to "is not a finding" unseen.
@@ -73,7 +75,9 @@ SECTION_1_SENTENCES = (
     "it as evidence, that the mutation landed — a non-empty diff against the pristine copy, or the edit "
     "anchor matched exactly once — and that the unmutated version passes.",
     "An unconfirmed RED is not evidence.",
-    "The diff or the matched anchor must lie in the code, fixture or text the test covers.",
+    "The diff or the matched anchor must lie in the code, fixture or text the test covers, and a matched "
+    "anchor counts only once the edit was applied there and the text changed.",
+    "A mutation tool that applies and checks its own mutants already meets this rule.",
 )
 # Readers of the mutation rule point to it; each pointer is pinned whole.
 BASELINE_MUTATION_POINTERS = (

@@ -20,7 +20,9 @@ once — and that the unmutated version passes. An unconfirmed RED is not
 evidence.
 
 The diff or the matched anchor must lie in the code, fixture or text the
-test covers.
+test covers, and a matched anchor counts only once the edit was applied there
+and the text changed. A mutation tool that applies and checks its own mutants
+already meets this rule.
 
 ## 2. Expected values come from an independent source
 
