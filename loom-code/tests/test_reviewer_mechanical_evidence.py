@@ -43,6 +43,32 @@ def test_reviewer_raises_unrequested_behaviour() -> None:
     assert pins_exact_sentence(_flat(REVIEWER_PATH), UNREQUESTED_BEHAVIOUR)
 
 
+_EXCESS = re.compile(r"\bexcess\b|\bunrequested\b|Out of scope excludes", re.IGNORECASE)
+_WAIVER = re.compile(
+    r"\b(?:skip\w*|optional|may omit|need not|only when|unless|except)\b", re.IGNORECASE
+)
+
+
+def _excess_carve_outs(text: str) -> list[str]:
+    """Sentences other than the pinned rule that mention the excess direction
+    beside a skip, permission or negation signal."""
+    return [
+        s for s in _sentences(text)
+        if s != UNREQUESTED_BEHAVIOUR and _EXCESS.search(s)
+        and (has_negation(s) or _WAIVER.search(s))
+    ]
+
+
+def test_excess_rule_has_no_carve_out() -> None:
+    """Acceptance 2: a sentence added beside the pinned rule must not make the
+    excess direction skippable."""
+    assert _excess_carve_outs(
+        UNREQUESTED_BEHAVIOUR + " You may skip the excess direction when the change is small."
+    )
+    assert not _excess_carve_outs("Excess is the fourth direction a reviewer reconciles.")
+    assert _excess_carve_outs(_flat(REVIEWER_PATH)) == []
+
+
 def test_reviewer_spells_the_lenses_path_one_way() -> None:
     """A4 negative (lenses-path-spelled-two-ways): reviewer.md sits at plugin
     level, so every citation resolves from the repository root."""
