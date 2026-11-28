@@ -2,7 +2,7 @@
 """A runtime prose contract cites only what ships with it.
 
 Scans `loom-code/skills/**/*.md`, `loom-code/agents/*.md` (non-recursive —
-that directory is flat), `loom-design/skills/**/*.md`,
+that directory is flat), `loom-code/references/*.md`, `loom-design/skills/**/*.md`,
 `loom-code/contract/templates/*.md`, and `loom-workflow/skills/**/*.md` for a
 backtick-quoted citation of a file under THIS repository's `docs/`
 development records (a dated entry under `specs/`, `plans/`, `audits/`,
@@ -74,6 +74,7 @@ from pathlib import Path
 _SCOPE_DIRS: tuple[tuple[str, bool], ...] = (
     ("loom-code/skills", True),
     ("loom-code/agents", False),
+    ("loom-code/references", False),
     ("loom-design/skills", True),
     ("loom-code/contract/templates", False),
     ("loom-code/contract", False),
