@@ -55,7 +55,9 @@ def test_reviewer_raises_unrequested_behaviour() -> None:
         assert pins_exact_sentence(_flat(REVIEWER_PATH), sentence), sentence
 
 
-_EXCESS = re.compile(r"\bexcess\w*|\bunrequest\w*|Out of scope excludes", re.IGNORECASE)
+_EXCESS = re.compile(
+    r"\bexcess\w*|\bunrequest\w*|\bout[\s-]+of[\s-]+scope\W+exclu\w*", re.IGNORECASE
+)
 
 
 def _excess_carve_outs(text: str) -> list[str]:
@@ -71,8 +73,12 @@ def test_excess_rule_has_no_carve_out() -> None:
         "Excesses need not be raised.",
         "Excessive behaviour need not be raised.",
         "Unrequestedness is never a finding.",
+        "Behaviour the out-of-scope excludes need not be raised.",
+        "Behaviour Out of scope excluded need not be raised.",
+        "An Out of scope exclusion is never a finding.",
     ):
         assert _excess_carve_outs(carve_out), carve_out
+    assert not _excess_carve_outs("Leave out of scope work for a later change.")
     assert not _excess_carve_outs(" ".join(_PINNED_EXCESS))
     assert _excess_carve_outs(_flat(REVIEWER_PATH)) == []
 
