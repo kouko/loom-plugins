@@ -33,7 +33,8 @@ Together these define TDD as design feedback, not coverage added later.
   either describes behaviour that already exists (no new test needed) or
   tests nothing.
 - **GREEN** — write the simplest code that makes it pass. *Simplest* is not
-  *sloppy*: no speculative generality, no premature abstraction. Duplication
+  *sloppy*: a new abstraction meets the threshold in
+  [`code-design-standard.md`](code-design-standard.md) §2. Duplication
   at GREEN is fine; it goes in the next step.
 - **REFACTOR** — with every test green, improve the internal structure
   without changing behaviour. If a test goes red during a refactor, revert
@@ -146,7 +147,9 @@ Terse rules the reviewer reads work against:
 1. **Think before coding.** State assumptions; name what is unclear instead
    of guessing; push back when something simpler would do.
 2. **Simplicity first.** The minimum code that solves the problem. Nothing
-   speculative, no abstraction for a single use.
+   speculative. Code-design rules, the abstraction threshold among them,
+   live in [`code-design-standard.md`](code-design-standard.md); read it
+   before writing code: the reviewer judges the design against it.
 3. **Surgical changes.** Touch only what the task requires. Clean up only
    your own leftovers. Match the surrounding style.
 4. **Read before you write.** Read the exports, the immediate callers, and
