@@ -66,10 +66,14 @@ RULE_SENTENCES = (
     "Unnecessary helpers and harnesses are findings.",
     "A test of a test is a finding, except the synthetic self-tests §5 requires.",
     "The fix for any finding adds at most one test, extending an existing test first.",
+)
+# The mutation rule's sentences, pinned in §1, the section every pointer names.
+SECTION_1_SENTENCES = (
     "Whoever forces a RED by deliberately mutating code, a fixture or text must confirm, before counting "
     "it as evidence, that the mutation landed — a non-empty diff against the pristine copy, or the edit "
     "anchor matched exactly once — and that the unmutated version passes.",
     "An unconfirmed RED is not evidence.",
+    "The diff or the matched anchor must lie in the code, fixture or text the test covers.",
 )
 # Readers of the mutation rule point to it; each pointer is pinned whole.
 BASELINE_MUTATION_POINTERS = (
@@ -113,16 +117,21 @@ def test_standard_exists_and_lens_row_cites_it() -> None:
 
 
 def test_moved_rules_stated_once_in_standard_only() -> None:
-    """A2/A9: each rule is present once in the standard and absent from baseline and lenses."""
+    """A2/A9: each rule is present once in the standard and absent from baseline, lenses and adversarial."""
     standard = flat_prose(STANDARD)
-    baseline, lenses = flat_prose(BASELINE), flat_prose(LENSES)
+    baseline, lenses, adversarial = flat_prose(BASELINE), flat_prose(LENSES), flat_prose(ADVERSARIAL)
     for rule in MOVED_RULES:
         assert standard.count(rule) == 1, rule
         assert rule not in baseline, f"restated in baseline: {rule}"
         assert rule not in lenses, f"restated in lenses: {rule}"
+        assert rule not in adversarial, f"restated in adversarial: {rule}"
     sentences = rule_prose(STANDARD)
     for sentence in RULE_SENTENCES:
         assert pins_exact_sentence(sentences, sentence), sentence
+    raw = STANDARD.read_text(encoding="utf-8")
+    section_1 = " ".join(raw.split("\n## 2.")[0].split("\n## 1.")[1].split("\n", 1)[1].split())
+    for sentence in SECTION_1_SENTENCES:
+        assert pins_exact_sentence(section_1, sentence), sentence
     assert pins_exact_sentence(rule_prose(BASELINE), BASELINE_POINTER)
     for pointer in BASELINE_MUTATION_POINTERS:
         assert pins_exact_sentence(rule_prose(BASELINE), pointer), pointer

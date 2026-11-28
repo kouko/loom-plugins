@@ -19,6 +19,9 @@ non-empty diff against the pristine copy, or the edit anchor matched exactly
 once — and that the unmutated version passes. An unconfirmed RED is not
 evidence.
 
+The diff or the matched anchor must lie in the code, fixture or text the
+test covers.
+
 ## 2. Expected values come from an independent source
 
 A tautological assertion is a finding: its expected value is computed the
