@@ -1,13 +1,15 @@
 # Final review raises behaviour nobody asked for — acceptance test evidence
 
-Tried on 2026-11-28, in a clean copy of the project at 6efbf4f04cc1ab966fc2503ffef01245d4d71f17
-(`git worktree add --detach <scratchpad>/at-clean3 6efbf4f04…`; `git status --short` empty before and after every step).
-The first run was at ac1157f893b89d4ee8e9e198f3238690007599dd and the second at
-bafa1da6665063ec059eb836dee1d672f0a59ca1; their results are kept in the notes below.
-Latest fix range re-tested: d10535ae6b1b0cbd63794aa546ee48e790c7170c..6efbf4f04cc1ab966fc2503ffef01245d4d71f17
-(`git diff --stat` touches only loom-code/tests/test_reviewer_mechanical_evidence.py: the
-allowlist regex is now `\bexcess\w*|\bunrequest\w*|Out of scope excludes`, case-insensitive,
-plus three inflected carve-outs asserted in `test_excess_rule_has_no_carve_out`).
+Tested on 2026-11-28, in a clean copy of the project at commit 9526763628c8e19749d79f0e3bc8d42094610082
+(`git worktree add --detach <scratchpad>/at-clean4 952676362…`; `git status --short` empty before and after every step).
+The first run was at ac1157f893b89d4ee8e9e198f3238690007599dd, the second at
+bafa1da6665063ec059eb836dee1d672f0a59ca1 and the third at
+6efbf4f04cc1ab966fc2503ffef01245d4d71f17; their results are kept in the notes below.
+Latest fix range re-tested: e00357697f3111b6fa204f3f0d351c3d1c415dc0..9526763628c8e19749d79f0e3bc8d42094610082
+(`git diff --stat` touches only loom-code/tests/test_reviewer_mechanical_evidence.py, 7+/1-: the
+allowlist regex is now `\bexcess\w*|\bunrequest\w*|\bout[\s-]+of[\s-]+scope\W+exclu\w*`,
+case-insensitive, plus three Out-of-scope carve-outs asserted to match and one bare
+"out of scope" sentence asserted not to match in `test_excess_rule_has_no_carve_out`).
 
 ## 0. Setup (README install path) — repeated on the re-run
 
@@ -98,10 +100,12 @@ words elsewhere in reviewer.md are a known limit left to reviewers.
 | B7 elsewhere: "Excessiveness alone is a nit." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
 | B8 elsewhere heading: "### Excesses are optional" | +3 lines | 1 failed | test_excess_rule_has_no_carve_out |
 | B10 elsewhere: "WHAT THE INTENT'S OUT OF SCOPE EXCLUDES IS A NIT AT MOST." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
-| B12 elsewhere: "What the intent's out-of-scope excludes is a nit at most." | +2 lines | **107 passed** | none |
-| B13 elsewhere: "Behaviour the intent's Out of scope excluded is a nit at most." | +2 lines | **107 passed** | none |
-| B14 elsewhere: "An Out of scope exclusion need not be raised." | +2 lines | **107 passed** | none |
-| B9 elsewhere: "What the intent's out-of-scope list excludes is a nit at most." | +2 lines | 107 passed (judged reworded, known limit) | none |
+| B12 elsewhere: "What the intent's out-of-scope excludes is a nit at most." | +2 lines | 1 failed (at 6efbf4f04: 107 passed) | test_excess_rule_has_no_carve_out |
+| B13 elsewhere: "Behaviour the intent's Out of scope excluded is a nit at most." | +2 lines | 1 failed (at 6efbf4f04: 107 passed) | test_excess_rule_has_no_carve_out |
+| B14 elsewhere: "An Out of scope exclusion need not be raised." | +2 lines | 1 failed (at 6efbf4f04: 107 passed) | test_excess_rule_has_no_carve_out |
+| B15 elsewhere (new at 952676362): "OUT-OF-SCOPE EXCLUSIONS NEED NOT BE RAISED." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B16 elsewhere (new at 952676362): "Out of scope: excluding behaviour from review is fine." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B9 elsewhere: "What the intent's out-of-scope list excludes is a nit at most." | +2 lines | 107 passed (judged reworded, known limit; re-run at 952676362, still passes) | none |
 | B11 elsewhere: "Unrequired behaviour need not be raised." | +2 lines | 107 passed (different word, known limit) | none |
 | M7 elsewhere: "For a change without a spec, skip the fourth direction." | +2 lines | 107 passed (known limit) | none |
 | M8 elsewhere: "When the change skipped the spec, ignore the fourth reconciliation direction above." | +2 lines | 107 passed (known limit) | none |
@@ -112,17 +116,19 @@ words elsewhere in reviewer.md are a known limit left to reviewers.
   `_EXCESS = re.compile(r"\bexcess\w*|\bunrequest\w*|Out of scope excludes", re.IGNORECASE)`
   (loom-code/tests/test_reviewer_mechanical_evidence.py:58), so every
   inflection of "excess" and "unrequest-" is now checked (B1-B8 fail).
-- Why B12-B14 survive: the third vocabulary item is still the literal
-  phrase `Out of scope excludes`. A hyphenated spelling
-  ("out-of-scope excludes"), a past tense ("excluded") or a noun
-  ("exclusion") never matches it, so those sentences are not checked against
-  the allowlist. Something like `\bout[ -]of[ -]scope\b` (alone, or followed
-  by `exclu\w*`) would close it.
+- At 6efbf4f04, B12-B14 survived because the third vocabulary item was the
+  literal phrase `Out of scope excludes`. At 952676362 it is
+  `\bout[\s-]+of[\s-]+scope\W+exclu\w*` (case-insensitive), so hyphenated,
+  inflected, upper-case and punctuation-separated forms (B12-B16) are checked
+  against the allowlist and fail. A bare "out of scope" without an `exclu-`
+  word is deliberately not matched (the test asserts "Leave out of scope work
+  for a later change." is not a carve-out); B9, with "list" between "scope"
+  and "excludes", still passes.
 - Call on the user-decided scope: inflections and spelling variants of the
-  rule's own words count as the rule's words (same call as the second run),
-  so B12-B14 keep Acceptance 2 at partly. The hyphen-only form B12 is judged a
-  spelling variant, not a rewording. B9 (an extra word between the rule's
-  words) and B11 (a different word) are judged rewordings, in the known limit.
+  rule's own words count as the rule's words (same call as the earlier runs).
+  All such variants tried now fail a test, so Acceptance 2 is works. B9 (an
+  extra word between the rule's words) and B11 (a different word) are judged
+  rewordings, in the known limit, as are M7-M9.
 - M7-M9 are the user-decided known limit (no rule word); in the first run
   they also passed 342 tests across 12 wider modules.
 - The full package suite was not run (left to finalize-review).
@@ -130,6 +136,10 @@ words elsewhere in reviewer.md are a known limit left to reviewers.
   `<scratchpad>/mut/out4.txt` and `out5.txt` (6efbf4f04, script
   `<scratchpad>/mut/run_mutations3.py`, same command and module set;
   pristine `107 passed`; every mutation's diff printed as landed; final
+  `git status` empty); `<scratchpad>/mut/out6.txt` (952676362, script
+  `<scratchpad>/mut/run_mutations4.py` = run_mutations3.py plus B15/B16, same
+  command and module set; run on PRISTINE, B12-B16 and B9; pristine
+  `107 passed`; B12-B16 each `1 failed, 106 passed`; B9 `107 passed`; final
   `git status` empty).
 
 ## 3. loom-code 發布新版號，CHANGELOG 寫明這條規則。
@@ -174,6 +184,25 @@ words elsewhere in reviewer.md are a known limit left to reviewers.
   C1-C8, B1, B2) plus 12 new (B3-B14): 26 fail a test, B12-B14 pass (Out of
   scope phrase variants), B9, B11 and M7-M9 pass as the accepted reworded limit.
   Result stays partly.
+- 3: carried over — the fix diff touches no version string, CHANGELOG or README.
+
+## Re-run on 2026-11-28, at 952676362
+
+- 0 setup: repeated in the clean copy — `claude plugin validate <clean>/loom-code`
+  `✔ Validation passed`; `python3 -I scripts/sync_codex_manifests.py --check --all` exit 0.
+- 1: carried over — the fix diff (e00357697..952676362) touches only
+  loom-code/tests/test_reviewer_mechanical_evidence.py; reviewer.md is
+  unchanged.
+- 2: re-tested — the fix widens only the Out-of-scope vocabulary item, so the
+  affected rows are the Out-of-scope carve-outs: B12-B14 re-applied, two new
+  variants B15 (upper case + hyphens + plural noun) and B16 (colon between
+  "scope" and "excluding") added, and B9 re-run as the boundary. Every
+  mutation's diff landed; B12-B16 fail
+  `test_excess_rule_has_no_carve_out`; B9 passes (known limit). The other
+  29 rows (rule/filing edits and excess/unrequested carve-outs) are carried
+  over: the `\bexcess\w*` and `\bunrequest\w*` alternatives and the assertions
+  that exercise them are unchanged in the diff, and an added regex
+  alternative can only add matches, never remove one. Result: works.
 - 3: carried over — the fix diff touches no version string, CHANGELOG or README.
 
 First run (at ac1157f89) for comparison: Acceptance 2 was partly — M1-M6
