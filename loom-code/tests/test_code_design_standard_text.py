@@ -48,7 +48,8 @@ RULE_SENTENCES = (
     "choice — is a finding.",
     "A module or function hiding any of those is outside this rule, and so is a re-export that declares "
     "the module's entry (a package `__init__`, a TS `index` barrel).",
-    "Rule of Three — three sites doing the same thing are an extraction candidate, extracted only when "
+    "Remove duplication and smells;",
+    "under the Rule of Three, three sites doing the same thing are an extraction candidate, extracted only when "
     "the three change for the same reason;",
     "a split or extraction defaults to a non-exported function inside the module, and becomes its own "
     "module with an entry only when another module needs to call it or its behaviour is unreachable "

@@ -8,12 +8,9 @@ reviewer runs and scores tests stays in the lens.
 
 ## 1. A test can fail for the behaviour it names
 
-**Tests verify intent.** A test that cannot fail when the logic changes is
-not a test.
-
-A test that cannot fail for the behaviour it names is a finding — one
-restating a constant or the implementation, one reading source text to
-assert code structure (prose-pin tests that meet §5 of this file excepted),
+**Tests verify intent.** A test that cannot fail for the behaviour
+it names is a finding — one restating a constant or the implementation,
+one reading source text to assert code structure (prose-pin tests that meet §5 of this file excepted),
 or a mock or stub replacing the very seam it claims to cover.
 
 ## 2. Expected values come from an independent source

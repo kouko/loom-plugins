@@ -20,7 +20,7 @@ LENSES = REPO / "loom-code/skills/closing-review/references/lenses.md"
 
 # One literal per moved or added rule; each lives in the standard only.
 MOVED_RULES = (
-    "A test that cannot fail when the logic changes is not a test.",
+    "**Tests verify intent.** A test that cannot fail for the behaviour it names is a finding",
     "one restating a constant or the implementation",
     "a mock or stub replacing the very seam it claims to cover",
     "entry is what other modules call, never whatever its tests call",
@@ -38,8 +38,7 @@ MOVED_RULES = (
 # Every rule sentence, pinned whole: a count-only pin lets "is a finding"
 # flip to "is not a finding" unseen.
 RULE_SENTENCES = (
-    "**Tests verify intent.** A test that cannot fail when the logic changes is not a test.",
-    "A test that cannot fail for the behaviour it names is a finding — one restating a constant or the "
+    "**Tests verify intent.** A test that cannot fail for the behaviour it names is a finding — one restating a constant or the "
     "implementation, one reading source text to assert code structure (prose-pin tests that meet §5 of "
     "this file excepted), or a mock or stub replacing the very seam it claims to cover.",
     "A tautological assertion is a finding: its expected value is computed the same way the code "

@@ -31,7 +31,7 @@ declares the module's entry (a package `__init__`, a TS `index` barrel).
 
 ## 4. Extract on the Rule of Three
 
-Duplication and smells; Rule of Three — three sites doing the same thing are
+Remove duplication and smells; under the Rule of Three, three sites doing the same thing are
 an extraction candidate, extracted only when the three change for the same
 reason; a split or extraction defaults to a non-exported function inside the
 module, and becomes its own module with an entry only when another module
