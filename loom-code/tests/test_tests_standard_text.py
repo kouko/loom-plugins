@@ -29,6 +29,11 @@ MOVED_RULES = (
     "requires an affirmative verb before the pinned literal",
     "computed the same way the code computes it",
     "verifying through a side channel instead of the public interface",
+    "what distinct defect, input, state, environment or oracle is new",
+    "the retained case detects the old defect",
+    "distinct boundary, integration and environment coverage",
+    "harnesses and tests of tests are findings",
+    "adds at most one test, extending an existing test first",
 )
 # Every rule sentence, pinned whole: a count-only pin lets "is a finding"
 # flip to "is not a finding" unseen.
@@ -54,6 +59,12 @@ RULE_SENTENCES = (
     "A test that pins a sentence of prose requires an affirmative verb before the pinned literal, "
     "rejects any negation token in that same sentence, and carries synthetic self-tests validating one "
     "affirmative example and one rejected negated example.",
+    "Compare tests for touched behaviour with existing cases: what distinct defect, input, state, "
+    "environment or oracle is new? Ordinary consolidation or deletion requires evidence the retained "
+    "case detects the old defect, not shared lines, text similarity or counts.",
+    "Preserve distinct boundary, integration and environment coverage.",
+    "Unnecessary helpers, harnesses and tests of tests are findings.",
+    "The fix for any finding adds at most one test, extending an existing test first.",
 )
 BASELINE_POINTER = (
     "**Test rules live in [`tests-standard.md`](tests-standard.md).** Read it before writing a test: "
@@ -62,7 +73,7 @@ BASELINE_POINTER = (
 LENS_POINTER = (
     "every rule in `../../../references/tests-standard.md` — tests that cannot fail for the behaviour "
     "they name, tautological assertions, tests coupled to the implementation, module entry versus "
-    "internal-function tests, prose-pin tests — is judged here, and a breach of it is a finding;"
+    "internal-function tests, prose-pin tests, new tests against existing cases — is judged here, and a breach of it is a finding;"
 )
 
 

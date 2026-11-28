@@ -51,10 +51,9 @@ does not repeat it; where they differ, the baseline wins.
    covered unchanged behaviour needs no duplicate function or file. The tests a task
    adds stay within a budget: at most one positive and one negative or
    boundary case per Acceptance line; add or extend only for a named uncovered
-   defect or behaviour; a finding's fix adds at most one
-   test, extending an existing test first; reuse the target test
-   file's existing helpers and fixtures; no new test harness; no tests of
-   tests. Report the net test lines added in `net_test_lines`.
+   defect or behaviour; reuse the target test
+   file's existing helpers and fixtures; no new test harness; a finding's
+   fix and tests of tests follow `../references/tests-standard.md` §6. Report the net test lines added in `net_test_lines`.
 3. **Stay inside your files.** Edit one outside your task's list only when
    the assigned task itself unavoidably requires the edit, naming it in
    `files_outside_task_list` with one line of why — an unreported edit is the defect a checkpoint least sees.

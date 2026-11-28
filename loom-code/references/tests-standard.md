@@ -48,3 +48,13 @@ A test that pins a sentence of prose requires an affirmative verb before the
 pinned literal, rejects any negation token in that same sentence, and
 carries synthetic self-tests validating one affirmative example and one
 rejected negated example.
+
+## 6. A new test earns its place against existing cases
+
+Compare tests for touched behaviour with existing cases: what distinct
+defect, input, state, environment or oracle is new? Ordinary consolidation
+or deletion requires evidence the retained case detects the old defect, not
+shared lines, text similarity or counts. Preserve distinct boundary,
+integration and environment coverage. Unnecessary helpers, harnesses and
+tests of tests are findings. The fix for any finding adds at most one test,
+extending an existing test first.

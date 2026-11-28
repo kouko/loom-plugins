@@ -67,16 +67,12 @@ def _sentence_pins_prose_rule(sentence: str) -> bool:
     return not _has_negation(sentence)
 
 
-def test_adversarymd_prosepinsentence_present() -> None:
-    """adversary.md must carry one sentence pinning the prose-pin rule
-    (affirmative verb before affirmative/negation/self-test vocabulary,
-    no negation token anywhere in that sentence)."""
-    text = ADVERSARY_MD.read_text(encoding="utf-8")
-    hits = [s for s in _sentences(text) if _sentence_pins_prose_rule(s)]
-    assert hits, (
-        "loom-code/agents/adversary.md has no sentence pinning the "
-        "prose-pin rule"
-    )
+def test_adversarymd_prosepinpointer_present() -> None:
+    """adversary.md points at the tests standard's prose-pin section
+    instead of restating the rule."""
+    sentences = _sentences(ADVERSARY_MD.read_text(encoding="utf-8"))
+    assert "A test that pins a sentence of prose follows `../references/tests-standard.md` §5." in sentences
+    assert not any(_sentence_pins_prose_rule(s) for s in sentences)
 
 
 def test_testsstandardmd_prosepinsentence_present() -> None:

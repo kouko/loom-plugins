@@ -69,10 +69,8 @@ findings: [{severity: fatal | important | nit, anchor: "<where>", text: "<label>
 Every probe function is named `test_<unit>_<state>_<expected>` — three
 underscore-separated parts (unit of work, state under test, expected
 behaviour) — and its docstring, and any evidence note you write, is in
-English. A test that pins a sentence of prose requires an affirmative verb
-before the pinned literal, rejects any negation token in that same
-sentence, and carries synthetic self-tests validating one affirmative
-example and one rejected negated example.
+English. A test that pins a sentence of prose follows
+`../references/tests-standard.md` §5.
 
 Amend an unseen probe fix into that probe's original commit. An update made on a Build re-dispatch is a new commit,
 never an amend.
