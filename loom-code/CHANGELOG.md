@@ -2,7 +2,7 @@
 
 ## [3.92.0] — 2026-11-28 — Confirm a mutation landed before its RED counts
 
-- `references/tests-standard.md` §1: a RED forced by deliberately mutating code, a fixture or text counts as evidence only after confirming the mutation landed (a non-empty diff against the pristine copy, or the edit anchor matched exactly once, in the code, fixture or text the test covers, where a matched anchor counts only once the edit was applied and the text changed) and that the unmutated version passes; an unconfirmed RED is not evidence. A mutation tool that applies and checks its own mutants already meets this rule.
+- `references/tests-standard.md` §1: a RED forced by deliberately mutating code, a fixture or text counts as evidence only after confirming the mutation landed (a non-empty diff against the pristine copy, or the edit anchor matched exactly once, in the code, fixture or text the test covers, where a matched anchor counts only once the edit was applied and the text changed) and that the unmutated version passes; an unconfirmed RED is not evidence. A mutation tool that applies and checks its own mutants has already confirmed they landed, and its run on the unmutated code must still pass.
 - `references/engineering-baseline.md`: the False-green diagnostic and Code-first backfill point to that rule instead of restating it.
 - `closing-review/references/adversarial.md`: a probe-update report now states, for each mutation, how it was confirmed landed, alongside its command and observed result.
 

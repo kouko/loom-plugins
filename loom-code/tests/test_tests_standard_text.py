@@ -77,7 +77,8 @@ SECTION_1_SENTENCES = (
     "An unconfirmed RED is not evidence.",
     "The diff or the matched anchor must lie in the code, fixture or text the test covers, and a matched "
     "anchor counts only once the edit was applied there and the text changed.",
-    "A mutation tool that applies and checks its own mutants already meets this rule.",
+    "A mutation tool that applies and checks its own mutants has already confirmed they landed, "
+    "and its run on the unmutated code must still pass.",
 )
 # Readers of the mutation rule point to it; each pointer is pinned whole.
 BASELINE_MUTATION_POINTERS = (

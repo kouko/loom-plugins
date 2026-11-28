@@ -22,7 +22,8 @@ evidence.
 The diff or the matched anchor must lie in the code, fixture or text the
 test covers, and a matched anchor counts only once the edit was applied there
 and the text changed. A mutation tool that applies and checks its own mutants
-already meets this rule.
+has already confirmed they landed, and its run on the unmutated code must
+still pass.
 
 ## 2. Expected values come from an independent source
 
