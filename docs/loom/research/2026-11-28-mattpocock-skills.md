@@ -1,7 +1,7 @@
 ---
 title: "mattpocock/skills: candidate implementations to reference for loom improvements"
 type: loom-research
-status: in-progress
+status: concluded
 created: 2026-11-28
 updated: 2026-11-28
 tags:
@@ -211,6 +211,40 @@ Decisions so far (2026-11-28):
    mandatory vocabulary terms (plain-language criteria instead), horizontal
    slicing (loom's one-failing-test-per-task flow already prevents it).
    Change: `docs/loom/intent/2026-11-28-shared-standard-files.md`.
+   **Shipped**: PR #183, loom-code 3.91.0.
+3. **Adopted (user-decided: a small change now)** — `diagnosing-bugs`'
+   mutation-diff RED verification. `loom-code/references/tests-standard.md`
+   §1 now says a RED forced by a deliberate mutation counts as evidence only
+   after confirming the mutation landed (a non-empty diff against the pristine
+   copy, or the edit anchor matched exactly once and the text changed) and
+   that the unmutated version passes. `engineering-baseline.md` and the
+   adversary's `adversarial.md` cite the rule instead of restating it. A
+   mutation tool that checks its own mutants needs no extra diff, but its run
+   on the unmutated code must still pass. Change:
+   `docs/loom/intent/2026-11-28-mutation-landed-check.md`. **Shipped**: PR
+   #184, loom-code 3.92.0.
+4. **Split not adopted; one gap filled (user-decided: a small change now)** —
+   `code-review`'s two-axis reviewer split.
+
+   | What the split aims for | mattpocock `code-review` | loom already |
+   |---|---|---|
+   | Standards axis | a sub-agent reads the diff against repo rules and Fowler's smells | the `code` lens scores naming, refactoring, architecture and principles conformance |
+   | Spec axis | a sub-agent reads the spec against the diff | an independent acceptance tester runs the change in a clean copy, line by line against Acceptance |
+   | One axis cannot mask the other | two reports, never merged | every dimension is scored separately; the worst score sets the verdict |
+   | Separate contexts | one sub-agent per axis | acceptance tester and reviewers are distinct agents |
+
+   Reasons for not splitting: loom's two reviewers read the same lens list,
+   and in this repo the second is Codex, so every dimension gets two vendors'
+   reads; splitting leaves one read per dimension, and a narrow change with a
+   single reviewer cannot be split at all. Gap found: the Spec axis also flags
+   unrequested behaviour, which loom checked only under the spec lens
+   (`spec-conformance`, spec required). Fixed: `loom-code/agents/reviewer.md`
+   reconciliation gains a fourth direction, excess — behaviour the intent
+   leaves unrequested or its Out of scope excludes is a finding under every
+   lens, with or without a spec, filed under `deletion-first` (or the lens's
+   only dimension for `design` and `principles`). Change:
+   `docs/loom/intent/2026-11-28-review-unrequested-behaviour.md`.
+   **Shipped**: PR #185, loom-code 3.93.0.
 
 Noted for later discussion (user-decided 2026-11-28):
 
@@ -219,12 +253,17 @@ Noted for later discussion (user-decided 2026-11-28):
   `loom-code/references/engineering-baseline.md` §2 runs red → green →
   refactor. Changing this alters loom's TDD flow, so it needs its own
   discussion and intent; the shared-standard change keeps the current loop.
+- **Periodic scan of existing code** for shallow modules (the
+  `improve-codebase-architecture` use of `codebase-design`): deferred under
+  item 2; loom has no entry point for it.
+- **A standalone `user-invocable: false` shared-standard skill**: deferred
+  under item 2 until a consumer outside loom stations appears.
 
-Not yet discussed:
-
-3. `diagnosing-bugs`' **mutation-diff RED verification** (adversary already
-   does mutation; the diff-against-pristine step may be borrowable).
-4. `code-review`'s **two-axis reviewer split** (closing-review lens design).
+Not read, not evaluated (user-decided 2026-11-28): every other pack skill,
+including `to-spec` / `to-tickets`, `triage` / `wayfinder`, `grilling` /
+`grill-with-docs` and `chief-of-staff`. The parallels table above rests on
+their one-line descriptions only; this record makes no claim about their
+content.
 
 ## Limitations
 
