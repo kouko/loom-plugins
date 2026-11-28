@@ -42,7 +42,9 @@ Together these define TDD as design feedback, not coverage added later.
   is not TDD (Beck 2002, Preface).
 
 **False-green diagnostic.** A test that passed on its first run: comment out
-the production change it covers, re-run — it must fail. If it still passes,
+the production change it covers, re-run — it must fail. That failure is
+evidence once it meets the mutation rule in
+[`tests-standard.md`](tests-standard.md) §1. If it still passes,
 the test is not testing what you think; rewrite it until it can fail.
 Restore the code, re-run, confirm green.
 
@@ -71,7 +73,8 @@ does when plan is absent or skipped. An uninstructed skip remains a violation.
 Code written after the flow
 began follows the iron law. A compile or import failure proves only that an
 interface is missing; break the covered behaviour and watch the test fail
-(false-green diagnostic) to show it catches a defect.
+(false-green diagnostic) to show it catches a defect. The mutation rule in
+[`tests-standard.md`](tests-standard.md) §1 decides when that failure counts.
 
 ## 3. Debugging: four phases, in order
 

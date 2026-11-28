@@ -34,6 +34,7 @@ MOVED_RULES = (
     "distinct boundary, integration and environment coverage",
     "A test of a test is a finding",
     "adds at most one test, extending an existing test first",
+    "must confirm, before counting it as evidence, that the mutation landed",
 )
 # Every rule sentence, pinned whole: a count-only pin lets "is a finding"
 # flip to "is not a finding" unseen.
@@ -65,6 +66,21 @@ RULE_SENTENCES = (
     "Unnecessary helpers and harnesses are findings.",
     "A test of a test is a finding, except the synthetic self-tests §5 requires.",
     "The fix for any finding adds at most one test, extending an existing test first.",
+    "Whoever forces a RED by deliberately mutating code, a fixture or text must confirm, before counting "
+    "it as evidence, that the mutation landed — a non-empty diff against the pristine copy, or the edit "
+    "anchor matched exactly once — and that the unmutated version passes.",
+    "An unconfirmed RED is not evidence.",
+)
+# Readers of the mutation rule point to it; each pointer is pinned whole.
+BASELINE_MUTATION_POINTERS = (
+    "That failure is evidence once it meets the mutation rule in [`tests-standard.md`](tests-standard.md) §1.",
+    "The mutation rule in [`tests-standard.md`](tests-standard.md) §1 decides when that failure counts.",
+)
+ADVERSARIAL = REPO / "loom-code/skills/closing-review/references/adversarial.md"
+ADVERSARIAL_MUTATION_POINTER = (
+    "Each mutation must turn the probe RED and is then reverted, and the report gives each one's command, "
+    "observed result and how the mutation was confirmed landed, as `../../../references/tests-standard.md` "
+    "§1 requires."
 )
 BASELINE_POINTER = (
     "**Test rules live in [`tests-standard.md`](tests-standard.md).** Read it before writing a test: "
@@ -108,6 +124,9 @@ def test_moved_rules_stated_once_in_standard_only() -> None:
     for sentence in RULE_SENTENCES:
         assert pins_exact_sentence(sentences, sentence), sentence
     assert pins_exact_sentence(rule_prose(BASELINE), BASELINE_POINTER)
+    for pointer in BASELINE_MUTATION_POINTERS:
+        assert pins_exact_sentence(rule_prose(BASELINE), pointer), pointer
+    assert pins_exact_sentence(rule_prose(ADVERSARIAL), ADVERSARIAL_MUTATION_POINTER)
 
 
 def test_tautology_and_impl_coupled_bans_affirmative() -> None:
