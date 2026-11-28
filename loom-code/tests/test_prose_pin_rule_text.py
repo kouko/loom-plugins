@@ -90,6 +90,9 @@ def test_testsstandardmd_prosepinsentence_present() -> None:
         "loom-code/references/tests-standard.md has no sentence "
         "pinning the prose-pin rule"
     )
+    assert any(re.search(r"\brejects any negation token\b", s) for s in hits), (
+        "the prose-pin sentence must say a pin rejects any negation token"
+    )
 
 
 def test_sentencepinsproserule_negatedsynthetic_rejected() -> None:

@@ -2,8 +2,7 @@
 """Adversary probe for 2026-10-05-entry-pin-negation-gaps.
 
 The change makes `_pins_outside_callers` judge whole sentences so a negation
-anywhere in the pinned sentence rejects it (engineering-baseline section 5
-item 8). At 721f0bc5 its splitter broke on any "." followed by whitespace, so
+anywhere in the pinned sentence rejects it (tests-standard.md section 5). At 721f0bc5 its splitter broke on any "." followed by whitespace, so
 "i.e.", "e.g." and "..." ended a "sentence" early: the affirmative fragment
 before them was judged alone and the negation after them was never seen.
 ebd3443c fixed this by ending a sentence only at ".", "!" or "?" followed by a

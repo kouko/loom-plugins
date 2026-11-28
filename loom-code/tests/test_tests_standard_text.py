@@ -4,13 +4,14 @@
 engineering-baseline.md and the closing-review `tests` lens row point to it
 instead of restating it. Pins follow the prose-pin rule: an affirmative verb
 before the pinned literal, no negation token in that sentence, and synthetic
-self-tests for one affirmative and one negated example.
+self-tests for one affirmative and one negated example. A rule sentence or
+reader pointer carrying its own negation is pinned whole instead.
 """
 from __future__ import annotations
 
 from pathlib import Path
 
-from prose_pin import affirms, flat_prose, rule_prose
+from prose_pin import affirms, flat_prose, pins_exact_sentence, rule_prose
 
 REPO = Path(__file__).resolve().parents[2]
 STANDARD = REPO / "loom-code/references/tests-standard.md"
@@ -28,6 +29,40 @@ MOVED_RULES = (
     "requires an affirmative verb before the pinned literal",
     "computed the same way the code computes it",
     "verifying through a side channel instead of the public interface",
+)
+# Every rule sentence, pinned whole: a count-only pin lets "is a finding"
+# flip to "is not a finding" unseen.
+RULE_SENTENCES = (
+    "**Tests verify intent.** A test that cannot fail when the logic changes is not a test.",
+    "A test that cannot fail for the behaviour it names is a finding — one restating a constant or the "
+    "implementation, one reading source text to assert code structure (prose-pin tests that meet §5 of "
+    "this file excepted), or a mock or stub replacing the very seam it claims to cover.",
+    "A tautological assertion is a finding: its expected value is computed the same way the code "
+    "computes it, so it passes by construction.",
+    "Expected values must come from an independent source: a known-good literal, a worked example done "
+    "by hand, or the spec.",
+    "A test coupled to the implementation is a finding: one mocking an internal collaborator, one "
+    "testing a private method, or one verifying through a side channel instead of the public interface.",
+    "The tell: a behaviour-preserving refactor breaks the test.",
+    "A module's entry is what other modules call, never whatever its tests call;",
+    "a task adding or changing a function's behaviour whose plan Files line marks no entry is a finding;",
+    "a new or changed test that calls an internal (non-entry) function is a finding when that behaviour "
+    "is reachable from the module's entry, whether or not entry tests already cover it, and the fix "
+    "moves the test to the entry, or deletes it when an entry test already covers that behaviour;",
+    "a test through the entry is never asked to add internal tests, and logic the entry cannot reach "
+    "that became its own module with its own entry, tested at that entry, is not a finding.",
+    "A test that pins a sentence of prose requires an affirmative verb before the pinned literal, "
+    "rejects any negation token in that same sentence, and carries synthetic self-tests validating one "
+    "affirmative example and one rejected negated example.",
+)
+BASELINE_POINTER = (
+    "**Test rules live in [`tests-standard.md`](tests-standard.md).** Read it before writing a test: "
+    "the reviewer judges every test against it."
+)
+LENS_POINTER = (
+    "every rule in `../../../references/tests-standard.md` — tests that cannot fail for the behaviour "
+    "they name, tautological assertions, tests coupled to the implementation, module entry versus "
+    "internal-function tests, prose-pin tests — is judged here, and a breach of it is a finding;"
 )
 
 
@@ -47,7 +82,7 @@ def test_standard_exists_and_lens_row_cites_it() -> None:
     """A1: the standard exists; the lens `tests` row cites it by relative path."""
     assert STANDARD.is_file()
     tests_row = next(l for l in LENSES.read_text(encoding="utf-8").splitlines() if l.startswith("| tests |"))
-    assert "`../../../references/tests-standard.md`" in tests_row
+    assert LENS_POINTER in tests_row
 
 
 def test_moved_rules_stated_once_in_standard_only() -> None:
@@ -58,7 +93,10 @@ def test_moved_rules_stated_once_in_standard_only() -> None:
         assert standard.count(rule) == 1, rule
         assert rule not in baseline, f"restated in baseline: {rule}"
         assert rule not in lenses, f"restated in lenses: {rule}"
-    assert "`tests-standard.md`" in baseline or "(tests-standard.md)" in baseline
+    sentences = rule_prose(STANDARD)
+    for sentence in RULE_SENTENCES:
+        assert pins_exact_sentence(sentences, sentence), sentence
+    assert pins_exact_sentence(rule_prose(BASELINE), BASELINE_POINTER)
 
 
 def test_tautology_and_impl_coupled_bans_affirmative() -> None:

@@ -5,14 +5,15 @@ engineering-baseline.md, the closing-review code-lens rows and write-plan's
 Task size paragraph point to it instead of restating it. Pins follow the
 prose-pin rule: an affirmative verb before the pinned literal, no negation
 token in that sentence, and synthetic self-tests for one affirmative and one
-negated example.
+negated example. A rule sentence or reader pointer carrying its own negation
+is pinned whole instead.
 """
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
-from prose_pin import affirms, flat_prose, rule_prose
+from prose_pin import affirms, flat_prose, pins_exact_sentence, rule_prose
 
 REPO = Path(__file__).resolve().parents[2]
 STANDARD = REPO / "loom-code/references/code-design-standard.md"
@@ -32,6 +33,48 @@ MOVED_RULES = (
     "wanting to test it alone is no reason for a new entry",
     "annotated with its ceiling and its upgrade path",
 )
+# Every rule sentence, pinned whole: a count-only pin lets "never itself a
+# finding" or "is annotated" flip unseen.
+RULE_SENTENCES = (
+    "Names say what the thing is;",
+    "functions stay short — past 20 lines, and again past 50, is a prompt to look, never itself a finding;",
+    "a split finding names a concrete problem, such as a function doing several unrelated things, and "
+    "length alone is never the finding.",
+    "Every new abstraction, flag, config or extension point justifies itself with two concrete users "
+    "now, an explicit request, or a visible motivation.",
+    "A finding must name the smaller shape that does the same job — no finding without a concrete alternative.",
+    "A new module or function that only forwards — just a call elsewhere returning its result, free of "
+    "branching, transformation, validation, error handling, resource-boundary handling and policy "
+    "choice — is a finding.",
+    "A module or function hiding any of those is outside this rule, and so is a re-export that declares "
+    "the module's entry (a package `__init__`, a TS `index` barrel).",
+    "Rule of Three — three sites doing the same thing are an extraction candidate, extracted only when "
+    "the three change for the same reason;",
+    "a split or extraction defaults to a non-exported function inside the module, and becomes its own "
+    "module with an entry only when another module needs to call it or its behaviour is unreachable "
+    "from the existing entry — wanting to test it alone is no reason for a new entry;",
+    "a shared extraction across modules stays acceptable as its own module whose entry its callers import.",
+    "A module whose interface is nearly as complex as what it does gives its callers little: they learn "
+    "almost as much to call it as to do the work themselves.",
+    "Prefer a small interface that hides substantial behaviour.",
+    "To judge a module, imagine deleting it: if the complexity vanishes with it, the module was a pass-through;",
+    "if the complexity reappears across its callers, the module earns its place.",
+    "Accept a dependency from outside — as a parameter or a constructor argument — rather than creating "
+    "it inside, so a test can hand in its own.",
+    "Where the behaviour allows, return a result rather than producing a side effect, so a test can "
+    "check the value it gets back.",
+    "A shortcut taken on purpose is annotated with its ceiling and its upgrade path;",
+    'an annotation saying "later" or "someday" names no ceiling and is a finding.',
+)
+BASELINE_POINTERS = (
+    "Code-design rules, the abstraction threshold among them, live in "
+    "[`code-design-standard.md`](code-design-standard.md);",
+    "read it before writing code: the reviewer judges the design against it.",
+)
+LENS_SECTIONS = {
+    "naming": "§1", "refactoring": "§4", "deliberate-simplification": "§7",
+    "deletion-first": "§2–3", "architecture": "§5–6",
+}
 SINGLE_USE_BANS = ("abstraction for a single use", "premature abstraction", "speculative generality")
 
 
@@ -79,8 +122,8 @@ def _lens_row(name: str) -> str:
 def test_standard_exists_and_code_lens_rows_cite_it() -> None:
     """A1 positive (file-exists): the standard exists; each moved row cites it."""
     assert STANDARD.is_file()
-    for name in ("naming", "refactoring", "deliberate-simplification", "deletion-first", "architecture"):
-        assert LENS_CITE in _lens_row(name), name
+    for name, section in LENS_SECTIONS.items():
+        assert affirms(_lens_row(name), "judged against", f"{LENS_CITE} {section}"), name
     assert "SOLID (Martin)" in _lens_row("architecture")
 
 
@@ -89,7 +132,11 @@ def test_moved_rules_stated_once_in_standard_only() -> None:
     standard, baseline, lenses = flat_prose(STANDARD), flat_prose(BASELINE), flat_prose(LENSES)
     for rule in MOVED_RULES:
         assert _owned_by_standard(rule, standard, baseline, lenses), rule
-    assert "(code-design-standard.md)" in baseline
+    sentences = rule_prose(STANDARD)
+    for sentence in RULE_SENTENCES:
+        assert pins_exact_sentence(sentences, sentence), sentence
+    for pointer in BASELINE_POINTERS:
+        assert pins_exact_sentence(rule_prose(BASELINE), pointer), pointer
 
 
 def test_owned_matcher_rejects_duplicate_and_missing() -> None:
