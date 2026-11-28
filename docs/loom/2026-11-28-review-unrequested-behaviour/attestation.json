@@ -1,0 +1,98 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-28-review-unrequested-behaviour",
+  "content_digest": "29e39233e0059758ee3c6e5c2dccb477197d3b25",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-11-28-review-unrequested-behaviour/evidence/probes/test_excess_rule_carve_out.py",
+      "artifact": "docs/loom/2026-11-28-review-unrequested-behaviour/evidence/probes/test_excess_rule_carve_out.py",
+      "result": "pass",
+      "command_digest": "00281520a87bba51db9802bebe0ba895e7e772e45db4ccda8306a37a2df4703e"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "claude-reviewer-1",
+      "vendor": "anthropic",
+      "model": "opus",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "3879464359f62fdef6588e23929e10131dc54763",
+      "review_target_sha": "51133a7bb319e119f4bc97e472becbaf6a5eccfb",
+      "findings": [],
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      }
+    },
+    {
+      "reviewer": "codex-gpt-6.2-sol",
+      "vendor": "openai",
+      "model": "gpt-6.2-sol",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "3879464359f62fdef6588e23929e10131dc54763",
+      "review_target_sha": "51133a7bb319e119f4bc97e472becbaf6a5eccfb",
+      "findings": [],
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Finding 1 — fixed: independently reproduced the original waiver example and confirmed that the allowlist now rejects it. Word-form coverage is consistent with the user-accepted scope.",
+        "Finding 2 — fixed: the new filing instruction maps excess findings to valid dimensions under every lens, including design and principles, without changing existing spec-conformance requirements.",
+        "Finding 3 — fixed: affirmative and negated synthetic examples satisfy the prose-pin test requirement. Independently ran the changed test module: 9 passed. No repository files were modified."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.2-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.2-sol",
+        "observed_effort": "high",
+        "output_digest": "03ccfe80ecdc1b67a40cd9c68d77efd279ce18a88ac98b3ce11636d219481fbb",
+        "reviewer": "codex-gpt-6.2-sol",
+        "review_target_sha": "51133a7bb319e119f4bc97e472becbaf6a5eccfb"
+      }
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "86d3e7d5d6d04b5d2d3d5894a04e35f0bd2193ed",
+  "tested_commit": "9526763628c8e19749d79f0e3bc8d42094610082",
+  "reviewed_commit": "51133a7bb319e119f4bc97e472becbaf6a5eccfb",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    }
+  ]
+}
