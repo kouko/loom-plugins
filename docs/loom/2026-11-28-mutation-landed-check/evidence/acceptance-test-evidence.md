@@ -68,3 +68,15 @@ Setup: `git worktree add --detach <scratchpad>/at2 77cf8999365deb0a50776798c3b62
   | r2-widen-exempt | exemption → "Any mutation tool already meets this rule." | 24,25c24 | `A mutation tool that applies and checks its own mutants already meets this rule.` |
   The test file is under `loom-code/tests/`, inside `TEST_ROOTS` of `scripts/run_package_tests.py`. Suite command (finalize-review): `python3 scripts/run_package_tests.py --loom-family`.
 - 5: re-tested — manifests and READMEs (`loom-code/README.md:15`, `README.ja.md:15`, `README.zh-TW.md:13`, root `README.md:17`, `:105`) all 3.92.0; CHANGELOG top entry `## [3.92.0] — 2026-11-28 — Confirm a mutation landed before its RED counts` unchanged by the fix. `r2-stale` (`.claude-plugin/plugin.json` 3.92.0 → 3.91.0, diff 3c3) → `AssertionError: assert '3.91.0' == '3.92.0'`. Observation: the CHANGELOG bullet does not mention the fix's two additions (anchor counts only once the edit was applied; self-checking mutation tools already meet the rule).
+
+## Re-run on 2026-11-28, at fbade2374 (full sha fbade23745b4f78abbee9a2a10aa7e6c4da3f803)
+
+Fix range cc67331fd8557d06d2f303527e88125033192331..fbade23745b4f78abbee9a2a10aa7e6c4da3f803: `git diff --stat` → `loom-code/CHANGELOG.md | 2 +-`, one file, the first 3.92.0 bullet only.
+
+Setup: `git worktree add --detach <scratchpad>/at3 fbade23745b4f78abbee9a2a10aa7e6c4da3f803`; HEAD printed the full sha; `git status --short` empty. `claude plugin validate ./loom-code` → `✔ Validation passed`, 12 skill/agent lines (8 skills, 4 agents). Unmutated: `pytest loom-code/tests/test_tests_standard_text.py loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized -q` → `6 passed in 0.19s`.
+
+- 1: carried over — the fix touches only `loom-code/CHANGELOG.md`; `tests-standard.md` is byte-identical to 77cf89993.
+- 2: carried over — `engineering-baseline.md` and `test_tests_standard_text.py` are unchanged; the restatement loop reads baseline, lenses and adversarial, not CHANGELOG (`grep CHANGELOG loom-code/tests/test_tests_standard_text.py` → no match).
+- 3: carried over — `adversarial.md` and its pins are unchanged; same reason as 2.
+- 4: carried over — the rule text and its pins are unchanged; the unmutated rule tests still pass at fbade2374 (6 passed above).
+- 5: re-tested — four manifests `3.92.0`; `loom-code/README.md:15`, `README.ja.md:15`, `README.zh-TW.md:13`, root `README.md:17`, `:105` all 3.92.0. CHANGELOG first 3.92.0 bullet now reads "… or the edit anchor matched exactly once, in the code, fixture or text the test covers, where a matched anchor counts only once the edit was applied and the text changed) and that the unmutated version passes; an unconfirmed RED is not evidence. A mutation tool that applies and checks its own mutants already meets this rule." plus the baseline and adversarial pointer bullets. `r3-stale` (`.claude-plugin/plugin.json` 3.92.0 → 3.91.0, anchor matches: 1, diff 3c3) → `AssertionError: assert '3.91.0' == '3.92.0'`, 1 failed. The previous run's CHANGELOG nit is resolved.
