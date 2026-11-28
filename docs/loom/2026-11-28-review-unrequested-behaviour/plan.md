@@ -37,5 +37,6 @@ charter: 1.1
 ## Risks
 1. No recorded incident grounds this rule; it is preventive. A reviewer may now raise findings on harmless incidental changes; the clause scopes it to behaviour, not wording.
 2. user-decided — automatic publication after closing-review; merge stays a separate decision.
-3. user-decided — Codex second reviewer at closing review, from the user's request 「好 讓 codex 審一次」.
+3. user-decided — Acceptance 2 scope, answer 「Ａ」: the suite blocks edits to the rule sentence and carve-outs naming its words; reworded carve-outs elsewhere are left to reviewers, a known limit in the report.
+4. user-decided — Codex second reviewer at closing review, from the user's request 「好 讓 codex 審一次」.
 user-decided — second-vendor selection-confirmed: codex
