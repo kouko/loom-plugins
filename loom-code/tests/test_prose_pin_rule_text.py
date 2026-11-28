@@ -1,4 +1,4 @@
-"""W1-03 — adversary.md and engineering-baseline.md state the prose-pin
+"""W1-03 — adversary.md and tests-standard.md state the prose-pin
 rule: a test that pins a sentence of prose requires an affirmative verb
 before the pinned literal, rejects any negation token in that same
 sentence, and carries synthetic self-tests.
@@ -24,6 +24,7 @@ REPO = Path(_REPO_RESULT.stdout.strip())
 
 ADVERSARY_MD = REPO / "loom-code" / "agents" / "adversary.md"
 BASELINE_MD = REPO / "loom-code" / "references" / "engineering-baseline.md"
+TESTS_STANDARD_MD = REPO / "loom-code" / "references" / "tests-standard.md"
 
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 from prose_pin import NEGATION_RE as _NEGATION_RE  # shared matcher, one place to widen
@@ -78,14 +79,15 @@ def test_adversarymd_prosepinsentence_present() -> None:
     )
 
 
-def test_engineeringbaselinemd_prosepinsentence_present() -> None:
-    """engineering-baseline.md must carry one sentence pinning the
-    prose-pin rule (affirmative verb before affirmative/negation/
-    self-test vocabulary, no negation token anywhere in that sentence)."""
-    text = BASELINE_MD.read_text(encoding="utf-8")
+def test_testsstandardmd_prosepinsentence_present() -> None:
+    """tests-standard.md (the prose-pin rule's home since it moved out of
+    engineering-baseline.md) must carry one sentence pinning the prose-pin
+    rule (affirmative verb before affirmative/negation/self-test
+    vocabulary, no negation token anywhere in that sentence)."""
+    text = TESTS_STANDARD_MD.read_text(encoding="utf-8")
     hits = [s for s in _sentences(text) if _sentence_pins_prose_rule(s)]
     assert hits, (
-        "loom-code/references/engineering-baseline.md has no sentence "
+        "loom-code/references/tests-standard.md has no sentence "
         "pinning the prose-pin rule"
     )
 

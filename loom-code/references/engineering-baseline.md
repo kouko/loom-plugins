@@ -153,13 +153,9 @@ Terse rules the reviewer reads work against:
    the shared utilities first. "Looks orthogonal" is where regressions live.
 5. **Surface conflicts, do not average them.** When two patterns contradict,
    pick one, say why, flag the other.
-6. **Tests verify intent.** A test that cannot fail when the logic changes
-   is not a test.
+6. **Test rules live in [`tests-standard.md`](tests-standard.md).** Read it
+   before writing a test: the reviewer judges every test against it.
 7. **Fail loud.** "Done" is wrong if anything was skipped silently; "tests
    pass" is wrong if you did not run them. A claim resting on belief is
    downgraded, never asserted — say "will verify by: `<command>`" instead.
-8. **Prose-pin tests are affirmative.** A test that pins a sentence of
-   prose requires an affirmative verb before the pinned literal, rejects
-   any negation token in that same sentence, and carries synthetic
-   self-tests validating one affirmative example and one rejected negated
-   example.
+8. **Prose-pin tests** follow [`tests-standard.md`](tests-standard.md) §5.
