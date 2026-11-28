@@ -18,8 +18,8 @@ use. Source attribution identified `mattpocock/skills` as the likely pack for
 these two names plus related siblings (`grill-with-docs`, `writing-for-agents`,
 `grilling`). This record inventories the pack and the two named skills in
 detail, and lists candidate implementation ideas worth discussing one at a time
-against loom's stations. This is a discovery/evaluation record; no loom change
-is proposed in this file.
+against loom's stations. This is a discovery/evaluation record; loom changes it
+leads to go through their own intents.
 
 ## Method and evidence
 
@@ -103,17 +103,107 @@ A **test-first discipline skill** that uses codebase-design's vocabulary:
 | `grilling` / `grill-with-docs` | critique | relentless interview; words questions so "yes" accepts the recommended answer |
 | `chief-of-staff` (dated wiki memory, commit-cited claims) | loom-memory | historical record discipline |
 
+### Where codebase-design is used, mapped to loom stations
+
+The original is consulted before and during code design, not after: `tdd`
+calls it before writing tests when the interface shape is in question
+(`tdd/SKILL.md:22-26`), users call it to design an interface, and
+`improve-codebase-architecture` calls it to scan existing code for shallow
+modules.
+
+| Moment | Loom station | Current state |
+|---|---|---|
+| Before code | write-plan — each task owns "one module boundary" and marks the entry other modules call (`loom-code/skills/write-plan/SKILL.md:263-268`) | no criterion for whether the boundary is well cut |
+| While coding | build — implementer reads `loom-code/references/engineering-baseline.md` | §5 has short versions of some rules |
+| After code | closing-review — reviewer reads `loom-code/skills/closing-review/references/lenses.md` | `deletion-first`, `architecture`, `refactoring` already cover the one-adapter rule and pass-through modules; no "shallow" criterion |
+| Periodic scan of existing code | none | no loom entry point |
+
+`loom-design:architecture-design` was considered and rejected as the home: it
+runs on request only, at repo level (module split, folder layout, CI), and
+never blocks a change.
+
+### Writer and judge read different texts of the same rule
+
+| Rule | Writer (`engineering-baseline.md` §5) | Judge (`lenses.md`) |
+|---|---|---|
+| Abstraction | "no abstraction for a single use" | `deletion-first`: two concrete users now, **or** an explicit request, **or** a visible motivation |
+| Tests | "A test that cannot fail when the logic changes is not a test" | `tests` asks only for RED→GREEN evidence |
+| Pass-through modules | absent | `deletion-first`: a forward-only module or function is a finding |
+
+The abstraction threshold disagrees: the writer is forbidden what the judge
+accepts.
+
+### Shared file vs reference-only skill (research 2026-11-28)
+
+Two research passes, official docs and practitioner sources. No source
+compares the two forms head to head.
+
+Official documentation:
+- Both forms are supported; neither is prescribed. A reference-only skill has
+  direct support: `user-invocable: false` "for background knowledge that isn't
+  actionable as a command" (https://code.claude.com/docs/en/skills).
+- A shared file under the plugin root is copied with the plugin; only files
+  above the plugin root are not ("Files outside the plugin directory aren't
+  copied", https://code.claude.com/docs/en/plugins/loading.md). Loom-code
+  already ships `references/engineering-baseline.md` and the reviewer's
+  `lenses.md` read this way.
+- Anthropic's example repo duplicates shared scripts per skill
+  (`skills/{docx,pptx,xlsx}/scripts/office/`), https://github.com/anthropics/skills.
+- Skill-to-skill invocation is undocumented; plugin-level `dependencies`
+  exist (https://code.claude.com/docs/en/plugins/dependencies.md).
+- Every skill's description is in context every turn; the listing budget is
+  1% of the context window, least-used descriptions dropped first
+  (https://code.claude.com/docs/en/skills); Codex uses at most 2%
+  (https://learn.chatgpt.com/docs/build-skills). A file costs nothing until
+  read (https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).
+- Subagents do not inherit skills; an agent's `skills:` field preloads full
+  content, or the agent calls the Skill tool itself
+  (https://code.claude.com/docs/en/sub-agents). Whether `skills:` works for
+  plugin agents is unverified.
+
+Practitioner sources:
+- Least-invoked skills lose their description first under the listing
+  budget; superpowers 4.0 merged rarely used skills to save it
+  (https://blog.fsck.com/2025/12/17/claude-code-skills-not-triggering).
+- One author measured skill firing rising from 15% to 62% after adding a
+  session-start hook (single source,
+  https://towardsdatascience.com/a-session-start-hook-raised-claude-code-skill-firing-from-15-to-62/).
+- mattpocock moved `LANGUAGE.md` and `deep-modules.md` out of `tdd` and
+  `improve-codebase-architecture` into `codebase-design` and marked it
+  **Breaking** because users must install it too
+  (https://github.com/mattpocock/skills/blob/main/CHANGELOG.md).
+- Both forms share one weakness: a "read this file" or "call this skill" line
+  is still a model decision; each consumer must say when to read it.
+
+| Criterion | Shared file | Reference-only skill |
+|---|---|---|
+| Loom's own stations and agents reliably read it | yes, by path; already in use | preload unverified for plugin agents, else a model decision |
+| Context cost per turn | 0 | ~100 tokens, competes for the listing budget |
+| Codex and other hosts | any host that reads files | depends on the Skill tool and its budget |
+| Usable outside loom stations | no | yes |
+| User can invoke by name | no | yes |
+
 ## Decision impact
 
-No decision yet. This record exists to feed one-at-a-time discussion of
-whether each idea is referenceable into loom's stations. The highest-signal
-candidates to discuss first, in my order:
+Decisions so far (2026-11-28):
 
-1. `tdd`'s **tautological-assertion anti-pattern** (loom build/implementer
-   instructions do not currently forbid it).
-2. `codebase-design` as a **standalone vocabulary skill** referenced by others
-   (matches the repo's Module Criteria locate rule; loom currently carries
-   such vocabulary inline in per-skill prose).
+1. **Adopted** — `tdd`'s tautological-assertion anti-pattern goes into the
+   writer's and judge's test standard.
+2. **Adopted, reshaped (user-decided: option B, three files)** — no
+   standalone `codebase-design` skill. Extract three plugin-level shared
+   standard files under `loom-code/references/`: tests, code design, and
+   docs/skill text. `engineering-baseline.md`, `lenses.md` and write-plan's
+   task-size rule cite them, so writer and judge read one text. Item 1 and a
+   "shallow module" criterion land in these files; the abstraction-threshold
+   disagreement above is resolved there. The docs/skill-text file takes the
+   docs-lens dimensions (omission, ambiguity, polarity against the base,
+   deletion-first for docs and skill), which today only the judge reads. A
+   `user-invocable: false` skill pointing at the same files can be added later
+   if a consumer outside loom stations appears; nothing now depends on it.
+   The periodic-scan entry point is deferred.
+
+Not yet discussed:
+
 3. `diagnosing-bugs`' **mutation-diff RED verification** (adversary already
    does mutation; the diff-against-pristine step may be borrowable).
 4. `code-review`'s **two-axis reviewer split** (closing-review lens design).
