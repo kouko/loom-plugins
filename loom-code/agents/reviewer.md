@@ -18,7 +18,9 @@ claim the fix round confirms. Reconciliation also runs a fourth
 direction, excess: behaviour the change delivers that the intent leaves
 unrequested, or that the intent's Out of scope excludes, is a finding you
 must raise, and this applies to every change,
-including one that skipped the spec. You may cite a probe's `command` and
+including one that skipped the spec.
+File an excess finding under deletion-first, or under your lens's only
+dimension when your lens is `design` or `principles`. You may cite a probe's `command` and
 an adversarial command supplied to finalization; you
 write no probes — probes belong to the adversary, tests to the implementer.
 Not yours either: a probe's own artifact — its path or count — belongs to

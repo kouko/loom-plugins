@@ -36,36 +36,38 @@ UNREQUESTED_BEHAVIOUR = (
 )
 
 
+EXCESS_FILING = (
+    "File an excess finding under deletion-first, or under your lens's only "
+    "dimension when your lens is `design` or `principles`."
+)
+_PINNED_EXCESS = (UNREQUESTED_BEHAVIOUR, EXCESS_FILING)
+
+
 def test_reviewer_raises_unrequested_behaviour() -> None:
     """Acceptance 1 and 2: the shared reconciliation paragraph obliges every
-    lens to raise behaviour the intent did not ask for, spec or none."""
-    assert not has_negation(UNREQUESTED_BEHAVIOUR)
-    assert pins_exact_sentence(_flat(REVIEWER_PATH), UNREQUESTED_BEHAVIOUR)
+    lens to raise behaviour the intent did not ask for, spec or none, and
+    names the dimension each lens files it under."""
+    negated = UNREQUESTED_BEHAVIOUR.replace("you must raise", "you must not raise")
+    assert has_negation(negated) and not pins_exact_sentence(negated, UNREQUESTED_BEHAVIOUR)
+    assert pins_exact_sentence(UNREQUESTED_BEHAVIOUR, UNREQUESTED_BEHAVIOUR)
+    for sentence in _PINNED_EXCESS:
+        assert not has_negation(sentence)
+        assert pins_exact_sentence(_flat(REVIEWER_PATH), sentence), sentence
 
 
 _EXCESS = re.compile(r"\bexcess\b|\bunrequested\b|Out of scope excludes", re.IGNORECASE)
-_WAIVER = re.compile(
-    r"\b(?:skip\w*|optional|may omit|need not|only when|unless|except)\b", re.IGNORECASE
-)
 
 
 def _excess_carve_outs(text: str) -> list[str]:
-    """Sentences other than the pinned rule that mention the excess direction
-    beside a skip, permission or negation signal."""
-    return [
-        s for s in _sentences(text)
-        if s != UNREQUESTED_BEHAVIOUR and _EXCESS.search(s)
-        and (has_negation(s) or _WAIVER.search(s))
-    ]
+    """Sentences naming the excess direction that are not a pinned sentence."""
+    return [s for s in _sentences(text) if _EXCESS.search(s) and s not in _PINNED_EXCESS]
 
 
 def test_excess_rule_has_no_carve_out() -> None:
-    """Acceptance 2: a sentence added beside the pinned rule must not make the
-    excess direction skippable."""
-    assert _excess_carve_outs(
-        UNREQUESTED_BEHAVIOUR + " You may skip the excess direction when the change is small."
-    )
-    assert not _excess_carve_outs("Excess is the fourth direction a reviewer reconciles.")
+    """Acceptance 2: every sentence naming the excess direction is one of the
+    pinned sentences, so none can make the direction skippable."""
+    assert _excess_carve_outs(UNREQUESTED_BEHAVIOUR + " Excess findings may be waived.")
+    assert not _excess_carve_outs(" ".join(_PINNED_EXCESS))
     assert _excess_carve_outs(_flat(REVIEWER_PATH)) == []
 
 

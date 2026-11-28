@@ -2,7 +2,7 @@
 
 ## [3.93.0] — 2026-11-28 — Reviewer raises behaviour the intent did not ask for
 
-- `agents/reviewer.md`: reconciliation now runs a fourth direction, excess, beside omission, overclaim and contradiction. Behaviour the change delivers that the intent leaves unrequested, or that the intent's Out of scope excludes, is a finding the reviewer must raise. This applies to every change, including one that skipped the spec, and under every lens; the lens rows themselves are unchanged.
+- `agents/reviewer.md`: reconciliation now runs a fourth direction, excess, beside omission, overclaim and contradiction. Behaviour the change delivers that the intent leaves unrequested, or that the intent's Out of scope excludes, is a finding the reviewer must raise. This applies to every change, including one that skipped the spec, and under every lens; the lens rows themselves are unchanged. An excess finding is filed under `deletion-first`, or under the lens's only dimension for the `design` and `principles` lenses.
 
 ## [3.92.0] — 2026-11-28 — Confirm a mutation landed before its RED counts
 

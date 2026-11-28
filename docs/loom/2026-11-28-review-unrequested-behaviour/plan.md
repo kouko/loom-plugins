@@ -15,7 +15,7 @@ charter: 1.1
 
 **W1-01 Unrequested-behaviour clause in reviewer reconciliation**  after: none  acceptance: 1, 2
 - Files: loom-code/agents/reviewer.md, loom-code/tests/test_reviewer_mechanical_evidence.py
-- Test: A1 positive: clause-sentence-pinned; negative: clause-absent-fails-pin. A2 positive: clause-sentence-pinned; negative: clause-made-optional-fails-pin. All four are one whole-sentence pin entry; no new test function.
+- Test: A1 positive: clause-sentence-pinned; negative: clause-absent-fails-pin. A2 positive: clause-sentence-pinned; negative: clause-made-optional-fails-pin. Covered by `test_reviewer_raises_unrequested_behaviour` (pins) and `test_excess_rule_has_no_carve_out` (allowlist).
 - Risk: one clause in the shared reconciliation paragraph so every lens applies it, not the code lens row alone; pin the sentence whole in the existing test module; agent-decided.
 
 ### Wave 2
