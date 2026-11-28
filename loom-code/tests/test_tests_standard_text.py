@@ -32,7 +32,7 @@ MOVED_RULES = (
     "what distinct defect, input, state, environment or oracle is new",
     "the retained case detects the old defect",
     "distinct boundary, integration and environment coverage",
-    "harnesses and tests of tests are findings",
+    "A test of a test is a finding",
     "adds at most one test, extending an existing test first",
 )
 # Every rule sentence, pinned whole: a count-only pin lets "is a finding"
@@ -62,7 +62,8 @@ RULE_SENTENCES = (
     "environment or oracle is new? Ordinary consolidation or deletion requires evidence the retained "
     "case detects the old defect, not shared lines, text similarity or counts.",
     "Preserve distinct boundary, integration and environment coverage.",
-    "Unnecessary helpers, harnesses and tests of tests are findings.",
+    "Unnecessary helpers and harnesses are findings.",
+    "A test of a test is a finding, except the synthetic self-tests §5 requires.",
     "The fix for any finding adds at most one test, extending an existing test first.",
 )
 BASELINE_POINTER = (

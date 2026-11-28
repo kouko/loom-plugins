@@ -52,6 +52,7 @@ Compare tests for touched behaviour with existing cases: what distinct
 defect, input, state, environment or oracle is new? Ordinary consolidation
 or deletion requires evidence the retained case detects the old defect, not
 shared lines, text similarity or counts. Preserve distinct boundary,
-integration and environment coverage. Unnecessary helpers, harnesses and
-tests of tests are findings. The fix for any finding adds at most one test,
+integration and environment coverage. Unnecessary helpers and harnesses are
+findings. A test of a test is a finding, except the synthetic self-tests §5
+requires. The fix for any finding adds at most one test,
 extending an existing test first.
