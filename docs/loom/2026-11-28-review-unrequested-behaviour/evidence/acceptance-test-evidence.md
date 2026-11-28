@@ -1,10 +1,13 @@
 # Final review raises behaviour nobody asked for — acceptance test evidence
 
-Tried on 2026-11-28, in a clean copy of the project at bafa1da6665063ec059eb836dee1d672f0a59ca1
-(`git worktree add --detach <scratchpad>/at-clean2 bafa1da66…`; `git status --short` empty before and after every step).
-The first run was at ac1157f893b89d4ee8e9e198f3238690007599dd; its results are kept in the "First run" notes below.
-Fix range re-tested: 6bae065f6de5fd2f8d457dae507f96c8fb301af6..bafa1da6665063ec059eb836dee1d672f0a59ca1
-(reviewer.md filing sentence, test_reviewer_mechanical_evidence.py allowlist, CHANGELOG line, plan Risks 3).
+Tried on 2026-11-28, in a clean copy of the project at 6efbf4f04cc1ab966fc2503ffef01245d4d71f17
+(`git worktree add --detach <scratchpad>/at-clean3 6efbf4f04…`; `git status --short` empty before and after every step).
+The first run was at ac1157f893b89d4ee8e9e198f3238690007599dd and the second at
+bafa1da6665063ec059eb836dee1d672f0a59ca1; their results are kept in the notes below.
+Latest fix range re-tested: d10535ae6b1b0cbd63794aa546ee48e790c7170c..6efbf4f04cc1ab966fc2503ffef01245d4d71f17
+(`git diff --stat` touches only loom-code/tests/test_reviewer_mechanical_evidence.py: the
+allowlist regex is now `\bexcess\w*|\bunrequest\w*|Out of scope excludes`, case-insensitive,
+plus three inflected carve-outs asserted in `test_excess_rule_has_no_carve_out`).
 
 ## 0. Setup (README install path) — repeated on the re-run
 
@@ -86,21 +89,48 @@ words elsewhere in reviewer.md are a known limit left to reviewers.
 | C6 elsewhere: "UNREQUESTED BEHAVIOUR IS NOT A FINDING." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
 | C7 elsewhere: "Excess? Optional!" | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
 | C8 elsewhere: "Excess-direction findings are nits only." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
-| B1 elsewhere: "Excessive behaviour need not be raised." | +2 lines | **107 passed** | none |
-| B2 elsewhere: "Excesses need not be raised for a change without a spec." | +2 lines | **107 passed** | none |
+| B1 elsewhere: "Excessive behaviour need not be raised." | +2 lines | 1 failed (at bafa1da66: 107 passed) | test_excess_rule_has_no_carve_out |
+| B2 elsewhere: "Excesses need not be raised for a change without a spec." | +2 lines | 1 failed (at bafa1da66: 107 passed) | test_excess_rule_has_no_carve_out |
+| B3 elsewhere: "Unrequestedness is never a finding." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B4 elsewhere: "EXCESSIVE BEHAVIOUR NEED NOT BE RAISED." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B5 adjacent: "Changes that do excessively much may be passed." | 1 line | 1 failed | test_excess_rule_has_no_carve_out |
+| B6 elsewhere: "An author unrequesting a behaviour makes it optional to raise." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B7 elsewhere: "Excessiveness alone is a nit." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B8 elsewhere heading: "### Excesses are optional" | +3 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B10 elsewhere: "WHAT THE INTENT'S OUT OF SCOPE EXCLUDES IS A NIT AT MOST." | +2 lines | 1 failed | test_excess_rule_has_no_carve_out |
+| B12 elsewhere: "What the intent's out-of-scope excludes is a nit at most." | +2 lines | **107 passed** | none |
+| B13 elsewhere: "Behaviour the intent's Out of scope excluded is a nit at most." | +2 lines | **107 passed** | none |
+| B14 elsewhere: "An Out of scope exclusion need not be raised." | +2 lines | **107 passed** | none |
+| B9 elsewhere: "What the intent's out-of-scope list excludes is a nit at most." | +2 lines | 107 passed (judged reworded, known limit) | none |
+| B11 elsewhere: "Unrequired behaviour need not be raised." | +2 lines | 107 passed (different word, known limit) | none |
 | M7 elsewhere: "For a change without a spec, skip the fourth direction." | +2 lines | 107 passed (known limit) | none |
 | M8 elsewhere: "When the change skipped the spec, ignore the fourth reconciliation direction above." | +2 lines | 107 passed (known limit) | none |
 | M9 elsewhere: "Extra behaviour the intent did not request is not a finding when no spec exists." | +2 lines | 107 passed (known limit) | none |
 
-- Why B1/B2 survive: `_EXCESS = re.compile(r"\bexcess\b|\bunrequested\b|Out of scope excludes", re.IGNORECASE)`
-  (loom-code/tests/test_reviewer_mechanical_evidence.py:58). `\bexcess\b`
-  does not match the plural "Excesses" or the adjective "Excessive", so
-  those sentences are never checked against the allowlist. Matching
-  `\bexcess(?:es|ive)?\b` (and the same for "unrequested") would close it.
+- At bafa1da66, B1/B2 survived because the regex was `\bexcess\b|\bunrequested\b|...`.
+  At 6efbf4f04 the regex is
+  `_EXCESS = re.compile(r"\bexcess\w*|\bunrequest\w*|Out of scope excludes", re.IGNORECASE)`
+  (loom-code/tests/test_reviewer_mechanical_evidence.py:58), so every
+  inflection of "excess" and "unrequest-" is now checked (B1-B8 fail).
+- Why B12-B14 survive: the third vocabulary item is still the literal
+  phrase `Out of scope excludes`. A hyphenated spelling
+  ("out-of-scope excludes"), a past tense ("excluded") or a noun
+  ("exclusion") never matches it, so those sentences are not checked against
+  the allowlist. Something like `\bout[ -]of[ -]scope\b` (alone, or followed
+  by `exclu\w*`) would close it.
+- Call on the user-decided scope: inflections and spelling variants of the
+  rule's own words count as the rule's words (same call as the second run),
+  so B12-B14 keep Acceptance 2 at partly. The hyphen-only form B12 is judged a
+  spelling variant, not a rewording. B9 (an extra word between the rule's
+  words) and B11 (a different word) are judged rewordings, in the known limit.
 - M7-M9 are the user-decided known limit (no rule word); in the first run
   they also passed 342 tests across 12 wider modules.
 - The full package suite was not run (left to finalize-review).
-- Evidence: script output `<scratchpad>/mut/out3.txt`.
+- Evidence: script output `<scratchpad>/mut/out3.txt` (bafa1da66);
+  `<scratchpad>/mut/out4.txt` and `out5.txt` (6efbf4f04, script
+  `<scratchpad>/mut/run_mutations3.py`, same command and module set;
+  pristine `107 passed`; every mutation's diff printed as landed; final
+  `git status` empty).
 
 ## 3. loom-code 發布新版號，CHANGELOG 寫明這條規則。
 
@@ -133,6 +163,18 @@ words elsewhere in reviewer.md are a known limit left to reviewers.
   adjective forms (B1, B2) pass; reworded M7-M9 pass as the accepted limit.
 - 3: re-tested — CHANGELOG line now names the filing; versions unchanged
   at 3.93.0 and consistent; pin test passes.
+
+## Re-run on 2026-11-28, at 6efbf4f04
+
+- 0 setup: repeated in the clean copy — `claude plugin validate <clean>/loom-code`
+  `✔ Validation passed`; `sync_codex_manifests.py --check --all` exit 0.
+- 1: carried over — the fix diff touches only the test file; reviewer.md is
+  unchanged since bafa1da66.
+- 2: re-tested in full — all 22 earlier mutations re-applied (M1-M9, M1b-M1d,
+  C1-C8, B1, B2) plus 12 new (B3-B14): 26 fail a test, B12-B14 pass (Out of
+  scope phrase variants), B9, B11 and M7-M9 pass as the accepted reworded limit.
+  Result stays partly.
+- 3: carried over — the fix diff touches no version string, CHANGELOG or README.
 
 First run (at ac1157f89) for comparison: Acceptance 2 was partly — M1-M6
 failed a test, M7-M9 passed; the keyword-plus-waiver-word test then let
