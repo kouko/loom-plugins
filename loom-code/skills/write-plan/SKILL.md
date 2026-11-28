@@ -265,7 +265,9 @@ declared dependencies, positive plus negative/boundary cases. Split unrelated
 behaviour; scenarios stay in the spec; never size by time. Tasks changing
 non-test code: Files marks the entry other modules call; case-ids
 name behaviour seen there; logic beyond that entry's reach is its own module,
-tested at its entry.
+tested at its entry. Read
+[`../../references/code-design-standard.md`](../../references/code-design-standard.md)
+when choosing each task's module boundary and entry.
 
 **Architecture.** Read root `ARCHITECTURE.md` before the Task DAG when it
 carries `ratified-by: <name> <date>`; unratified drafts are advisory. Place

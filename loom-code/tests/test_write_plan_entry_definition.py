@@ -7,7 +7,7 @@ helper becomes an "entry" and the closing-review `tests` row (internal =
 non-entry) never fires. This probe requires the Task size paragraph to tie
 the entry to its callers outside the module in an affirmative sentence.
 
-Per engineering-baseline §5 item 8, it judges whole sentences and rejects
+Per tests-standard.md §5, it judges whole sentences and rejects
 any negation token in the same sentence, ";" clauses included. A sentence
 ends only before a capitalised word, so "i.e. not" stays one sentence but
 "i.e. Never" splits. It is a

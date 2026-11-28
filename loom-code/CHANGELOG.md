@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.93.0] — 2026-11-28 — Reviewer raises behaviour the intent did not ask for
+
+- `agents/reviewer.md`: reconciliation now runs a fourth direction, excess, beside omission, overclaim and contradiction. Behaviour the change delivers that the intent leaves unrequested, or that the intent's Out of scope excludes, is a finding the reviewer must raise. This applies to every change, including one that skipped the spec, and under every lens; the lens rows themselves are unchanged. An excess finding is filed under `deletion-first`, or under the lens's only dimension for the `design` and `principles` lenses.
+
+## [3.92.0] — 2026-11-28 — Confirm a mutation landed before its RED counts
+
+- `references/tests-standard.md` §1: a RED forced by deliberately mutating code, a fixture or text counts as evidence only after confirming the mutation landed (a non-empty diff against the pristine copy, or the edit anchor matched exactly once, in the code, fixture or text the test covers, where a matched anchor counts only once the edit was applied and the text changed) and that the unmutated version passes; an unconfirmed RED is not evidence. A mutation tool that applies and checks its own mutants has already confirmed they landed, and its run on the unmutated code must still pass.
+- `references/engineering-baseline.md`: the False-green diagnostic and Code-first backfill point to that rule instead of restating it.
+- `closing-review/references/adversarial.md`: a probe-update report now states, for each mutation, how it was confirmed landed, alongside its command and observed result.
+
+## [3.91.0] — 2026-11-28 — Shared standard files read by writer and judge
+
+- New `references/tests-standard.md`, `references/code-design-standard.md` and `references/docs-standard.md`: the implementer (via `engineering-baseline.md`), write-plan's task-size rule and the closing-review lenses now read one text per topic.
+- The abstraction threshold is one rule: two concrete users now, an explicit request, or a visible motivation (the baseline's stricter "no abstraction for a single use" is replaced).
+- New rules: tautological assertions (expected values from an independent source), implementation-coupled tests (tell: a behaviour-preserving refactor breaks the test), shallow modules and the deletion test, and testability design (accept dependencies, return results).
+- Reviewer dimension names and verdict format are unchanged; red → green → refactor is unchanged.
+
 ## [3.90.2] — 2026-11-25 — Document Codex hook re-approval after update
 
 - README (en, ja, zh-TW): after updating loom-code in Codex, start Codex interactively once and approve the changed hooks; until then Codex may skip the agent hook, which then may not stop commits, merges or pushes to main.

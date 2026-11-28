@@ -63,6 +63,15 @@ def test_a_listed_file_that_stopped_violating_also_fails(tmp_path: Path) -> None
     assert any("STALE" in m and rel in m for m in messages)
 
 
+def test_a_citation_in_loom_code_references_fails(tmp_path: Path) -> None:
+    """The shared standards and the baseline are runtime prose, so they are scanned."""
+    rel = "loom-code/references/some-standard.md"
+    _write_scoped_file(tmp_path, rel, "See `docs/loom/2026-01-01-x/plan.md` for why.\n")
+    ok, messages = evaluate(set(scan_repo(tmp_path).keys()), frozenset())
+    assert not ok
+    assert any(rel in m for m in messages)
+
+
 def test_checker_exits_0_against_the_current_tree() -> None:
     import subprocess
     import sys
