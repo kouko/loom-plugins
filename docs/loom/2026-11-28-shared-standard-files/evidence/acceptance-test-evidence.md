@@ -1,6 +1,9 @@
 # Writer and judge read one standard — acceptance test evidence
 
-Tried on 2026-11-28, in a clean copy of the project at be8c2e454
+Tried on 2026-11-28, in a clean copy of the project at 750da7564 (re-run
+after the fix range bf0ae36f6..750da7564; see "Re-run on 2026-11-28, at
+750da7564" at the end). Sections 1-10 below record the first run, made in a
+clean copy at be8c2e454
 (`git worktree add --detach <scratch>/at-clean be8c2e454`; `git status --short`
 empty before and after every step). Base for comparison: 847fbb6cd.
 
@@ -145,4 +148,84 @@ empty before and after every step). Base for comparison: 847fbb6cd.
   (base was 3.90.2).
 - Full suite: not run here. The full package suite is run by finalize-review,
   which refuses the attestation when it fails. Command:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+## Re-run on 2026-11-28, at 750da7564
+
+Clean copy: `git worktree add --detach <scratch>/at-clean2 750da7564`;
+`git status --short` empty before and after. Fix range read in full:
+`git diff bf0ae36f6..750da7564` (117aec7e4 scanner scope, f24cfe8ff lens
+`tests` rules moved to tests-standard §6 + adversary/implementer pointers,
+750da7564 tests-standard §1 and code-design-standard §4 wording).
+
+- Setup: re-tested — `claude plugin validate ./loom-code` from the clean copy:
+  `✔ Validation passed`, exit 0; only advisory `ICON_MISSING`.
+- 1: re-tested — `ls loom-code/references/`: `tests-standard.md`,
+  `code-design-standard.md`, `docs-standard.md` present; read each. tests-standard
+  now has §1–§6 (new §6 "A new test earns its place against existing cases",
+  test-only content); code-design §1–§7, docs §1–§7 unchanged in scope.
+  Evidence: `loom-code/references/tests-standard.md:49-57`.
+- 2: re-tested — `git diff 847fbb6cd HEAD` on baseline and lenses, then grep of
+  `loom-code/**/*.md` for 22 phrases (the earlier 18 plus "tests of tests",
+  "at most one test", "text similarity", "extending an existing test",
+  "logic changes", "Duplication and smells"). Rule text hits only in the three
+  standards; `lenses.md:58` (tests row) now lists "new tests against existing
+  cases" as judged against tests-standard and keeps only reviewer mechanics
+  ("Duplicate findings name surviving protection and a smaller shape" stays —
+  a reviewer finding format, not a writer rule); `lenses.md:65`, `:80` are
+  pointers. Earlier open question confirmed closed: `loom-code/agents/adversary.md:72-73`
+  now reads "A test that pins a sentence of prose follows
+  `../references/tests-standard.md` §5."; `loom-code/agents/implementer.md:55-56`
+  points finding-fix and tests-of-tests to tests-standard §6. One unrelated hit,
+  `loom-code/skills/write-plan/SKILL.md:312` "distinct defect", is a planning
+  rule outside this fix range and outside the three topics' moved text.
+- 3: re-tested — `code-design-standard.md:19-20` still the single threshold
+  sentence; `engineering-baseline.md:36-37` GREEN and `lenses.md:65` deletion-first
+  point to §2; "single use" / "premature abstraction": 0 hits. The fix touched
+  only code-design §4 line 34 ("Duplication and smells; Rule of Three —" →
+  "Remove duplication and smells; under the Rule of Three,"; rest verbatim,
+  same direction).
+- 4: re-tested — `tests-standard.md:16-21` §2 text unchanged by the fix (diff
+  shows no hunk in §2); lens tests row still names "tautological assertions".
+- 5: carried over — fix diff to `code-design-standard.md` is one line in §4;
+  §5 and the lens architecture row (`lenses.md:55`) have no hunk.
+- 6: re-tested — `tests-standard.md:23-28` §3 unchanged: mocking an internal
+  collaborator, testing a private method, verifying through a side channel;
+  "The tell: a behaviour-preserving refactor breaks the test."
+- 7: carried over — no hunk in code-design-standard §6.
+- 8: carried over — no hunk in `loom-code/skills/write-plan/`; the linked file
+  keeps its name and path.
+- 9: re-tested — compared every line the fix removed with its new home:
+
+  | Removed in fix range | Now | Direction |
+  |---|---|---|
+  | lens tests: "compare tests for touched behaviour with existing cases: what distinct defect, input, state, environment or oracle is new?" | tests §6 verbatim | same |
+  | lens tests: "ordinary consolidation or deletion requires evidence the retained case detects the old defect, not shared lines, text similarity or counts" | tests §6 verbatim | same |
+  | lens tests: "preserve distinct boundary, integration and environment coverage" | tests §6 verbatim | same |
+  | lens tests: "unnecessary helpers, harnesses and tests of tests are findings" | tests §6 verbatim | same |
+  | lens tests: "the fix for any finding adds at most one test, extending an existing test first" | tests §6 verbatim | same |
+  | tests §1 (from baseline item 6 at base): "A test that cannot fail when the logic changes is not a test." | merged: "**Tests verify intent.** A test that cannot fail for the behaviour it names is a finding — …" (the lens's base sentence) | same — judged: both forbid a test that cannot fail; the kept sentence names which change must make it fail. Listed in the report's decisions section. |
+  | code-design §4 (lens refactoring row at base) "Duplication and smells; Rule of Three —" | "Remove duplication and smells; under the Rule of Three," | same |
+
+  Red → green → refactor: `git diff be8c2e454 750da7564 -- loom-code/references/engineering-baseline.md`
+  is empty, so the cycle is as verified in the first run.
+  Outside line 9's two documents: implementer.md "no tests of tests" became
+  "tests of tests follow tests-standard §6", whose sentence is "Unnecessary
+  helpers, harnesses and tests of tests are findings" — if "Unnecessary"
+  qualifies all three, the implementer's absolute ban is now conditional.
+  Raised as a nit and an open question in the report.
+- 10: re-tested — ran only the tests covering this change and the fix (not the
+  full suite):
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_tests_standard_text.py loom-code/tests/test_code_design_standard_text.py loom-code/tests/test_docs_standard_text.py loom-code/tests/test_prose_pin_rule_text.py loom-code/tests/test_check_contract_citations.py loom-code/tests/test_write_plan_entry_definition.py loom-code/tests/test_write_plan_entry_definition_split.py loom-code/tests/test_write_plan_station_text.py`
+  → `104 passed in 0.45s` (includes
+  `test_current_release_metadata_is_synchronized`).
+  `python3 loom-code/scripts/check_contract_citations.py` (now scanning
+  `loom-code/references`) → `OK: 1 known-violating files unchanged, no new
+  contract citations of this repo's records.` exit 0.
+  `python3 scripts/sync_codex_manifests.py --check --all` exit 0.
+  Version 3.91.0 in all four loom-code manifests, the three loom-code READMEs,
+  root README (line 17 table row, line 105 section), CHANGELOG
+  `## [3.91.0] — 2026-11-28`.
+  Full suite: not run here; run by finalize-review, which refuses the
+  attestation when it fails. Command:
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
