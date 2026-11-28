@@ -1,0 +1,126 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-28-shared-standard-files",
+  "content_digest": "eb1750396f3fb919c3e05f4c8281af709b2ef036",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-11-28-shared-standard-files/evidence/probes/test_probe_standard_pin_mutants.py",
+      "artifact": "docs/loom/2026-11-28-shared-standard-files/evidence/probes/test_probe_standard_pin_mutants.py",
+      "result": "pass",
+      "command_digest": "9e504e7ce6aa86950b94c071d98a86f50d0a5c1c1a09b0da133f7325606be0e3"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "claude-reviewer-1",
+      "vendor": "anthropic",
+      "model": "opus",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "847fbb6cd3c1a46d64ca44a06478bb754f0ded60",
+      "review_target_sha": "f160a181fcb646486128146b4224c39837ca6687",
+      "findings": [],
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      }
+    },
+    {
+      "reviewer": "codex-gpt-6.2-sol",
+      "vendor": "openai",
+      "model": "gpt-6.2-sol",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "847fbb6cd3c1a46d64ca44a06478bb754f0ded60",
+      "review_target_sha": "b81f66caf1758cc23e5c4528c85fac3cde875d8e",
+      "findings": [],
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Round 2 finding: fixed. Tests-standard §6 restores the absolute prohibition on tests of tests. The sole exception preserves the synthetic self-tests explicitly required by both the base adversary contract and engineering baseline.",
+        "All shared-standard references resolve, the contract-citation checker passes, and all four release manifests agree on version 3.91.0. No remaining polarity regression was identified.",
+        "Independently ran 82 focused tests successfully. Temporary-file-dependent tests were not rerun under the read-only sandbox. The acceptance evidence reports 104 passing tests; complete package-suite verification remains with finalize-review."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.2-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.2-sol",
+        "observed_effort": "high",
+        "output_digest": "a8beaf6b2e75816e4f6a053b9d926d47a1b45a45b08c982736846024920090f2",
+        "reviewer": "codex-gpt-6.2-sol",
+        "review_target_sha": "b81f66caf1758cc23e5c4528c85fac3cde875d8e"
+      }
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "93f7ee80ca777f16e857a42ab5865ff3d7bd0a41",
+  "tested_commit": "b4f877e832f53bc072987b7cd3b176dc5d862956",
+  "reviewed_commit": "b81f66caf1758cc23e5c4528c85fac3cde875d8e",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    },
+    {
+      "acceptance": 8,
+      "status": "works"
+    },
+    {
+      "acceptance": 9,
+      "status": "works"
+    },
+    {
+      "acceptance": 10,
+      "status": "works"
+    }
+  ]
+}

@@ -33,7 +33,8 @@ Together these define TDD as design feedback, not coverage added later.
   either describes behaviour that already exists (no new test needed) or
   tests nothing.
 - **GREEN** — write the simplest code that makes it pass. *Simplest* is not
-  *sloppy*: no speculative generality, no premature abstraction. Duplication
+  *sloppy*: a new abstraction meets the threshold in
+  [`code-design-standard.md`](code-design-standard.md) §2. Duplication
   at GREEN is fine; it goes in the next step.
 - **REFACTOR** — with every test green, improve the internal structure
   without changing behaviour. If a test goes red during a refactor, revert
@@ -146,20 +147,21 @@ Terse rules the reviewer reads work against:
 1. **Think before coding.** State assumptions; name what is unclear instead
    of guessing; push back when something simpler would do.
 2. **Simplicity first.** The minimum code that solves the problem. Nothing
-   speculative, no abstraction for a single use.
+   speculative. Code-design rules, the abstraction threshold among them,
+   live in [`code-design-standard.md`](code-design-standard.md); read it
+   before writing code: the reviewer judges the design against it.
 3. **Surgical changes.** Touch only what the task requires. Clean up only
    your own leftovers. Match the surrounding style.
 4. **Read before you write.** Read the exports, the immediate callers, and
    the shared utilities first. "Looks orthogonal" is where regressions live.
 5. **Surface conflicts, do not average them.** When two patterns contradict,
    pick one, say why, flag the other.
-6. **Tests verify intent.** A test that cannot fail when the logic changes
-   is not a test.
+6. **Test rules live in [`tests-standard.md`](tests-standard.md).** Read it
+   before writing a test: the reviewer judges every test against it.
 7. **Fail loud.** "Done" is wrong if anything was skipped silently; "tests
    pass" is wrong if you did not run them. A claim resting on belief is
    downgraded, never asserted — say "will verify by: `<command>`" instead.
-8. **Prose-pin tests are affirmative.** A test that pins a sentence of
-   prose requires an affirmative verb before the pinned literal, rejects
-   any negation token in that same sentence, and carries synthetic
-   self-tests validating one affirmative example and one rejected negated
-   example.
+8. **Prose-pin tests** follow [`tests-standard.md`](tests-standard.md) §5.
+9. **Docs and skill text.** Read [`docs-standard.md`](docs-standard.md)
+   before writing docs, a SKILL.md, a reference or rule text: the reviewer
+   judges that prose against it.

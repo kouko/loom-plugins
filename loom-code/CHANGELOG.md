@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.91.0] — 2026-11-28 — Shared standard files read by writer and judge
+
+- New `references/tests-standard.md`, `references/code-design-standard.md` and `references/docs-standard.md`: the implementer (via `engineering-baseline.md`), write-plan's task-size rule and the closing-review lenses now read one text per topic.
+- The abstraction threshold is one rule: two concrete users now, an explicit request, or a visible motivation (the baseline's stricter "no abstraction for a single use" is replaced).
+- New rules: tautological assertions (expected values from an independent source), implementation-coupled tests (tell: a behaviour-preserving refactor breaks the test), shallow modules and the deletion test, and testability design (accept dependencies, return results).
+- Reviewer dimension names and verdict format are unchanged; red → green → refactor is unchanged.
+
 ## [3.90.2] — 2026-11-25 — Document Codex hook re-approval after update
 
 - README (en, ja, zh-TW): after updating loom-code in Codex, start Codex interactively once and approve the changed hooks; until then Codex may skip the agent hook, which then may not stop commits, merges or pushes to main.
