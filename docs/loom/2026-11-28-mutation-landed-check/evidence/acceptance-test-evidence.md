@@ -80,3 +80,27 @@ Setup: `git worktree add --detach <scratchpad>/at3 fbade23745b4f78abbee9a2a10aa7
 - 3: carried over — `adversarial.md` and its pins are unchanged; same reason as 2.
 - 4: carried over — the rule text and its pins are unchanged; the unmutated rule tests still pass at fbade2374 (6 passed above).
 - 5: re-tested — four manifests `3.92.0`; `loom-code/README.md:15`, `README.ja.md:15`, `README.zh-TW.md:13`, root `README.md:17`, `:105` all 3.92.0. CHANGELOG first 3.92.0 bullet now reads "… or the edit anchor matched exactly once, in the code, fixture or text the test covers, where a matched anchor counts only once the edit was applied and the text changed) and that the unmutated version passes; an unconfirmed RED is not evidence. A mutation tool that applies and checks its own mutants already meets this rule." plus the baseline and adversarial pointer bullets. `r3-stale` (`.claude-plugin/plugin.json` 3.92.0 → 3.91.0, anchor matches: 1, diff 3c3) → `AssertionError: assert '3.91.0' == '3.92.0'`, 1 failed. The previous run's CHANGELOG nit is resolved.
+
+## Re-run on 2026-11-28, at 3fe55ccc7 (full sha 3fe55ccc732c865b1d027875c82143f40feef9fd)
+
+Fix range 12fc709b694c50a536eaef9e9b99e59e0d6d2989..3fe55ccc732c865b1d027875c82143f40feef9fd: `loom-code/CHANGELOG.md | 2 +-`, `loom-code/references/tests-standard.md | 3 ++-`, `loom-code/tests/test_tests_standard_text.py | 3 ++-`. The §1 tool sentence now reads "A mutation tool that applies and checks its own mutants has already confirmed they landed, and its run on the unmutated code must still pass."; the same wording replaced the CHANGELOG bullet's last sentence and the `SECTION_1_SENTENCES` pin. Rows 1, 4, 5 read changed files; rows 2 and 3 rest on `test_moved_rules_stated_once_in_standard_only`, the function whose pin changed. All five re-tested in full.
+
+Setup: `git worktree add --detach <scratchpad>/at4 3fe55ccc732c865b1d027875c82143f40feef9fd`; HEAD printed the full sha; `git status --short` empty. `claude plugin validate ./loom-code` → `✔ Validation passed`, 12 skill/agent lines (8 skills, 4 agents). Unmutated: `pytest loom-code/tests/test_tests_standard_text.py loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized -q` → `6 passed in 0.18s`. Each mutation ran in its own `cp -R` copy (`r4-<name>`); helper printed `anchor matches: 1`; `diff` against the clean copy shown; command `pytest loom-code/tests/test_tests_standard_text.py -q`; every mutation gave `1 failed, 4 passed`.
+
+- 1: re-tested — `tests-standard.md:16-26` holds both paragraphs. `grep -rn "mutation landed\|unmutated version\|pristine copy\|own mutants\|edit was applied\|unmutated code" loom-code loom-design loom-workflow` (excluding CHANGELOG and tests) → only `tests-standard.md:17,18,19,23,24,25`.
+- 2: re-tested — `r4-restate-baseline` (49c49) → `restated in baseline: must confirm, before counting it as evidence, that the mutation landed`; `r4-drop-baseline-ptr1` (45,47c45) → `That failure is evidence once it meets the mutation rule in [`tests-standard.md`](tests-standard.md) §1.`; `r4-drop-baseline-ptr2` (76,77c76) → `The mutation rule in [`tests-standard.md`](tests-standard.md) §1 decides when that failure counts.`
+- 3: re-tested — link `loom-code/skills/closing-review/references/../../../references/tests-standard.md` resolves. `r4-drop-adv-ptr` (126,127c126) → failed; `r4-restate-adv-new` (127c127) → `restated in adversarial: must lie in the code, fixture or text the test covers`.
+- 4: re-tested — mutations of `tests-standard.md`:
+  | Copy | Mutation | diff | Assertion |
+  |---|---|---|---|
+  | r4-rewiden | dropped ", and its run on the unmutated code must still pass" | 25,26c25 | full tool sentence |
+  | r4-tool-meets-rule | tool sentence → "… its own mutants already meets this rule." (the pre-fix wording) | 25,26c25 | full tool sentence |
+  | r4-unmutated-may | "must still pass" → "need not pass" | 25,26c25 | full tool sentence |
+  | r4-delete-rule | first paragraph removed | 16,21d15 | `must confirm, before counting it as evidence, that the mutation landed` |
+  | r4-must-to-may | "must confirm" → "may skip confirming" | 16,17c16 | same |
+  | r4-notevidence | "is not evidence" → "is still evidence" | 19c19 | `An unconfirmed RED is not evidence.` |
+  | r4-drop-unmutated | " — and that the unmutated version passes." → " —." | 19c19 | `and that the unmutated version passes` |
+  | r4-drop-target | "must lie in … the test covers," → "may lie anywhere," | 22,23c22 | `must lie in the code, fixture or text the test covers` |
+  | r4-drop-applied | removed the applied-edit clause | 23,24c23 | full second-paragraph first sentence |
+  Suite command (finalize-review): `python3 scripts/run_package_tests.py --loom-family`.
+- 5: re-tested — four manifests `3.92.0`; `loom-code/README.md:15`, `README.ja.md:15`, `README.zh-TW.md:13`, root `README.md:17`, `:105` all 3.92.0. `grep -c "has already confirmed they landed, and its run on the unmutated code must still pass" loom-code/CHANGELOG.md` → 1 (in the 3.92.0 first bullet). `r4-stale` (`.claude-plugin/plugin.json` → 3.91.0, 3c3) → `AssertionError: assert '3.91.0' == '3.92.0'`, 1 failed.
