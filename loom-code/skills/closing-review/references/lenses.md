@@ -68,23 +68,17 @@ literally wrong the text is:
 
 | Dimension | What fires it |
 |---|---|
-| omission | An obligation or referent the text needs and lacks: a step the reader cannot execute, a term used but never defined, a promised section absent, a required diagram or comparison table missing (or declared not-applicable for a reason the text's own content contradicts) |
-| ambiguity | An absolute — "only", "never", "zero" — with no support; a sentence with two live readings that fork what the executor does |
-| inconsistency | Two passages contradicting, including changed against unchanged: the delta says X and an untouched paragraph still says not-X |
-| incorrect-fact | A citation that does not support its claim — open the source and read the cited span before scoring — or a stated number or path that is wrong against the artifact it describes |
-| missing-population | A measured number with no denominator or scope: "0% false positives" without saying over what |
-| deletion-first | See "Deletion-first for docs and skill" below — the same rule as the code lens's `deletion-first`, applied to station text and agent contracts |
+| omission | A missing obligation or referent, judged against `../../../references/docs-standard.md` §1 |
+| ambiguity | An unsupported absolute or a forking reading, judged against `../../../references/docs-standard.md` §2 |
+| inconsistency | Contradicting passages, judged against `../../../references/docs-standard.md` §3 |
+| incorrect-fact | A wrong citation, number or path, judged against `../../../references/docs-standard.md` §4 — open the source and read the cited span before scoring |
+| missing-population | A number with no population, judged against `../../../references/docs-standard.md` §5 |
+| deletion-first | New station text or contract machinery, judged against `../../../references/docs-standard.md` §7, severity by consequence as in the code lens's `deletion-first` |
 
 **Polarity against the base.** This sharpens `inconsistency` for changed
 against base, in the docs lens and so in the skill lens that scores these
-five dimensions. When the diff deletes or rewrites a sentence carrying a
-polarity word — never, must not, only, always, 不得 and their kin (no, do
-not, may not, forbid, 禁止, 絕不) — read the base version with
-`git show <base>:<path>` and compare each such sentence with its new form.
-A reversed direction (must ↔ may, never ↔ always, forbid ↔ allow), or a
-polarity clause dropped with nothing else in the delta or the unchanged
-tree carrying it, is an `inconsistency` finding, severity by consequence;
-a rewording that keeps the direction is not a finding.
+five dimensions: every changed sentence carrying a polarity word is judged
+against `../../../references/docs-standard.md` §6, severity by consequence.
 
 <!-- gate: charter.plan-omission-narrow -->
 **Plan omission, narrowed by the charter.** Omission on a `plan` is
@@ -99,17 +93,6 @@ A REQ missing task coverage is `cross-task-coherence` against the
 spec's REQ list, scored by the code lens.
 <!-- /gate -->
 
-**Deletion-first for docs and skill.** A new paragraph, mechanism, reserved
-task or fallback path in station text or a contract shows in the delta
-what it replaced, or names the already-observed failure it prevents by
-citing a concrete failure or a `docs/loom/memory` entry — otherwise it
-is a finding, and the finding names the smaller shape that does the same
-job, the same rule and severity-by-consequence as the code lens's
-`deletion-first` above. A `*_CAP` constant raised in the same file across
-two consecutive changes is a design smell: the `deletion-first` dimension
-always names at least one deletion candidate for that file, standing
-until it is rebutted with evidence.
-
 ## Conformance and question lenses
 
 | Dimension | What it asks |
@@ -123,7 +106,7 @@ until it is rebutted with evidence.
 
 A `SKILL.md` or an agent contract is prose that an agent executes, so it is
 scored on the five docs dimensions plus `user-judgment-leak` and
-`deletion-first` (see "Deletion-first for docs and skill" above), with two
+`deletion-first` (judged against `../../../references/docs-standard.md` §7), with two
 sharpenings: a step whose input the reader must guess is an omission; a rule
 subject to Loom's gate-registration contract that lacks its required
 `<!-- gate: <id> -->` comment or registration is an omission too — an

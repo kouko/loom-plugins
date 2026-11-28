@@ -162,3 +162,6 @@ Terse rules the reviewer reads work against:
    pass" is wrong if you did not run them. A claim resting on belief is
    downgraded, never asserted — say "will verify by: `<command>`" instead.
 8. **Prose-pin tests** follow [`tests-standard.md`](tests-standard.md) §5.
+9. **Docs and skill text.** Read [`docs-standard.md`](docs-standard.md)
+   before writing docs, a SKILL.md, a reference or rule text: the reviewer
+   judges that prose against it.
