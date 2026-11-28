@@ -200,7 +200,25 @@ Decisions so far (2026-11-28):
    deletion-first for docs and skill), which today only the judge reads. A
    `user-invocable: false` skill pointing at the same files can be added later
    if a consumer outside loom stations appears; nothing now depends on it.
-   The periodic-scan entry point is deferred.
+   The periodic-scan entry point is deferred. Two further `tdd` /
+   `codebase-design` rules absent from loom are added in the same change
+   (user-decided): implementation-coupled tests (mocking internals, testing
+   private methods, verifying through a side channel; tell: a
+   behaviour-preserving refactor breaks the test) and testability design
+   (accept dependencies rather than create them; return results rather than
+   produce side effects). Not adopted: confirming test seams with the user
+   (conflicts with loom's rule that the user never judges technical detail),
+   mandatory vocabulary terms (plain-language criteria instead), horizontal
+   slicing (loom's one-failing-test-per-task flow already prevents it).
+   Change: `docs/loom/intent/2026-11-28-shared-standard-files.md`.
+
+Noted for later discussion (user-decided 2026-11-28):
+
+- **Refactoring outside the TDD loop.** `tdd` says "refactoring is not part
+  of the loop" and leaves it to code review; loom's
+  `loom-code/references/engineering-baseline.md` §2 runs red → green →
+  refactor. Changing this alters loom's TDD flow, so it needs its own
+  discussion and intent; the shared-standard change keeps the current loop.
 
 Not yet discussed:
 
