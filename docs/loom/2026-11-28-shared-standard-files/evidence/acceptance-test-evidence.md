@@ -1,8 +1,9 @@
 # Writer and judge read one standard — acceptance test evidence
 
-Tried on 2026-11-28, in a clean copy of the project at 750da7564 (re-run
-after the fix range bf0ae36f6..750da7564; see "Re-run on 2026-11-28, at
-750da7564" at the end). Sections 1-10 below record the first run, made in a
+Tried on 2026-11-28, in a clean copy of the project at b4f877e83 (second
+re-run, after the fix range 1ec1bc12a..b4f877e83; see "Re-run on 2026-11-28,
+at b4f877e83" at the end; the first re-run at 750da7564 is kept above it).
+Sections 1-10 below record the first run, made in a
 clean copy at be8c2e454
 (`git worktree add --detach <scratch>/at-clean be8c2e454`; `git status --short`
 empty before and after every step). Base for comparison: 847fbb6cd.
@@ -226,6 +227,82 @@ Clean copy: `git worktree add --detach <scratch>/at-clean2 750da7564`;
   Version 3.91.0 in all four loom-code manifests, the three loom-code READMEs,
   root README (line 17 table row, line 105 section), CHANGELOG
   `## [3.91.0] — 2026-11-28`.
+  Full suite: not run here; run by finalize-review, which refuses the
+  attestation when it fails. Command:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+## Re-run on 2026-11-28, at b4f877e83
+
+Clean copy: `git worktree add --detach <scratch>/at-clean3 b4f877e83`;
+`git rev-parse --short HEAD` → `b4f877e83`; `git status --short` empty before
+and after; worktree removed afterwards. Fix range read in full:
+`git diff 1ec1bc12a..b4f877e83` — two files, one hunk each:
+`loom-code/references/tests-standard.md` §6 ("Unnecessary helpers, harnesses
+and tests of tests are findings." → "Unnecessary helpers and harnesses are
+findings. A test of a test is a finding, except the synthetic self-tests §5
+requires.") and the matching pins in
+`loom-code/tests/test_tests_standard_text.py` (`MOVED_RULES`,
+`RULE_SENTENCES`). Re-tested every row whose surface includes tests-standard
+§6 or its pointers (1, 2, 9, 10); others carried over against this diff.
+
+- Setup: re-tested — `claude plugin validate ./loom-code` from the clean copy:
+  `✔ Validation passed`, exit 0; only advisory `ICON_MISSING`.
+- 1: re-tested — `ls loom-code/references/`: `tests-standard.md`,
+  `code-design-standard.md`, `docs-standard.md` present (plus the unrelated
+  pre-existing references). Read `tests-standard.md` in full: §1–§6, all
+  test-only; §6 now ends "Unnecessary helpers and harnesses are findings. A
+  test of a test is a finding, except the synthetic self-tests §5 requires.
+  The fix for any finding adds at most one test, extending an existing test
+  first." Evidence: `loom-code/references/tests-standard.md:49-58`.
+  code-design and docs standards: no hunk in fix range.
+- 2: re-tested — grep of `loom-code` for the 22 phrases of the first re-run
+  plus "tests of tests", "test of a test", "harnesses", "synthetic
+  self-test". Rule text in `.md` files hits only the three standards; the
+  remaining `.md` hits are pointers (`lenses.md:58` "every rule in
+  `../../../references/tests-standard.md` — … new tests against existing
+  cases — is judged here"; `lenses.md:65` "judged against
+  `code-design-standard.md`") or unrelated research/example docs
+  ("Rule of Three" in `loom-code/research/grounding-v0.1.0.md` and
+  `loom-code/docs/examples/typescript-react-toast.md`, "denominator"/"harness"
+  in research notes, both outside the baseline and lenses).
+  `loom-code/agents/implementer.md:55-56`: "a finding's fix and tests of tests
+  follow `../references/tests-standard.md` §6." — pointer only.
+  `git diff 750da7564 HEAD` on `loom-code/` touches only tests-standard.md and
+  its pin test, so lenses and baseline are as verified in the first re-run.
+- 3: carried over — no hunk in code-design-standard.md, baseline or lenses.
+- 4: carried over — the only tests-standard hunk is in §6; §2 unchanged.
+- 5: carried over — no hunk in code-design-standard.md or lenses.
+- 6: carried over — the only tests-standard hunk is in §6; §3 unchanged.
+- 7: carried over — no hunk in code-design-standard.md.
+- 8: carried over — no hunk in `loom-code/skills/write-plan/`; linked file
+  keeps its name and path.
+- 9: re-tested — open question from the previous run checked against base:
+  `git show 847fbb6cd:loom-code/agents/implementer.md` line 56: "no new test
+  harness; no tests of tests" (absolute ban). Base lens `tests` row
+  (`git show 847fbb6cd:…/lenses.md` line 58): "unnecessary helpers, harnesses
+  and tests of tests are findings". Base baseline line 164 (prose-pin rule):
+  "carries synthetic self-tests validating one affirmative example and one
+  rejected negated example" — required at base.
+
+  | Base | Now (tests §6) | Direction |
+  |---|---|---|
+  | implementer "no tests of tests" (absolute) | "A test of a test is a finding, except the synthetic self-tests §5 requires." | same — the only exception is a test the prose-pin rule already required at base; the conflict between the two base rules is now resolved in writing |
+  | lens "unnecessary helpers, harnesses and tests of tests are findings" | "Unnecessary helpers and harnesses are findings." + the sentence above | same for helpers/harnesses; tests of tests: no wider than either base reading (absolute minus the base-required self-tests) |
+
+  Red → green → refactor: `git diff 750da7564 b4f877e83 -- loom-code/references/engineering-baseline.md`
+  empty, unchanged since the first run. The previous run's nit/open question
+  on `implementer.md:55-56` is closed.
+- 10: re-tested — ran only the tests covering this change and the fix (not the
+  full suite):
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_tests_standard_text.py loom-code/tests/test_code_design_standard_text.py loom-code/tests/test_docs_standard_text.py loom-code/tests/test_prose_pin_rule_text.py loom-code/tests/test_check_contract_citations.py loom-code/tests/test_write_plan_entry_definition.py loom-code/tests/test_write_plan_entry_definition_split.py loom-code/tests/test_write_plan_station_text.py`
+  → `104 passed in 0.40s` (includes the new `RULE_SENTENCES` pin and
+  `test_current_release_metadata_is_synchronized`).
+  `python3 loom-code/scripts/check_contract_citations.py` → `OK: 1
+  known-violating files unchanged, no new contract citations of this repo's
+  records.` exit 0. `python3 scripts/sync_codex_manifests.py --check --all`
+  exit 0. `"version": "3.91.0"` in all four loom-code manifests; "3.91.0" in
+  the three loom-code READMEs and root README (2 hits); CHANGELOG line 3
+  `## [3.91.0] — 2026-11-28 — Shared standard files read by writer and judge`.
   Full suite: not run here; run by finalize-review, which refuses the
   attestation when it fails. Command:
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
